@@ -1,0 +1,256 @@
+from __future__ import annotations
+
+import re
+from enum import StrEnum
+from typing import Any, Literal
+
+from pydantic import BaseModel, Field, field_validator
+
+
+class Side(StrEnum):
+    AXIS = "axis"
+    ALLIES = "allies"
+
+    @property
+    def opponent(self) -> "Side":
+        return Side.ALLIES if self == Side.AXIS else Side.AXIS
+
+
+class Phase(StrEnum):
+    REINFORCEMENT = "reinforcement"
+    MOVEMENT_PLANNING = "movement_planning"
+    TORPEDO_PLANNING = "torpedo_planning"
+    MOVEMENT_RESOLUTION = "movement_resolution"
+    GUNNERY = "gunnery"
+    TORPEDO_EFFECTS = "torpedo_effects"
+    FIRE_END = "fire_end"
+    COMPLETE = "complete"
+
+
+def column_to_index(label: str) -> int:
+    normalized = label.upper()
+    if len(normalized) == 1 and "A" <= normalized <= "Z":
+        return ord(normalized) - 65
+    if len(normalized) == 2 and normalized[0] == normalized[1] and "A" <= normalized[0] <= "H":
+        return 26 + ord(normalized[0]) - 65
+    raise ValueError(f"Invalid map column {label!r}; expected A-Z or AA-HH")
+
+
+def index_to_column(index: int) -> str:
+    if 0 <= index <= 25:
+        return chr(65 + index)
+    if 26 <= index <= 33:
+        character = chr(65 + index - 26)
+        return character * 2
+    raise ValueError("Map column index must be 0 through 33")
+
+
+class HexCoord(BaseModel, frozen=True):
+    q: int = Field(ge=0, le=33)
+    r: int = Field(ge=-40, le=40)
+
+    @classmethod
+    def from_label(cls, label: str) -> "HexCoord":
+        match = re.fullmatch(r"([A-Za-z]{1,2})(\d{1,2})", label.strip())
+        if not match:
+            raise ValueError(f"Invalid hex label {label!r}")
+        column = column_to_index(match.group(1))
+        display_row = int(match.group(2)) - 1
+        axial_row = display_row - (column - (column & 1)) // 2
+        return cls(q=column, r=axial_row)
+
+    @property
+    def label(self) -> str:
+        display_row = self.r + (self.q - (self.q & 1)) // 2
+        return f"{index_to_column(self.q)}{display_row + 1}"
+
+    def neighbor(self, heading: int) -> "HexCoord":
+        directions = {1: (0, -1), 2: (1, -1), 3: (1, 0), 4: (0, 1), 5: (-1, 1), 6: (-1, 0)}
+        if heading not in directions:
+            raise ValueError("Heading must be 1 through 6")
+        dq, dr = directions[heading]
+        candidate = HexCoord(q=self.q + dq, r=self.r + dr)
+        display_row = candidate.r + (candidate.q - (candidate.q & 1)) // 2
+        if not 0 <= display_row <= 26:
+            raise ValueError("Movement leaves the map")
+        return candidate
+
+    def distance(self, other: "HexCoord") -> int:
+        return (abs(self.q - other.q) + abs(self.r - other.r) + abs((-self.q - self.r) - (-other.q - other.r))) // 2
+
+
+class OptionalRules(BaseModel):
+    hidden_contacts: bool = False
+    radar: bool = False
+    star_shells: bool = False
+    searchlights: bool = False
+    malfunction_66: bool = False
+    squalls: bool = False
+    smoke: bool = False
+    silhouettes: bool = False
+    hidden_damage: bool = False
+    blind_torpedoes: bool = False
+
+
+class GameOptions(BaseModel):
+    mode: Literal["hotseat", "llm"] = "hotseat"
+    optional_rules: OptionalRules = Field(default_factory=OptionalRules)
+
+
+class WeaponMount(BaseModel):
+    kind: Literal["primary", "secondary", "torpedo"]
+    firepower: int = Field(default=0, ge=0)
+    caliber: float = Field(default=0, ge=0)
+    ammo: int | None = Field(default=None, ge=0)
+    destroyed: bool = False
+
+
+class ShipState(BaseModel):
+    id: str
+    name: str
+    side: Side
+    ship_type: str
+    position: HexCoord | None
+    heading: int = Field(ge=1, le=6)
+    speed_track: tuple[int, int, int]
+    current_speed: int = Field(ge=0)
+    previous_speed: int = Field(ge=0)
+    hull: int = Field(ge=0)
+    max_hull: int = Field(gt=0)
+    primary: WeaponMount
+    secondary: WeaponMount | None = None
+    torpedo: WeaponMount | None = None
+    torpedo_type: str | None = None
+    belt_armor: float = 0
+    vp: int = 0
+    asset: str | None = None
+    fire_markers: int = Field(default=0, ge=0)
+    mfc_destroyed: bool = False
+    radar_destroyed: bool = False
+    fired: bool = False
+    smoke: bool = False
+    sunk: bool = False
+    reinforcement_turn: int | None = None
+
+    def max_speed_for_turn(self, turn: int) -> int:
+        return self.speed_track[(turn - 1) % 3]
+
+
+class MovementOrder(BaseModel):
+    ship_id: str
+    plan: str = "0"
+
+
+class GunneryOrder(BaseModel):
+    ship_id: str
+    primary_target: str | None = None
+    secondary_target: str | None = None
+    searchlight_target: str | None = None
+
+
+class TorpedoOrder(BaseModel):
+    ship_id: str
+    target_id: str | None = None
+    count: int = Field(default=1, ge=0, le=9)
+    speed: Literal["fast", "medium", "slow"] = "fast"
+
+
+class OrderBatch(BaseModel):
+    side: Side
+    movement: list[MovementOrder] = Field(default_factory=list)
+    gunnery: list[GunneryOrder] = Field(default_factory=list)
+    torpedoes: list[TorpedoOrder] = Field(default_factory=list)
+    smoke_ships: list[str] = Field(default_factory=list)
+
+    @field_validator("smoke_ships")
+    @classmethod
+    def unique_smoke_ships(cls, value: list[str]) -> list[str]:
+        if len(value) != len(set(value)):
+            raise ValueError("Duplicate smoke ship")
+        return value
+
+
+class RuleReference(BaseModel):
+    rule_id: str
+    document: str
+    pdf_page: int | None = None
+    section: str | None = None
+
+
+class DiceRoll(BaseModel):
+    dice: list[int]
+    notation: str
+    raw: int
+    adjusted: int | None = None
+
+
+class GameEvent(BaseModel):
+    sequence: int
+    turn: int
+    phase: Phase
+    type: str
+    message: str
+    payload: dict[str, Any] = Field(default_factory=dict)
+    rule: RuleReference | None = None
+    dice: DiceRoll | None = None
+
+
+class GameState(BaseModel):
+    game_id: str
+    scenario_id: str
+    scenario_title: str
+    turn: int = 1
+    max_turns: int
+    phase: Phase = Phase.REINFORCEMENT
+    seed: int
+    rng_counter: int = 0
+    options: GameOptions
+    visibility: dict[str, int]
+    ships: dict[str, ShipState]
+    submitted_orders: dict[str, OrderBatch] = Field(default_factory=dict)
+    events: list[GameEvent] = Field(default_factory=list)
+    score: dict[str, int] = Field(default_factory=lambda: {Side.AXIS.value: 0, Side.ALLIES.value: 0})
+    winner: Side | None = None
+    victory_reason: str | None = None
+
+
+class PublicShip(BaseModel):
+    id: str
+    name: str
+    side: Side
+    ship_type: str
+    position: HexCoord | None
+    heading: int
+    current_speed: int
+    hull: int | None
+    max_hull: int | None
+    fire_markers: int
+    fired: bool
+    sunk: bool
+    asset: str | None
+
+
+class PlayerObservation(BaseModel):
+    game_id: str
+    scenario_id: str
+    scenario_title: str
+    side: Side
+    turn: int
+    max_turns: int
+    phase: Phase
+    ships: list[PublicShip]
+    score: dict[str, int]
+    recent_events: list[GameEvent]
+    winner: Side | None
+    victory_reason: str | None
+
+
+class LegalAction(BaseModel):
+    kind: str
+    ship_id: str | None = None
+    schema_hint: dict[str, Any] = Field(default_factory=dict)
+
+
+class ValidationResult(BaseModel):
+    valid: bool
+    errors: list[str] = Field(default_factory=list)
