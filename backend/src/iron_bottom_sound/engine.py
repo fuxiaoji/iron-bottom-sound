@@ -28,7 +28,9 @@ from .models import (
     RuleReference,
     ShipState,
     Side,
+    TorpedoTrack,
     ValidationResult,
+    WreckState,
 )
 
 
@@ -382,10 +384,50 @@ class IronBottomEngine:
             ship = owned.get(order.ship_id)
             if not ship or not ship.torpedo or ship.torpedo.destroyed:
                 errors.append(f"{order.ship_id} cannot fire torpedoes")
-            elif order.count > (ship.torpedo.ammo or 0):
+                continue
+            if state.scenario_id == "IBS-S-01" and state.turn < 4 and batch.side == Side.AXIS:
+                errors.append("Japanese ships may not launch torpedoes before scenario 1 turn 4")
+            if ship.ship_type in {"BB", "BC"} and ship.current_speed >= 4:
+                errors.append(f"{order.ship_id}: BB/BC moving at 4 MF or more may not launch torpedoes")
+            launcher = next((item for item in ship.torpedo_launchers if item.id == order.launcher_id), None)
+            if not launcher or launcher.destroyed or launcher.reload_turns_remaining:
+                errors.append(f"{order.ship_id}: unavailable torpedo launcher {order.launcher_id}")
+                continue
+            if order.count > launcher.loaded:
                 errors.append(f"{order.ship_id} lacks torpedo ammunition")
-            if order.target_id and (order.target_id not in state.ships or state.ships[order.target_id].side == batch.side):
-                errors.append(f"Illegal torpedo target {order.target_id}")
+            if not order.launch_side or not order.launch_angle:
+                errors.append(f"{order.ship_id}: launch_side and launch_angle are required")
+            elif order.launch_angle in {"A", "B"} and order.launch_side != "port":
+                errors.append(f"{order.ship_id}: angles A/B are port launches")
+            elif order.launch_angle in {"X", "Y"} and order.launch_side != "starboard":
+                errors.append(f"{order.ship_id}: angles X/Y are starboard launches")
+            elif FiringArc(order.launch_side) not in launcher.arcs:
+                errors.append(f"{order.ship_id}:{launcher.id} cannot launch to {order.launch_side}")
+            definition = self.rules.torpedoes.get(ship.torpedo_type or "")
+            if not definition or order.setting_index >= len(definition["settings"]):
+                errors.append(f"{order.ship_id}: invalid torpedo speed setting {order.setting_index}")
+            movement = next(
+                (
+                    item
+                    for batch_item in self._sealed_batches(state, Phase.MOVEMENT_PLANNING)
+                    for item in batch_item.movement
+                    if item.ship_id == ship.id
+                ),
+                None,
+            )
+            if not movement:
+                errors.append(f"{order.ship_id}: missing sealed movement plan")
+                continue
+            commands = self.movement_commands(movement)
+            trajectory, _ = self.movement_trajectory(ship, movement.plan, commands)
+            if order.launch_at_mf > len(trajectory):
+                errors.append(f"{order.ship_id}: launch MF exceeds movement plan")
+            elif not order.launch_hex or order.launch_hex != trajectory[order.launch_at_mf - 1][0]:
+                errors.append(f"{order.ship_id}: launch_hex does not match its MF position")
+        if state.phase == Phase.TORPEDO_PLANNING:
+            launcher_keys = [(order.ship_id, order.launcher_id) for order in batch.torpedoes]
+            if len(launcher_keys) != len(set(launcher_keys)):
+                errors.append("A torpedo launcher may receive only one launch order per turn")
         return ValidationResult(valid=not errors, errors=errors)
 
     def submit_orders(self, game_id: str, batch: OrderBatch) -> ValidationResult:
@@ -457,6 +499,21 @@ class IronBottomEngine:
                     ship.smoke = False
                     for mount in ship.gun_mounts:
                         mount.fired_this_phase = False
+                    for launcher in ship.torpedo_launchers:
+                        if launcher.reload_turns_remaining:
+                            launcher.reload_turns_remaining -= 1
+                            if launcher.reload_turns_remaining == 0 and launcher.reloads_remaining:
+                                launcher.loaded = launcher.torpedoes
+                                launcher.reloads_remaining -= 1
+                                if ship.torpedo:
+                                    ship.torpedo.ammo = sum(item.loaded for item in ship.torpedo_launchers)
+                                self._event(
+                                    state,
+                                    "torpedo_launcher_reloaded",
+                                    f"{ship.name} {launcher.id} 再装填完成",
+                                    payload={"ship_id": ship.id, "launcher_id": launcher.id},
+                                    rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
+                                )
         self._event(state, "phase_changed", f"阶段：{state.phase.value}", rule=self._rule("IBS-R-05", 6, "5.0"))
         return state.events[before:]
 
@@ -613,6 +670,11 @@ class IronBottomEngine:
             for batch in self._sealed_batches(state, Phase.MOVEMENT_PLANNING)
             for order in batch.movement
         }
+        torpedo_orders = [
+            order
+            for batch in self._sealed_batches(state, Phase.TORPEDO_PLANNING)
+            for order in batch.torpedoes
+        ]
         paths: dict[str, list[tuple[HexCoord, int]]] = {}
         final_headings: dict[str, int] = {}
         for ship in state.ships.values():
@@ -624,8 +686,23 @@ class IronBottomEngine:
             paths[ship.id] = trajectory
             final_headings[ship.id] = heading
             ship.current_speed = self.movement_cost(order.plan, commands)
-        maximum_impulses = max((len(path) for path in paths.values()), default=0)
+        track_allowance = {
+            track.id: track.speed_cycle[(state.turn - track.launched_turn) % 3]
+            for track in state.torpedo_tracks
+            if not track.contact_ship_ids
+        }
+        planned_torpedo_allowance = [
+            self.rules.torpedoes[state.ships[order.ship_id].torpedo_type or ""]["settings"][order.setting_index]["speed"][0]
+            for order in torpedo_orders
+        ]
+        maximum_impulses = max(
+            [len(path) for path in paths.values()]
+            + list(track_allowance.values())
+            + planned_torpedo_allowance
+            + [0]
+        )
         stopped: set[str] = set()
+        moved_tracks: dict[str, int] = {track.id: 0 for track in state.torpedo_tracks}
         for impulse in range(maximum_impulses):
             destinations: dict[str, HexCoord] = {}
             for ship_id, path in paths.items():
@@ -648,21 +725,112 @@ class IronBottomEngine:
                         collision_sets.add(frozenset((left_id, right_id)))
             for collision_set in collision_sets:
                 ids = sorted(collision_set)
-                for ship_id in ids:
+                for left_index, left_id in enumerate(ids):
+                    for right_id in ids[left_index + 1:]:
+                        if left_id in stopped or right_id in stopped:
+                            continue
+                        if self._resolve_ship_collision(state, state.ships[left_id], state.ships[right_id]):
+                            stopped.update((left_id, right_id))
+            wreck_positions = {wreck.position: wreck for wreck in state.wrecks}
+            for ship_id, destination in destinations.items():
+                if ship_id in stopped or destination not in wreck_positions:
+                    continue
+                if self._resolve_wreck_collision(state, state.ships[ship_id], wreck_positions[destination]):
                     stopped.add(ship_id)
-                    self._damage_hull(state, state.ships[ship_id], 1, "collision")
-                self._event(
-                    state,
-                    "collision",
-                    "发生碰撞：" + "、".join(state.ships[item].name for item in ids),
-                    payload={"ships": ids},
-                    rule=self._rule("IBS-R-06.4", 8, "6.4"),
-                )
             for ship_id, position in destinations.items():
                 if ship_id not in stopped:
                     state.ships[ship_id].position = position
                     if impulse < len(paths[ship_id]):
                         state.ships[ship_id].heading = paths[ship_id][impulse][1]
+            launched_this_impulse: set[str] = set()
+            for order in torpedo_orders:
+                if order.launch_at_mf != impulse + 1 or not order.launch_hex or not order.launcher_id:
+                    continue
+                ship = state.ships[order.ship_id]
+                if ship.sunk or ship.position != order.launch_hex or impulse >= len(paths.get(ship.id, [])):
+                    self._event(
+                        state,
+                        "torpedo_launch_cancelled",
+                        f"{ship.name} 未到达计划发射格，鱼雷发射取消",
+                        payload={"ship_id": ship.id, "planned_hex": order.launch_hex.label},
+                        rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
+                    )
+                    continue
+                launcher = next(item for item in ship.torpedo_launchers if item.id == order.launcher_id)
+                definition = self.rules.torpedoes[ship.torpedo_type or ""]
+                setting = definition["settings"][order.setting_index]
+                launch_heading = paths[ship.id][impulse][1]
+                heading = self._torpedo_launch_heading(launch_heading, order.launch_angle or "A")
+                track = TorpedoTrack(
+                    id=f"TT-{state.turn}-{ship.id}-{launcher.id}-{len(state.torpedo_tracks)+1}",
+                    side=ship.side,
+                    launcher_ship_id=ship.id,
+                    torpedo_type=ship.torpedo_type or "",
+                    position=order.launch_hex,
+                    heading=heading,
+                    speed_cycle=tuple(setting["speed"]),
+                    range_remaining=int(setting["range"]),
+                    launched_turn=state.turn,
+                    salvo_size=order.count,
+                    hidden=state.options.optional_rules.blind_torpedoes,
+                )
+                state.torpedo_tracks.append(track)
+                track_allowance[track.id] = track.speed_cycle[0]
+                moved_tracks[track.id] = 0
+                launched_this_impulse.add(track.id)
+                launcher.loaded -= order.count
+                if launcher.loaded == 0 and launcher.reloads_remaining:
+                    reload_duration = 3 if ship.ship_type in {"DD", "APD"} else 2
+                    launcher.reload_turns_remaining = reload_duration + 1
+                if ship.torpedo:
+                    ship.torpedo.ammo = sum(item.loaded for item in ship.torpedo_launchers)
+                self._event(
+                    state,
+                    "torpedo_launched",
+                    f"{ship.name} {launcher.id} 在 {order.launch_hex.label} 发射鱼雷",
+                    payload={
+                        "track_id": track.id,
+                        "ship_id": ship.id,
+                        "launcher_id": launcher.id,
+                        "launch_mf": order.launch_at_mf,
+                        "heading": heading,
+                        "setting": order.setting_index,
+                    },
+                    rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
+                )
+            for track in list(state.torpedo_tracks):
+                if (
+                    track.id in launched_this_impulse
+                    or track.contact_ship_ids
+                    or track.range_remaining == 0
+                    or moved_tracks.get(track.id, 0) >= track_allowance.get(track.id, 0)
+                ):
+                    continue
+                try:
+                    track.position = track.position.neighbor(track.heading)
+                except ValueError:
+                    track.range_remaining = 0
+                    continue
+                track.range_remaining -= 1
+                track.distance_travelled += 1
+                moved_tracks[track.id] = moved_tracks.get(track.id, 0) + 1
+                contacts = [
+                    ship.id
+                    for ship in state.ships.values()
+                    if ship.side != track.side and not ship.sunk and ship.position == track.position
+                ]
+                if contacts:
+                    track.contact_ship_ids = contacts
+                    self._event(
+                        state,
+                        "torpedo_contact",
+                        f"鱼雷 {track.id} 进入目标格 {track.position.label}",
+                        payload={"track_id": track.id, "candidate_targets": contacts},
+                        rule=self._rule("IBS-R-08.2.3", 12, "8.2 鱼雷攻击过程"),
+                    )
+            state.torpedo_tracks = [
+                track for track in state.torpedo_tracks if track.range_remaining > 0 or track.contact_ship_ids
+            ]
         for ship_id, heading in final_headings.items():
             ship = state.ships[ship_id]
             ship.heading = heading
@@ -747,44 +915,44 @@ class IronBottomEngine:
                 )
 
     def _resolve_torpedoes(self, state: GameState) -> None:
-        orders = [order for batch in self._sealed_batches(state, Phase.TORPEDO_PLANNING) for order in batch.torpedoes]
-        displacement = {"DD": "A", "APD": "A", "AV": "B", "CL": "B", "CA": "C", "BC": "F", "BB": "F"}
-        for order in orders:
-            attacker = state.ships[order.ship_id]
-            if not order.target_id or attacker.sunk or not attacker.position or not attacker.torpedo:
-                continue
-            target = state.ships[order.target_id]
-            if target.sunk or not target.position:
-                continue
-            distance = attacker.position.distance(target.position)
-            if distance == 0:
-                continue
-            definition = self.rules.torpedoes.get(attacker.torpedo_type or "", {})
-            max_range = max(setting["range"] for setting in definition["settings"])
-            if distance > max_range:
-                continue
-            roll, dice = self._roll_2d6(state)
-            adjusted = roll + self._torpedo_modifier(attacker, target, distance)
-            aspect = self._target_aspect(attacker, target)
+        resolved_track_ids: set[str] = set()
+        for track in [item for item in state.torpedo_tracks if item.contact_ship_ids]:
+            attacker = state.ships[track.launcher_ship_id]
+            definition = self.rules.torpedoes[track.torpedo_type]
+            distance = max(1, track.distance_travelled)
+            candidates: list[tuple[int, ShipState, int, list[int], str]] = []
+            for target_id in track.contact_ship_ids:
+                target = state.ships[target_id]
+                roll, dice = self._roll_2d6(state)
+                adjusted = roll + self._torpedo_modifier(attacker, target, distance)
+                aspect = self._torpedo_track_aspect(track, target)
+                candidates.append((adjusted, target, roll, dice, aspect))
+            adjusted, target, roll, dice, aspect = max(candidates, key=lambda item: item[0])
             hits = 0
             if aspect == "broadside":
                 hits = 2 if adjusted >= 13 else (1 if adjusted >= 11 else 0)
             elif adjusted >= 13:
                 hits = 1
-            hits = min(hits, order.count, attacker.torpedo.ammo or 0)
-            attacker.torpedo.ammo = (attacker.torpedo.ammo or 0) - order.count
+            hits = min(hits, track.salvo_size)
             self._event(
                 state,
                 "torpedo_attack",
                 f"{attacker.name} 对 {target.name} 发射鱼雷：{hits} 命中",
-                payload={"attacker": attacker.id, "target": target.id, "distance": distance, "hits": hits},
+                payload={
+                    "track_id": track.id,
+                    "attacker": attacker.id,
+                    "target": target.id,
+                    "distance": distance,
+                    "aspect": aspect,
+                    "hits": hits,
+                },
                 rule=self._rule("IBS-R-08.2", 12, "8.2"),
                 dice=DiceRoll(dice=dice, notation="2D6", raw=roll, adjusted=adjusted),
             )
             for _ in range(hits):
                 damage_roll, damage_dice = self._roll_2d6(state)
                 damage_roll += int(definition.get("damage_modifier", 0))
-                effect = self.rules.torpedo_effect(damage_roll, displacement.get(target.ship_type, "C"))
+                effect = self.rules.torpedo_effect(damage_roll, target.displacement_band)
                 hull, speed, sunk, fire = parse_effect(effect)
                 self._damage_hull(state, target, target.hull if sunk else hull, "torpedo")
                 self._lose_speed(target, speed)
@@ -798,6 +966,19 @@ class IronBottomEngine:
                     rule=self._rule("IBS-T-THDT", 3, "鱼雷与碰撞结果表"),
                     dice=DiceRoll(dice=damage_dice, notation="2D6", raw=damage_roll),
                 )
+            resolved_track_ids.add(track.id)
+        state.torpedo_tracks = [track for track in state.torpedo_tracks if track.id not in resolved_track_ids]
+
+    @staticmethod
+    def _torpedo_launch_heading(ship_heading: int, angle: str) -> int:
+        relative = {"A": -2, "B": -1, "X": 1, "Y": 2}[angle]
+        return ((ship_heading - 1 + relative) % 6) + 1
+
+    @staticmethod
+    def _torpedo_track_aspect(track: TorpedoTrack, target: ShipState) -> str:
+        source_bearing = ((track.heading + 2) % 6) + 1
+        relative = (source_bearing - target.heading) % 6
+        return "bow_stern" if relative in {0, 3} else "broadside"
 
     def _resolve_fire(self, state: GameState) -> None:
         for ship in state.ships.values():
@@ -1038,19 +1219,98 @@ class IronBottomEngine:
         state.score[ship.side.opponent.value] += min(amount, ship.max_hull)
         if ship.hull == 0:
             ship.sunk = True
+            if ship.position and not any(wreck.source_ship_id == ship.id for wreck in state.wrecks):
+                state.wrecks.append(
+                    WreckState(id=f"WRECK-{ship.id}", position=ship.position, source_ship_id=ship.id)
+                )
             state.score[ship.side.opponent.value] += ship.vp
             self._event(state, "ship_sunk", f"{ship.name} 沉没", payload={"ship_id": ship.id, "cause": cause})
+
+    def _resolve_ship_collision(self, state: GameState, left: ShipState, right: ShipState) -> bool:
+        check, die = self._roll_d6(state)
+        self._event(
+            state,
+            "collision_check",
+            f"{left.name}与{right.name}碰撞检定 {check}",
+            payload={"ships": [left.id, right.id], "collided": check >= 5},
+            rule=self._rule("IBS-R-06.4", 8, "6.4 碰撞"),
+            dice=DiceRoll(dice=[die], notation="1D6", raw=check),
+        )
+        if check < 5:
+            return False
+        for ship, other in ((left, right), (right, left)):
+            modifier = self._collision_modifier(ship, other.ship_type)
+            if left.current_speed <= 2 and right.current_speed <= 2:
+                modifier += int(self.rules.modifiers["collision_modifier"]["both_moved_2mf_or_less"])
+            self._apply_collision_damage(state, ship, modifier, other.id)
+        return True
+
+    def _resolve_wreck_collision(self, state: GameState, ship: ShipState, wreck: WreckState) -> bool:
+        check, die = self._roll_d6(state)
+        self._event(
+            state,
+            "collision_check",
+            f"{ship.name}与船骸碰撞检定 {check}",
+            payload={"ship_id": ship.id, "wreck_id": wreck.id, "collided": check >= 5},
+            rule=self._rule("IBS-R-06.4", 8, "6.4 碰撞"),
+            dice=DiceRoll(dice=[die], notation="1D6", raw=check),
+        )
+        if check < 5:
+            return False
+        self._apply_collision_damage(state, ship, self._collision_modifier(ship, "wreck"), wreck.id)
+        return True
+
+    def _collision_modifier(self, ship: ShipState, other_type: str) -> int:
+        own = "BB_BC" if ship.ship_type in {"BB", "BC"} else (
+            "CA_CL_AV" if ship.ship_type in {"CA", "CL", "AV"} else "DD_APD"
+        )
+        other = "wreck" if other_type == "wreck" else (
+            "BB_BC" if other_type in {"BB", "BC"} else (
+                "CA_CL_AV" if other_type in {"CA", "CL", "AV"} else "DD_APD"
+            )
+        )
+        table = self.rules.modifiers["collision_modifier"]
+        return int(table["rows"][own][table["columns"].index(other)])
+
+    def _apply_collision_damage(self, state: GameState, ship: ShipState, modifier: int, obstacle_id: str) -> None:
+        raw, dice = self._roll_2d6(state)
+        adjusted = raw + modifier
+        effect = self.rules.torpedo_effect(adjusted, ship.displacement_band)
+        hull, speed, sunk, fire = parse_effect(effect)
+        self._damage_hull(state, ship, ship.hull if sunk else hull, "collision")
+        self._lose_speed(ship, speed)
+        if fire:
+            ship.fire_markers += 1
+        self._event(
+            state,
+            "collision_result",
+            f"{ship.name}碰撞结果：{effect}",
+            payload={"ship_id": ship.id, "obstacle_id": obstacle_id, "modifier": modifier, "effect": effect},
+            rule=self._rule("IBS-T-THDT", 3, "鱼雷与碰撞结果表"),
+            dice=DiceRoll(dice=dice, notation="2D6", raw=raw, adjusted=adjusted),
+        )
 
     @staticmethod
     def _lose_speed(ship: ShipState, amount: int) -> None:
         if amount <= 0:
             return
-        values = list(ship.speed_track)
+        crossed = list(ship.speed_damage_crossed)
         for _ in range(amount):
+            values = [
+                row[crossed[index]] if crossed[index] < len(row) else 0
+                for index, row in enumerate(ship.speed_damage_track)
+            ]
             maximum = max(values)
+            if maximum == 0:
+                break
             index = max(index for index, value in enumerate(values) if value == maximum)
-            values[index] = max(0, values[index] - 1)
-        ship.speed_track = tuple(values)  # type: ignore[assignment]
+            crossed[index] += 1
+        ship.speed_damage_crossed = tuple(crossed)  # type: ignore[assignment]
+        values = tuple(
+            row[crossed[index]] if crossed[index] < len(row) else 0
+            for index, row in enumerate(ship.speed_damage_track)
+        )
+        ship.speed_track = values
         ship.current_speed = min(ship.current_speed, max(values))
 
     def _visible_to(self, state: GameState, target: ShipState, side: Side, own_positions: Iterable[HexCoord | None]) -> bool:

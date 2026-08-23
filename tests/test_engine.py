@@ -10,6 +10,7 @@ from iron_bottom_sound.models import (
     OrderBatch,
     Phase,
     Side,
+    TorpedoOrder,
 )
 
 
@@ -253,3 +254,132 @@ def test_scenario_one_allied_mount_firepower_is_halved_rounding_up() -> None:
     engine.advance(state.game_id)
     event = next(event for event in state.events if event.type == "gun_mount_attack")
     assert event.payload["firepower"] == (mount.firepower + 1) // 2
+
+
+def test_torpedo_launches_at_planned_mf_moves_by_impulse_and_contacts_ship() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=9)
+    attacker = state.ships["IBS-U-KM-KARL-GALSTER"]
+    target = state.ships["IBS-U-RN-JAVELIN"]
+    target.position = HexCoord.from_label("N15")
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        ).valid
+    engine.advance(state.game_id)
+    for side in Side:
+        own = [ship for ship in state.ships.values() if ship.side == side and ship.position]
+        movement = [
+            MovementOrder(ship_id=ship.id, plan="3" if ship.id == attacker.id else "0")
+            for ship in own
+        ]
+        assert engine.submit_orders(
+            state.game_id,
+            OrderBatch(side=side, phase=Phase.MOVEMENT_PLANNING, movement=movement),
+        ).valid
+    engine.advance(state.game_id)
+    launch_hex = HexCoord.from_label("O15")
+    axis_torpedo = TorpedoOrder(
+        ship_id=attacker.id,
+        launcher_id="TT1",
+        count=1,
+        launch_at_mf=1,
+        launch_hex=launch_hex,
+        launch_side="starboard",
+        launch_angle="X",
+        setting_index=0,
+    )
+    assert engine.submit_orders(
+        state.game_id,
+        OrderBatch(side=Side.AXIS, phase=Phase.TORPEDO_PLANNING, torpedoes=[axis_torpedo]),
+    ).valid
+    assert engine.submit_orders(
+        state.game_id, OrderBatch(side=Side.ALLIES, phase=Phase.TORPEDO_PLANNING)
+    ).valid
+    engine.advance(state.game_id)
+    engine.advance(state.game_id)
+    assert len(state.torpedo_tracks) == 1
+    track = state.torpedo_tracks[0]
+    assert track.position == target.position
+    assert track.contact_ship_ids == [target.id]
+    assert track.distance_travelled == 1
+    assert next(item for item in attacker.torpedo_launchers if item.id == "TT1").loaded == 0
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.GUNNERY)
+        ).valid
+    engine.advance(state.game_id)
+    engine.advance(state.game_id)
+    assert not state.torpedo_tracks
+    assert any(event.type == "torpedo_attack" for event in state.events)
+
+
+def test_torpedo_plan_rejects_wrong_launch_hex_and_side_angle_pair() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=9)
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        ).valid
+    engine.advance(state.game_id)
+    for side in Side:
+        own = [ship for ship in state.ships.values() if ship.side == side and ship.position]
+        movement = [MovementOrder(ship_id=ship.id, plan="1") for ship in own]
+        assert engine.submit_orders(
+            state.game_id,
+            OrderBatch(side=side, phase=Phase.MOVEMENT_PLANNING, movement=movement),
+        ).valid
+    engine.advance(state.game_id)
+    result = engine.validate_orders(
+        state.game_id,
+        OrderBatch(
+            side=Side.AXIS,
+            phase=Phase.TORPEDO_PLANNING,
+            torpedoes=[TorpedoOrder(
+                ship_id="IBS-U-KM-KARL-GALSTER",
+                launcher_id="TT1",
+                launch_at_mf=1,
+                launch_hex=HexCoord.from_label("A1"),
+                launch_side="port",
+                launch_angle="X",
+            )],
+        ),
+    )
+    assert not result.valid
+    assert any("angles X/Y are starboard" in error for error in result.errors)
+    assert any("launch_hex does not match" in error for error in result.errors)
+
+
+def test_helena_seven_mf_loss_reproduces_rulebook_three_three_three_example() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-01", seed=1)
+    helena = state.ships["IBS-U-USN-HELENA"]
+    assert helena.speed_track == (6, 5, 5)
+    engine._lose_speed(helena, 7)
+    assert helena.speed_track == (3, 3, 3)
+    assert helena.speed_damage_crossed == (3, 2, 2)
+
+
+def test_collision_requires_five_or_six_then_uses_collision_table_for_both_ships() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=1)
+    left = state.ships["IBS-U-KM-KARL-GALSTER"]
+    right = state.ships["IBS-U-RN-JAVELIN"]
+    assert engine._resolve_ship_collision(state, left, right)
+    check = next(event for event in state.events if event.type == "collision_check")
+    results = [event for event in state.events if event.type == "collision_result"]
+    assert check.dice and check.dice.raw == 5
+    assert len(results) == 2
+    assert all(event.rule and event.rule.rule_id == "IBS-T-THDT" for event in results)
+
+
+def test_sunk_ship_creates_structured_wreck_at_its_hex() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=1)
+    ship = state.ships["IBS-U-KM-KARL-GALSTER"]
+    original_position = ship.position
+    engine._damage_hull(state, ship, ship.hull, "test")
+    assert ship.sunk
+    assert len(state.wrecks) == 1
+    assert state.wrecks[0].position == original_position
+    assert state.wrecks[0].source_ship_id == ship.id

@@ -65,6 +65,7 @@ def make_ship(
             "displacement_band": record.displacement_band,
             "hull": record.hull_boxes,
             "speed_track": record.maximum_speed_cycle,
+            "speed_damage_track": record.speed_damage_track,
             "primary_gf": _broadside_firepower(record, "primary"),
             "primary_caliber": primary_mounts[0].caliber,
             "secondary_gf": _broadside_firepower(record, "secondary") if secondary_mounts else 0,
@@ -81,6 +82,10 @@ def make_ship(
     else:
         data = deepcopy(templates[entry["template"]])
         data.setdefault("displacement_band", "A" if data["type"] in {"DD", "APD"} else "C")
+        data.setdefault(
+            "speed_damage_track",
+            tuple(tuple(range(speed, 0, -1)) for speed in data["speed_track"]),
+        )
     primary = WeaponMount(kind="primary", firepower=data.get("primary_gf", 0), caliber=data.get("primary_caliber", 0))
     secondary = None
     if data.get("secondary_gf", 0):
@@ -97,6 +102,7 @@ def make_ship(
         position=HexCoord.from_label(entry["position"]) if entry.get("position") else None,
         heading=entry.get("heading", 1),
         speed_track=tuple(data["speed_track"]),
+        speed_damage_track=tuple(tuple(row) for row in data["speed_damage_track"]),
         initial_max_speed=max(data["speed_track"]),
         current_speed=entry.get("speed", 0),
         previous_speed=entry.get("speed", 0),

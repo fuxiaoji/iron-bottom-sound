@@ -200,6 +200,8 @@ class ShipState(BaseModel):
     position: HexCoord | None
     heading: int = Field(ge=1, le=6)
     speed_track: tuple[int, int, int]
+    speed_damage_track: tuple[tuple[int, ...], tuple[int, ...], tuple[int, ...]]
+    speed_damage_crossed: tuple[int, int, int] = (0, 0, 0)
     initial_max_speed: int = Field(gt=0)
     current_speed: int = Field(ge=0)
     previous_speed: int = Field(ge=0)
@@ -227,7 +229,10 @@ class ShipState(BaseModel):
     reinforcement_turn: int | None = None
 
     def max_speed_for_turn(self, turn: int) -> int:
-        return self.speed_track[(turn - 1) % 3]
+        row_index = (turn - 1) % 3
+        row = self.speed_damage_track[row_index]
+        crossed = self.speed_damage_crossed[row_index]
+        return row[crossed] if crossed < len(row) else 0
 
 
 class MovementCommand(BaseModel):
@@ -283,9 +288,11 @@ class TorpedoOrder(BaseModel):
     count: int = Field(default=1, ge=0, le=9)
     speed: Literal["fast", "medium", "slow"] = "fast"
     launcher_id: str | None = None
-    launch_at_mf: int = Field(default=0, ge=0)
+    launch_at_mf: int = Field(default=1, ge=1, le=8)
     launch_hex: HexCoord | None = None
     bearing: int | None = Field(default=None, ge=1, le=6)
+    launch_side: Literal["port", "starboard"] | None = None
+    launch_angle: Literal["A", "B", "X", "Y"] | None = None
     setting_index: int = Field(default=0, ge=0)
 
 
@@ -348,7 +355,10 @@ class TorpedoTrack(BaseModel):
     heading: int = Field(ge=1, le=6)
     speed_cycle: tuple[int, int, int]
     range_remaining: int = Field(ge=0)
+    distance_travelled: int = Field(default=0, ge=0)
     launched_turn: int = Field(gt=0)
+    salvo_size: int = Field(default=1, ge=1)
+    contact_ship_ids: list[str] = Field(default_factory=list)
     hidden: bool = False
 
 
