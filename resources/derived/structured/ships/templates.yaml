@@ -1,0 +1,77 @@
+schema_version: 1
+templates:
+  dd-german-1940:
+    type: DD
+    hull: 6
+    speed_track: [6, 6, 6]
+    primary_gf: 2
+    primary_caliber: 5
+    torpedoes: 2
+    torpedo_type: us-21-mk14-1928
+    vp: 4
+  dd-british-1940:
+    type: DD
+    hull: 6
+    speed_track: [6, 6, 6]
+    primary_gf: 3
+    primary_caliber: 4.7
+    torpedoes: 2
+    torpedo_type: us-21-mk14-1928
+    vp: 3
+  ca-japanese-1942:
+    type: CA
+    hull: 11
+    speed_track: [6, 5, 5]
+    primary_gf: 16
+    primary_caliber: 8
+    secondary_gf: 2
+    belt_armor: 3
+    torpedoes: 2
+    torpedo_type: jp-24-type93
+    vp: 11
+  ca-american-1942:
+    type: CA
+    hull: 11
+    speed_track: [6, 5, 5]
+    primary_gf: 15
+    primary_caliber: 8
+    secondary_gf: 2
+    belt_armor: 4
+    torpedoes: 0
+    vp: 11
+  cl-american-1942:
+    type: CL
+    hull: 10
+    speed_track: [6, 5, 5]
+    primary_gf: 14
+    primary_caliber: 6
+    secondary_gf: 2
+    belt_armor: 3
+    torpedoes: 0
+    vp: 9
+  dd-japanese-1942:
+    type: DD
+    hull: 6
+    speed_track: [6, 6, 5]
+    primary_gf: 3
+    primary_caliber: 5
+    torpedoes: 2
+    torpedo_type: jp-24-type93
+    vp: 4
+  dd-american-1942:
+    type: DD
+    hull: 6
+    speed_track: [6, 6, 6]
+    primary_gf: 2
+    primary_caliber: 5
+    torpedoes: 2
+    torpedo_type: us-21-mk15-1942
+    vp: 2
+  av-japanese-1942:
+    type: AV
+    hull: 8
+    speed_track: [5, 5, 4]
+    primary_gf: 2
+    primary_caliber: 5
+    torpedoes: 0
+    vp: 6

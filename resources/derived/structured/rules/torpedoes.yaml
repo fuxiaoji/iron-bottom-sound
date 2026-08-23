@@ -1,0 +1,10 @@
+schema_version: 1
+source: {document: player-aid-tables-zh.pdf, pdf_page: 3, status: verified_source}
+types:
+  us-21-mk11-1928: {nation: US, caliber_in: 21, speeds: [[8, 8, 7], [6, 6, 4]], ranges: [10, 16], damage_modifier: -2}
+  us-21-mk14-1928: {nation: US, caliber_in: 21, speeds: [[8, 8, 7], [6, 6, 4]], ranges: [10, 16], damage_modifier: -1}
+  us-21-mk15-1942: {nation: US, caliber_in: 21, speeds: [[8, 8, 8], [6, 6, 6]], ranges: [16, 24], damage_modifier: 0}
+  jp-21: {nation: JP, caliber_in: 21, speeds: [[7, 7, 7], [6, 6, 6]], ranges: [18, 27], damage_modifier: 0}
+  jp-24-type8: {nation: JP, caliber_in: 24, speeds: [[8, 8, 7], [6, 6, 6]], ranges: [18, 36], damage_modifier: 0}
+  jp-24-type90: {nation: JP, caliber_in: 24, speeds: [[8, 8, 7], [7, 7, 7]], ranges: [27, 45], damage_modifier: 0}
+  jp-24-type93: {nation: JP, caliber_in: 24, speeds: [[8, 8, 8], [7, 7, 7], [6, 6, 6]], ranges: [36, 58, 71], damage_modifier: 1}

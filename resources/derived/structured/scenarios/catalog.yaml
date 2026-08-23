@@ -1,0 +1,16 @@
+schema_version: 1
+scenarios:
+  - {id: IBS-S-01, number: 1, title: 埃斯佩兰斯角海战, date: 1942-10-11, turns: 7, status: playable}
+  - {id: IBS-S-02, number: 2, title: 库拉湾海战, date: 1943-07-06, turns: 9, status: catalogued}
+  - {id: IBS-S-03, number: 3, title: 通道行动, date: 1940-11-28, turns: 4, status: playable}
+  - {id: IBS-S-04, number: 4, title: 塔萨法隆格海战, date: 1942-11-30, turns: 6, status: catalogued}
+  - {id: IBS-S-05, number: 5, title: 圣乔治角海战, date: 1943-11-25, turns: 10, status: catalogued}
+  - {id: IBS-S-06, number: 6, title: 第二次瓜达尔卡纳尔岛海战, date: 1942-11-15, turns: 10, status: catalogued}
+  - {id: IBS-S-07, number: 7, title: 所罗门群岛海战, date: 1928-07-03, turns: 7, status: catalogued}
+  - {id: IBS-S-08, number: 8, title: 科隆班加拉岛海战, date: 1943-07-13, turns: 15, status: catalogued}
+  - {id: IBS-S-09, number: 9, title: 第一次瓜达尔卡纳尔岛海战, date: 1942-11-13, turns: 6, status: catalogued}
+  - {id: IBS-S-10, number: 10, title: 萨沃岛海战, date: 1942-08-09, turns: 3, status: catalogued}
+  - {id: IBS-S-11, number: 11, title: 奥古斯塔皇后湾海战, date: 1943-11-02, turns: 9, status: catalogued}
+  - {id: IBS-S-12, number: 12, title: 布干维尔岛海战, date: 1928-03-03, turns: 9, status: catalogued}
+  - {id: IBS-S-13, number: 13, title: 韦拉拉韦拉岛海战, date: 1943-10-06, turns: 11, status: catalogued}
+  - {id: IBS-S-14, number: 14, title: 霍腊纽姆海战, date: 1943-08-18, turns: 12, status: catalogued}

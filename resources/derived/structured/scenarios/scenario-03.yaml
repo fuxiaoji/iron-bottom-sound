@@ -1,0 +1,21 @@
+id: IBS-S-03
+number: 3
+title: 通道行动
+date: 1940-11-28
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 3, printed_page: 4, status: verified_source}
+turns: 4
+visibility: {axis: 4, allies: 4}
+optional_rules: []
+victory:
+  kind: elimination_or_escape
+  notes: 英军击沉或使德军舰只减速至2-2-2或更低；德军需击沉或减速后脱离。
+ships:
+  - {id: IBS-U-KM-KARL-GALSTER, name: 卡尔加尔斯特, side: axis, template: dd-german-1940, position: O14, heading: 4, speed: 5, asset: 德国-DD-卡尔加尔斯特.png}
+  - {id: IBS-U-KM-RICHARD-BEITZEN, name: 里夏德·拜茨恩, side: axis, template: dd-german-1940, position: P13, heading: 4, speed: 5, asset: 德国-DD-里夏德·拜茨恩.png}
+  - {id: IBS-U-KM-HANS-LODY, name: 汉斯·洛迪, side: axis, template: dd-german-1940, position: R12, heading: 4, speed: 5, asset: 德国-DD-汉斯·洛迪.png}
+  - {id: IBS-U-RN-JAVELIN, name: 标枪, side: allies, template: dd-british-1940, position: R16, heading: 5, speed: 5, asset: 英国-DD-标枪.png}
+  - {id: IBS-U-RN-KASHMIR, name: 克什米尔, side: allies, template: dd-british-1940, position: S16, heading: 5, speed: 5, asset: 英国-DD-克什米尔.png}
+  - {id: IBS-U-RN-JERSEY, name: 泽西, side: allies, template: dd-british-1940, position: T15, heading: 5, speed: 5, asset: 英国-DD-泽西.png}
+  - {id: IBS-U-RN-JACKAL, name: 豺, side: allies, template: dd-british-1940, position: U15, heading: 5, speed: 5, asset: 英国-DD-豺.png}
+  - {id: IBS-U-RN-JUPITER, name: 朱庇特, side: allies, template: dd-british-1940, position: V14, heading: 5, speed: 5, asset: 英国-DD-朱庇特.png}

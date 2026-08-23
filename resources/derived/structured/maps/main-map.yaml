@@ -1,0 +1,25 @@
+id: IBS-M-MAIN
+title: 铁底湾主地图
+source: resources/originals/assets/images/铁底湾-地图.jpg
+status: verified_source
+columns: {first: A, last: HH, count: 60}
+rows: {first: 1, last: 27, count: 27}
+layout: pointy_top_odd_q
+hex_scale: {yards: 600}
+terrain_default: sea
+direction_headings:
+  1: north
+  2: northeast
+  3: southeast
+  4: south
+  5: southwest
+  6: northwest
+overlays:
+  island_xy:
+    source: resources/originals/assets/images/岛屿.jpg
+    anchors: [X, Y]
+    status: verified_source_geometry_pending
+  coast_z:
+    source: resources/originals/assets/images/海岸.jpg
+    anchors: [Z]
+    status: verified_source_geometry_pending

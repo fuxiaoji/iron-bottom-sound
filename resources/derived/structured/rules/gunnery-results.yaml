@@ -1,0 +1,44 @@
+schema_version: 1
+id: IBS-T-GHRT
+source: {document: player-aid-tables-zh.pdf, pdf_page: 1, status: verified_source}
+results:
+  11: special
+  12: special
+  13: primary_bow
+  14: special
+  15: {hull: 2, armour_check: true}
+  16: special
+  21: {hull: 1, speed_loss: 1}
+  22: {hull: 1}
+  23: {hull: 2, speed_loss: 1}
+  24: {hull: 1, armour_check: true}
+  25: variable_hull_by_ship_type
+  26: variable_hull_by_ship_type
+  31: {secondary: 1, armour_check: true}
+  32: special
+  33: primary_stern_star
+  34: [special, radar]
+  35: {primary_mid: 1, armour_check: true}
+  36: {primary_bow: 1, armour_check: true}
+  41: [fire_control, radar]
+  42: {secondary: 1}
+  43: {secondary: 1, armour_check: true}
+  44: special
+  45: special
+  46: {primary_stern: 1, armour_check: true}
+  51: [primary_mid, radar]
+  52: [secondary, fire_control]
+  53: {hull: 1, speed_loss: 1}
+  54: {hull: 1, armour_check: true}
+  55: {hull: 1, fire_check: true}
+  56: {primary_bow: 1, armour_check: true}
+  61: {primary_stern: 1, armour_check: true}
+  62: {secondary: 1, armour_check: true}
+  63: {secondary: 1, armour_check: true}
+  64: [primary_bow, radar]
+  65: {hull: 1, armour_check: true}
+  66: miss
+notes:
+  - DD/APD and other specified ships treat secondary results as misses.
+  - Radar and fire-control results do not require armour penetration.
+  - Armour-check results use the armour penetration table; failure causes no damage.

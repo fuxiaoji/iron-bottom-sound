@@ -1,0 +1,6 @@
+interface:
+  display_name: "铁底湾规则核验"
+  short_description: "检索、核验并实现《铁底湾的回响 IV》规则与想定"
+  default_prompt: "Use $iron-bottom-sound-rules to verify this Iron Bottom Sound IV rule and cite its source page."
+policy:
+  allow_implicit_invocation: true

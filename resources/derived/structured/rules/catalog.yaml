@@ -1,0 +1,44 @@
+schema_version: 1
+authority_order:
+  - scenario_special_rule
+  - ship_record_or_player_aid
+  - general_rulebook
+rules:
+  - id: IBS-R-01.2
+    title: 推演尺度
+    status: tested
+    source: {document: iron-bottom-sound-iv-rules-zh.pdf, pdf_page: 3, printed_section: "1.2"}
+    data: {hex_yards: 600, turn_minutes: 3}
+  - id: IBS-R-05
+    title: 七阶段回合流程
+    status: tested
+    source: {document: iron-bottom-sound-iv-rules-zh.pdf, pdf_page: 6, printed_section: "5.0"}
+    phases: [reinforcement, movement_planning, torpedo_planning, movement_resolution, gunnery, torpedo_effects, fire_end]
+  - id: IBS-R-06
+    title: 移动、速度循环与加减速
+    status: tested
+    source: {document: iron-bottom-sound-iv-rules-zh.pdf, pdf_pages: [7, 8], printed_section: "6.0"}
+    data:
+      forward_cost: 1
+      acceleration_limit: 2
+      deceleration_limit: 5
+      capital_ship_deceleration_limit: 3
+      free_turn_degrees: 60
+      paid_turn_degrees: 120
+      paid_turn_cost: 1
+  - id: IBS-R-06.4
+    title: 碰撞与船骸
+    status: tested
+    source: {document: iron-bottom-sound-iv-rules-zh.pdf, pdf_page: 8, printed_section: "6.4"}
+  - id: IBS-R-08.1
+    title: 炮击计划、命中与损伤
+    status: executable
+    source: {document: iron-bottom-sound-iv-rules-zh.pdf, pdf_pages: [8, 9, 10, 11], printed_section: "8.1"}
+  - id: IBS-R-08.2
+    title: 鱼雷发射、航行、命中与效果
+    status: executable
+    source: {document: iron-bottom-sound-iv-rules-zh.pdf, pdf_pages: [11, 12], printed_section: "8.2"}
+  - id: IBS-R-09
+    title: 可选规则
+    status: tested
+    source: {document: iron-bottom-sound-iv-rules-zh.pdf, pdf_pages: [13, 14], printed_section: "9.0"}

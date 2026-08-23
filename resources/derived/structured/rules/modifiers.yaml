@@ -1,0 +1,31 @@
+schema_version: 1
+source: {document: player-aid-tables-zh.pdf, pdf_pages: [2, 3, 4], status: verified_source}
+range_modifier:
+  gunnery:
+    - {min: 1, max: 1, value: -24}
+    - {min: 2, max: 2, value: -15}
+    - {min: 3, max: 5, value: -12}
+    - {min: 6, max: 9, value: -6}
+    - {min: 10, max: 15, value: 0}
+    - {min: 16, max: 20, value: 2}
+    - {min: 21, max: 999, value: 4}
+  torpedo:
+    - {min: 1, max: 2, value: 5}
+    - {min: 3, max: 4, value: 3}
+    - {min: 5, max: 6, value: 1}
+    - {min: 7, max: 10, value: 0}
+    - {min: 11, max: 15, value: -1}
+    - {min: 16, max: 999, value: -1}
+target_speed_modifier:
+  gunnery: {0: -18, 1: -9, "2-3": -4, "4+": 0}
+  torpedo: {0: 4, 1: 4, 2: 2, 3: 1, "4+": 0}
+target_aspect_modifier:
+  gunnery_bow_stern: -6
+  torpedo_bow_stern: -8
+other:
+  target_on_fire: -2
+  each_additional_attacker: 1
+  each_additional_target: 6
+  mfc_destroyed: 3
+  searchlight_target: -3
+  searchlight_user: -3

@@ -1,0 +1,19 @@
+schema_version: 1
+id: IBS-T-THDT
+source: {document: player-aid-tables-zh.pdf, pdf_page: 3, status: verified_source}
+columns: [A, B, C, D, E, F, G, H, I]
+rows:
+  "2-": [1H/-4MF, 1H/-4MF, 1H/-3MF, 1H/-3MF, 1H/-2MF, 1H/-2MF, 1H/-1MF, 1H/-1MF, 1H/-1MF]
+  "3": [Miss, Miss, Miss, Miss, Miss, Miss, Miss, Miss, Miss]
+  "4": [1H/-5MF, 5H/-11MF, 2H/-3MF, 1H/-2MF, 1H/-1MF, 1H/-1MF, 1H, 1H, 1H]
+  "5": [1H/-11MF, 2H/-5MF*, 3H/-3MF, 2H/-3MF, 2H/-2MF, 2H/-1MF, 1H/-1MF, -1MF, 1H]
+  "6": [1H/-7MF*, 1H/-7MF, 4H/-5MF, 3H/-2MF, 2H/-2MF, 2H/-2MF, 2H/-1MF, 1H/-1MF, 1H]
+  "7": [2H/-13MF, 3H/-6MF, 4H/-6MF, 4H/-5MF, 4H/-3MF, 3H/-1MF, 3H/-2MF, 3H/-1MF, 2H/-1MF]
+  "8": [Sunk, 4H/-9MF, 5H/-7MF, 4H/-5MF, 4H/-3MF, 3H/-2MF, 3H/-2MF, 3H/-1MF, 2H/-1MF]
+  "9": [Sunk, Sunk, 5H/-6MF, 5H/-5MF, 4H/-2MF, 4H/-2MF, 3H/-2MF, 2H/-2MF, 2H/-1MF]
+  "10": [Sunk, Sunk, 6H, 5H/-6MF, 5H/-4MF, 4H/-3MF, 4H/-3MF, 3H/-2MF, 3H/-2MF]
+  "11": [Sunk, Sunk, 7H, 5H/-8MF*, 4H/-6MF, 4H/-4MF, 3H/-4MF, 2H/-2MF, 2H/-2MF]
+  "12+": [Sunk, Sunk, 8H, 6H/-10MF, 7H/-1MF*, 4H/-5MF*, 4H/-5MF*, 3H/-3MF*, 3H/-2MF*]
+notes:
+  - H means hull damage; MF means speed loss; starred results also cause fire.
+  - Sum 8 results always cause fire regardless of printed star.

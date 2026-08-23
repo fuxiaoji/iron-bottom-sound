@@ -1,0 +1,12 @@
+schema_version: 1
+optional_rules:
+  - {id: IBS-R-09.1, key: hidden_contacts, title: 隐藏标记算子, default: false}
+  - {id: IBS-R-09.2, key: radar, title: 雷达, default: false}
+  - {id: IBS-R-09.3, key: star_shells, title: 闪光弹/照明弹, default: false}
+  - {id: IBS-R-09.4, key: searchlights, title: 探照灯, default: false}
+  - {id: IBS-R-09.5, key: malfunction_66, title: "66 故障", default: false}
+  - {id: IBS-R-09.6, key: squalls, title: 雨飑, default: false}
+  - {id: IBS-R-09.7, key: smoke, title: 烟幕, default: false}
+  - {id: IBS-R-09.8, key: silhouettes, title: 炮击剪影, default: false}
+  - {id: IBS-R-09.9, key: hidden_damage, title: 隐藏损伤, default: false}
+  - {id: IBS-R-09.10, key: blind_torpedoes, title: 鱼雷盲射, default: false}

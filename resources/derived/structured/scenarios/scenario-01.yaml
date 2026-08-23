@@ -1,0 +1,33 @@
+id: IBS-S-01
+number: 1
+title: 埃斯佩兰斯角海战
+date: 1942-10-11
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 1, printed_page: 2, status: verified_source}
+turns: 7
+visibility: {axis: 16, allies: 14}
+optional_rules: [radar, star_shells, searchlights]
+victory:
+  kind: victory_points
+  points_per_hull_lost: 1
+  leader_margin: 4
+  shore_bombardment: {axis_points_per_success: 1, attempts: 5}
+special_rules:
+  - 第一回合从炮击执行阶段开始，移动已经结束。
+  - 日军首回合不能射击，直到对手炮击后才可开火。
+ships:
+  - {id: IBS-U-IJN-AOBA, name: 青叶, side: axis, template: ca-japanese-1942, position: P10, heading: 2, speed: 5, asset: 日本-CA-青叶.png}
+  - {id: IBS-U-IJN-FURUTAKA, name: 古鹰, side: axis, template: ca-japanese-1942, position: N9, heading: 2, speed: 5, asset: 日本-CA-古鹰.png}
+  - {id: IBS-U-IJN-KINUGASA, name: 衣笠, side: axis, template: ca-japanese-1942, position: L8, heading: 2, speed: 5, asset: 日本-CA-衣笠.png}
+  - {id: IBS-U-IJN-FUBUKI, name: 吹雪, side: axis, template: dd-japanese-1942, position: P14, heading: 2, speed: 5, asset: 日本-DD-吹雪.png}
+  - {id: IBS-U-IJN-HATSUYUKI, name: 初雪, side: axis, template: dd-japanese-1942, position: R7, heading: 2, speed: 5, asset: 日本-DD-初雪.png}
+  - {id: IBS-U-USN-SAN-FRANCISCO, name: 旧金山, side: allies, template: ca-american-1942, position: V12, heading: 4, speed: 5, asset: 美国-CA-旧金山.png}
+  - {id: IBS-U-USN-BOISE, name: 博伊西, side: allies, template: cl-american-1942, position: X11, heading: 4, speed: 5, asset: 美国-CL-博伊西.png}
+  - {id: IBS-U-USN-SALT-LAKE-CITY, name: 盐湖城, side: allies, template: ca-american-1942, position: V14, heading: 4, speed: 3, asset: 美国-CA-盐湖城.png}
+  - {id: IBS-U-USN-FARENHOLT, name: 法伦霍尔特, side: allies, template: dd-american-1942, position: W14, heading: 4, speed: 3, asset: 美国-DD-法伦霍尔特.png}
+  - {id: IBS-U-USN-LAFFEY, name: 拉菲, side: allies, template: dd-american-1942, position: X13, heading: 4, speed: 3, asset: 美国-DD-拉菲.png}
+  - {id: IBS-U-USN-DUNCAN, name: 邓肯, side: allies, template: dd-american-1942, position: Y13, heading: 4, speed: 3, asset: 美国-DD-邓肯.png}
+  - {id: IBS-U-USN-BUCHANAN, name: 布坎南, side: allies, template: dd-american-1942, position: Z12, heading: 4, speed: 3, asset: 美国-DD-布坎南.png}
+reinforcements:
+  status: source_review_required
+  entry_hexes: [E17, U27]
