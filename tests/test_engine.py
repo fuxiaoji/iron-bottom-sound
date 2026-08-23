@@ -4,13 +4,17 @@ from iron_bottom_sound.models import (
     GunMountOrder,
     GunneryOrder,
     HexCoord,
+    IlluminationOrder,
+    MarkerState,
     MovementCommand,
     MovementOrder,
     OptionalRules,
     OrderBatch,
     Phase,
     Side,
+    SmokeOrder,
     TorpedoOrder,
+    TorpedoTrack,
 )
 
 
@@ -54,6 +58,20 @@ def test_same_seed_and_orders_produce_identical_event_stream() -> None:
     ]
 
 
+def test_replay_rebuilds_state_and_byte_equivalent_event_stream_without_snapshot() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", 41, game_id="replay-source")
+    engine.step(
+        state.game_id,
+        {side: standing_orders(engine, state.game_id, side) for side in Side},
+    )
+    rebuilt = engine.replay(state.events)
+    assert rebuilt.model_dump(mode="json") == state.model_dump(mode="json")
+    assert [event.model_dump_json() for event in rebuilt.events] == [
+        event.model_dump_json() for event in state.events
+    ]
+
+
 def test_hidden_damage_filters_enemy_but_not_own_damage() -> None:
     engine = IronBottomEngine()
     options = GameOptions(optional_rules=OptionalRules(hidden_damage=True))
@@ -71,7 +89,8 @@ def test_four_turns_reach_automatic_terminal_state() -> None:
     while state.phase != Phase.COMPLETE:
         engine.step(state.game_id, {side: standing_orders(engine, state.game_id, side) for side in Side})
     assert state.turn == 4
-    assert state.victory_reason == "平局"
+    assert state.winner == Side.AXIS
+    assert state.victory_reason and "德军战术胜利" in state.victory_reason
 
 
 def test_explicit_movement_commands_are_costed_and_traced_by_mf() -> None:
@@ -383,3 +402,130 @@ def test_sunk_ship_creates_structured_wreck_at_its_hex() -> None:
     assert len(state.wrecks) == 1
     assert state.wrecks[0].position == original_position
     assert state.wrecks[0].source_ship_id == ship.id
+
+
+def test_scenario_three_one_slowed_german_ship_is_allied_tactical_victory() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=1)
+    ship = state.ships["IBS-U-KM-KARL-GALSTER"]
+    ship.speed_track = (2, 2, 2)
+    state.turn = 4
+    state.phase = Phase.FIRE_END
+    engine.advance(state.game_id)
+    assert state.winner == Side.ALLIES
+    assert state.victory_reason and "英军战术胜利" in state.victory_reason
+
+
+def test_scenario_one_requires_four_point_margin_from_hull_damage_only() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-01", seed=1)
+    helena = state.ships["IBS-U-USN-HELENA"]
+    engine._damage_hull(state, helena, 12, "test")
+    assert state.score[Side.AXIS.value] == 4
+    state.turn = 7
+    state.phase = Phase.FIRE_END
+    engine.advance(state.game_id)
+    assert state.winner == Side.AXIS
+    assert state.victory_reason and "领先 4 分" in state.victory_reason
+
+
+def test_optional_star_shell_creates_next_turn_illumination_marker() -> None:
+    engine = IronBottomEngine()
+    options = GameOptions(optional_rules=OptionalRules(star_shells=True))
+    state = engine.reset("IBS-S-03", seed=1, options=options)
+    ship = state.ships["IBS-U-KM-KARL-GALSTER"]
+    mount = ship.gun_mounts[0]
+    batch = OrderBatch(
+        side=ship.side,
+        phase=Phase.GUNNERY,
+        illumination=[IlluminationOrder(ship_id=ship.id, mount_id=mount.id, target_hex=HexCoord.from_label("R16"))],
+    )
+    engine._resolve_optional_gunnery(state, [batch])
+    assert mount.fired_this_phase
+    assert any(marker.kind == "star_shell" and marker.expires_turn == 2 for marker in state.markers)
+    assert any(event.type == "star_shell_fired" and event.rule and event.rule.rule_id == "IBS-R-09.3" for event in state.events)
+
+
+def test_optional_radar_extends_detection_only_for_radar_equipped_attacker() -> None:
+    engine = IronBottomEngine()
+    options = GameOptions(optional_rules=OptionalRules(radar=True))
+    state = engine.reset("IBS-S-01", seed=1, options=options)
+    helena = state.ships["IBS-U-USN-HELENA"]
+    aoba = state.ships["IBS-U-IJN-AOBA"]
+    helena.position = HexCoord.from_label("A1")
+    aoba.position = HexCoord.from_label("HH27")
+    assert helena.radar
+    assert engine._can_see(state, helena, aoba)
+    helena.radar_destroyed = True
+    assert not engine._can_see(state, helena, aoba)
+
+
+def test_optional_squall_blocks_fire_and_moves_with_audited_die() -> None:
+    engine = IronBottomEngine()
+    options = GameOptions(optional_rules=OptionalRules(squalls=True))
+    state = engine.reset("IBS-S-03", seed=1, options=options)
+    attacker = state.ships["IBS-U-KM-KARL-GALSTER"]
+    target = state.ships["IBS-U-RN-JAVELIN"]
+    state.markers.append(MarkerState(id="SQ-1", kind="squall", position=attacker.position))
+    assert not engine._can_see(state, attacker, target)
+    original = state.markers[0].position
+    engine._move_squalls(state)
+    assert state.markers[0].position != original
+    event = next(event for event in state.events if event.type == "squall_moved")
+    assert event.rule and event.rule.rule_id == "IBS-R-09.6"
+
+
+def test_blind_torpedo_is_visible_only_to_owner_until_contact() -> None:
+    engine = IronBottomEngine()
+    options = GameOptions(optional_rules=OptionalRules(blind_torpedoes=True))
+    state = engine.reset("IBS-S-03", seed=1, options=options)
+    ship = state.ships["IBS-U-KM-KARL-GALSTER"]
+    state.torpedo_tracks.append(TorpedoTrack(
+        id="SECRET-TT",
+        side=Side.AXIS,
+        launcher_ship_id=ship.id,
+        torpedo_type=ship.torpedo_type or "de-nl-21",
+        position=ship.position,
+        heading=1,
+        speed_cycle=(8, 8, 2),
+        range_remaining=10,
+        launched_turn=1,
+        hidden=True,
+    ))
+    assert [track.id for track in engine.observe(state.game_id, Side.AXIS).torpedo_tracks] == ["SECRET-TT"]
+    assert not engine.observe(state.game_id, Side.ALLIES).torpedo_tracks
+
+
+def test_optional_smoke_releases_marker_and_applies_exact_plus_six_modifier() -> None:
+    engine = IronBottomEngine()
+    options = GameOptions(optional_rules=OptionalRules(smoke=True))
+    state = engine.reset("IBS-S-03", seed=1, options=options)
+    attacker = state.ships["IBS-U-KM-KARL-GALSTER"]
+    target = state.ships["IBS-U-RN-JAVELIN"]
+    distance = attacker.position.distance(target.position)  # type: ignore[union-attr]
+    baseline = engine._gunnery_modifier(state, attacker, target, distance, 1)
+    batch = OrderBatch(
+        side=attacker.side,
+        phase=Phase.GUNNERY,
+        smoke=[SmokeOrder(ship_id=attacker.id)],
+    )
+    engine._resolve_optional_gunnery(state, [batch])
+    assert attacker.smoke
+    assert engine._gunnery_modifier(state, attacker, target, distance, 1) == baseline + 6
+    assert any(marker.kind == "smoke" for marker in state.markers)
+
+
+def test_optional_commands_are_rejected_when_their_rule_is_disabled() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=1)
+    state.phase = Phase.GUNNERY
+    result = engine.validate_orders(
+        state.game_id,
+        OrderBatch(
+            side=Side.AXIS,
+            phase=Phase.GUNNERY,
+            smoke=[SmokeOrder(ship_id="IBS-U-KM-KARL-GALSTER")],
+        ),
+    )
+    assert not result.valid
+    assert any("optional rule 9.7" in error for error in result.errors)

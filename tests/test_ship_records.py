@@ -50,7 +50,7 @@ def test_every_mount_and_launcher_has_a_legal_source_arc() -> None:
         ids = [mount.id for mount in record.guns] + [launcher.id for launcher in record.torpedo_launchers]
         assert len(ids) == len(set(ids))
         assert all(mount.arcs for mount in record.guns)
-        assert all(launcher.arcs <= {FiringArc.PORT, FiringArc.STARBOARD} for launcher in record.torpedo_launchers)
+        assert all(set(launcher.arcs) <= {FiringArc.PORT, FiringArc.STARBOARD} for launcher in record.torpedo_launchers)
 
 
 def test_torpedo_characteristics_table_matches_source_cells() -> None:

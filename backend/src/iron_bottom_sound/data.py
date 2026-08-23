@@ -77,6 +77,7 @@ def make_ship(
             "secondary_armor": record.armour.secondary or 0,
             "bridge_armor": record.armour.bridge or 0,
             "aircraft": record.aircraft,
+            "radar": record.radar,
             "vp": record.vp,
         }
     else:
@@ -117,6 +118,7 @@ def make_ship(
         secondary_armor=data.get("secondary_armor", 0),
         bridge_armor=data.get("bridge_armor", 0),
         aircraft=data.get("aircraft", False),
+        radar=data.get("radar", False),
         gun_mounts=[GunMountState.model_validate(mount.model_dump()) for mount in record.guns] if record else [],
         torpedo_launchers=[
             TorpedoLauncherState(

@@ -20,6 +20,7 @@ from .models import (
     GunneryOrder,
     HexCoord,
     LegalAction,
+    MarkerState,
     MovementOrder,
     OrderBatch,
     Phase,
@@ -201,6 +202,12 @@ class IronBottomEngine:
             state,
             "game_created",
             f"加载想定 {state.scenario_title}",
+            payload={
+                "game_id": identifier,
+                "scenario_id": scenario_id,
+                "seed": seed,
+                "options": state.options.model_dump(mode="json"),
+            },
             rule=self._rule("IBS-R-05", 6, "5.0"),
         )
         self.games[identifier] = state
@@ -239,7 +246,24 @@ class IronBottomEngine:
                     asset=ship.asset,
                 )
             )
-        safe_events = [event for event in state.events[-40:] if event.payload.get("secret_side") in (None, side.value)]
+        safe_events = [
+            event
+            for event in state.events[-40:]
+            if event.payload.get("secret_side") in (None, side.value)
+            and not self._hidden_damage_event(state, event, side)
+        ]
+        tracks = [
+            track.model_copy(deep=True)
+            for track in state.torpedo_tracks
+            if not state.options.optional_rules.blind_torpedoes
+            or track.side == side
+            or bool(track.contact_ship_ids)
+        ]
+        markers = [
+            marker.model_copy(deep=True)
+            for marker in state.markers
+            if marker.secret_side in (None, side)
+        ]
         return PlayerObservation(
             game_id=game_id,
             scenario_id=state.scenario_id,
@@ -249,11 +273,22 @@ class IronBottomEngine:
             max_turns=state.max_turns,
             phase=state.phase,
             ships=ships,
+            torpedo_tracks=tracks,
+            markers=markers,
             score=deepcopy(state.score),
             recent_events=safe_events,
             winner=state.winner,
             victory_reason=state.victory_reason,
         )
+
+    @staticmethod
+    def _hidden_damage_event(state: GameState, event: GameEvent, side: Side) -> bool:
+        if not state.options.optional_rules.hidden_damage:
+            return False
+        if event.type not in {"gunnery_result", "special_damage", "torpedo_result", "fire_check", "collision_result"}:
+            return False
+        ship_id = event.payload.get("target") or event.payload.get("ship_id")
+        return bool(ship_id in state.ships and state.ships[ship_id].side != side)
 
     def legal_actions(self, game_id: str, side: Side) -> list[LegalAction]:
         state = self.get(game_id)
@@ -364,6 +399,8 @@ class IronBottomEngine:
                 continue
             if state.scenario_id == "IBS-S-01" and state.turn == 1 and batch.side == Side.AXIS:
                 errors.append("Japanese ships may not fire during scenario 1 turn 1")
+            if state.options.optional_rules.squalls and self._in_squall(state, attacker.position):
+                errors.append(f"{order.ship_id}: ships in squalls may not fire")
             for target in (order.primary_target, order.secondary_target, order.searchlight_target):
                 if target and (target not in state.ships or state.ships[target].side == batch.side):
                     errors.append(f"Illegal target {target}")
@@ -380,6 +417,34 @@ class IronBottomEngine:
                     errors.append(f"Illegal target {mount_order.target_id}")
                 elif mount and not self._mount_can_bear(attacker, target, mount.arcs):
                     errors.append(f"{order.ship_id}:{mount.id} cannot bear on {target.id}")
+        if state.phase == Phase.GUNNERY:
+            optional = state.options.optional_rules
+            if batch.illumination and not optional.star_shells:
+                errors.append("Star-shell orders require optional rule 9.3")
+            if batch.searchlights and not optional.searchlights:
+                errors.append("Searchlight orders require optional rule 9.4")
+            if (batch.smoke or batch.smoke_ships) and not optional.smoke:
+                errors.append("Smoke orders require optional rule 9.7")
+            for order in batch.illumination:
+                ship = owned.get(order.ship_id)
+                mount = next((item for item in ship.gun_mounts if item.id == order.mount_id), None) if ship else None
+                if not ship or ship.mfc_destroyed or not mount or mount.destroyed:
+                    errors.append(f"{order.ship_id}: cannot fire star shell from {order.mount_id}")
+            for order in batch.searchlights:
+                ship = owned.get(order.ship_id)
+                target = state.ships.get(order.target_id or "") if order.target_id else None
+                if not ship or ship.mfc_destroyed:
+                    errors.append(f"{order.ship_id}: cannot use searchlight")
+                elif order.active and (
+                    not target or target.side == batch.side or not ship.position or not target.position
+                    or ship.position.distance(target.position) > (14 if ship.side == Side.AXIS else 12)
+                ):
+                    errors.append(f"{order.ship_id}: illegal searchlight target {order.target_id}")
+            smoke_ids = batch.smoke_ships + [order.ship_id for order in batch.smoke if order.deploy]
+            for ship_id in smoke_ids:
+                ship = owned.get(ship_id)
+                if not ship or ship.ship_type not in {"DD", "CL"}:
+                    errors.append(f"{ship_id}: only DD or CL may release smoke")
         for order in batch.torpedoes if state.phase == Phase.TORPEDO_PLANNING else []:
             ship = owned.get(order.ship_id)
             if not ship or not ship.torpedo or ship.torpedo.destroyed:
@@ -389,6 +454,8 @@ class IronBottomEngine:
                 errors.append("Japanese ships may not launch torpedoes before scenario 1 turn 4")
             if ship.ship_type in {"BB", "BC"} and ship.current_speed >= 4:
                 errors.append(f"{order.ship_id}: BB/BC moving at 4 MF or more may not launch torpedoes")
+            if state.options.optional_rules.squalls and self._in_squall(state, ship.position):
+                errors.append(f"{order.ship_id}: ships in squalls may not launch torpedoes")
             launcher = next((item for item in ship.torpedo_launchers if item.id == order.launcher_id), None)
             if not launcher or launcher.destroyed or launcher.reload_turns_remaining:
                 errors.append(f"{order.ship_id}: unavailable torpedo launcher {order.launcher_id}")
@@ -440,7 +507,7 @@ class IronBottomEngine:
             state,
             "orders_submitted",
             f"{batch.side.value} 已封存秘密计划",
-            payload={"secret_side": batch.side.value},
+            payload={"secret_side": batch.side.value, "order_batch": batch.model_dump(mode="json")},
             rule=self._rule("IBS-R-05", 6, "5.0 B-C"),
         )
         return validation
@@ -475,6 +542,8 @@ class IronBottomEngine:
             if set(state.submitted_orders) != {Side.AXIS.value, Side.ALLIES.value}:
                 raise ValueError("Both sides must submit torpedo plans before advancing")
             self._seal_orders(state)
+            if state.options.optional_rules.squalls:
+                self._move_squalls(state)
             state.phase = Phase.MOVEMENT_RESOLUTION
         elif state.phase == Phase.MOVEMENT_RESOLUTION:
             self._resolve_movement(state)
@@ -490,6 +559,11 @@ class IronBottomEngine:
             state.phase = Phase.FIRE_END
         elif state.phase == Phase.FIRE_END:
             self._resolve_fire(state)
+            state.markers = [
+                marker
+                for marker in state.markers
+                if marker.kind == "squall" or marker.expires_turn is None or marker.expires_turn > state.turn
+            ]
             self._check_victory(state)
             if state.phase != Phase.COMPLETE:
                 state.turn += 1
@@ -545,9 +619,30 @@ class IronBottomEngine:
                 break
         return {side: self.observe(game_id, side) for side in Side}, events
 
-    def replay(self, game_id: str) -> GameState:
-        """Return a detached projection; stored events and snapshots are canonical persistence inputs."""
-        return self.get(game_id).model_copy(deep=True)
+    def replay(self, event_log: str | Iterable[GameEvent]) -> GameState:
+        """Rebuild state only from the initial event and submitted command events."""
+        source_events = list(self.get(event_log).events) if isinstance(event_log, str) else list(event_log)
+        if not source_events or source_events[0].type != "game_created":
+            raise ValueError("An event log must begin with game_created")
+        created = source_events[0].payload
+        replay_engine = IronBottomEngine()
+        state = replay_engine.reset(
+            str(created["scenario_id"]),
+            int(created["seed"]),
+            GameOptions.model_validate(created["options"]),
+            game_id=str(created["game_id"]),
+        )
+        for event in source_events[1:]:
+            if event.type == "orders_submitted":
+                raw_batch = event.payload.get("order_batch")
+                if raw_batch is None:
+                    raise ValueError(f"Event {event.sequence} lacks replayable order_batch")
+                result = replay_engine.submit_orders(state.game_id, OrderBatch.model_validate(raw_batch))
+                if not result.valid:
+                    raise ValueError(f"Replay rejected event {event.sequence}: {result.errors}")
+            elif event.type == "phase_changed":
+                replay_engine.advance(state.game_id)
+        return state.model_copy(deep=True)
 
     @staticmethod
     def movement_commands(order: MovementOrder) -> list[str]:
@@ -756,6 +851,15 @@ class IronBottomEngine:
                         rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
                     )
                     continue
+                if state.options.optional_rules.squalls and self._in_squall(state, ship.position):
+                    self._event(
+                        state,
+                        "torpedo_launch_cancelled",
+                        f"{ship.name} 处于雨飑中，鱼雷发射取消",
+                        payload={"ship_id": ship.id, "reason": "squall"},
+                        rule=self._rule("IBS-R-09.6", 13, "9.6 雨飑"),
+                    )
+                    continue
                 launcher = next(item for item in ship.torpedo_launchers if item.id == order.launcher_id)
                 definition = self.rules.torpedoes[ship.torpedo_type or ""]
                 setting = definition["settings"][order.setting_index]
@@ -844,7 +948,9 @@ class IronBottomEngine:
             )
 
     def _resolve_gunnery(self, state: GameState) -> None:
-        orders = [order for batch in self._sealed_batches(state, Phase.GUNNERY) for order in batch.gunnery]
+        batches = self._sealed_batches(state, Phase.GUNNERY)
+        self._resolve_optional_gunnery(state, batches)
+        orders = [order for batch in batches for order in batch.gunnery]
         attacks: list[tuple[ShipState, Any, ShipState]] = []
         for order in orders:
             attacker = state.ships[order.ship_id]
@@ -912,6 +1018,77 @@ class IronBottomEngine:
                     payload={"target": target.id, "result": result},
                     rule=self._rule("IBS-T-GHRT", 1, "炮击结果表"),
                     dice=DiceRoll(dice=result_dice, notation="D66", raw=result_roll),
+                )
+
+    def _resolve_optional_gunnery(self, state: GameState, batches: list[OrderBatch]) -> None:
+        optional = state.options.optional_rules
+        if optional.star_shells:
+            for order in [item for batch in batches for item in batch.illumination]:
+                ship = state.ships[order.ship_id]
+                mount = next(item for item in ship.gun_mounts if item.id == order.mount_id)
+                mount.fired_this_phase = True
+                roll, die = self._roll_d6(state)
+                success = roll >= 4
+                if success:
+                    state.markers.append(
+                        MarkerState(
+                            id=f"STAR-{state.turn}-{ship.id}-{mount.id}",
+                            kind="star_shell",
+                            position=order.target_hex,
+                            expires_turn=state.turn + 1,
+                        )
+                    )
+                self._event(
+                    state,
+                    "star_shell_fired",
+                    f"{ship.name} 闪光弹检定 {roll}",
+                    payload={"ship_id": ship.id, "mount_id": mount.id, "target_hex": order.target_hex.label, "success": success},
+                    rule=self._rule("IBS-R-09.3", 13, "9.3 闪光弹"),
+                    dice=DiceRoll(dice=[die], notation="1D6", raw=roll),
+                )
+        if optional.searchlights:
+            for order in [item for batch in batches for item in batch.searchlights if item.active and item.target_id]:
+                ship = state.ships[order.ship_id]
+                state.markers.append(
+                    MarkerState(
+                        id=f"SEARCH-{state.turn}-{ship.id}",
+                        kind="searchlight",
+                        ship_id=ship.id,
+                        target_ship_id=order.target_id,
+                        expires_turn=state.turn,
+                    )
+                )
+                self._event(
+                    state,
+                    "searchlight_activated",
+                    f"{ship.name} 开启探照灯",
+                    payload={"ship_id": ship.id, "target_id": order.target_id},
+                    rule=self._rule("IBS-R-09.4", 13, "9.4 探照灯"),
+                )
+        if optional.smoke:
+            smoke_ids = {
+                ship_id for batch in batches for ship_id in batch.smoke_ships
+            } | {
+                order.ship_id for batch in batches for order in batch.smoke if order.deploy
+            }
+            for ship_id in sorted(smoke_ids):
+                ship = state.ships[ship_id]
+                ship.smoke = True
+                state.markers.append(
+                    MarkerState(
+                        id=f"SMOKE-{state.turn}-{ship.id}",
+                        kind="smoke",
+                        position=ship.position,
+                        ship_id=ship.id,
+                        expires_turn=state.turn,
+                    )
+                )
+                self._event(
+                    state,
+                    "smoke_released",
+                    f"{ship.name} 释放烟幕",
+                    payload={"ship_id": ship.id, "position": ship.position.label if ship.position else None},
+                    rule=self._rule("IBS-R-09.7", 14, "9.7 烟幕"),
                 )
 
     def _resolve_torpedoes(self, state: GameState) -> None:
@@ -1005,23 +1182,45 @@ class IronBottomEngine:
                 )
 
     def _check_victory(self, state: GameState) -> None:
-        alive = {
-            side: [ship for ship in state.ships.values() if ship.side == side and not ship.sunk]
-            for side in Side
-        }
-        if not alive[Side.AXIS] or not alive[Side.ALLIES]:
-            state.winner = Side.ALLIES if not alive[Side.AXIS] else Side.AXIS
-            state.victory_reason = "对方已无可战舰只"
-        elif state.turn >= state.max_turns:
-            if state.score[Side.AXIS.value] != state.score[Side.ALLIES.value]:
-                state.winner = max(Side, key=lambda side: state.score[side.value])
-                state.victory_reason = "想定结束时胜利点领先"
+        if state.turn < state.max_turns:
+            return
+        if state.scenario_id == "IBS-S-03":
+            axis_ships = [ship for ship in state.ships.values() if ship.side == Side.AXIS]
+            qualifying = [
+                ship for ship in axis_ships
+                if ship.sunk or all(speed <= 2 for speed in ship.speed_track)
+            ]
+            sunk_allies = sum(ship.sunk for ship in state.ships.values() if ship.side == Side.ALLIES)
+            if len(qualifying) >= 2:
+                state.winner = Side.ALLIES
+                state.victory_reason = "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2"
+            elif len(qualifying) == 1:
+                state.winner = Side.ALLIES
+                state.victory_reason = "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2"
+            elif sunk_allies >= 2:
+                state.winner = Side.AXIS
+                state.victory_reason = "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰"
             else:
-                state.victory_reason = "平局"
-            state.phase = Phase.COMPLETE
-        if state.winner:
-            state.phase = Phase.COMPLETE
-            self._event(state, "victory", f"{state.winner.value} 获胜：{state.victory_reason}")
+                state.winner = Side.AXIS
+                state.victory_reason = "德军战术胜利：无德舰被击沉或减速至2-2-2"
+        elif state.scenario_id == "IBS-S-01":
+            margin = state.score[Side.AXIS.value] - state.score[Side.ALLIES.value]
+            if abs(margin) >= 4:
+                state.winner = Side.AXIS if margin > 0 else Side.ALLIES
+                state.victory_reason = f"想定1胜利点领先 {abs(margin)} 分"
+            else:
+                state.victory_reason = "平局：胜利点差小于4"
+        else:
+            margin = state.score[Side.AXIS.value] - state.score[Side.ALLIES.value]
+            state.winner = Side.AXIS if margin > 0 else (Side.ALLIES if margin < 0 else None)
+            state.victory_reason = "想定结束时胜利点领先" if margin else "平局"
+        state.phase = Phase.COMPLETE
+        self._event(
+            state,
+            "victory",
+            f"{state.winner.value if state.winner else '无胜方'}：{state.victory_reason}",
+            rule=self._scenario_rule(f"{state.scenario_id}-VICTORY", 3 if state.scenario_id == "IBS-S-03" else 1, "胜利条件"),
+        )
 
     def _gunnery_modifier(self, state: GameState, attacker: ShipState, target: ShipState, distance: int, attackers: int) -> int:
         modifier = self.rules.range_modifier("gunnery", distance)
@@ -1031,7 +1230,20 @@ class IronBottomEngine:
         modifier += max(0, attackers - 1) * int(self.rules.modifiers["other"]["each_additional_attacker"])
         if target.fire_markers:
             modifier += int(self.rules.modifiers["other"]["target_on_fire"])
-        if state.options.optional_rules.smoke and target.smoke:
+        if state.options.optional_rules.radar and distance > int(state.visibility[attacker.side.value]) and attacker.radar:
+            modifier += int(self.rules.modifiers["optional"]["star_shell_or_radar_illumination"])
+        if state.options.optional_rules.star_shells and any(
+            marker.kind == "star_shell" and marker.expires_turn == state.turn and marker.position
+            and target.position and marker.position.distance(target.position) <= 2
+            for marker in state.markers
+        ):
+            modifier += int(self.rules.modifiers["optional"]["star_shell_or_radar_illumination"])
+        if state.options.optional_rules.searchlights:
+            if any(marker.kind == "searchlight" and marker.target_ship_id == target.id for marker in state.markers):
+                modifier += int(self.rules.modifiers["optional"]["target_searchlit"])
+            if any(marker.kind == "searchlight" and marker.ship_id == attacker.id for marker in state.markers):
+                modifier += int(self.rules.modifiers["optional"]["searchlight_user"])
+        if state.options.optional_rules.smoke and (target.smoke or attacker.smoke):
             modifier += int(self.rules.modifiers["optional"]["through_smoke"])
         return modifier
 
@@ -1215,15 +1427,22 @@ class IronBottomEngine:
     def _damage_hull(self, state: GameState, ship: ShipState, amount: int, cause: str) -> None:
         if amount <= 0 or ship.sunk:
             return
+        before = ship.hull
         ship.hull = max(0, ship.hull - amount)
-        state.score[ship.side.opponent.value] += min(amount, ship.max_hull)
+        actual = before - ship.hull
+        state.hull_damage_taken[ship.side.value] += actual
+        if state.scenario_id == "IBS-S-01":
+            state.score[ship.side.opponent.value] = state.hull_damage_taken[ship.side.value] // 3
+        elif state.scenario_id not in {"IBS-S-03"}:
+            state.score[ship.side.opponent.value] += actual
         if ship.hull == 0:
             ship.sunk = True
             if ship.position and not any(wreck.source_ship_id == ship.id for wreck in state.wrecks):
                 state.wrecks.append(
                     WreckState(id=f"WRECK-{ship.id}", position=ship.position, source_ship_id=ship.id)
                 )
-            state.score[ship.side.opponent.value] += ship.vp
+            if state.scenario_id not in {"IBS-S-01", "IBS-S-03"}:
+                state.score[ship.side.opponent.value] += ship.vp
             self._event(state, "ship_sunk", f"{ship.name} 沉没", payload={"ship_id": ship.id, "cause": cause})
 
     def _resolve_ship_collision(self, state: GameState, left: ShipState, right: ShipState) -> bool:
@@ -1318,13 +1537,90 @@ class IronBottomEngine:
             return True
         if target.fire_markers:
             return True
+        if state.options.optional_rules.squalls and self._in_squall(state, target.position):
+            return False
+        if any(
+            marker.kind == "searchlight" and marker.target_ship_id == target.id
+            or marker.kind == "star_shell" and marker.expires_turn == state.turn and marker.position
+            and marker.position.distance(target.position) <= 2
+            for marker in state.markers
+        ):
+            return True
         visibility = int(state.visibility[side.value])
-        if state.options.optional_rules.radar:
-            visibility = max(visibility, 60)
-        return any(position and position.distance(target.position) <= visibility for position in own_positions)
+        if any(position and position.distance(target.position) <= visibility for position in own_positions):
+            return True
+        if state.options.optional_rules.radar and any(
+            ship.side == side and ship.radar and not ship.radar_destroyed and not ship.sunk and ship.position
+            and not self._in_squall(state, ship.position)
+            for ship in state.ships.values()
+        ):
+            return True
+        return state.options.optional_rules.silhouettes and self._silhouetted(state, target)
 
     def _can_see(self, state: GameState, attacker: ShipState, target: ShipState) -> bool:
-        return self._visible_to(state, target, attacker.side, [attacker.position])
+        if state.options.optional_rules.squalls and (
+            self._in_squall(state, attacker.position) or self._in_squall(state, target.position)
+        ):
+            return False
+        if not attacker.position or not target.position:
+            return False
+        illuminated = any(
+            marker.kind == "searchlight" and marker.target_ship_id == target.id
+            or marker.kind == "star_shell" and marker.expires_turn == state.turn and marker.position
+            and marker.position.distance(target.position) <= 2
+            for marker in state.markers
+        )
+        if illuminated or attacker.position.distance(target.position) <= int(state.visibility[attacker.side.value]):
+            return True
+        if state.options.optional_rules.silhouettes and self._silhouetted(state, target):
+            return True
+        return bool(
+            state.options.optional_rules.radar and attacker.radar and not attacker.radar_destroyed
+        )
+
+    @staticmethod
+    def _silhouetted(state: GameState, candidate: ShipState) -> bool:
+        if not candidate.position:
+            return False
+        for event in state.events:
+            if event.type != "gun_mount_attack":
+                continue
+            attacker = state.ships.get(event.payload.get("attacker"))
+            target = state.ships.get(event.payload.get("target"))
+            if not attacker or not target or not attacker.position or not target.position:
+                continue
+            if attacker.position.distance(candidate.position) + candidate.position.distance(target.position) == attacker.position.distance(target.position):
+                return True
+        return False
+
+    @staticmethod
+    def _in_squall(state: GameState, position: HexCoord | None) -> bool:
+        return bool(
+            position and any(
+                marker.kind == "squall" and marker.position and marker.position.distance(position) <= 1
+                for marker in state.markers
+            )
+        )
+
+    def _move_squalls(self, state: GameState) -> None:
+        for marker in [item for item in state.markers if item.kind == "squall" and item.position]:
+            roll, die = self._roll_d6(state)
+            distance = 0 if roll == 1 else (2 if roll == 6 else 1)
+            for _ in range(distance):
+                try:
+                    marker.position = marker.position.neighbor(2)
+                except ValueError:
+                    marker.position = None
+                    break
+            self._event(
+                state,
+                "squall_moved",
+                f"雨飑 {marker.id} 移动 {distance} 格",
+                payload={"marker_id": marker.id, "distance": distance, "position": marker.position.label if marker.position else None},
+                rule=self._rule("IBS-R-09.6", 13, "9.6 雨飑"),
+                dice=DiceRoll(dice=[die], notation="1D6", raw=roll),
+            )
+        state.markers = [marker for marker in state.markers if marker.position or marker.kind != "squall"]
 
     def _roll_d66(self, state: GameState) -> tuple[int, list[int]]:
         rng = random.Random(state.seed * 1_000_003 + state.rng_counter)

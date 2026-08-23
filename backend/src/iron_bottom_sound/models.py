@@ -126,7 +126,7 @@ class GunMountRecord(BaseModel):
     position: MountPosition
     firepower: int = Field(gt=0)
     caliber: float = Field(gt=0)
-    arcs: frozenset[FiringArc]
+    arcs: tuple[FiringArc, ...]
     armour: float | None = Field(default=None, ge=0)
 
 
@@ -138,7 +138,7 @@ class GunMountState(GunMountRecord):
 class TorpedoLauncherRecord(BaseModel):
     id: str
     position: MountPosition
-    arcs: frozenset[FiringArc]
+    arcs: tuple[FiringArc, ...]
     torpedoes: int = Field(gt=0)
     reloads: int = Field(default=0, ge=0)
 
@@ -216,6 +216,7 @@ class ShipState(BaseModel):
     secondary_armor: float = 0
     bridge_armor: float = 0
     aircraft: bool = False
+    radar: bool = False
     gun_mounts: list[GunMountState] = Field(default_factory=list)
     torpedo_launchers: list[TorpedoLauncherState] = Field(default_factory=list)
     vp: int = 0
@@ -268,6 +269,7 @@ class GunneryOrder(BaseModel):
 
 class IlluminationOrder(BaseModel):
     ship_id: str
+    mount_id: str | None = None
     target_hex: HexCoord
 
 
@@ -370,9 +372,10 @@ class WreckState(BaseModel):
 
 class MarkerState(BaseModel):
     id: str
-    kind: Literal["fire", "smoke", "star_shell", "searchlight", "torpedo_hit", "sunk"]
+    kind: Literal["fire", "smoke", "star_shell", "searchlight", "squall", "contact", "torpedo_hit", "sunk"]
     position: HexCoord | None = None
     ship_id: str | None = None
+    target_ship_id: str | None = None
     expires_turn: int | None = None
     secret_side: Side | None = None
 
@@ -403,6 +406,9 @@ class GameState(BaseModel):
     reinforcement_entry_end: HexCoord | None = None
     events: list[GameEvent] = Field(default_factory=list)
     score: dict[str, int] = Field(default_factory=lambda: {Side.AXIS.value: 0, Side.ALLIES.value: 0})
+    hull_damage_taken: dict[str, int] = Field(
+        default_factory=lambda: {Side.AXIS.value: 0, Side.ALLIES.value: 0}
+    )
     winner: Side | None = None
     victory_reason: str | None = None
 
@@ -432,6 +438,8 @@ class PlayerObservation(BaseModel):
     max_turns: int
     phase: Phase
     ships: list[PublicShip]
+    torpedo_tracks: list[TorpedoTrack] = Field(default_factory=list)
+    markers: list[MarkerState] = Field(default_factory=list)
     score: dict[str, int]
     recent_events: list[GameEvent]
     winner: Side | None
