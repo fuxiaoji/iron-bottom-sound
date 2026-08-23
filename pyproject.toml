@@ -17,7 +17,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pytest-cov>=5", "hypothesis>=6"]
-corpus = ["pypdf>=5", "python-docx>=1.1", "openpyxl>=3.1", "pypdfium2>=4.30"]
+corpus = ["pypdf>=5", "python-docx>=1.1", "openpyxl>=3.1", "pypdfium2>=4.30", "rapidocr>=3.9", "onnxruntime>=1.29"]
 
 [tool.setuptools]
 package-dir = {"" = "backend/src"}

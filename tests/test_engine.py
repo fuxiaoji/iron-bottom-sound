@@ -19,7 +19,8 @@ def test_scenario_three_loads_verified_order_of_battle() -> None:
 def test_scenario_one_loads_and_enables_special_options() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-01", seed=7)
-    assert len(state.ships) == 12
+    assert len(state.ships) == 14
+    assert state.phase == Phase.GUNNERY
     assert state.options.optional_rules.radar
     assert state.options.optional_rules.star_shells
     assert state.options.optional_rules.searchlights

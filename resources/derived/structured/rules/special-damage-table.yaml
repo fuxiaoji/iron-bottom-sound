@@ -1,0 +1,23 @@
+schema_version: 1
+id: IBS-T-SPECIAL-DAMAGE
+source: {document: player-aid-tables-zh.pdf, pdf_page: 4, status: verified_source}
+status: structured
+notes:
+  - 在所有 44–65 结果中均须执行装甲穿透检定。
+  - 百分比航速损失按初始最大航速的四分之一或二分之一向下取整。
+displacement_bands: [A, B, C, D, E, F, G, H, I]
+results:
+  "44": {A: 1H/-2MF, B: 1H/-2MF, C: 1H/-2MF, D: 1H/-2MF, E: 2H/-2MF, F: 2H/-2MF, G: 2H/-2MF, H: 2H/-2MF, I: 2H/-1MF}
+  "45": {A: 1H/-4MF, B: 1H/-4MF, C: 2H/-3MF, D: 2H/-3MF, E: 3H/-3MF, F: 3H/-2MF, G: 2H/-2MF, H: 2H/-2MF, I: 1H/-2MF}
+  "46": {A: 1H, B: 2H, C: 2H, D: 2H, E: 2H, F: 2H, G: 2H, H: 2H, I: 2H, additional: secondary_1}
+  "51": {A: 1H, B: 1H, C: 1H, D: 1H, E: 3H, F: 3H, G: 4H, H: 4H, I: 5H, additional: secondary_1}
+  "52": {A: 2H/-1MF, B: 2H/-1MF, C: 3H/-1MF, D: 3H/-1MF, E: 4H/-1MF, F: 4H/-1MF, G: 4H/-1MF, H: 4H/-1MF, I: 5H/-1MF, additional: primary_1}
+  "53": {A: 1H/-2MF, B: 1H/-2MF, C: 2H/-2MF, D: 2H/-2MF, E: 3H/-2MF, F: 3H/-2MF, G: 4H/-2MF, H: 4H/-2MF, I: 4H/-2MF, additional: primary_1}
+  "54": {A: 1H, B: 2H, C: 3H, D: 3H, E: 4H, F: 4H, G: 5H, H: 5H, I: 5H, additional: primary_1_secondary_1}
+  "55": {A: 1H/-5MF, B: 2H/-6MF, C: 3H/-6MF, D: 3H/-4MF, E: 4H/-4MF, F: 4H/-3MF, G: 4H/-3MF, H: 4H/-3MF, I: 4H/-3MF}
+  "56": {A: 1H/-11MF, B: 1H/-11MF, C: 2H/-6MF, D: 2H/-6MF, E: 2H/-6MF, F: 2H/-6MF, G: 2H/-6MF, H: 2H/-6MF, I: 2H/-6MF}
+  "61": {A: 1H/-3MF, B: 1H/-3MF, C: 2H/-3MF, D: 2H/-3MF, E: 3H/-3MF, F: 3H/-3MF, G: 3H/-3MF, H: 3H/-3MF, I: 3H/-3MF}
+  "62": {A: 1H/-50%, B: 1H/-50%, C: 1H/-50%, D: 1H/-50%, E: 1H/-50%, F: 1H/-50%, G: 1H/-50%, H: 1H/-50%, I: 1H/-50%}
+  "63": {A: 1H/-100%, B: 1H/-100%, C: 2H/-100%, D: 2H/-100%, E: 3H/-25%, F: 3H/-25%, G: 3H/-25%, H: 3H/-25%, I: 3H/-25%}
+  "64": {A: 1H/-25%, B: 1H/-25%, C: 2H/-25%, D: 2H/-25%, E: 3H/-25%, F: 3H/-25%, G: 3H/-25%, H: 3H/-25%, I: 3H/-25%}
+  "65": {A: 1H/-50%, B: 1H/-50%, C: 2H/-50%, D: 2H/-50%, E: 2H/-50%, F: 2H/-50%, G: 3H/-50%, H: 2H/-50%, I: 2H/-50%}

@@ -25,32 +25,37 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def load_ocr_cache() -> dict[tuple[str, int], str]:
-    cache: dict[tuple[str, int], str] = {}
+def load_ocr_cache() -> dict[tuple[str, int], dict]:
+    cache: dict[tuple[str, int], dict] = {}
     if not OCR_CACHE.exists():
         return cache
     for line in OCR_CACHE.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
         item = json.loads(line)
-        cache[(item["source"], int(item["page"]))] = item["text"]
+        cache[(item["source"], int(item["page"]))] = item
     return cache
 
 
-def pdf_pages(path: Path, ocr: dict[tuple[str, int], str]) -> Iterable[dict]:
+def pdf_pages(path: Path, ocr: dict[tuple[str, int], dict]) -> Iterable[dict]:
     from pypdf import PdfReader
 
     reader = PdfReader(str(path))
     relative = path.relative_to(ROOT).as_posix()
     for index, page in enumerate(reader.pages, start=1):
         extracted = (page.extract_text() or "").strip()
-        cached = ocr.get((relative, index), "").strip()
+        cached_item = ocr.get((relative, index), {})
+        cached = str(cached_item.get("text", "")).strip()
         text = cached or extracted
+        if cached:
+            method = "verified_ocr" if cached_item.get("status") == "verified" else "ocr_draft"
+        else:
+            method = "text_layer" if extracted else "missing_ocr"
         yield {
             "source": relative,
             "page": index,
             "text": text,
-            "method": "verified_ocr" if cached else ("text_layer" if extracted else "missing_ocr"),
+            "method": method,
         }
 
 
@@ -131,6 +136,8 @@ def build() -> dict:
             continue
         document["pages"] = len(extracted)
         document["missing_ocr_pages"] = sum(item["method"] == "missing_ocr" for item in extracted)
+        document["draft_ocr_pages"] = sum(item["method"] == "ocr_draft" for item in extracted)
+        document["verified_ocr_pages"] = sum(item["method"] == "verified_ocr" for item in extracted)
         documents.append(document)
         pages.extend(extracted)
 

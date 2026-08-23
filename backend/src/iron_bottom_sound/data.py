@@ -6,7 +6,7 @@ from typing import Any
 
 import yaml
 
-from .models import GameOptions, GameState, HexCoord, ShipState, Side, WeaponMount
+from .models import GameOptions, GameState, HexCoord, Phase, ShipState, Side, WeaponMount
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -77,6 +77,7 @@ def build_initial_state(game_id: str, scenario_id: str, seed: int, options: Game
         scenario_id=scenario_id,
         scenario_title=scenario["title"],
         max_turns=scenario["turns"],
+        phase=Phase(scenario.get("initial_phase", Phase.REINFORCEMENT.value)),
         seed=seed,
         options=options,
         visibility=scenario["visibility"],

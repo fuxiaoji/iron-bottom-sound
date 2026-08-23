@@ -7,27 +7,43 @@ source: {document: scenario-book-zh.pdf, pdf_page: 1, printed_page: 2, status: v
 turns: 7
 visibility: {axis: 16, allies: 14}
 optional_rules: [radar, star_shells, searchlights]
+initial_phase: gunnery
 victory:
   kind: victory_points
-  points_per_hull_lost: 1
+  points_per_three_hull_lost: 1
   leader_margin: 4
-  shore_bombardment: {axis_points_per_success: 1, attempts: 5}
+  draw_if_margin_below: 4
 special_rules:
-  - 第一回合从炮击执行阶段开始，移动已经结束。
-  - 日军首回合不能射击，直到对手炮击后才可开火。
+  - {id: IBS-S-01-R1, text: 第一回合从炮击执行阶段开始；移动已完成。}
+  - {id: IBS-S-01-R2, text: 日军第一回合不得炮击。}
+  - {id: IBS-S-01-R3, text: 日军第四回合之前不得发射鱼雷。}
+  - {id: IBS-S-01-R4, text: 美军火控不佳；所有阶段、所有攻击的 GF 减半并向上取整。}
+  - {id: IBS-S-01-R5, text: 第三回合开始时掷一次 1D6；结果为 1 时，日军增援在第四回合开始、移动计划前从 E17 至 U27 间入场。}
+  - {id: IBS-S-01-R6, text: 除朝云外，所有增援驱逐舰划去全部鱼雷备雷。}
 ships:
   - {id: IBS-U-IJN-AOBA, name: 青叶, side: axis, template: ca-japanese-1942, position: P10, heading: 2, speed: 5, asset: 日本-CA-青叶.png}
   - {id: IBS-U-IJN-FURUTAKA, name: 古鹰, side: axis, template: ca-japanese-1942, position: N9, heading: 2, speed: 5, asset: 日本-CA-古鹰.png}
   - {id: IBS-U-IJN-KINUGASA, name: 衣笠, side: axis, template: ca-japanese-1942, position: L8, heading: 2, speed: 5, asset: 日本-CA-衣笠.png}
   - {id: IBS-U-IJN-FUBUKI, name: 吹雪, side: axis, template: dd-japanese-1942, position: P14, heading: 2, speed: 5, asset: 日本-DD-吹雪.png}
   - {id: IBS-U-IJN-HATSUYUKI, name: 初雪, side: axis, template: dd-japanese-1942, position: R7, heading: 2, speed: 5, asset: 日本-DD-初雪.png}
-  - {id: IBS-U-USN-SAN-FRANCISCO, name: 旧金山, side: allies, template: ca-american-1942, position: V12, heading: 4, speed: 5, asset: 美国-CA-旧金山.png}
-  - {id: IBS-U-USN-BOISE, name: 博伊西, side: allies, template: cl-american-1942, position: X11, heading: 4, speed: 5, asset: 美国-CL-博伊西.png}
-  - {id: IBS-U-USN-SALT-LAKE-CITY, name: 盐湖城, side: allies, template: ca-american-1942, position: V14, heading: 4, speed: 3, asset: 美国-CA-盐湖城.png}
-  - {id: IBS-U-USN-FARENHOLT, name: 法伦霍尔特, side: allies, template: dd-american-1942, position: W14, heading: 4, speed: 3, asset: 美国-DD-法伦霍尔特.png}
-  - {id: IBS-U-USN-LAFFEY, name: 拉菲, side: allies, template: dd-american-1942, position: X13, heading: 4, speed: 3, asset: 美国-DD-拉菲.png}
-  - {id: IBS-U-USN-DUNCAN, name: 邓肯, side: allies, template: dd-american-1942, position: Y13, heading: 4, speed: 3, asset: 美国-DD-邓肯.png}
+  - {id: IBS-U-USN-FARENHOLT, name: 法伦霍尔特, side: allies, template: dd-american-1942, position: V12, heading: 4, speed: 5, asset: 美国-DD-法伦霍尔特.png}
+  - {id: IBS-U-USN-LAFFEY, name: 拉菲, side: allies, template: dd-american-1942, position: X11, heading: 4, speed: 5, asset: 美国-DD-拉菲.png}
+  - {id: IBS-U-USN-SAN-FRANCISCO, name: 旧金山, side: allies, template: ca-american-1942, position: V14, heading: 4, speed: 3, asset: 美国-CA-旧金山.png}
+  - {id: IBS-U-USN-BOISE, name: 博伊西, side: allies, template: cl-american-1942, position: W14, heading: 4, speed: 3, asset: 美国-CL-博伊西.png}
+  - {id: IBS-U-USN-SALT-LAKE-CITY, name: 盐湖城, side: allies, template: ca-american-1942, position: X13, heading: 4, speed: 3, asset: 美国-CA-盐湖城.png}
+  - {id: IBS-U-USN-HELENA, name: 海伦娜, side: allies, template: cl-american-1942, position: Y13, heading: 4, speed: 3, asset: 美国-CL-海伦娜.png}
   - {id: IBS-U-USN-BUCHANAN, name: 布坎南, side: allies, template: dd-american-1942, position: Z12, heading: 4, speed: 3, asset: 美国-DD-布坎南.png}
+  - {id: IBS-U-USN-MCCALLA, name: 麦卡拉, side: allies, template: dd-american-1942, position: AA12, heading: 4, speed: 3, asset: 美国-DD-麦卡拉.png}
+  - {id: IBS-U-USN-DUNCAN, name: 邓肯, side: allies, template: dd-american-1942, position: X8, heading: 4, speed: 5, asset: 美国-DD-邓肯.png}
 reinforcements:
-  status: source_review_required
-  entry_hexes: [E17, U27]
+  trigger: {turn: 3, roll: 1d6, succeeds_on: [1]}
+  arrival: {turn: 4, timing: before_movement_planning, entry_hex_range: [E17, U27], speed: any_legal}
+  ships:
+    - {id: IBS-U-IJN-CHITOSE, name: 千岁, side: axis, template: av-japanese-1942, speed_track: [5, 5, 4], asset: 日本-AV-千岁.png}
+    - {id: IBS-U-IJN-NISSHIN, name: 日进, side: axis, template: av-japanese-1942, speed_track: [5, 5, 4], asset: 日本-AV-日进.png}
+    - {id: IBS-U-IJN-ASAGUMO, name: 朝云, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], retain_torpedo_reloads: true, asset: 日本-DD-朝云.png}
+    - {id: IBS-U-IJN-NATSUGUMO, name: 夏云, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], torpedo_reloads: 0, asset: 日本-DD-夏云.png}
+    - {id: IBS-U-IJN-YAMAGUMO, name: 山云, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], torpedo_reloads: 0, asset: 日本-DD-山云.png}
+    - {id: IBS-U-IJN-SHIRAYUKI, name: 白雪, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], torpedo_reloads: 0, asset: 日本-DD-白雪.png}
+    - {id: IBS-U-IJN-MURAKUMO, name: 丛云, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], torpedo_reloads: 0, asset: 日本-DD-丛云.png}
+    - {id: IBS-U-IJN-AKIZUKI, name: 秋月, side: axis, template: dd-japanese-1942, speed_track: [6, 5, 5], torpedo_reloads: 0, asset: 日本-DD-秋月.png}

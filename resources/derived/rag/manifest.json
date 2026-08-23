@@ -6,1998 +6,2568 @@
       "sha256": "fa8bf24262e768afd4b224f15c50aa1491eba98c95ac23d9d083ee7868651200",
       "bytes": 8125,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/2.png",
       "sha256": "db89946001239a441762edfa9780d0e416ab0d4a3fd17096273d90c068dcbbf1",
       "bytes": 7596,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/3.png",
       "sha256": "d96ce93a15d9c73571d6256c78e57c518c5f06c2bf8f4cbfc87009493c6988fd",
       "bytes": 8965,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/4.png",
       "sha256": "365f2a8aa86bd6b31c9beea7be301d6f8ed2144d4957ce5570a1ac1f9dc4784f",
       "bytes": 7091,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/5.png",
       "sha256": "ff8ba41783c720670d2d1a5ce6bf469be521b1899376b3c1f2f785d5f902d500",
       "bytes": 7054,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/BB（日）.png",
       "sha256": "792a491dc2d1d7949b60b046808aa4a9db91802e224832094c188af02597b2a1",
       "bytes": 12039,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/BB（美）.png",
       "sha256": "f4956295d83aec4c52df68c5979d441cd9c936a226997336afb847650b442e6c",
       "bytes": 12437,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/CA（日）.png",
       "sha256": "07f0c89e0c6a526bea94e1ac30873b19f9ca117e35900ebae2a1dfe38830f8ae",
       "bytes": 12225,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/CA（美）.png",
       "sha256": "5e8aa33b74d786d023252836468dac78299edc9631abbe4be6c040a9dec3b909",
       "bytes": 11961,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/CA（英）.png",
       "sha256": "775811ff04987f5ee8b0e93c60ddec74b3cea08f82a6db3f08ea2c8feafe30dd",
       "bytes": 11482,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/DD（德）.png",
       "sha256": "348d065500ce26be284096f95c4fc35bab4b65bb15529da34d61afcd2dae2bcf",
       "bytes": 9754,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/DD（日）.png",
       "sha256": "a88b95f65c33cd45e23503fa13597755d1cc1e1563988ffa103fc4760e7c82dc",
       "bytes": 10454,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/DD（美）.png",
       "sha256": "abb3704728bf85f92630fbf30c079d97b1780e63ffb65c1cf49cfb4d97259fed",
       "bytes": 10730,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/turn.png",
       "sha256": "3908dcf6ade17fdf52ebe494971cc60ff7e6cd7d33dc8e261e68bf7236b6ed27",
       "bytes": 4354,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/光源.png",
       "sha256": "4f5c4ec96cca7391f3d2897b719f179043ce62c068d5d2f22a4bcf1e4c29b137",
       "bytes": 13143,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/同盟背景.jpg",
       "sha256": "a494e5d1331639fa7565b2e9634d11a5098e073bb8eb1a3a7e1867c32492c3d8",
       "bytes": 89432,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/命中.png",
       "sha256": "9af0501f5f1bcb8268a2033a373c089d5807c80b7ee2989447109b32355d9cc4",
       "bytes": 18229,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/回合表.png",
       "sha256": "66b2aba71354a45ea2cd08b5a9248b39576686182c286b7460f25eff0eba841c",
       "bytes": 194475,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/封面.jpg",
       "sha256": "097ba86f3e1f5b3c5da0ef3285482f58aa19cb30c96ec6a8710df9f279395698",
       "bytes": 64352,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/岛屿.jpg",
       "sha256": "5b9cd594846235d829228a202a8a8bb320baf5b0b7ee84753725fb1986fc79fd",
       "bytes": 2821411,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/已开火.png",
       "sha256": "bb3a7a39e3df5aead44381c67b8adf8708ab17a5c53dbd7c8d8bc033160f64f9",
       "bytes": 20510,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/德国-DD-卡尔加尔斯特.png",
       "sha256": "918196c7a6450f13aed798a47f48dd90f659611c49f6677d343878c871714eb6",
       "bytes": 17436,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/德国-DD-汉斯·洛迪.png",
       "sha256": "905031a5614f145456fc9673a3ad10c45b9c1b98af66c4e71493ccf972785327",
       "bytes": 16386,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/德国-DD-里夏德·拜茨恩.png",
       "sha256": "d71a2357bf9b8fec5a5458ff9881c9c438ca425fea68a91bfb5d6d6055b1e9af",
       "bytes": 18285,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/敌舰.png",
       "sha256": "0d4b1c4b8152bf8814bf510cccc4b1f0af4109a36bc5e71c1faa126e520f2431",
       "bytes": 21722,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/新西兰-CL-利安德.png",
       "sha256": "82cd2adbc8eb75c756542085af29eec1229162eeba85ca53eb9357e350a53afe",
       "bytes": 17881,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-APD-三日月.png",
       "sha256": "57e1d92a24aacf825659b280c58c4f2dcf76c31e55454b8576e370ff0f60ea0b",
       "bytes": 16620,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-APD-卯月2.png",
       "sha256": "bb0bddfe4ca72fdc55b5c54b705872cdc545163a17ae01231cb04c3225dda706",
       "bytes": 17382,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-APD-夕凪.png",
       "sha256": "55d44da63f5603b702127a80e4be4833daffb4440b4f2965dbc15c36651fe3f2",
       "bytes": 16174,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-APD-文月.png",
       "sha256": "fb703815012c6eabad53ad10150a848edbaa94c7838062adfa855e50a0b4831d",
       "bytes": 16588,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-APD-望月.png",
       "sha256": "66ef1f23d0bc390b79dfc8b8eaa015dc1893420f4c9d4a5e6f4747051abd9738",
       "bytes": 16910,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-APD-松风.png",
       "sha256": "202c4eec231244f45c2d0f99d5406a1b4d8904429affeb71baf3e92c637061af",
       "bytes": 16931,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-APD-水无月.png",
       "sha256": "173acf319fcc17550e2d0632a9778b85b10e1eb32fd58fbbcc7c92ffc02b3bb5",
       "bytes": 17412,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-APD-皋月.png",
       "sha256": "f37db7bcb1290e244565ff3b241e028b24696b1cae38deb65a4e192634c8fef3",
       "bytes": 17105,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-APD-长月.png",
       "sha256": "fa2fff805625f3861fdf28b88b3ce372a1478434b165b24e6bc03c04b9af66d0",
       "bytes": 16565,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-AV-千岁.png",
       "sha256": "98ee0b5a53bff3aa8630559d68078c99f16aa99d956198bf7baeb5f7d3594191",
       "bytes": 15866,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-AV-日进.png",
       "sha256": "d9e0b4885f12cf66e275e0db9c23f04306140639373a62668b412be75b5f0198",
       "bytes": 16824,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-BB-大和.png",
       "sha256": "5416ed113db40007b79c47c52fbe47cf91342ff75be73c82ffc3b95abe197579",
       "bytes": 16180,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-BB-比叡.png",
       "sha256": "2834c9a65e320682b4c20e991f5d788ecde8a3281cc592d6a398b9801150ae28",
       "bytes": 17262,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-BB-长门.png",
       "sha256": "45d2eec4690e8531e6e56108a27942a341fc2028a188d342f742857da042bb49",
       "bytes": 16809,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-BB-陆奥.png",
       "sha256": "cc1f5884a652367256f84f502b1979968d3a0d0d27532583773be92a4301290b",
       "bytes": 17162,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-BB-雾岛.png",
       "sha256": "954a7e717eb49ea97c0ff64d9c6b52cefde9f8752b02263842ebe1f6183a36f3",
       "bytes": 17641,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-BC-天城.png",
       "sha256": "67d7ce196d62e5922aaad00d1893a64e36bb2d0fd1e2dd392f2ff1ed1a3ca1c6",
       "bytes": 15256,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-BC-尾张.png",
       "sha256": "abd13720446f368abf9f0c41879fc2ec0d51f71b50b62019292872fa7162c942",
       "bytes": 15688,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-BC-赤城.png",
       "sha256": "c3a5132144ab81ff5ed5e2e903761649ef4574de4fe84d30f4bbda96d9afeb53",
       "bytes": 15417,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CA-加古1.png",
       "sha256": "7c58d77b9032469444bb20d870e392d2ab5a836475b7356bf13842cf4e50670d",
       "bytes": 16182,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CA-加古2.png",
       "sha256": "0422fb23821b2560702297c4ae10c26aa23062c88f2cdccdb830a3350e51f45c",
       "bytes": 16989,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CA-古鹰.png",
       "sha256": "762323e461e2d03f82d5e8951e193d710ac47580c13ce2395b24f60452d10512",
       "bytes": 17132,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CA-妙高.png",
       "sha256": "d0629055d8b333cef926d9dbb854d8c35cfc52e4edfb23a14aae3a49a94fb4c8",
       "bytes": 16396,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CA-爱宕.png",
       "sha256": "e71bafa66a37a5f80fd7daee4068728dcad7afcab14a17110e029ded9437b935",
       "bytes": 17290,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CA-羽黑.png",
       "sha256": "0f18c4441a47d898bf694e5d3562211abccadbe4e41d850c66f9a6dd8fffbd41",
       "bytes": 17451,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CA-衣笠.png",
       "sha256": "575311892bfac8d17a756c96d25273770c91fcb03726eceef089abe5a8ea87e2",
       "bytes": 17336,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CA-那智.png",
       "sha256": "e7fe695bf4504c0b12e8f37791723be017936563ae4c624313ce8e8909e7185c",
       "bytes": 18108,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CA-青叶.png",
       "sha256": "9ba3e97edec565bba830f180797194b02046e5eb139f4b67111bb9740e819c38",
       "bytes": 16407,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CA-高雄.png",
       "sha256": "a36051ef108a45ddb2fac26586d2bc76b3bd205efa2c2bfe5b714600ad7ba549",
       "bytes": 17178,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CA-鸟海.png",
       "sha256": "6459f7587d102aa92698fb14e29130c179fd3f061e82993e9944b569fb5b819d",
       "bytes": 17107,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CL-夕张.png",
       "sha256": "0fbe86399be9d032e3fa67145f032f3408ff4f1e2766e69cb495e086ec51663f",
       "bytes": 16671,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CL-天龙.png",
       "sha256": "808287277000914410ebdc34366857d58424515c8592e59d047f87e05a83176a",
       "bytes": 16687,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CL-川内.png",
       "sha256": "63a56d04f385ac4961b69b31774d052125eb9917b8c452b61698b546ec43977f",
       "bytes": 14810,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CL-神通1.png",
       "sha256": "1b2a0fc6fae60aac475844ec0e01042ce6026a52f407d8b5463f6a97fc9bf278",
       "bytes": 17827,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CL-神通2.png",
       "sha256": "31d945dd23aa2a57b5001b9da3f1c5cb8a6548cb2ad12f4f4529001a0669a3f6",
       "bytes": 18046,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CL-长良.png",
       "sha256": "d04b8844d2bd67ebfc654d6717d3e86daa713005ab10a425714ca776c33fb888",
       "bytes": 16586,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CL-阿贺野.png",
       "sha256": "541692677ce21031696ed7ae2041cb78a0363b35c748633ac30eae98e9ec4937",
       "bytes": 17399,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-CL-龙田.png",
       "sha256": "2860e79181b2e154501c52cf376515dbc1d8acc9888cc16f537040269661892b",
       "bytes": 16341,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-丛云.png",
       "sha256": "5ab59bf0a54e73c564c52cf739143082e1fec5ede25fbe315d4250c7464d432c",
       "bytes": 15552,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-五月雨.png",
       "sha256": "15e2bc8264709367be7d1118a1f4acd679618243b1bfbf4e02ad1820acf3161b",
       "bytes": 16415,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-亲潮.png",
       "sha256": "6b78608565d61f474ec57ced4437844edc95f569c5b65a9e13c1f741cc4b7949",
       "bytes": 16051,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-凉风.png",
       "sha256": "c416ea587101735c15a8738ce57e340b3782d36341b70cbd7bd41199bb30b969",
       "bytes": 16134,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-初雪.png",
       "sha256": "e24364674393aacbfa99bdc59c698ab396026b25ac4e51d35d886fccded5ac48",
       "bytes": 15918,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-初风.png",
       "sha256": "dee65f1a83b7e67e1ecc3047d50b58fdaba10bfd26d5489b33eb47d5857d0f0e",
       "bytes": 15626,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-卯月1.png",
       "sha256": "59e31d2b192eba2d3167c1e25b69d0d37e391b797d9acf41178664460c75b0b9",
       "bytes": 15195,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-卷波.png",
       "sha256": "bda4c4ef9c1478387edb24f2f5bd4cfc776b43944129564c0db9319d07994902",
       "bytes": 15863,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-吹雪.png",
       "sha256": "b5e2711ffcd0ce2455c4dc367d5c13edff015c1e2ec201b8480ed7f049c6f930",
       "bytes": 15828,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-夏云.png",
       "sha256": "b41048d3a12ed53f77065e866cf3ca0d5f980c5ba08c65953d400328975de253",
       "bytes": 15713,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-夕云.png",
       "sha256": "b6d24794330d1c3e43951942c19b6fc1ff216882b235760d58a501580977217d",
       "bytes": 14570,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-夕暮.png",
       "sha256": "21269ed672b5bff82eaeb7cc19b12535790c7bca639e5d19633ce6b6bd316251",
       "bytes": 15804,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-夕立.png",
       "sha256": "ad3813c04cf081141d65ce293477186627f2ee2ee352c89a06f5771092f16453",
       "bytes": 15151,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-夕雾.png",
       "sha256": "87201926c20358ae0423821c00456bbd9477d5401a39e120a29398b47020db10",
       "bytes": 15913,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-大波.png",
       "sha256": "c7f8606b92e4bde7cd8ef000612768e10f6f3bea9864d67175ea36352b70ed5d",
       "bytes": 15661,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-天津风.png",
       "sha256": "f32351fb0866efc90a9d77f8bf46f5136c8a07ba2c206dc8965833796730ee96",
       "bytes": 16551,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-天雾.png",
       "sha256": "c7f8e9a56b111f944d4116c2afe84250a5a761f01052d7f2c27a9387ed4a37ef",
       "bytes": 15979,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-山云.png",
       "sha256": "76a844ef64466b6b57e2edeac2ecb39387d583b8fd6b77c582d54e696d57719f",
       "bytes": 15108,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-岚.png",
       "sha256": "c363ddac27918d5568cb1177849b8279cb91a0631a18d0f25dd5db4a90719086",
       "bytes": 14234,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-敷波.png",
       "sha256": "14eeac8d78b73ad661a0d70718916ac3dbf3aed793644943aec51432e23350bc",
       "bytes": 16595,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-新月.png",
       "sha256": "a104238c89b62a855aedca3cb64d82e2b244ec4c0d48481e37a8ddc60c337b1e",
       "bytes": 14997,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-时雨.png",
       "sha256": "e1c9d927efdecfbe9e9835154b5e412bf932a792890f7ec6bfe71d4da71f58ed",
       "bytes": 15466,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-春雨.png",
       "sha256": "ce82129f9e69314e262d54e331a93afc738172d908ae4a95534cc98217c483ff",
       "bytes": 16025,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-晓.png",
       "sha256": "020ad6b00245abbdff15580fa57b7e017d555621c36ca933c6a94d5dc06c280e",
       "bytes": 14890,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-朝云.png",
       "sha256": "9829d3d39228b071670bc7bd5eafb77e56d1c2169fe0fdb7db1a616b8d8f0295",
       "bytes": 15773,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-朝风.png",
       "sha256": "382889dfd84c38945ed547b9d51569d29b2a0bbd0824ecabe2a253d912844d4b",
       "bytes": 15595,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-村雨.png",
       "sha256": "877c8842f89d4bafe2b81bd23b3ab8daafd38260c3dca9308da5afb97a617ae8",
       "bytes": 15920,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-江风.png",
       "sha256": "f1aacfb29f35adb2fb9ecc6ef5eb6f14424e1863a5544da29eab0dabe7abb363",
       "bytes": 15510,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-浜风.png",
       "sha256": "d0ba6944591c2d367c0855375dbda42ee3f4caa17c8067c1dff5a19eca0bb235",
       "bytes": 15847,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-浦波.png",
       "sha256": "f961f47f04e284b0647c93f269531c0faa61fe9885186382b6a652a01001d283",
       "bytes": 16172,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-涟.png",
       "sha256": "e97bb1e43018a1cd0158724be88986ef38e2fc119d8ccb536b342ea41c53d737",
       "bytes": 14823,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-清波.png",
       "sha256": "ce2f2c52a8ced628bcb42ed038bbb5aee116ce2d92647ffe1dbbb2812aaa890a",
       "bytes": 15741,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-照月.png",
       "sha256": "25126e389a42608de87803a2949086ea44e0d3a1e06f4c124f6ede9b62b6f716",
       "bytes": 15223,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-电.png",
       "sha256": "d44cfc886bc75e3b129f0f916bda034f10955f7fca47e40b0d17aacb52c379db",
       "bytes": 14197,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-白雪.png",
       "sha256": "bdae021c8574a38ccdcd09843fbc9dfc6255828fc3b435fdf6d21627591a4cfc",
       "bytes": 15749,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-白露.png",
       "sha256": "64630588a19cc370fadcf5d55d8e3ea30969dbbfcc75bd6f2d20b3cbfe6fe13a",
       "bytes": 16149,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-睦月.png",
       "sha256": "0576fd06deb0954a59372d463c8a3b1526776a587bb8fdc9d34f8c84b5be23bc",
       "bytes": 14840,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-矶风.png",
       "sha256": "0f53bb7001fd37f81d2ca3d0c0b6b612a8b4ece130800f20b23aeb4a75b5c54e",
       "bytes": 15148,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-神风.png",
       "sha256": "b1f919a09c77308b2fdd8eccedd6028b2a029909516e154b86fdc5b14e55ec46",
       "bytes": 15015,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-秋云.png",
       "sha256": "059f254d183337b17416381570b162ee791a2de858d62c6930ddf918a4ce90a5",
       "bytes": 15553,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-秋月.png",
       "sha256": "255b49f9316d8960fa8f7518dafb2b6fc08928831fab0027ff5e6ca8c9183e62",
       "bytes": 16247,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-绫波.png",
       "sha256": "a5ffabf66a09e0953503a235e7f344567876bbcbdd333acdbd668a5e585d943a",
       "bytes": 16815,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-若月.png",
       "sha256": "4dae5a56caae254f0ab86ae68a447bbc97186622c66bd00a18938d2498e442ef",
       "bytes": 15274,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-萩风.png",
       "sha256": "00f134cb9983696b61c740c48df7de7ed6238223503497bac90a6c6bada27c2f",
       "bytes": 15344,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-谷风.png",
       "sha256": "5a7d039394b02e5e65e24c6c45300399a33277cafd01b4be78aa1b341d2f48a6",
       "bytes": 15838,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-追风.png",
       "sha256": "672c6c2f15697605b0f269a3cbd2fccb3187ea5bd2d2893ea756c381c8d67d20",
       "bytes": 14750,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-长波.png",
       "sha256": "e3e61009caaccd3411dd684cfb38defa4f815c0622f86ffe3da41bcfce8f3701",
       "bytes": 15167,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-阳炎.png",
       "sha256": "479f2774a49c8639369378ff1b14e40b4323613d90ec52d57f015305f0089cdc",
       "bytes": 15754,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-雪风.png",
       "sha256": "7fe87993ddb8fad89fd291496e9abbdddab849b4ba954628d83dbf28691a1f4e",
       "bytes": 15687,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-雷.png",
       "sha256": "5e627185e6fd091248505d10a8e0ecc2f2a398ad91067379c4c0f8eea40dd607",
       "bytes": 14855,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-风云.png",
       "sha256": "4093c932b726c6f1be45a8a0ce082cb682f078e09d6cd729bb54517e64f3fb14",
       "bytes": 15035,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-高波.png",
       "sha256": "f73223782a0eaabde21d56cb06e1d3713195500b63f637061ce6471515182243",
       "bytes": 15839,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/日本-DD-黑潮.png",
       "sha256": "813ea0c60e96f49815c2f2a1b4abf48b2eeb9fc266ad738c4539fec4065a2c36",
       "bytes": 16220,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/暴风雨.png",
       "sha256": "bf87652a00a011f7b7865917a1993167a60b21f02326385b35a66ade4de47a90",
       "bytes": 12672,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/沉没中.png",
       "sha256": "4d573a0d83b2f38f9b9b0664d9fab37cd8064b94804001aaa6155aced6529c57",
       "bytes": 7578,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/海岸.jpg",
       "sha256": "0f5d8bc42fa650db3bf1e207a7b4c5ed58b6ea37f0cd9046b4a1c46a7eda7f8c",
       "bytes": 2703524,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/澳大利亚-CA-堪培拉.png",
       "sha256": "8e4e6199fd2e7b9a79a81c06e78e76b11104666f8d31fc0a5ff9ed221433ced7",
       "bytes": 17962,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/澳大利亚-CA-澳大利亚.png",
       "sha256": "51c146b24397032abf1208193836447ceb2d3b25753a417ac0935e85685188ee",
       "bytes": 18518,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/澳大利亚-CL-帕斯.png",
       "sha256": "50b697cc7099b9624971c34e04652218ebeb9a7955c2d437b786fb51f280c972",
       "bytes": 16815,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/澳大利亚-CL-霍巴特.png",
       "sha256": "cb78bccaaedf7a233e4f92974da7dcc087466cc490caab6b8c1c247e68d49aee",
       "bytes": 18216,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/烟雾.png",
       "sha256": "b67e6dd782c066d05df849b777c4cd0f5297857c4aa5fe3538fcec5cb8bd071a",
       "bytes": 28317,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/照明弹.png",
       "sha256": "592c0c1184f5aaf8a573ce8abd72db56acd7701ed1b1709f4a29b04e1bbf6f3e",
       "bytes": 11018,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-BB-北卡罗来纳.png",
       "sha256": "dc6105d69cdc5ae0bdbeb4b7e1462255b852ddd0134c5c356a1815610e82fbb9",
       "bytes": 20940,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-BB-华盛顿.png",
       "sha256": "acaaf85fd1f37acadc6a9a78ddf51bd9805e071b445c599deac7db4267785fae",
       "bytes": 19598,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-BB-南达科塔.png",
       "sha256": "bd04e4f23f8a03f569d1124ea7d10136a9ee0eb0243a34632cfc88eea3091eb7",
       "bytes": 20255,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-BB-科罗拉多.png",
       "sha256": "426c530fc4f5b3e4f3a84df73cb56c0b104a6274dbbc7f51dec6c30d6e016e32",
       "bytes": 19608,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-BB-西弗吉尼亚.png",
       "sha256": "3d6bad8260d1c8444e2a5c03176563220cb29ec1e598d11e556a3a569fa7c740",
       "bytes": 20276,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-BC-列克星敦.png",
       "sha256": "ed9d000f10c04d49160812d3b2e67502daa9845e340070d580a61f5228af5904",
       "bytes": 21765,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-BC-合众国.png",
       "sha256": "74a5d7d2b26e8595efccaee353308cc031b9b8e49071c44579c5be64102191b2",
       "bytes": 18084,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-BC-宪法.png",
       "sha256": "814bd304baff834f134eac95bf2ccb374d104e691fcd31eec28a4dcc67211146",
       "bytes": 16854,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CA-休斯顿.png",
       "sha256": "41772050395058a79128690fbcb7460f1e8026d49264909a201c9bcf05e19329",
       "bytes": 19143,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CA-北安普敦.png",
       "sha256": "60f6df56428f8229954add1378b24306ce083154708285c6b4a15d77ad7dca33",
       "bytes": 20416,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CA-彭萨科拉.png",
       "sha256": "16cd46232bdd5fe07357e989c6622ef60555c76ea0f492e0575a3bd3f651d264",
       "bytes": 20637,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CA-文森斯.png",
       "sha256": "01b80ab09b4b084ef7f41261aad8fdf2bca9d1f0f324233858250acdb0af9b7f",
       "bytes": 18742,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CA-新奥尔良.png",
       "sha256": "13b2d819e206dd1010a09c8cc33d2ed9a513699f826e98a905aa7e18a1a0f150",
       "bytes": 20211,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CA-旧金山.png",
       "sha256": "97ed0392127803f63a848b5bc840351c2d9a037a7bfabdd398e27997b17f6d83",
       "bytes": 17585,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CA-昆西.png",
       "sha256": "c3c9f2799b673417c5ada9a38306258e12e1133ffc3e6da96d390f2cfba561ae",
       "bytes": 17376,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CA-明尼阿波里斯.png",
       "sha256": "ab2081233e2adf445aac8ef426876628a6b010f8df0f97cbcaba80cfba6ef062",
       "bytes": 22340,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CA-波特兰.png",
       "sha256": "50a505d0db1bde0af004ed503c3052ab1cb65cf7a97e8c1f3e84045fab39db83",
       "bytes": 17913,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CA-盐湖城.png",
       "sha256": "ebff76e26d91b958cfd2d8842bf3cf095baf00ad11619a0a87b66dd1f8e79f18",
       "bytes": 19329,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CA-芝加哥.png",
       "sha256": "cbba4b8de923a1995229ef42113261be29435629944f7f53310dbdad706f4c0b",
       "bytes": 17669,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CA-阿斯托里亚.png",
       "sha256": "8c7ddd156d4ff04502ada9f350d565e7215b8cd9d1f43dcd215fdb5c9706bbb4",
       "bytes": 21005,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CL-丹佛.png",
       "sha256": "f4451ee38fe236b92e42da1a85fd2af5e0ece1629952af6191fd619238bdd55c",
       "bytes": 15597,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CL-亚特兰大.png",
       "sha256": "6efa9176d76cdb6153e59e3a4977948a4c58d164076426550d9b14a59d4c5f8b",
       "bytes": 18967,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CL-克利夫兰.png",
       "sha256": "1fb98683d7273988373e78a7adce1cfd5b2e70fb4697f87053df3710b9156b19",
       "bytes": 17968,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CL-博伊西.png",
       "sha256": "10a78a4f29ee24c55df48c333a5c005c63234d914b53cb5970679f908903cdc6",
       "bytes": 16892,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CL-哥伦比亚.png",
       "sha256": "7a682518d8df68a26d3e77eff858f3154ad6e832227691b4f432837310b00240",
       "bytes": 18195,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CL-圣胡安.png",
       "sha256": "1c3baa553a6de3ca029219946a1f1eeaf187dbe874fdce2e24650d1e6af7f152",
       "bytes": 17827,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CL-圣路易斯.png",
       "sha256": "9b50b890e2b977a004d309a853683ddf6eb0d29a2be767dd4ef33819b8327d4c",
       "bytes": 20064,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CL-奥马哈.png",
       "sha256": "04f4560bb1bd94fc3ab8339d377fd61f4d1f2903c8754cad3155ef7af5458c3e",
       "bytes": 20086,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CL-孟菲斯.png",
       "sha256": "403b04622a69ea9dabf0d373cb4da80efa6e1d5267c947a342cb97ecca7ecc2b",
       "bytes": 20359,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CL-朱诺.png",
       "sha256": "af19a4e28fe82dffa752ad4427c65ebf2b42f591fee2bfaab4e49174f10e3975",
       "bytes": 17612,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CL-海伦娜.png",
       "sha256": "a67188fbf259b408a1b83f22d023e04501f2662bd8e0746538d69b1077475b5c",
       "bytes": 18583,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CL-火奴鲁鲁.png",
       "sha256": "6990d1044b3b0b4d2af76b3845620e65bdeaf6c79812e8facbb5909e0dcfee7f",
       "bytes": 17888,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-CL-蒙彼利埃.png",
       "sha256": "9f87681304db0135263a6ab522d4c8a10b115ec51f3c2b5bc007de2017796550",
       "bytes": 19532,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-亚伦沃德.png",
       "sha256": "d0b39493e1c3619f75c3163d9bd5c1d2afd5e4ed3d9071f9da010e8e652febed",
       "bytes": 18886,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-伍德沃斯.png",
       "sha256": "2bda09e8148f9f7a6ff83c4197f53ae0c678a0514f86931e2550cccb951fa855",
       "bytes": 19074,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-佩里.png",
       "sha256": "a80182a44116a50a2768a2b3ca77ccafff5059892e01695657e3ff54117416da",
       "bytes": 16625,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-克拉克斯顿.png",
       "sha256": "f1509b7abc2fd8050e7a44c598ace130086ceaf26134c828cc854afcb5844509",
       "bytes": 19305,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-史特雷特.png",
       "sha256": "71beae26945308004fd2146bff2d56cceae382a603cd4fefa7f0348699809923",
       "bytes": 17400,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-埃利特.png",
       "sha256": "f8994f40296e5977969f635af7e32f4ac0cf03f6858a846f726a086876128f04",
       "bytes": 16634,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-奥班农.png",
       "sha256": "4b9f8aa3b56e72131ded95298a27aede98a601b77e64671b9f0fd944a05a7855",
       "bytes": 17829,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-威尔逊.png",
       "sha256": "2ab6cf877d3200b424b3439804ffb0282e3e6baa224f720fa0291ac3174cac20",
       "bytes": 16879,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-尼古拉斯.png",
       "sha256": "0a4fc8a4a7261badb5d7c6e967e20d7692fbde7cbfbdeccefc373c27ac3e6184",
       "bytes": 18027,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-巴尔奇.png",
       "sha256": "a70a97d96b21c1f3340fd7dfeecae9d05ccb7705099b3c22656e765f15c2b2ac",
       "bytes": 17364,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-巴格莱.png",
       "sha256": "d8c55dacdb6f9d3e379a4f319d2af9936b93ac42d040bf05af3dadd3bf8c3a37",
       "bytes": 16673,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-巴顿.png",
       "sha256": "391dbeed1fefabdfacaccc7a7c675d7a05e77207d75b82f405ea0674d2bc9ce3",
       "bytes": 15752,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-布坎南.png",
       "sha256": "8cbba503b31f5d0a2fb29f0126ff3e7d38add01815da92a738c671630282ee7b",
       "bytes": 17085,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-布鲁.png",
       "sha256": "2c0b6d3b566cd616fc27e2e01bcfd5cbfe62d6b99a8c518f13997d46b03a85c5",
       "bytes": 15265,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-帕特森.png",
       "sha256": "c309d2a2747e729ca2b6f173e05677adaeac534e4e90d0a428099c39c46dc17a",
       "bytes": 17190,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-帕金斯.png",
       "sha256": "8bcd81bf378041f095ef79476c513fb785a685369ff92bfa26b86cbacd84895a",
       "bytes": 17310,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-库欣.png",
       "sha256": "12306cbccaa0495449720d1cba2e9d9bebae1a2b388200f128ffdd16b6a0b080",
       "bytes": 15884,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-康弗斯.png",
       "sha256": "ec4e516120044b2065cdd09d998acfed35401abee2e6ece904fbd125e926d0de",
       "bytes": 17540,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-弗莱彻.png",
       "sha256": "b58c3ba5b37eb253fee462e4bcbc9efb476e073743cce79a845b00c5936348a3",
       "bytes": 17540,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-德雷顿.png",
       "sha256": "aa9811de332e64612427a9ffd482ae19c304a092f175bbfbbe675a4a730c064e",
       "bytes": 17957,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-戴森.png",
       "sha256": "a1df7035ddd3a74c17af782b841a045a59679194cee06d6c04bec69644eb3d85",
       "bytes": 20220,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-拉姆森.png",
       "sha256": "e3ee435169bbe823d2e15667681f6139042f5522d05e6ac780b296f25154fe15",
       "bytes": 17768,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-拉尔夫·托尔伯特.png",
       "sha256": "81aa58564e2f8e28ec769155b587682d09414e83f243b81722d8f5c4cc491c51",
       "bytes": 20070,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-拉德纳.png",
       "sha256": "9e787b4f01d252a993ec1f6c2a997f070c39216287640791dd5621b929fcc2fa",
       "bytes": 17474,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-拉瓦利特.png",
       "sha256": "affc98b9df049b0a613bcc3cab2378b7f00e11db653c33d80be34dc9256219ab",
       "bytes": 18605,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-拉菲.png",
       "sha256": "7f8766c2bee263efc7ffa37a3f78fcb01fe9ef7c45a1b3baaedb96af81ac2f6c",
       "bytes": 16284,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-撒切尔.png",
       "sha256": "5943edf437388a3e10e55fa8ed6cb2d2feb365a59285ede6ec7fe91174d3dd5d",
       "bytes": 17152,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-斯坦立.png",
       "sha256": "900408344da6d496755b27a0edbbff9edf72f447a55e353268692dda2405c25b",
       "bytes": 16944,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-斯塔克.png",
       "sha256": "ed7d17e310cf820ab7b3f2973ec2d53093bdfb858fd690385c5bfaf43d6d22ab",
       "bytes": 16566,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-斯彭斯.png",
       "sha256": "754ee0479be53ab26217a714e708a5f290527aaca1d8aa56454a05c79992ed73",
       "bytes": 17298,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-普雷斯顿.png",
       "sha256": "a586f26f0c7b243f725b0eb8acd210909034ae1535cc9dc4741701627d008203",
       "bytes": 18989,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-本汉姆.png",
       "sha256": "ba9e55eebe70893ecc5998c1fd77bd50594f31f04b26444b1caad09ebdd876c8",
       "bytes": 16324,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-杜威.png",
       "sha256": "f4abac9478945b1998f9e73506f4208072a66b70784cc72b131bb7cfb1a03a4e",
       "bytes": 15983,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-查尔斯·奥斯本.png",
       "sha256": "eb4e1fcd507a91714e8b60e0a85df1808fa61d8fa7232dff54f818d71fa9acd9",
       "bytes": 19926,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-格里德利.png",
       "sha256": "580e1bba214274d3f48baf4a03c61156ac189d6755dd4d0f1d2387576c31eae1",
       "bytes": 18648,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-沃克.png",
       "sha256": "ebd8ea03b2faff4b2d8dfdca5d1f7d6c7b8596ba0d42b14c1adafeeef6b814bd",
       "bytes": 15361,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-法伦霍尔特.png",
       "sha256": "3eded7f4aeaf06e877c5f58e798015c7eb22e94f679059020cd4ebda5f3c8b5a",
       "bytes": 20454,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-泰勒.png",
       "sha256": "9dcde6d3a938c6a65e88d3822050d35db02bf28e3fb7cd6d082e0ad63287a649",
       "bytes": 16513,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-特鲁斯顿.png",
       "sha256": "678c27ea127f5afc1f28c0ad39a4f7932185bdbb1bc5404f8114ba6769626f1b",
       "bytes": 19994,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-班布里奇.png",
       "sha256": "aa4292300cc3826fe760e04409e4ec011a1bc3673220e7193ffe678130737d42",
       "bytes": 18887,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-福克斯.png",
       "sha256": "bb8ec88c80b6868ee2c31b3af3643ca2035c721f27e0b101fc3fa254a88a3109",
       "bytes": 18257,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-福特.png",
       "sha256": "5bc06133ca38cebc3570da98a407ca86c8beaf306c5eb4bf49f629146dec4388",
       "bytes": 16327,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-莫里.png",
       "sha256": "3f9b17c5347857f8c9791d68382fb7ac71e8752eb601b7a37aa1ae1b31cb865a",
       "bytes": 15373,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-葛文.png",
       "sha256": "cd5579913efabf922b73e65d7059c11041adb0ce177eb5e8bca9db1abc29c809",
       "bytes": 15548,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-蒙森.png",
       "sha256": "7819a08cf7959e8216ec93e95ed04592015652b34b611e501c8dadf2d6ef40a8",
       "bytes": 17139,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-詹金斯.png",
       "sha256": "9a1315b49209e9792057c8f3f25e449af90b6647ebe839916cfe4fa152639e62",
       "bytes": 17595,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-谢伐利埃.png",
       "sha256": "6c21e479581f5772429d4a18889b267ea9ffed6852050eb808f3cc35980c751b",
       "bytes": 19020,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-贾维斯.png",
       "sha256": "adfda08ecd4ab6197a889d4862c5347043c4f38da76649f33daf4c4a65729ab5",
       "bytes": 17828,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-赛尔弗里纪.png",
       "sha256": "62e5ad16a5348432357f8bb151dc4ce26f22497387283fa4957138f70ff73251",
       "bytes": 20482,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-赫尔1.png",
       "sha256": "24940ff32e01c3d735bc469c0d4a98d6dc8858c191425b49e789811188a51cff",
       "bytes": 16750,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-赫尔2.png",
       "sha256": "8520326910cf0818883abf2cd2a2b3a9db7f7a1e84189ebd26be952aaa0693a6",
       "bytes": 16226,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-赫尔姆.png",
       "sha256": "1898f8bcc02389e458de71baaa8552fe6d03f2d8b4cb5013bc9e7d44e83d123c",
       "bytes": 17273,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-达尔格伦.png",
       "sha256": "09b478f4385f321546582f4795f330b9d345b308d22ecfd8173e01a6ab552f49",
       "bytes": 19245,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-迪凯特.png",
       "sha256": "b9783bc4d929cc7d5eeaa3567c4e3adb6392f4c184094638c8e8ec1bee7444a4",
       "bytes": 18487,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-邓拉普.png",
       "sha256": "c56ca9889a8e9458ff0554420472fc7c5ef4e41f183a84b144fa38734f4b5fbb",
       "bytes": 17056,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-邓肯.png",
       "sha256": "2a3c64c79e1f84b32e206a0c2348e90892764f499edec1033f5c6fe3aa3dc1af",
       "bytes": 15965,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-郎.png",
       "sha256": "599f608c59a7b649af27221753feda2f91ee18ab84dcffb04f0ea46c3db817f1",
       "bytes": 13629,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-雷德福德.png",
       "sha256": "76058e67ac378047739045accc1cb4cc626a96344fe082541031beb4329986c3",
       "bytes": 19165,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-麦克多诺.png",
       "sha256": "e2ad12d4b4b5b3f62662a3ec2f8ce14363120d1455849d563b077aa6e51e07c8",
       "bytes": 19553,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-DD-麦卡拉.png",
       "sha256": "0c5fb4576cd952f4e3351ce18bf6f77f45a4545b6ddda612b10d8aeb1a4e34f5",
       "bytes": 16763,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-ML-布里斯.png",
       "sha256": "f3632d21ff61724ca0d70f01ba3988277a6fbc55d6450319ec298b4ada0edc52",
       "bytes": 19787,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-ML-德雷福.png",
       "sha256": "fd2d50fa1d21d24c2b7b202f7bb3f3962192a3decd6302ba66f5812724093acb",
       "bytes": 20527,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-ML-普雷贝尔.png",
       "sha256": "6a9c34bad46fa94db0469345c252317e80932ac317cc4d37ddd224352f3daf3b",
       "bytes": 20583,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/美国-ML-甘布勒.png",
       "sha256": "b61541997201cda1835fab27ce514c1955011beee619d5ba4a880ceff57fe6ab",
       "bytes": 19444,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/能见度.png",
       "sha256": "2ab9dc860daacd367de03454b07252835cef4e38451c1e9021b88576131a15b4",
       "bytes": 6491,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/英国-CA-哈津斯.png",
       "sha256": "a6122a29e45f4a40c06938a31638aba03ba54c51043e13b837bf3216568fcb8e",
       "bytes": 18630,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/英国-DD-克什米尔.png",
       "sha256": "9a4b520916df38af6645fd673ae3e744786ff83eb9f2e1ecc439c6c50f6d47fc",
       "bytes": 17753,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/英国-DD-朱庇特.png",
       "sha256": "569301eea367e3a36df7cd0b931942127a6e852da06c3b7f7a86cbb741ddca40",
       "bytes": 17610,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/英国-DD-标枪.png",
       "sha256": "6a5873e6c7ae0dc546194474b4b60ca05bbb9a50e1160577c8ccdf347bc2b05c",
       "bytes": 16723,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/英国-DD-泽西.png",
       "sha256": "7fe240f091439867f8417a4fc1695c1717abc5e87fbb90b8bd73540d1bdc6dd4",
       "bytes": 16306,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/英国-DD-豺.png",
       "sha256": "5779cfe4cb1760b31bf0122274a9d459a40206cb086c4ea9692833eb81f0ed14",
       "bytes": 15240,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/荷兰-CL-德·鲁伊特.png",
       "sha256": "c986f69183c7ac1d11402020ea74296fcc898e90579e9440bad393ac7183a7a0",
       "bytes": 21493,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/荷兰-CL-爪哇.png",
       "sha256": "3508d53078536abc136a5d486d2a4bba3c8d4bc04e99510d3865bf3790837383",
       "bytes": 18143,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/起火.png",
       "sha256": "40b13e230b58c86186d60bb76b933c0f6d9e97df2128cfc536796c43ce34fff2",
       "bytes": 12950,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/轴心背景.jpg",
       "sha256": "ec6a84bc00797cde293f15647ef517d593e3c1b98ad5117c704ff13545c4e340",
       "bytes": 145462,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/铁底湾-地图.jpg",
       "sha256": "7fc2fe3e004d9fbd1c4800ad1298404114dd59d4b9416f73d205d1ea39dd2747",
       "bytes": 13225904,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/隐藏.png",
       "sha256": "5d501fb650dfb71c73207088cb210d886bde9aa1b0ea5ba74c29cd67e8391e52",
       "bytes": 1869,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/鱼雷1（日）.png",
       "sha256": "2f547f936655d3adf821129dc548ad59074c6250be8136529fcc5a728bdcaa3a",
       "bytes": 6493,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/鱼雷1（美）.png",
       "sha256": "fa8ac88cebd05bd8bc3b179ffe0ca6e4e5d00e8bd637e2d13389aa7090d9089f",
       "bytes": 6444,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/鱼雷2（日）.png",
       "sha256": "a73bac2c3b6f45046650bdd45525fce9c5a6dc73ad1336f0d74e41029b8951fe",
       "bytes": 8399,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/鱼雷2（美）.png",
       "sha256": "358abe76b24173c136ed211d7ff6cce7936421a8776b29cae2430373d99b475c",
       "bytes": 8223,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/images/鱼雷3（日）.png",
       "sha256": "9966c590538ca8ce3778c3fa32524d6ad0879cad3bb692e6a2af41807756debc",
       "bytes": 10106,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/APD睦月级.png",
       "sha256": "67d321950d729923199ba04381cff66c3b673c228893892f97b7910afa41cb01",
       "bytes": 37162,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/APD神风级.png",
       "sha256": "a40c6b37886cd38ab589a4105fa593e01ea0d40b4069ba24a238e2ab6f787725",
       "bytes": 35431,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/BB大和级.png",
       "sha256": "3350fd91ad86a41164d63b3cb1c15b7f94a477aca437a313daf7c3c522ad80d7",
       "bytes": 82358,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/BB金刚级.png",
       "sha256": "d0480756d5bd8c463c073937da8f13a8574a4cce1e885eb574880daf92e6d20b",
       "bytes": 73588,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/BB长门级.png",
       "sha256": "fa9825c3087ff38f1eee5eae3b0e44e089141cf5870268e6caac94375c006ae2",
       "bytes": 72771,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/BC纪伊级.png",
       "sha256": "d333cf5738d0fae7568e8b44ae07f9769c619afb864d6e56999355b9b328e60b",
       "bytes": 75025,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/BC赤城级.png",
       "sha256": "c4a2f788b0288f986094f8e6221b506449dcd01e65cc79c0fb36697e5cff5f96",
       "bytes": 73464,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/CA古鹰级1928.png",
       "sha256": "4b7adc2c05b9e9a3c467290b44d5ffe30f77f5be8056421bdafa83841f799921",
       "bytes": 70160,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/CA古鹰青叶级.png",
       "sha256": "2b46b7a808c66bc1d026a8f54d0ec9982731f3a54ac90484dd8a3c6bce23aced",
       "bytes": 66535,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/CA妙高级.png",
       "sha256": "6eaa79f51619cbf63b5e485d36724067804e81add00534fc21ab476233a60ee6",
       "bytes": 71045,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/CA高雄级.png",
       "sha256": "f036e017852b6cb1ef8821c279cf165d70f6d7144c5067cb662c871e36ef42e0",
       "bytes": 73058,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/CL夕张级_实际无副炮.png",
       "sha256": "9b8cdcdabb3711b9584ae28623438f54feb178f0613e6a46218b1130cac3df72",
       "bytes": 63160,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/CL天龙级.png",
       "sha256": "8b254e300898334d49f5b8eb83ee6d6166772329edbdef1f35a26d02cefca0f7",
       "bytes": 63830,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/CL天龙级1928.png",
       "sha256": "19df0bdec81d923b394da9f8d89ebe8c3a2b9ffa189d4a3d84e8ce3b964d9f78",
       "bytes": 60844,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/CL川内级1928.png",
       "sha256": "afea0026f5e7b3b697737bdae629013fa3dbd943faf5f1b2e10135a7d65ea531",
       "bytes": 66725,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/CL长良川内级.png",
       "sha256": "07f8348f3849670db2feaa5b7fc214ed7f82bf428ea1f7c18fd4049df2214c1f",
       "bytes": 68710,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/CL阿贺野级.png",
       "sha256": "fbb8af601d662181fd5b79241f9f05503c182a5387fc66b8f583ad9e14ad2890",
       "bytes": 65864,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/DD初春&有明&白露级.png",
       "sha256": "7a437551afa85380ee4eeef5bf58942fc17a5b606ce4b9924f816786393dd346",
       "bytes": 38036,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/DD吹雪&晓级.png",
       "sha256": "686d47e74062d430dd12408b46c2b9ef435091c21f4a5448a54669631fb3331a",
       "bytes": 36064,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/DD朝潮&阳炎&夕云级.png",
       "sha256": "9fcf246277933091b816cabba6f08c8dcda30c24a4489db93333c9106368e8c3",
       "bytes": 36872,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/DD神风级1928.png",
       "sha256": "77744ed0d876a54a6b7f3906c8734fa4dcae33486daa7ca48cd8b7c03d4213d9",
       "bytes": 35636,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/japan/DD秋月级.png",
       "sha256": "94c7e48b97946f78df0547959a64f9daf6223acf93733f0536b6e5a737483556",
       "bytes": 34713,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/BB北卡罗来纳级.png",
       "sha256": "5edec0f0546298d607cb0ab24ad5d161d93ed1f42412c25fed7f58922359ed29",
       "bytes": 74032,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/BB南达科塔级.png",
       "sha256": "a82a504904ee8ff499c5e4f9d2dfa571fb801693f8840b2be19624277eba2c31",
       "bytes": 74804,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/BB科罗拉多级.png",
       "sha256": "551268118e746e3f626aea4999ba18765d38f8c902b99db9b90448523316c788",
       "bytes": 74858,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/BC列克星敦级.png",
       "sha256": "fecdb640e9e239ecedbc5bf8d2d780a2322c38a550b5fb93ba6d8419bab7d5c6",
       "bytes": 74785,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/CA北安普顿级.png",
       "sha256": "833cba2761a11cf046b36769f6dd6ccf103d09f37c18e29060784e269fed39b1",
       "bytes": 66839,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/CA彭萨科拉级.png",
       "sha256": "42cb06cacbe2346d3aa2e906a541744e6e03cc300f4b81d18074873034659046",
       "bytes": 67353,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/CA新奥尔良级.png",
       "sha256": "5d9f104427f01e400b5ee3cc1003e8604ade24661f2978e2a8fb00b1c298357b",
       "bytes": 65977,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/CA波特兰级.png",
       "sha256": "39f64560357e54f60ec244df7d1b508266d4a0c84571228b04fb112763f4ec5d",
       "bytes": 64977,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/CL亚特兰大级.png",
       "sha256": "675e404690cd153327562b6af0b8987208d172a234bfe7c85fc71723df5352d7",
       "bytes": 67594,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/CL克利夫兰级.png",
       "sha256": "80e04293377971eefe17c3fd2a0807a823f4cbb3b39623044aefc5a7542849b6",
       "bytes": 67977,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/CL奥马哈级1928.png",
       "sha256": "9325a30022da1a3f98b64c306ccd0565eda3e3f98357444d8a3b92889e74345a",
       "bytes": 68276,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/CL布鲁林克级.png",
       "sha256": "abca14ad506c28a5c1cdf1c4420af019637ba8fd23942d4fb26c6682beb97d12",
       "bytes": 65049,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/DD克莱姆森级1928.png",
       "sha256": "d68789fe7238b8b9eea7426bc2023dc2fe2ea9acc657cec6d902dc5bcccecde7",
       "bytes": 37125,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/DD格里德利级.png",
       "sha256": "b6b9bbd334f98235b1214bc0e2e6528eec457e105f0b1c7e97850593c7d1c4e3",
       "bytes": 37685,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/DD西姆斯&本森&格里维斯&弗莱彻级.png",
       "sha256": "4f9f7bf9434d86cbfc937bdd4c92494874a6cf5a4c0ff6c107b797c7562e606e",
       "bytes": 40851,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/assets/ship-classes/usa/DD马汉级.png",
       "sha256": "baf1174c31656964e1feff1a64c8dd47fb6926969e72fc10c4ac567afc289ca4",
       "bytes": 39316,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/records/ship-record-manual-1.1-zh.pdf",
       "sha256": "eeff020db4a7f491def219335404996d4b204035923be2b5bd925f65dfdac210",
       "bytes": 53104132,
       "pages": 28,
-      "missing_ocr_pages": 28
+      "missing_ocr_pages": 1,
+      "draft_ocr_pages": 27,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/rules/iron-bottom-sound-iv-rules-zh.pdf",
       "sha256": "0f14cbf1dee747d14e1fb52db77a4fff440076b2a96826f4299faa60b45c573e",
       "bytes": 4463021,
       "pages": 15,
-      "missing_ocr_pages": 2
+      "missing_ocr_pages": 1,
+      "draft_ocr_pages": 2,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/rules/player-aid-tables-zh.pdf",
       "sha256": "0aae79ccc1ec699834e259d8818dbf48f66cbd077b19c34ed9570c6aff9b76bc",
       "bytes": 2460843,
       "pages": 4,
-      "missing_ocr_pages": 4
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 4,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/scenarios/scenario-book-zh.pdf",
       "sha256": "c11394a7dda262dcafd17a647d3699426ba54c9e55f2a142704f094c31c1c813",
       "bytes": 7907157,
       "pages": 15,
-      "missing_ocr_pages": 15
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 15,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/tables/movement-attack-log-zh.xlsx",
       "sha256": "bd7876a6e5dab806464ec8f778c7aa8d71a35ea99739c7e0179898cfba969b71",
       "bytes": 11078,
       "pages": 3,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     },
     {
       "source": "resources/originals/tables/ship-list-zh.docx",
       "sha256": "ec70e54a5deb57d58020c6ee6260b1217abfbe941ea42c08ff20aac5a1a54c6f",
       "bytes": 40691,
       "pages": 1,
-      "missing_ocr_pages": 0
+      "missing_ocr_pages": 0,
+      "draft_ocr_pages": 0,
+      "verified_ocr_pages": 0
     }
   ],
   "page_count": 345,
-  "chunk_count": 362,
-  "table_candidate_count": 17
+  "chunk_count": 372,
+  "table_candidate_count": 38
 }

@@ -4,12 +4,20 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sqlite3
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[3]
 DATABASE = ROOT / "resources" / "derived" / "rag" / "iron_bottom_sound_rules.sqlite3"
+
+
+def fts_expression(term: str) -> str:
+    tokens = [token.replace('"', '""') for token in re.findall(r"\S+", term.strip())]
+    if not tokens:
+        raise ValueError("Query term cannot be empty")
+    return " AND ".join(f'"{token}"' for token in tokens)
 
 
 def query(term: str, limit: int) -> list[tuple]:
@@ -26,7 +34,7 @@ def query(term: str, limit: int) -> list[tuple]:
             ORDER BY bm25(page_fts)
             LIMIT ?
             """,
-            (term, limit),
+            (fts_expression(term), limit),
         ).fetchall()
     finally:
         connection.close()
