@@ -47,6 +47,7 @@ PHASES = [
     Phase.FIRE_END,
 ]
 ORDER_PHASES = {Phase.REINFORCEMENT, Phase.MOVEMENT_PLANNING, Phase.TORPEDO_PLANNING, Phase.GUNNERY}
+ORDER_PHASES.add(Phase.CONTACT_SETUP)
 
 
 def d66_adjust(value: int, modifier: int) -> int:
@@ -225,7 +226,7 @@ class IronBottomEngine:
         ships: list[PublicShip] = []
         own_positions = [ship.position for ship in state.ships.values() if ship.side == side and not ship.sunk and ship.position]
         for ship in state.ships.values():
-            visible = ship.side == side or self._visible_to(state, ship, side, own_positions)
+            visible = ship.side == side or bool(ship.position and self._visible_to(state, ship, side, own_positions))
             if not visible:
                 continue
             hide_damage = state.options.optional_rules.hidden_damage and ship.side != side
@@ -259,11 +260,17 @@ class IronBottomEngine:
             or track.side == side
             or bool(track.contact_ship_ids)
         ]
-        markers = [
-            marker.model_copy(deep=True)
-            for marker in state.markers
-            if marker.secret_side in (None, side)
-        ]
+        markers: list[MarkerState] = []
+        for marker in state.markers:
+            if marker.kind == "contact":
+                if marker.position is None and marker.secret_side != side:
+                    continue
+                public_marker = marker.model_copy(deep=True)
+                if marker.secret_side != side:
+                    public_marker.contact_truth = None
+                markers.append(public_marker)
+            elif marker.secret_side in (None, side):
+                markers.append(marker.model_copy(deep=True))
         return PlayerObservation(
             game_id=game_id,
             scenario_id=state.scenario_id,
@@ -296,6 +303,7 @@ class IronBottomEngine:
             return []
         if state.phase in ORDER_PHASES and side.value not in state.submitted_orders:
             schemas: dict[Phase, dict[str, Any]] = {
+                Phase.CONTACT_SETUP: {"contacts": "four edge markers; two real formations and two decoys"},
                 Phase.REINFORCEMENT: {"reinforcements": "entry_hex, heading, speed", "confirmation": {"ready": True}},
                 Phase.MOVEMENT_PLANNING: {
                     "movement": {"ship_id": "owned ship", "speed": "legal MF", "commands": "advance/turn_*"},
@@ -327,17 +335,20 @@ class IronBottomEngine:
             errors.append("This side already submitted orders")
         owned = {ship.id: ship for ship in state.ships.values() if ship.side == batch.side and not ship.sunk}
         allowed_fields = {
+            Phase.CONTACT_SETUP: {"contacts"},
             Phase.REINFORCEMENT: {"reinforcements"},
-            Phase.MOVEMENT_PLANNING: {"movement"},
+            Phase.MOVEMENT_PLANNING: {"movement", "contact_movement"},
             Phase.TORPEDO_PLANNING: {"torpedoes"},
             Phase.GUNNERY: {"gunnery", "smoke", "smoke_ships", "illumination", "searchlights"},
         }.get(state.phase, set())
         populated = {
-            name for name in ("reinforcements", "movement", "torpedoes", "gunnery", "smoke", "smoke_ships", "illumination", "searchlights")
+            name for name in ("contacts", "reinforcements", "movement", "contact_movement", "torpedoes", "gunnery", "smoke", "smoke_ships", "illumination", "searchlights")
             if getattr(batch, name)
         }
         for name in sorted(populated - allowed_fields):
             errors.append(f"{name} orders are not legal during {state.phase}")
+        if state.phase == Phase.CONTACT_SETUP:
+            self._validate_contact_setup(state, batch, errors)
         for order in batch.movement if state.phase == Phase.MOVEMENT_PLANNING else []:
             ship = owned.get(order.ship_id)
             if not ship:
@@ -363,6 +374,7 @@ class IronBottomEngine:
             submitted = {order.ship_id for order in batch.movement}
             if submitted != expected:
                 errors.append(f"Movement plans must cover every active ship; missing={sorted(expected-submitted)}, extra={sorted(submitted-expected)}")
+            self._validate_contact_movement(state, batch, errors)
         for order in batch.reinforcements if state.phase == Phase.REINFORCEMENT else []:
             ship = owned.get(order.ship_id)
             if not ship or ship.position is not None or ship.reinforcement_turn != state.turn:
@@ -527,7 +539,14 @@ class IronBottomEngine:
         before = len(state.events)
         if state.phase == Phase.COMPLETE:
             return []
-        if state.phase == Phase.REINFORCEMENT:
+        if state.phase == Phase.CONTACT_SETUP:
+            if set(state.submitted_orders) != {Side.AXIS.value, Side.ALLIES.value}:
+                raise ValueError("Both sides must submit hidden contact setup before advancing")
+            self._seal_orders(state)
+            self._resolve_contact_setup(state)
+            state.phase = state.resume_phase or Phase.REINFORCEMENT
+            state.resume_phase = None
+        elif state.phase == Phase.REINFORCEMENT:
             if set(state.submitted_orders) != {Side.AXIS.value, Side.ALLIES.value}:
                 raise ValueError("Both sides must confirm reinforcement orders before advancing")
             self._seal_orders(state)
@@ -602,8 +621,10 @@ class IronBottomEngine:
                     projected = OrderBatch(
                         side=side,
                         phase=state.phase,
+                        contacts=source.contacts if state.phase == Phase.CONTACT_SETUP else [],
                         reinforcements=source.reinforcements if state.phase == Phase.REINFORCEMENT else [],
                         movement=source.movement if state.phase == Phase.MOVEMENT_PLANNING else [],
+                        contact_movement=source.contact_movement if state.phase == Phase.MOVEMENT_PLANNING else [],
                         torpedoes=source.torpedoes if state.phase == Phase.TORPEDO_PLANNING else [],
                         gunnery=source.gunnery if state.phase == Phase.GUNNERY else [],
                         smoke=source.smoke if state.phase == Phase.GUNNERY else [],
@@ -759,6 +780,179 @@ class IronBottomEngine:
         # The printed entry boundary is the shortest hex-edge corridor between its two labelled endpoints.
         return start.distance(entry) + entry.distance(end) == start.distance(end)
 
+    def _validate_contact_setup(self, state: GameState, batch: OrderBatch, errors: list[str]) -> None:
+        markers = {
+            marker.id: marker
+            for marker in state.markers
+            if marker.kind == "contact" and marker.secret_side == batch.side
+        }
+        submitted_ids = [order.marker_id for order in batch.contacts]
+        if len(submitted_ids) != len(set(submitted_ids)):
+            errors.append("Duplicate hidden contact setup order")
+        if set(submitted_ids) != set(markers):
+            errors.append("Hidden contact setup must cover all four owned markers")
+        entry_labels = [order.entry_hex.label for order in batch.contacts]
+        if len(entry_labels) != len(set(entry_labels)):
+            errors.append("Hidden contacts must use distinct entry hexes")
+        assigned: list[str] = []
+        for order in batch.contacts:
+            marker = markers.get(order.marker_id)
+            if not marker:
+                errors.append(f"Non-owned hidden contact {order.marker_id}")
+                continue
+            if not self._map_edge(order.entry_hex):
+                errors.append(f"Hidden contact {order.marker_id} must start on a map edge")
+            if marker.contact_truth == "real" and not order.ship_ids:
+                errors.append(f"Real hidden contact {order.marker_id} requires a formation")
+            if marker.contact_truth == "decoy" and order.ship_ids:
+                errors.append(f"Decoy hidden contact {order.marker_id} may not contain ships")
+            assigned.extend(order.ship_ids)
+            if order.ship_ids:
+                original = [state.contact_reserve_positions.get(ship_id) for ship_id in order.ship_ids]
+                if any(position is None for position in original):
+                    errors.append(f"{order.marker_id} formation contains a non-owned or unavailable ship")
+                else:
+                    anchor = original[0]
+                    for position in original:
+                        q = order.entry_hex.q + position.q - anchor.q  # type: ignore[union-attr]
+                        r = order.entry_hex.r + position.r - anchor.r  # type: ignore[union-attr]
+                        if not self._coord_on_map(q, r):
+                            errors.append(f"{order.marker_id} translated formation leaves the map")
+                            break
+        expected = {
+            ship_id for ship_id in state.contact_reserve_positions
+            if state.ships[ship_id].side == batch.side
+        }
+        if len(assigned) != len(set(assigned)) or set(assigned) != expected:
+            errors.append("The two real hidden contacts must partition every owned starting ship exactly once")
+
+    def _validate_contact_movement(self, state: GameState, batch: OrderBatch, errors: list[str]) -> None:
+        markers = {
+            marker.id: marker
+            for marker in state.markers
+            if marker.kind == "contact" and marker.secret_side == batch.side and marker.position
+        }
+        submitted = {order.marker_id for order in batch.contact_movement}
+        if submitted != set(markers):
+            errors.append(
+                f"Contact movement must cover all owned contacts; missing={sorted(set(markers)-submitted)}, "
+                f"extra={sorted(submitted-set(markers))}"
+            )
+        for order in batch.contact_movement:
+            marker = markers.get(order.marker_id)
+            if not marker:
+                continue
+            try:
+                commands = self.movement_commands(MovementOrder(ship_id=marker.id, plan=order.plan))
+                self.validate_movement_commands(commands)
+                cost = self.movement_cost(order.plan, commands)
+                if cost not in {4, 5}:
+                    errors.append(f"{marker.id}: hidden contacts must move at 4 or 5 MF")
+                self._marker_trajectory(marker, commands)
+            except ValueError as error:
+                errors.append(f"{marker.id}: {error}")
+
+    @staticmethod
+    def _map_edge(coord: HexCoord) -> bool:
+        display_row = coord.r + (coord.q - (coord.q & 1)) // 2
+        return coord.q in {0, 33} or display_row in {0, 26}
+
+    @staticmethod
+    def _coord_on_map(q: int, r: int) -> bool:
+        display_row = r + (q - (q & 1)) // 2
+        return 0 <= q <= 33 and 0 <= display_row <= 26
+
+    def _resolve_contact_setup(self, state: GameState) -> None:
+        markers = {marker.id: marker for marker in state.markers if marker.kind == "contact"}
+        for batch in self._sealed_batches(state, Phase.CONTACT_SETUP):
+            for order in batch.contacts:
+                marker = markers[order.marker_id]
+                marker.position = order.entry_hex
+                marker.heading = order.heading
+                marker.movement_rate = order.speed
+                state.contact_formations[marker.id] = list(order.ship_ids)
+                if order.ship_ids:
+                    anchor = state.contact_reserve_positions[order.ship_ids[0]]
+                    state.contact_offsets[marker.id] = {
+                        ship_id: (
+                            state.contact_reserve_positions[ship_id].q - anchor.q,
+                            state.contact_reserve_positions[ship_id].r - anchor.r,
+                        )
+                        for ship_id in order.ship_ids
+                    }
+            self._event(
+                state,
+                "contact_setup_sealed",
+                f"{batch.side.value} 隐蔽标记已部署",
+                payload={"secret_side": batch.side.value},
+                rule=self._rule("IBS-R-09.1", 13, "9.1 隐蔽标记算子"),
+            )
+
+    def _marker_trajectory(self, marker: MarkerState, commands: list[str]) -> tuple[list[tuple[HexCoord, int]], int]:
+        if not marker.position or not marker.heading:
+            return [], marker.heading or 1
+        heading = marker.heading
+        position = marker.position
+        trajectory: list[tuple[HexCoord, int]] = []
+        for command in commands:
+            if command == "advance":
+                position = position.neighbor(heading)
+                trajectory.append((position, heading))
+            elif command == "turn_port_60":
+                heading = 6 if heading == 1 else heading - 1
+            elif command == "turn_starboard_60":
+                heading = 1 if heading == 6 else heading + 1
+            elif command == "turn_port_120":
+                heading = ((heading - 3) % 6) + 1
+                trajectory.append((position, heading))
+            elif command == "turn_starboard_120":
+                heading = ((heading + 1) % 6) + 1
+                trajectory.append((position, heading))
+        return trajectory, heading
+
+    def _reveal_detected_contacts(self, state: GameState) -> None:
+        contacts = [marker for marker in state.markers if marker.kind == "contact" and marker.position]
+        detected: set[str] = set()
+        for observer in contacts:
+            if observer.contact_truth != "real" or not observer.position or not observer.secret_side:
+                continue
+            radar = state.options.optional_rules.radar and any(
+                state.ships[ship_id].radar and not state.ships[ship_id].radar_destroyed
+                for ship_id in state.contact_formations.get(observer.id, [])
+            )
+            visibility = int(state.visibility[observer.secret_side.value])
+            for target in contacts:
+                if target.secret_side == observer.secret_side or not target.position:
+                    continue
+                if radar or observer.position.distance(target.position) <= visibility:
+                    detected.add(target.id)
+        for marker_id in sorted(detected):
+            marker = next((item for item in state.markers if item.id == marker_id), None)
+            if marker:
+                self._reveal_contact(state, marker)
+
+    def _reveal_contact(self, state: GameState, marker: MarkerState) -> None:
+        formation = state.contact_formations.get(marker.id, [])
+        if marker.contact_truth == "real" and marker.position:
+            for ship_id in formation:
+                ship = state.ships[ship_id]
+                dq, dr = state.contact_offsets[marker.id][ship_id]
+                ship.position = HexCoord(q=marker.position.q + dq, r=marker.position.r + dr)
+                ship.heading = marker.heading or ship.heading
+                ship.current_speed = marker.movement_rate or 4
+                ship.previous_speed = ship.current_speed
+            message = f"真实隐蔽标记 {marker.id} 揭示编队"
+        else:
+            message = f"假隐蔽标记 {marker.id} 揭示并移除"
+        self._event(
+            state,
+            "contact_revealed",
+            message,
+            payload={"marker_id": marker.id, "truth": marker.contact_truth, "ship_ids": formation},
+            rule=self._rule("IBS-R-09.1", 13, "9.1 隐蔽标记算子"),
+        )
+        state.markers = [item for item in state.markers if item.id != marker.id]
+
     def _resolve_movement(self, state: GameState) -> None:
         movement_orders = {
             order.ship_id: order
@@ -770,6 +964,25 @@ class IronBottomEngine:
             for batch in self._sealed_batches(state, Phase.TORPEDO_PLANNING)
             for order in batch.torpedoes
         ]
+        contact_orders = {
+            order.marker_id: order
+            for batch in self._sealed_batches(state, Phase.MOVEMENT_PLANNING)
+            for order in batch.contact_movement
+        }
+        contact_markers = {
+            marker.id: marker
+            for marker in state.markers
+            if marker.kind == "contact" and marker.position and marker.id in contact_orders
+        }
+        contact_paths: dict[str, list[tuple[HexCoord, int]]] = {}
+        contact_headings: dict[str, int] = {}
+        for marker_id, marker in contact_markers.items():
+            order = contact_orders[marker_id]
+            commands = self.movement_commands(MovementOrder(ship_id=marker_id, plan=order.plan))
+            trajectory, heading = self._marker_trajectory(marker, commands)
+            contact_paths[marker_id] = trajectory
+            contact_headings[marker_id] = heading
+            marker.movement_rate = self.movement_cost(order.plan, commands)
         paths: dict[str, list[tuple[HexCoord, int]]] = {}
         final_headings: dict[str, int] = {}
         for ship in state.ships.values():
@@ -792,6 +1005,7 @@ class IronBottomEngine:
         ]
         maximum_impulses = max(
             [len(path) for path in paths.values()]
+            + [len(path) for path in contact_paths.values()]
             + list(track_allowance.values())
             + planned_torpedo_allowance
             + [0]
@@ -837,6 +1051,12 @@ class IronBottomEngine:
                     state.ships[ship_id].position = position
                     if impulse < len(paths[ship_id]):
                         state.ships[ship_id].heading = paths[ship_id][impulse][1]
+            for marker_id, path in contact_paths.items():
+                marker = contact_markers[marker_id]
+                if marker not in state.markers or not marker.position or impulse >= len(path):
+                    continue
+                marker.position, marker.heading = path[impulse]
+            self._reveal_detected_contacts(state)
             launched_this_impulse: set[str] = set()
             for order in torpedo_orders:
                 if order.launch_at_mf != impulse + 1 or not order.launch_hex or not order.launcher_id:
@@ -945,6 +1165,18 @@ class IronBottomEngine:
                 f"{ship.name} 移动至 {ship.position.label if ship.position else '场外'}",
                 payload={"ship_id": ship.id, "position": ship.position.label if ship.position else None, "heading": ship.heading},
                 rule=self._rule("IBS-R-06", 7, "6.0"),
+            )
+        for marker_id, heading in contact_headings.items():
+            marker = contact_markers[marker_id]
+            if marker not in state.markers:
+                continue
+            marker.heading = heading
+            self._event(
+                state,
+                "contact_moved",
+                f"隐蔽标记 {marker.id} 移动至 {marker.position.label if marker.position else '场外'}",
+                payload={"marker_id": marker.id, "position": marker.position.label if marker.position else None},
+                rule=self._rule("IBS-R-09.1", 13, "9.1 隐蔽标记算子"),
             )
 
     def _resolve_gunnery(self, state: GameState) -> None:

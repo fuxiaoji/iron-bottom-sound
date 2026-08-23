@@ -12,6 +12,7 @@ from .models import (
     GameState,
     GunMountState,
     HexCoord,
+    MarkerState,
     Phase,
     ShipRecord,
     ShipState,
@@ -166,4 +167,23 @@ def build_initial_state(game_id: str, scenario_id: str, seed: int, options: Game
         start, end = reinforcement["arrival"]["entry_hex_range"]
         state.reinforcement_entry_start = HexCoord.from_label(start)
         state.reinforcement_entry_end = HexCoord.from_label(end)
+    if options.optional_rules.hidden_contacts:
+        state.resume_phase = state.phase
+        state.phase = Phase.CONTACT_SETUP
+        state.contact_reserve_positions = {
+            ship.id: ship.position for ship in state.ships.values() if ship.position
+        }
+        for ship in state.ships.values():
+            if ship.position:
+                ship.position = None
+        for side in Side:
+            for index in range(1, 5):
+                state.markers.append(
+                    MarkerState(
+                        id=f"CONTACT-{side.value}-{index}",
+                        kind="contact",
+                        secret_side=side,
+                        contact_truth="real" if index <= 2 else "decoy",
+                    )
+                )
     return state

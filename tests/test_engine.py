@@ -1,6 +1,8 @@
 from iron_bottom_sound.engine import IronBottomEngine
 from iron_bottom_sound.models import (
     GameOptions,
+    ContactSetupOrder,
+    ContactMovementOrder,
     GunMountOrder,
     GunneryOrder,
     HexCoord,
@@ -529,3 +531,113 @@ def test_optional_commands_are_rejected_when_their_rule_is_disabled() -> None:
     )
     assert not result.valid
     assert any("optional rule 9.7" in error for error in result.errors)
+
+
+def test_hidden_contacts_setup_seals_two_real_formations_and_two_decoys_per_side() -> None:
+    engine = IronBottomEngine()
+    options = GameOptions(optional_rules=OptionalRules(hidden_contacts=True))
+    state = engine.reset("IBS-S-03", seed=1, options=options)
+    assert state.phase == Phase.CONTACT_SETUP
+    assert not [ship for ship in state.ships.values() if ship.position]
+
+    edge_coords = []
+    for q in range(34):
+        for display_row in (0, 26):
+            edge_coords.append(HexCoord(q=q, r=display_row - (q - (q & 1)) // 2))
+    for display_row in range(1, 26):
+        edge_coords.append(HexCoord(q=0, r=display_row))
+        edge_coords.append(HexCoord(q=33, r=display_row - 16))
+    used: set[str] = set()
+
+    def entry_for(group: list[str]) -> HexCoord:
+        anchor = state.contact_reserve_positions[group[0]]
+        for candidate in edge_coords:
+            if candidate.label in used:
+                continue
+            if all(
+                engine._coord_on_map(
+                    candidate.q + state.contact_reserve_positions[ship_id].q - anchor.q,
+                    candidate.r + state.contact_reserve_positions[ship_id].r - anchor.r,
+                )
+                for ship_id in group
+            ):
+                used.add(candidate.label)
+                return candidate
+        raise AssertionError("No legal contact entry")
+
+    def inward_heading(coord: HexCoord) -> int:
+        display_row = coord.r + (coord.q - (coord.q & 1)) // 2
+        if coord.q == 0:
+            return 3
+        if coord.q == 33:
+            return 6
+        return 4 if display_row == 0 else 1
+
+    for side in Side:
+        ships = [ship_id for ship_id in state.contact_reserve_positions if state.ships[ship_id].side == side]
+        split = max(1, len(ships) // 2)
+        groups = [ships[:split], ships[split:]]
+        orders = [
+            ContactSetupOrder(
+                marker_id=f"CONTACT-{side.value}-{index + 1}",
+                entry_hex=(entry := entry_for(group)),
+                heading=inward_heading(entry),
+                speed=4,
+                ship_ids=group,
+            )
+            for index, group in enumerate(groups)
+        ]
+        for index in (3, 4):
+            entry = next(coord for coord in edge_coords if coord.label not in used)
+            used.add(entry.label)
+            orders.append(ContactSetupOrder(
+                marker_id=f"CONTACT-{side.value}-{index}",
+                entry_hex=entry,
+                heading=inward_heading(entry),
+                speed=5,
+            ))
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.CONTACT_SETUP, contacts=orders)
+        ).valid
+    engine.advance(state.game_id)
+    assert state.phase == Phase.REINFORCEMENT
+    allied_view = engine.observe(state.game_id, Side.ALLIES)
+    enemy_contacts = [marker for marker in allied_view.markers if marker.secret_side == Side.AXIS]
+    assert enemy_contacts and all(marker.contact_truth is None for marker in enemy_contacts)
+
+    axis_real = next(marker for marker in state.markers if marker.id == "CONTACT-axis-1")
+    allied_real = next(marker for marker in state.markers if marker.id == "CONTACT-allies-1")
+    axis_real.position = HexCoord.from_label("O14")
+    allied_real.position = HexCoord.from_label("P14")
+    engine._reveal_detected_contacts(state)
+    assert axis_real not in state.markers
+    assert allied_real not in state.markers
+    assert all(state.ships[ship_id].position for ship_id in state.contact_formations[axis_real.id])
+    assert all(state.ships[ship_id].position for ship_id in state.contact_formations[allied_real.id])
+
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        ).valid
+    engine.advance(state.game_id)
+    for side in Side:
+        active_ships = [ship for ship in state.ships.values() if ship.side == side and ship.position]
+        contacts = [
+            marker for marker in state.markers
+            if marker.kind == "contact" and marker.secret_side == side and marker.position
+        ]
+        batch = OrderBatch(
+            side=side,
+            phase=Phase.MOVEMENT_PLANNING,
+            movement=[MovementOrder(ship_id=ship.id, plan="0") for ship in active_ships],
+            contact_movement=[ContactMovementOrder(marker_id=marker.id, plan="4") for marker in contacts],
+        )
+        assert engine.submit_orders(state.game_id, batch).valid
+    engine.advance(state.game_id)
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.TORPEDO_PLANNING)
+        ).valid
+    engine.advance(state.game_id)
+    engine.advance(state.game_id)
+    assert any(event.type == "contact_moved" for event in state.events)

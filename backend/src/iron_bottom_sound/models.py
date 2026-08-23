@@ -17,6 +17,7 @@ class Side(StrEnum):
 
 
 class Phase(StrEnum):
+    CONTACT_SETUP = "contact_setup"
     REINFORCEMENT = "reinforcement"
     MOVEMENT_PLANNING = "movement_planning"
     TORPEDO_PLANNING = "torpedo_planning"
@@ -247,6 +248,19 @@ class MovementOrder(BaseModel):
     commands: list[MovementCommand] = Field(default_factory=list)
 
 
+class ContactSetupOrder(BaseModel):
+    marker_id: str
+    entry_hex: HexCoord
+    heading: int = Field(ge=1, le=6)
+    speed: Literal[4, 5]
+    ship_ids: list[str] = Field(default_factory=list)
+
+
+class ContactMovementOrder(BaseModel):
+    marker_id: str
+    plan: str
+
+
 class ReinforcementOrder(BaseModel):
     ship_id: str
     entry_hex: HexCoord
@@ -306,6 +320,8 @@ class OrderBatch(BaseModel):
     side: Side
     phase: Phase | None = None
     reinforcements: list[ReinforcementOrder] = Field(default_factory=list)
+    contacts: list[ContactSetupOrder] = Field(default_factory=list)
+    contact_movement: list[ContactMovementOrder] = Field(default_factory=list)
     movement: list[MovementOrder] = Field(default_factory=list)
     gunnery: list[GunneryOrder] = Field(default_factory=list)
     torpedoes: list[TorpedoOrder] = Field(default_factory=list)
@@ -378,6 +394,9 @@ class MarkerState(BaseModel):
     target_ship_id: str | None = None
     expires_turn: int | None = None
     secret_side: Side | None = None
+    heading: int | None = Field(default=None, ge=1, le=6)
+    movement_rate: int | None = Field(default=None, ge=0, le=8)
+    contact_truth: Literal["real", "decoy"] | None = None
 
 
 class GameState(BaseModel):
@@ -397,6 +416,10 @@ class GameState(BaseModel):
     torpedo_tracks: list[TorpedoTrack] = Field(default_factory=list)
     wrecks: list[WreckState] = Field(default_factory=list)
     markers: list[MarkerState] = Field(default_factory=list)
+    resume_phase: Phase | None = None
+    contact_reserve_positions: dict[str, HexCoord] = Field(default_factory=dict)
+    contact_formations: dict[str, list[str]] = Field(default_factory=dict)
+    contact_offsets: dict[str, dict[str, tuple[int, int]]] = Field(default_factory=dict)
     reinforcement_trigger_turn: int | None = None
     reinforcement_arrival_turn: int | None = None
     reinforcement_succeeds_on: tuple[int, ...] = ()
