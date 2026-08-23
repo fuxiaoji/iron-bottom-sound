@@ -95,6 +95,21 @@ def test_hidden_damage_filters_enemy_but_not_own_damage() -> None:
     assert next(ship for ship in plain_view.ships if ship.id == plain_enemy.id).hull == plain_enemy.hull
 
 
+def test_secret_orders_and_hidden_damage_score_never_enter_opponent_observation() -> None:
+    engine = IronBottomEngine()
+    options = GameOptions(optional_rules=OptionalRules(hidden_damage=True))
+    state = engine.reset("IBS-S-01", seed=1, options=options)
+    assert engine.submit_orders(
+        state.game_id, OrderBatch(side=Side.ALLIES, phase=Phase.GUNNERY)
+    ).valid
+    enemy_view = engine.observe(state.game_id, Side.AXIS)
+    assert not any(event.type == "orders_submitted" for event in enemy_view.recent_events)
+    assert all("order_batch" not in event.payload for event in enemy_view.recent_events)
+    state.score[Side.AXIS.value] = 4
+    state.score[Side.ALLIES.value] = 7
+    assert engine.observe(state.game_id, Side.AXIS).score == {"axis": 0, "allies": 0}
+
+
 def test_four_turns_reach_automatic_terminal_state() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=3)
@@ -827,6 +842,41 @@ def test_optional_malfunction_power_failure_disables_all_guns_temporarily() -> N
     event = next(event for event in state.events if event.type == "malfunction")
     assert event.rule and event.rule.rule_id == "IBS-R-09.5"
     assert event.payload["result"] == {"power_failure_turns": 2}
+
+
+def test_every_fire_table_result_executes_for_fired_and_non_firing_ships() -> None:
+    for fired in (False, True):
+        for raw in range(2, 13):
+            engine = IronBottomEngine()
+            state = engine.reset("IBS-S-03", seed=raw)
+            ship = state.ships["IBS-U-KM-KARL-GALSTER"]
+            ship.fire_markers = 1
+            ship.fired = fired
+            engine._roll_2d6 = lambda _, value=raw: (  # type: ignore[method-assign]
+                value, [max(1, value - 6), min(6, value - 1)]
+            )
+            engine._roll_d66 = lambda _: (66, [6, 6])  # type: ignore[method-assign]
+            engine._resolve_fire(state)
+            event = next(event for event in state.events if event.type == "fire_check")
+            expected = min(12, raw + (0 if fired else 1))
+            assert event.dice and event.dice.raw == raw and event.dice.adjusted == expected
+
+
+def test_every_malfunction_table_result_executes_with_audited_effect() -> None:
+    for raw in range(2, 13):
+        engine = IronBottomEngine()
+        state = engine.reset("IBS-S-01", seed=raw)
+        ship = state.ships["IBS-U-IJN-AOBA"]
+        engine._roll_2d6 = lambda _, value=raw: (  # type: ignore[method-assign]
+            value, [max(1, value - 6), min(6, value - 1)]
+        )
+        engine._roll_d66 = lambda _: (66, [6, 6])  # type: ignore[method-assign]
+        engine._resolve_malfunction(state, ship)
+        event = next(event for event in state.events if event.type == "malfunction")
+        assert event.dice and event.dice.raw == raw
+        assert event.payload["result"] == engine.rules.table_2d6(
+            engine.rules.malfunction_results, raw
+        )
 
 
 def test_hidden_contacts_setup_seals_two_real_formations_and_two_decoys_per_side() -> None:

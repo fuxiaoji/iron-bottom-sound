@@ -284,7 +284,11 @@ class IronBottomEngine:
             ships=ships,
             torpedo_tracks=tracks,
             markers=markers,
-            score=deepcopy(state.score),
+            score=(
+                {Side.AXIS.value: 0, Side.ALLIES.value: 0}
+                if state.options.optional_rules.hidden_damage and state.phase != Phase.COMPLETE
+                else deepcopy(state.score)
+            ),
             recent_events=safe_events,
             winner=state.winner,
             victory_reason=state.victory_reason,
