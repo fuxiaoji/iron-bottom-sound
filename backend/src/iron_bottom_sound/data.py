@@ -6,7 +6,7 @@ from typing import Any
 
 import yaml
 
-from .models import GameOptions, GameState, HexCoord, Phase, ShipState, Side, WeaponMount
+from .models import FiringArc, GameOptions, GameState, HexCoord, Phase, ShipRecord, ShipState, Side, WeaponMount
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -34,8 +34,35 @@ def load_templates() -> dict[str, dict[str, Any]]:
     return read_yaml(STRUCTURED / "ships" / "templates.yaml")["templates"]
 
 
-def make_ship(entry: dict[str, Any], templates: dict[str, dict[str, Any]]) -> ShipState:
-    data = deepcopy(templates[entry["template"]])
+def _broadside_firepower(record: ShipRecord, kind: str) -> int:
+    return max(
+        sum(mount.firepower for mount in record.guns if mount.kind == kind and arc in mount.arcs)
+        for arc in FiringArc
+    )
+
+
+def make_ship(
+    entry: dict[str, Any], templates: dict[str, dict[str, Any]], records: dict[str, ShipRecord] | None = None
+) -> ShipState:
+    record = (records or {}).get(entry["id"])
+    if record:
+        primary_mounts = [mount for mount in record.guns if mount.kind == "primary"]
+        secondary_mounts = [mount for mount in record.guns if mount.kind == "secondary"]
+        data = {
+            "type": record.ship_type,
+            "hull": record.hull_boxes,
+            "speed_track": record.maximum_speed_cycle,
+            "primary_gf": _broadside_firepower(record, "primary"),
+            "primary_caliber": primary_mounts[0].caliber,
+            "secondary_gf": _broadside_firepower(record, "secondary") if secondary_mounts else 0,
+            "secondary_caliber": secondary_mounts[0].caliber if secondary_mounts else 0,
+            "torpedoes": sum(launcher.torpedoes for launcher in record.torpedo_launchers),
+            "torpedo_type": record.torpedo_type,
+            "belt_armor": record.armour.belt or 0,
+            "vp": record.vp,
+        }
+    else:
+        data = deepcopy(templates[entry["template"]])
     primary = WeaponMount(kind="primary", firepower=data.get("primary_gf", 0), caliber=data.get("primary_caliber", 0))
     secondary = None
     if data.get("secondary_gf", 0):
@@ -67,9 +94,12 @@ def make_ship(entry: dict[str, Any], templates: dict[str, dict[str, Any]]) -> Sh
 
 
 def build_initial_state(game_id: str, scenario_id: str, seed: int, options: GameOptions) -> GameState:
+    from .ship_records import load_ship_records
+
     scenario = load_scenario(scenario_id)
     templates = load_templates()
-    ships = {entry["id"]: make_ship(entry, templates) for entry in scenario["ships"]}
+    records = load_ship_records()
+    ships = {entry["id"]: make_ship(entry, templates, records) for entry in scenario["ships"]}
     for key in scenario.get("optional_rules", []):
         setattr(options.optional_rules, key, True)
     return GameState(

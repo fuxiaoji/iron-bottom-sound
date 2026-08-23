@@ -456,7 +456,7 @@ class IronBottomEngine:
             if distance == 0:
                 continue
             definition = self.rules.torpedoes.get(attacker.torpedo_type or "", {})
-            max_range = max(definition.get("ranges", [10]))
+            max_range = max(setting["range"] for setting in definition["settings"])
             if distance > max_range:
                 continue
             roll, dice = self._roll_2d6(state)

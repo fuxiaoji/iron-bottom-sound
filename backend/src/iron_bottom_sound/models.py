@@ -27,6 +27,21 @@ class Phase(StrEnum):
     COMPLETE = "complete"
 
 
+class FiringArc(StrEnum):
+    BOW = "bow"
+    PORT = "port"
+    STARBOARD = "starboard"
+    STERN = "stern"
+
+
+class MountPosition(StrEnum):
+    BOW = "bow"
+    MIDSHIPS = "midships"
+    PORT = "port"
+    STARBOARD = "starboard"
+    STERN = "stern"
+
+
 def column_to_index(label: str) -> int:
     normalized = label.upper()
     if len(normalized) == 1 and "A" <= normalized <= "Z":
@@ -103,6 +118,65 @@ class WeaponMount(BaseModel):
     caliber: float = Field(default=0, ge=0)
     ammo: int | None = Field(default=None, ge=0)
     destroyed: bool = False
+
+
+class GunMountRecord(BaseModel):
+    id: str
+    kind: Literal["primary", "secondary"]
+    position: MountPosition
+    firepower: int = Field(gt=0)
+    caliber: float = Field(gt=0)
+    arcs: frozenset[FiringArc]
+    armour: float | None = Field(default=None, ge=0)
+
+
+class TorpedoLauncherRecord(BaseModel):
+    id: str
+    position: MountPosition
+    arcs: frozenset[FiringArc]
+    torpedoes: int = Field(gt=0)
+    reloads: int = Field(default=0, ge=0)
+
+
+class ArmourRecord(BaseModel):
+    primary: float | None = Field(default=None, ge=0)
+    secondary: float | None = Field(default=None, ge=0)
+    belt: float | None = Field(default=None, ge=0)
+    bridge: float | None = Field(default=None, ge=0)
+
+
+class ShipRecord(BaseModel):
+    id: str
+    name: str
+    ship_type: str
+    displacement_band: Literal["A", "B", "C", "D", "E", "F", "G", "H", "I"]
+    hull_rows: tuple[int, int, int]
+    speed_damage_track: tuple[tuple[int, ...], tuple[int, ...], tuple[int, ...]]
+    guns: tuple[GunMountRecord, ...]
+    torpedo_launchers: tuple[TorpedoLauncherRecord, ...] = ()
+    torpedo_type: str | None = None
+    armour: ArmourRecord = Field(default_factory=ArmourRecord)
+    fire_control: bool = True
+    radar: bool = False
+    aircraft: bool = False
+    vp: int = Field(ge=0)
+    special_rules: tuple[str, ...] = ()
+    source_page: int = Field(gt=0)
+
+    @property
+    def hull_boxes(self) -> int:
+        return sum(self.hull_rows)
+
+    @property
+    def maximum_speed_cycle(self) -> tuple[int, int, int]:
+        return tuple(row[0] for row in self.speed_damage_track)
+
+    @field_validator("speed_damage_track")
+    @classmethod
+    def descending_speed_rows(cls, value: tuple[tuple[int, ...], tuple[int, ...], tuple[int, ...]]):
+        if any(not row or any(left <= right for left, right in zip(row, row[1:])) for row in value):
+            raise ValueError("Each speed-damage row must be non-empty and strictly descending")
+        return value
 
 
 class ShipState(BaseModel):

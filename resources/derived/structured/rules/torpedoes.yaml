@@ -1,10 +1,56 @@
-schema_version: 1
+schema_version: 2
+id: IBS-T-TORPEDO-CHARACTERISTICS
 source: {document: player-aid-tables-zh.pdf, pdf_page: 3, status: verified_source}
+status: structured
 types:
-  us-21-mk11-1928: {nation: US, caliber_in: 21, speeds: [[8, 8, 7], [6, 6, 4]], ranges: [10, 16], damage_modifier: -2}
-  us-21-mk14-1928: {nation: US, caliber_in: 21, speeds: [[8, 8, 7], [6, 6, 4]], ranges: [10, 16], damage_modifier: -1}
-  us-21-mk15-1942: {nation: US, caliber_in: 21, speeds: [[8, 8, 8], [6, 6, 6]], ranges: [16, 24], damage_modifier: 0}
-  jp-21: {nation: JP, caliber_in: 21, speeds: [[7, 7, 7], [6, 6, 6]], ranges: [18, 27], damage_modifier: 0}
-  jp-24-type8: {nation: JP, caliber_in: 24, speeds: [[8, 8, 7], [6, 6, 6]], ranges: [18, 36], damage_modifier: 0}
-  jp-24-type90: {nation: JP, caliber_in: 24, speeds: [[8, 8, 7], [7, 7, 7]], ranges: [27, 45], damage_modifier: 0}
-  jp-24-type93: {nation: JP, caliber_in: 24, speeds: [[8, 8, 8], [7, 7, 7], [6, 6, 6]], ranges: [36, 58, 71], damage_modifier: 1}
+  us-21-mk11-model3-1928:
+    nation: US
+    caliber_in: 21
+    settings: [{speed: [8, 8, 2], range: 10}, {speed: [6, 6, 4], range: 16}, {speed: [5, 5, 4], range: 21}]
+    damage_modifier: -2
+  us-21-mk11-model4-1928:
+    nation: US
+    caliber_in: 21
+    settings: [{speed: [8, 8, 2], range: 10}, {speed: [6, 6, 4], range: 16}, {speed: [5, 4, 4], range: 30}]
+    damage_modifier: -1
+  us-21-mk15-1942:
+    nation: US
+    caliber_in: 21
+    settings: [{speed: [8, 8, 2], range: 10}, {speed: [6, 6, 4], range: 16}, {speed: [5, 4, 4], range: 25}]
+    damage_modifier: 0
+  uk-21-mk7c:
+    nation: UK
+    applies_to: [Australia, New Zealand]
+    caliber_in: 21
+    settings: [{speed: [6, 6, 5], range: 11}, {speed: [6, 6, 5], range: 17}, {speed: [5, 5, 5], range: 22}]
+    damage_modifier: 0
+  uk-21-mk9:
+    nation: UK
+    caliber_in: 21
+    settings: [{speed: [6, 5, 5], range: 18}, {speed: [5, 4, 4], range: 25}]
+    damage_modifier: 0
+  jp-21:
+    nation: JP
+    caliber_in: 21
+    settings: [{speed: [8, 8, 2], range: 10}, {speed: [6, 6, 6], range: 18}]
+    damage_modifier: -1
+  jp-24-type8:
+    nation: JP
+    caliber_in: 24
+    settings: [{speed: [7, 6, 6], range: 18}, {speed: [6, 5, 5], range: 27}, {speed: [5, 5, 4], range: 36}]
+    damage_modifier: 0
+  jp-24-type90:
+    nation: JP
+    caliber_in: 24
+    settings: [{speed: [8, 7, 7], range: 12}, {speed: [7, 7, 7], range: 18}, {speed: [6, 6, 6], range: 27}]
+    damage_modifier: 0
+  jp-24-type93:
+    nation: JP
+    caliber_in: 24
+    settings: [{speed: [8, 8, 8], range: 36}, {speed: [7, 7, 7], range: 58}, {speed: [6, 6, 6], range: 71}]
+    damage_modifier: 1
+  de-nl-21:
+    nation: DE_NL
+    caliber_in: 21
+    settings: [{speed: [8, 8, 2], range: 10}, {speed: [7, 7, 7], range: 14}, {speed: [5, 5, 5], range: 25}]
+    damage_modifier: 0
