@@ -14,7 +14,7 @@ range_modifier:
     - {min: 3, max: 4, value: 3}
     - {min: 5, max: 6, value: 1}
     - {min: 7, max: 10, value: 0}
-    - {min: 11, max: 15, value: -1}
+    - {min: 11, max: 15, value: 0, non_japanese_additional: -1}
     - {min: 16, max: 999, value: -1}
 target_speed_modifier:
   gunnery: {0: -18, 1: -9, "2-3": -4, "4+": 0}
@@ -29,3 +29,25 @@ other:
   mfc_destroyed: 3
   searchlight_target: -3
   searchlight_user: -3
+optional:
+  star_shell_or_radar_illumination: 3
+  target_searchlit: -3
+  searchlight_user: -3
+  through_smoke: 6
+gunnery_caliber_target_modifier:
+  columns: [BB_BC, CA, CL_AV, DD_APD]
+  rows:
+    11-18: [0, -3, -3, 3]
+    7.5-8: [6, 0, 0, 0]
+    5.25-6.1: [12, 0, 0, 0]
+    3-5.1: [18, 6, 6, 0]
+torpedo_hit:
+  broadside: {2-10: 0, 11-12: 1, 13+: 2}
+  bow_stern: {2-12: 0, 13+: 1}
+collision_modifier:
+  columns: [wreck, DD_APD, CA_CL_AV, BB_BC]
+  rows:
+    BB_BC: [-4, -5, -4, -3]
+    CA_CL_AV: [-4, -4, -3, -2]
+    DD_APD: [-4, -3, -2, -1]
+  both_moved_2mf_or_less: -1

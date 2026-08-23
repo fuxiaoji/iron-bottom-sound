@@ -184,9 +184,11 @@ class ShipState(BaseModel):
     name: str
     side: Side
     ship_type: str
+    displacement_band: Literal["A", "B", "C", "D", "E", "F", "G", "H", "I"] = "A"
     position: HexCoord | None
     heading: int = Field(ge=1, le=6)
     speed_track: tuple[int, int, int]
+    initial_max_speed: int = Field(gt=0)
     current_speed: int = Field(ge=0)
     previous_speed: int = Field(ge=0)
     hull: int = Field(ge=0)
@@ -196,6 +198,10 @@ class ShipState(BaseModel):
     torpedo: WeaponMount | None = None
     torpedo_type: str | None = None
     belt_armor: float = 0
+    primary_armor: float = 0
+    secondary_armor: float = 0
+    bridge_armor: float = 0
+    aircraft: bool = False
     vp: int = 0
     asset: str | None = None
     fire_markers: int = Field(default=0, ge=0)

@@ -6,6 +6,25 @@ notes:
   - 在所有 44–65 结果中均须执行装甲穿透检定。
   - 百分比航速损失按初始最大航速的四分之一或二分之一向下取整。
 displacement_bands: [A, B, C, D, E, F, G, H, I]
+direct_results:
+  "11": {fire: 1, narrative: 防空炮弹药起火}
+  "12": {fire: 1, narrative: 舰内食堂起火}
+  "13": {fire: 1, narrative: 油料起火}
+  "14": {fire: 1, narrative: 医护室起火，负伤船员被烧死}
+  "15": {fire: 1, narrative: 船员休息室起火}
+  "16": {fire: 1, torpedo_launcher_hit: 1}
+  "21": {hull: 1, speed_loss: 1, torpedo_launcher_hit: 1}
+  "22": {hull: 1, torpedo_launcher_hit: 1}
+  "23": {fire: 1, hull: 1, torpedo_launcher_hit: 1}
+  "24": {rudder_side_check: true, future_turn_limit_degrees: 60}
+  "25": {rudder_side_check: true, straight_turns: 3}
+  "26": {rudder_hit: true, circle_turns: 2, fire_control: true}
+  "31": {rudder_or_bridge: true, next_turn_straight_at_original_speed: true, captain_killed: true}
+  "32": {bridge_hit: true, hold_turn_degrees: 60, circle_turns: 2, captain_wounded: true}
+  "33-36": {fire: 1, hull: 1, ignore_fire_if_armoured_without_aircraft: true, fire_control: true}
+  "41": {fire: 1, hull: 2, ignore_fire_if_armoured_without_aircraft: true}
+  "42": {hull: 2, primary: 2, secondary: 1, radar: true, captain_killed: true}
+  "43": {sunk: true, side_check: true}
 results:
   "44": {A: 1H/-2MF, B: 1H/-2MF, C: 1H/-2MF, D: 1H/-2MF, E: 2H/-2MF, F: 2H/-2MF, G: 2H/-2MF, H: 2H/-2MF, I: 2H/-1MF}
   "45": {A: 1H/-4MF, B: 1H/-4MF, C: 2H/-3MF, D: 2H/-3MF, E: 3H/-3MF, F: 3H/-2MF, G: 2H/-2MF, H: 2H/-2MF, I: 1H/-2MF}

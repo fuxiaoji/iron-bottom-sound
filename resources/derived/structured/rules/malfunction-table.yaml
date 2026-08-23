@@ -1,0 +1,14 @@
+schema_version: 1
+id: IBS-T-MALFUNCTION-66
+source: {document: player-aid-tables-zh.pdf, pdf_page: 1, status: verified_source}
+status: structured
+results:
+  2: {power_failure_turns: 2}
+  3: {power_failure_turns: 1}
+  4: {destroy_random_secondary: 1}
+  5: {ammunition_explosion: true, fire: 1}
+  6-8: {kind: no_effect}
+  9: {fire_if_aircraft_aboard: 1}
+  10: {destroy_random_primary: 1}
+  11: {destroy_random_secondary: 1}
+  12: {destroy_random_primary: 1, special_damage: true}

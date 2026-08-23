@@ -74,6 +74,12 @@ class RuleData:
         self.gunnery_results = self._yaml("gunnery-results.yaml")["results"]
         self.torpedo_collision = self._yaml("torpedo-collision-table.yaml")
         self.torpedoes = self._yaml("torpedoes.yaml")["types"]
+        self.modifiers = self._yaml("modifiers.yaml")
+        self.fire_results = self._yaml("fire-table.yaml")["results"]
+        self.malfunction_results = self._yaml("malfunction-table.yaml")["results"]
+        self.special_damage = self._yaml("special-damage-table.yaml")
+        with (RULES / "armour-penetration-table.csv").open("r", encoding="utf-8", newline="") as stream:
+            self.armour_penetration = list(csv.DictReader(stream))
 
     @staticmethod
     def _yaml(name: str) -> dict[str, Any]:
@@ -98,6 +104,75 @@ class RuleData:
             key = str(roll)
         column = self.torpedo_collision["columns"].index(displacement)
         return self.torpedo_collision["rows"][key][column]
+
+    @staticmethod
+    def _range_value(rows: list[dict[str, Any]], distance: int) -> dict[str, Any]:
+        return next(row for row in rows if int(row["min"]) <= distance <= int(row["max"]))
+
+    def range_modifier(self, kind: str, distance: int, japanese: bool = False) -> int:
+        row = self._range_value(self.modifiers["range_modifier"][kind], distance)
+        return int(row["value"]) + (0 if japanese else int(row.get("non_japanese_additional", 0)))
+
+    def target_speed_modifier(self, kind: str, speed: int) -> int:
+        table = self.modifiers["target_speed_modifier"][kind]
+        if speed in table:
+            return int(table[speed])
+        for key, value in table.items():
+            if isinstance(key, str) and key.endswith("+") and speed >= int(key[:-1]):
+                return int(value)
+            if isinstance(key, str) and "-" in key:
+                lower, upper = (int(number) for number in key.split("-"))
+                if lower <= speed <= upper:
+                    return int(value)
+        raise KeyError(speed)
+
+    @staticmethod
+    def table_2d6(table: dict[Any, Any], roll: int) -> dict[str, Any]:
+        if roll in table:
+            return table[roll]
+        for key, value in table.items():
+            if isinstance(key, str) and "-" in key:
+                lower, upper = (int(number) for number in key.split("-"))
+                if lower <= roll <= upper:
+                    return value
+        raise KeyError(roll)
+
+    def gunnery_result(self, roll: int) -> Any:
+        return self.gunnery_results["66+"] if roll >= 66 else self.gunnery_results[roll]
+
+    def special_damage_result(self, roll: int, displacement_band: str) -> dict[str, Any]:
+        direct = self.special_damage["direct_results"]
+        key = str(roll)
+        if key in direct:
+            return deepcopy(direct[key])
+        for candidate, result in direct.items():
+            if "-" in candidate:
+                lower, upper = (int(number) for number in candidate.split("-"))
+                if lower <= roll <= upper:
+                    return deepcopy(result)
+        result = self.special_damage["results"][key]
+        return {"effect": result[displacement_band], "additional": result.get("additional"), "armour_check": True}
+
+    def penetration(self, nation: str, caliber: float, distance: int) -> float:
+        distance_column = next(
+            label
+            for label, lower, upper in (
+                ("1-2", 1, 2), ("3-5", 3, 5), ("6-7", 6, 7), ("8-10", 8, 10),
+                ("11-13", 11, 13), ("14-17", 14, 17), ("18-20", 18, 20), ("21-25", 21, 25),
+            )
+            if lower <= distance <= upper
+        )
+        candidates = []
+        for row in self.armour_penetration:
+            calibers = [float(value) for value in row["caliber_in"].split("|")]
+            nations = row["nation"].split("_")
+            if caliber in calibers and (nation in nations or row["nation"] == "GENERIC"):
+                candidates.append(row)
+        if not candidates:
+            return 0
+        row = next((item for item in candidates if nation in item["nation"].split("_")), candidates[0])
+        value = row[distance_column]
+        return 0 if value == "-" else float(value)
 
 
 class IronBottomEngine:
@@ -431,8 +506,8 @@ class IronBottomEngine:
                 self._resolve_malfunction(state, attacker)
             for _ in range(hits):
                 result_roll, result_dice = self._roll_d66(state)
-                result = self.rules.gunnery_results[result_roll]
-                self._apply_gunnery_result(state, attacker, target, result_roll, result)
+                result = self.rules.gunnery_result(result_roll)
+                self._apply_gunnery_result(state, attacker, target, result_roll, result, distance)
                 self._event(
                     state,
                     "gunnery_result",
@@ -460,7 +535,7 @@ class IronBottomEngine:
             if distance > max_range:
                 continue
             roll, dice = self._roll_2d6(state)
-            adjusted = roll + self._torpedo_modifier(target, distance)
+            adjusted = roll + self._torpedo_modifier(attacker, target, distance)
             aspect = self._target_aspect(attacker, target)
             hits = 0
             if aspect == "broadside":
@@ -499,9 +574,16 @@ class IronBottomEngine:
         for ship in state.ships.values():
             for _ in range(ship.fire_markers):
                 roll, dice = self._roll_2d6(state)
-                if roll in {3, 7, 11}:
-                    self._damage_hull(state, ship, 1, "fire")
-                if roll in {4, 8, 9}:
+                result = self.rules.table_2d6(self.rules.fire_results, roll)
+                if result.get("kind") == "special_damage":
+                    self._resolve_special_damage(state, ship, armour_already_penetrated=True)
+                self._damage_hull(state, ship, int(result.get("hull", 0)), "fire")
+                self._lose_speed(ship, int(result.get("speed_loss", 0)))
+                if result.get("secondary") and ship.secondary:
+                    ship.secondary.destroyed = True
+                if result.get("primary"):
+                    ship.primary.destroyed = True
+                if result.get("extinguish") and (result.get("applies_to") != "US_only" or ship.id.startswith("IBS-U-USN-")):
                     ship.fire_markers = max(0, ship.fire_markers - 1)
                 self._event(
                     state,
@@ -532,46 +614,20 @@ class IronBottomEngine:
             self._event(state, "victory", f"{state.winner.value} 获胜：{state.victory_reason}")
 
     def _gunnery_modifier(self, state: GameState, attacker: ShipState, target: ShipState, distance: int, attackers: int) -> int:
-        if distance == 1:
-            modifier = -24
-        elif distance == 2:
-            modifier = -15
-        elif distance <= 5:
-            modifier = -12
-        elif distance <= 9:
-            modifier = -6
-        elif distance <= 15:
-            modifier = 0
-        elif distance <= 20:
-            modifier = 2
-        else:
-            modifier = 4
-        speed = target.current_speed
-        modifier += 0 if speed >= 4 else (-4 if speed >= 2 else (-9 if speed == 1 else -18))
+        modifier = self.rules.range_modifier("gunnery", distance)
+        modifier += self.rules.target_speed_modifier("gunnery", target.current_speed)
         if attacker.mfc_destroyed:
-            modifier += 3
-        modifier += max(0, attackers - 1)
+            modifier += int(self.rules.modifiers["other"]["mfc_destroyed"])
+        modifier += max(0, attackers - 1) * int(self.rules.modifiers["other"]["each_additional_attacker"])
         if target.fire_markers:
-            modifier -= 2
-        if state.options.optional_rules.silhouettes and target.fired:
-            modifier -= 3
+            modifier += int(self.rules.modifiers["other"]["target_on_fire"])
         if state.options.optional_rules.smoke and target.smoke:
-            modifier += 6
+            modifier += int(self.rules.modifiers["optional"]["through_smoke"])
         return modifier
 
-    @staticmethod
-    def _torpedo_modifier(target: ShipState, distance: int) -> int:
-        if distance <= 2:
-            modifier = 5
-        elif distance <= 4:
-            modifier = 3
-        elif distance <= 6:
-            modifier = 1
-        elif distance <= 15:
-            modifier = 0
-        else:
-            modifier = -1
-        modifier += 4 if target.current_speed <= 1 else (2 if target.current_speed == 2 else (1 if target.current_speed == 3 else 0))
+    def _torpedo_modifier(self, attacker: ShipState, target: ShipState, distance: int) -> int:
+        modifier = self.rules.range_modifier("torpedo", distance, japanese=attacker.id.startswith("IBS-U-IJN-"))
+        modifier += self.rules.target_speed_modifier("torpedo", target.current_speed)
         return modifier
 
     @staticmethod
@@ -589,19 +645,19 @@ class IronBottomEngine:
             stern = None
         return "bow_stern" if attacker.position in {bow, stern} else "broadside"
 
-    def _apply_gunnery_result(self, state: GameState, attacker: ShipState, target: ShipState, roll: int, result: Any) -> None:
+    def _apply_gunnery_result(
+        self, state: GameState, attacker: ShipState, target: ShipState, roll: int, result: Any, distance: int
+    ) -> None:
         if result == "miss":
             return
         if result == "special":
-            self._resolve_special_damage(state, target)
-            return
-        if result == "variable_hull_by_ship_type":
-            amount = 3 if target.ship_type in {"BB", "BC"} else (2 if target.ship_type in {"AV", "CA", "CL"} else 1)
-            self._damage_hull(state, target, amount, "gunnery")
+            self._resolve_special_damage(state, target, attacker, distance)
             return
         if isinstance(result, list):
             for item in result:
-                if item == "radar":
+                if item == "special":
+                    self._resolve_special_damage(state, target, attacker, distance)
+                elif item == "radar":
                     target.radar_destroyed = True
                 elif item == "fire_control":
                     target.mfc_destroyed = True
@@ -615,7 +671,19 @@ class IronBottomEngine:
                 target.primary.destroyed = True
             return
         if isinstance(result, dict):
-            if result.get("armour_check") and not self._penetrates(attacker, target):
+            if "hull_by_ship_type" in result:
+                group = "BB_BC" if target.ship_type in {"BB", "BC"} else (
+                    "AV_CA_CL" if target.ship_type in {"AV", "CA", "CL"} else "other"
+                )
+                group = group if group in result["hull_by_ship_type"] else "other"
+                self._damage_hull(state, target, int(result["hull_by_ship_type"][group]), "gunnery")
+                return
+            armour = target.belt_armor
+            if any(key.startswith("primary") for key in result):
+                armour = target.primary_armor
+            elif "secondary" in result:
+                armour = target.secondary_armor
+            if result.get("armour_check") and not self._penetrates(attacker, armour, distance):
                 return
             self._damage_hull(state, target, int(result.get("hull", 0)), "gunnery")
             self._lose_speed(target, int(result.get("speed_loss", 0)))
@@ -626,35 +694,68 @@ class IronBottomEngine:
             if any(key.startswith("primary") for key in result):
                 target.primary.destroyed = True
 
-    def _resolve_special_damage(self, state: GameState, target: ShipState) -> None:
+    def _resolve_special_damage(
+        self,
+        state: GameState,
+        target: ShipState,
+        attacker: ShipState | None = None,
+        distance: int | None = None,
+        armour_already_penetrated: bool = False,
+    ) -> None:
         roll, dice = self._roll_d66(state)
-        if roll in {11, 12, 13, 14, 15, 16, 23, 31, 33, 34, 41}:
-            target.fire_markers += 1
-        if roll in {21, 22, 23, 33, 41, 44, 45, 46, 51, 52, 53, 54, 55, 56, 61, 63, 64, 65}:
-            self._damage_hull(state, target, 1, "special_damage")
-        if roll in {21, 23, 53, 55, 56, 61}:
-            self._lose_speed(target, 1)
-        if roll in {24, 25, 26, 31, 32}:
-            target.heading = ((target.heading + (1 if roll % 2 else -1) - 1) % 6) + 1
-        if roll in {42, 52, 54, 55, 61, 62, 63, 64, 65}:
-            target.primary.destroyed = target.primary.destroyed or roll in {52, 54, 55}
+        result = self.rules.special_damage_result(roll, target.displacement_band)
+        penetrated = True
+        if result.get("armour_check") and not armour_already_penetrated:
+            penetrated = bool(attacker and distance is not None and self._penetrates(attacker, target.belt_armor, distance))
+        if penetrated:
+            if "effect" in result:
+                hull, speed, sunk, fire = parse_effect(result["effect"])
+                percent = re.search(r"-(25|50|100)%", result["effect"])
+                if percent:
+                    speed = target.initial_max_speed * int(percent.group(1)) // 100
+                self._damage_hull(state, target, target.hull if sunk else hull, "special_damage")
+                self._lose_speed(target, speed)
+                if fire:
+                    target.fire_markers += 1
+            else:
+                self._damage_hull(state, target, target.hull if result.get("sunk") else int(result.get("hull", 0)), "special_damage")
+                self._lose_speed(target, int(result.get("speed_loss", 0)))
+                target.fire_markers += int(result.get("fire", 0))
+                if result.get("fire_control"):
+                    target.mfc_destroyed = True
+                if result.get("radar"):
+                    target.radar_destroyed = True
+                if result.get("primary"):
+                    target.primary.destroyed = True
+                if result.get("secondary") and target.secondary:
+                    target.secondary.destroyed = True
+            additional = result.get("additional")
+            if additional in {"primary_1", "primary_1_secondary_1"}:
+                target.primary.destroyed = True
+            if additional in {"secondary_1", "primary_1_secondary_1"} and target.secondary:
+                target.secondary.destroyed = True
         self._event(
             state,
             "special_damage",
             f"{target.name} 特殊损伤 {roll}",
-            payload={"target": target.id, "result": roll},
+            payload={"target": target.id, "result": roll, "effect": result, "penetrated": penetrated},
             rule=self._rule("IBS-T-SPECIAL", 4, "特殊伤害表"),
             dice=DiceRoll(dice=dice, notation="D66", raw=roll),
         )
 
     def _resolve_malfunction(self, state: GameState, attacker: ShipState) -> None:
         roll, dice = self._roll_2d6(state)
-        if roll in {4, 10, 11, 12}:
+        result = self.rules.table_2d6(self.rules.malfunction_results, roll)
+        if result.get("destroy_random_primary"):
             attacker.primary.destroyed = True
-        if roll in {2, 3}:
+        if result.get("power_failure_turns"):
             attacker.mfc_destroyed = True
-        if roll in {5, 9, 12}:
+        if result.get("destroy_random_secondary") and attacker.secondary:
+            attacker.secondary.destroyed = True
+        if result.get("fire") or (result.get("fire_if_aircraft_aboard") and attacker.aircraft):
             attacker.fire_markers += 1
+        if result.get("special_damage"):
+            self._resolve_special_damage(state, attacker, armour_already_penetrated=True)
         self._event(
             state,
             "malfunction",
@@ -663,11 +764,15 @@ class IronBottomEngine:
             dice=DiceRoll(dice=dice, notation="2D6", raw=roll),
         )
 
-    @staticmethod
-    def _penetrates(attacker: ShipState, target: ShipState) -> bool:
-        if target.belt_armor <= 0:
+    def _penetrates(self, attacker: ShipState, armour: float, distance: int) -> bool:
+        if armour <= 0:
             return True
-        return attacker.primary.caliber >= target.belt_armor
+        nation = "JP" if attacker.id.startswith("IBS-U-IJN-") else (
+            "US" if attacker.id.startswith("IBS-U-USN-") else (
+                "UK" if attacker.id.startswith("IBS-U-RN-") else "DE"
+            )
+        )
+        return self.rules.penetration(nation, attacker.primary.caliber, distance) >= armour
 
     def _damage_hull(self, state: GameState, ship: ShipState, amount: int, cause: str) -> None:
         if amount <= 0 or ship.sunk:

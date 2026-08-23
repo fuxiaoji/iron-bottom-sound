@@ -1,0 +1,19 @@
+schema_version: 1
+id: IBS-T-FIRE
+source: {document: player-aid-tables-zh.pdf, pdf_page: 1, status: verified_source}
+status: structured
+results:
+  2: {kind: special_damage, armour_already_penetrated: true}
+  3: {primary: 1, hull: 1}
+  4: {extinguish: true, applies_to: US_only}
+  5-6: {kind: no_effect}
+  7: {hull: 1}
+  8-9: {extinguish: true}
+  10: {kind: no_effect}
+  11: {hull: 1, secondary: 1, speed_loss: 1}
+  12: {kind: special_damage, armour_already_penetrated: true}
+modifiers:
+  ship_did_not_fire: 1
+  ignore_results_if_ship_did_not_fire: [7, 12]
+notes:
+  - 离开地图后仍继续火灾判定，除非舰只沉没；离图后的火灾损伤计入分数。

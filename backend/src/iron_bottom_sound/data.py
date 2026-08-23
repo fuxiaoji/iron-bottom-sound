@@ -50,6 +50,7 @@ def make_ship(
         secondary_mounts = [mount for mount in record.guns if mount.kind == "secondary"]
         data = {
             "type": record.ship_type,
+            "displacement_band": record.displacement_band,
             "hull": record.hull_boxes,
             "speed_track": record.maximum_speed_cycle,
             "primary_gf": _broadside_firepower(record, "primary"),
@@ -59,10 +60,15 @@ def make_ship(
             "torpedoes": sum(launcher.torpedoes for launcher in record.torpedo_launchers),
             "torpedo_type": record.torpedo_type,
             "belt_armor": record.armour.belt or 0,
+            "primary_armor": record.armour.primary or 0,
+            "secondary_armor": record.armour.secondary or 0,
+            "bridge_armor": record.armour.bridge or 0,
+            "aircraft": record.aircraft,
             "vp": record.vp,
         }
     else:
         data = deepcopy(templates[entry["template"]])
+        data.setdefault("displacement_band", "A" if data["type"] in {"DD", "APD"} else "C")
     primary = WeaponMount(kind="primary", firepower=data.get("primary_gf", 0), caliber=data.get("primary_caliber", 0))
     secondary = None
     if data.get("secondary_gf", 0):
@@ -75,9 +81,11 @@ def make_ship(
         name=entry["name"],
         side=Side(entry["side"]),
         ship_type=data["type"],
+        displacement_band=data["displacement_band"],
         position=HexCoord.from_label(entry["position"]) if entry.get("position") else None,
         heading=entry["heading"],
         speed_track=tuple(data["speed_track"]),
+        initial_max_speed=max(data["speed_track"]),
         current_speed=entry["speed"],
         previous_speed=entry["speed"],
         hull=data["hull"],
@@ -87,6 +95,10 @@ def make_ship(
         torpedo=torpedo,
         torpedo_type=data.get("torpedo_type"),
         belt_armor=data.get("belt_armor", 0),
+        primary_armor=data.get("primary_armor", 0),
+        secondary_armor=data.get("secondary_armor", 0),
+        bridge_armor=data.get("bridge_armor", 0),
+        aircraft=data.get("aircraft", False),
         vp=data.get("vp", 0),
         asset=entry.get("asset"),
         reinforcement_turn=entry.get("reinforcement_turn"),
