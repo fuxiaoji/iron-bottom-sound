@@ -55,7 +55,7 @@ def scenarios():
 def create_game(request: CreateGame):
     try:
         state = engine.reset(request.scenario_id, request.seed, request.options)
-    except KeyError as error:
+    except (KeyError, ValueError) as error:
         raise HTTPException(422, str(error)) from error
     repository.save(state)
     return {"game_id": state.game_id, "scenario_id": state.scenario_id, "phase": state.phase}

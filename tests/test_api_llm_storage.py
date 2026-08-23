@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from iron_bottom_sound.api import app
+from iron_bottom_sound.api import app, engine as api_engine
 from iron_bottom_sound.engine import IronBottomEngine
 from iron_bottom_sound.llm import DeterministicCommander
 from iron_bottom_sound.models import OrderBatch, Phase, Side
@@ -32,6 +32,62 @@ def test_api_supplies_editable_engine_validated_orders() -> None:
         headers={"X-Player-Side": "axis"},
         json=batch.model_dump(mode="json"),
     ).status_code == 200
+
+
+def test_api_hotseat_full_transport_and_persistence_surface() -> None:
+    client = TestClient(app)
+    assert client.get("/scenarios").status_code == 200
+    assert client.post("/games", json={"scenario_id": "missing"}).status_code == 422
+    assert client.get("/games/missing/view", headers={"X-Player-Side": "axis"}).status_code == 404
+
+    created = client.post("/games", json={"scenario_id": "IBS-S-03", "seed": 8}).json()
+    game_id = created["game_id"]
+    assert client.get(
+        f"/games/{game_id}/view", headers={"X-Player-Side": "invalid"}
+    ).status_code == 400
+    assert client.get(
+        f"/games/{game_id}/legal-actions", headers={"X-Player-Side": "axis"}
+    ).json()[0]["kind"] == "submit_phase_orders"
+    assert client.post(f"/games/{game_id}/handoff").json()["clear_sensitive_state"] is True
+    assert client.post(f"/games/{game_id}/advance").status_code == 409
+
+    axis = OrderBatch(side=Side.AXIS, phase=Phase.REINFORCEMENT)
+    assert client.post(
+        f"/games/{game_id}/orders",
+        headers={"X-Player-Side": "allies"},
+        json=axis.model_dump(mode="json"),
+    ).status_code == 403
+    wrong_phase = OrderBatch(side=Side.AXIS, phase=Phase.GUNNERY)
+    assert client.post(
+        f"/games/{game_id}/orders",
+        headers={"X-Player-Side": "axis"},
+        json=wrong_phase.model_dump(mode="json"),
+    ).status_code == 422
+
+    for side in Side:
+        batch = OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        response = client.post(
+            f"/games/{game_id}/orders",
+            headers={"X-Player-Side": side.value},
+            json=batch.model_dump(mode="json"),
+        )
+        assert response.status_code == 200
+    assert response.json()["both_submitted"] is True
+    assert client.post(f"/games/{game_id}/advance").status_code == 200
+    assert client.get(
+        f"/games/{game_id}/events?after=0", headers={"X-Player-Side": "axis"}
+    ).json()
+
+    api_engine.games.pop(game_id)
+    restored = client.get(
+        f"/games/{game_id}/view", headers={"X-Player-Side": "axis"}
+    )
+    assert restored.status_code == 200 and restored.json()["phase"] == "movement_planning"
+
+    with client.websocket_connect(f"/games/{game_id}?side=axis") as socket:
+        assert socket.receive_json()["side"] == "axis"
+        socket.send_text("refresh")
+        assert socket.receive_json()["game_id"] == game_id
 
 
 def test_fake_llm_returns_engine_validated_conservative_plan() -> None:

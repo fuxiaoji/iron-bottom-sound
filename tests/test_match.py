@@ -5,7 +5,7 @@ import pytest
 
 from iron_bottom_sound.engine import IronBottomEngine
 from iron_bottom_sound.llm import OpenAICompatibleCommander
-from iron_bottom_sound.match import run_match
+from iron_bottom_sound.match import main, make_session, run_match
 from iron_bottom_sound.models import AIPlanSheet, GameOptions, OptionalRules, OrderBatch, Phase, Side
 
 
@@ -91,3 +91,30 @@ def test_deepseek_adapter_retries_invalid_json_then_self_corrects(monkeypatch) -
     assert payload["response_format"] == {"type": "json_object"}
     assert payload["temperature"] == 0 and payload["max_tokens"] == 1200
     assert "test-only-placeholder" not in "".join(audit.model_dump_json() for audit in audits)
+
+
+def test_match_runner_enforces_request_limit_and_player_names() -> None:
+    report, _, _ = run_match("IBS-S-03", request_limit=0)
+    assert not report.passed
+    assert report.failure_reason == "LLM request limit 0 reached"
+    assert make_session(Side.AXIS, "deepseek").side == Side.AXIS
+    with pytest.raises(ValueError, match="Unknown player"):
+        make_session(Side.AXIS, "unknown")
+
+
+def test_match_cli_writes_acceptance_artifacts(monkeypatch, tmp_path, capsys) -> None:
+    artifacts = tmp_path / "cli-match"
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "iron_bottom_sound.match",
+            "--scenario", "IBS-S-03",
+            "--seed", "9",
+            "--all-optional",
+            "--artifacts", str(artifacts),
+        ],
+    )
+    assert main() == 0
+    printed = json.loads(capsys.readouterr().out)
+    assert printed["passed"] is True
+    assert (artifacts / "event-replay.json").exists()
