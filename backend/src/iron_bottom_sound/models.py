@@ -493,3 +493,47 @@ class LegalAction(BaseModel):
 class ValidationResult(BaseModel):
     valid: bool
     errors: list[str] = Field(default_factory=list)
+
+
+class AIPlanSheet(BaseModel):
+    turn: int = Field(gt=0)
+    phase: Phase
+    situation_summary: str = Field(max_length=400)
+    phase_goal: str = Field(max_length=120)
+    unit_intents: dict[str, str] = Field(default_factory=dict)
+    orders: dict[str, Any]
+    contingency: list[str] = Field(default_factory=list, max_length=2)
+
+
+class LLMCallAudit(BaseModel):
+    side: Side
+    turn: int = Field(gt=0)
+    phase: Phase
+    attempt: int = Field(ge=1, le=3)
+    model: str
+    request_id: str | None = None
+    elapsed_ms: int = Field(ge=0)
+    input_tokens: int = Field(default=0, ge=0)
+    output_tokens: int = Field(default=0, ge=0)
+    cache_hit_tokens: int = Field(default=0, ge=0)
+    valid: bool
+    validation_errors: list[str] = Field(default_factory=list)
+
+
+class MatchReport(BaseModel):
+    game_id: str
+    scenario_id: str
+    seed: int
+    winner: Side | None
+    victory_reason: str | None
+    completed: bool
+    request_count: int = Field(ge=0)
+    fallback_count: int = Field(default=0, ge=0)
+    manual_state_changes: int = Field(default=0, ge=0)
+    axis_plan_count: int = Field(default=0, ge=0)
+    allies_plan_count: int = Field(default=0, ge=0)
+    total_input_tokens: int = Field(default=0, ge=0)
+    total_output_tokens: int = Field(default=0, ge=0)
+    elapsed_ms: int = Field(default=0, ge=0)
+    passed: bool
+    failure_reason: str | None = None

@@ -16,6 +16,24 @@ def test_hotseat_api_requires_side_header() -> None:
     ).status_code == 200
 
 
+def test_api_supplies_editable_engine_validated_orders() -> None:
+    client = TestClient(app)
+    created = client.post("/games", json={"scenario_id": "IBS-S-03", "seed": 6}).json()
+    game_id = created["game_id"]
+    response = client.get(
+        f"/games/{game_id}/suggested-orders", headers={"X-Player-Side": "axis"}
+    )
+    assert response.status_code == 200
+    batch = OrderBatch.model_validate(response.json())
+    assert batch.side == Side.AXIS
+    assert batch.phase == Phase.REINFORCEMENT
+    assert client.post(
+        f"/games/{game_id}/orders",
+        headers={"X-Player-Side": "axis"},
+        json=batch.model_dump(mode="json"),
+    ).status_code == 200
+
+
 def test_fake_llm_returns_engine_validated_conservative_plan() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", 1)
@@ -34,4 +52,5 @@ def test_sqlite_round_trip(tmp_path) -> None:
     restored = repository.load(state.game_id)
     assert restored.model_dump(mode="json") == state.model_dump(mode="json")
     assert repository.events(state.game_id)[0].type == "game_created"
+    assert repository.game_ids() == [state.game_id]
     repository.close()

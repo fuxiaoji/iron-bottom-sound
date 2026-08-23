@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import os
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import FastAPI, Header, HTTPException, Query, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, Field
 
 from .engine import IronBottomEngine
+from .llm import DeterministicCommander
 from .models import GameOptions, OrderBatch, Side
 from .storage import GameRepository
 
@@ -17,7 +20,8 @@ class CreateGame(BaseModel):
 
 
 engine = IronBottomEngine()
-repository = GameRepository(":memory:")
+_default_db = Path(__file__).resolve().parents[3] / "backend" / "iron-bottom-sound.sqlite3"
+repository = GameRepository(os.environ.get("IBS_DB_PATH", str(_default_db)))
 app = FastAPI(title="铁底湾的回响 IV", version="0.1.0")
 
 
@@ -33,8 +37,13 @@ def side_from_header(value: str | None) -> Side:
 def get_game(game_id: str):
     try:
         return engine.get(game_id)
-    except KeyError as error:
-        raise HTTPException(404, str(error)) from error
+    except KeyError:
+        try:
+            state = repository.load(game_id)
+        except KeyError as error:
+            raise HTTPException(404, str(error)) from error
+        engine.games[game_id] = state
+        return state
 
 
 @app.get("/scenarios")
@@ -64,9 +73,20 @@ def legal_actions(game_id: str, x_player_side: Annotated[str | None, Header()] =
     return engine.legal_actions(game_id, side_from_header(x_player_side))
 
 
+@app.get("/games/{game_id}/suggested-orders")
+def suggested_orders(game_id: str, x_player_side: Annotated[str | None, Header()] = None):
+    """Return an editable, engine-validated starting batch without exposing enemy data."""
+    get_game(game_id)
+    side = side_from_header(x_player_side)
+    try:
+        return DeterministicCommander().choose_orders(engine, game_id, side)
+    except ValueError as error:
+        raise HTTPException(409, str(error)) from error
+
+
 @app.post("/games/{game_id}/orders")
 def orders(game_id: str, batch: OrderBatch, x_player_side: Annotated[str | None, Header()] = None):
-    get_game(game_id)
+    state = get_game(game_id)
     side = side_from_header(x_player_side)
     if batch.side != side:
         raise HTTPException(403, "A side may submit only its own orders")
@@ -74,7 +94,11 @@ def orders(game_id: str, batch: OrderBatch, x_player_side: Annotated[str | None,
     if not result.valid:
         raise HTTPException(422, result.errors)
     repository.save(engine.get(game_id))
-    return result
+    return {
+        **result.model_dump(mode="json"),
+        "both_submitted": set(state.submitted_orders) == {Side.AXIS.value, Side.ALLIES.value},
+        "phase": state.phase.value,
+    }
 
 
 @app.post("/games/{game_id}/handoff")
@@ -98,7 +122,12 @@ def advance(game_id: str):
 def events(game_id: str, after: int = Query(default=0, ge=0), x_player_side: Annotated[str | None, Header()] = None):
     state = get_game(game_id)
     side = side_from_header(x_player_side)
-    return [event for event in state.events if event.sequence > after and event.payload.get("secret_side") in (None, side.value)]
+    return [
+        event for event in state.events
+        if event.sequence > after
+        and event.payload.get("secret_side") in (None, side.value)
+        and not engine._hidden_damage_event(state, event, side)
+    ]
 
 
 @app.websocket("/games/{game_id}")

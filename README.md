@@ -4,6 +4,20 @@
 
 ## 本地运行
 
+Windows 一键启动（首次运行前需按下文安装 Python 与前端依赖）：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/start-game.ps1
+```
+
+脚本会打开 `http://127.0.0.1:5173`，进度会保存到本地 SQLite。停止服务：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/stop-game.ps1
+```
+
+也可以分别启动后端和前端：
+
 ```powershell
 python -m pip install -e ".[dev,corpus]"
 python -m iron_bottom_sound

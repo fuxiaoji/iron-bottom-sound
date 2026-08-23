@@ -61,6 +61,12 @@ class GameRepository:
             raise KeyError(f"Unknown game {game_id}")
         return GameState.model_validate_json(row["state_json"])
 
+    def game_ids(self) -> list[str]:
+        rows = self.connection.execute(
+            "SELECT game_id FROM games ORDER BY updated_at DESC"
+        ).fetchall()
+        return [str(row["game_id"]) for row in rows]
+
     def events(self, game_id: str, after: int = 0) -> list[GameEvent]:
         rows = self.connection.execute(
             "SELECT event_json FROM events WHERE game_id = ? AND sequence > ? ORDER BY sequence",
