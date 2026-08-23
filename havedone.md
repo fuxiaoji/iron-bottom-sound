@@ -17,3 +17,4 @@
 - 实现 React/TypeScript 六角地图、想定选择、单位面板、规则事件日志和热座交接清屏基础 UI；TypeScript 检查及 Vite 生产构建通过。
 - 后端自动化验证：`19 passed`；当前代码覆盖率 `60%`。覆盖率尚未达到阶段门槛，不创建阶段完成标签。
 - 保留三个明确阻塞项：想定 1 增援顺序、特殊损伤表完整分段、X/Y/Z 岛屿陆地格；详见 `docs/rules/open_questions.md`。
+- 阶段 1 可运行基础提交：`9bdd89d`（分支 `codex/phase1-engine`）；该提交不是 `v0.1.0-phase1` 完成发布。
