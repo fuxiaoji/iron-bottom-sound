@@ -18,7 +18,7 @@ families:
     torpedo_launchers:
       - {id: TT-P, position: port, arcs: [port], torpedoes: 1, reloads: 1}
       - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 1, reloads: 1}
-    torpedo_type: jp-24-type90
+    torpedo_type: jp-24-type93
     armour: {primary: 1, belt: 3}
     aircraft: true
   ijn-fubuki-dd:

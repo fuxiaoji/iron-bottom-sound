@@ -33,7 +33,7 @@ def test_ship_record_mounts_and_tracks_match_source_examples() -> None:
     assert aoba.hull_boxes == 11
     assert aoba.maximum_speed_cycle == (6, 5, 5)
     assert sum(mount.firepower for mount in aoba.guns if mount.kind == "primary") == 16
-    assert aoba.torpedo_type == "jp-24-type90"
+    assert aoba.torpedo_type == "jp-24-type93"
     assert sum(launcher.reloads for launcher in aoba.torpedo_launchers) == 2
     assert helena.hull_boxes == 14
     assert helena.radar

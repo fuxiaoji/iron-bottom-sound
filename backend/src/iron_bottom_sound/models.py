@@ -428,6 +428,9 @@ class GameState(BaseModel):
     torpedo_tracks: list[TorpedoTrack] = Field(default_factory=list)
     wrecks: list[WreckState] = Field(default_factory=list)
     markers: list[MarkerState] = Field(default_factory=list)
+    land_hexes: set[str] = Field(default_factory=set)
+    coast_hexes: set[str] = Field(default_factory=set)
+    radar_blocking_hexes: set[str] = Field(default_factory=set)
     resume_phase: Phase | None = None
     contact_reserve_positions: dict[str, HexCoord] = Field(default_factory=dict)
     contact_formations: dict[str, list[str]] = Field(default_factory=dict)

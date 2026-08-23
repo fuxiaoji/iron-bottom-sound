@@ -360,7 +360,9 @@ class IronBottomEngine:
                 commands = self.movement_commands(order)
                 self.validate_movement_commands(commands)
                 cost = self.movement_cost(order.plan, commands)
-                self.movement_trajectory(ship, order.plan, commands)
+                trajectory, _ = self.movement_trajectory(ship, order.plan, commands)
+                if any(self._terrain_impassable(state, position) for position, _ in trajectory):
+                    errors.append(f"{order.ship_id}: movement plan enters land")
             except ValueError as error:
                 errors.append(f"{order.ship_id}: {error}")
                 continue
@@ -401,6 +403,8 @@ class IronBottomEngine:
                 errors.append(f"Reinforcement group is not available on turn {state.turn}")
             if not self._reinforcement_entry_legal(state, order.entry_hex):
                 errors.append(f"Illegal reinforcement entry hex {order.entry_hex.label}")
+            if self._terrain_impassable(state, order.entry_hex):
+                errors.append(f"Reinforcement entry hex {order.entry_hex.label} is land")
             if order.speed > ship.max_speed_for_turn(state.turn):
                 errors.append(f"{order.ship_id}: entry speed exceeds current maximum")
         if state.phase == Phase.REINFORCEMENT:
@@ -875,7 +879,9 @@ class IronBottomEngine:
                 cost = self.movement_cost(order.plan, commands)
                 if cost not in {4, 5}:
                     errors.append(f"{marker.id}: hidden contacts must move at 4 or 5 MF")
-                self._marker_trajectory(marker, commands)
+                trajectory, _ = self._marker_trajectory(marker, commands)
+                if any(self._terrain_impassable(state, position) for position, _ in trajectory):
+                    errors.append(f"{marker.id}: hidden contact plan enters land")
             except ValueError as error:
                 errors.append(f"{marker.id}: {error}")
 
@@ -888,6 +894,58 @@ class IronBottomEngine:
     def _coord_on_map(q: int, r: int) -> bool:
         display_row = r + (q - (q & 1)) // 2
         return 0 <= q <= 33 and 0 <= display_row <= 26
+
+    @staticmethod
+    def _terrain_impassable(state: GameState, coord: HexCoord) -> bool:
+        return coord.label in state.land_hexes
+
+    @staticmethod
+    def _hex_line(origin: HexCoord, target: HexCoord) -> list[HexCoord]:
+        distance = origin.distance(target)
+        if distance == 0:
+            return [origin]
+
+        def cube_round(x: float, y: float, z: float) -> tuple[int, int]:
+            rx, ry, rz = round(x), round(y), round(z)
+            x_delta, y_delta, z_delta = abs(rx - x), abs(ry - y), abs(rz - z)
+            if x_delta > y_delta and x_delta > z_delta:
+                rx = -ry - rz
+            elif y_delta > z_delta:
+                ry = -rx - rz
+            else:
+                rz = -rx - ry
+            return rx, rz
+
+        ox, oz = origin.q, origin.r
+        oy = -ox - oz
+        tx, tz = target.q, target.r
+        ty = -tx - tz
+        line: list[HexCoord] = []
+        for step in range(distance + 1):
+            fraction = step / distance
+            q, r = cube_round(
+                ox + (tx - ox) * fraction,
+                oy + (ty - oy) * fraction,
+                oz + (tz - oz) * fraction,
+            )
+            line.append(HexCoord(q=q, r=r))
+        return line
+
+    def _terrain_blocks_sight(
+        self, state: GameState, origin: HexCoord, target: HexCoord, *, radar: bool = False
+    ) -> bool:
+        blockers = (state.land_hexes | state.radar_blocking_hexes) if radar else state.land_hexes
+        if not blockers:
+            return False
+        line = self._hex_line(origin, target)
+        if any(coord.label in blockers for coord in line[1:-1]):
+            return True
+        return bool(
+            radar and any(
+                HexCoord.from_label(label).distance(target) <= 4
+                for label in blockers
+            )
+        )
 
     def _resolve_contact_setup(self, state: GameState) -> None:
         markers = {marker.id: marker for marker in state.markers if marker.kind == "contact"}
@@ -1162,6 +1220,17 @@ class IronBottomEngine:
                     destinations[ship_id] = ship.position  # type: ignore[assignment]
                 else:
                     destinations[ship_id] = path[impulse][0]
+            for ship_id, destination in list(destinations.items()):
+                if ship_id not in stopped and self._terrain_impassable(state, destination):
+                    destinations[ship_id] = state.ships[ship_id].position  # type: ignore[assignment]
+                    stopped.add(ship_id)
+                    self._event(
+                        state,
+                        "movement_blocked_by_land",
+                        f"{state.ships[ship_id].name} 在 {destination.label} 前停止：陆地不可进入",
+                        payload={"ship_id": ship_id, "land_hex": destination.label, "movement_impulse": impulse + 1},
+                        rule=self._rule("IBS-R-06.1", 7, "6.1 海上移动"),
+                    )
             by_hex: dict[str, list[str]] = {}
             for ship_id, position in destinations.items():
                 by_hex.setdefault(position.label, []).append(ship_id)
@@ -1273,10 +1342,21 @@ class IronBottomEngine:
                 ):
                     continue
                 try:
-                    track.position = track.position.neighbor(track.heading)
+                    next_position = track.position.neighbor(track.heading)
                 except ValueError:
                     track.range_remaining = 0
                     continue
+                if self._terrain_impassable(state, next_position):
+                    track.range_remaining = 0
+                    self._event(
+                        state,
+                        "torpedo_grounded",
+                        f"鱼雷航迹 {track.id} 在 {next_position.label} 撞击陆地并移除",
+                        payload={"track_id": track.id, "land_hex": next_position.label},
+                        rule=self._rule("IBS-R-08.2.3", 11, "8.2 鱼雷移动"),
+                    )
+                    continue
+                track.position = next_position
                 track.range_remaining -= 1
                 track.distance_travelled += 1
                 moved_tracks[track.id] = moved_tracks.get(track.id, 0) + 1
@@ -1358,45 +1438,57 @@ class IronBottomEngine:
                 ):
                     attacks.append((attacker, mount, target))
                     mount.fired_this_phase = True
+        grouped_attacks: dict[tuple[str, str, str], tuple[ShipState, list[Any], ShipState]] = {}
+        for attacker, mount, target in attacks:
+            key = (attacker.id, target.id, mount.kind)
+            if key not in grouped_attacks:
+                grouped_attacks[key] = (attacker, [], target)
+            grouped_attacks[key][1].append(mount)
         attacking_ships: dict[str, set[str]] = {}
         targets_per_attacker: dict[str, set[str]] = {}
-        for attacker, _, target in attacks:
+        for attacker, _, target in grouped_attacks.values():
             attacking_ships.setdefault(target.id, set()).add(attacker.id)
             targets_per_attacker.setdefault(attacker.id, set()).add(target.id)
-        prepared: list[tuple[ShipState, Any, ShipState, int, dict[str, int], int]] = []
-        for attacker, mount, target in attacks:
+        prepared: list[tuple[ShipState, list[Any], ShipState, int, dict[str, int], int, float]] = []
+        for attacker, mounts, target in grouped_attacks.values():
             distance = attacker.position.distance(target.position)
             if not self._can_see(state, attacker, target):
                 self._event(state, "gunnery_rejected", f"{attacker.name} 无法看见 {target.name}", rule=self._rule("IBS-R-08.1", 9, "8.1"))
                 continue
+            caliber = max(mount.caliber for mount in mounts)
             modifiers = self._gunnery_modifiers(
                 state,
                 attacker,
                 target,
                 distance,
                 len(attacking_ships[target.id]),
-                mount.caliber,
+                caliber,
                 len(targets_per_attacker[attacker.id]),
             )
-            firepower = mount.firepower
+            firepower = sum(mount.firepower for mount in mounts)
             if state.scenario_id == "IBS-S-01" and attacker.side == Side.ALLIES:
                 firepower = (firepower + 1) // 2
-            prepared.append((attacker, mount, target, distance, modifiers, firepower))
+            prepared.append((attacker, mounts, target, distance, modifiers, firepower, caliber))
         # The attack list and all modifiers are frozen before damage is applied: sunk ships still complete this phase's fire.
-        for attacker, mount, target, distance, modifiers, firepower in prepared:
+        for attacker, mounts, target, distance, modifiers, firepower, caliber in prepared:
             modifier = sum(modifiers.values())
             raw, dice = self._roll_d66(state)
             adjusted = d66_adjust(raw, modifier)
             hits = self.rules.hit_count(firepower, adjusted)
             attacker.fired = True
+            mount_ids = [mount.id for mount in mounts]
             self._event(
                 state,
                 "gun_mount_attack",
-                f"{attacker.name} {mount.id} 炮击 {target.name}：{hits} 发命中",
+                f"{attacker.name} {'+'.join(mount_ids)} 炮击 {target.name}：{hits} 发命中",
                 payload={
-                    "attacker": attacker.id, "mount_id": mount.id, "target": target.id,
+                    "attacker": attacker.id,
+                    "mount_id": mount_ids[0] if len(mount_ids) == 1 else "+".join(mount_ids),
+                    "mount_ids": mount_ids,
+                    "battery_kind": mounts[0].kind,
+                    "target": target.id,
                     "distance": distance, "modifier": modifier, "firepower": firepower,
-                    "modifiers": modifiers, "caliber": mount.caliber, "hits": hits,
+                    "modifiers": modifiers, "caliber": caliber, "hits": hits,
                 },
                 rule=self._rule("IBS-T-GHT", 2, "炮击命中表"),
                 dice=DiceRoll(dice=dice, notation="D66", raw=raw, adjusted=adjusted),
@@ -1406,7 +1498,7 @@ class IronBottomEngine:
             for _ in range(hits):
                 result_roll, result_dice = self._roll_d66(state)
                 result = self.rules.gunnery_result(result_roll)
-                self._apply_gunnery_result(state, attacker, target, result_roll, result, distance, mount.caliber)
+                self._apply_gunnery_result(state, attacker, target, result_roll, result, distance, caliber)
                 self._event(
                     state,
                     "gunnery_result",
@@ -1525,8 +1617,9 @@ class IronBottomEngine:
                 dice=DiceRoll(dice=dice, notation="2D6", raw=roll, adjusted=adjusted),
             )
             for _ in range(hits):
-                damage_roll, damage_dice = self._roll_2d6(state)
-                damage_roll += int(definition.get("damage_modifier", 0))
+                raw_damage_roll, damage_dice = self._roll_2d6(state)
+                damage_modifier = int(definition.get("damage_modifier", 0))
+                damage_roll = raw_damage_roll + damage_modifier
                 effect = self.rules.torpedo_effect(damage_roll, target.displacement_band)
                 hull, speed, sunk, fire = parse_effect(effect)
                 self._damage_hull(state, target, target.hull if sunk else hull, "torpedo")
@@ -1537,9 +1630,9 @@ class IronBottomEngine:
                     state,
                     "torpedo_result",
                     f"{target.name} 鱼雷效果：{effect}",
-                    payload={"target": target.id, "effect": effect},
+                    payload={"target": target.id, "effect": effect, "modifier": damage_modifier},
                     rule=self._rule("IBS-T-THDT", 3, "鱼雷与碰撞结果表"),
-                    dice=DiceRoll(dice=damage_dice, notation="2D6", raw=damage_roll),
+                    dice=DiceRoll(dice=damage_dice, notation="2D6", raw=raw_damage_roll, adjusted=damage_roll),
                 )
             resolved_track_ids.add(track.id)
         state.torpedo_tracks = [track for track in state.torpedo_tracks if track.id not in resolved_track_ids]
@@ -2151,8 +2244,6 @@ class IronBottomEngine:
     def _visible_to(self, state: GameState, target: ShipState, side: Side, own_positions: Iterable[HexCoord | None]) -> bool:
         if target.sunk or not target.position:
             return True
-        if target.fire_markers:
-            return True
         if state.options.optional_rules.squalls and self._in_squall(state, target.position):
             return False
         if any(
@@ -2163,11 +2254,21 @@ class IronBottomEngine:
         ):
             return True
         visibility = int(state.visibility[side.value])
-        if any(position and position.distance(target.position) <= visibility for position in own_positions):
+        positions = [position for position in own_positions if position]
+        if target.fire_markers and any(
+            not self._terrain_blocks_sight(state, position, target.position) for position in positions
+        ):
+            return True
+        if any(
+            position.distance(target.position) <= visibility
+            and not self._terrain_blocks_sight(state, position, target.position)
+            for position in positions
+        ):
             return True
         if state.options.optional_rules.radar and any(
             ship.side == side and ship.radar and not ship.radar_destroyed and not ship.sunk and ship.position
             and not self._in_squall(state, ship.position)
+            and not self._terrain_blocks_sight(state, ship.position, target.position, radar=True)
             for ship in state.ships.values()
         ):
             return True
@@ -2186,12 +2287,16 @@ class IronBottomEngine:
             and marker.position.distance(target.position) <= 2
             for marker in state.markers
         )
-        if illuminated or attacker.position.distance(target.position) <= int(state.visibility[attacker.side.value]):
+        optical_blocked = self._terrain_blocks_sight(state, attacker.position, target.position)
+        if not optical_blocked and (
+            illuminated or attacker.position.distance(target.position) <= int(state.visibility[attacker.side.value])
+        ):
             return True
-        if state.options.optional_rules.silhouettes and self._silhouetted(state, target):
+        if not optical_blocked and state.options.optional_rules.silhouettes and self._silhouetted(state, target):
             return True
         return bool(
             state.options.optional_rules.radar and attacker.radar and not attacker.radar_destroyed
+            and not self._terrain_blocks_sight(state, attacker.position, target.position, radar=True)
         )
 
     def _silhouetted(self, state: GameState, candidate: ShipState) -> bool:

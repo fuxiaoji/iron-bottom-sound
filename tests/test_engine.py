@@ -126,6 +126,17 @@ def test_explicit_movement_commands_are_costed_and_traced_by_mf() -> None:
     assert final_heading == ship.heading
 
 
+def test_atlanta_rulebook_movement_example_costs_six_mf_for_3pp2() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=3)
+    ship = state.ships["IBS-U-KM-KARL-GALSTER"]
+    commands = engine.movement_commands(MovementOrder(ship_id=ship.id, plan="3PP2"))
+    trajectory, final_heading = engine.movement_trajectory(ship, "3PP2", commands)
+    assert engine.movement_cost("3PP2", commands) == 6
+    assert len(trajectory) == 6
+    assert final_heading == ((ship.heading - 3) % 6) + 1
+
+
 def test_leaving_map_shifts_every_other_counter_and_emits_rule_event() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=3)
@@ -175,6 +186,63 @@ def test_leaving_map_shifts_every_other_counter_and_emits_rule_event() -> None:
     event = next(event for event in state.events if event.type == "world_shifted")
     assert event.rule and event.rule.rule_id == "IBS-R-06.1.8"
     assert event.payload["movement_impulse"] == 1
+
+
+def test_structured_land_blocks_ship_plan_and_torpedo_track() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=3)
+    ship = state.ships["IBS-U-KM-KARL-GALSTER"]
+    ship.position = HexCoord.from_label("A1")
+    ship.heading = 4
+    state.land_hexes.add("A2")
+    state.phase = Phase.MOVEMENT_PLANNING
+    result = engine.validate_orders(
+        state.game_id,
+        OrderBatch(
+            side=ship.side,
+            phase=Phase.MOVEMENT_PLANNING,
+            movement=[MovementOrder(ship_id=ship.id, plan="1")],
+        ),
+    )
+    assert not result.valid
+    assert any("enters land" in error for error in result.errors)
+
+    state.torpedo_tracks.append(TorpedoTrack(
+        id="land-track",
+        side=ship.side,
+        launcher_ship_id=ship.id,
+        torpedo_type="test",
+        position=HexCoord.from_label("A1"),
+        heading=4,
+        speed_cycle=(1, 1, 1),
+        range_remaining=2,
+        launched_turn=1,
+    ))
+    engine._resolve_movement(state)
+    assert not state.torpedo_tracks
+    event = next(event for event in state.events if event.type == "torpedo_grounded")
+    assert event.payload["land_hex"] == "A2"
+
+
+def test_structured_island_blocks_optical_line_and_radar_within_four_hexes() -> None:
+    engine = IronBottomEngine()
+    options = GameOptions(optional_rules=OptionalRules(radar=True))
+    state = engine.reset("IBS-S-01", seed=1, options=options)
+    attacker = state.ships["IBS-U-USN-HELENA"]
+    target = state.ships["IBS-U-IJN-AOBA"]
+    attacker.position = HexCoord.from_label("A1")
+    target.position = HexCoord.from_label("A5")
+    state.visibility[attacker.side.value] = 10
+    state.land_hexes.add("A3")
+    assert not engine._can_see(state, attacker, target)
+
+    state.land_hexes.clear()
+    state.visibility[attacker.side.value] = 0
+    state.radar_blocking_hexes.add("B5")
+    assert target.position.distance(HexCoord.from_label("B5")) <= 4
+    assert not engine._can_see(state, attacker, target)
+    state.radar_blocking_hexes.clear()
+    assert engine._can_see(state, attacker, target)
 
 
 def test_movement_plan_enforces_first_advance_and_post_turn_advance() -> None:
@@ -338,6 +406,44 @@ def test_scenario_one_allied_mount_firepower_is_halved_rounding_up() -> None:
     assert event.payload["firepower"] == (mount.firepower + 1) // 2
 
 
+def test_aoba_helena_rulebook_gunnery_example_aggregates_main_battery() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-01", seed=5)
+    state.turn = 2
+    state.phase = Phase.GUNNERY
+    aoba = state.ships["IBS-U-IJN-AOBA"]
+    helena = state.ships["IBS-U-USN-HELENA"]
+    aoba.position = HexCoord.from_label("A1")
+    aoba.heading = 2
+    helena.position = HexCoord.from_label("J5")
+    helena.heading = 1
+    helena.current_speed = 4
+    primary = [mount for mount in aoba.gun_mounts if mount.kind == "primary"]
+    assert sum(mount.firepower for mount in primary) == 16
+    assert all(engine._mount_can_bear(aoba, helena, mount.arcs) for mount in primary)
+    rolls = iter([(26, [2, 6]), (66, [6, 6]), (66, [6, 6])])
+    engine._roll_d66 = lambda _: next(rolls)  # type: ignore[method-assign]
+    axis = OrderBatch(
+        side=Side.AXIS,
+        phase=Phase.GUNNERY,
+        gunnery=[GunneryOrder(
+            ship_id=aoba.id,
+            mounts=[GunMountOrder(mount_id=mount.id, target_id=helena.id) for mount in primary],
+        )],
+    )
+    assert engine.submit_orders(state.game_id, axis).valid
+    assert engine.submit_orders(
+        state.game_id, OrderBatch(side=Side.ALLIES, phase=Phase.GUNNERY)
+    ).valid
+    engine.advance(state.game_id)
+    attack = next(event for event in state.events if event.type == "gun_mount_attack")
+    assert attack.payload["mount_ids"] == ["P1", "P2", "P3"]
+    assert attack.payload["firepower"] == 16
+    assert attack.payload["modifier"] == -6
+    assert attack.dice and attack.dice.raw == 26 and attack.dice.adjusted == 16
+    assert attack.payload["hits"] == 2
+
+
 def test_torpedo_launches_at_planned_mf_moves_by_impulse_and_contacts_ship() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=9)
@@ -394,6 +500,43 @@ def test_torpedo_launches_at_planned_mf_moves_by_impulse_and_contacts_ship() -> 
     engine.advance(state.game_id)
     assert not state.torpedo_tracks
     assert any(event.type == "torpedo_attack" for event in state.events)
+
+
+def test_aoba_helena_rulebook_torpedo_example_scores_one_hit_and_5h_7mf() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-01", seed=9)
+    aoba = state.ships["IBS-U-IJN-AOBA"]
+    helena = state.ships["IBS-U-USN-HELENA"]
+    assert aoba.torpedo_type == "jp-24-type93"
+    helena.current_speed = 5
+    helena.previous_speed = 5
+    helena.heading = 1
+    before_hull = helena.hull
+    state.torpedo_tracks.append(TorpedoTrack(
+        id="AOBA-HELENA-GOLD",
+        side=aoba.side,
+        launcher_ship_id=aoba.id,
+        torpedo_type=aoba.torpedo_type,
+        position=helena.position,
+        heading=2,
+        speed_cycle=(8, 8, 8),
+        range_remaining=32,
+        distance_travelled=4,
+        launched_turn=1,
+        salvo_size=1,
+        contact_ship_ids=[helena.id],
+    ))
+    rolls = iter([(8, [4, 4]), (7, [3, 4])])
+    engine._roll_2d6 = lambda _: next(rolls)  # type: ignore[method-assign]
+    engine._resolve_torpedoes(state)
+    attack = next(event for event in state.events if event.type == "torpedo_attack")
+    result = next(event for event in state.events if event.type == "torpedo_result")
+    assert attack.dice and attack.dice.raw == 8 and attack.dice.adjusted == 11
+    assert attack.payload["hits"] == 1
+    assert result.dice and result.dice.raw == 7 and result.dice.adjusted == 8
+    assert result.payload["effect"] == "5H/-7MF"
+    assert helena.hull == before_hull - 5
+    assert helena.speed_track == (3, 3, 3)
 
 
 def test_torpedo_plan_rejects_wrong_launch_hex_and_side_angle_pair() -> None:
