@@ -56,7 +56,7 @@ def test_modifier_tables_preserve_source_exceptions() -> None:
 
 def test_special_damage_direct_and_displacement_domains_are_complete() -> None:
     table = load_yaml("special-damage-table.yaml")
-    assert set(table["direct_results"]) == {"11", "12", "13", "14", "15", "16", "21", "22", "23", "24", "25", "26", "31", "32", "33-36", "41", "42", "43"}
+    assert set(table["direct_results"]) == {"11", "12", "13", "14", "15", "16", "21", "22", "23", "24", "25", "26", "31", "32", "33-36", "41", "42", "43", "66"}
     assert table["direct_results"]["43"]["sunk"] is True
     assert table["direct_results"]["16"]["torpedo_launcher_hit"] == 1
     assert len(table["results"]) == 14

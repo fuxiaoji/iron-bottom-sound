@@ -19,6 +19,14 @@ range_modifier:
 target_speed_modifier:
   gunnery: {0: -18, 1: -9, "2-3": -4, "4+": 0}
   torpedo: {0: 4, 1: 4, 2: 2, 3: 1, "4+": 0}
+longitudinal_modifier:
+  - {min: 1, max: 1, value: -8}
+  - {min: 2, max: 2, value: -8}
+  - {min: 3, max: 5, value: -8}
+  - {min: 6, max: 9, value: -6}
+  - {min: 10, max: 15, value: -4}
+  - {min: 16, max: 20, value: -1}
+  - {min: 21, max: 999, value: 0}
 target_aspect_modifier:
   gunnery_bow_stern: -6
   torpedo_bow_stern: -8

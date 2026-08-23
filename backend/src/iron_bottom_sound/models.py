@@ -228,7 +228,19 @@ class ShipState(BaseModel):
     fired: bool = False
     smoke: bool = False
     sunk: bool = False
+    sinking_turn: int | None = None
+    sinking_drift_pending: bool = False
     reinforcement_turn: int | None = None
+    rudder_destroyed: bool = False
+    bridge_destroyed: bool = False
+    captain_status: Literal["fit", "wounded", "killed"] = "fit"
+    turn_limit_degrees: int | None = None
+    forced_straight_turns: int = Field(default=0, ge=0)
+    forced_circle_turns: int = Field(default=0, ge=0)
+    forced_turn_side: Literal["port", "starboard"] | None = None
+    forced_speed: int | None = Field(default=None, ge=0)
+    forced_speed_turns: int = Field(default=0, ge=0)
+    guns_disabled_turns: int = Field(default=0, ge=0)
 
     def max_speed_for_turn(self, turn: int) -> int:
         row_index = (turn - 1) % 3

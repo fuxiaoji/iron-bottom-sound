@@ -17,6 +17,7 @@ from iron_bottom_sound.models import (
     SmokeOrder,
     TorpedoOrder,
     TorpedoTrack,
+    WreckState,
 )
 
 
@@ -83,6 +84,15 @@ def test_hidden_damage_filters_enemy_but_not_own_damage() -> None:
     view = engine.observe(state.game_id, Side.ALLIES)
     public_enemy = next(ship for ship in view.ships if ship.id == enemy.id)
     assert public_enemy.hull is None
+    own = next(ship for ship in state.ships.values() if ship.side == Side.ALLIES)
+    public_own = next(ship for ship in view.ships if ship.id == own.id)
+    assert public_own.hull == own.hull
+
+    plain = IronBottomEngine()
+    plain_state = plain.reset("IBS-S-03", 1)
+    plain_enemy = next(ship for ship in plain_state.ships.values() if ship.side == Side.AXIS)
+    plain_view = plain.observe(plain_state.game_id, Side.ALLIES)
+    assert next(ship for ship in plain_view.ships if ship.id == plain_enemy.id).hull == plain_enemy.hull
 
 
 def test_four_turns_reach_automatic_terminal_state() -> None:
@@ -114,6 +124,57 @@ def test_explicit_movement_commands_are_costed_and_traced_by_mf() -> None:
     assert engine.movement_cost(order.plan, commands) == 2
     assert len(trajectory) == 2
     assert final_heading == ship.heading
+
+
+def test_leaving_map_shifts_every_other_counter_and_emits_rule_event() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=3)
+    mover = state.ships["IBS-U-KM-KARL-GALSTER"]
+    other = state.ships["IBS-U-RN-JAVELIN"]
+    mover.position = HexCoord.from_label("A10")
+    mover.heading = 6
+    other.position = HexCoord.from_label("R16")
+    original_other = other.position
+    state.torpedo_tracks.append(TorpedoTrack(
+        id="edge-track",
+        side=Side.AXIS,
+        launcher_ship_id=mover.id,
+        torpedo_type="G7a",
+        position=HexCoord.from_label("S16"),
+        heading=1,
+        speed_cycle=(0, 0, 0),
+        range_remaining=1,
+        launched_turn=1,
+    ))
+    state.wrecks.append(WreckState(
+        id="edge-wreck", position=HexCoord.from_label("T16"), source_ship_id="test"
+    ))
+    state.markers.append(MarkerState(
+        id="edge-marker", kind="smoke", position=HexCoord.from_label("U16")
+    ))
+    originals = (
+        state.torpedo_tracks[0].position,
+        state.wrecks[0].position,
+        state.markers[0].position,
+    )
+    state.sealed_orders["1:movement_planning"] = {
+        Side.AXIS.value: OrderBatch(
+            side=Side.AXIS,
+            phase=Phase.MOVEMENT_PLANNING,
+            movement=[MovementOrder(ship_id=mover.id, plan="1")],
+        )
+    }
+
+    engine._resolve_movement(state)
+
+    assert mover.position == HexCoord.from_label("A10")
+    assert other.position == HexCoord(q=original_other.q + 1, r=original_other.r)
+    assert state.torpedo_tracks[0].position == HexCoord(q=originals[0].q + 1, r=originals[0].r)
+    assert state.wrecks[0].position == HexCoord(q=originals[1].q + 1, r=originals[1].r)
+    assert state.markers[0].position == HexCoord(q=originals[2].q + 1, r=originals[2].r)
+    event = next(event for event in state.events if event.type == "world_shifted")
+    assert event.rule and event.rule.rule_id == "IBS-R-06.1.8"
+    assert event.payload["movement_impulse"] == 1
 
 
 def test_movement_plan_enforces_first_advance_and_post_turn_advance() -> None:
@@ -394,16 +455,35 @@ def test_collision_requires_five_or_six_then_uses_collision_table_for_both_ships
     assert all(event.rule and event.rule.rule_id == "IBS-T-THDT" for event in results)
 
 
-def test_sunk_ship_creates_structured_wreck_at_its_hex() -> None:
+def test_moving_sunk_ship_drifts_one_hex_at_next_movement_then_creates_wreck() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=1)
+    ship = state.ships["IBS-U-KM-KARL-GALSTER"]
+    assert ship.position
+    expected_position = ship.position.neighbor(ship.heading)
+    engine._damage_hull(state, ship, ship.hull, "test")
+    assert ship.sunk
+    assert ship.sinking_drift_pending
+    assert len(state.wrecks) == 0
+    state.turn += 1
+    engine._resolve_sinking_drift(state)
+    assert len(state.wrecks) == 1
+    assert state.wrecks[0].position == expected_position
+    assert state.wrecks[0].source_ship_id == ship.id
+    assert ship.position is None
+    assert any(event.type == "sinking_marker_placed" for event in state.events)
+
+
+def test_zero_speed_ship_sinks_in_place_without_drift() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=1)
     ship = state.ships["IBS-U-KM-KARL-GALSTER"]
     original_position = ship.position
+    ship.previous_speed = 0
     engine._damage_hull(state, ship, ship.hull, "test")
-    assert ship.sunk
-    assert len(state.wrecks) == 1
+    assert not ship.sinking_drift_pending
+    assert ship.position is None
     assert state.wrecks[0].position == original_position
-    assert state.wrecks[0].source_ship_id == ship.id
 
 
 def test_scenario_three_one_slowed_german_ship_is_allied_tactical_victory() -> None:
@@ -533,6 +613,79 @@ def test_optional_commands_are_rejected_when_their_rule_is_disabled() -> None:
     assert any("optional rule 9.7" in error for error in result.errors)
 
 
+def test_optional_searchlight_applies_both_exact_minus_three_modifiers() -> None:
+    engine = IronBottomEngine()
+    options = GameOptions(optional_rules=OptionalRules(searchlights=True))
+    state = engine.reset("IBS-S-03", seed=1, options=options)
+    attacker = state.ships["IBS-U-KM-KARL-GALSTER"]
+    target = state.ships["IBS-U-RN-JAVELIN"]
+    state.markers.append(MarkerState(
+        id="SEARCH-test", kind="searchlight", ship_id=attacker.id, target_ship_id=target.id
+    ))
+    values = engine._gunnery_modifiers(
+        state,
+        attacker,
+        target,
+        attacker.position.distance(target.position),  # type: ignore[union-attr]
+        attackers=1,
+        caliber=5,
+        target_count=1,
+    )
+    assert values["target_searchlit"] == -3
+    assert values["searchlight_user"] == -3
+
+
+def test_optional_silhouette_reveals_only_intervening_ship_during_current_fire() -> None:
+    engine = IronBottomEngine()
+    options = GameOptions(optional_rules=OptionalRules(silhouettes=True))
+    state = engine.reset("IBS-S-03", seed=1, options=options)
+    attacker = state.ships["IBS-U-KM-KARL-GALSTER"]
+    candidate = state.ships["IBS-U-RN-JAVELIN"]
+    target = state.ships["IBS-U-RN-KASHMIR"]
+    attacker.position = HexCoord.from_label("A1")
+    candidate.position = HexCoord.from_label("A3")
+    target.position = HexCoord.from_label("A5")
+    state.visibility[Side.AXIS.value] = 0
+    state.sealed_orders["1:gunnery"] = {
+        Side.AXIS.value: OrderBatch(
+            side=Side.AXIS,
+            phase=Phase.GUNNERY,
+            gunnery=[GunneryOrder(ship_id=attacker.id, primary_target=target.id)],
+        )
+    }
+    assert engine._can_see(state, attacker, candidate)
+    state.options.optional_rules.silhouettes = False
+    assert not engine._can_see(state, attacker, candidate)
+
+
+def test_fire_table_applies_no_fire_plus_one_and_ignores_adjusted_seven() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=1)
+    ship = state.ships["IBS-U-KM-KARL-GALSTER"]
+    ship.fire_markers = 1
+    ship.fired = False
+    before = ship.hull
+    engine._roll_2d6 = lambda _: (6, [3, 3])  # type: ignore[method-assign]
+    engine._resolve_fire(state)
+    assert ship.hull == before
+    event = next(event for event in state.events if event.type == "fire_check")
+    assert event.dice and event.dice.raw == 6 and event.dice.adjusted == 7
+    assert event.payload["ignored_for_no_fire"] is True
+
+
+def test_optional_malfunction_power_failure_disables_all_guns_temporarily() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=1)
+    ship = state.ships["IBS-U-KM-KARL-GALSTER"]
+    engine._roll_2d6 = lambda _: (2, [1, 1])  # type: ignore[method-assign]
+    engine._resolve_malfunction(state, ship)
+    assert ship.guns_disabled_turns == 2
+    assert not ship.mfc_destroyed
+    event = next(event for event in state.events if event.type == "malfunction")
+    assert event.rule and event.rule.rule_id == "IBS-R-09.5"
+    assert event.payload["result"] == {"power_failure_turns": 2}
+
+
 def test_hidden_contacts_setup_seals_two_real_formations_and_two_decoys_per_side() -> None:
     engine = IronBottomEngine()
     options = GameOptions(optional_rules=OptionalRules(hidden_contacts=True))
@@ -641,3 +794,96 @@ def test_hidden_contacts_setup_seals_two_real_formations_and_two_decoys_per_side
     engine.advance(state.game_id)
     engine.advance(state.game_id)
     assert any(event.type == "contact_moved" for event in state.events)
+
+
+def test_gunnery_modifier_breakdown_applies_longitudinal_additional_ship_and_multiple_targets() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=1)
+    attacker = state.ships["IBS-U-KM-KARL-GALSTER"]
+    target = state.ships["IBS-U-RN-JAVELIN"]
+    attacker.position = HexCoord.from_label("O10")
+    target.position = HexCoord.from_label("O14")
+    target.heading = 1
+    target.current_speed = 5
+    values = engine._gunnery_modifiers(
+        state, attacker, target, distance=4, attackers=3, caliber=5, target_count=2
+    )
+    assert values["range"] == -12
+    assert values["longitudinal"] == -8
+    assert values["additional_attackers"] == 2
+    assert values["multiple_targets"] == 6
+    assert values["caliber_target"] == 0
+
+
+def test_small_caliber_against_battleship_uses_exact_target_class_modifier() -> None:
+    engine = IronBottomEngine()
+    assert engine._caliber_target_modifier(5, "BB") == 18
+    assert engine._caliber_target_modifier(8, "CA") == 0
+
+
+def test_positional_gun_hit_destroys_only_matching_operational_mount() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-01", seed=1)
+    attacker = state.ships["IBS-U-IJN-AOBA"]
+    target = state.ships["IBS-U-USN-HELENA"]
+    bow_mounts = [mount for mount in target.gun_mounts if mount.kind == "primary" and mount.position.value == "bow"]
+    engine._apply_gunnery_result(state, attacker, target, 13, "primary_bow", 9, caliber=8)
+    assert sum(mount.destroyed for mount in bow_mounts) == 1
+    assert not any(
+        mount.destroyed for mount in target.gun_mounts
+        if mount.kind == "primary" and mount.position.value != "bow"
+    )
+    for mount in bow_mounts:
+        mount.destroyed = True
+    before = sum(mount.destroyed for mount in target.gun_mounts)
+    engine._apply_gunnery_result(state, attacker, target, 13, "primary_bow", 9, caliber=8)
+    assert sum(mount.destroyed for mount in target.gun_mounts) == before
+
+
+def test_special_damage_torpedo_launcher_hit_updates_launcher_and_aggregate_ammo() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-01", seed=1)
+    ship = state.ships["IBS-U-IJN-AOBA"]
+    initial_ammo = ship.torpedo.ammo if ship.torpedo else 0
+    destroyed = engine._destroy_torpedo_launchers(state, ship, 1, "test")
+    assert len(destroyed) == 1
+    assert ship.torpedo and ship.torpedo.ammo == initial_ammo - 1
+    assert any(event.type == "torpedo_launcher_destroyed" for event in state.events)
+
+
+def test_special_damage_66_disables_all_guns_next_turn_and_wounds_captain() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=11)
+    ship = state.ships["IBS-U-KM-KARL-GALSTER"]
+    engine._resolve_special_damage(state, ship, armour_already_penetrated=True)
+    event = next(event for event in state.events if event.type == "special_damage")
+    assert event.dice and event.dice.raw == 66
+    assert ship.guns_disabled_turns == 1
+    assert ship.captain_status == "wounded"
+
+
+def test_rudder_and_bridge_restrictions_reject_illegal_movement_plan() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=1)
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        ).valid
+    engine.advance(state.game_id)
+    restricted = state.ships["IBS-U-KM-KARL-GALSTER"]
+    restricted.turn_limit_degrees = 60
+    restricted.forced_straight_turns = 1
+    restricted.forced_speed = 5
+    movement = [
+        MovementOrder(ship_id=ship.id, plan="1PP1" if ship.id == restricted.id else "0")
+        for ship in state.ships.values()
+        if ship.side == Side.AXIS and ship.position
+    ]
+    result = engine.validate_orders(
+        state.game_id,
+        OrderBatch(side=Side.AXIS, phase=Phase.MOVEMENT_PLANNING, movement=movement),
+    )
+    assert not result.valid
+    assert any("limits turns to 60" in error for error in result.errors)
+    assert any("requires straight movement" in error for error in result.errors)
+    assert any("requires original speed 5" in error for error in result.errors)
