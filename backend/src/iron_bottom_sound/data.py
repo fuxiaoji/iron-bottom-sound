@@ -95,11 +95,11 @@ def make_ship(
         ship_type=data["type"],
         displacement_band=data["displacement_band"],
         position=HexCoord.from_label(entry["position"]) if entry.get("position") else None,
-        heading=entry["heading"],
+        heading=entry.get("heading", 1),
         speed_track=tuple(data["speed_track"]),
         initial_max_speed=max(data["speed_track"]),
-        current_speed=entry["speed"],
-        previous_speed=entry["speed"],
+        current_speed=entry.get("speed", 0),
+        previous_speed=entry.get("speed", 0),
         hull=data["hull"],
         max_hull=data["hull"],
         primary=primary,
@@ -116,7 +116,7 @@ def make_ship(
             TorpedoLauncherState(
                 **launcher.model_dump(),
                 loaded=launcher.torpedoes,
-                reloads_remaining=launcher.reloads,
+                reloads_remaining=entry.get("torpedo_reloads", launcher.reloads),
             )
             for launcher in record.torpedo_launchers
         ] if record else [],
@@ -132,10 +132,15 @@ def build_initial_state(game_id: str, scenario_id: str, seed: int, options: Game
     scenario = load_scenario(scenario_id)
     templates = load_templates()
     records = load_ship_records()
-    ships = {entry["id"]: make_ship(entry, templates, records) for entry in scenario["ships"]}
+    entries = list(scenario["ships"])
+    reinforcement = scenario.get("reinforcements")
+    if reinforcement:
+        arrival_turn = int(reinforcement["arrival"]["turn"])
+        entries.extend({**entry, "reinforcement_turn": arrival_turn} for entry in reinforcement["ships"])
+    ships = {entry["id"]: make_ship(entry, templates, records) for entry in entries}
     for key in scenario.get("optional_rules", []):
         setattr(options.optional_rules, key, True)
-    return GameState(
+    state = GameState(
         game_id=game_id,
         scenario_id=scenario_id,
         scenario_title=scenario["title"],
@@ -146,3 +151,11 @@ def build_initial_state(game_id: str, scenario_id: str, seed: int, options: Game
         visibility=scenario["visibility"],
         ships=ships,
     )
+    if reinforcement:
+        state.reinforcement_trigger_turn = int(reinforcement["trigger"]["turn"])
+        state.reinforcement_arrival_turn = int(reinforcement["arrival"]["turn"])
+        state.reinforcement_succeeds_on = tuple(int(value) for value in reinforcement["trigger"]["succeeds_on"])
+        start, end = reinforcement["arrival"]["entry_hex_range"]
+        state.reinforcement_entry_start = HexCoord.from_label(start)
+        state.reinforcement_entry_end = HexCoord.from_label(end)
+    return state

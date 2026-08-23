@@ -384,6 +384,13 @@ class GameState(BaseModel):
     torpedo_tracks: list[TorpedoTrack] = Field(default_factory=list)
     wrecks: list[WreckState] = Field(default_factory=list)
     markers: list[MarkerState] = Field(default_factory=list)
+    reinforcement_trigger_turn: int | None = None
+    reinforcement_arrival_turn: int | None = None
+    reinforcement_succeeds_on: tuple[int, ...] = ()
+    reinforcement_roll_done: bool = False
+    reinforcement_available: bool = False
+    reinforcement_entry_start: HexCoord | None = None
+    reinforcement_entry_end: HexCoord | None = None
     events: list[GameEvent] = Field(default_factory=list)
     score: dict[str, int] = Field(default_factory=lambda: {Side.AXIS.value: 0, Side.ALLIES.value: 0})
     winner: Side | None = None
