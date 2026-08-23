@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from iron_bottom_sound.api import app
 from iron_bottom_sound.engine import IronBottomEngine
 from iron_bottom_sound.llm import DeterministicCommander
-from iron_bottom_sound.models import Phase, Side
+from iron_bottom_sound.models import OrderBatch, Phase, Side
 from iron_bottom_sound.storage import GameRepository
 
 
@@ -19,6 +19,8 @@ def test_hotseat_api_requires_side_header() -> None:
 def test_fake_llm_returns_engine_validated_conservative_plan() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", 1)
+    for side in Side:
+        assert engine.submit_orders(state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)).valid
     engine.advance(state.game_id)
     batch = DeterministicCommander().choose_orders(engine, state.game_id, Side.AXIS)
     assert engine.validate_orders(state.game_id, batch).valid

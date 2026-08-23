@@ -130,12 +130,24 @@ class GunMountRecord(BaseModel):
     armour: float | None = Field(default=None, ge=0)
 
 
+class GunMountState(GunMountRecord):
+    destroyed: bool = False
+    fired_this_phase: bool = False
+
+
 class TorpedoLauncherRecord(BaseModel):
     id: str
     position: MountPosition
     arcs: frozenset[FiringArc]
     torpedoes: int = Field(gt=0)
     reloads: int = Field(default=0, ge=0)
+
+
+class TorpedoLauncherState(TorpedoLauncherRecord):
+    loaded: int = Field(ge=0)
+    reloads_remaining: int = Field(ge=0)
+    reload_turns_remaining: int = Field(default=0, ge=0)
+    destroyed: bool = False
 
 
 class ArmourRecord(BaseModel):
@@ -202,6 +214,8 @@ class ShipState(BaseModel):
     secondary_armor: float = 0
     bridge_armor: float = 0
     aircraft: bool = False
+    gun_mounts: list[GunMountState] = Field(default_factory=list)
+    torpedo_launchers: list[TorpedoLauncherState] = Field(default_factory=list)
     vp: int = 0
     asset: str | None = None
     fire_markers: int = Field(default=0, ge=0)
@@ -216,9 +230,27 @@ class ShipState(BaseModel):
         return self.speed_track[(turn - 1) % 3]
 
 
+class MovementCommand(BaseModel):
+    action: Literal["advance", "turn_port_60", "turn_starboard_60", "turn_port_120", "turn_starboard_120"]
+
+
 class MovementOrder(BaseModel):
     ship_id: str
     plan: str = "0"
+    speed: int | None = Field(default=None, ge=0)
+    commands: list[MovementCommand] = Field(default_factory=list)
+
+
+class ReinforcementOrder(BaseModel):
+    ship_id: str
+    entry_hex: HexCoord
+    heading: int = Field(ge=1, le=6)
+    speed: int = Field(ge=0)
+
+
+class GunMountOrder(BaseModel):
+    mount_id: str
+    target_id: str
 
 
 class GunneryOrder(BaseModel):
@@ -226,6 +258,23 @@ class GunneryOrder(BaseModel):
     primary_target: str | None = None
     secondary_target: str | None = None
     searchlight_target: str | None = None
+    mounts: list[GunMountOrder] = Field(default_factory=list)
+
+
+class IlluminationOrder(BaseModel):
+    ship_id: str
+    target_hex: HexCoord
+
+
+class SearchlightOrder(BaseModel):
+    ship_id: str
+    target_id: str | None = None
+    active: bool = True
+
+
+class SmokeOrder(BaseModel):
+    ship_id: str
+    deploy: bool = True
 
 
 class TorpedoOrder(BaseModel):
@@ -233,14 +282,29 @@ class TorpedoOrder(BaseModel):
     target_id: str | None = None
     count: int = Field(default=1, ge=0, le=9)
     speed: Literal["fast", "medium", "slow"] = "fast"
+    launcher_id: str | None = None
+    launch_at_mf: int = Field(default=0, ge=0)
+    launch_hex: HexCoord | None = None
+    bearing: int | None = Field(default=None, ge=1, le=6)
+    setting_index: int = Field(default=0, ge=0)
+
+
+class PhaseConfirmation(BaseModel):
+    ready: bool = True
 
 
 class OrderBatch(BaseModel):
     side: Side
+    phase: Phase | None = None
+    reinforcements: list[ReinforcementOrder] = Field(default_factory=list)
     movement: list[MovementOrder] = Field(default_factory=list)
     gunnery: list[GunneryOrder] = Field(default_factory=list)
     torpedoes: list[TorpedoOrder] = Field(default_factory=list)
     smoke_ships: list[str] = Field(default_factory=list)
+    smoke: list[SmokeOrder] = Field(default_factory=list)
+    illumination: list[IlluminationOrder] = Field(default_factory=list)
+    searchlights: list[SearchlightOrder] = Field(default_factory=list)
+    confirmation: PhaseConfirmation = Field(default_factory=PhaseConfirmation)
 
     @field_validator("smoke_ships")
     @classmethod
@@ -275,6 +339,34 @@ class GameEvent(BaseModel):
     dice: DiceRoll | None = None
 
 
+class TorpedoTrack(BaseModel):
+    id: str
+    side: Side
+    launcher_ship_id: str
+    torpedo_type: str
+    position: HexCoord
+    heading: int = Field(ge=1, le=6)
+    speed_cycle: tuple[int, int, int]
+    range_remaining: int = Field(ge=0)
+    launched_turn: int = Field(gt=0)
+    hidden: bool = False
+
+
+class WreckState(BaseModel):
+    id: str
+    position: HexCoord
+    source_ship_id: str
+
+
+class MarkerState(BaseModel):
+    id: str
+    kind: Literal["fire", "smoke", "star_shell", "searchlight", "torpedo_hit", "sunk"]
+    position: HexCoord | None = None
+    ship_id: str | None = None
+    expires_turn: int | None = None
+    secret_side: Side | None = None
+
+
 class GameState(BaseModel):
     game_id: str
     scenario_id: str
@@ -288,6 +380,10 @@ class GameState(BaseModel):
     visibility: dict[str, int]
     ships: dict[str, ShipState]
     submitted_orders: dict[str, OrderBatch] = Field(default_factory=dict)
+    sealed_orders: dict[str, dict[str, OrderBatch]] = Field(default_factory=dict)
+    torpedo_tracks: list[TorpedoTrack] = Field(default_factory=list)
+    wrecks: list[WreckState] = Field(default_factory=list)
+    markers: list[MarkerState] = Field(default_factory=list)
     events: list[GameEvent] = Field(default_factory=list)
     score: dict[str, int] = Field(default_factory=lambda: {Side.AXIS.value: 0, Side.ALLIES.value: 0})
     winner: Side | None = None

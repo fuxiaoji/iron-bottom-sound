@@ -42,6 +42,7 @@ PHASES = [
     Phase.TORPEDO_EFFECTS,
     Phase.FIRE_END,
 ]
+ORDER_PHASES = {Phase.REINFORCEMENT, Phase.MOVEMENT_PLANNING, Phase.TORPEDO_PLANNING, Phase.GUNNERY}
 
 
 def d66_adjust(value: int, modifier: int) -> int:
@@ -255,33 +256,60 @@ class IronBottomEngine:
         state = self.get(game_id)
         if state.phase == Phase.COMPLETE:
             return []
-        if state.phase == Phase.MOVEMENT_PLANNING and side.value not in state.submitted_orders:
-            return [
-                LegalAction(
-                    kind="submit_orders",
-                    ship_id=ship.id,
-                    schema_hint={"movement": "0 or digits plus P/S turns", "gunnery_target": "visible enemy id"},
-                )
-                for ship in state.ships.values()
-                if ship.side == side and not ship.sunk and ship.position
-            ]
-        return [LegalAction(kind="advance")] if len(state.submitted_orders) == 2 else []
+        if state.phase in ORDER_PHASES and side.value not in state.submitted_orders:
+            schemas: dict[Phase, dict[str, Any]] = {
+                Phase.REINFORCEMENT: {"reinforcements": "entry_hex, heading, speed", "confirmation": {"ready": True}},
+                Phase.MOVEMENT_PLANNING: {
+                    "movement": {"ship_id": "owned ship", "speed": "legal MF", "commands": "advance/turn_*"},
+                    "confirmation": {"ready": True},
+                },
+                Phase.TORPEDO_PLANNING: {
+                    "torpedoes": "launcher, launch_at_mf, launch_hex, bearing, setting_index",
+                    "confirmation": {"ready": True},
+                },
+                Phase.GUNNERY: {
+                    "gunnery": "per-mount target orders",
+                    "illumination": "star-shell target hex",
+                    "searchlights": "target and active flag",
+                    "smoke": "deploy flag",
+                    "confirmation": {"ready": True},
+                },
+            }
+            return [LegalAction(kind="submit_phase_orders", schema_hint=schemas[state.phase])]
+        return [LegalAction(kind="advance")] if state.phase not in ORDER_PHASES or len(state.submitted_orders) == 2 else []
 
     def validate_orders(self, game_id: str, batch: OrderBatch) -> ValidationResult:
         state = self.get(game_id)
         errors: list[str] = []
-        if state.phase != Phase.MOVEMENT_PLANNING:
-            errors.append(f"Orders may only be submitted during {Phase.MOVEMENT_PLANNING}")
+        if state.phase not in ORDER_PHASES:
+            errors.append(f"Orders may not be submitted during {state.phase}")
+        if batch.phase is not None and batch.phase != state.phase:
+            errors.append(f"Order phase {batch.phase} does not match current phase {state.phase}")
         if batch.side.value in state.submitted_orders:
             errors.append("This side already submitted orders")
         owned = {ship.id: ship for ship in state.ships.values() if ship.side == batch.side and not ship.sunk}
-        for order in batch.movement:
+        allowed_fields = {
+            Phase.REINFORCEMENT: {"reinforcements"},
+            Phase.MOVEMENT_PLANNING: {"movement"},
+            Phase.TORPEDO_PLANNING: {"torpedoes"},
+            Phase.GUNNERY: {"gunnery", "smoke", "smoke_ships", "illumination", "searchlights"},
+        }.get(state.phase, set())
+        populated = {
+            name for name in ("reinforcements", "movement", "torpedoes", "gunnery", "smoke", "smoke_ships", "illumination", "searchlights")
+            if getattr(batch, name)
+        }
+        for name in sorted(populated - allowed_fields):
+            errors.append(f"{name} orders are not legal during {state.phase}")
+        for order in batch.movement if state.phase == Phase.MOVEMENT_PLANNING else []:
             ship = owned.get(order.ship_id)
             if not ship:
                 errors.append(f"Movement references non-owned ship {order.ship_id}")
                 continue
             try:
-                cost = self.movement_cost(order.plan)
+                commands = self.movement_commands(order)
+                self.validate_movement_commands(commands)
+                cost = self.movement_cost(order.plan, commands)
+                self.movement_trajectory(ship, order.plan, commands)
             except ValueError as error:
                 errors.append(f"{order.ship_id}: {error}")
                 continue
@@ -290,13 +318,20 @@ class IronBottomEngine:
             minimum = max(0, ship.previous_speed - deceleration)
             if not minimum <= cost <= maximum:
                 errors.append(f"{order.ship_id}: movement cost {cost} outside legal range {minimum}-{maximum}")
-        for order in batch.gunnery:
+            if order.speed is not None and order.speed != cost:
+                errors.append(f"{order.ship_id}: declared speed {order.speed} does not match {cost} MF plan")
+        if state.phase == Phase.MOVEMENT_PLANNING:
+            expected = {ship.id for ship in owned.values() if ship.position}
+            submitted = {order.ship_id for order in batch.movement}
+            if submitted != expected:
+                errors.append(f"Movement plans must cover every active ship; missing={sorted(expected-submitted)}, extra={sorted(submitted-expected)}")
+        for order in batch.gunnery if state.phase == Phase.GUNNERY else []:
             if order.ship_id not in owned:
                 errors.append(f"Gunnery references non-owned ship {order.ship_id}")
             for target in (order.primary_target, order.secondary_target, order.searchlight_target):
                 if target and (target not in state.ships or state.ships[target].side == batch.side):
                     errors.append(f"Illegal target {target}")
-        for order in batch.torpedoes:
+        for order in batch.torpedoes if state.phase == Phase.TORPEDO_PLANNING else []:
             ship = owned.get(order.ship_id)
             if not ship or not ship.torpedo or ship.torpedo.destroyed:
                 errors.append(f"{order.ship_id} cannot fire torpedoes")
@@ -321,24 +356,44 @@ class IronBottomEngine:
         )
         return validation
 
+    @staticmethod
+    def _seal_orders(state: GameState) -> None:
+        key = f"{state.turn}:{state.phase.value}"
+        state.sealed_orders[key] = deepcopy(state.submitted_orders)
+        state.submitted_orders.clear()
+
+    @staticmethod
+    def _sealed_batches(state: GameState, phase: Phase) -> list[OrderBatch]:
+        return list(state.sealed_orders.get(f"{state.turn}:{phase.value}", {}).values())
+
     def advance(self, game_id: str) -> list[GameEvent]:
         state = self.get(game_id)
         before = len(state.events)
         if state.phase == Phase.COMPLETE:
             return []
         if state.phase == Phase.REINFORCEMENT:
+            if set(state.submitted_orders) != {Side.AXIS.value, Side.ALLIES.value}:
+                raise ValueError("Both sides must confirm reinforcement orders before advancing")
+            self._seal_orders(state)
             self._resolve_reinforcements(state)
             state.phase = Phase.MOVEMENT_PLANNING
         elif state.phase == Phase.MOVEMENT_PLANNING:
             if set(state.submitted_orders) != {Side.AXIS.value, Side.ALLIES.value}:
                 raise ValueError("Both sides must submit orders before advancing")
+            self._seal_orders(state)
             state.phase = Phase.TORPEDO_PLANNING
         elif state.phase == Phase.TORPEDO_PLANNING:
+            if set(state.submitted_orders) != {Side.AXIS.value, Side.ALLIES.value}:
+                raise ValueError("Both sides must submit torpedo plans before advancing")
+            self._seal_orders(state)
             state.phase = Phase.MOVEMENT_RESOLUTION
         elif state.phase == Phase.MOVEMENT_RESOLUTION:
             self._resolve_movement(state)
             state.phase = Phase.GUNNERY
         elif state.phase == Phase.GUNNERY:
+            if set(state.submitted_orders) != {Side.AXIS.value, Side.ALLIES.value}:
+                raise ValueError("Both sides must submit gunnery orders before advancing")
+            self._seal_orders(state)
             self._resolve_gunnery(state)
             state.phase = Phase.TORPEDO_EFFECTS
         elif state.phase == Phase.TORPEDO_EFFECTS:
@@ -350,7 +405,6 @@ class IronBottomEngine:
             if state.phase != Phase.COMPLETE:
                 state.turn += 1
                 state.phase = Phase.REINFORCEMENT
-                state.submitted_orders.clear()
                 for ship in state.ships.values():
                     ship.fired = False
                     ship.smoke = False
@@ -358,16 +412,31 @@ class IronBottomEngine:
         return state.events[before:]
 
     def step(self, game_id: str, joint_orders: dict[Side, OrderBatch]) -> tuple[dict[Side, PlayerObservation], list[GameEvent]]:
-        state = self.get(game_id)
-        if state.phase == Phase.REINFORCEMENT:
-            self.advance(game_id)
-        for side in (Side.AXIS, Side.ALLIES):
-            result = self.submit_orders(game_id, joint_orders[side])
-            if not result.valid:
-                raise ValueError(result.errors)
         events: list[GameEvent] = []
-        while self.get(game_id).phase not in {Phase.REINFORCEMENT, Phase.COMPLETE}:
+        starting_turn = self.get(game_id).turn
+        while self.get(game_id).phase != Phase.COMPLETE:
+            state = self.get(game_id)
+            if state.phase in ORDER_PHASES:
+                for side in Side:
+                    source = joint_orders[side]
+                    projected = OrderBatch(
+                        side=side,
+                        phase=state.phase,
+                        reinforcements=source.reinforcements if state.phase == Phase.REINFORCEMENT else [],
+                        movement=source.movement if state.phase == Phase.MOVEMENT_PLANNING else [],
+                        torpedoes=source.torpedoes if state.phase == Phase.TORPEDO_PLANNING else [],
+                        gunnery=source.gunnery if state.phase == Phase.GUNNERY else [],
+                        smoke=source.smoke if state.phase == Phase.GUNNERY else [],
+                        smoke_ships=source.smoke_ships if state.phase == Phase.GUNNERY else [],
+                        illumination=source.illumination if state.phase == Phase.GUNNERY else [],
+                        searchlights=source.searchlights if state.phase == Phase.GUNNERY else [],
+                    )
+                    result = self.submit_orders(game_id, projected)
+                    if not result.valid:
+                        raise ValueError(result.errors)
             events.extend(self.advance(game_id))
+            if self.get(game_id).turn != starting_turn:
+                break
         return {side: self.observe(game_id, side) for side in Side}, events
 
     def replay(self, game_id: str) -> GameState:
@@ -375,7 +444,52 @@ class IronBottomEngine:
         return self.get(game_id).model_copy(deep=True)
 
     @staticmethod
-    def movement_cost(plan: str) -> int:
+    def movement_commands(order: MovementOrder) -> list[str]:
+        if order.commands:
+            return [command.action for command in order.commands]
+        plan = order.plan.strip().upper().replace("左", "P").replace("右", "S")
+        if plan == "0":
+            return []
+        tokens = re.findall(r"\d+|PP|SS|LL|RR|P|S|L|R", plan)
+        if "".join(tokens) != plan:
+            raise ValueError(f"Invalid movement plan {order.plan!r}")
+        commands: list[str] = []
+        mapping = {
+            "P": "turn_port_60", "L": "turn_port_60",
+            "S": "turn_starboard_60", "R": "turn_starboard_60",
+            "PP": "turn_port_120", "LL": "turn_port_120",
+            "SS": "turn_starboard_120", "RR": "turn_starboard_120",
+        }
+        for token in tokens:
+            if token.isdigit():
+                commands.extend(["advance"] * int(token))
+            else:
+                commands.append(mapping[token])
+        return commands
+
+    @staticmethod
+    def validate_movement_commands(commands: list[str]) -> None:
+        if not commands:
+            return
+        if commands[0] != "advance":
+            raise ValueError("The first movement command must be advance")
+        turn_actions = {
+            "turn_port_60", "turn_starboard_60", "turn_port_120", "turn_starboard_120"
+        }
+        for index, command in enumerate(commands):
+            if command not in turn_actions | {"advance"}:
+                raise ValueError(f"Unknown movement command {command}")
+            if command in turn_actions:
+                if index == len(commands) - 1:
+                    if command not in {"turn_port_60", "turn_starboard_60"}:
+                        raise ValueError("Only a free 60-degree turn is allowed after the final MF")
+                elif commands[index + 1] != "advance":
+                    raise ValueError("A ship must advance one MF after turning")
+
+    @staticmethod
+    def movement_cost(plan: str, commands: list[str] | None = None) -> int:
+        if commands is not None:
+            return sum(command == "advance" or command.endswith("120") for command in commands)
         plan = plan.strip().upper().replace("左", "P").replace("右", "S")
         if plan == "0":
             return 0
@@ -384,42 +498,49 @@ class IronBottomEngine:
             raise ValueError(f"Invalid movement plan {plan!r}")
         return sum(int(token) if token.isdigit() else (1 if token in {"PP", "SS", "LL", "RR"} else 0) for token in tokens)
 
-    def movement_trajectory(self, ship: ShipState, plan: str) -> tuple[list[tuple[HexCoord, int]], int]:
+    def movement_trajectory(
+        self, ship: ShipState, plan: str, commands: list[str] | None = None
+    ) -> tuple[list[tuple[HexCoord, int]], int]:
         if not ship.position:
             return [], ship.heading
-        normalized = plan.strip().upper().replace("左", "P").replace("右", "S")
-        if normalized == "0":
+        parsed = commands if commands is not None else self.movement_commands(MovementOrder(ship_id=ship.id, plan=plan))
+        if not parsed:
             return [], ship.heading
-        tokens = re.findall(r"\d+|PP|SS|LL|RR|P|S|L|R", normalized)
         heading = ship.heading
         position = ship.position
         trajectory: list[tuple[HexCoord, int]] = []
-        for token in tokens:
-            if token.isdigit():
-                for _ in range(int(token)):
-                    position = position.neighbor(heading)
-                    trajectory.append((position, heading))
-            elif token in {"P", "L"}:
+        for command in parsed:
+            if command == "advance":
+                position = position.neighbor(heading)
+                trajectory.append((position, heading))
+            elif command == "turn_port_60":
                 heading = 6 if heading == 1 else heading - 1
-            elif token in {"S", "R"}:
+            elif command == "turn_starboard_60":
                 heading = 1 if heading == 6 else heading + 1
-            elif token in {"PP", "LL"}:
+            elif command == "turn_port_120":
                 heading = ((heading - 3) % 6) + 1
                 trajectory.append((position, heading))
-            elif token in {"SS", "RR"}:
+            elif command == "turn_starboard_120":
                 heading = ((heading + 1) % 6) + 1
                 trajectory.append((position, heading))
         return trajectory, heading
 
     def _resolve_reinforcements(self, state: GameState) -> None:
+        orders = [order for batch in self._sealed_batches(state, Phase.REINFORCEMENT) for order in batch.reinforcements]
+        by_ship = {order.ship_id: order for order in orders}
         for ship in state.ships.values():
-            if ship.position is None and ship.reinforcement_turn == state.turn:
-                self._event(state, "reinforcement_pending", f"{ship.name} 等待想定入场格", rule=self._rule("IBS-R-05", 6, "5.0 A"))
+            if ship.position is None and ship.reinforcement_turn == state.turn and ship.id in by_ship:
+                order = by_ship[ship.id]
+                ship.position = order.entry_hex
+                ship.heading = order.heading
+                ship.current_speed = order.speed
+                ship.previous_speed = order.speed
+                self._event(state, "reinforcement_entered", f"{ship.name} 从 {order.entry_hex.label} 入场", rule=self._rule("IBS-R-05", 6, "5.0 A"))
 
     def _resolve_movement(self, state: GameState) -> None:
         movement_orders = {
             order.ship_id: order
-            for batch in state.submitted_orders.values()
+            for batch in self._sealed_batches(state, Phase.MOVEMENT_PLANNING)
             for order in batch.movement
         }
         paths: dict[str, list[tuple[HexCoord, int]]] = {}
@@ -427,11 +548,12 @@ class IronBottomEngine:
         for ship in state.ships.values():
             if ship.sunk or not ship.position:
                 continue
-            plan = movement_orders.get(ship.id, MovementOrder(ship_id=ship.id, plan="0")).plan
-            trajectory, heading = self.movement_trajectory(ship, plan)
+            order = movement_orders.get(ship.id, MovementOrder(ship_id=ship.id, plan="0"))
+            commands = self.movement_commands(order)
+            trajectory, heading = self.movement_trajectory(ship, order.plan, commands)
             paths[ship.id] = trajectory
             final_headings[ship.id] = heading
-            ship.current_speed = self.movement_cost(plan)
+            ship.current_speed = self.movement_cost(order.plan, commands)
         maximum_impulses = max((len(path) for path in paths.values()), default=0)
         stopped: set[str] = set()
         for impulse in range(maximum_impulses):
@@ -446,7 +568,16 @@ class IronBottomEngine:
             for ship_id, position in destinations.items():
                 by_hex.setdefault(position.label, []).append(ship_id)
             collisions = [ids for ids in by_hex.values() if len(ids) > 1]
-            for ids in collisions:
+            collision_sets = {frozenset(ids) for ids in collisions}
+            active_ids = sorted(destinations)
+            for left_index, left_id in enumerate(active_ids):
+                for right_id in active_ids[left_index + 1:]:
+                    left = state.ships[left_id]
+                    right = state.ships[right_id]
+                    if destinations[left_id] == right.position and destinations[right_id] == left.position:
+                        collision_sets.add(frozenset((left_id, right_id)))
+            for collision_set in collision_sets:
+                ids = sorted(collision_set)
                 for ship_id in ids:
                     stopped.add(ship_id)
                     self._damage_hull(state, state.ships[ship_id], 1, "collision")
@@ -460,6 +591,8 @@ class IronBottomEngine:
             for ship_id, position in destinations.items():
                 if ship_id not in stopped:
                     state.ships[ship_id].position = position
+                    if impulse < len(paths[ship_id]):
+                        state.ships[ship_id].heading = paths[ship_id][impulse][1]
         for ship_id, heading in final_headings.items():
             ship = state.ships[ship_id]
             ship.heading = heading
@@ -473,7 +606,7 @@ class IronBottomEngine:
             )
 
     def _resolve_gunnery(self, state: GameState) -> None:
-        orders = [order for batch in state.submitted_orders.values() for order in batch.gunnery]
+        orders = [order for batch in self._sealed_batches(state, Phase.GUNNERY) for order in batch.gunnery]
         attackers_per_target: dict[str, int] = {}
         for order in orders:
             if order.primary_target:
@@ -518,7 +651,7 @@ class IronBottomEngine:
                 )
 
     def _resolve_torpedoes(self, state: GameState) -> None:
-        orders = [order for batch in state.submitted_orders.values() for order in batch.torpedoes]
+        orders = [order for batch in self._sealed_batches(state, Phase.TORPEDO_PLANNING) for order in batch.torpedoes]
         displacement = {"DD": "A", "APD": "A", "AV": "B", "CL": "B", "CA": "C", "BC": "F", "BB": "F"}
         for order in orders:
             attacker = state.ships[order.ship_id]

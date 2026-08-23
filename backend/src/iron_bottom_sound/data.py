@@ -6,7 +6,19 @@ from typing import Any
 
 import yaml
 
-from .models import FiringArc, GameOptions, GameState, HexCoord, Phase, ShipRecord, ShipState, Side, WeaponMount
+from .models import (
+    FiringArc,
+    GameOptions,
+    GameState,
+    GunMountState,
+    HexCoord,
+    Phase,
+    ShipRecord,
+    ShipState,
+    Side,
+    TorpedoLauncherState,
+    WeaponMount,
+)
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -99,6 +111,15 @@ def make_ship(
         secondary_armor=data.get("secondary_armor", 0),
         bridge_armor=data.get("bridge_armor", 0),
         aircraft=data.get("aircraft", False),
+        gun_mounts=[GunMountState.model_validate(mount.model_dump()) for mount in record.guns] if record else [],
+        torpedo_launchers=[
+            TorpedoLauncherState(
+                **launcher.model_dump(),
+                loaded=launcher.torpedoes,
+                reloads_remaining=launcher.reloads,
+            )
+            for launcher in record.torpedo_launchers
+        ] if record else [],
         vp=data.get("vp", 0),
         asset=entry.get("asset"),
         reinforcement_turn=entry.get("reinforcement_turn"),
