@@ -13,8 +13,17 @@ $Backend = Start-Process -FilePath "python" `
     -RedirectStandardError (Join-Path $RuntimeDir "backend-error.log") `
     -WindowStyle Hidden -PassThru
 
-$Node = Get-Command "node" -ErrorAction Stop
-$Frontend = Start-Process -FilePath $Node.Source `
+$Node = Get-Command "node" -ErrorAction SilentlyContinue
+if ($null -eq $Node) {
+    $BundledNode = Join-Path $env:USERPROFILE ".cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
+    if (-not (Test-Path $BundledNode)) {
+        throw "未找到 Node.js。请先安装 Node.js 20+ 和 pnpm。"
+    }
+    $NodePath = $BundledNode
+} else {
+    $NodePath = $Node.Source
+}
+$Frontend = Start-Process -FilePath $NodePath `
     -ArgumentList "node_modules/vite/bin/vite.js", "--host", "127.0.0.1" `
     -WorkingDirectory (Join-Path $ProjectRoot "frontend") `
     -RedirectStandardOutput (Join-Path $RuntimeDir "frontend.log") `
