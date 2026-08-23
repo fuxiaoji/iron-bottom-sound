@@ -6,13 +6,15 @@ status: playable
 source: {document: scenario-book-zh.pdf, pdf_page: 1, printed_page: 2, status: verified_source}
 turns: 7
 visibility: {axis: 16, allies: 14}
-optional_rules: [radar, star_shells, searchlights]
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
 initial_phase: gunnery
 victory:
   kind: victory_points
   points_per_three_hull_lost: 1
   leader_margin: 4
   draw_if_margin_below: 4
+  evaluated_at: end_of_turn_7
 special_rules:
   - {id: IBS-S-01-R1, text: 第一回合从炮击执行阶段开始；移动已完成。}
   - {id: IBS-S-01-R2, text: 日军第一回合不得炮击。}

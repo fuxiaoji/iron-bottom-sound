@@ -17,3 +17,12 @@ IBS-R-09.10,鱼雷盲射,verified_source,structured,partial,pending,structured
 IBS-T-GHT,炮击命中表,verified_source,structured,executable,pending,executable
 IBS-T-GHRT,炮击结果表,verified_source,structured,executable,pending,executable
 IBS-T-THDT,鱼雷与碰撞结果表,verified_source,structured,executable,pending,executable
+IBS-T-APT,装甲穿透表,verified_source,structured,partial,tested,structured
+IBS-T-SPECIAL,特殊损伤表,verified_source,structured,partial,tested,structured
+IBS-T-FIRE,火灾判定表,verified_source,structured,partial,tested,structured
+IBS-T-MALFUNCTION-66,故障判定表,verified_source,structured,partial,tested,structured
+IBS-T-TORPEDO-CHARACTERISTICS,鱼雷特性表,verified_source,structured,partial,tested,structured
+IBS-U-PLAYABLE,想定1/3逐舰记录,verified_source,structured,partial,tested,structured
+IBS-M-OVERLAYS,X/Y/Z地形覆盖,verified_source,structured,pending,tested,structured
+IBS-S-01,埃斯佩兰斯角海战,verified_source,structured,partial,tested,structured
+IBS-S-03,通道行动,verified_source,structured,partial,tested,structured

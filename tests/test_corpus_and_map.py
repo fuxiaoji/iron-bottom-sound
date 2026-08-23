@@ -44,6 +44,8 @@ def test_scenario_01_source_order_of_battle_and_special_rules() -> None:
     assert ships["IBS-U-USN-MCCALLA"]["position"] == "AA12"
     assert ships["IBS-U-USN-DUNCAN"]["position"] == "X8"
     assert data["initial_phase"] == "gunnery"
+    assert data["optional_rules"] == []
+    assert len(data["available_optional_rules"]) == 10
     assert "shore_bombardment" not in data["victory"]
     assert len(data["reinforcements"]["ships"]) == 8
     assert data["reinforcements"]["trigger"] == {"turn": 3, "roll": "1d6", "succeeds_on": [1]}

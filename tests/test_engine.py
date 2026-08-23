@@ -16,14 +16,14 @@ def test_scenario_three_loads_verified_order_of_battle() -> None:
     assert state.ships["IBS-U-KM-KARL-GALSTER"].position.label == "O14"
 
 
-def test_scenario_one_loads_and_enables_special_options() -> None:
+def test_scenario_one_loads_without_forcing_optional_rules() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-01", seed=7)
     assert len(state.ships) == 14
     assert state.phase == Phase.GUNNERY
-    assert state.options.optional_rules.radar
-    assert state.options.optional_rules.star_shells
-    assert state.options.optional_rules.searchlights
+    assert not state.options.optional_rules.radar
+    assert not state.options.optional_rules.star_shells
+    assert not state.options.optional_rules.searchlights
 
 
 def test_same_seed_and_orders_produce_identical_event_stream() -> None:

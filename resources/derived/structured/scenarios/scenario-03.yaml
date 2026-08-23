@@ -7,9 +7,16 @@ source: {document: scenario-book-zh.pdf, pdf_page: 3, printed_page: 4, status: v
 turns: 4
 visibility: {axis: 4, allies: 4}
 optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
 victory:
-  kind: elimination_or_escape
-  notes: 英军击沉或使德军舰只减速至2-2-2或更低；德军需击沉或减速后脱离。
+  kind: scenario_03_thresholds
+  evaluated_at: end_of_turn_4
+  british:
+    tactical: 击沉或把至少一艘德国 DD 的速度降至 2-2-2 或更低。
+    strategic: 击沉或把多艘德国 DD 的速度降至 2-2-2 或更低。
+  german:
+    tactical: 没有德国 DD 被击沉或被降速至 2-2-2 或更低。
+    minor_strategic: 在满足战术胜利前提下，另击沉至少两艘英国 DD。
 ships:
   - {id: IBS-U-KM-KARL-GALSTER, name: 卡尔加尔斯特, side: axis, template: dd-german-1940, position: O14, heading: 4, speed: 5, asset: 德国-DD-卡尔加尔斯特.png}
   - {id: IBS-U-KM-RICHARD-BEITZEN, name: 里夏德·拜茨恩, side: axis, template: dd-german-1940, position: P13, heading: 4, speed: 5, asset: 德国-DD-里夏德·拜茨恩.png}
