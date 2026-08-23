@@ -18,7 +18,7 @@ IBS-T-GHT,炮击命中表,verified_source,structured,executable,tested,tested
 IBS-T-GHRT,炮击结果表,verified_source,structured,executable,tested,tested
 IBS-T-THDT,鱼雷与碰撞结果表,verified_source,structured,executable,tested,tested
 IBS-T-APT,装甲穿透表,verified_source,structured,executable,tested,tested
-IBS-T-SPECIAL,特殊损伤表,verified_source,structured,partial,tested,structured
+IBS-T-SPECIAL,特殊损伤表,verified_source,structured,executable,tested,tested
 IBS-T-FIRE,火灾判定表,verified_source,structured,executable,tested,tested
 IBS-T-MALFUNCTION-66,故障判定表,verified_source,structured,executable,tested,tested
 IBS-T-TORPEDO-CHARACTERISTICS,鱼雷特性表,verified_source,structured,executable,tested,tested

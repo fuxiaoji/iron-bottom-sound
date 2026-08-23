@@ -1889,7 +1889,7 @@ class IronBottomEngine:
                 self._damage_hull(state, target, target.hull if result.get("sunk") else int(result.get("hull", 0)), "special_damage")
                 self._lose_speed(target, int(result.get("speed_loss", 0)))
                 fire = int(result.get("fire", 0))
-                if result.get("ignore_fire_if_armoured_without_aircraft") and target.belt_armor and not target.aircraft:
+                if result.get("ignore_fire_if_no_aircraft") and not target.aircraft:
                     fire = 0
                 if result.get("torpedo_launcher_hit") and (not target.torpedo or not target.torpedo.ammo):
                     fire = 0

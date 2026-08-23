@@ -21,8 +21,8 @@ direct_results:
   "26": {rudder_hit: true, circle_turns: 2, fire_control: true}
   "31": {bridge_hit: true, bridge_armour_check: true, radar: true, next_turn_straight_at_original_speed: true, captain_killed: true}
   "32": {bridge_hit: true, hold_turn_degrees: 60, circle_turns: 2, captain_wounded: true}
-  "33-36": {fire: 1, hull: 1, ignore_fire_if_armoured_without_aircraft: true, fire_control: true}
-  "41": {fire: 1, hull: 2, ignore_fire_if_armoured_without_aircraft: true}
+  "33-36": {fire: 1, hull: 1, ignore_fire_if_no_aircraft: true, fire_control: true}
+  "41": {fire: 1, hull: 2, ignore_fire_if_no_aircraft: true}
   "42": {hull: 2, primary: 2, secondary: 1, radar: true, captain_killed: true}
   "43": {sunk: true, armour_check: true, armour_location: belt}
   "66": {all_guns_disabled_turns: 1, captain_wounded: true}

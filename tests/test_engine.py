@@ -1,4 +1,4 @@
-from iron_bottom_sound.engine import IronBottomEngine
+from iron_bottom_sound.engine import D66_VALUES, IronBottomEngine
 from iron_bottom_sound.models import (
     GameOptions,
     ContactSetupOrder,
@@ -1003,6 +1003,76 @@ def test_special_damage_66_disables_all_guns_next_turn_and_wounds_captain() -> N
     assert event.dice and event.dice.raw == 66
     assert ship.guns_disabled_turns == 1
     assert ship.captain_status == "wounded"
+
+
+def test_special_damage_deck_fire_is_ignored_for_ship_without_aircraft() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=1)
+    ship = state.ships["IBS-U-KM-KARL-GALSTER"]
+    assert not ship.aircraft and ship.belt_armor == 0
+    before = ship.hull
+    engine._roll_d66 = lambda _: (33, [3, 3])  # type: ignore[method-assign]
+    engine._resolve_special_damage(state, ship, armour_already_penetrated=True)
+    assert ship.hull == before - 1
+    assert ship.fire_markers == 0
+    assert ship.mfc_destroyed
+
+
+def test_special_damage_belt_armour_exactly_equal_penetration_sinks_but_above_does_not() -> None:
+    exact_engine = IronBottomEngine()
+    exact = exact_engine.reset("IBS-S-01", seed=1)
+    attacker = exact.ships["IBS-U-IJN-AOBA"]
+    target = exact.ships["IBS-U-USN-HELENA"]
+    target.belt_armor = 7
+    exact_engine._roll_d66 = lambda _: (43, [4, 3])  # type: ignore[method-assign]
+    exact_engine._resolve_special_damage(exact, target, attacker, distance=21, caliber=8)
+    assert target.sunk
+    event = next(event for event in exact.events if event.type == "special_damage")
+    assert event.payload["penetrated"] is True
+
+    blocked_engine = IronBottomEngine()
+    blocked = blocked_engine.reset("IBS-S-01", seed=1)
+    blocked_attacker = blocked.ships["IBS-U-IJN-AOBA"]
+    blocked_target = blocked.ships["IBS-U-USN-HELENA"]
+    blocked_target.belt_armor = 7.1
+    blocked_engine._roll_d66 = lambda _: (43, [4, 3])  # type: ignore[method-assign]
+    blocked_engine._resolve_special_damage(
+        blocked, blocked_target, blocked_attacker, distance=21, caliber=8
+    )
+    assert not blocked_target.sunk
+    blocked_event = next(event for event in blocked.events if event.type == "special_damage")
+    assert blocked_event.payload["penetrated"] is False
+
+
+def test_special_damage_31_destroys_radar_even_when_bridge_armour_stops_bridge_effects() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-01", seed=1)
+    attacker = state.ships["IBS-U-IJN-AOBA"]
+    target = state.ships["IBS-U-USN-HELENA"]
+    target.bridge_armor = 99
+    engine._roll_d66 = lambda _: (31, [3, 1])  # type: ignore[method-assign]
+    engine._resolve_special_damage(state, target, attacker, distance=9, caliber=8)
+    assert target.radar_destroyed
+    assert not target.bridge_destroyed
+    assert target.captain_status == "fit"
+    assert target.forced_straight_turns == 0
+
+
+def test_every_special_damage_d66_result_executes_with_audited_event() -> None:
+    for roll in D66_VALUES:
+        engine = IronBottomEngine()
+        state = engine.reset("IBS-S-01", seed=roll)
+        attacker = state.ships["IBS-U-IJN-AOBA"]
+        target = state.ships["IBS-U-USN-HELENA"]
+        engine._roll_d66 = lambda _, value=roll: (value, [value // 10, value % 10])  # type: ignore[method-assign]
+        engine._resolve_special_damage(
+            state, target, attacker, distance=9, armour_already_penetrated=True, caliber=8
+        )
+        event = next(event for event in state.events if event.type == "special_damage")
+        assert event.dice and event.dice.raw == roll
+        assert event.payload["effect"] == engine.rules.special_damage_result(
+            roll, target.displacement_band
+        )
 
 
 def test_rudder_and_bridge_restrictions_reject_illegal_movement_plan() -> None:
