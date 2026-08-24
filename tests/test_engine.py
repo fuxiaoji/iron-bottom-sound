@@ -665,7 +665,8 @@ def test_torpedo_launches_at_planned_mf_moves_by_impulse_and_contacts_ship() -> 
     assert track.position == target.position
     assert track.contact_ship_ids == [target.id]
     assert track.distance_travelled == 1
-    assert next(item for item in attacker.torpedo_launchers if item.id == "TT1").loaded == 0
+    assert track.salvo_size == 1
+    assert next(item for item in attacker.torpedo_launchers if item.id == "TT1").loaded == 1
     for side in Side:
         assert engine.submit_orders(
             state.game_id, OrderBatch(side=side, phase=Phase.GUNNERY)
@@ -697,6 +698,7 @@ def test_stationary_ship_launches_from_its_current_hex_at_mf_zero() -> None:
     engine.advance(state.game_id)
     hints = engine.legal_actions(state.game_id, Side.ALLIES)[0].schema_hint["torpedo_candidates"]
     javelin_hint = next(item for item in hints if item["ship_id"] == attacker.id)
+    assert [launcher["loaded"] for launcher in javelin_hint["launchers"]] == [2, 2]
     assert javelin_hint["launch_positions"] == [{
         "mf": 0,
         "hex": attacker.position.model_dump(mode="json"),
@@ -717,7 +719,7 @@ def test_stationary_ship_launches_from_its_current_hex_at_mf_zero() -> None:
     )
     assert not result.valid
     assert any("launch_hex does not match" in error for error in result.errors)
-    order = invalid.model_copy(update={"launch_hex": attacker.position})
+    order = invalid.model_copy(update={"launch_hex": attacker.position, "count": 2})
     assert engine.submit_orders(
         state.game_id,
         OrderBatch(side=Side.ALLIES, phase=Phase.TORPEDO_PLANNING, torpedoes=[order]),
@@ -731,6 +733,7 @@ def test_stationary_ship_launches_from_its_current_hex_at_mf_zero() -> None:
     assert launch.payload["launch_mf"] == 0
     track = state.torpedo_tracks[0]
     assert track.distance_travelled == track.speed_cycle[0]
+    assert track.salvo_size == 2
     assert next(item for item in attacker.torpedo_launchers if item.id == "TT1").loaded == 0
 
 
@@ -1277,7 +1280,8 @@ def test_special_damage_torpedo_launcher_hit_updates_launcher_and_aggregate_ammo
     initial_ammo = ship.torpedo.ammo if ship.torpedo else 0
     destroyed = engine._destroy_torpedo_launchers(state, ship, 1, "test")
     assert len(destroyed) == 1
-    assert ship.torpedo and ship.torpedo.ammo == initial_ammo - 1
+    assert ship.torpedo and ship.torpedo.ammo == initial_ammo - 2
+    assert ship.torpedo.ammo == sum(launcher.loaded for launcher in ship.torpedo_launchers)
     assert any(event.type == "torpedo_launcher_destroyed" for event in state.events)
 
 

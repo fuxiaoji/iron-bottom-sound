@@ -16,8 +16,8 @@ families:
       - {id: S3, kind: secondary, position: starboard, firepower: 1, caliber: 4.7, arcs: [starboard]}
       - {id: S4, kind: secondary, position: starboard, firepower: 1, caliber: 4.7, arcs: [starboard]}
     torpedo_launchers:
-      - {id: TT-P, position: port, arcs: [port], torpedoes: 1, reloads: 1}
-      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 1, reloads: 1}
+      - {id: TT-P, position: port, arcs: [port], torpedoes: 2, reloads: 1}
+      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 2, reloads: 1}
     torpedo_type: jp-24-type93
     armour: {primary: 1, belt: 3}
     aircraft: true
@@ -31,8 +31,8 @@ families:
       - {id: P2, kind: primary, position: stern, firepower: 3, caliber: 5, arcs: [port, starboard, stern]}
       - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 5, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 1, reloads: 1}
-      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 1, reloads: 1}
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 1}
+      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 1}
     torpedo_type: jp-24-type90
   ijn-akizuki-dd:
     ship_type: DD
@@ -45,7 +45,7 @@ families:
       - {id: P3, kind: primary, position: stern, firepower: 2, caliber: 3.9, arcs: [port, starboard, stern]}
       - {id: P4, kind: primary, position: stern, firepower: 3, caliber: 3.9, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 1, reloads: 0}
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: jp-24-type90
   ijn-chitose-av:
     ship_type: AV
@@ -125,7 +125,7 @@ families:
       - {id: P4, kind: primary, position: stern, firepower: 1, caliber: 5, arcs: [port, starboard, stern]}
       - {id: P5, kind: primary, position: stern, firepower: 2, caliber: 5, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 1, reloads: 0}
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
       - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 1, reloads: 0}
     torpedo_type: us-21-mk15-1942
   km-destroyer:
@@ -140,8 +140,8 @@ families:
       - {id: P4, kind: primary, position: stern, firepower: 2, caliber: 5, arcs: [port, starboard, stern]}
       - {id: P5, kind: primary, position: stern, firepower: 2, caliber: 5, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 1, reloads: 0}
-      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 1, reloads: 0}
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: de-nl-21
   rn-j-class-dd:
     ship_type: DD
@@ -153,8 +153,8 @@ families:
       - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 4.7, arcs: [bow, port, starboard]}
       - {id: P3, kind: primary, position: stern, firepower: 2, caliber: 4.7, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 1, reloads: 0}
-      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 1, reloads: 0}
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: uk-21-mk9
 records:
   IBS-U-IJN-AOBA: {family: ijn-aoba-ca, name: 青叶, vp: 12, source_page: 2}
@@ -164,7 +164,14 @@ records:
   IBS-U-IJN-HATSUYUKI: {family: ijn-fubuki-dd, name: 初雪, vp: 3, source_page: 2}
   IBS-U-IJN-CHITOSE: {family: ijn-chitose-av, name: 千岁, vp: 12, source_page: 2}
   IBS-U-IJN-NISSHIN: {family: ijn-nisshin-av, name: 日进, vp: 12, source_page: 2}
-  IBS-U-IJN-ASAGUMO: {family: ijn-fubuki-dd, name: 朝云, vp: 4, source_page: 2}
+  IBS-U-IJN-ASAGUMO:
+    family: ijn-fubuki-dd
+    name: 朝云
+    vp: 4
+    source_page: 2
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 3, reloads: 1}
+      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 3, reloads: 1}
   IBS-U-IJN-NATSUGUMO: {family: ijn-fubuki-dd, name: 夏云, vp: 4, source_page: 2}
   IBS-U-IJN-YAMAGUMO: {family: ijn-fubuki-dd, name: 山云, vp: 3, source_page: 2}
   IBS-U-IJN-MURAKUMO: {family: ijn-fubuki-dd, name: 丛云, vp: 3, source_page: 2}

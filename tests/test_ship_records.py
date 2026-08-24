@@ -34,15 +34,21 @@ def test_ship_record_mounts_and_tracks_match_source_examples() -> None:
     assert aoba.maximum_speed_cycle == (6, 5, 5)
     assert sum(mount.firepower for mount in aoba.guns if mount.kind == "primary") == 16
     assert aoba.torpedo_type == "jp-24-type93"
+    assert [launcher.torpedoes for launcher in aoba.torpedo_launchers] == [2, 2]
     assert sum(launcher.reloads for launcher in aoba.torpedo_launchers) == 2
     assert helena.hull_boxes == 14
     assert helena.radar
     assert sum(mount.firepower for mount in helena.guns if mount.kind == "primary") == 32
     assert helena.armour.secondary == 1
     assert akizuki.hull_boxes == 7 and akizuki.maximum_speed_cycle == (6, 5, 5)
-    assert len(akizuki.torpedo_launchers) == 1
+    assert [launcher.torpedoes for launcher in akizuki.torpedo_launchers] == [2]
     assert karl.hull_boxes == 6 and karl.maximum_speed_cycle == (6, 6, 6)
+    assert [launcher.torpedoes for launcher in karl.torpedo_launchers] == [2, 2]
     assert javelin.hull_boxes == 5 and javelin.maximum_speed_cycle == (6, 6, 5)
+    assert [launcher.torpedoes for launcher in javelin.torpedo_launchers] == [2, 2]
+    assert [launcher.torpedoes for launcher in records["IBS-U-USN-FARENHOLT"].torpedo_launchers] == [2, 1]
+    assert [launcher.torpedoes for launcher in records["IBS-U-IJN-FUBUKI"].torpedo_launchers] == [2, 2]
+    assert [launcher.torpedoes for launcher in records["IBS-U-IJN-ASAGUMO"].torpedo_launchers] == [3, 3]
 
 
 def test_every_mount_and_launcher_has_a_legal_source_arc() -> None:
