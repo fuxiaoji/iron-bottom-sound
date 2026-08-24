@@ -15,6 +15,7 @@ function explainError(error:unknown){
  if(raw.includes("launch MF exceeds movement plan"))return `鱼雷不能在该舰停止航行之后发射。请删除这次发射，或把“发射 MF”改成不超过上一阶段为该舰填写的航行 MF。\n\n裁决原文：${raw}`;
  if(raw.includes("movement plan"))return `移动计划未通过。请检查错误中点名的舰船：航路里的直航 MF 总数、转向符号和声明速度必须彼此一致。\n\n裁决原文：${raw}`;
  if(raw.includes("launcher"))return `鱼雷发射器设置未通过。请检查发射器、舷侧、角度、枚数和发射 MF。\n\n裁决原文：${raw}`;
+ if(raw.includes("cannot bear"))return `有炮位无法转向当前目标。请根据裁决原文找到舰船和炮位，取消勾选该炮位，或为该舰更换目标后重试。\n\n裁决原文：${raw}`;
  return raw;
 }
 

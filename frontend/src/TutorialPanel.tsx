@@ -5,7 +5,7 @@ const lessons:{phases:Phase[];title:string;goal:string;action:string;rule:string
  {phases:["movement_planning"],title:"2. 编制移动",goal:"区分上回合速度、循环上限与本回合实际 MF。",action:"点击地图棋子查看引擎给出的合法 MF 范围，再填写航路。数字是直航 MF，P/S 是左/右转 60°，PP/SS 是 120°。可用示例按钮按合法上限填入。",rule:"IBS-R-06 · 规则书 p.7–8"},
  {phases:["torpedo_planning"],title:"3. 计划鱼雷",goal:"理解鱼雷必须预先指定发射时点和位置。",action:"本次可以留空学习安全通过；随后再用“添加发射”选择发射器、MF、舷侧和角度。非法位置会由引擎拒绝并解释。",rule:"IBS-R-08.2 · 规则书 p.10–11"},
  {phases:["movement_resolution"],title:"4. 同步移动",goal:"观察双方按 MF 脉冲同时移动。",action:"点击“执行引擎裁决”。地图棋子会按双方已封存计划移动，玩家不能在结算中途改令。",rule:"IBS-R-06 · 规则书 p.7"},
- {phases:["gunnery"],title:"5. 炮击",goal:"为可用炮位选择一个已观察目标。",action:"点击“添加齐射”，选择目标和参加射击的炮位；若当前没有合法射界，可不射击直接确认。日志会显示掷骰、修正、查表与规则出处。",rule:"IBS-R-08.1 · 规则书 p.8–10"},
+ {phases:["gunnery"],title:"5. 炮击",goal:"逐舰为可用炮位选择已观察目标。",action:"在逐舰炮击名册中分别为卡尔、里夏德和汉斯安排齐射；每舰可独立选择目标与炮位。所有炮击同时生效，射界不合法时引擎会点名舰船和炮位。",rule:"IBS-R-05 / IBS-R-08.1 · 规则书 p.6、8–10"},
  {phases:["torpedo_effects","fire_end","complete"],title:"6. 损伤与回合结束",goal:"读取鱼雷、火灾、沉没与胜负事件。",action:"依次执行自动裁决，查看舰体格、速度、火灾和炮位状态如何变化。进入下一回合后重复移动—鱼雷—炮击流程。",rule:"IBS-R-08.2 / IBS-R-05 · p.10–12"},
 ];
 
