@@ -381,6 +381,19 @@ class GameEvent(BaseModel):
     dice: DiceRoll | None = None
 
 
+class ShipCombatEntry(BaseModel):
+    sequence: int
+    turn: int
+    phase: Phase
+    direction: Literal["inflicted", "received"]
+    event_type: str
+    message: str
+    related_ship_id: str | None = None
+    related_ship_name: str | None = None
+    rule: RuleReference | None = None
+    dice: DiceRoll | None = None
+
+
 class TorpedoTrack(BaseModel):
     id: str
     side: Side
@@ -476,6 +489,7 @@ class PublicShip(BaseModel):
     torpedo_type: str | None = None
     gun_mounts: list[GunMountState] = Field(default_factory=list)
     torpedo_launchers: list[TorpedoLauncherState] = Field(default_factory=list)
+    combat_history: list[ShipCombatEntry] = Field(default_factory=list)
 
 
 class PlayerObservation(BaseModel):

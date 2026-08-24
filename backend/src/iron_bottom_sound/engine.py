@@ -28,6 +28,7 @@ from .models import (
     PlayerObservation,
     PublicShip,
     RuleReference,
+    ShipCombatEntry,
     ShipState,
     Side,
     TorpedoTrack,
@@ -227,6 +228,12 @@ class IronBottomEngine:
     def observe(self, game_id: str, side: Side) -> PlayerObservation:
         state = self.get(game_id)
         ships: list[PublicShip] = []
+        all_safe_events = [
+            event
+            for event in state.events
+            if event.payload.get("secret_side") in (None, side.value)
+            and not self._hidden_damage_event(state, event, side)
+        ]
         own_positions = [ship.position for ship in state.ships.values() if ship.side == side and not ship.sunk and ship.position]
         for ship in state.ships.values():
             visible = ship.side == side or bool(ship.position and self._visible_to(state, ship, side, own_positions))
@@ -254,14 +261,10 @@ class IronBottomEngine:
                     torpedo_type=ship.torpedo_type if ship.side == side else None,
                     gun_mounts=deepcopy(ship.gun_mounts) if ship.side == side else [],
                     torpedo_launchers=deepcopy(ship.torpedo_launchers) if ship.side == side else [],
+                    combat_history=self._ship_combat_history(state, ship.id, all_safe_events),
                 )
             )
-        safe_events = [
-            event
-            for event in state.events[-40:]
-            if event.payload.get("secret_side") in (None, side.value)
-            and not self._hidden_damage_event(state, event, side)
-        ]
+        safe_events = all_safe_events[-40:]
         tracks = [
             track.model_copy(deep=True)
             for track in state.torpedo_tracks
@@ -301,6 +304,47 @@ class IronBottomEngine:
             winner=state.winner,
             victory_reason=state.victory_reason,
         )
+
+    @staticmethod
+    def _ship_combat_history(
+        state: GameState, ship_id: str, events: list[GameEvent]
+    ) -> list[ShipCombatEntry]:
+        combat_types = {
+            "gun_mount_attack", "gunnery_result", "torpedo_attack", "torpedo_result",
+            "special_damage", "fire_check", "collision_check", "collision_result", "ship_sunk",
+        }
+        history: list[ShipCombatEntry] = []
+        for event in events:
+            if event.type not in combat_types:
+                continue
+            attacker = event.payload.get("attacker")
+            target = event.payload.get("target") or event.payload.get("ship_id")
+            ships = event.payload.get("ships", [])
+            directions: list[tuple[str, str | None]] = []
+            if attacker == ship_id:
+                directions.append(("inflicted", target if isinstance(target, str) else None))
+            if target == ship_id:
+                directions.append(("received", attacker if isinstance(attacker, str) else None))
+            if isinstance(ships, list) and ship_id in ships:
+                other = next((item for item in ships if item != ship_id), None)
+                directions.append(("received", other if isinstance(other, str) else None))
+            for direction, related_id in directions:
+                related = state.ships.get(related_id) if related_id else None
+                history.append(
+                    ShipCombatEntry(
+                        sequence=event.sequence,
+                        turn=event.turn,
+                        phase=event.phase,
+                        direction=direction,
+                        event_type=event.type,
+                        message=event.message,
+                        related_ship_id=related_id,
+                        related_ship_name=related.name if related else None,
+                        rule=event.rule,
+                        dice=event.dice,
+                    )
+                )
+        return history[-80:]
 
     @staticmethod
     def _hidden_damage_event(state: GameState, event: GameEvent, side: Side) -> bool:
@@ -1629,7 +1673,7 @@ class IronBottomEngine:
                     state,
                     "gunnery_result",
                     f"{target.name} 命中结果 {result_roll}",
-                    payload={"target": target.id, "result": result},
+                    payload={"attacker": attacker.id, "target": target.id, "result": result},
                     rule=self._rule("IBS-T-GHRT", 1, "炮击结果表"),
                     dice=DiceRoll(dice=result_dice, notation="D66", raw=result_roll),
                 )
@@ -1756,7 +1800,13 @@ class IronBottomEngine:
                     state,
                     "torpedo_result",
                     f"{target.name} 鱼雷效果：{effect}",
-                    payload={"target": target.id, "effect": effect, "modifier": damage_modifier},
+                    payload={
+                        "track_id": track.id,
+                        "attacker": attacker.id,
+                        "target": target.id,
+                        "effect": effect,
+                        "modifier": damage_modifier,
+                    },
                     rule=self._rule("IBS-T-THDT", 3, "鱼雷与碰撞结果表"),
                     dice=DiceRoll(dice=damage_dice, notation="2D6", raw=raw_damage_roll, adjusted=damage_roll),
                 )
@@ -2069,6 +2119,7 @@ class IronBottomEngine:
             "special_damage",
             f"{target.name} 特殊损伤 {roll}",
             payload={
+                "attacker": attacker.id if attacker else None,
                 "target": target.id,
                 "result": roll,
                 "effect": result,

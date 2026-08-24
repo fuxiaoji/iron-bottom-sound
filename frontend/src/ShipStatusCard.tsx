@@ -3,6 +3,12 @@ import type {Ship} from "./types";
 
 const arcNames:Record<string,string>={bow:"艏",stern:"艉",port:"左",starboard:"右"};
 const arcLabel=(arcs:string[])=>arcs.map(arc=>arcNames[arc]??arc).join("·");
+const phaseNames:Record<string,string>={gunnery:"炮击",torpedo_effects:"鱼雷",fire_end:"火灾/回合末",movement_resolution:"碰撞"};
+
+function CombatColumn({ship,direction,title}:{ship:Ship;direction:"inflicted"|"received";title:string}){
+ const entries=ship.combat_history.filter(entry=>entry.direction===direction).slice(-8).reverse();
+ return <section className={`combat-ledger ${direction}`}><h3>{title}<small>{entries.length?`最近 ${entries.length} 项`:"尚无记录"}</small></h3>{entries.length?<ol>{entries.map(entry=><li key={`${direction}-${entry.sequence}`}><div><b>T{entry.turn} · {phaseNames[entry.phase]??entry.phase}</b>{entry.related_ship_name&&<span>{direction==="inflicted"?"目标":"来源"}：{entry.related_ship_name}</span>}</div><p>{entry.message}</p><footer>{entry.dice&&<span>{entry.dice.notation} {entry.dice.raw}{entry.dice.adjusted!=null&&entry.dice.adjusted!==entry.dice.raw?` → ${entry.dice.adjusted}`:""}</span>}{entry.rule&&<code>{entry.rule.rule_id}{entry.rule.pdf_page?` · p.${entry.rule.pdf_page}`:""}</code>}</footer></li>)}</ol>:<p className="empty-plan">{direction==="inflicted"?"本舰还没有公开战果。":"本舰还没有受到公开攻击或损伤。"}</p>}</section>;
+}
 
 export function ShipStatusCard({ship}:{ship:Ship|undefined}){
  if(!ship)return <section className="ship-status"><h2>舰船记录表</h2><p className="empty-plan">点击地图上的己方棋子查看记录。</p></section>;
@@ -20,5 +26,6 @@ export function ShipStatusCard({ship}:{ship:Ship|undefined}){
   <h3 className="section-label">鱼雷 {ship.torpedo_type??""}</h3>
   <div className="launcher-strip">{ship.torpedo_launchers.map(launcher=><div className={`launcher-token ${launcher.destroyed?"destroyed":""}`} key={launcher.id}><b>{launcher.id}</b><span>{arcLabel(launcher.arcs)}</span><div className="torpedo-pips" aria-label={`已装填 ${launcher.loaded}`}>{Array.from({length:launcher.torpedoes},(_,index)=><i className={index<launcher.loaded?"loaded":"empty"} key={index}/>)}</div><small>备雷 {launcher.reloads_remaining}{launcher.reload_turns_remaining?` · 装填剩余 ${launcher.reload_turns_remaining} 回合`:""}</small></div>)}</div>
   {ship.torpedo_launchers.length===0&&<p className="empty-plan">无鱼雷发射器。</p>}
+  <div className="combat-ledgers"><CombatColumn ship={ship} direction="inflicted" title="本舰战果"/><CombatColumn ship={ship} direction="received" title="受伤与攻击来源"/></div>
  </section>;
 }

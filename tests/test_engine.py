@@ -95,6 +95,40 @@ def test_hidden_damage_filters_enemy_but_not_own_damage() -> None:
     assert next(ship for ship in plain_view.ships if ship.id == plain_enemy.id).hull == plain_enemy.hull
 
 
+def test_ship_combat_history_attributes_source_and_respects_hidden_damage() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", 13)
+    attacker = next(ship for ship in state.ships.values() if ship.side == Side.AXIS)
+    target = next(ship for ship in state.ships.values() if ship.side == Side.ALLIES)
+    engine._event(
+        state,
+        "gunnery_result",
+        f"{target.name} 命中结果 44",
+        payload={"attacker": attacker.id, "target": target.id, "result": {"hull": 1}},
+    )
+    axis_ship = next(ship for ship in engine.observe(state.game_id, Side.AXIS).ships if ship.id == attacker.id)
+    allies_ship = next(ship for ship in engine.observe(state.game_id, Side.ALLIES).ships if ship.id == target.id)
+    assert axis_ship.combat_history[-1].direction == "inflicted"
+    assert axis_ship.combat_history[-1].related_ship_name == target.name
+    assert allies_ship.combat_history[-1].direction == "received"
+    assert allies_ship.combat_history[-1].related_ship_name == attacker.name
+
+    hidden = IronBottomEngine()
+    hidden_state = hidden.reset(
+        "IBS-S-03", 13, GameOptions(optional_rules=OptionalRules(hidden_damage=True))
+    )
+    hidden._event(
+        hidden_state,
+        "gunnery_result",
+        "敌舰隐藏损伤",
+        payload={"attacker": attacker.id, "target": target.id, "result": {"hull": 1}},
+    )
+    hidden_attacker = next(
+        ship for ship in hidden.observe(hidden_state.game_id, Side.AXIS).ships if ship.id == attacker.id
+    )
+    assert not any(entry.message == "敌舰隐藏损伤" for entry in hidden_attacker.combat_history)
+
+
 def test_observation_exposes_only_own_planning_hardware() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", 17)
