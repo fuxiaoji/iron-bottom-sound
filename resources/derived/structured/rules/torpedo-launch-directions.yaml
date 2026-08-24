@@ -5,5 +5,5 @@ source:
   printed_section: "8.2.3 b"
 angles: [A, B, X, Y]
 relative_heading:
-  port: {A: 3, B: -2, X: -1, Y: 0}
-  starboard: {A: 3, B: 2, X: 1, Y: 0}
+  port: {A: -1, B: -2, X: -3, Y: -4}
+  starboard: {A: 1, B: 2, X: 3, Y: 4}

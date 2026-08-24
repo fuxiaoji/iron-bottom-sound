@@ -623,7 +623,8 @@ def test_torpedo_launches_at_planned_mf_moves_by_impulse_and_contacts_ship() -> 
     attacker = state.ships["IBS-U-KM-KARL-GALSTER"]
     attacker.heading = 3
     target = state.ships["IBS-U-RN-JAVELIN"]
-    target.position = HexCoord.from_label("N15")
+    # Heading 3 + starboard-X (+3) launches north along heading 6.
+    target.position = HexCoord.from_label("O14")
     for side in Side:
         assert engine.submit_orders(
             state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
@@ -666,6 +667,12 @@ def test_torpedo_launches_at_planned_mf_moves_by_impulse_and_contacts_ship() -> 
     assert track.contact_ship_ids == [target.id]
     assert track.distance_travelled == 1
     assert track.salvo_size == 1
+    assert track.launch_position == launch_hex
+    assert track.launch_side == "starboard"
+    assert track.launch_angle == "X"
+    assert [position.label for position in track.traversed_hexes] == [launch_hex.label, "O14"]
+    movement_event = next(event for event in state.events if event.type == "torpedo_moved")
+    assert movement_event.payload["path"] == [launch_hex.label, "O14"]
     assert next(item for item in attacker.torpedo_launchers if item.id == "TT1").loaded == 1
     for side in Side:
         assert engine.submit_orders(
@@ -813,21 +820,27 @@ def test_torpedo_plan_accepts_port_x_but_rejects_wrong_launch_hex() -> None:
 def test_torpedo_port_and_starboard_each_offer_abxy_directions() -> None:
     engine = IronBottomEngine()
     expected = {
-        ("port", "A"): 5,
+        ("port", "A"): 1,
         ("port", "B"): 6,
-        ("port", "X"): 1,
-        ("port", "Y"): 2,
-        ("starboard", "A"): 5,
+        ("port", "X"): 5,
+        ("port", "Y"): 4,
+        ("starboard", "A"): 3,
         ("starboard", "B"): 4,
-        ("starboard", "X"): 3,
-        ("starboard", "Y"): 2,
+        ("starboard", "X"): 5,
+        ("starboard", "Y"): 6,
     }
     assert {
         (side, angle): engine._torpedo_launch_heading(2, side, angle)
         for side in ("port", "starboard") for angle in ("A", "B", "X", "Y")
     } == expected
-    # Rulebook p.12 Aoba example: heading 2, port-X follows heading 1.
-    assert engine._torpedo_launch_heading(2, "port", "X") == 1
+    # Rulebook p.12 Aoba example: heading 2, port-X follows heading 5.
+    assert engine._torpedo_launch_heading(2, "port", "X") == 5
+    # User-reported scenario 3 gold case: heading 4, port-A runs down column O.
+    assert engine._torpedo_launch_heading(4, "port", "A") == 3
+    position = HexCoord.from_label("O14")
+    for _ in range(8):
+        position = position.neighbor(3)
+    assert position == HexCoord.from_label("O22")
 
 
 def test_helena_seven_mf_loss_reproduces_rulebook_three_three_three_example() -> None:

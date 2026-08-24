@@ -406,6 +406,10 @@ class TorpedoTrack(BaseModel):
     distance_travelled: int = Field(default=0, ge=0)
     launched_turn: int = Field(gt=0)
     salvo_size: int = Field(default=1, ge=1)
+    launch_position: HexCoord | None = None
+    launch_side: Literal["port", "starboard"] | None = None
+    launch_angle: Literal["A", "B", "X", "Y"] | None = None
+    traversed_hexes: list[HexCoord] = Field(default_factory=list)
     contact_ship_ids: list[str] = Field(default_factory=list)
     hidden: bool = False
 

@@ -1309,6 +1309,10 @@ class IronBottomEngine:
             range_remaining=int(setting["range"]),
             launched_turn=state.turn,
             salvo_size=order.count,
+            launch_position=order.launch_hex,
+            launch_side=order.launch_side,
+            launch_angle=order.launch_angle,
+            traversed_hexes=[order.launch_hex],
             hidden=state.options.optional_rules.blind_torpedoes,
         )
         state.torpedo_tracks.append(track)
@@ -1327,8 +1331,12 @@ class IronBottomEngine:
                 "ship_id": ship.id,
                 "launcher_id": launcher.id,
                 "launch_mf": order.launch_at_mf,
+                "launch_hex": order.launch_hex.label,
+                "launch_side": order.launch_side,
+                "launch_angle": order.launch_angle,
                 "heading": heading,
                 "setting": order.setting_index,
+                "salvo_size": order.count,
             },
             rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
         )
@@ -1398,6 +1406,8 @@ class IronBottomEngine:
         )
         stopped: set[str] = set()
         moved_tracks: dict[str, int] = {track.id: 0 for track in state.torpedo_tracks}
+        movement_trace_start: dict[str, str] = {}
+        movement_trace_tracks: dict[str, TorpedoTrack] = {}
         for order in torpedo_orders:
             if order.launch_at_mf != 0:
                 continue
@@ -1526,7 +1536,12 @@ class IronBottomEngine:
                         rule=self._rule("IBS-R-08.2.3", 11, "8.2 鱼雷移动"),
                     )
                     continue
+                movement_trace_start.setdefault(track.id, track.position.label)
+                movement_trace_tracks[track.id] = track
+                if not track.traversed_hexes:
+                    track.traversed_hexes.append(track.position)
                 track.position = next_position
+                track.traversed_hexes.append(next_position)
                 track.range_remaining -= 1
                 track.distance_travelled += 1
                 moved_tracks[track.id] = moved_tracks.get(track.id, 0) + 1
@@ -1547,6 +1562,25 @@ class IronBottomEngine:
             state.torpedo_tracks = [
                 track for track in state.torpedo_tracks if track.range_remaining > 0 or track.contact_ship_ids
             ]
+        for track_id, track in movement_trace_tracks.items():
+            full_path = [position.label for position in track.traversed_hexes]
+            self._event(
+                state,
+                "torpedo_moved",
+                f"鱼雷航迹 {track.id} 从 {movement_trace_start[track_id]} 沿方向 {track.heading} 移动至 {track.position.label}",
+                payload={
+                    "track_id": track.id,
+                    "launcher_ship_id": track.launcher_ship_id,
+                    "start_hex": movement_trace_start[track_id],
+                    "end_hex": track.position.label,
+                    "heading": track.heading,
+                    "salvo_size": track.salvo_size,
+                    "distance_travelled": track.distance_travelled,
+                    "range_remaining": track.range_remaining,
+                    "path": full_path,
+                },
+                rule=self._rule("IBS-R-08.2.3", 12, "8.2 鱼雷移动"),
+            )
         for ship_id, heading in final_headings.items():
             ship = state.ships[ship_id]
             ship.heading = heading

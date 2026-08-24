@@ -34,10 +34,17 @@ export function headingVector(heading:number,length=1){
  return {x:Math.cos(radians)*length,y:Math.sin(radians)*length};
 }
 
+// The source torpedo artwork points to direction 5 (north-west) before rotation.
+export function torpedoCounterRotation(heading:number){
+ return (((heading-5)%6+6)%6)*60;
+}
+
 // Source map IBS-M-MAIN uses flat-top odd-q: B/D/... sit half a row below A/C/....
 const even=hexCenter(0,displayRowToAxial(0,0));
 const odd=hexCenter(1,displayRowToAxial(1,0));
 if(Math.abs((odd.y-even.y)-HEX_ROW_HEIGHT/2)>1e-9)throw new Error("odd-q projection invariant failed");
 const compassRotations=[150,210,270,330,30,90];
 if(compassRotations.some((rotation,index)=>headingRotation(index+1)!==rotation))throw new Error("IBS-M-MAIN heading compass invariant failed");
+const torpedoRotations=[120,180,240,300,0,60];
+if(torpedoRotations.some((rotation,index)=>torpedoCounterRotation(index+1)!==rotation))throw new Error("torpedo counter heading invariant failed");
 if(hexLabel({q:17,r:7})!=="R16"||hexLabel({q:16,r:7})!=="Q16"||hexLabel({q:0,r:0})!=="A1"||hexLabel({q:33,r:10})!=="HH27")throw new Error("IBS-M-MAIN coordinate label invariant failed");
