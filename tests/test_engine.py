@@ -461,6 +461,40 @@ def test_gunnery_executes_individual_mount_orders_for_both_sides() -> None:
     assert {event.payload["mount_id"] for event in attacks} == {"P1"}
 
 
+def test_legal_actions_publish_only_engine_valid_weapon_candidates() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=51)
+    state.phase = Phase.GUNNERY
+    hint = engine.legal_actions(state.game_id, Side.AXIS)[0].schema_hint
+    candidates = hint["gunnery_candidates"]
+    assert len(candidates) == 3
+    assert any(candidate["targets"] for candidate in candidates)
+    for candidate in candidates:
+        attacker = state.ships[candidate["ship_id"]]
+        for target_hint in candidate["targets"]:
+            target = state.ships[target_hint["target_id"]]
+            assert engine._can_see(state, attacker, target)
+            for mount_id in target_hint["mount_ids"]:
+                mount = next(item for item in attacker.gun_mounts if item.id == mount_id)
+                assert engine._mount_can_bear(attacker, target, mount.arcs)
+
+    state.phase = Phase.TORPEDO_PLANNING
+    axis_ships = [ship for ship in state.ships.values() if ship.side == Side.AXIS and ship.position]
+    state.sealed_orders["1:movement_planning"] = {
+        Side.AXIS.value: OrderBatch(
+            side=Side.AXIS,
+            phase=Phase.MOVEMENT_PLANNING,
+            movement=[MovementOrder(ship_id=ship.id, plan="1") for ship in axis_ships],
+        )
+    }
+    torpedo_hint = engine.legal_actions(state.game_id, Side.AXIS)[0].schema_hint
+    torpedo_candidates = torpedo_hint["torpedo_candidates"]
+    assert len(torpedo_candidates) == 3
+    assert all(candidate["launchers"] for candidate in torpedo_candidates)
+    assert all(candidate["launch_positions"][0]["mf"] == 1 for candidate in torpedo_candidates)
+    assert all(candidate["settings"] for candidate in torpedo_candidates)
+
+
 def test_gunnery_rejects_destroyed_mount_and_scenario_one_axis_turn_one_fire() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-01", seed=5)

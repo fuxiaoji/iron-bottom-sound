@@ -1,7 +1,8 @@
-import type {Event,Observation,Side} from "./types";
+import type {Event,LegalAction,Observation,Side} from "./types";
 const headers=(side?:Side):Record<string,string>=>{const value:Record<string,string>={"Content-Type":"application/json"};if(side)value["X-Player-Side"]=side;return value};
 export async function createGame(scenario_id:string,seed:number,mode:"hotseat"|"tutorial"="hotseat"){const r=await fetch("/api/games",{method:"POST",headers:headers(),body:JSON.stringify({scenario_id,seed,options:{mode}})});if(!r.ok)throw new Error(await r.text());return r.json()}
 export async function viewGame(id:string,side:Side):Promise<Observation>{const r=await fetch(`/api/games/${id}/view`,{headers:headers(side)});if(!r.ok)throw new Error(await r.text());return r.json()}
+export async function legalActions(id:string,side:Side):Promise<LegalAction[]>{const r=await fetch(`/api/games/${id}/legal-actions`,{headers:headers(side)});if(!r.ok)throw new Error(await r.text());return r.json()}
 export async function advance(id:string,side:Side){const r=await fetch(`/api/games/${id}/advance`,{method:"POST",headers:headers(side)});if(!r.ok)throw new Error(await r.text());return r.json() as Promise<Event[]>}
 export async function gameEvents(id:string,side:Side,after=0):Promise<Event[]>{const r=await fetch(`/api/games/${id}/events?after=${after}`,{headers:headers(side)});if(!r.ok)throw new Error(await r.text());return r.json()}
 export async function submitOrders(id:string,side:Side,batch:unknown){const r=await fetch(`/api/games/${id}/orders`,{method:"POST",headers:headers(side),body:JSON.stringify(batch)});if(!r.ok)throw new Error(await r.text());return r.json() as Promise<{valid:boolean;both_submitted:boolean;phase:string}>}

@@ -324,10 +324,12 @@ class IronBottomEngine:
                 },
                 Phase.TORPEDO_PLANNING: {
                     "torpedoes": "launcher, launch_at_mf, launch_hex, bearing, setting_index",
+                    "torpedo_candidates": self._torpedo_candidates(state, side),
                     "confirmation": {"ready": True},
                 },
                 Phase.GUNNERY: {
                     "gunnery": "per-mount target orders",
+                    "gunnery_candidates": self._gunnery_candidates(state, side),
                     "illumination": "star-shell target hex",
                     "searchlights": "target and active flag",
                     "smoke": "deploy flag",
@@ -336,6 +338,82 @@ class IronBottomEngine:
             }
             return [LegalAction(kind="submit_phase_orders", schema_hint=schemas[state.phase])]
         return [LegalAction(kind="advance")] if state.phase not in ORDER_PHASES or len(state.submitted_orders) == 2 else []
+
+    def _gunnery_candidates(self, state: GameState, side: Side) -> list[dict[str, Any]]:
+        candidates: list[dict[str, Any]] = []
+        for ship in state.ships.values():
+            if ship.side != side or ship.sunk or not ship.position:
+                continue
+            blocked_reason: str | None = None
+            if state.scenario_id == "IBS-S-01" and state.turn == 1 and side == Side.AXIS:
+                blocked_reason = "想定特例：日军第 1 回合不得开火"
+            elif ship.guns_disabled_turns:
+                blocked_reason = "本回合全部火炮失效"
+            elif state.options.optional_rules.squalls and self._in_squall(state, ship.position):
+                blocked_reason = "舰船位于飑区内"
+            targets: list[dict[str, Any]] = []
+            if not blocked_reason:
+                for target in state.ships.values():
+                    if target.side == side or target.sunk or not target.position or not self._can_see(state, ship, target):
+                        continue
+                    mount_ids = [
+                        mount.id for mount in ship.gun_mounts
+                        if not mount.destroyed and not mount.fired_this_phase
+                        and self._mount_can_bear(ship, target, mount.arcs)
+                    ]
+                    if mount_ids:
+                        targets.append({"target_id": target.id, "mount_ids": mount_ids})
+            candidates.append({"ship_id": ship.id, "targets": targets, "blocked_reason": blocked_reason})
+        return candidates
+
+    def _torpedo_candidates(self, state: GameState, side: Side) -> list[dict[str, Any]]:
+        candidates: list[dict[str, Any]] = []
+        for ship in state.ships.values():
+            if ship.side != side or ship.sunk or not ship.position or not ship.torpedo or ship.torpedo.destroyed:
+                continue
+            blocked_reason: str | None = None
+            if state.scenario_id == "IBS-S-01" and state.turn < 4 and side == Side.AXIS:
+                blocked_reason = "想定特例：日军第 4 回合前不得发射鱼雷"
+            elif ship.ship_type in {"BB", "BC"} and ship.current_speed >= 4:
+                blocked_reason = "战列舰/战列巡洋舰以 4 MF 或更高速度航行"
+            elif state.options.optional_rules.squalls and self._in_squall(state, ship.position):
+                blocked_reason = "舰船位于飑区内"
+            movement = next(
+                (
+                    item for batch in self._sealed_batches(state, Phase.MOVEMENT_PLANNING)
+                    for item in batch.movement if item.ship_id == ship.id
+                ),
+                None,
+            )
+            launch_positions: list[dict[str, Any]] = []
+            if movement:
+                trajectory, _ = self.movement_trajectory(ship, movement.plan, self.movement_commands(movement))
+                launch_positions = [
+                    {"mf": index, "hex": position.model_dump(mode="json"), "heading": heading}
+                    for index, (position, heading) in enumerate(trajectory, start=1)
+                ]
+            launchers = [] if blocked_reason else [
+                {
+                    "launcher_id": launcher.id,
+                    "loaded": launcher.loaded,
+                    "sides": [arc.value for arc in launcher.arcs if arc in {FiringArc.PORT, FiringArc.STARBOARD}],
+                }
+                for launcher in ship.torpedo_launchers
+                if not launcher.destroyed and not launcher.reload_turns_remaining and launcher.loaded > 0
+            ]
+            definition = self.rules.torpedoes.get(ship.torpedo_type or "", {})
+            settings = [
+                {"index": index, "speed": setting["speed"], "range": setting["range"]}
+                for index, setting in enumerate(definition.get("settings", []))
+            ]
+            candidates.append({
+                "ship_id": ship.id,
+                "launchers": launchers,
+                "launch_positions": launch_positions,
+                "settings": settings,
+                "blocked_reason": blocked_reason or ("本回合航路为 0 MF，无合法发射时点" if not launch_positions else None),
+            })
+        return candidates
 
     def validate_orders(self, game_id: str, batch: OrderBatch) -> ValidationResult:
         state = self.get(game_id)
@@ -459,6 +537,8 @@ class IronBottomEngine:
                     errors.append(f"{order.ship_id}: unavailable gun mount {mount_order.mount_id}")
                 if not target or target.side == batch.side or target.sunk or not target.position:
                     errors.append(f"Illegal target {mount_order.target_id}")
+                elif not self._can_see(state, attacker, target):
+                    errors.append(f"{order.ship_id}: cannot see {target.id}")
                 elif mount and not self._mount_can_bear(attacker, target, mount.arcs):
                     errors.append(f"{order.ship_id}:{mount.id} cannot bear on {target.id}")
         if state.phase == Phase.GUNNERY:

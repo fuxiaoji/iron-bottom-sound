@@ -19,7 +19,7 @@ function facts(events:Event[]){
 }
 
 function EventRow({event}:{event:Event}){
- return <li><div><span>{phaseNames[event.phase]??event.phase}</span><b>{event.message}</b></div>{event.dice&&<small>掷骰 {event.dice.notation}：{event.dice.raw}{event.dice.adjusted!==undefined&&event.dice.adjusted!==event.dice.raw?` → 修正后 ${event.dice.adjusted}`:""}</small>}{event.rule&&<code>{event.rule.rule_id}{event.rule.pdf_page?` · 规则书 p.${event.rule.pdf_page}`:""}{event.rule.section?` · ${event.rule.section}`:""}</code>}</li>;
+ return <li><div><span>{phaseNames[event.phase]??event.phase}</span><b>{event.message}</b></div>{event.dice&&<small>掷骰 {event.dice.notation}：{event.dice.raw}{event.dice.adjusted!=null&&event.dice.adjusted!==event.dice.raw?` → 修正后 ${event.dice.adjusted}`:""}</small>}{event.rule&&<code>{event.rule.rule_id}{event.rule.pdf_page?` · 规则书 p.${event.rule.pdf_page}`:""}{event.rule.section?` · ${event.rule.section}`:""}</code>}</li>;
 }
 
 export function BattleReportModal({report,onClose}:{report:TurnBattleReport;onClose:()=>void}){
