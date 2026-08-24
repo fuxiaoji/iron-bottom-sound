@@ -95,6 +95,22 @@ def test_hidden_damage_filters_enemy_but_not_own_damage() -> None:
     assert next(ship for ship in plain_view.ships if ship.id == plain_enemy.id).hull == plain_enemy.hull
 
 
+def test_observation_exposes_only_own_planning_hardware() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", 17)
+    view = engine.observe(state.game_id, Side.AXIS)
+    own = next(ship for ship in view.ships if ship.side == Side.AXIS)
+    enemy = next(ship for ship in view.ships if ship.side == Side.ALLIES)
+    assert own.max_speed is not None
+    assert own.gun_mounts
+    assert own.torpedo_launchers
+    assert own.torpedo_type
+    assert enemy.max_speed is None
+    assert enemy.gun_mounts == []
+    assert enemy.torpedo_launchers == []
+    assert enemy.torpedo_type is None
+
+
 def test_secret_orders_and_hidden_damage_score_never_enter_opponent_observation() -> None:
     engine = IronBottomEngine()
     options = GameOptions(optional_rules=OptionalRules(hidden_damage=True))

@@ -247,6 +247,10 @@ class IronBottomEngine:
                     fired=ship.fired,
                     sunk=ship.sunk,
                     asset=ship.asset,
+                    max_speed=ship.max_speed_for_turn(state.turn) if ship.side == side else None,
+                    torpedo_type=ship.torpedo_type if ship.side == side else None,
+                    gun_mounts=deepcopy(ship.gun_mounts) if ship.side == side else [],
+                    torpedo_launchers=deepcopy(ship.torpedo_launchers) if ship.side == side else [],
                 )
             )
         safe_events = [

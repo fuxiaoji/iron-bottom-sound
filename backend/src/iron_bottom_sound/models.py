@@ -109,7 +109,7 @@ class OptionalRules(BaseModel):
 
 
 class GameOptions(BaseModel):
-    mode: Literal["hotseat", "llm"] = "hotseat"
+    mode: Literal["hotseat", "tutorial", "llm"] = "hotseat"
     optional_rules: OptionalRules = Field(default_factory=OptionalRules)
 
 
@@ -465,6 +465,10 @@ class PublicShip(BaseModel):
     fired: bool
     sunk: bool
     asset: str | None
+    max_speed: int | None = None
+    torpedo_type: str | None = None
+    gun_mounts: list[GunMountState] = Field(default_factory=list)
+    torpedo_launchers: list[TorpedoLauncherState] = Field(default_factory=list)
 
 
 class PlayerObservation(BaseModel):

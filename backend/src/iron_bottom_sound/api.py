@@ -5,9 +5,11 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import FastAPI, Header, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .engine import IronBottomEngine
+from .data import ROOT
 from .llm import DeterministicCommander
 from .models import GameOptions, OrderBatch, Side
 from .storage import GameRepository
@@ -23,6 +25,11 @@ engine = IronBottomEngine()
 _default_db = Path(__file__).resolve().parents[3] / "backend" / "iron-bottom-sound.sqlite3"
 repository = GameRepository(os.environ.get("IBS_DB_PATH", str(_default_db)))
 app = FastAPI(title="铁底湾的回响 IV", version="0.1.0")
+app.mount(
+    "/assets/counters",
+    StaticFiles(directory=ROOT / "resources" / "originals" / "assets" / "images"),
+    name="counter-assets",
+)
 
 
 def side_from_header(value: str | None) -> Side:
@@ -82,6 +89,28 @@ def suggested_orders(game_id: str, x_player_side: Annotated[str | None, Header()
         return DeterministicCommander().choose_orders(engine, game_id, side)
     except ValueError as error:
         raise HTTPException(409, str(error)) from error
+
+
+@app.post("/games/{game_id}/tutorial-opponent")
+def tutorial_opponent(game_id: str, x_player_side: Annotated[str | None, Header()] = None):
+    """Submit the isolated instructor side without returning its private order batch."""
+    state = get_game(game_id)
+    player_side = side_from_header(x_player_side)
+    if state.options.mode != "tutorial" or player_side != Side.AXIS:
+        raise HTTPException(403, "Tutorial instructor is available only to the axis tutorial player")
+    if Side.AXIS.value not in state.submitted_orders:
+        raise HTTPException(409, "Submit the player's tutorial orders first")
+    if Side.ALLIES.value in state.submitted_orders:
+        return {"valid": True, "instructor_submitted": True}
+    try:
+        batch = DeterministicCommander().choose_orders(engine, game_id, Side.ALLIES)
+    except ValueError as error:
+        raise HTTPException(409, str(error)) from error
+    result = engine.submit_orders(game_id, batch)
+    if not result.valid:
+        raise HTTPException(409, result.errors)
+    repository.save(engine.get(game_id))
+    return {"valid": True, "instructor_submitted": True}
 
 
 @app.post("/games/{game_id}/orders")

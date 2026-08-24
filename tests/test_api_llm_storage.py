@@ -1,3 +1,6 @@
+import hashlib
+from urllib.parse import quote
+
 from fastapi.testclient import TestClient
 
 from iron_bottom_sound.api import app, engine as api_engine
@@ -32,6 +35,82 @@ def test_api_supplies_editable_engine_validated_orders() -> None:
         headers={"X-Player-Side": "axis"},
         json=batch.model_dump(mode="json"),
     ).status_code == 200
+
+
+def test_tutorial_instructor_submits_only_after_player_without_leaking_orders() -> None:
+    client = TestClient(app)
+    created = client.post(
+        "/games",
+        json={"scenario_id": "IBS-S-03", "seed": 12, "options": {"mode": "tutorial"}},
+    ).json()
+    game_id = created["game_id"]
+    premature = client.post(
+        f"/games/{game_id}/tutorial-opponent", headers={"X-Player-Side": "axis"}
+    )
+    assert premature.status_code == 409
+    player_batch = OrderBatch(side=Side.AXIS, phase=Phase.REINFORCEMENT)
+    assert client.post(
+        f"/games/{game_id}/orders",
+        headers={"X-Player-Side": "axis"},
+        json=player_batch.model_dump(mode="json"),
+    ).status_code == 200
+    response = client.post(
+        f"/games/{game_id}/tutorial-opponent", headers={"X-Player-Side": "axis"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"valid": True, "instructor_submitted": True}
+    assert "orders" not in response.text
+    assert client.post(
+        f"/games/{game_id}/tutorial-opponent", headers={"X-Player-Side": "allies"}
+    ).status_code == 403
+
+
+def test_tutorial_api_reaches_second_turn_and_serves_canonical_counter() -> None:
+    client = TestClient(app)
+    asset = client.get(f"/assets/counters/{quote('德国-DD-卡尔加尔斯特.png')}")
+    assert asset.status_code == 200
+    assert asset.headers["content-type"] == "image/png"
+    assert hashlib.sha256(asset.content).hexdigest() == (
+        "918196c7a6450f13aed798a47f48dd90f659611c49f6677d343878c871714eb6"
+    )
+
+    created = client.post(
+        "/games",
+        json={"scenario_id": "IBS-S-03", "seed": 15, "options": {"mode": "tutorial"}},
+    ).json()
+    game_id = created["game_id"]
+    order_phases = {"reinforcement", "movement_planning", "torpedo_planning", "gunnery"}
+    for _ in range(20):
+        view = client.get(
+            f"/games/{game_id}/view", headers={"X-Player-Side": "axis"}
+        ).json()
+        if view["turn"] >= 2 or view["phase"] == "complete":
+            break
+        if view["phase"] in order_phases:
+            batch = client.get(
+                f"/games/{game_id}/suggested-orders",
+                headers={"X-Player-Side": "axis"},
+            ).json()
+            assert client.post(
+                f"/games/{game_id}/orders",
+                headers={"X-Player-Side": "axis"},
+                json=batch,
+            ).status_code == 200
+            assert client.post(
+                f"/games/{game_id}/tutorial-opponent",
+                headers={"X-Player-Side": "axis"},
+            ).status_code == 200
+        assert client.post(f"/games/{game_id}/advance").status_code == 200
+    final_view = client.get(
+        f"/games/{game_id}/view", headers={"X-Player-Side": "axis"}
+    ).json()
+    assert final_view["turn"] >= 2
+
+    hotseat = client.post("/games", json={"scenario_id": "IBS-S-03", "seed": 13}).json()
+    assert client.post(
+        f"/games/{hotseat['game_id']}/tutorial-opponent",
+        headers={"X-Player-Side": "axis"},
+    ).status_code == 403
 
 
 def test_api_hotseat_full_transport_and_persistence_surface() -> None:

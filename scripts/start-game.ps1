@@ -3,11 +3,10 @@ $ProjectRoot = Split-Path -Parent $PSScriptRoot
 $RuntimeDir = Join-Path $ProjectRoot "tmp\runtime"
 New-Item -ItemType Directory -Force -Path $RuntimeDir | Out-Null
 
-$env:PYTHONPATH = Join-Path $ProjectRoot "backend\src"
 $env:IBS_DB_PATH = Join-Path $ProjectRoot "backend\iron-bottom-sound.sqlite3"
 
 $Backend = Start-Process -FilePath "python" `
-    -ArgumentList "-m", "iron_bottom_sound" `
+    -ArgumentList "-m", "uvicorn", "iron_bottom_sound.api:app", "--app-dir", "backend/src", "--host", "127.0.0.1", "--port", "8000" `
     -WorkingDirectory $ProjectRoot `
     -RedirectStandardOutput (Join-Path $RuntimeDir "backend.log") `
     -RedirectStandardError (Join-Path $RuntimeDir "backend-error.log") `

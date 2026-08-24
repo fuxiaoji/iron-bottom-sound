@@ -8,7 +8,7 @@ columns:
   count: 34
   labels: [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, BB, CC, DD, EE, FF, GG, HH]
 rows: {first: 1, last: 27, count: 27}
-layout: pointy_top_odd_q
+layout: flat_top_odd_q
 hex_scale: {yards: 600}
 terrain_default: sea
 direction_headings:
