@@ -102,10 +102,13 @@ def test_observation_exposes_only_own_planning_hardware() -> None:
     own = next(ship for ship in view.ships if ship.side == Side.AXIS)
     enemy = next(ship for ship in view.ships if ship.side == Side.ALLIES)
     assert own.max_speed is not None
+    assert (own.min_legal_speed, own.max_legal_speed) == (0, 6)
     assert own.gun_mounts
     assert own.torpedo_launchers
     assert own.torpedo_type
     assert enemy.max_speed is None
+    assert enemy.min_legal_speed is None
+    assert enemy.max_legal_speed is None
     assert enemy.gun_mounts == []
     assert enemy.torpedo_launchers == []
     assert enemy.torpedo_type is None
@@ -157,6 +160,41 @@ def test_explicit_movement_commands_are_costed_and_traced_by_mf() -> None:
     assert final_heading == ship.heading
 
 
+def test_main_map_heading_compass_and_scenario_3_heading_four_gold() -> None:
+    origin = HexCoord.from_label("O14")
+    assert {heading: origin.neighbor(heading).label for heading in range(1, 7)} == {
+        1: "P13", 2: "P14", 3: "O15", 4: "N14", 5: "N13", 6: "O13"
+    }
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=3)
+    ship = state.ships["IBS-U-KM-KARL-GALSTER"]
+    trajectory, heading = engine.movement_trajectory(ship, "1", ["advance"])
+    assert ship.position.label == "O14"
+    assert ship.heading == heading == 4
+    assert trajectory == [(HexCoord.from_label("N14"), 4)]
+
+
+def test_speed_is_a_legal_range_not_a_mandatory_maximum() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=3)
+    for side in Side:
+        assert engine.submit_orders(state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)).valid
+    engine.advance(state.game_id)
+    axis_orders = [
+        MovementOrder(ship_id=ship.id, plan="0")
+        for ship in state.ships.values() if ship.side == Side.AXIS and ship.position
+    ]
+    assert engine.validate_orders(
+        state.game_id, OrderBatch(side=Side.AXIS, phase=Phase.MOVEMENT_PLANNING, movement=axis_orders)
+    ).valid
+    state.ships[axis_orders[0].ship_id].ship_type = "BB"
+    rejected = engine.validate_orders(
+        state.game_id, OrderBatch(side=Side.AXIS, phase=Phase.MOVEMENT_PLANNING, movement=axis_orders)
+    )
+    assert not rejected.valid
+    assert any("outside legal range 2-6" in error for error in rejected.errors)
+
+
 def test_atlanta_rulebook_movement_example_costs_six_mf_for_3pp2() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=3)
@@ -174,7 +212,7 @@ def test_leaving_map_shifts_every_other_counter_and_emits_rule_event() -> None:
     mover = state.ships["IBS-U-KM-KARL-GALSTER"]
     other = state.ships["IBS-U-RN-JAVELIN"]
     mover.position = HexCoord.from_label("A10")
-    mover.heading = 6
+    mover.heading = 5
     other.position = HexCoord.from_label("R16")
     original_other = other.position
     state.torpedo_tracks.append(TorpedoTrack(
@@ -224,7 +262,7 @@ def test_structured_land_blocks_ship_plan_and_torpedo_track() -> None:
     state = engine.reset("IBS-S-03", seed=3)
     ship = state.ships["IBS-U-KM-KARL-GALSTER"]
     ship.position = HexCoord.from_label("A1")
-    ship.heading = 4
+    ship.heading = 3
     state.land_hexes.add("A2")
     state.phase = Phase.MOVEMENT_PLANNING
     result = engine.validate_orders(
@@ -244,7 +282,7 @@ def test_structured_land_blocks_ship_plan_and_torpedo_track() -> None:
         launcher_ship_id=ship.id,
         torpedo_type="test",
         position=HexCoord.from_label("A1"),
-        heading=4,
+        heading=3,
         speed_cycle=(1, 1, 1),
         range_remaining=2,
         launched_turn=1,
@@ -445,9 +483,9 @@ def test_aoba_helena_rulebook_gunnery_example_aggregates_main_battery() -> None:
     aoba = state.ships["IBS-U-IJN-AOBA"]
     helena = state.ships["IBS-U-USN-HELENA"]
     aoba.position = HexCoord.from_label("A1")
-    aoba.heading = 2
+    aoba.heading = 1
     helena.position = HexCoord.from_label("J5")
-    helena.heading = 1
+    helena.heading = 6
     helena.current_speed = 4
     primary = [mount for mount in aoba.gun_mounts if mount.kind == "primary"]
     assert sum(mount.firepower for mount in primary) == 16
@@ -479,6 +517,7 @@ def test_torpedo_launches_at_planned_mf_moves_by_impulse_and_contacts_ship() -> 
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=9)
     attacker = state.ships["IBS-U-KM-KARL-GALSTER"]
+    attacker.heading = 3
     target = state.ships["IBS-U-RN-JAVELIN"]
     target.position = HexCoord.from_label("N15")
     for side in Side:
@@ -497,7 +536,7 @@ def test_torpedo_launches_at_planned_mf_moves_by_impulse_and_contacts_ship() -> 
             OrderBatch(side=side, phase=Phase.MOVEMENT_PLANNING, movement=movement),
         ).valid
     engine.advance(state.game_id)
-    launch_hex = HexCoord.from_label("O15")
+    launch_hex = attacker.position.neighbor(attacker.heading)
     axis_torpedo = TorpedoOrder(
         ship_id=attacker.id,
         launcher_id="TT1",
@@ -930,10 +969,10 @@ def test_hidden_contacts_setup_seals_two_real_formations_and_two_decoys_per_side
     def inward_heading(coord: HexCoord) -> int:
         display_row = coord.r + (coord.q - (coord.q & 1)) // 2
         if coord.q == 0:
-            return 3
+            return 2
         if coord.q == 33:
-            return 6
-        return 4 if display_row == 0 else 1
+            return 5
+        return 3 if display_row == 0 else 6
 
     for side in Side:
         ships = [ship_id for ship_id in state.contact_reserve_positions if state.ships[ship_id].side == side]
@@ -1012,7 +1051,7 @@ def test_gunnery_modifier_breakdown_applies_longitudinal_additional_ship_and_mul
     target = state.ships["IBS-U-RN-JAVELIN"]
     attacker.position = HexCoord.from_label("O10")
     target.position = HexCoord.from_label("O14")
-    target.heading = 1
+    target.heading = 6
     target.current_speed = 5
     values = engine._gunnery_modifiers(
         state, attacker, target, distance=4, attackers=3, caliber=5, target_count=2

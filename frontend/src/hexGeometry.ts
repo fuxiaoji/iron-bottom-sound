@@ -13,14 +13,16 @@ export function columnLabel(q:number){
  return q<26?String.fromCharCode(65+q):String.fromCharCode(65+q-26).repeat(2);
 }
 
-// The counter artwork is horizontal. On a flat-top grid, a legal heading runs
-// through an edge centre, so heading 1 starts at 30 degrees, not at a vertex.
+// IBS-M-MAIN compass: 1 NE, 2 SE, 3 S, 4 SW, 5 NW, 6 N. Counter artwork's
+// printed bow arrow points left (180 degrees), so rotate that arrow onto the
+// corresponding edge-centre vector.
 export function headingRotation(heading:number){
- return 30+((heading-1)%6+6)%6*60;
+ return (150+((heading-1)%6+6)%6*60)%360;
 }
 
 // Source map IBS-M-MAIN uses flat-top odd-q: B/D/... sit half a row below A/C/....
 const even=hexCenter(0,displayRowToAxial(0,0));
 const odd=hexCenter(1,displayRowToAxial(1,0));
 if(Math.abs((odd.y-even.y)-HEX_ROW_HEIGHT/2)>1e-9)throw new Error("odd-q projection invariant failed");
-if([1,2,3,4,5,6].some((heading,index)=>headingRotation(heading)!==30+index*60))throw new Error("edge-facing heading invariant failed");
+const compassRotations=[150,210,270,330,30,90];
+if(compassRotations.some((rotation,index)=>headingRotation(index+1)!==rotation))throw new Error("IBS-M-MAIN heading compass invariant failed");

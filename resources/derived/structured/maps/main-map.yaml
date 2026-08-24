@@ -9,15 +9,18 @@ columns:
   labels: [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, BB, CC, DD, EE, FF, GG, HH]
 rows: {first: 1, last: 27, count: 27}
 layout: flat_top_odd_q
+heading_compass:
+  source: "IBS-M-MAIN lower-left printed compass, visually verified 2026-08-24"
+  directions: {1: north_east, 2: south_east, 3: south, 4: south_west, 5: north_west, 6: north}
 hex_scale: {yards: 600}
 terrain_default: sea
 direction_headings:
-  1: north
-  2: northeast
-  3: southeast
-  4: south
-  5: southwest
-  6: northwest
+  1: north_east
+  2: south_east
+  3: south
+  4: south_west
+  5: north_west
+  6: north
 overlays:
   island_xy:
     source: resources/originals/assets/images/岛屿.jpg

@@ -56,13 +56,13 @@ class DeterministicCommander(LLMCommander):
     def _inward_heading(coord: HexCoord) -> int:
         display_row = coord.r + (coord.q - (coord.q & 1)) // 2
         if display_row == 0:
-            return 4
-        if display_row == 26:
-            return 1
-        if coord.q == 0:
             return 3
-        if coord.q == 33:
+        if display_row == 26:
             return 6
+        if coord.q == 0:
+            return 2
+        if coord.q == 33:
+            return 5
         raise ValueError(f"{coord.label} is not on a map edge")
 
     def _contact_setup(

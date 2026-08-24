@@ -81,15 +81,20 @@ class HexCoord(BaseModel, frozen=True):
         return f"{index_to_column(self.q)}{display_row + 1}"
 
     def neighbor(self, heading: int) -> "HexCoord":
-        directions = {1: (0, -1), 2: (1, -1), 3: (1, 0), 4: (0, 1), 5: (-1, 1), 6: (-1, 0)}
-        if heading not in directions:
-            raise ValueError("Heading must be 1 through 6")
-        dq, dr = directions[heading]
+        dq, dr = self.direction_delta(heading)
         candidate = HexCoord(q=self.q + dq, r=self.r + dr)
         display_row = candidate.r + (candidate.q - (candidate.q & 1)) // 2
         if not 0 <= display_row <= 26:
             raise ValueError("Movement leaves the map")
         return candidate
+
+    @staticmethod
+    def direction_delta(heading: int) -> tuple[int, int]:
+        # IBS-M-MAIN printed compass: 1 NE, 2 SE, 3 S, 4 SW, 5 NW, 6 N.
+        directions = {1: (1, -1), 2: (1, 0), 3: (0, 1), 4: (-1, 1), 5: (-1, 0), 6: (0, -1)}
+        if heading not in directions:
+            raise ValueError("Heading must be 1 through 6")
+        return directions[heading]
 
     def distance(self, other: "HexCoord") -> int:
         return (abs(self.q - other.q) + abs(self.r - other.r) + abs((-self.q - self.r) - (-other.q - other.r))) // 2
@@ -466,6 +471,8 @@ class PublicShip(BaseModel):
     sunk: bool
     asset: str | None
     max_speed: int | None = None
+    min_legal_speed: int | None = None
+    max_legal_speed: int | None = None
     torpedo_type: str | None = None
     gun_mounts: list[GunMountState] = Field(default_factory=list)
     torpedo_launchers: list[TorpedoLauncherState] = Field(default_factory=list)

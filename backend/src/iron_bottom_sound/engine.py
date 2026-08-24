@@ -248,6 +248,8 @@ class IronBottomEngine:
                     sunk=ship.sunk,
                     asset=ship.asset,
                     max_speed=ship.max_speed_for_turn(state.turn) if ship.side == side else None,
+                    min_legal_speed=self._legal_speed_range(ship, state.turn)[0] if ship.side == side else None,
+                    max_legal_speed=self._legal_speed_range(ship, state.turn)[1] if ship.side == side else None,
                     torpedo_type=ship.torpedo_type if ship.side == side else None,
                     gun_mounts=deepcopy(ship.gun_mounts) if ship.side == side else [],
                     torpedo_launchers=deepcopy(ship.torpedo_launchers) if ship.side == side else [],
@@ -374,9 +376,7 @@ class IronBottomEngine:
             except ValueError as error:
                 errors.append(f"{order.ship_id}: {error}")
                 continue
-            maximum = min(ship.max_speed_for_turn(state.turn), ship.previous_speed + 2)
-            deceleration = 3 if ship.ship_type in {"BB", "BC"} else 5
-            minimum = max(0, ship.previous_speed - deceleration)
+            minimum, maximum = self._legal_speed_range(ship, state.turn)
             if not minimum <= cost <= maximum:
                 errors.append(f"{order.ship_id}: movement cost {cost} outside legal range {minimum}-{maximum}")
             if order.speed is not None and order.speed != cost:
@@ -539,6 +539,15 @@ class IronBottomEngine:
             if len(launcher_keys) != len(set(launcher_keys)):
                 errors.append("A torpedo launcher may receive only one launch order per turn")
         return ValidationResult(valid=not errors, errors=errors)
+
+    @staticmethod
+    def _legal_speed_range(ship: ShipState, turn: int) -> tuple[int, int]:
+        maximum = min(ship.max_speed_for_turn(turn), ship.previous_speed + 2)
+        deceleration = 3 if ship.ship_type in {"BB", "BC"} else 5
+        minimum = max(0, ship.previous_speed - deceleration)
+        if ship.forced_straight_turns and ship.forced_speed is not None:
+            return ship.forced_speed, ship.forced_speed
+        return minimum, maximum
 
     def submit_orders(self, game_id: str, batch: OrderBatch) -> ValidationResult:
         state = self.get(game_id)
@@ -1065,8 +1074,7 @@ class IronBottomEngine:
         contact_paths: dict[str, list[tuple[HexCoord, int]]],
         torpedo_orders: list[TorpedoOrder],
     ) -> None:
-        directions = {1: (0, -1), 2: (1, -1), 3: (1, 0), 4: (0, 1), 5: (-1, 1), 6: (-1, 0)}
-        leaving_dq, leaving_dr = directions[heading]
+        leaving_dq, leaving_dr = HexCoord.direction_delta(heading)
         dq, dr = -leaving_dq, -leaving_dr
 
         # Validate the complete translation before mutating state.  The
