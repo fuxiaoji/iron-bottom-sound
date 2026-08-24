@@ -1,0 +1,9 @@
+rule_id: IBS-R-08.2
+source:
+  document: iron-bottom-sound-iv-rules-zh.pdf
+  pdf_page: 11
+  printed_section: "8.2.3 b"
+angles: [A, B, X, Y]
+relative_heading:
+  port: {A: 3, B: -2, X: -1, Y: 0}
+  starboard: {A: 3, B: 2, X: 1, Y: 0}

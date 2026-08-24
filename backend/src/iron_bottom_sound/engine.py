@@ -81,6 +81,7 @@ class RuleData:
         self.gunnery_results = self._yaml("gunnery-results.yaml")["results"]
         self.torpedo_collision = self._yaml("torpedo-collision-table.yaml")
         self.torpedoes = self._yaml("torpedoes.yaml")["types"]
+        self.torpedo_launch_directions = self._yaml("torpedo-launch-directions.yaml")
         self.modifiers = self._yaml("modifiers.yaml")
         self.fire_table = self._yaml("fire-table.yaml")
         self.fire_results = self.fire_table["results"]
@@ -397,6 +398,7 @@ class IronBottomEngine:
                     "launcher_id": launcher.id,
                     "loaded": launcher.loaded,
                     "sides": [arc.value for arc in launcher.arcs if arc in {FiringArc.PORT, FiringArc.STARBOARD}],
+                    "angles": self.rules.torpedo_launch_directions["angles"],
                 }
                 for launcher in ship.torpedo_launchers
                 if not launcher.destroyed and not launcher.reload_turns_remaining and launcher.loaded > 0
@@ -588,10 +590,6 @@ class IronBottomEngine:
                 errors.append(f"{order.ship_id} lacks torpedo ammunition")
             if not order.launch_side or not order.launch_angle:
                 errors.append(f"{order.ship_id}: launch_side and launch_angle are required")
-            elif order.launch_angle in {"A", "B"} and order.launch_side != "port":
-                errors.append(f"{order.ship_id}: angles A/B are port launches")
-            elif order.launch_angle in {"X", "Y"} and order.launch_side != "starboard":
-                errors.append(f"{order.ship_id}: angles X/Y are starboard launches")
             elif FiringArc(order.launch_side) not in launcher.arcs:
                 errors.append(f"{order.ship_id}:{launcher.id} cannot launch to {order.launch_side}")
             definition = self.rules.torpedoes.get(ship.torpedo_type or "")
@@ -1392,7 +1390,11 @@ class IronBottomEngine:
                 definition = self.rules.torpedoes[ship.torpedo_type or ""]
                 setting = definition["settings"][order.setting_index]
                 launch_heading = paths[ship.id][impulse][1]
-                heading = self._torpedo_launch_heading(launch_heading, order.launch_angle or "A")
+                heading = self._torpedo_launch_heading(
+                    launch_heading,
+                    order.launch_side or "port",
+                    order.launch_angle or "A",
+                )
                 track = TorpedoTrack(
                     id=f"TT-{state.turn}-{ship.id}-{launcher.id}-{len(state.torpedo_tracks)+1}",
                     side=ship.side,
@@ -1734,9 +1736,8 @@ class IronBottomEngine:
             resolved_track_ids.add(track.id)
         state.torpedo_tracks = [track for track in state.torpedo_tracks if track.id not in resolved_track_ids]
 
-    @staticmethod
-    def _torpedo_launch_heading(ship_heading: int, angle: str) -> int:
-        relative = {"A": -2, "B": -1, "X": 1, "Y": 2}[angle]
+    def _torpedo_launch_heading(self, ship_heading: int, side: str, angle: str) -> int:
+        relative = int(self.rules.torpedo_launch_directions["relative_heading"][side][angle])
         return ((ship_heading - 1 + relative) % 6) + 1
 
     @staticmethod

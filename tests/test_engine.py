@@ -491,6 +491,10 @@ def test_legal_actions_publish_only_engine_valid_weapon_candidates() -> None:
     torpedo_candidates = torpedo_hint["torpedo_candidates"]
     assert len(torpedo_candidates) == 3
     assert all(candidate["launchers"] for candidate in torpedo_candidates)
+    assert all(
+        launcher["angles"] == ["A", "B", "X", "Y"]
+        for candidate in torpedo_candidates for launcher in candidate["launchers"]
+    )
     assert all(candidate["launch_positions"][0]["mf"] == 1 for candidate in torpedo_candidates)
     assert all(candidate["settings"] for candidate in torpedo_candidates)
 
@@ -674,7 +678,7 @@ def test_aoba_helena_rulebook_torpedo_example_scores_one_hit_and_5h_7mf() -> Non
     assert helena.speed_track == (3, 3, 3)
 
 
-def test_torpedo_plan_rejects_wrong_launch_hex_and_side_angle_pair() -> None:
+def test_torpedo_plan_accepts_port_x_but_rejects_wrong_launch_hex() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=9)
     for side in Side:
@@ -706,8 +710,28 @@ def test_torpedo_plan_rejects_wrong_launch_hex_and_side_angle_pair() -> None:
         ),
     )
     assert not result.valid
-    assert any("angles X/Y are starboard" in error for error in result.errors)
+    assert not any("angle" in error.lower() for error in result.errors)
     assert any("launch_hex does not match" in error for error in result.errors)
+
+
+def test_torpedo_port_and_starboard_each_offer_abxy_directions() -> None:
+    engine = IronBottomEngine()
+    expected = {
+        ("port", "A"): 5,
+        ("port", "B"): 6,
+        ("port", "X"): 1,
+        ("port", "Y"): 2,
+        ("starboard", "A"): 5,
+        ("starboard", "B"): 4,
+        ("starboard", "X"): 3,
+        ("starboard", "Y"): 2,
+    }
+    assert {
+        (side, angle): engine._torpedo_launch_heading(2, side, angle)
+        for side in ("port", "starboard") for angle in ("A", "B", "X", "Y")
+    } == expected
+    # Rulebook p.12 Aoba example: heading 2, port-X follows heading 1.
+    assert engine._torpedo_launch_heading(2, "port", "X") == 1
 
 
 def test_helena_seven_mf_loss_reproduces_rulebook_three_three_three_example() -> None:

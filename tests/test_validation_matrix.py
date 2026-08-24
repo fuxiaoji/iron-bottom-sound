@@ -1,5 +1,6 @@
 from iron_bottom_sound.engine import IronBottomEngine
 from iron_bottom_sound.models import (
+    FiringArc,
     GunMountOrder,
     GunneryOrder,
     HexCoord,
@@ -102,6 +103,7 @@ def test_validation_rejects_illegal_gunnery_optional_and_torpedo_orders() -> Non
         if ship.side == Side.AXIS and ship.torpedo and ship.torpedo_launchers
     )
     launcher = torpedo_ship.torpedo_launchers[0]
+    launcher.arcs = (FiringArc.PORT,)
     state.phase = Phase.TORPEDO_PLANNING
     order = TorpedoOrder(
         ship_id=torpedo_ship.id,
@@ -117,7 +119,7 @@ def test_validation_rejects_illegal_gunnery_optional_and_torpedo_orders() -> Non
         OrderBatch(side=Side.AXIS, phase=state.phase, torpedoes=[order, order]),
     ).errors
     assert any("lacks torpedo ammunition" in error for error in errors)
-    assert any("A/B are port" in error for error in errors)
+    assert any("cannot launch to starboard" in error for error in errors)
     assert any("invalid torpedo speed" in error for error in errors)
     assert any("missing sealed movement" in error for error in errors)
     assert any("only one launch order" in error for error in errors)
