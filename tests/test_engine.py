@@ -195,6 +195,37 @@ def test_speed_is_a_legal_range_not_a_mandatory_maximum() -> None:
     assert any("outside legal range 2-6" in error for error in rejected.errors)
 
 
+def test_tutorial_contact_preserving_example_keeps_a_british_ship_visible() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=3, options=GameOptions(mode="tutorial"))
+    for side in Side:
+        assert engine.submit_orders(state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)).valid
+    engine.advance(state.game_id)
+    for side in Side:
+        ships = [ship for ship in state.ships.values() if ship.side == side and ship.position]
+        movement = [
+            MovementOrder(
+                ship_id=ship.id,
+                plan="1" if side == Side.AXIS and ship.id == "IBS-U-KM-KARL-GALSTER" else "0",
+            )
+            for ship in ships
+        ]
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.MOVEMENT_PLANNING, movement=movement)
+        ).valid
+    engine.advance(state.game_id)
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.TORPEDO_PLANNING)
+        ).valid
+    engine.advance(state.game_id)
+    engine.advance(state.game_id)
+    view = engine.observe(state.game_id, Side.AXIS)
+    assert view.phase == Phase.GUNNERY
+    assert view.visibility == 4
+    assert any(ship.side == Side.ALLIES for ship in view.ships)
+
+
 def test_atlanta_rulebook_movement_example_costs_six_mf_for_3pp2() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=3)

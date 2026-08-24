@@ -12,9 +12,11 @@ const lessons:{phases:Phase[];title:string;goal:string;action:string;rule:string
 export function TutorialPanel({view}:{view:Observation}){
  const index=Math.max(0,lessons.findIndex(lesson=>lesson.phases.includes(view.phase)));
  const lesson=lessons[index];
+ const visibleEnemies=view.ships.filter(ship=>ship.side!==view.side&&!ship.sunk);
  return <section className="tutorial-card">
   <div className="tutorial-kicker">教学关 · 第 {index+1}/{lessons.length} 课</div><h2>{lesson.title}</h2>
   <p><b>目标：</b>{lesson.goal}</p><p><b>操作：</b>{lesson.action}</p><code>{lesson.rule}</code>
+  {view.phase==="gunnery"&&visibleEnemies.length===0&&<p className="visibility-warning"><b>当前没有可见英舰。</b>英舰仍在对局中，只是全部超出德方 {view.visibility} 格能见度；本阶段不能指定其为目标。</p>}
   <ol className="lesson-track">{lessons.map((item,itemIndex)=><li className={itemIndex<index?"done":itemIndex===index?"current":""} key={item.title}>{item.title}</li>)}</ol>
  </section>;
 }

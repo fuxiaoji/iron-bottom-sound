@@ -486,6 +486,7 @@ class PlayerObservation(BaseModel):
     turn: int
     max_turns: int
     phase: Phase
+    visibility: int
     ships: list[PublicShip]
     torpedo_tracks: list[TorpedoTrack] = Field(default_factory=list)
     markers: list[MarkerState] = Field(default_factory=list)

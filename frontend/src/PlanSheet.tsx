@@ -21,14 +21,14 @@ export function PlanSheet({view,side,draft,setDraft,intent,setIntent,tutorial=fa
  const setCoord=(coord:HexCoord,key:"q"|"r",value:string)=>{coord[key]=numberValue(value)};
  const addTorpedo=()=>commit(next=>{const ship=own.find(item=>item.position&&item.torpedo_launchers.some(launcher=>!launcher.destroyed&&launcher.loaded>0));if(!ship)return;const launcher=ship.torpedo_launchers.find(item=>!item.destroyed&&item.loaded>0)!;const launchSide=launcher.arcs.includes("port")?"port":"starboard";next.torpedoes.push({ship_id:ship.id,launcher_id:launcher.id,count:1,speed:"fast",launch_at_mf:1,launch_hex:ship.position,bearing:ship.heading,launch_side:launchSide,launch_angle:launchSide==="port"?"A":"X",setting_index:0})});
  const addGunnery=()=>commit(next=>{const ship=own.find(item=>item.position&&item.gun_mounts.some(mount=>!mount.destroyed&&!mount.fired_this_phase));const target=enemies[0];if(!ship||!target)return;next.gunnery.push({ship_id:ship.id,primary_target:target.id,secondary_target:null,searchlight_target:null,mounts:ship.gun_mounts.filter(mount=>!mount.destroyed&&!mount.fired_this_phase).map(mount=>({mount_id:mount.id,target_id:target.id}))})});
- const fillTutorialMovement=()=>commit(next=>{next.movement.forEach(order=>{const ship=own.find(item=>item.id===order.ship_id);order.plan=String(ship?.max_legal_speed??ship?.max_speed??0);order.speed=null})});
+ const fillTutorialMovement=()=>commit(next=>{next.movement.forEach((order,index)=>{order.plan=index===0?"1":"0";order.speed=null})});
  if(!draft)return <section className="plan-sheet"><p className="empty-plan">正在载入本阶段合法订单……</p></section>;
  if(!parsed)return <section className="plan-sheet"><p className="form-error">高级 JSON 格式错误；修正后才能继续使用计划表。</p><details open><summary>高级 JSON</summary><textarea aria-label="本阶段秘密订单 JSON" value={draft} onChange={event=>setDraft(event.target.value)} spellCheck={false}/></details></section>;
  return <section className="plan-sheet">
   {tutorial&&<div className="field-coach">
    <b>现在照着做</b>
    {view.phase==="reinforcement"&&<ol><li>确认下方显示“本阶段没有可用增援”。</li><li>不需要填写坐标。</li><li>点击页面右上角的确认按钮。</li></ol>}
-   {view.phase==="movement_planning"&&<><ol><li>先点地图上的一艘德舰，查看“上回合实际消耗”和“本回合合法消耗”。</li><li>航路数字是本回合实际消耗的 MF；最大速度不是必须耗尽。想定 3 的 DD 从 5 MF 最多减 5，所以可合法填写 0。</li><li>本课示例让三舰各按合法上限直航；之后你可改为范围内其他数值。</li></ol><button type="button" onClick={fillTutorialMovement}>按本回合合法上限填入示例</button></>}
+   {view.phase==="movement_planning"&&<><ol><li>先点地图上的一艘德舰，查看“上回合实际消耗”和“本回合合法消耗”。淡色海格是己舰当前 {view.visibility} 格视距覆盖。</li><li>最大速度不是必须耗尽；想定 3 的 DD 从 5 MF 最多减 5，所以可合法填写 0。</li><li>本课用卡尔直航 1 MF、另两舰停船来保持与英舰接触，便于下一课学习炮击。</li></ol><button type="button" onClick={fillTutorialMovement}>填入保持接触示例（1 / 0 / 0）</button></>}
    {view.phase==="torpedo_planning"&&<ol><li>鱼雷是可选命令；第一次学习建议保持空表。</li><li>若添加发射，“发射 MF”不能超过该舰上一阶段计划的航行 MF。</li><li>误加时点“删除”，空表也可合法提交。</li></ol>}
    {view.phase==="gunnery"&&<ol><li>先看地图上是否有已观察敌舰。</li><li>点“添加齐射”，再选目标并勾选可用炮位。</li><li>没有目标或射界时保持空表，直接提交。</li></ol>}
   </div>}

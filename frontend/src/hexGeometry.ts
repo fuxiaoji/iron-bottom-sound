@@ -9,6 +9,11 @@ export function hexCenter(q:number,r:number){
  return {x:38+q*HEX_SIZE*1.5,y:35+(r+q/2)*HEX_ROW_HEIGHT};
 }
 
+export function hexDistance(a:{q:number;r:number},b:{q:number;r:number}){
+ const dq=a.q-b.q,dr=a.r-b.r;
+ return (Math.abs(dq)+Math.abs(dr)+Math.abs(dq+dr))/2;
+}
+
 export function columnLabel(q:number){
  return q<26?String.fromCharCode(65+q):String.fromCharCode(65+q-26).repeat(2);
 }

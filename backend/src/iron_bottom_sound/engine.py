@@ -287,6 +287,7 @@ class IronBottomEngine:
             turn=state.turn,
             max_turns=state.max_turns,
             phase=state.phase,
+            visibility=int(state.visibility[side.value]),
             ships=ships,
             torpedo_tracks=tracks,
             markers=markers,
