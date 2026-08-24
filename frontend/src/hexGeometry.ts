@@ -18,6 +18,10 @@ export function columnLabel(q:number){
  return q<26?String.fromCharCode(65+q):String.fromCharCode(65+q-26).repeat(2);
 }
 
+export function hexLabel(coord:{q:number;r:number}){
+ return `${columnLabel(coord.q)}${coord.r+Math.floor(coord.q/2)+1}`;
+}
+
 // IBS-M-MAIN compass: 1 NE, 2 SE, 3 S, 4 SW, 5 NW, 6 N. Counter artwork's
 // printed bow arrow points left (180 degrees), so rotate that arrow onto the
 // corresponding edge-centre vector.
@@ -36,3 +40,4 @@ const odd=hexCenter(1,displayRowToAxial(1,0));
 if(Math.abs((odd.y-even.y)-HEX_ROW_HEIGHT/2)>1e-9)throw new Error("odd-q projection invariant failed");
 const compassRotations=[150,210,270,330,30,90];
 if(compassRotations.some((rotation,index)=>headingRotation(index+1)!==rotation))throw new Error("IBS-M-MAIN heading compass invariant failed");
+if(hexLabel({q:17,r:7})!=="R16"||hexLabel({q:16,r:7})!=="Q16"||hexLabel({q:0,r:0})!=="A1"||hexLabel({q:33,r:10})!=="HH27")throw new Error("IBS-M-MAIN coordinate label invariant failed");
