@@ -100,7 +100,9 @@ def test_tutorial_api_reaches_second_turn_and_serves_canonical_counter() -> None
                 f"/games/{game_id}/tutorial-opponent",
                 headers={"X-Player-Side": "axis"},
             ).status_code == 200
-        assert client.post(f"/games/{game_id}/advance").status_code == 200
+        assert client.post(
+            f"/games/{game_id}/advance", headers={"X-Player-Side": "axis"}
+        ).status_code == 200
     final_view = client.get(
         f"/games/{game_id}/view", headers={"X-Player-Side": "axis"}
     ).json()
@@ -128,7 +130,10 @@ def test_api_hotseat_full_transport_and_persistence_surface() -> None:
         f"/games/{game_id}/legal-actions", headers={"X-Player-Side": "axis"}
     ).json()[0]["kind"] == "submit_phase_orders"
     assert client.post(f"/games/{game_id}/handoff").json()["clear_sensitive_state"] is True
-    assert client.post(f"/games/{game_id}/advance").status_code == 409
+    assert client.post(f"/games/{game_id}/advance").status_code == 400
+    assert client.post(
+        f"/games/{game_id}/advance", headers={"X-Player-Side": "axis"}
+    ).status_code == 409
 
     axis = OrderBatch(side=Side.AXIS, phase=Phase.REINFORCEMENT)
     assert client.post(
@@ -152,7 +157,9 @@ def test_api_hotseat_full_transport_and_persistence_surface() -> None:
         )
         assert response.status_code == 200
     assert response.json()["both_submitted"] is True
-    assert client.post(f"/games/{game_id}/advance").status_code == 200
+    assert client.post(
+        f"/games/{game_id}/advance", headers={"X-Player-Side": "axis"}
+    ).status_code == 200
     assert client.get(
         f"/games/{game_id}/events?after=0", headers={"X-Player-Side": "axis"}
     ).json()

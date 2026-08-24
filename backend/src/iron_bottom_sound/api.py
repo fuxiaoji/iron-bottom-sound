@@ -137,14 +137,19 @@ def handoff(game_id: str):
 
 
 @app.post("/games/{game_id}/advance")
-def advance(game_id: str):
-    get_game(game_id)
+def advance(game_id: str, x_player_side: Annotated[str | None, Header()] = None):
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
     try:
         events = engine.advance(game_id)
     except ValueError as error:
         raise HTTPException(409, str(error)) from error
     repository.save(engine.get(game_id))
-    return events
+    return [
+        event for event in events
+        if event.payload.get("secret_side") in (None, side.value)
+        and not engine._hidden_damage_event(state, event, side)
+    ]
 
 
 @app.get("/games/{game_id}/events")
