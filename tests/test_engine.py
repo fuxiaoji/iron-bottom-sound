@@ -495,7 +495,8 @@ def test_legal_actions_publish_only_engine_valid_weapon_candidates() -> None:
         launcher["angles"] == ["A", "B", "X", "Y"]
         for candidate in torpedo_candidates for launcher in candidate["launchers"]
     )
-    assert all(candidate["launch_positions"][0]["mf"] == 1 for candidate in torpedo_candidates)
+    assert all(candidate["launch_positions"][0]["mf"] == 0 for candidate in torpedo_candidates)
+    assert all(candidate["launch_positions"][1]["mf"] == 1 for candidate in torpedo_candidates)
     assert all(candidate["settings"] for candidate in torpedo_candidates)
 
 
@@ -639,6 +640,64 @@ def test_torpedo_launches_at_planned_mf_moves_by_impulse_and_contacts_ship() -> 
     engine.advance(state.game_id)
     assert not state.torpedo_tracks
     assert any(event.type == "torpedo_attack" for event in state.events)
+
+
+def test_stationary_ship_launches_from_its_current_hex_at_mf_zero() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=90)
+    attacker = state.ships["IBS-U-RN-JAVELIN"]
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        ).valid
+    engine.advance(state.game_id)
+    for side in Side:
+        movement = [
+            MovementOrder(ship_id=ship.id, plan="0")
+            for ship in state.ships.values() if ship.side == side and ship.position
+        ]
+        assert engine.submit_orders(
+            state.game_id,
+            OrderBatch(side=side, phase=Phase.MOVEMENT_PLANNING, movement=movement),
+        ).valid
+    engine.advance(state.game_id)
+    hints = engine.legal_actions(state.game_id, Side.ALLIES)[0].schema_hint["torpedo_candidates"]
+    javelin_hint = next(item for item in hints if item["ship_id"] == attacker.id)
+    assert javelin_hint["launch_positions"] == [{
+        "mf": 0,
+        "hex": attacker.position.model_dump(mode="json"),
+        "heading": attacker.heading,
+    }]
+    wrong_hex = attacker.position.neighbor(attacker.heading)
+    invalid = TorpedoOrder(
+        ship_id=attacker.id,
+        launcher_id="TT1",
+        launch_at_mf=0,
+        launch_hex=wrong_hex,
+        launch_side="port",
+        launch_angle="X",
+    )
+    result = engine.validate_orders(
+        state.game_id,
+        OrderBatch(side=Side.ALLIES, phase=Phase.TORPEDO_PLANNING, torpedoes=[invalid]),
+    )
+    assert not result.valid
+    assert any("launch_hex does not match" in error for error in result.errors)
+    order = invalid.model_copy(update={"launch_hex": attacker.position})
+    assert engine.submit_orders(
+        state.game_id,
+        OrderBatch(side=Side.ALLIES, phase=Phase.TORPEDO_PLANNING, torpedoes=[order]),
+    ).valid
+    assert engine.submit_orders(
+        state.game_id, OrderBatch(side=Side.AXIS, phase=Phase.TORPEDO_PLANNING)
+    ).valid
+    engine.advance(state.game_id)
+    engine.advance(state.game_id)
+    launch = next(event for event in state.events if event.type == "torpedo_launched")
+    assert launch.payload["launch_mf"] == 0
+    track = state.torpedo_tracks[0]
+    assert track.distance_travelled == track.speed_cycle[0]
+    assert next(item for item in attacker.torpedo_launchers if item.id == "TT1").loaded == 0
 
 
 def test_aoba_helena_rulebook_torpedo_example_scores_one_hit_and_5h_7mf() -> None:

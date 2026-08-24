@@ -321,7 +321,7 @@ class TorpedoOrder(BaseModel):
     count: int = Field(default=1, ge=0, le=9)
     speed: Literal["fast", "medium", "slow"] = "fast"
     launcher_id: str | None = None
-    launch_at_mf: int = Field(default=1, ge=1, le=8)
+    launch_at_mf: int = Field(default=1, ge=0, le=8)
     launch_hex: HexCoord | None = None
     bearing: int | None = Field(default=None, ge=1, le=6)
     launch_side: Literal["port", "starboard"] | None = None

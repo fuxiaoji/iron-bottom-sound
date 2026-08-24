@@ -25,6 +25,11 @@ export function headingRotation(heading:number){
  return (150+((heading-1)%6+6)%6*60)%360;
 }
 
+export function headingVector(heading:number,length=1){
+ const radians=(180+headingRotation(heading))*Math.PI/180;
+ return {x:Math.cos(radians)*length,y:Math.sin(radians)*length};
+}
+
 // Source map IBS-M-MAIN uses flat-top odd-q: B/D/... sit half a row below A/C/....
 const even=hexCenter(0,displayRowToAxial(0,0));
 const odd=hexCenter(1,displayRowToAxial(1,0));

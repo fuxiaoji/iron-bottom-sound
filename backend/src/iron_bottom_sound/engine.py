@@ -389,7 +389,11 @@ class IronBottomEngine:
             launch_positions: list[dict[str, Any]] = []
             if movement:
                 trajectory, _ = self.movement_trajectory(ship, movement.plan, self.movement_commands(movement))
-                launch_positions = [
+                launch_positions = [{
+                    "mf": 0,
+                    "hex": ship.position.model_dump(mode="json"),
+                    "heading": ship.heading,
+                }] + [
                     {"mf": index, "hex": position.model_dump(mode="json"), "heading": heading}
                     for index, (position, heading) in enumerate(trajectory, start=1)
                 ]
@@ -413,7 +417,7 @@ class IronBottomEngine:
                 "launchers": launchers,
                 "launch_positions": launch_positions,
                 "settings": settings,
-                "blocked_reason": blocked_reason or ("本回合航路为 0 MF，无合法发射时点" if not launch_positions else None),
+                "blocked_reason": blocked_reason or ("缺少已封存的移动计划" if not movement else None),
             })
         return candidates
 
@@ -611,8 +615,10 @@ class IronBottomEngine:
             trajectory, _ = self.movement_trajectory(ship, movement.plan, commands)
             if order.launch_at_mf > len(trajectory):
                 errors.append(f"{order.ship_id}: launch MF exceeds movement plan")
-            elif not order.launch_hex or order.launch_hex != trajectory[order.launch_at_mf - 1][0]:
-                errors.append(f"{order.ship_id}: launch_hex does not match its MF position")
+            else:
+                expected_hex = ship.position if order.launch_at_mf == 0 else trajectory[order.launch_at_mf - 1][0]
+                if not order.launch_hex or order.launch_hex != expected_hex:
+                    errors.append(f"{order.ship_id}: launch_hex does not match its MF position")
         if state.phase == Phase.TORPEDO_PLANNING:
             launcher_keys = [(order.ship_id, order.launcher_id) for order in batch.torpedoes]
             if len(launcher_keys) != len(set(launcher_keys)):
@@ -1213,6 +1219,77 @@ class IronBottomEngine:
             rule=self._rule("IBS-R-06.1.8", 7, "6.1 移动机制第8条"),
         )
 
+    def _launch_torpedo_order(
+        self,
+        state: GameState,
+        order: TorpedoOrder,
+        launch_heading: int,
+    ) -> TorpedoTrack | None:
+        if not order.launch_hex or not order.launcher_id:
+            return None
+        ship = state.ships[order.ship_id]
+        if ship.sunk or ship.position != order.launch_hex:
+            self._event(
+                state,
+                "torpedo_launch_cancelled",
+                f"{ship.name} 未到达计划发射格，鱼雷发射取消",
+                payload={"ship_id": ship.id, "planned_hex": order.launch_hex.label},
+                rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
+            )
+            return None
+        if state.options.optional_rules.squalls and self._in_squall(state, ship.position):
+            self._event(
+                state,
+                "torpedo_launch_cancelled",
+                f"{ship.name} 处于雨飑中，鱼雷发射取消",
+                payload={"ship_id": ship.id, "reason": "squall"},
+                rule=self._rule("IBS-R-09.6", 13, "9.6 雨飑"),
+            )
+            return None
+        launcher = next(item for item in ship.torpedo_launchers if item.id == order.launcher_id)
+        definition = self.rules.torpedoes[ship.torpedo_type or ""]
+        setting = definition["settings"][order.setting_index]
+        heading = self._torpedo_launch_heading(
+            launch_heading,
+            order.launch_side or "port",
+            order.launch_angle or "A",
+        )
+        track = TorpedoTrack(
+            id=f"TT-{state.turn}-{ship.id}-{launcher.id}-{len(state.torpedo_tracks)+1}",
+            side=ship.side,
+            launcher_ship_id=ship.id,
+            torpedo_type=ship.torpedo_type or "",
+            position=order.launch_hex,
+            heading=heading,
+            speed_cycle=tuple(setting["speed"]),
+            range_remaining=int(setting["range"]),
+            launched_turn=state.turn,
+            salvo_size=order.count,
+            hidden=state.options.optional_rules.blind_torpedoes,
+        )
+        state.torpedo_tracks.append(track)
+        launcher.loaded -= order.count
+        if launcher.loaded == 0 and launcher.reloads_remaining:
+            reload_duration = 3 if ship.ship_type in {"DD", "APD"} else 2
+            launcher.reload_turns_remaining = reload_duration + 1
+        if ship.torpedo:
+            ship.torpedo.ammo = sum(item.loaded for item in ship.torpedo_launchers)
+        self._event(
+            state,
+            "torpedo_launched",
+            f"{ship.name} {launcher.id} 在 {order.launch_hex.label} 发射鱼雷",
+            payload={
+                "track_id": track.id,
+                "ship_id": ship.id,
+                "launcher_id": launcher.id,
+                "launch_mf": order.launch_at_mf,
+                "heading": heading,
+                "setting": order.setting_index,
+            },
+            rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
+        )
+        return track
+
     def _resolve_movement(self, state: GameState) -> None:
         self._resolve_sinking_drift(state)
         movement_orders = {
@@ -1277,6 +1354,13 @@ class IronBottomEngine:
         )
         stopped: set[str] = set()
         moved_tracks: dict[str, int] = {track.id: 0 for track in state.torpedo_tracks}
+        for order in torpedo_orders:
+            if order.launch_at_mf != 0:
+                continue
+            track = self._launch_torpedo_order(state, order, state.ships[order.ship_id].heading)
+            if track:
+                track_allowance[track.id] = track.speed_cycle[0]
+                moved_tracks[track.id] = 0
         for impulse in range(maximum_impulses):
             # 6.1.8: when a ship would leave the printed map, keep that ship on
             # its edge hex and translate every other counter in the opposite
@@ -1368,70 +1452,13 @@ class IronBottomEngine:
                 if order.launch_at_mf != impulse + 1 or not order.launch_hex or not order.launcher_id:
                     continue
                 ship = state.ships[order.ship_id]
-                if ship.sunk or ship.position != order.launch_hex or impulse >= len(paths.get(ship.id, [])):
-                    self._event(
-                        state,
-                        "torpedo_launch_cancelled",
-                        f"{ship.name} 未到达计划发射格，鱼雷发射取消",
-                        payload={"ship_id": ship.id, "planned_hex": order.launch_hex.label},
-                        rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
-                    )
-                    continue
-                if state.options.optional_rules.squalls and self._in_squall(state, ship.position):
-                    self._event(
-                        state,
-                        "torpedo_launch_cancelled",
-                        f"{ship.name} 处于雨飑中，鱼雷发射取消",
-                        payload={"ship_id": ship.id, "reason": "squall"},
-                        rule=self._rule("IBS-R-09.6", 13, "9.6 雨飑"),
-                    )
-                    continue
-                launcher = next(item for item in ship.torpedo_launchers if item.id == order.launcher_id)
-                definition = self.rules.torpedoes[ship.torpedo_type or ""]
-                setting = definition["settings"][order.setting_index]
                 launch_heading = paths[ship.id][impulse][1]
-                heading = self._torpedo_launch_heading(
-                    launch_heading,
-                    order.launch_side or "port",
-                    order.launch_angle or "A",
-                )
-                track = TorpedoTrack(
-                    id=f"TT-{state.turn}-{ship.id}-{launcher.id}-{len(state.torpedo_tracks)+1}",
-                    side=ship.side,
-                    launcher_ship_id=ship.id,
-                    torpedo_type=ship.torpedo_type or "",
-                    position=order.launch_hex,
-                    heading=heading,
-                    speed_cycle=tuple(setting["speed"]),
-                    range_remaining=int(setting["range"]),
-                    launched_turn=state.turn,
-                    salvo_size=order.count,
-                    hidden=state.options.optional_rules.blind_torpedoes,
-                )
-                state.torpedo_tracks.append(track)
+                track = self._launch_torpedo_order(state, order, launch_heading)
+                if not track:
+                    continue
                 track_allowance[track.id] = track.speed_cycle[0]
                 moved_tracks[track.id] = 0
                 launched_this_impulse.add(track.id)
-                launcher.loaded -= order.count
-                if launcher.loaded == 0 and launcher.reloads_remaining:
-                    reload_duration = 3 if ship.ship_type in {"DD", "APD"} else 2
-                    launcher.reload_turns_remaining = reload_duration + 1
-                if ship.torpedo:
-                    ship.torpedo.ammo = sum(item.loaded for item in ship.torpedo_launchers)
-                self._event(
-                    state,
-                    "torpedo_launched",
-                    f"{ship.name} {launcher.id} 在 {order.launch_hex.label} 发射鱼雷",
-                    payload={
-                        "track_id": track.id,
-                        "ship_id": ship.id,
-                        "launcher_id": launcher.id,
-                        "launch_mf": order.launch_at_mf,
-                        "heading": heading,
-                        "setting": order.setting_index,
-                    },
-                    rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
-                )
             for track in list(state.torpedo_tracks):
                 if (
                     track.id in launched_this_impulse
