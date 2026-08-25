@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import csv
+import math
 import random
 import re
 import uuid
+from collections import deque
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Iterable
@@ -50,6 +52,9 @@ PHASES = [
 ]
 ORDER_PHASES = {Phase.REINFORCEMENT, Phase.MOVEMENT_PLANNING, Phase.TORPEDO_PLANNING, Phase.GUNNERY}
 ORDER_PHASES.add(Phase.CONTACT_SETUP)
+# 齐射推荐器的"质量相近"容差（UI 偏好，非规则常量）：同档炮位数量下，与最佳修正差
+# 不超过该值时优先分散目标以避集火；差更大则仍选修正最佳者。
+GUNNERY_ASSIST_BAND = 3
 
 
 def d66_adjust(value: int, modifier: int) -> int:
@@ -117,7 +122,8 @@ class RuleData:
 
     @staticmethod
     def _range_value(rows: list[dict[str, Any]], distance: int) -> dict[str, Any]:
-        return next(row for row in rows if int(row["min"]) <= distance <= int(row["max"]))
+        # 同格（碰撞检定失败的舰只，distance=0）按最近射程行处理：下限钳到 1。
+        return next(row for row in rows if int(row["min"]) <= max(1, distance) <= int(row["max"]))
 
     def range_modifier(self, kind: str, distance: int, japanese: bool = False) -> int:
         row = self._range_value(self.modifiers["range_modifier"][kind], distance)
@@ -164,6 +170,8 @@ class RuleData:
         return {"effect": result[displacement_band], "additional": result.get("additional"), "armour_check": True}
 
     def penetration(self, nation: str, caliber: float, distance: int) -> float:
+        # 同格（碰撞检定失败，distance=0）按最近档处理。
+        distance = max(1, distance)
         distance_column = next(
             label
             for label, lower, upper in (
@@ -190,6 +198,10 @@ class IronBottomEngine:
         self.games: dict[str, GameState] = {}
         self.initial_states: dict[str, GameState] = {}
         self.rules = RuleData()
+        # 命中期望值实例级缓存：对抗评分在单次移动决策里对同一 (firepower, distance,
+        # target_speed) 求值约数万次，命中表/修正查表是该热点的唯一重复成本；
+        # 键与规则常量无关、跨游戏复用，行为与不缓存完全等价。
+        self._gunnery_expect_cache: dict[tuple[int, int, int], float] = {}
 
     def scenarios(self) -> list[dict[str, Any]]:
         return scenario_catalog()
@@ -225,21 +237,27 @@ class IronBottomEngine:
         except KeyError as error:
             raise KeyError(f"Unknown game {game_id}") from error
 
-    def observe(self, game_id: str, side: Side) -> PlayerObservation:
+    def observe(self, game_id: str, side: Side, debug: bool = False) -> PlayerObservation:
+        """调试模式（debug=True）解除战争迷雾：两阵营舰船/损伤/鱼雷/事件/比分全可见，
+        仅用于本地调试，不参与任何裁决路径。"""
         state = self.get(game_id)
         ships: list[PublicShip] = []
         all_safe_events = [
             event
             for event in state.events
-            if event.payload.get("secret_side") in (None, side.value)
-            and not self._hidden_damage_event(state, event, side)
+            if debug
+            or (
+                event.payload.get("secret_side") in (None, side.value)
+                and not self._hidden_damage_event(state, event, side)
+            )
         ]
         own_positions = [ship.position for ship in state.ships.values() if ship.side == side and not ship.sunk and ship.position]
         for ship in state.ships.values():
-            visible = ship.side == side or bool(ship.position and self._visible_to(state, ship, side, own_positions))
+            visible = debug or ship.side == side or bool(ship.position and self._visible_to(state, ship, side, own_positions))
             if not visible:
                 continue
-            hide_damage = state.options.optional_rules.hidden_damage and ship.side != side
+            reveal = debug or ship.side == side
+            hide_damage = not debug and state.options.optional_rules.hidden_damage and ship.side != side
             ships.append(
                 PublicShip(
                     id=ship.id,
@@ -255,12 +273,25 @@ class IronBottomEngine:
                     fired=ship.fired,
                     sunk=ship.sunk,
                     asset=ship.asset,
-                    max_speed=ship.max_speed_for_turn(state.turn) if ship.side == side else None,
-                    min_legal_speed=self._legal_speed_range(ship, state.turn)[0] if ship.side == side else None,
-                    max_legal_speed=self._legal_speed_range(ship, state.turn)[1] if ship.side == side else None,
-                    torpedo_type=ship.torpedo_type if ship.side == side else None,
-                    gun_mounts=deepcopy(ship.gun_mounts) if ship.side == side else [],
-                    torpedo_launchers=deepcopy(ship.torpedo_launchers) if ship.side == side else [],
+                    vp=ship.vp,
+                    max_speed=ship.max_speed_for_turn(state.turn) if reveal else None,
+                    speed_damage_crossed=list(ship.speed_damage_crossed) if reveal else None,
+                    speed_damage_track=[list(row) for row in ship.speed_damage_track] if reveal else None,
+                    min_legal_speed=self._legal_speed_range(ship, state.turn)[0] if reveal else None,
+                    max_legal_speed=self._legal_speed_range(ship, state.turn)[1] if reveal else None,
+                    torpedo_type=ship.torpedo_type if reveal else None,
+                    gun_mounts=deepcopy(ship.gun_mounts) if reveal else [],
+                    torpedo_launchers=deepcopy(ship.torpedo_launchers) if reveal else [],
+                    turn_limit_degrees=ship.turn_limit_degrees if reveal else None,
+                    forced_straight_turns=ship.forced_straight_turns if reveal else 0,
+                    forced_circle_turns=ship.forced_circle_turns if reveal else 0,
+                    forced_turn_side=ship.forced_turn_side if reveal else None,
+                    forced_speed=ship.forced_speed if reveal else None,
+                    mfc_destroyed=ship.mfc_destroyed if reveal else False,
+                    radar_destroyed=ship.radar_destroyed if reveal else False,
+                    bridge_destroyed=ship.bridge_destroyed if reveal else False,
+                    rudder_destroyed=ship.rudder_destroyed if reveal else False,
+                    captain_status=ship.captain_status if reveal else None,
                     combat_history=self._ship_combat_history(state, ship.id, all_safe_events),
                 )
             )
@@ -268,20 +299,21 @@ class IronBottomEngine:
         tracks = [
             track.model_copy(deep=True)
             for track in state.torpedo_tracks
-            if not state.options.optional_rules.blind_torpedoes
+            if debug
+            or not state.options.optional_rules.blind_torpedoes
             or track.side == side
             or bool(track.contact_ship_ids)
         ]
         markers: list[MarkerState] = []
         for marker in state.markers:
             if marker.kind == "contact":
-                if marker.position is None and marker.secret_side != side:
+                if marker.position is None and marker.secret_side != side and not debug:
                     continue
                 public_marker = marker.model_copy(deep=True)
-                if marker.secret_side != side:
+                if marker.secret_side != side and not debug:
                     public_marker.contact_truth = None
                 markers.append(public_marker)
-            elif marker.secret_side in (None, side):
+            elif marker.secret_side in (None, side) or debug:
                 markers.append(marker.model_copy(deep=True))
         return PlayerObservation(
             game_id=game_id,
@@ -296,9 +328,9 @@ class IronBottomEngine:
             torpedo_tracks=tracks,
             markers=markers,
             score=(
-                {Side.AXIS.value: 0, Side.ALLIES.value: 0}
-                if state.options.optional_rules.hidden_damage and state.phase != Phase.COMPLETE
-                else deepcopy(state.score)
+                deepcopy(state.score)
+                if debug or not (state.options.optional_rules.hidden_damage and state.phase != Phase.COMPLETE)
+                else {Side.AXIS.value: 0, Side.ALLIES.value: 0}
             ),
             recent_events=safe_events,
             winner=state.winner,
@@ -342,6 +374,7 @@ class IronBottomEngine:
                         related_ship_name=related.name if related else None,
                         rule=event.rule,
                         dice=event.dice,
+                        payload=event.payload,
                     )
                 )
         return history[-80:]
@@ -355,6 +388,72 @@ class IronBottomEngine:
         ship_id = event.payload.get("target") or event.payload.get("ship_id")
         return bool(ship_id in state.ships and state.ships[ship_id].side != side)
 
+    @staticmethod
+    def _damage_snapshot(ship: ShipState) -> dict[str, Any]:
+        """结算前状态快照：五个结算点以此为基准计算归一化损伤摘要。"""
+        return {
+            "hull": ship.hull,
+            "speed_damage_crossed": list(ship.speed_damage_crossed),
+            "fire_markers": ship.fire_markers,
+            "gun_mounts_destroyed": sum(1 for mount in ship.gun_mounts if mount.destroyed),
+            "torpedo_launchers_destroyed": sum(1 for launcher in ship.torpedo_launchers if launcher.destroyed),
+            "sunk": ship.sunk,
+            "mfc_destroyed": ship.mfc_destroyed,
+            "radar_destroyed": ship.radar_destroyed,
+            "bridge_destroyed": ship.bridge_destroyed,
+            "rudder_destroyed": ship.rudder_destroyed,
+            "captain_status": ship.captain_status,
+            "guns_disabled_turns": ship.guns_disabled_turns,
+            "turn_limit_degrees": ship.turn_limit_degrees,
+            "forced_straight_turns": ship.forced_straight_turns,
+            "forced_circle_turns": ship.forced_circle_turns,
+            "forced_speed": ship.forced_speed,
+            "forced_speed_turns": ship.forced_speed_turns,
+        }
+
+    @staticmethod
+    def _damage_delta(before: dict[str, Any], after: dict[str, Any]) -> dict[str, Any]:
+        """归一化损伤摘要：仅统计 actually 发生的差异，flag 只列置位项。"""
+        crossed_before = sum(before["speed_damage_crossed"])
+        crossed_after = sum(after["speed_damage_crossed"])
+        flags: dict[str, Any] = {}
+        for key in ("mfc_destroyed", "radar_destroyed", "bridge_destroyed", "rudder_destroyed"):
+            if after[key] and not before[key]:
+                flags[key] = True
+        if after["captain_status"] != before["captain_status"]:
+            flags["captain_status"] = after["captain_status"]
+        if after["guns_disabled_turns"] > before["guns_disabled_turns"]:
+            flags["guns_disabled_turns"] = after["guns_disabled_turns"]
+        if after["turn_limit_degrees"] != before["turn_limit_degrees"]:
+            flags["turn_limit_degrees"] = after["turn_limit_degrees"]
+        if after["forced_straight_turns"] > before["forced_straight_turns"]:
+            flags["forced_straight_turns"] = after["forced_straight_turns"]
+        if after["forced_circle_turns"] > before["forced_circle_turns"]:
+            flags["forced_circle_turns"] = after["forced_circle_turns"]
+        if after["forced_speed"] != before["forced_speed"]:
+            flags["forced_speed"] = after["forced_speed"]
+        if after["forced_speed_turns"] > before["forced_speed_turns"]:
+            flags["forced_speed_turns"] = after["forced_speed_turns"]
+        return {
+            "hull_lost": before["hull"] - after["hull"],
+            "speed_lost": crossed_after - crossed_before,
+            "fire_added": max(0, after["fire_markers"] - before["fire_markers"]),
+            "fire_remaining": after["fire_markers"],
+            "gun_mounts_destroyed": after["gun_mounts_destroyed"] - before["gun_mounts_destroyed"],
+            "torpedo_launchers_destroyed": after["torpedo_launchers_destroyed"] - before["torpedo_launchers_destroyed"],
+            "sank": bool(after["sunk"] and not before["sunk"]),
+            "flags": flags,
+        }
+
+    def _add_fire(self, state: GameState, ship: ShipState, attacker: ShipState | None = None, count: int = 1) -> None:
+        """统一加火源；首次点火者记入 ship.fire_source_attacker 供火灾沉没追溯。"""
+        if count <= 0:
+            return
+        ship.fire_markers += count
+        if ship.fire_source_attacker is None:
+            ship.fire_source_attacker = attacker.id if attacker is not None else None
+            ship.fire_source_turn = state.turn
+
     def legal_actions(self, game_id: str, side: Side) -> list[LegalAction]:
         state = self.get(game_id)
         if state.phase == Phase.COMPLETE:
@@ -362,9 +461,18 @@ class IronBottomEngine:
         if state.phase in ORDER_PHASES and side.value not in state.submitted_orders:
             schemas: dict[Phase, dict[str, Any]] = {
                 Phase.CONTACT_SETUP: {"contacts": "four edge markers; two real formations and two decoys"},
-                Phase.REINFORCEMENT: {"reinforcements": "entry_hex, heading, speed", "confirmation": {"ready": True}},
+                Phase.REINFORCEMENT: {
+                    "reinforcements": "entry_hex, heading, speed",
+                    "reinforcement_candidates": self._reinforcement_candidates(state, side),
+                    "confirmation": {"ready": True},
+                },
                 Phase.MOVEMENT_PLANNING: {
                     "movement": {"ship_id": "owned ship", "speed": "legal MF", "commands": "advance/turn_*"},
+                    "movement_candidates": [
+                        self.movement_candidates(state, ship)
+                        for ship in state.ships.values()
+                        if ship.side == side and ship.position is not None
+                    ],
                     "confirmation": {"ready": True},
                 },
                 Phase.TORPEDO_PLANNING: {
@@ -407,9 +515,370 @@ class IronBottomEngine:
                         and self._mount_can_bear(ship, target, mount.arcs)
                     ]
                     if mount_ids:
-                        targets.append({"target_id": target.id, "mount_ids": mount_ids})
+                        distance = ship.position.distance(target.position)
+                        caliber = max(
+                            (mount.caliber for mount in ship.gun_mounts if mount.id in mount_ids),
+                            default=ship.primary.caliber,
+                        )
+                        # 单人单目标固有修正（不含集火附加射手/多目标惩罚两项分配相关项）；
+                        # 修正值由引擎计算下发，前端不复制规则常量。
+                        modifier = self._gunnery_modifier(state, ship, target, distance, 1, caliber, 1)
+                        # 期望命中同样由引擎计算下发（规则公式唯一在引擎，AI 不复制）。
+                        expected_hits = sum(
+                            self.expected_gunnery_hits(mount.firepower, distance)
+                            for mount in ship.gun_mounts
+                            if mount.id in mount_ids
+                        )
+                        targets.append({
+                            "target_id": target.id,
+                            "mount_ids": mount_ids,
+                            "range": distance,
+                            "modifier": modifier,
+                            "expected_hits": expected_hits,
+                        })
             candidates.append({"ship_id": ship.id, "targets": targets, "blocked_reason": blocked_reason})
         return candidates
+
+    def gunnery_assist(
+        self, state: GameState, side: Side, assigned: list[dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
+        """为全舰齐射推荐目标分配（只读、不落库）。
+
+        优先级：1) 每舰优先射界炮位最多的目标（火力）→ 2) 同档内修正最佳（距离+各类修正；
+        D66 骰点越小越好、命中表低段命中更多，故修正为负更好、取最小修正为目标最佳）；
+        3) 修正差不超过 GUNNERY_ASSIST_BAND 时优先分散到负载最小目标，避免多舰集火同一目标。
+        `assigned` 为草稿中既有齐射 {ship_id,target_id}：这些舰不再推荐，其目标计入负载。
+        目标/射界/修正全部来自引擎 `_gunnery_candidates`，前端不复制任何规则常量。
+        """
+        candidates = self._gunnery_candidates(state, side)
+        load: dict[str, int] = {}
+        already = set()
+        for entry in assigned or []:
+            ship_id, target_id = entry.get("ship_id"), entry.get("target_id")
+            if ship_id and target_id:
+                already.add(ship_id)
+                load[target_id] = load.get(target_id, 0) + 1
+        options: list[dict[str, Any]] = []
+        excluded: list[dict[str, Any]] = []
+        for candidate in candidates:
+            if candidate["ship_id"] in already:
+                continue
+            if candidate["blocked_reason"] or not candidate["targets"]:
+                excluded.append({
+                    "ship_id": candidate["ship_id"],
+                    "reason": candidate["blocked_reason"] or "当前无合法目标/射界",
+                })
+                continue
+            options.append(candidate)
+        # 越受限越先分配：目标少的舰先选，灵活舰后补空档，避免把资源耗在同一目标上。
+        options.sort(key=lambda item: (len(item["targets"]), -max(len(t["mount_ids"]) for t in item["targets"])))
+        recommendations: list[dict[str, Any]] = []
+        for candidate in options:
+            targets = candidate["targets"]
+            max_mounts = max(len(t["mount_ids"]) for t in targets)
+            tier = [t for t in targets if len(t["mount_ids"]) == max_mounts]
+            # D66 命中表骰点越小越好：修正为负更好，最佳修正 = 最小的修正值。
+            best_modifier = min(t["modifier"] for t in tier)
+            band = [t for t in tier if t["modifier"] <= best_modifier + GUNNERY_ASSIST_BAND]
+            chosen = min(band, key=lambda t: (load.get(t["target_id"], 0), t["modifier"], t["range"]))
+            load[chosen["target_id"]] = load.get(chosen["target_id"], 0) + 1
+            recommendations.append({
+                "ship_id": candidate["ship_id"],
+                "target_id": chosen["target_id"],
+                "mount_ids": chosen["mount_ids"],
+                "range": chosen["range"],
+                "modifier": chosen["modifier"],
+                "expected_hits": chosen["expected_hits"],
+            })
+        return {"recommendations": recommendations, "excluded": excluded}
+
+    def gunnery_target_options(self, state: GameState, side: Side) -> list[dict[str, Any]]:
+        """只读：每舰全部合法炮击目标选项（含 `expected_hits`），供 AI 概率抽样。
+        与 `gunnery_assist` 的"每舰一条推荐"不同，这里返回每舰每个合法目标一条。"""
+        return self._gunnery_candidates(state, side)
+
+    @staticmethod
+    def _ship_fire_heat(ship: ShipState, viewer: Side, expected_hits, cells: list[HexCoord]) -> dict[str, float]:
+        """单舰射界热力：可指向该格的炮位 `firepower × 期望命中` 之和。
+
+        热值 = Σ 每门炮 firepower × 该距离的 D66 期望命中数（用户公式）；火力大的炮位贡献更大，
+        多炮位/多舰线性叠加。本方用真实状态（已毁炮位剔除）；敌方按记录全炮位（不剔除已毁，
+        避免隐藏损伤泄漏）。与 `field_of_fire_heatmap` 全方模式共用同一公式。
+        """
+        heat: dict[str, float] = {}
+        for mount in ship.gun_mounts:
+            if ship.side == viewer and mount.destroyed:
+                continue
+            for cell in cells:
+                if cell == ship.position:
+                    continue
+                if IronBottomEngine._relative_aspect(ship.position, ship.heading, cell) not in mount.arcs:
+                    continue
+                value = expected_hits(mount.firepower, ship.position.distance(cell))
+                if value <= 0:
+                    continue
+                heat[cell.label] = heat.get(cell.label, 0.0) + mount.firepower * value
+        return heat
+
+    def expected_gunnery_hits(self, firepower: int, distance: int, target_speed: int = 4) -> float:
+        """单门炮对指定距离的 D66 期望命中数：对 36 档 D66 全举
+        `d66_adjust(roll, 距离修正 + 目标航速修正)` 后查命中表取均值。
+
+        命中表/距离/航速修正是规则常量，全部由引擎唯一计算并下发；热力图与
+        战术 AI 的 `ship_gun_pressure` 共用本方法，避免公式在引擎外复制。
+        """
+        key = (firepower, distance, target_speed)
+        cached = self._gunnery_expect_cache.get(key)
+        if cached is not None:
+            return cached
+        speed_mod = self.rules.target_speed_modifier("gunnery", target_speed)
+        value = sum(
+            self.rules.hit_count(
+                firepower,
+                d66_adjust(roll, self.rules.range_modifier("gunnery", distance) + speed_mod),
+            )
+            for roll in D66_VALUES
+        ) / len(D66_VALUES)
+        self._gunnery_expect_cache[key] = value
+        return value
+
+    def ship_gun_pressure(
+        self, state: GameState, ship: ShipState,
+        position: HexCoord | None = None, heading: int | None = None,
+        target_hexes: list[HexCoord] | None = None,
+    ) -> float:
+        """舰在（可选假想）位/航向下对目标格的火力压力：Σ 可指向该格的未毁炮位
+        `firepower × 期望命中`。
+
+        默认 `target_hexes` = 本方可见敌舰格（`_visible_to` 与 observe/热力图同源，
+        不泄漏隐蔽舰位置）。战术 AI 在候选移动位/航向上调用本方法做"让敌方处于
+        我方火力覆盖"的打分；命中公式唯一在 `expected_gunnery_hits`。
+        """
+        position = position if position is not None else ship.position
+        heading = heading if heading is not None else ship.heading
+        if position is None:
+            return 0.0
+        if target_hexes is None:
+            own_positions = [
+                other.position for other in state.ships.values()
+                if other.side == ship.side and not other.sunk and other.position
+            ]
+            target_hexes = [
+                enemy.position for enemy in state.ships.values()
+                if enemy.side != ship.side and not enemy.sunk and enemy.position
+                and self._visible_to(state, enemy, ship.side, own_positions)
+            ]
+        total = 0.0
+        for mount in ship.gun_mounts:
+            if mount.destroyed:
+                continue
+            for target in target_hexes:
+                if target == position:
+                    continue
+                if self._relative_aspect(position, heading, target) not in mount.arcs:
+                    continue
+                total += mount.firepower * self.expected_gunnery_hits(mount.firepower, position.distance(target))
+        return total
+
+    def field_of_fire_heatmap(self, state: GameState, viewer: Side, ship_id: str | None = None, target_speed: int = 4) -> dict[str, Any]:
+        """只读射界热力图：把双方各舰每门可射火炮的射界/射程覆盖叠加到地图每格。
+
+        热值 = Σ 可指向该格的炮位 `firepower` × 该格 D66 期望命中数。期望命中 = 对 36 档
+        D66 全举 `d66_adjust(roll, 距离修正 + 目标航速修正)` 后查命中表取均值；近格修正更负 →
+        期望命中更高 → 更热；跨舰/跨炮线性叠加。
+
+        `target_speed` 是假定被射击目标的航速，其修正按已验证的目标航速表
+        `target_speed_modifier("gunnery", speed)` 取值（0→-18、1→-9、2-3→-4、4+→0），默认
+        航速 4 → 修正 0。命中表/距离/航速修正是规则常量，全部由引擎唯一计算并下发，前端只渲染颜色。
+
+        本方用真实状态（已毁炮位剔除）；敌方按记录全炮位（不泄漏隐藏损伤），且只含
+        `_visible_to` 可见敌舰（不泄漏隐蔽舰位置）。
+
+        `ship_id` 给定时只算该舰（"选中哪艘就展示哪艘"），所属方填充该舰热值，另一侧为空；
+        本方舰走真实炮位、敌方舰走记录炮位，敌方舰仍须可见（兜底，前端只能选到已渲染的可见舰）。
+        """
+        expected: dict[tuple[int, int], float] = {}
+
+        def expected_hits(firepower: int, distance: int) -> float:
+            key = (firepower, distance)
+            if key not in expected:
+                expected[key] = self.expected_gunnery_hits(firepower, distance, target_speed)
+            return expected[key]
+
+        cells = [
+            HexCoord(q=q, r=row - (q - (q & 1)) // 2)
+            for q in range(34)
+            for row in range(27)
+        ]
+        own_positions = [
+            ship.position for ship in state.ships.values()
+            if ship.side == viewer and not ship.sunk and ship.position
+        ]
+
+        def empty_side() -> dict[str, Any]:
+            return {"hexes": {}, "max_heat": 0.0, "ships": []}
+
+        if ship_id is not None:
+            target = state.ships.get(ship_id)
+            if target is None or target.sunk or not target.position:
+                return {"viewer": viewer.value, "sides": {s.value: empty_side() for s in (Side.AXIS, Side.ALLIES)}}
+            if target.side != viewer and not self._visible_to(state, target, viewer, own_positions):
+                return {"viewer": viewer.value, "sides": {s.value: empty_side() for s in (Side.AXIS, Side.ALLIES)}}
+            heat = self._ship_fire_heat(target, viewer, expected_hits, cells)
+            sides: dict[str, Any] = {s.value: empty_side() for s in (Side.AXIS, Side.ALLIES)}
+            sides[target.side.value] = {
+                "hexes": {label: round(value, 4) for label, value in sorted(heat.items())},
+                "max_heat": round(max(heat.values(), default=0.0), 4),
+                "ships": [{
+                    "ship_id": target.id,
+                    "name": target.name,
+                    "position": target.position.label,
+                    "heading": target.heading,
+                }],
+            }
+            return {"viewer": viewer.value, "sides": sides}
+
+        sides: dict[str, Any] = {}
+        for side in (Side.AXIS, Side.ALLIES):
+            heat: dict[str, float] = {}
+            ships_info: list[dict[str, Any]] = []
+            for ship in state.ships.values():
+                if ship.sunk or not ship.position or ship.side != side:
+                    continue
+                if side != viewer and not self._visible_to(state, ship, viewer, own_positions):
+                    continue
+                if ship.gun_mounts:
+                    ships_info.append({
+                        "ship_id": ship.id,
+                        "name": ship.name,
+                        "position": ship.position.label,
+                        "heading": ship.heading,
+                    })
+                for label, value in self._ship_fire_heat(ship, viewer, expected_hits, cells).items():
+                    heat[label] = heat.get(label, 0.0) + value
+            sides[side.value] = {
+                "hexes": {label: round(value, 4) for label, value in sorted(heat.items())},
+                "max_heat": round(max(heat.values(), default=0.0), 4),
+                "ships": ships_info,
+            }
+        return {"viewer": viewer.value, "sides": sides}
+
+    def _reinforcement_candidates(self, state: GameState, side: Side) -> dict[str, Any]:
+        """本回合本方待入场增援与入场信息（只读，供增援阶段 UI 使用）。
+
+        只列本方 `reinforcement_turn == 当前回合` 且尚未入场的舰船；入口走廊格按
+        `_reinforcement_entry_legal`（E17-U27 最短六角边走廊）枚举。检定结果取最后一条
+        `reinforcement_roll` 事件。前端据此展示"检定失败/未到回合"或逐舰入场表。
+        """
+        pending = [
+            ship for ship in state.ships.values()
+            if ship.side == side and ship.position is None and ship.reinforcement_turn == state.turn
+        ]
+        entry_hexes: list[str] = []
+        if state.reinforcement_entry_start is not None and state.reinforcement_entry_end is not None:
+            for q in range(1, 34):
+                for r in range(1, 28):
+                    candidate = HexCoord(q=q, r=r)
+                    if self._reinforcement_entry_legal(state, candidate):
+                        entry_hexes.append(candidate.label)
+        roll_result = None
+        for event in reversed(state.events):
+            if event.type == "reinforcement_roll":
+                roll_result = {
+                    "roll": event.payload["roll"],
+                    "available": event.payload["available"],
+                }
+                break
+        return {
+            "group_available": bool(state.reinforcement_available),
+            "arrival_turn": state.reinforcement_arrival_turn,
+            "trigger_turn": state.reinforcement_trigger_turn,
+            "succeeds_on": list(state.reinforcement_succeeds_on),
+            "roll_result": roll_result,
+            "entry_range": [
+                state.reinforcement_entry_start.label, state.reinforcement_entry_end.label,
+            ] if state.reinforcement_entry_start is not None else None,
+            "entry_hexes": entry_hexes,
+            "ships": [
+                {
+                    "ship_id": ship.id,
+                    "name": ship.name,
+                    "asset": ship.asset,
+                    "max_speed": ship.max_speed_for_turn(state.turn),
+                }
+                for ship in sorted(pending, key=lambda item: item.id)
+            ],
+        }
+
+    def movement_plan_trajectories(
+        self, state: GameState, side: Side, plans: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        """本回合已编排移动计划的逐舰航迹（只读，供地图画线/目标点淡算子）。
+
+        逐舰复用 `movement_preview`：引擎计算航迹，前端只画线。非本方/无位舰返回
+        invalid 条目而不是抛错，便于前端一次批量画草稿里全部计划。
+        """
+        trajectories: list[dict[str, Any]] = []
+        for entry in plans:
+            ship_id = entry.get("ship_id")
+            plan = entry.get("plan", "0")
+            ship = state.ships.get(ship_id)
+            if not ship or ship.side != side or ship.sunk or not ship.position:
+                trajectories.append({
+                    "ship_id": ship_id,
+                    "plan": plan,
+                    "cost": 0,
+                    "valid": False,
+                    "commitable": False,
+                    "errors": ["该舰不可规划移动"],
+                    "trajectory": [],
+                    "end_hex": None,
+                    "end_heading": None,
+                })
+                continue
+            preview = self.movement_preview(state, ship, plan=plan)
+            trajectories.append({
+                "ship_id": ship_id,
+                "plan": plan,
+                "cost": preview["cost"],
+                "valid": preview["valid"],
+                "commitable": preview["commitable"],
+                "errors": preview["errors"],
+                "trajectory": preview["trajectory"],
+                "end_hex": preview["current_label"],
+                "end_heading": preview["current_heading"],
+            })
+        return {"trajectories": trajectories}
+
+    def sealed_movement_trajectories(
+        self, state: GameState, side: Side, debug: bool = False,
+    ) -> dict[str, Any]:
+        """从已封存的移动计划重放本回合逐舰航迹（供鱼雷计划阶段保留显示）。
+
+        移动阶段结束时双方计划已封存；鱼雷计划阶段调用本接口把航迹画回地图。
+        默认只含本方（敌方计划属机密），调试模式（debug=True）下全阵营可见。
+        """
+        trajectories: list[dict[str, Any]] = []
+        for batch in self._sealed_batches(state, Phase.MOVEMENT_PLANNING):
+            for movement in batch.movement:
+                ship = state.ships.get(movement.ship_id)
+                if not ship or ship.sunk or not ship.position:
+                    continue
+                if ship.side != side and not debug:
+                    continue
+                preview = self.movement_preview(state, ship, plan=movement.plan or "0")
+                trajectories.append({
+                    "ship_id": ship.id,
+                    "name": ship.name,
+                    "side": ship.side.value,
+                    "plan": movement.plan or "0",
+                    "cost": preview["cost"],
+                    "valid": preview["valid"],
+                    "trajectory": preview["trajectory"],
+                    "end_hex": preview["current_label"],
+                    "end_heading": preview["current_heading"],
+                })
+        return {"trajectories": trajectories}
 
     def _torpedo_candidates(self, state: GameState, side: Side) -> list[dict[str, Any]]:
         candidates: list[dict[str, Any]] = []
@@ -447,6 +916,7 @@ class IronBottomEngine:
                     "loaded": launcher.loaded,
                     "sides": [arc.value for arc in launcher.arcs if arc in {FiringArc.PORT, FiringArc.STARBOARD}],
                     "angles": self.rules.torpedo_launch_directions["angles"],
+                    "relative_heading": self.rules.torpedo_launch_directions["relative_heading"],
                 }
                 for launcher in ship.torpedo_launchers
                 if not launcher.destroyed and not launcher.reload_turns_remaining and launcher.loaded > 0
@@ -464,6 +934,304 @@ class IronBottomEngine:
                 "blocked_reason": blocked_reason or ("缺少已封存的移动计划" if not movement else None),
             })
         return candidates
+
+    @staticmethod
+    def torpedo_hit_count(aspect: str, adjusted: int) -> int:
+        """IBS-R-08.2 鱼雷命中阈值，从 _resolve_torpedoes 提取，引擎与推荐器共用防漂移。"""
+        if aspect == "broadside":
+            return 2 if adjusted >= 13 else (1 if adjusted >= 11 else 0)
+        return 1 if adjusted >= 13 else 0
+
+    @staticmethod
+    def expected_torpedo_hits(aspect: str, modifier: int, salvo_size: int) -> float:
+        """2D6 36 结果穷举的期望命中数（按齐射枚数封顶，与结算一致）。"""
+        total = 0
+        for die_one in range(1, 7):
+            for die_two in range(1, 7):
+                total += min(IronBottomEngine.torpedo_hit_count(aspect, die_one + die_two + modifier), salvo_size)
+        return total / 36
+
+    @staticmethod
+    def torpedo_hit_probability(aspect: str, modifier: int) -> float:
+        """至少 1 发命中的概率（2D6 36 结果穷举）。"""
+        hits = 0
+        for die_one in range(1, 7):
+            for die_two in range(1, 7):
+                if IronBottomEngine.torpedo_hit_count(aspect, die_one + die_two + modifier) >= 1:
+                    hits += 1
+        return hits / 36
+
+    def _project_torpedo_path(
+        self, state: GameState, torpedo_type: str, launch_hex: HexCoord,
+        heading: int, setting_index: int, launch_at_mf: int,
+        launch_angle: str = "A", ship_heading: int | None = None,
+    ) -> dict[str, Any]:
+        """纯几何直线投影，与 _resolve_movement 鱼雷循环一致：逐格直行、
+        range_remaining 递减、触陆/越界截停；跨回合按 speed_cycle[(回合-发射)%3]
+        推进（发射回合首段扣已耗 MF）。起点按锚点偏移（B 船尾外 1 格、X 船头外
+        1 格）落格。"""
+        definition = self.rules.torpedoes[torpedo_type]
+        setting = definition["settings"][setting_index]
+        cycle = setting["speed"]
+        position = self._torpedo_anchor_hex(launch_hex, ship_heading or heading, launch_angle)
+        path: list[HexCoord] = [position]
+        distance_travelled = 0
+        range_remaining = int(setting["range"])
+        obstacle: str | None = None
+        rel_turn = 0
+        allowance = max(0, int(cycle[0]) - launch_at_mf)
+        while range_remaining > 0:
+            if allowance <= 0:
+                rel_turn += 1
+                allowance = int(cycle[rel_turn % 3])
+                continue
+            try:
+                next_position = position.neighbor(heading)
+            except ValueError:
+                obstacle = "edge"
+                break
+            if self._terrain_impassable(state, next_position):
+                obstacle = "land"
+                break
+            position = next_position
+            path.append(position)
+            distance_travelled += 1
+            range_remaining -= 1
+            allowance -= 1
+        return {
+            "start_hex": path[0].label,
+            "end_hex": position.label,
+            "heading": heading,
+            "path": [coord.label for coord in path],
+            "distance_travelled": distance_travelled,
+            "range_remaining": range_remaining,
+            "obstacle": obstacle,
+        }
+
+    def _project_target_position(self, state: GameState, ship: ShipState, turns: int) -> HexCoord | None:
+        """可见信息匀速直线外推：目标沿当前航向每回合走 current_speed 格，触界钳制。"""
+        position = ship.position
+        if position is None or turns <= 0:
+            return position
+        for _ in range(turns * max(0, ship.current_speed)):
+            try:
+                position = position.neighbor(ship.heading)
+            except ValueError:
+                break
+        return position
+
+    def _assist_intercept(
+        self, state: GameState, torpedo_type: str, launch_hex: HexCoord, heading: int,
+        setting_index: int, launch_at_mf: int, target: ShipState,
+        launch_angle: str = "A", ship_heading: int | None = None,
+    ) -> tuple[HexCoord | None, int, str | None, int]:
+        """逐 impulse 同时推进鱼雷与目标，返回 (交点, 鱼雷到交点距离, 截停原因, 第几回合)。
+        与 _resolve_movement 同步移动语义一致：同格即接触，船撞静止雷也算；
+        发射回合目标在发射前领先 launch_at_mf 步。起点按锚点偏移落格。"""
+        definition = self.rules.torpedoes[torpedo_type]
+        setting = definition["settings"][setting_index]
+        cycle = setting["speed"]
+        position = self._torpedo_anchor_hex(launch_hex, ship_heading or heading, launch_angle)
+        target_position = target.position
+        target_speed = max(0, target.current_speed)
+        distance = 0
+        range_remaining = int(setting["range"])
+        rel_turn = 0
+        allowance = max(0, int(cycle[0]) - launch_at_mf)
+        target_moved = min(launch_at_mf, target_speed)
+        for _ in range(target_moved):
+            try:
+                target_position = target_position.neighbor(target.heading)
+            except ValueError:
+                break
+        while range_remaining > 0:
+            target_remaining = target_speed - target_moved
+            if allowance <= 0 and target_remaining <= 0:
+                rel_turn += 1
+                allowance = int(cycle[rel_turn % 3])
+                target_moved = 0
+                continue
+            for _ in range(max(allowance, target_remaining)):
+                if allowance > 0 and range_remaining > 0:
+                    try:
+                        next_position = position.neighbor(heading)
+                    except ValueError:
+                        return None, max(1, distance), "edge", rel_turn
+                    if self._terrain_impassable(state, next_position):
+                        return None, max(1, distance), "land", rel_turn
+                    position = next_position
+                    distance += 1
+                    range_remaining -= 1
+                    allowance -= 1
+                if target_remaining > 0:
+                    try:
+                        target_position = target_position.neighbor(target.heading)
+                    except ValueError:
+                        pass
+                    target_moved += 1
+                    target_remaining -= 1
+                if position == target_position:
+                    return position, max(1, distance), None, rel_turn
+                if allowance <= 0 and target_remaining <= 0:
+                    break
+            if range_remaining <= 0:
+                break
+        return None, max(1, distance), None, rel_turn
+
+    def _assist_launch_combos(self, state: GameState, side: Side) -> list[dict[str, Any]]:
+        """枚举某阵营当前可发射的全部合法组合（复用 _torpedo_candidates 为唯一事实来源）。"""
+        combos: list[dict[str, Any]] = []
+        for candidate in self._torpedo_candidates(state, side):
+            if candidate["blocked_reason"]:
+                continue
+            ship = state.ships[candidate["ship_id"]]
+            for launcher in candidate["launchers"]:
+                salvo_size = int(launcher["loaded"])
+                for launch_position in candidate["launch_positions"]:
+                    for launch_side in launcher["sides"]:
+                        for launch_angle in launcher["angles"]:
+                            for setting in candidate["settings"]:
+                                combos.append({
+                                    "ship_id": ship.id,
+                                    "launcher_id": launcher["launcher_id"],
+                                    "launch_at_mf": int(launch_position["mf"]),
+                                    "launch_hex": HexCoord(**launch_position["hex"]),
+                                    "launch_heading": int(launch_position["heading"]),
+                                    "launch_side": launch_side,
+                                    "launch_angle": launch_angle,
+                                    "setting_index": int(setting["index"]),
+                                    "salvo_size": salvo_size,
+                                })
+        return combos
+
+    def _assist_launch_from_dict(
+        self, state: GameState, side: Side, launch: dict[str, Any],
+    ) -> dict[str, Any] | None:
+        """从 API 下发的单个发射参数还原组合（launch_hex/舰首取自已封存移动计划）。"""
+        ship = state.ships.get(launch.get("ship_id"))
+        if not ship or ship.side != side:
+            return None
+        candidate = next(
+            (item for item in self._torpedo_candidates(state, side) if item["ship_id"] == ship.id), None
+        )
+        if not candidate or candidate["blocked_reason"]:
+            return None
+        launcher = next(
+            (item for item in candidate["launchers"] if item["launcher_id"] == launch.get("launcher_id")), None
+        )
+        if not launcher:
+            return None
+        launch_at_mf = int(launch.get("launch_at_mf", 0))
+        position = next(
+            (item for item in candidate["launch_positions"] if item["mf"] == launch_at_mf), None
+        )
+        if not position:
+            return None
+        launch_side = launch.get("launch_side")
+        launch_angle = launch.get("launch_angle")
+        if launch_side not in launcher["sides"] or launch_angle not in launcher["angles"]:
+            return None
+        setting_index = int(launch.get("setting_index", 0))
+        if setting_index >= len(candidate["settings"]):
+            return None
+        return {
+            "ship_id": ship.id,
+            "launcher_id": launcher["launcher_id"],
+            "launch_at_mf": launch_at_mf,
+            "launch_hex": HexCoord(**position["hex"]),
+            "launch_heading": int(position["heading"]),
+            "launch_side": launch_side,
+            "launch_angle": launch_angle,
+            "setting_index": setting_index,
+            "salvo_size": int(launcher["loaded"]),
+        }
+
+    def _assist_evaluate(
+        self, state: GameState, target: ShipState, combo: dict[str, Any],
+    ) -> dict[str, Any]:
+        """对单个组合投影鱼雷航迹、推算与目标外推的交点、命中概率与期望命中。"""
+        ship = state.ships[combo["ship_id"]]
+        torpedo_type = ship.torpedo_type or ""
+        torpedo_heading = self._torpedo_launch_heading(
+            int(combo["launch_heading"]), combo["launch_side"], combo["launch_angle"]
+        )
+        ship_heading = int(combo["launch_heading"])
+        projection = self._project_torpedo_path(
+            state, torpedo_type, combo["launch_hex"], torpedo_heading,
+            int(combo["setting_index"]), int(combo["launch_at_mf"]),
+            combo["launch_angle"], ship_heading,
+        )
+        intercept_hex, distance, obstacle, intercept_turn = self._assist_intercept(
+            state, torpedo_type, combo["launch_hex"], torpedo_heading,
+            int(combo["setting_index"]), int(combo["launch_at_mf"]), target,
+            combo["launch_angle"], ship_heading,
+        )
+        result: dict[str, Any] = {
+            **combo,
+            "torpedo_heading": torpedo_heading,
+            "launch_hex": combo["launch_hex"].label,
+            "distance": max(1, distance),
+            "aspect": None,
+            "modifier": None,
+            "hit_probability": None,
+            "expected_hits": 0,
+            "intercept_hex": intercept_hex.label if intercept_hex else None,
+            "intercept_turn": intercept_turn,
+            "predicted_path": projection["path"],
+            "predicted_end": projection["end_hex"],
+            "blocked_reason": obstacle,
+        }
+        if intercept_hex:
+            source_bearing = ((torpedo_heading + 2) % 6) + 1
+            relative = (source_bearing - target.heading) % 6
+            aspect = "bow_stern" if relative in {0, 3} else "broadside"
+            modifier = self._torpedo_modifier(ship, target, distance)
+            result["aspect"] = aspect
+            result["modifier"] = modifier
+            result["hit_probability"] = self.torpedo_hit_probability(aspect, modifier)
+            result["expected_hits"] = self.expected_torpedo_hits(aspect, modifier, int(combo["salvo_size"]))
+        return result
+
+    def torpedo_assist(
+        self, state: GameState, side: Side,
+        target_id: str | None = None, launch: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """鱼雷辅助推荐：仅用可见信息（目标当前航向/航速匀速外推），按期望命中
+        降序返回合法组合与预测航迹；不读敌方封存计划。给 launch 只算该组合。"""
+        target: ShipState | None = None
+        if target_id and target_id in state.ships:
+            chosen = state.ships[target_id]
+            if chosen.side != side and not chosen.sunk and chosen.position:
+                target = chosen
+        if target is None:
+            own = [ship for ship in state.ships.values() if ship.side == side and ship.position and not ship.sunk]
+            enemies = [ship for ship in state.ships.values() if ship.side != side and ship.position and not ship.sunk]
+            if own and enemies:
+                target = min(enemies, key=lambda enemy: min(enemy.position.distance(ship.position) for ship in own))
+        if target is None:
+            return {"target_id": None, "target_name": None, "projected_target": None, "combos": []}
+        if launch is not None:
+            combo = self._assist_launch_from_dict(state, side, launch)
+            combos = [self._assist_evaluate(state, target, combo)] if combo else []
+        else:
+            combos = [self._assist_evaluate(state, target, combo) for combo in self._assist_launch_combos(state, side)]
+        combos = [combo for combo in combos if combo]
+        combos.sort(key=lambda combo: (-combo["expected_hits"], combo["distance"]))
+        top = combos[:12]
+        best_turn = top[0]["intercept_turn"] if top and top[0]["intercept_hex"] else 0
+        projected = self._project_target_position(state, target, best_turn)
+        return {
+            "target_id": target.id,
+            "target_name": target.name,
+            "projected_target": {
+                "hex": projected.model_dump(mode="json") if projected else None,
+                "label": projected.label if projected else None,
+                "heading": target.heading,
+                "speed": target.current_speed,
+                "turns": best_turn,
+            },
+            "combos": top,
+        }
 
     def validate_orders(self, game_id: str, batch: OrderBatch) -> ValidationResult:
         state = self.get(game_id)
@@ -663,6 +1431,12 @@ class IronBottomEngine:
                 expected_hex = ship.position if order.launch_at_mf == 0 else trajectory[order.launch_at_mf - 1][0]
                 if not order.launch_hex or order.launch_hex != expected_hex:
                     errors.append(f"{order.ship_id}: launch_hex does not match its MF position")
+                expected_heading = ship.heading if order.launch_at_mf == 0 else trajectory[order.launch_at_mf - 1][1]
+                if order.bearing is not None and order.bearing != expected_heading:
+                    errors.append(
+                        f"{order.ship_id}: bearing {order.bearing} does not match ship heading "
+                        f"{expected_heading} at launch MF {order.launch_at_mf}"
+                    )
         if state.phase == Phase.TORPEDO_PLANNING:
             launcher_keys = [(order.ship_id, order.launcher_id) for order in batch.torpedoes]
             if len(launcher_keys) != len(set(launcher_keys)):
@@ -923,6 +1697,421 @@ class IronBottomEngine:
                 heading = ((heading + 1) % 6) + 1
                 trajectory.append((position, heading, None))
         return trajectory, heading
+
+    @staticmethod
+    def commands_to_plan(commands: list[str]) -> str:
+        """Compress a command list back into the plan shorthand (1P2S...)."""
+        tokens: list[str] = []
+        advances = 0
+        mapping = {
+            "turn_port_60": "P",
+            "turn_starboard_60": "S",
+            "turn_port_120": "PP",
+            "turn_starboard_120": "SS",
+        }
+        for command in commands:
+            if command == "advance":
+                advances += 1
+            else:
+                if advances:
+                    tokens.append(str(advances))
+                    advances = 0
+                tokens.append(mapping[command])
+        if advances:
+            tokens.append(str(advances))
+        return "".join(tokens) if tokens else "0"
+
+    @staticmethod
+    def _path_to_commands(position: HexCoord, heading: int, hexes: list[HexCoord]) -> list[str]:
+        """Convert a click/drag hex path into movement commands from an explicit
+        start state, turning as needed between adjacent steps. 180-degree
+        reversals are rejected outright."""
+        commands: list[str] = []
+        for target in hexes:
+            if position.distance(target) != 1:
+                raise ValueError(
+                    f"Movement path step {position.label} → {target.label} is not adjacent"
+                )
+            bearing = IronBottomEngine._bearing_between(position, target)
+            relative = (bearing - heading) % 6
+            if relative == 0:
+                commands.append("advance")
+            elif relative == 1:
+                commands.extend(["turn_starboard_60", "advance"])
+            elif relative == 5:
+                commands.extend(["turn_port_60", "advance"])
+            elif relative == 2:
+                commands.extend(["turn_starboard_120", "advance"])
+            elif relative == 4:
+                commands.extend(["turn_port_120", "advance"])
+            else:
+                raise ValueError(
+                    f"Movement path cannot reverse 180 degrees at {position.label}"
+                )
+            position = target
+            heading = bearing
+        return commands
+
+    @staticmethod
+    def path_to_commands(ship: ShipState, hexes: list[HexCoord]) -> list[str]:
+        """Ship convenience wrapper over _path_to_commands starting from the
+        ship's current position and heading."""
+        if not ship.position:
+            raise ValueError(f"{ship.name} has no position to plan movement from")
+        return IronBottomEngine._path_to_commands(ship.position, ship.heading, hexes)
+
+    @staticmethod
+    def _turn_side(heading: int, new_heading: int) -> str:
+        return "starboard" if (new_heading - heading) % 6 == 1 else "port"
+
+    @staticmethod
+    def _forced_constraints(ship: ShipState) -> dict[str, Any]:
+        return {
+            "turn_limit_degrees": ship.turn_limit_degrees,
+            "forced_straight_turns": ship.forced_straight_turns,
+            "forced_circle_turns": ship.forced_circle_turns,
+            "forced_turn_side": ship.forced_turn_side,
+            "forced_speed": ship.forced_speed,
+        }
+
+    @staticmethod
+    def _movement_expand(
+        state: GameState, ship: ShipState,
+        position: HexCoord, heading: int, cost: int, last: str | None, turned_flag: bool,
+        maximum: int,
+    ) -> Iterable[tuple[HexCoord, int, int, str, bool, str]]:
+        """单状态合法转移枚举器：`_movement_reachable` 与 `movement_path` 共用。
+
+        逐分支等价于原 `_movement_reachable` 的展开逻辑（首命令 advance、转后必接
+        advance、60° 免费、120° 计 1MF、forced/界/陆约束）。产出
+        `(new_pos, new_head, new_cost, new_last, new_turned, action)`。
+        """
+        turn_ok = not ship.forced_straight_turns
+        turn_120_ok = turn_ok and ship.turn_limit_degrees != 60 and not ship.forced_circle_turns
+        circle_side = ship.forced_turn_side if ship.forced_circle_turns else None
+        if cost < maximum:
+            try:
+                target = position.neighbor(heading)
+            except ValueError:
+                target = None
+            if target is not None and not IronBottomEngine._terrain_impassable(state, target):
+                yield target, heading, cost + 1, "advance", turned_flag, "advance"
+        if last == "advance" and turn_ok:
+            port60 = 6 if heading == 1 else heading - 1
+            starboard60 = 1 if heading == 6 else heading + 1
+            for new_head, action in (
+                (port60, "turn_port_60"),
+                (starboard60, "turn_starboard_60"),
+            ):
+                if circle_side and IronBottomEngine._turn_side(heading, new_head) != circle_side:
+                    continue
+                yield position, new_head, cost, action, True, action
+            if turn_120_ok and cost + 1 <= maximum:
+                port120 = ((heading - 3) % 6) + 1
+                starboard120 = ((heading + 1) % 6) + 1
+                for new_head, action in (
+                    (port120, "turn_port_120"),
+                    (starboard120, "turn_starboard_120"),
+                ):
+                    yield position, new_head, cost + 1, action, True, action
+
+    def movement_path(
+        self, state: GameState, ship: ShipState,
+        target_hex: HexCoord, heading: int | None = None,
+    ) -> dict[str, Any]:
+        """从舰当前位/航向到 `target_hex`（可选固定末航向）的最短合法命令路径。
+
+        用与 `movement_candidates` 完全相同的状态机（`_movement_expand`）做 0-1 BFS
+        （转向=0 成本边进队首、推进=1 成本边进队尾，保证首次弹出的状态即最短路径），
+        记录 parent，返回 `{valid, reason, commands, plan, cost, end_hex,
+        end_heading}`。终态须落在 `[min,max]` 成本内且末动作合法；`heading` 给定
+        时末航向须匹配（不可达则该航向返回 `valid=False`，调用方回退）。纯只读。
+        """
+        if not ship.position:
+            return {"valid": False, "reason": "ship has no position"}
+        minimum, maximum = self._legal_speed_range(ship, state.turn)
+        start: tuple[Any, ...] = (ship.position, ship.heading, None, False)
+        dist: dict[tuple[Any, ...], int] = {start: 0}
+        parents: dict[tuple[Any, ...], tuple[Any, ...]] = {}
+        parent_actions: dict[tuple[Any, ...], str] = {}
+        queue: deque[tuple[Any, ...]] = deque([start])
+        while queue:
+            key = queue.popleft()
+            pos, head, last, turned_flag = key
+            cost = dist[key]
+            terminal = (
+                minimum <= cost <= maximum
+                and last in (None, "advance", "turn_port_60", "turn_starboard_60")
+                and (not ship.forced_circle_turns or turned_flag)
+            )
+            if terminal and pos == target_hex and (heading is None or head == heading):
+                commands: list[str] = []
+                current: tuple[Any, ...] = key
+                while current in parents:
+                    commands.append(parent_actions[current])
+                    current = parents[current]
+                commands.reverse()
+                return {
+                    "valid": True,
+                    "reason": None,
+                    "commands": commands,
+                    "plan": self.commands_to_plan(commands),
+                    "cost": cost,
+                    "end_hex": pos.label,
+                    "end_heading": head,
+                }
+            for new_pos, new_head, new_cost, new_last, new_turned, action in self._movement_expand(
+                state, ship, pos, head, cost, last, turned_flag, maximum
+            ):
+                new_key = (new_pos, new_head, new_last, new_turned)
+                if new_key not in dist or new_cost < dist[new_key]:
+                    dist[new_key] = new_cost
+                    parents[new_key] = key
+                    parent_actions[new_key] = action
+                    if new_cost == cost:
+                        queue.appendleft(new_key)
+                    else:
+                        queue.append(new_key)
+        return {"valid": False, "reason": "target hex not reachable within legal speed range", "commands": [], "plan": None, "cost": None, "end_hex": None, "end_heading": None}
+
+    def _movement_reachable(
+        self,
+        state: GameState,
+        ship: ShipState,
+        position: HexCoord,
+        heading: int,
+        spent: int,
+        has_turned: bool,
+    ) -> tuple[list[dict[str, Any]], int, int]:
+        """Enumerate every final hex/heading a ship can occupy from a movement
+        prefix, walking the exact command-legality state machine:
+        first command advance, turns only after advance, a free 60-degree turn
+        allowed at the end, 120-degree turns cost 1 MF, cost must fall in the
+        legal speed range, land and map-edge block advance. Pure read-only."""
+        minimum, maximum = self._legal_speed_range(ship, state.turn)
+        finals: dict[HexCoord, dict[int, set[int]]] = {}
+        queue: deque[tuple[HexCoord, int, int, str | None, bool]] = deque(
+            [(position, heading, spent, None, has_turned)]
+        )
+        seen: set[tuple[HexCoord, int, int, str | None, bool]] = set()
+        while queue:
+            pos, head, cost, last, turned_flag = queue.popleft()
+            key = (pos, head, cost, last, turned_flag)
+            if key in seen:
+                continue
+            seen.add(key)
+            if (
+                minimum <= cost <= maximum
+                and last in (None, "advance", "turn_port_60", "turn_starboard_60")
+                and (not ship.forced_circle_turns or turned_flag)
+            ):
+                finals.setdefault(pos, {}).setdefault(cost, set()).add(head)
+            for new_pos, new_head, new_cost, new_last, new_turned, _action in self._movement_expand(
+                state, ship, pos, head, cost, last, turned_flag, maximum
+            ):
+                queue.append((new_pos, new_head, new_cost, new_last, new_turned))
+        reachable = [
+            {
+                "hex": {"q": pos.q, "r": pos.r},
+                "label": pos.label,
+                "cost": min(costs),
+                "final_headings": sorted(costs[min(costs)]),
+            }
+            for pos, costs in finals.items()
+        ]
+        reachable.sort(key=lambda item: item["label"])
+        return reachable, minimum, maximum
+
+    def movement_candidates(self, state: GameState, ship: ShipState) -> dict[str, Any]:
+        """Full reachable-hex overlay for one owned ship at its current state."""
+        forced = self._forced_constraints(ship)
+        if not ship.position:
+            return {
+                "ship_id": ship.id,
+                "position": None,
+                "heading": ship.heading,
+                "min_cost": 0,
+                "max_cost": 0,
+                "forced": forced,
+                "reachable": [],
+                "blocked_reason": "ship has no position to move from",
+            }
+        reachable, minimum, maximum = self._movement_reachable(
+            state, ship, ship.position, ship.heading, 0, False
+        )
+        return {
+            "ship_id": ship.id,
+            "position": {"q": ship.position.q, "r": ship.position.r},
+            "heading": ship.heading,
+            "min_cost": minimum,
+            "max_cost": maximum,
+            "forced": forced,
+            "reachable": reachable,
+        }
+
+    def movement_preview(
+        self,
+        state: GameState,
+        ship: ShipState,
+        commands: list[str] | None = None,
+        plan: str | None = None,
+        hexes: list[HexCoord] | None = None,
+    ) -> dict[str, Any]:
+        """Pure read-only snapshot of a movement prefix: trajectory so far, the
+        next legal commands, and whether the plan is ready to commit. Exactly one
+        of commands/plan/hexes drives the prefix; defaults to the empty plan."""
+        def base() -> dict[str, Any]:
+            return {
+                "ship_id": ship.id,
+                "commands": [],
+                "plan": "0",
+                "cost": 0,
+                "valid": False,
+                "errors": [],
+                "commitable": False,
+                "current_hex": None,
+                "current_label": None,
+                "current_heading": ship.heading if ship.position else None,
+                "trajectory": [],
+                "min_cost": 0,
+                "max_cost": 0,
+                "next_options": {"advance": [], "turns": []},
+                "reachable": [],
+                "forced": self._forced_constraints(ship),
+            }
+
+        if not ship.position:
+            return base()
+        if hexes:
+            # drag continuation: hexes are appended to the commands prefix and
+            # turned from the prefix's end state, not the ship's real position
+            prefix = commands or []
+            program, prefix_heading = self._movement_program(ship.position, ship.heading, prefix)
+            end_pos = program[-1][0] if program else ship.position
+            try:
+                continuation = IronBottomEngine._path_to_commands(end_pos, prefix_heading, hexes)
+            except ValueError as error:
+                result = base()
+                result["errors"] = [str(error)]
+                return result
+            commands = prefix + continuation
+        elif commands is None:
+            try:
+                commands = self.movement_commands(
+                    MovementOrder(ship_id=ship.id, plan=plan or "0")
+                )
+            except ValueError as error:
+                result = base()
+                result["errors"] = [str(error)]
+                return result
+        errors: list[str] = []
+        try:
+            self.validate_movement_commands(commands)
+        except ValueError as error:
+            errors.append(str(error))
+        program, final_heading = self._movement_program(ship.position, ship.heading, commands)
+        cost = self.movement_cost("", commands)
+        minimum, maximum = self._legal_speed_range(ship, state.turn)
+        trajectory = [
+            {
+                "hex": {"q": pos.q, "r": pos.r},
+                "label": pos.label,
+                "heading": head,
+                "mf": index + 1,
+            }
+            for index, (pos, head, _shift) in enumerate(program)
+        ]
+        current_pos = program[-1][0] if program else ship.position
+        current_label = current_pos.label
+        turns = [command for command in commands if command != "advance"]
+        if not errors and not minimum <= cost <= maximum:
+            errors.append(f"movement cost {cost} outside legal range {minimum}-{maximum}")
+        if not errors and ship.turn_limit_degrees == 60 and any(command.endswith("120") for command in turns):
+            errors.append("rudder damage limits turns to 60 degrees")
+        if not errors and ship.forced_straight_turns:
+            if turns:
+                errors.append("rudder/bridge damage requires straight movement")
+            if ship.forced_speed is not None and cost != ship.forced_speed:
+                errors.append(f"bridge damage requires original speed {ship.forced_speed}")
+        if not errors and ship.forced_circle_turns:
+            sixty_turns = [command for command in turns if command.endswith("60")]
+            if not sixty_turns or len(sixty_turns) != len(turns):
+                errors.append("rudder/bridge damage requires a 60-degree circling turn")
+            sides = {"port" if "port" in command else "starboard" for command in sixty_turns}
+            if len(sides) > 1 or (ship.forced_turn_side and sides and ship.forced_turn_side not in sides):
+                errors.append(f"circling direction must remain {ship.forced_turn_side or 'constant'}")
+        valid = not errors
+        commitable = valid
+        next_options: dict[str, Any] = {"advance": [], "turns": []}
+        last = commands[-1] if commands else None
+        if cost < maximum:
+            try:
+                target = current_pos.neighbor(final_heading)
+            except ValueError:
+                target = None
+            if target is not None and not self._terrain_impassable(state, target):
+                next_options["advance"].append(
+                    {
+                        "hex": {"q": target.q, "r": target.r},
+                        "label": target.label,
+                        "heading": final_heading,
+                        "cost_delta": 1,
+                    }
+                )
+        if last == "advance" and not ship.forced_straight_turns:
+            circle_side = ship.forced_turn_side if ship.forced_circle_turns else None
+            port60 = 6 if final_heading == 1 else final_heading - 1
+            starboard60 = 1 if final_heading == 6 else final_heading + 1
+            port120 = ((final_heading - 3) % 6) + 1
+            starboard120 = ((final_heading + 1) % 6) + 1
+            for action, new_head, cost_delta in (
+                ("turn_port_60", port60, 0),
+                ("turn_starboard_60", starboard60, 0),
+                ("turn_port_120", port120, 1),
+                ("turn_starboard_120", starboard120, 1),
+            ):
+                legal = True
+                reason: str | None = None
+                if action.endswith("120"):
+                    if ship.turn_limit_degrees == 60:
+                        legal, reason = False, "rudder damage limits turns to 60 degrees"
+                    elif ship.forced_circle_turns:
+                        legal, reason = False, "circling requires 60-degree turns"
+                else:
+                    if ship.forced_circle_turns and circle_side and IronBottomEngine._turn_side(final_heading, new_head) != circle_side:
+                        legal, reason = False, f"circling direction must remain {circle_side}"
+                if legal and cost + cost_delta > maximum:
+                    legal, reason = False, "exceeds maximum speed"
+                next_options["turns"].append(
+                    {
+                        "action": action,
+                        "cost_delta": cost_delta,
+                        "heading_after": new_head,
+                        "legal": legal,
+                        "reason": reason,
+                    }
+                )
+        reachable, _, _ = self._movement_reachable(
+            state, ship, current_pos, final_heading, cost, bool(turns)
+        )
+        return {
+            "ship_id": ship.id,
+            "commands": commands,
+            "plan": self.commands_to_plan(commands),
+            "cost": cost,
+            "valid": valid,
+            "errors": errors,
+            "commitable": commitable,
+            "current_hex": {"q": current_pos.q, "r": current_pos.r},
+            "current_label": current_label,
+            "current_heading": final_heading,
+            "trajectory": trajectory,
+            "min_cost": minimum,
+            "max_cost": maximum,
+            "next_options": next_options,
+            "reachable": reachable,
+            "forced": self._forced_constraints(ship),
+        }
 
     def _resolve_reinforcements(self, state: GameState) -> None:
         if state.reinforcement_trigger_turn == state.turn and not state.reinforcement_roll_done:
@@ -1298,21 +2487,24 @@ class IronBottomEngine:
             order.launch_side or "port",
             order.launch_angle or "A",
         )
+        anchor_hex = self._torpedo_anchor_hex(
+            order.launch_hex, launch_heading, order.launch_angle or "A"
+        )
         track = TorpedoTrack(
             id=f"TT-{state.turn}-{ship.id}-{launcher.id}-{len(state.torpedo_tracks)+1}",
             side=ship.side,
             launcher_ship_id=ship.id,
             torpedo_type=ship.torpedo_type or "",
-            position=order.launch_hex,
+            position=anchor_hex,
             heading=heading,
             speed_cycle=tuple(setting["speed"]),
             range_remaining=int(setting["range"]),
             launched_turn=state.turn,
             salvo_size=order.count,
-            launch_position=order.launch_hex,
+            launch_position=anchor_hex,
             launch_side=order.launch_side,
             launch_angle=order.launch_angle,
-            traversed_hexes=[order.launch_hex],
+            traversed_hexes=[anchor_hex],
             hidden=state.options.optional_rules.blind_torpedoes,
         )
         state.torpedo_tracks.append(track)
@@ -1413,7 +2605,10 @@ class IronBottomEngine:
                 continue
             track = self._launch_torpedo_order(state, order, state.ships[order.ship_id].heading)
             if track:
-                track_allowance[track.id] = track.speed_cycle[0]
+                # IBS-R-08.2.x: a torpedo's first-turn speed is reduced by the
+                # MF the launcher already consumed before firing.  At MF 0 this
+                # is simply the full first-cycle speed.
+                track_allowance[track.id] = max(0, track.speed_cycle[0] - order.launch_at_mf)
                 moved_tracks[track.id] = 0
         for impulse in range(maximum_impulses):
             # 6.1.8: when a ship would leave the printed map, keep that ship on
@@ -1449,6 +2644,8 @@ class IronBottomEngine:
             destinations: dict[str, HexCoord] = {}
             for ship_id, path in paths.items():
                 ship = state.ships[ship_id]
+                if not ship.position:
+                    continue  # 上一脉冲沉没：不再参与移动/碰撞结算
                 if ship_id in stopped or impulse >= len(path):
                     destinations[ship_id] = ship.position  # type: ignore[assignment]
                 else:
@@ -1476,7 +2673,7 @@ class IronBottomEngine:
                     right = state.ships[right_id]
                     if destinations[left_id] == right.position and destinations[right_id] == left.position:
                         collision_sets.add(frozenset((left_id, right_id)))
-            for collision_set in collision_sets:
+            for collision_set in sorted(collision_sets, key=lambda group: sorted(group)):
                 ids = sorted(collision_set)
                 for left_index, left_id in enumerate(ids):
                     for right_id in ids[left_index + 1:]:
@@ -1510,7 +2707,8 @@ class IronBottomEngine:
                 track = self._launch_torpedo_order(state, order, launch_heading)
                 if not track:
                     continue
-                track_allowance[track.id] = track.speed_cycle[0]
+                # First-turn speed is reduced by the launcher's already-spent MF.
+                track_allowance[track.id] = max(0, track.speed_cycle[0] - order.launch_at_mf)
                 moved_tracks[track.id] = 0
                 launched_this_impulse.add(track.id)
             for track in list(state.torpedo_tracks):
@@ -1545,20 +2743,10 @@ class IronBottomEngine:
                 track.range_remaining -= 1
                 track.distance_travelled += 1
                 moved_tracks[track.id] = moved_tracks.get(track.id, 0) + 1
-                contacts = [
-                    ship.id
-                    for ship in state.ships.values()
-                    if ship.side != track.side and not ship.sunk and ship.position == track.position
-                ]
-                if contacts:
-                    track.contact_ship_ids = contacts
-                    self._event(
-                        state,
-                        "torpedo_contact",
-                        f"鱼雷 {track.id} 进入目标格 {track.position.label}",
-                        payload={"track_id": track.id, "candidate_targets": contacts},
-                        rule=self._rule("IBS-R-08.2.3", 12, "8.2 鱼雷攻击过程"),
-                    )
+            # IBS-R-08.2.3: any torpedo and ship sharing a hex is a contact,
+            # whether the torpedo moved this impulse or a ship drove into its
+            # stationary hex.
+            self._check_torpedo_contacts(state)
             state.torpedo_tracks = [
                 track for track in state.torpedo_tracks if track.range_remaining > 0 or track.contact_ship_ids
             ]
@@ -1614,6 +2802,29 @@ class IronBottomEngine:
                 payload={"marker_id": marker.id, "position": marker.position.label if marker.position else None},
                 rule=self._rule("IBS-R-09.1", 13, "9.1 隐蔽标记算子"),
             )
+
+    def _check_torpedo_contacts(self, state: GameState) -> None:
+        """IBS-R-08.2.3: mark any torpedo sharing a hex with an opposing,
+        unsunk ship as in contact.  Runs every impulse so a ship that drives
+        into a stationary torpedo's hex is detected even when the torpedo does
+        not move that impulse."""
+        for track in state.torpedo_tracks:
+            if track.contact_ship_ids:
+                continue
+            contacts = [
+                ship.id
+                for ship in state.ships.values()
+                if ship.side != track.side and not ship.sunk and ship.position == track.position
+            ]
+            if contacts:
+                track.contact_ship_ids = contacts
+                self._event(
+                    state,
+                    "torpedo_contact",
+                    f"鱼雷 {track.id} 进入目标格 {track.position.label}",
+                    payload={"track_id": track.id, "candidate_targets": contacts},
+                    rule=self._rule("IBS-R-08.2.3", 12, "8.2 鱼雷攻击过程"),
+                )
 
     def _resolve_gunnery(self, state: GameState) -> None:
         disabled_before = {ship.id for ship in state.ships.values() if ship.guns_disabled_turns}
@@ -1687,10 +2898,12 @@ class IronBottomEngine:
                 f"{attacker.name} {'+'.join(mount_ids)} 炮击 {target.name}：{hits} 发命中",
                 payload={
                     "attacker": attacker.id,
+                    "attacker_side": attacker.side.value,
                     "mount_id": mount_ids[0] if len(mount_ids) == 1 else "+".join(mount_ids),
                     "mount_ids": mount_ids,
                     "battery_kind": mounts[0].kind,
                     "target": target.id,
+                    "target_side": target.side.value,
                     "distance": distance, "modifier": modifier, "firepower": firepower,
                     "modifiers": modifiers, "caliber": caliber, "hits": hits,
                 },
@@ -1702,12 +2915,21 @@ class IronBottomEngine:
             for _ in range(hits):
                 result_roll, result_dice = self._roll_d66(state)
                 result = self.rules.gunnery_result(result_roll)
+                before = self._damage_snapshot(target)
                 self._apply_gunnery_result(state, attacker, target, result_roll, result, distance, caliber)
+                damage = self._damage_delta(before, self._damage_snapshot(target))
                 self._event(
                     state,
                     "gunnery_result",
                     f"{target.name} 命中结果 {result_roll}",
-                    payload={"attacker": attacker.id, "target": target.id, "result": result},
+                    payload={
+                        "attacker": attacker.id,
+                        "attacker_name": attacker.name,
+                        "target": target.id,
+                        "target_name": target.name,
+                        "result": result,
+                        "damage": damage,
+                    },
                     rule=self._rule("IBS-T-GHRT", 1, "炮击结果表"),
                     dice=DiceRoll(dice=result_dice, notation="D66", raw=result_roll),
                 )
@@ -1799,12 +3021,7 @@ class IronBottomEngine:
                 aspect = self._torpedo_track_aspect(track, target)
                 candidates.append((adjusted, target, roll, dice, aspect))
             adjusted, target, roll, dice, aspect = max(candidates, key=lambda item: item[0])
-            hits = 0
-            if aspect == "broadside":
-                hits = 2 if adjusted >= 13 else (1 if adjusted >= 11 else 0)
-            elif adjusted >= 13:
-                hits = 1
-            hits = min(hits, track.salvo_size)
+            hits = min(self.torpedo_hit_count(aspect, adjusted), track.salvo_size)
             self._event(
                 state,
                 "torpedo_attack",
@@ -1812,7 +3029,9 @@ class IronBottomEngine:
                 payload={
                     "track_id": track.id,
                     "attacker": attacker.id,
+                    "attacker_side": attacker.side.value,
                     "target": target.id,
+                    "target_side": target.side.value,
                     "distance": distance,
                     "aspect": aspect,
                     "hits": hits,
@@ -1826,10 +3045,12 @@ class IronBottomEngine:
                 damage_roll = raw_damage_roll + damage_modifier
                 effect = self.rules.torpedo_effect(damage_roll, target.displacement_band)
                 hull, speed, sunk, fire = parse_effect(effect)
-                self._damage_hull(state, target, target.hull if sunk else hull, "torpedo")
+                before = self._damage_snapshot(target)
+                self._damage_hull(state, target, target.hull if sunk else hull, "torpedo", attacker)
                 self._lose_speed(target, speed)
                 if fire or damage_roll == 8:
-                    target.fire_markers += 1
+                    self._add_fire(state, target, attacker)
+                damage = self._damage_delta(before, self._damage_snapshot(target))
                 self._event(
                     state,
                     "torpedo_result",
@@ -1837,9 +3058,12 @@ class IronBottomEngine:
                     payload={
                         "track_id": track.id,
                         "attacker": attacker.id,
+                        "attacker_name": attacker.name,
                         "target": target.id,
+                        "target_name": target.name,
                         "effect": effect,
                         "modifier": damage_modifier,
+                        "damage": damage,
                     },
                     rule=self._rule("IBS-T-THDT", 3, "鱼雷与碰撞结果表"),
                     dice=DiceRoll(dice=damage_dice, notation="2D6", raw=raw_damage_roll, adjusted=damage_roll),
@@ -1850,6 +3074,21 @@ class IronBottomEngine:
     def _torpedo_launch_heading(self, ship_heading: int, side: str, angle: str) -> int:
         relative = int(self.rules.torpedo_launch_directions["relative_heading"][side][angle])
         return ((ship_heading - 1 + relative) % 6) + 1
+
+    def _torpedo_anchor_hex(self, launch_hex: HexCoord, ship_heading: int, angle: str) -> HexCoord:
+        """鱼雷算子起点：沿舰船头轴偏移（A/Y 在舰格；B 向船尾外 1 格；X 向船头外 1 格）。
+
+        偏移取朝向以发射时点舰首为准（"朝船头方向/朝船头反方向一格"），与鱼雷行进方向无关。
+        锚点越出地图时退回舰发射格。
+        """
+        offset = int(self.rules.torpedo_launch_directions["launch_anchor"][angle])
+        if offset == 0:
+            return launch_hex
+        direction = ship_heading if offset > 0 else ((ship_heading + 2) % 6) + 1
+        try:
+            return launch_hex.neighbor(direction)
+        except ValueError:
+            return launch_hex
 
     @staticmethod
     def _torpedo_track_aspect(track: TorpedoTrack, target: ShipState) -> str:
@@ -1866,6 +3105,7 @@ class IronBottomEngine:
                 roll = min(12, raw + modifier)
                 ignored = did_not_fire and roll in self.rules.fire_table["modifiers"]["ignore_results_if_ship_did_not_fire"]
                 result = {"kind": "no_effect"} if ignored else self.rules.table_2d6(self.rules.fire_results, roll)
+                before = self._damage_snapshot(ship)
                 if result.get("kind") == "special_damage":
                     self._resolve_special_damage(state, ship, armour_already_penetrated=True)
                 self._damage_hull(state, ship, int(result.get("hull", 0)), "fire")
@@ -1882,9 +3122,11 @@ class IronBottomEngine:
                     f"{ship.name} 火灾检定 {raw}{' +1' if modifier else ''} = {roll}",
                     payload={
                         "ship_id": ship.id,
+                        "target_name": ship.name,
                         "modifier": modifier,
                         "result": result,
                         "ignored_for_no_fire": ignored,
+                        "damage": self._damage_delta(before, self._damage_snapshot(ship)),
                     },
                     rule=self._rule("IBS-R-08.1", 10, "8.1 火灾"),
                     dice=DiceRoll(dice=dice, notation="2D6", raw=raw, adjusted=roll),
@@ -2040,7 +3282,7 @@ class IronBottomEngine:
                     "AV_CA_CL" if target.ship_type in {"AV", "CA", "CL"} else "other"
                 )
                 group = group if group in result["hull_by_ship_type"] else "other"
-                self._damage_hull(state, target, int(result["hull_by_ship_type"][group]), "gunnery")
+                self._damage_hull(state, target, int(result["hull_by_ship_type"][group]), "gunnery", attacker)
                 return
             armour = target.belt_armor
             if any(key.startswith("primary") for key in result):
@@ -2049,10 +3291,10 @@ class IronBottomEngine:
                 armour = target.secondary_armor
             if result.get("armour_check") and not self._penetrates(attacker, armour, distance, caliber):
                 return
-            self._damage_hull(state, target, int(result.get("hull", 0)), "gunnery")
+            self._damage_hull(state, target, int(result.get("hull", 0)), "gunnery", attacker)
             self._lose_speed(target, int(result.get("speed_loss", 0)))
             if result.get("fire_check"):
-                target.fire_markers += 1
+                self._add_fire(state, target, attacker)
             if "secondary" in result:
                 self._destroy_gun_mounts(state, target, "secondary", int(result.get("secondary", 1)), None, "gunnery")
             for key, value in result.items():
@@ -2072,6 +3314,7 @@ class IronBottomEngine:
     ) -> None:
         roll, dice = self._roll_d66(state)
         result = self.rules.special_damage_result(roll, target.displacement_band)
+        before = self._damage_snapshot(target)
         penetrated = True
         if result.get("armour_check") and not armour_already_penetrated:
             penetrated = bool(
@@ -2090,19 +3333,19 @@ class IronBottomEngine:
                 percent = re.search(r"-(25|50|100)%", result["effect"])
                 if percent:
                     speed = target.initial_max_speed * int(percent.group(1)) // 100
-                self._damage_hull(state, target, target.hull if sunk else hull, "special_damage")
+                self._damage_hull(state, target, target.hull if sunk else hull, "special_damage", attacker)
                 self._lose_speed(target, speed)
                 if fire:
-                    target.fire_markers += 1
+                    self._add_fire(state, target, attacker)
             else:
-                self._damage_hull(state, target, target.hull if result.get("sunk") else int(result.get("hull", 0)), "special_damage")
+                self._damage_hull(state, target, target.hull if result.get("sunk") else int(result.get("hull", 0)), "special_damage", attacker)
                 self._lose_speed(target, int(result.get("speed_loss", 0)))
                 fire = int(result.get("fire", 0))
                 if result.get("ignore_fire_if_no_aircraft") and not target.aircraft:
                     fire = 0
                 if result.get("torpedo_launcher_hit") and (not target.torpedo or not target.torpedo.ammo):
                     fire = 0
-                target.fire_markers += fire
+                self._add_fire(state, target, attacker, fire)
                 if result.get("fire_control"):
                     target.mfc_destroyed = True
                 if result.get("captain_killed") and not result.get("bridge_hit"):
@@ -2154,11 +3397,14 @@ class IronBottomEngine:
             f"{target.name} 特殊损伤 {roll}",
             payload={
                 "attacker": attacker.id if attacker else None,
+                "attacker_name": attacker.name if attacker else None,
                 "target": target.id,
+                "target_name": target.name,
                 "result": roll,
                 "effect": result,
                 "penetrated": penetrated,
                 "bridge_penetrated": bridge_penetrated,
+                "damage": self._damage_delta(before, self._damage_snapshot(target)),
             },
             rule=self._rule("IBS-T-SPECIAL", 4, "特殊伤害表"),
             dice=DiceRoll(dice=dice, notation="D66", raw=roll),
@@ -2176,7 +3422,7 @@ class IronBottomEngine:
         if result.get("destroy_random_secondary"):
             self._destroy_gun_mounts(state, attacker, "secondary", 1, None, "malfunction", random_choice=True)
         if result.get("fire") or (result.get("fire_if_aircraft_aboard") and attacker.aircraft):
-            attacker.fire_markers += 1
+            self._add_fire(state, attacker)
         if result.get("special_damage"):
             self._resolve_special_damage(state, attacker, armour_already_penetrated=True)
         self._event(
@@ -2271,12 +3517,12 @@ class IronBottomEngine:
         return destroyed
 
     @staticmethod
-    def _mount_can_bear(attacker: ShipState, target: ShipState, arcs: Iterable[FiringArc]) -> bool:
-        if not attacker.position or not target.position:
-            return False
-        bearing = IronBottomEngine._bearing_between(attacker.position, target.position)
-        relative = (bearing - attacker.heading) % 6
-        aspect = {
+    def _relative_aspect(origin: HexCoord, heading: int, target: HexCoord) -> FiringArc:
+        """目标相对舰首的射界扇区（规则 8.1a 中心连线方位）。`_mount_can_bear` 与
+        射界热力图共用同一几何，避免两处方位/扇区判定漂移。"""
+        bearing = IronBottomEngine._bearing_between(origin, target)
+        relative = (bearing - heading) % 6
+        return {
             0: FiringArc.BOW,
             1: FiringArc.STARBOARD,
             2: FiringArc.STARBOARD,
@@ -2284,23 +3530,35 @@ class IronBottomEngine:
             4: FiringArc.PORT,
             5: FiringArc.PORT,
         }[relative]
-        return aspect in arcs
+
+    @staticmethod
+    def _mount_can_bear(attacker: ShipState, target: ShipState, arcs: Iterable[FiringArc]) -> bool:
+        if not attacker.position or not target.position:
+            return False
+        return IronBottomEngine._relative_aspect(attacker.position, attacker.heading, target.position) in arcs
 
     @staticmethod
     def _bearing_between(origin: HexCoord, target: HexCoord) -> int:
-        candidates: list[tuple[int, int]] = []
-        for heading in range(1, 7):
-            try:
-                candidates.append((origin.neighbor(heading).distance(target), heading))
-            except ValueError:
-                continue
-        if not candidates:
-            raise ValueError("No bearing between map coordinates")
-        return min(candidates)[1]
+        # 方位 = 与"射击格中心→目标格中心"连线最接近的六方向（规则 8.1a 中心连线）。
+        # 在 flat-top odd-q 渲染下按屏幕空间角度计算，与玩家所见一致；旧的"最近邻格"
+        # 近似在错位网格上会误判约四成目标（例如正前方的目标被归为左舷 60°），
+        # 导致射界与纵射判定错误。相邻格时两种算法结果完全相同（逐格移动不受影响）。
+        dq = target.q - origin.q
+        dr = target.r - origin.r
+        dx = dq * 1.5
+        dy = (dr + dq / 2.0) * math.sqrt(3.0)
+        angle = math.degrees(math.atan2(dy, dx))
+        # 舰首朝向的屏幕角度：heading 1..6 分别为 330/30/90/150/210/270 度。
+        return min(
+            range(1, 7),
+            key=lambda heading: abs(((330 + (heading - 1) * 60) % 360 - angle + 180) % 360 - 180),
+        )
 
-    def _damage_hull(self, state: GameState, ship: ShipState, amount: int, cause: str) -> None:
+    def _damage_hull(
+        self, state: GameState, ship: ShipState, amount: int, cause: str, attacker: ShipState | None = None
+    ) -> int:
         if amount <= 0 or ship.sunk:
-            return
+            return 0
         before = ship.hull
         ship.hull = max(0, ship.hull - amount)
         actual = before - ship.hull
@@ -2316,6 +3574,7 @@ class IronBottomEngine:
             sinking_position = ship.position
             if state.scenario_id not in {"IBS-S-01", "IBS-S-03"}:
                 state.score[ship.side.opponent.value] += ship.vp
+            attacker_id = ship.fire_source_attacker if cause == "fire" else (attacker.id if attacker else None)
             self._event(
                 state,
                 "ship_sunk",
@@ -2324,11 +3583,15 @@ class IronBottomEngine:
                     "ship_id": ship.id,
                     "cause": cause,
                     "drift_pending": ship.sinking_drift_pending,
+                    "attacker": attacker_id,
+                    "attacker_name": state.ships[attacker_id].name if attacker_id else None,
+                    "position": sinking_position.label if sinking_position else None,
                 },
                 rule=self._rule("IBS-R-08.1-F1", 10, "8.1 f.1 船体损伤与沉没"),
             )
             if sinking_position and not ship.sinking_drift_pending:
                 self._place_sinking_wreck(state, ship, sinking_position, drifted=False)
+        return actual
 
     def _place_sinking_wreck(
         self, state: GameState, ship: ShipState, position: HexCoord, *, drifted: bool
@@ -2415,10 +3678,11 @@ class IronBottomEngine:
         adjusted = raw + modifier
         effect = self.rules.torpedo_effect(adjusted, ship.displacement_band)
         hull, speed, sunk, fire = parse_effect(effect)
-        self._damage_hull(state, ship, ship.hull if sunk else hull, "collision")
+        obstacle_ship = state.ships.get(obstacle_id) if obstacle_id in state.ships else None
+        self._damage_hull(state, ship, ship.hull if sunk else hull, "collision", obstacle_ship)
         self._lose_speed(ship, speed)
         if fire:
-            ship.fire_markers += 1
+            self._add_fire(state, ship, obstacle_ship)
         self._event(
             state,
             "collision_result",
@@ -2429,10 +3693,11 @@ class IronBottomEngine:
         )
 
     @staticmethod
-    def _lose_speed(ship: ShipState, amount: int) -> None:
+    def _lose_speed(ship: ShipState, amount: int) -> int:
         if amount <= 0:
-            return
-        crossed = list(ship.speed_damage_crossed)
+            return 0
+        before = ship.speed_damage_crossed
+        crossed = list(before)
         for _ in range(amount):
             values = [
                 row[crossed[index]] if crossed[index] < len(row) else 0
@@ -2450,6 +3715,7 @@ class IronBottomEngine:
         )
         ship.speed_track = values
         ship.current_speed = min(ship.current_speed, max(values))
+        return sum(crossed) - sum(before)
 
     def _visible_to(self, state: GameState, target: ShipState, side: Side, own_positions: Iterable[HexCoord | None]) -> bool:
         if target.sunk or not target.position:

@@ -163,6 +163,26 @@ class DeterministicCommander(LLMCommander):
             for index, ship in enumerate(ships)
         ]
 
+    @staticmethod
+    def _stationary_plan(engine: IronBottomEngine, game_id: str, ship_id: str) -> str:
+        """基线移动计划：优先 `"0"`；桥楼/舵损伤（forced_speed>0、forced_circle）
+        使 `"0"` 非法时回退到直行最大成本或首个可达格路径，保证计划永远合法。"""
+        state = engine.get(game_id)
+        ship = state.ships[ship_id]
+        if engine.movement_preview(state, ship, plan="0")["commitable"]:
+            return "0"
+        candidates = engine.movement_candidates(state, ship)
+        if candidates["max_cost"] > 0:
+            plan = str(candidates["max_cost"])
+            if engine.movement_preview(state, ship, plan=plan)["commitable"]:
+                return plan
+        for entry in candidates["reachable"]:
+            hexc = HexCoord(q=entry["hex"]["q"], r=entry["hex"]["r"])
+            result = engine.movement_path(state, ship, hexc, None)
+            if result["valid"] and engine.movement_preview(state, ship, plan=result["plan"])["commitable"]:
+                return result["plan"]
+        return "0"
+
     def choose_plan(
         self, engine: IronBottomEngine, game_id: str, side: Side
     ) -> tuple[AIPlanSheet, OrderBatch, list[LLMCallAudit]]:
@@ -178,7 +198,10 @@ class DeterministicCommander(LLMCommander):
             intents = {order.ship_id: "按想定边界进入" for order in batch.reinforcements}
         elif state.phase == Phase.MOVEMENT_PLANNING:
             own = [ship for ship in observation.ships if ship.side == side and not ship.sunk and ship.position]
-            batch.movement = [MovementOrder(ship_id=ship.id, plan="0") for ship in own]
+            batch.movement = [
+                MovementOrder(ship_id=ship.id, plan=self._stationary_plan(engine, state.game_id, ship.id))
+                for ship in own
+            ]
             batch.contact_movement = [
                 ContactMovementOrder(marker_id=marker.id, plan="4")
                 for marker in observation.markers

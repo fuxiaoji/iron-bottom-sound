@@ -114,7 +114,9 @@ class OptionalRules(BaseModel):
 
 
 class GameOptions(BaseModel):
-    mode: Literal["hotseat", "tutorial", "llm"] = "hotseat"
+    mode: Literal["hotseat", "tutorial", "llm", "vs_ai"] = "hotseat"
+    # 人机大战时对手 AI 的风格 profile（tactical.PROFILES 键）；其余模式恒为 None。
+    ai_profile: str | None = None
     optional_rules: OptionalRules = Field(default_factory=OptionalRules)
 
 
@@ -228,6 +230,8 @@ class ShipState(BaseModel):
     vp: int = 0
     asset: str | None = None
     fire_markers: int = Field(default=0, ge=0)
+    fire_source_attacker: str | None = None
+    fire_source_turn: int | None = None
     mfc_destroyed: bool = False
     radar_destroyed: bool = False
     fired: bool = False
@@ -263,6 +267,31 @@ class MovementOrder(BaseModel):
     plan: str = "0"
     speed: int | None = Field(default=None, ge=0)
     commands: list[MovementCommand] = Field(default_factory=list)
+
+
+class MovementPreviewRequest(BaseModel):
+    ship_id: str
+    commands: list[str] = Field(default_factory=list)
+    plan: str | None = None
+    hexes: list[HexCoord] = Field(default_factory=list)
+
+
+class MovementTrajectoryEntry(BaseModel):
+    ship_id: str
+    plan: str = "0"
+
+
+class MovementTrajectoriesRequest(BaseModel):
+    plans: list[MovementTrajectoryEntry] = Field(default_factory=list)
+
+
+class TorpedoAssistRequest(BaseModel):
+    target_id: str | None = None
+    launch: dict[str, Any] | None = None
+
+
+class GunneryAssistRequest(BaseModel):
+    assigned: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class ContactSetupOrder(BaseModel):
@@ -392,6 +421,7 @@ class ShipCombatEntry(BaseModel):
     related_ship_name: str | None = None
     rule: RuleReference | None = None
     dice: DiceRoll | None = None
+    payload: dict[str, Any] = Field(default_factory=dict)
 
 
 class TorpedoTrack(BaseModel):
@@ -487,12 +517,25 @@ class PublicShip(BaseModel):
     fired: bool
     sunk: bool
     asset: str | None
+    vp: int = 0
     max_speed: int | None = None
+    speed_damage_crossed: list[int] | None = None
+    speed_damage_track: list[list[int]] | None = None
     min_legal_speed: int | None = None
     max_legal_speed: int | None = None
     torpedo_type: str | None = None
     gun_mounts: list[GunMountState] = Field(default_factory=list)
     torpedo_launchers: list[TorpedoLauncherState] = Field(default_factory=list)
+    turn_limit_degrees: int | None = None
+    forced_straight_turns: int = 0
+    forced_circle_turns: int = 0
+    forced_turn_side: Literal["port", "starboard"] | None = None
+    forced_speed: int | None = None
+    mfc_destroyed: bool = False
+    radar_destroyed: bool = False
+    bridge_destroyed: bool = False
+    rudder_destroyed: bool = False
+    captain_status: Literal["fit", "wounded", "killed"] | None = None
     combat_history: list[ShipCombatEntry] = Field(default_factory=list)
 
 

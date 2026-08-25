@@ -10,8 +10,8 @@ from pydantic import BaseModel, Field
 
 from .engine import IronBottomEngine
 from .data import ROOT
-from .llm import DeterministicCommander
-from .models import GameOptions, OrderBatch, Side
+from .tactical import PROFILES, TacticalCommander
+from .models import GameOptions, GunneryAssistRequest, MovementPreviewRequest, MovementTrajectoriesRequest, OrderBatch, Phase, Side, TorpedoAssistRequest
 from .storage import GameRepository
 
 
@@ -19,6 +19,11 @@ class CreateGame(BaseModel):
     scenario_id: str = "IBS-S-03"
     seed: int = 1
     options: GameOptions = Field(default_factory=GameOptions)
+
+
+class FieldOfFireRequest(BaseModel):
+    ship_id: str | None = None
+    target_speed: int = 4
 
 
 engine = IronBottomEngine()
@@ -69,9 +74,13 @@ def create_game(request: CreateGame):
 
 
 @app.get("/games/{game_id}/view")
-def view_game(game_id: str, x_player_side: Annotated[str | None, Header()] = None):
+def view_game(
+    game_id: str,
+    x_player_side: Annotated[str | None, Header()] = None,
+    debug: bool = False,
+):
     get_game(game_id)
-    return engine.observe(game_id, side_from_header(x_player_side))
+    return engine.observe(game_id, side_from_header(x_player_side), debug=debug)
 
 
 @app.get("/games/{game_id}/legal-actions")
@@ -86,7 +95,7 @@ def suggested_orders(game_id: str, x_player_side: Annotated[str | None, Header()
     get_game(game_id)
     side = side_from_header(x_player_side)
     try:
-        return DeterministicCommander().choose_orders(engine, game_id, side)
+        return TacticalCommander().choose_orders(engine, game_id, side)
     except ValueError as error:
         raise HTTPException(409, str(error)) from error
 
@@ -103,7 +112,7 @@ def tutorial_opponent(game_id: str, x_player_side: Annotated[str | None, Header(
     if Side.ALLIES.value in state.submitted_orders:
         return {"valid": True, "instructor_submitted": True}
     try:
-        batch = DeterministicCommander().choose_orders(engine, game_id, Side.ALLIES)
+        batch = TacticalCommander().choose_orders(engine, game_id, Side.ALLIES)
     except ValueError as error:
         raise HTTPException(409, str(error)) from error
     result = engine.submit_orders(game_id, batch)
@@ -111,6 +120,109 @@ def tutorial_opponent(game_id: str, x_player_side: Annotated[str | None, Header(
         raise HTTPException(409, result.errors)
     repository.save(engine.get(game_id))
     return {"valid": True, "instructor_submitted": True}
+
+
+class AIOpponentRequest(BaseModel):
+    profile: str = "balanced"
+
+
+@app.post("/games/{game_id}/ai-opponent")
+def ai_opponent(game_id: str, request: AIOpponentRequest | None = None, x_player_side: Annotated[str | None, Header()] = None):
+    """人机大战：提交玩家对侧的 AI 订单（按 X-Player-Side 求对侧、风格 profile
+    可选），不返回其私有订单。通用（不限 mode/阵营）；玩家须先提交本阶段，AI 侧
+    已提交则幂等短路。订单仍由规则引擎 `submit_orders` 校验，AI 不直接改状态。"""
+    state = get_game(game_id)
+    player_side = side_from_header(x_player_side)
+    ai_side = player_side.opponent
+    profile_name = request.profile if request is not None and request.profile else "balanced"
+    if profile_name not in PROFILES:
+        raise HTTPException(422, f"Unknown AI profile {profile_name}")
+    if player_side.value not in state.submitted_orders:
+        raise HTTPException(409, "Submit the player's orders first")
+    if ai_side.value in state.submitted_orders:
+        return {"valid": True, "ai_submitted": True}
+    try:
+        batch = TacticalCommander(profile=PROFILES[profile_name]).choose_orders(engine, game_id, ai_side)
+    except ValueError as error:
+        raise HTTPException(409, str(error)) from error
+    result = engine.submit_orders(game_id, batch)
+    if not result.valid:
+        raise HTTPException(409, result.errors)
+    repository.save(engine.get(game_id))
+    return {"valid": True, "ai_submitted": True}
+
+
+@app.post("/games/{game_id}/movement-preview")
+def movement_preview(game_id: str, request: MovementPreviewRequest, x_player_side: Annotated[str | None, Header()] = None):
+    """Pure read-only preview of a movement prefix for an owned ship; never saves."""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if state.phase != Phase.MOVEMENT_PLANNING:
+        raise HTTPException(409, "Movement preview is available only during movement planning")
+    ship = state.ships.get(request.ship_id)
+    if not ship or ship.side != side:
+        raise HTTPException(403, "Movement preview is restricted to owned ships")
+    return engine.movement_preview(
+        state,
+        ship,
+        commands=request.commands or None,
+        plan=request.plan,
+        hexes=request.hexes or None,
+    )
+
+
+@app.post("/games/{game_id}/movement-trajectories")
+def movement_trajectories(game_id: str, request: MovementTrajectoriesRequest, x_player_side: Annotated[str | None, Header()] = None):
+    """Pure read-only planned-movement trajectories for the side's own draft plans; never saves."""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if state.phase != Phase.MOVEMENT_PLANNING:
+        raise HTTPException(409, "Movement trajectories are available only during movement planning")
+    return engine.movement_plan_trajectories(
+        state, side, [entry.model_dump() for entry in request.plans]
+    )
+
+
+@app.get("/games/{game_id}/sealed-trajectories")
+def sealed_trajectories(game_id: str, x_player_side: Annotated[str | None, Header()] = None, debug: bool = False):
+    """Replay this turn's sealed movement plans as trajectories (kept visible during
+    torpedo planning). Own side always; enemy plans only when debug=true."""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if state.phase != Phase.TORPEDO_PLANNING:
+        raise HTTPException(409, "Sealed trajectories are available only during torpedo planning")
+    return engine.sealed_movement_trajectories(state, side, debug=debug)
+
+
+@app.post("/games/{game_id}/torpedo-assist")
+def torpedo_assist(game_id: str, request: TorpedoAssistRequest, x_player_side: Annotated[str | None, Header()] = None):
+    """Pure read-only torpedo recommendation (visible-info extrapolation); never saves."""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if state.phase != Phase.TORPEDO_PLANNING:
+        raise HTTPException(409, "Torpedo assist is available only during torpedo planning")
+    return engine.torpedo_assist(state, side, target_id=request.target_id, launch=request.launch)
+
+
+@app.post("/games/{game_id}/field-of-fire")
+def field_of_fire(game_id: str, request: FieldOfFireRequest | None = None, x_player_side: Annotated[str | None, Header()] = None):
+    """Pure read-only field-of-fire heatmap overlay (both sides, or one ship via body.ship_id); never saves."""
+    state = get_game(game_id)
+    return engine.field_of_fire_heatmap(
+        state, side_from_header(x_player_side),
+        ship_id=request.ship_id if request else None,
+        target_speed=request.target_speed if request else 4,
+    )
+
+
+@app.post("/games/{game_id}/gunnery-assist")
+def gunnery_assist(game_id: str, request: GunneryAssistRequest, x_player_side: Annotated[str | None, Header()] = None):
+    """Pure read-only gunnery scheduling recommendation (most mounts, best modifier, spread); never saves."""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if state.phase != Phase.GUNNERY:
+        raise HTTPException(409, "Gunnery assist is available only during gunnery")
+    return engine.gunnery_assist(state, side, assigned=request.assigned)
 
 
 @app.post("/games/{game_id}/orders")

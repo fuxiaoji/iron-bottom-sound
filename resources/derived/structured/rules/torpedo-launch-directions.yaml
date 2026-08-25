@@ -5,5 +5,14 @@ source:
   printed_section: "8.2.3 b"
 angles: [A, B, X, Y]
 relative_heading:
-  port: {A: -1, B: -2, X: -3, Y: -4}
-  starboard: {A: 1, B: 2, X: 3, Y: 4}
+  # User-confirmed rule (8.2.3 b): heading m.  Port A=m-1, B=m-1, X=m-2, Y=m-2;
+  # starboard A=m+1, B=m+1, X=m+2, Y=m+2.  Wrap: 0->6, 7->1.
+  port: {A: -1, B: -1, X: -2, Y: -2}
+  starboard: {A: 1, B: 1, X: 2, Y: 2}
+launch_anchor:
+  # 鱼雷算子起点相对舰发射格沿船头轴的偏移（用户权威规则）：0 = 舰所在发射格；
+  # B = 朝船头反方向（船尾）外 1 格；X = 朝船头方向外 1 格。左右舷同角度共用。
+  A: 0
+  B: -1
+  X: 1
+  Y: 0

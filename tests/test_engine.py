@@ -163,6 +163,64 @@ def test_secret_orders_and_hidden_damage_score_never_enter_opponent_observation(
     assert engine.observe(state.game_id, Side.AXIS).score == {"axis": 0, "allies": 0}
 
 
+def test_debug_observe_reveals_both_sides_and_planning_hardware() -> None:
+    """调试模式解除战争迷雾：两阵营舰船全可见、隐藏损伤与规划硬件全展示、比分/事件不隐藏。"""
+    engine = IronBottomEngine()
+    state = engine.reset(
+        "IBS-S-03", 17, GameOptions(optional_rules=OptionalRules(hidden_damage=True))
+    )
+    state.score[Side.AXIS.value] = 4
+    state.score[Side.ALLIES.value] = 7
+    debug_view = engine.observe(state.game_id, Side.AXIS, debug=True)
+    assert {ship.id for ship in debug_view.ships} == set(state.ships)
+    for public in debug_view.ships:
+        private = state.ships[public.id]
+        assert public.hull == private.hull  # hidden damage revealed
+        assert public.max_speed is not None
+        assert public.min_legal_speed is not None
+        assert public.max_legal_speed is not None
+        assert public.gun_mounts and public.torpedo_type is not None
+    assert debug_view.score == {"axis": 4, "allies": 7}  # hidden_damage 不再扣分
+    # 非调试观察仍保持迷雾：敌方舰规划硬件隐藏、比分扣零
+    plain_view = engine.observe(state.game_id, Side.AXIS)
+    enemy_plain = next(ship for ship in plain_view.ships if ship.side == Side.ALLIES)
+    assert enemy_plain.max_speed is None
+    assert enemy_plain.torpedo_type is None
+    assert plain_view.score == {"axis": 0, "allies": 0}
+
+
+def test_sealed_movement_trajectories_retained_during_torpedo_planning() -> None:
+    """移动阶段封存计划在鱼雷计划阶段重放：默认只含本方，调试模式含敌方。"""
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=9)
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        ).valid
+    engine.advance(state.game_id)
+    for side in Side:
+        own = [ship for ship in state.ships.values() if ship.side == side and ship.position]
+        movement = [
+            MovementOrder(ship_id=ship.id, plan="1" if ship.id == "IBS-U-KM-KARL-GALSTER" else "0")
+            for ship in own
+        ]
+        assert engine.submit_orders(
+            state.game_id,
+            OrderBatch(side=side, phase=Phase.MOVEMENT_PLANNING, movement=movement),
+        ).valid
+    engine.advance(state.game_id)
+    assert state.phase == Phase.TORPEDO_PLANNING
+    axis = engine.sealed_movement_trajectories(state, Side.AXIS)
+    assert axis["trajectories"]
+    assert all(item["side"] == "axis" for item in axis["trajectories"])
+    karl = next(item for item in axis["trajectories"] if item["ship_id"] == "IBS-U-KM-KARL-GALSTER")
+    assert karl["valid"] and karl["trajectory"]
+    assert not any(item["side"] == "allies" for item in axis["trajectories"])
+    all_sides = engine.sealed_movement_trajectories(state, Side.AXIS, debug=True)
+    assert any(item["side"] == "axis" for item in all_sides["trajectories"])
+    assert any(item["side"] == "allies" for item in all_sides["trajectories"])
+
+
 def test_four_turns_reach_automatic_terminal_state() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=3)
@@ -623,8 +681,9 @@ def test_torpedo_launches_at_planned_mf_moves_by_impulse_and_contacts_ship() -> 
     attacker = state.ships["IBS-U-KM-KARL-GALSTER"]
     attacker.heading = 3
     target = state.ships["IBS-U-RN-JAVELIN"]
-    # Heading 3 + starboard-X (+3) launches north along heading 6.
-    target.position = HexCoord.from_label("O14")
+    # Heading 3 + starboard-X (+2) launches NW along heading 5; X 锚点 = 船头外 1 格
+    # (O15 的船头方向 heading 3 → O16)，第一程即 N15。
+    target.position = HexCoord.from_label("N15")
     for side in Side:
         assert engine.submit_orders(
             state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
@@ -663,16 +722,17 @@ def test_torpedo_launches_at_planned_mf_moves_by_impulse_and_contacts_ship() -> 
     engine.advance(state.game_id)
     assert len(state.torpedo_tracks) == 1
     track = state.torpedo_tracks[0]
+    anchor_hex = launch_hex.neighbor(attacker.heading)  # X 锚点 = 船头外 1 格
     assert track.position == target.position
     assert track.contact_ship_ids == [target.id]
     assert track.distance_travelled == 1
     assert track.salvo_size == 1
-    assert track.launch_position == launch_hex
+    assert track.launch_position == anchor_hex
     assert track.launch_side == "starboard"
     assert track.launch_angle == "X"
-    assert [position.label for position in track.traversed_hexes] == [launch_hex.label, "O14"]
+    assert [position.label for position in track.traversed_hexes] == [anchor_hex.label, "N15"]
     movement_event = next(event for event in state.events if event.type == "torpedo_moved")
-    assert movement_event.payload["path"] == [launch_hex.label, "O14"]
+    assert movement_event.payload["path"] == [anchor_hex.label, "N15"]
     assert next(item for item in attacker.torpedo_launchers if item.id == "TT1").loaded == 1
     for side in Side:
         assert engine.submit_orders(
@@ -682,6 +742,117 @@ def test_torpedo_launches_at_planned_mf_moves_by_impulse_and_contacts_ship() -> 
     engine.advance(state.game_id)
     assert not state.torpedo_tracks
     assert any(event.type == "torpedo_attack" for event in state.events)
+
+
+def test_ship_driving_into_stopped_torpedo_hex_detects_contact() -> None:
+    """IBS-R-08.2.3: contact is detected when a ship enters a hex holding a
+    torpedo that already finished moving, even though the torpedo did not move
+    that impulse. Regression: contact used to be checked only when the torpedo
+    itself moved."""
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=9)
+    attacker = state.ships["IBS-U-KM-KARL-GALSTER"]
+    target = state.ships["IBS-U-RN-JAVELIN"]
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        ).valid
+    engine.advance(state.game_id)
+    # Axis torpedo already on the map, speed-2 allowance: O15 -> O16 (imp0) ->
+    # O17 (imp1), then stationary. Javelin moves up O20 -> O19 -> O18 -> O17 (imp2).
+    state.torpedo_tracks.append(TorpedoTrack(
+        id="slow-tt",
+        side=Side.AXIS,
+        launcher_ship_id=attacker.id,
+        torpedo_type="G7a",
+        position=HexCoord.from_label("O15"),
+        heading=3,
+        speed_cycle=(2, 2, 2),
+        range_remaining=10,
+        launched_turn=state.turn,
+    ))
+    target.position = HexCoord.from_label("O20")
+    target.heading = 6
+    for side in Side:
+        own = [ship for ship in state.ships.values() if ship.side == side and ship.position]
+        movement = [
+            MovementOrder(ship_id=ship.id, plan="3" if ship.id == target.id else "0")
+            for ship in own
+        ]
+        assert engine.submit_orders(
+            state.game_id,
+            OrderBatch(side=side, phase=Phase.MOVEMENT_PLANNING, movement=movement),
+        ).valid
+    engine.advance(state.game_id)
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.TORPEDO_PLANNING)
+        ).valid
+    engine.advance(state.game_id)
+    engine.advance(state.game_id)
+    track = next(track for track in state.torpedo_tracks if track.id == "slow-tt")
+    assert target.position == HexCoord.from_label("O17")
+    assert track.position == HexCoord.from_label("O17")
+    assert track.contact_ship_ids == [target.id]
+    assert any(event.type == "torpedo_contact" for event in state.events)
+
+
+def test_late_torpedo_launch_has_reduced_first_turn_speed() -> None:
+    """IBS-R-08.2.x: a torpedo launched at MF k travels (speed - k) hexes on the
+    launch turn, not its full first-cycle speed — even when another torpedo
+    launched at MF 0 extends the resolution phase to k+8 impulses. Regression:
+    the full-speed allowance used to let a late-launched slow torpedo over-travel."""
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=9)
+    karl = state.ships["IBS-U-KM-KARL-GALSTER"]
+    beitzen = state.ships["IBS-U-KM-RICHARD-BEITZEN"]
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        ).valid
+    engine.advance(state.game_id)
+    for side in Side:
+        own = [ship for ship in state.ships.values() if ship.side == side and ship.position]
+        movement = [
+            MovementOrder(ship_id=ship.id, plan="3" if ship.id == karl.id else "0")
+            for ship in own
+        ]
+        assert engine.submit_orders(
+            state.game_id,
+            OrderBatch(side=side, phase=Phase.MOVEMENT_PLANNING, movement=movement),
+        ).valid
+    engine.advance(state.game_id)
+    hints = engine.legal_actions(state.game_id, Side.AXIS)[0].schema_hint["torpedo_candidates"]
+    karl_positions = {
+        position["mf"]: position
+        for position in next(item for item in hints if item["ship_id"] == karl.id)["launch_positions"]
+    }
+    beitzen_positions = {
+        position["mf"]: position
+        for position in next(item for item in hints if item["ship_id"] == beitzen.id)["launch_positions"]
+    }
+    slow = TorpedoOrder(
+        ship_id=karl.id, launcher_id="TT1", count=1, launch_at_mf=3,
+        launch_hex=HexCoord(q=karl_positions[3]["hex"]["q"], r=karl_positions[3]["hex"]["r"]),
+        launch_side="port", launch_angle="A", setting_index=2,  # speed 5 -> 5 - 3 = 2
+    )
+    fast = TorpedoOrder(
+        ship_id=beitzen.id, launcher_id="TT1", count=1, launch_at_mf=0,
+        launch_hex=HexCoord(q=beitzen_positions[0]["hex"]["q"], r=beitzen_positions[0]["hex"]["r"]),
+        launch_side="port", launch_angle="A", setting_index=0,  # speed 8
+    )
+    assert engine.submit_orders(
+        state.game_id,
+        OrderBatch(side=Side.AXIS, phase=Phase.TORPEDO_PLANNING, torpedoes=[slow, fast]),
+    ).valid
+    assert engine.submit_orders(
+        state.game_id, OrderBatch(side=Side.ALLIES, phase=Phase.TORPEDO_PLANNING)
+    ).valid
+    engine.advance(state.game_id)
+    engine.advance(state.game_id)
+    by_launcher = {track.launcher_ship_id: track for track in state.torpedo_tracks}
+    assert by_launcher[karl.id].distance_travelled == 2
+    assert by_launcher[beitzen.id].distance_travelled == 8
 
 
 def test_stationary_ship_launches_from_its_current_hex_at_mf_zero() -> None:
@@ -742,6 +913,179 @@ def test_stationary_ship_launches_from_its_current_hex_at_mf_zero() -> None:
     assert track.distance_travelled == track.speed_cycle[0]
     assert track.salvo_size == 2
     assert next(item for item in attacker.torpedo_launchers if item.id == "TT1").loaded == 0
+
+
+def test_torpedo_direction_uses_ship_heading_at_launch_mf_after_turn() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=9)
+    attacker = state.ships["IBS-U-KM-KARL-GALSTER"]
+    attacker.heading = 3
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        ).valid
+    engine.advance(state.game_id)
+    # "1S1": advance (MF1, heading 3), free starboard 60 turn (heading 3->4),
+    # advance (MF2, heading 4). Launch at MF2 must use heading 4, not the
+    # constant initial heading 3.
+    for side in Side:
+        own = [ship for ship in state.ships.values() if ship.side == side and ship.position]
+        movement = [
+            MovementOrder(ship_id=ship.id, plan="1S1" if ship.id == attacker.id else "0")
+            for ship in own
+        ]
+        assert engine.submit_orders(
+            state.game_id,
+            OrderBatch(side=side, phase=Phase.MOVEMENT_PLANNING, movement=movement),
+        ).valid
+    engine.advance(state.game_id)
+    hints = engine.legal_actions(state.game_id, Side.AXIS)[0].schema_hint["torpedo_candidates"]
+    karl = next(item for item in hints if item["ship_id"] == attacker.id)
+    positions = {position["mf"]: position for position in karl["launch_positions"]}
+    assert positions[2]["heading"] == 4
+    order = TorpedoOrder(
+        ship_id=attacker.id,
+        launcher_id="TT1",
+        count=1,
+        launch_at_mf=2,
+        launch_hex=HexCoord(q=positions[2]["hex"]["q"], r=positions[2]["hex"]["r"]),
+        launch_side="starboard",
+        launch_angle="X",
+        setting_index=0,
+    )
+    assert engine.submit_orders(
+        state.game_id,
+        OrderBatch(side=Side.AXIS, phase=Phase.TORPEDO_PLANNING, torpedoes=[order]),
+    ).valid
+    assert engine.submit_orders(
+        state.game_id, OrderBatch(side=Side.ALLIES, phase=Phase.TORPEDO_PLANNING)
+    ).valid
+    engine.advance(state.game_id)
+    engine.advance(state.game_id)
+    track = state.torpedo_tracks[0]
+    # Heading 4 + starboard-X (+2) => 6.
+    assert track.heading == 6
+    # X 锚点 = 船头方向（发射时航向 4）外 1 格。
+    launch_hex = HexCoord(q=positions[2]["hex"]["q"], r=positions[2]["hex"]["r"])
+    assert track.launch_position == launch_hex.neighbor(4)
+
+
+def test_torpedo_direction_uses_heading_after_120_degree_turn_pulse() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=9)
+    attacker = state.ships["IBS-U-KM-KARL-GALSTER"]
+    attacker.heading = 3
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        ).valid
+    engine.advance(state.game_id)
+    # "1SS1": advance (MF1), starboard 120 turn in place (MF2, heading 3->5),
+    # advance (MF3). Launch at MF2 (the turn pulse) must use heading 5.
+    for side in Side:
+        own = [ship for ship in state.ships.values() if ship.side == side and ship.position]
+        movement = [
+            MovementOrder(ship_id=ship.id, plan="1SS1" if ship.id == attacker.id else "0")
+            for ship in own
+        ]
+        assert engine.submit_orders(
+            state.game_id,
+            OrderBatch(side=side, phase=Phase.MOVEMENT_PLANNING, movement=movement),
+        ).valid
+    engine.advance(state.game_id)
+    hints = engine.legal_actions(state.game_id, Side.AXIS)[0].schema_hint["torpedo_candidates"]
+    karl = next(item for item in hints if item["ship_id"] == attacker.id)
+    positions = {position["mf"]: position for position in karl["launch_positions"]}
+    assert positions[2]["heading"] == 5
+    order = TorpedoOrder(
+        ship_id=attacker.id,
+        launcher_id="TT1",
+        count=1,
+        launch_at_mf=2,
+        launch_hex=HexCoord(q=positions[2]["hex"]["q"], r=positions[2]["hex"]["r"]),
+        launch_side="starboard",
+        launch_angle="X",
+        setting_index=0,
+    )
+    assert engine.submit_orders(
+        state.game_id,
+        OrderBatch(side=Side.AXIS, phase=Phase.TORPEDO_PLANNING, torpedoes=[order]),
+    ).valid
+    assert engine.submit_orders(
+        state.game_id, OrderBatch(side=Side.ALLIES, phase=Phase.TORPEDO_PLANNING)
+    ).valid
+    engine.advance(state.game_id)
+    engine.advance(state.game_id)
+    # Heading 5 + starboard-X (+2) => 1.
+    assert state.torpedo_tracks[0].heading == 1
+
+
+def test_torpedo_candidates_annotate_ship_heading_per_mf_and_relative_heading() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=9)
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        ).valid
+    engine.advance(state.game_id)
+    for side in Side:
+        own = [ship for ship in state.ships.values() if ship.side == side and ship.position]
+        movement = [MovementOrder(ship_id=ship.id, plan="2" if ship.id == "IBS-U-KM-KARL-GALSTER" else "0") for ship in own]
+        assert engine.submit_orders(
+            state.game_id,
+            OrderBatch(side=side, phase=Phase.MOVEMENT_PLANNING, movement=movement),
+        ).valid
+    engine.advance(state.game_id)
+    hints = engine.legal_actions(state.game_id, Side.AXIS)[0].schema_hint["torpedo_candidates"]
+    karl = next(item for item in hints if item["ship_id"] == "IBS-U-KM-KARL-GALSTER")
+    assert all(1 <= position["heading"] <= 6 for position in karl["launch_positions"])
+    assert karl["launchers"][0]["relative_heading"]["starboard"]["X"] == 2
+    assert karl["launchers"][0]["relative_heading"]["starboard"]["A"] == 1
+    assert karl["launchers"][0]["relative_heading"]["port"]["A"] == -1
+    assert karl["launchers"][0]["relative_heading"]["port"]["Y"] == -2
+
+
+def test_torpedo_bearing_mismatch_rejected_and_correct_bearing_accepted() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=9)
+    attacker = state.ships["IBS-U-KM-KARL-GALSTER"]
+    attacker.heading = 3
+    for side in Side:
+        assert engine.submit_orders(
+            state.game_id, OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        ).valid
+    engine.advance(state.game_id)
+    for side in Side:
+        own = [ship for ship in state.ships.values() if ship.side == side and ship.position]
+        movement = [
+            MovementOrder(ship_id=ship.id, plan="1S1" if ship.id == attacker.id else "0")
+            for ship in own
+        ]
+        assert engine.submit_orders(
+            state.game_id,
+            OrderBatch(side=side, phase=Phase.MOVEMENT_PLANNING, movement=movement),
+        ).valid
+    engine.advance(state.game_id)
+    hints = engine.legal_actions(state.game_id, Side.AXIS)[0].schema_hint["torpedo_candidates"]
+    karl = next(item for item in hints if item["ship_id"] == attacker.id)
+    position = next(item for item in karl["launch_positions"] if item["mf"] == 2)
+    assert position["heading"] == 4
+    base = dict(
+        ship_id=attacker.id, launcher_id="TT1", count=1, launch_at_mf=2,
+        launch_hex=HexCoord(q=position["hex"]["q"], r=position["hex"]["r"]),
+        launch_side="starboard", launch_angle="X", setting_index=0,
+    )
+    wrong = engine.validate_orders(
+        state.game_id,
+        OrderBatch(side=Side.AXIS, phase=Phase.TORPEDO_PLANNING, torpedoes=[TorpedoOrder(**base, bearing=3)]),
+    )
+    assert not wrong.valid
+    assert any("bearing" in error and "does not match" in error for error in wrong.errors)
+    right = engine.validate_orders(
+        state.game_id,
+        OrderBatch(side=Side.AXIS, phase=Phase.TORPEDO_PLANNING, torpedoes=[TorpedoOrder(**base, bearing=4)]),
+    )
+    assert right.valid
 
 
 def test_aoba_helena_rulebook_torpedo_example_scores_one_hit_and_5h_7mf() -> None:
@@ -821,26 +1165,56 @@ def test_torpedo_port_and_starboard_each_offer_abxy_directions() -> None:
     engine = IronBottomEngine()
     expected = {
         ("port", "A"): 1,
-        ("port", "B"): 6,
-        ("port", "X"): 5,
-        ("port", "Y"): 4,
+        ("port", "B"): 1,
+        ("port", "X"): 6,
+        ("port", "Y"): 6,
         ("starboard", "A"): 3,
-        ("starboard", "B"): 4,
-        ("starboard", "X"): 5,
-        ("starboard", "Y"): 6,
+        ("starboard", "B"): 3,
+        ("starboard", "X"): 4,
+        ("starboard", "Y"): 4,
     }
     assert {
         (side, angle): engine._torpedo_launch_heading(2, side, angle)
         for side in ("port", "starboard") for angle in ("A", "B", "X", "Y")
     } == expected
-    # Rulebook p.12 Aoba example: heading 2, port-X follows heading 5.
-    assert engine._torpedo_launch_heading(2, "port", "X") == 5
-    # User-reported scenario 3 gold case: heading 4, port-A runs down column O.
+    # Authoritative rule (8.2.3 b): heading m -> port A/B = m-1, X/Y = m-2,
+    # starboard A/B = m+1, X/Y = m+2.  Wrap 0->6 and 7->1.  For heading 2,
+    # port-X = m-2 = 0 -> 6 (the old table wrongly gave 5).
+    assert engine._torpedo_launch_heading(2, "port", "X") == 6
+    # User-reported gold case (IBS-S-01 Helena at AA12, heading 4):
+    # port B -> heading 3 (down column AA: AA13 -> AA14), port X -> heading 2.
     assert engine._torpedo_launch_heading(4, "port", "A") == 3
-    position = HexCoord.from_label("O14")
-    for _ in range(8):
+    assert engine._torpedo_launch_heading(4, "port", "B") == 3
+    assert engine._torpedo_launch_heading(4, "port", "X") == 2
+    position = HexCoord.from_label("AA12")
+    for _ in range(2):
         position = position.neighbor(3)
-    assert position == HexCoord.from_label("O22")
+    assert position == HexCoord.from_label("AA14")
+
+
+def test_torpedo_launch_headings_match_authoritative_abxy_rule() -> None:
+    """8.2.3 b user-confirmed rule: port A/B = m-1, X/Y = m-2; starboard A/B = m+1, X/Y = m+2.
+
+    Wrap: port subtracts to 0 become 6 (m=2 -> port X = 6); starboard adds past 6
+    wrap to 1 (m=5 -> starboard X = 1).  All eight (side, angle) combos for every
+    ship heading must follow the rule, and the user's reported IBS-S-01 gold case
+    (ship at AA12, heading 4) must hold: port B -> heading 3 (AA13-AA14), port X -> 2.
+    """
+    engine = IronBottomEngine()
+    rule = {
+        "port": {"A": -1, "B": -1, "X": -2, "Y": -2},
+        "starboard": {"A": 1, "B": 1, "X": 2, "Y": 2},
+    }
+    for heading in range(1, 7):
+        for side in ("port", "starboard"):
+            for angle in ("A", "B", "X", "Y"):
+                relative = rule[side][angle]
+                expected = ((heading - 1 + relative) % 6) + 1
+                assert engine._torpedo_launch_heading(heading, side, angle) == expected, (
+                    f"heading {heading} {side}-{angle}"
+                )
+    assert engine._torpedo_launch_heading(4, "port", "B") == 3
+    assert engine._torpedo_launch_heading(4, "port", "X") == 2
 
 
 def test_helena_seven_mf_loss_reproduces_rulebook_three_three_three_example() -> None:

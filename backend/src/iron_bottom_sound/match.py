@@ -8,11 +8,14 @@ from pathlib import Path
 from .engine import ORDER_PHASES, IronBottomEngine
 from .llm import DeterministicCommander, LLMPlayerSession, OpenAICompatibleCommander
 from .models import GameOptions, MatchReport, OptionalRules, Phase, Side
+from .tactical import PROFILES, TacticalCommander
 
 
-def make_session(side: Side, player: str) -> LLMPlayerSession:
+def make_session(side: Side, player: str, profile: str | None = None) -> LLMPlayerSession:
     if player == "deterministic":
         return LLMPlayerSession(side, DeterministicCommander())
+    if player == "tactical":
+        return LLMPlayerSession(side, TacticalCommander(profile=PROFILES.get(profile or "balanced", PROFILES["balanced"])))
     if player == "deepseek":
         return LLMPlayerSession(side, OpenAICompatibleCommander())
     raise ValueError(f"Unknown player {player}")
@@ -23,6 +26,8 @@ def run_match(
     *,
     axis: str = "deterministic",
     allies: str = "deterministic",
+    axis_profile: str | None = None,
+    allies_profile: str | None = None,
     seed: int = 1,
     options: GameOptions | None = None,
     request_limit: int = 128,
@@ -32,8 +37,8 @@ def run_match(
     engine = IronBottomEngine()
     state = engine.reset(scenario_id, seed, options or GameOptions(mode="llm"))
     sessions = {
-        Side.AXIS: make_session(Side.AXIS, axis),
-        Side.ALLIES: make_session(Side.ALLIES, allies),
+        Side.AXIS: make_session(Side.AXIS, axis, axis_profile),
+        Side.ALLIES: make_session(Side.ALLIES, allies, allies_profile),
     }
     failure: str | None = None
     try:
@@ -95,8 +100,10 @@ def write_match_artifacts(directory: Path, report, state, sessions) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run an isolated dual-player Iron Bottom Sound IV match")
     parser.add_argument("--scenario", default="IBS-S-03", choices=("IBS-S-01", "IBS-S-03"))
-    parser.add_argument("--axis", default="deterministic", choices=("deterministic", "deepseek"))
-    parser.add_argument("--allies", default="deterministic", choices=("deterministic", "deepseek"))
+    parser.add_argument("--axis", default="deterministic", choices=("deterministic", "tactical", "deepseek"))
+    parser.add_argument("--allies", default="deterministic", choices=("deterministic", "tactical", "deepseek"))
+    parser.add_argument("--axis-profile", default=None, choices=tuple(PROFILES))
+    parser.add_argument("--allies-profile", default=None, choices=tuple(PROFILES))
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--request-limit", type=int, default=128)
     parser.add_argument("--all-optional", action="store_true")
@@ -113,6 +120,8 @@ def main() -> int:
         args.scenario,
         axis=args.axis,
         allies=args.allies,
+        axis_profile=args.axis_profile,
+        allies_profile=args.allies_profile,
         seed=args.seed,
         options=options,
         request_limit=args.request_limit,
