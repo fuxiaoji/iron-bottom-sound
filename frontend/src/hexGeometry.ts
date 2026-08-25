@@ -22,6 +22,17 @@ export function hexLabel(coord:{q:number;r:number}){
  return `${columnLabel(coord.q)}${coord.r+Math.floor(coord.q/2)+1}`;
 }
 
+// Inverse of hexLabel: parse an engine hex label ("R16", "HH27") back into axial
+// coordinates. Pure geometry, no rule data. Two-letter columns cover q 26..33.
+export function hexFromLabel(label:string){
+ const match=/^([A-Z]{1,2})(\d{1,2})$/.exec(label.trim().toUpperCase());
+ if(!match)throw new Error(`Invalid hex label ${label}`);
+ const letters=match[1];
+ const column=letters.length===1?letters.charCodeAt(0)-65:(letters.charCodeAt(0)-65)+26;
+ const displayRow=Number.parseInt(match[2],10)-1;
+ return {q:column,r:displayRow-Math.floor(column/2)};
+}
+
 // IBS-M-MAIN compass: 1 NE, 2 SE, 3 S, 4 SW, 5 NW, 6 N. Counter artwork's
 // printed bow arrow points left (180 degrees), so rotate that arrow onto the
 // corresponding edge-centre vector.
@@ -48,3 +59,4 @@ if(compassRotations.some((rotation,index)=>headingRotation(index+1)!==rotation))
 const torpedoRotations=[120,180,240,300,0,60];
 if(torpedoRotations.some((rotation,index)=>torpedoCounterRotation(index+1)!==rotation))throw new Error("torpedo counter heading invariant failed");
 if(hexLabel({q:17,r:7})!=="R16"||hexLabel({q:16,r:7})!=="Q16"||hexLabel({q:0,r:0})!=="A1"||hexLabel({q:33,r:10})!=="HH27")throw new Error("IBS-M-MAIN coordinate label invariant failed");
+if(hexLabel(hexFromLabel("HH27"))!=="HH27"||hexFromLabel(hexLabel({q:17,r:7})).q!==17||hexFromLabel("R16").r!==7)throw new Error("hexFromLabel round-trip invariant failed");
