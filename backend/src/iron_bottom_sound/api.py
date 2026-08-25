@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from .engine import IronBottomEngine
 from .data import ROOT
+from .state_export import export_frame, render_board
 from .tactical import PROFILES, TacticalCommander
 from .models import GameOptions, GunneryAssistRequest, MovementPreviewRequest, MovementTrajectoriesRequest, OrderBatch, Phase, Side, TorpedoAssistRequest
 from .storage import GameRepository
@@ -87,6 +88,15 @@ def view_game(
 def legal_actions(game_id: str, x_player_side: Annotated[str | None, Header()] = None):
     get_game(game_id)
     return engine.legal_actions(game_id, side_from_header(x_player_side))
+
+
+@app.get("/games/{game_id}/export")
+def game_export(game_id: str, x_player_side: Annotated[str | None, Header()] = None):
+    """投影一导出：JSONL 世界态帧 + cell-aligned ASCII 棋盘。纯只读，全部从
+    `engine.observe` 可见集派生（战争迷雾一致），绝不落盘。"""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    return {"frame": export_frame(state, engine, side), "board": render_board(state, engine, side)}
 
 
 @app.get("/games/{game_id}/suggested-orders")
