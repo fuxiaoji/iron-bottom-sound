@@ -9,10 +9,12 @@ from typing import Any
 import httpx
 
 from .engine import IronBottomEngine
+from .state_export import export_frame, render_board
 from .models import (
     AIPlanSheet,
     ContactMovementOrder,
     ContactSetupOrder,
+    GameState,
     HexCoord,
     LLMCallAudit,
     MovementOrder,
@@ -235,8 +237,145 @@ class DeterministicCommander(LLMCommander):
         return plan, batch, [audit]
 
 
+# ── 提示词工程（投影一）──────────────────────────────────────────────
+# 棋盘 + 世界态帧 + few-shot 示范输出 + 反过度思考纪律。规则常量绝不复制到引擎外：
+# 距离公式/符号约定只作为给 LLM 的读取提示，裁决仍唯一由引擎负责。
+
+_DISCIPLINE_SYSTEM_PROMPT = (
+    "你是铁底湾的回响 IV（二战太平洋海战六角格兵棋）中某阵营的舰队指挥官。\n"
+    "任务只有一件：根据【棋盘】【世界态帧】与【合法动作】，输出一个完整、合法的 AIPlanSheet "
+    "JSON（其 orders 字段是 OrderBatch，绑定本方 side 与当前 phase）。\n"
+    "响应必须以 `{` 开头，正文只有 JSON，无任何解释文字。\n"
+    "【思考纪律】（逐条强制）：\n"
+    "1. 只做一件事：写完完整合法的 JSON 立即停止。不补充、不复述、不解释。\n"
+    "2. 禁止候选枚举：不要写「方案 A/B/C」、不要列多个选项再挑。选定一个保守合法动作直接输出。\n"
+    "3. 禁止自我怀疑与复读：不写「也许」「不确定」「再检查一遍」这类句子。敌方信息不明时，"
+    "用一个保守合法动作直接输出，不纠结。\n"
+    "4. 禁止重复推导：不要重述规则、距离公式、或已给出棋盘/帧里的内容。\n"
+    "5. 篇幅硬限：situation_summary ≤ 80 字，phase_goal ≤ 40 字，contingency ≤ 2 条且每条一句话。\n"
+    "6. 产出即终稿：不回头修订自己。\n"
+    "距离：六角格轴向距离 = (|Δq| + |Δr| + |Δq+Δr|) / 2。用【世界态帧】里各实体的 q/r 计算，"
+    "不要数棋盘格子（ASCII 棋盘排版对六角格只是近似）。例：O14(q14,r6) → P15(q15,r7) "
+    "距离 = (1+1+2)/2 = 2。\n"
+    "所有 ship_id / marker_id / target_id 必须来自【世界态帧】或【合法动作】；示例里的 "
+    "SAMPLE- 开头 id 是占位符，照抄会被引擎判非法并在重试时告知。"
+)
+
+# 每订单阶段一个完整 AIPlanSheet 示范（orders 字段与 OrderBatch 结构一致）。
+# 全部 id 用 SAMPLE- 保留前缀占位；turn/phase/side 在调用时注入当前值。
+_FEW_SHOT_BY_PHASE: dict[str, dict[str, Any]] = {
+    "contact_setup": {
+        "turn": 1, "phase": "contact_setup",
+        "situation_summary": "轴心舰队在北侧岛链外部署两枚隐蔽编队标记，预置南下入口。",
+        "phase_goal": "分配隐蔽编队入口与航向。",
+        "unit_intents": {"SAMPLE-CM-1": "北缘N2入口三舰编队", "SAMPLE-CM-2": "西缘B3入口单舰"},
+        "orders": {
+            "side": "axis", "phase": "contact_setup",
+            "reinforcements": [],
+            "contacts": [
+                {"marker_id": "SAMPLE-CM-1", "entry_hex": {"q": 14, "r": -3}, "heading": 3, "speed": 4,
+                 "ship_ids": ["SAMPLE-U-KM-0001", "SAMPLE-U-KM-0002", "SAMPLE-U-KM-0003"]},
+                {"marker_id": "SAMPLE-CM-2", "entry_hex": {"q": 0, "r": 10}, "heading": 2, "speed": 5},
+            ],
+            "contact_movement": [], "movement": [], "gunnery": [], "torpedoes": [],
+            "smoke_ships": [], "smoke": [], "illumination": [], "searchlights": [],
+            "confirmation": {"ready": True},
+        },
+        "contingency": ["入口格被占时改相邻北缘入口。"],
+    },
+    "reinforcement": {
+        "turn": 2, "phase": "reinforcement",
+        "situation_summary": "盟军增援舰按想定自南缘进入，本回合可部署两艘。",
+        "phase_goal": "在合法南缘入口部署增援。",
+        "unit_intents": {"SAMPLE-U-RN-0001": "南缘V26进入", "SAMPLE-U-RN-0002": "南缘Z25进入"},
+        "orders": {
+            "side": "allies", "phase": "reinforcement",
+            "reinforcements": [
+                {"ship_id": "SAMPLE-U-RN-0001", "entry_hex": {"q": 21, "r": 10}, "heading": 6, "speed": 0},
+                {"ship_id": "SAMPLE-U-RN-0002", "entry_hex": {"q": 25, "r": 9}, "heading": 6, "speed": 0},
+            ],
+            "contacts": [], "contact_movement": [], "movement": [], "gunnery": [], "torpedoes": [],
+            "smoke_ships": [], "smoke": [], "illumination": [], "searchlights": [],
+            "confirmation": {"ready": True},
+        },
+        "contingency": ["入口被占则选相邻南缘合法入口。"],
+    },
+    "movement_planning": {
+        "turn": 2, "phase": "movement_planning",
+        "situation_summary": "轴心舰队以4节纵队南下，各舰保持间距并远离鱼雷轨道。",
+        "phase_goal": "全舰队合法移动并保持队形。",
+        "unit_intents": {"SAMPLE-U-KM-0001": "直行4节", "SAMPLE-U-KM-0002": "右转1格保持间距"},
+        "orders": {
+            "side": "axis", "phase": "movement_planning",
+            "movement": [
+                {"ship_id": "SAMPLE-U-KM-0001", "plan": "4", "speed": None, "commands": []},
+                {"ship_id": "SAMPLE-U-KM-0002", "plan": "1S3", "speed": None, "commands": []},
+            ],
+            "contact_movement": [{"marker_id": "SAMPLE-CM-1", "plan": "4"}],
+            "contacts": [], "reinforcements": [], "gunnery": [], "torpedoes": [],
+            "smoke_ships": [], "smoke": [], "illumination": [], "searchlights": [],
+            "confirmation": {"ready": True},
+        },
+        "contingency": ["若4节非法则用引擎接受的最小速度。"],
+    },
+    "torpedo_planning": {
+        "turn": 3, "phase": "torpedo_planning",
+        "situation_summary": "盟军驱逐舰前出，对轴心旗舰发射扇形鱼雷。",
+        "phase_goal": "用装填完成的发射器发射一组鱼雷。",
+        "unit_intents": {"SAMPLE-U-RN-0003": "左舷发射器齐射2枚"},
+        "orders": {
+            "side": "allies", "phase": "torpedo_planning",
+            "torpedoes": [
+                {"ship_id": "SAMPLE-U-RN-0003", "target_id": "SAMPLE-U-KM-0001", "count": 2,
+                 "speed": "fast", "launcher_id": "SAMPLE-L-0001", "launch_at_mf": 4,
+                 "launch_hex": {"q": 14, "r": 6}, "bearing": 3, "launch_side": "port",
+                 "launch_angle": "A", "setting_index": 0},
+            ],
+            "reinforcements": [], "contacts": [], "contact_movement": [], "movement": [],
+            "gunnery": [], "smoke_ships": [], "smoke": [], "illumination": [], "searchlights": [],
+            "confirmation": {"ready": True},
+        },
+        "contingency": ["若发射格非法则顺延到下一机动时刻。"],
+    },
+    "gunnery": {
+        "turn": 3, "phase": "gunnery",
+        "situation_summary": "轴心主力对盟军旗舰集中射击，压制其舰桥。",
+        "phase_goal": "主炮齐射盟军旗舰。",
+        "unit_intents": {"SAMPLE-U-KM-0001": "主炮集火SAMPLE-E-RN-0001"},
+        "orders": {
+            "side": "axis", "phase": "gunnery",
+            "gunnery": [
+                {"ship_id": "SAMPLE-U-KM-0001", "primary_target": "SAMPLE-E-RN-0001",
+                 "secondary_target": None, "searchlight_target": None,
+                 "mounts": [{"mount_id": "SAMPLE-M-0001", "target_id": "SAMPLE-E-RN-0001"}]},
+            ],
+            "reinforcements": [], "contacts": [], "contact_movement": [], "movement": [],
+            "torpedoes": [], "smoke_ships": [], "smoke": [], "illumination": [], "searchlights": [],
+            "confirmation": {"ready": True},
+        },
+        "contingency": ["若目标沉没则转打最近敌舰。"],
+    },
+}
+
+
+def _few_shot_for(state: GameState, side: Side) -> dict[str, Any]:
+    """当前阶段的 few-shot 示范，turn/phase/orders.side 注入当前值。"""
+    template = _FEW_SHOT_BY_PHASE.get(state.phase.value)
+    if template is None:
+        return {}
+    example = json.loads(json.dumps(template))
+    example["turn"] = state.turn
+    example["phase"] = state.phase.value
+    example["orders"]["side"] = side.value
+    return example
+
+
 class OpenAICompatibleCommander(LLMCommander):
-    """DeepSeek/OpenAI-compatible JSON adapter with no silent fallback."""
+    """DeepSeek/OpenAI-compatible JSON adapter with no silent fallback.
+
+    提示词 = 棋盘 + 世界态帧 + 合法动作 + few-shot 示范 + 【思考纪律】。可选
+    `thinking_enabled`：开启时 DeepSeek 返回 reasoning_content，采集进
+    LLMCallAudit.reasoning_preview，供观察思考过程/找死循环点。"""
 
     def __init__(
         self,
@@ -244,14 +383,19 @@ class OpenAICompatibleCommander(LLMCommander):
         model: str = "deepseek-v4-flash",
         api_key_env: str = "DEEPSEEK_API_KEY",
         timeout: float = 45,
-        max_tokens: int = 1200,
+        max_tokens: int | None = None,
+        thinking_enabled: bool = False,
+        reasoning_effort: str | None = None,
         client: httpx.Client | None = None,
     ) -> None:
         self.endpoint = endpoint.rstrip("/")
         self.model = model
         self.api_key_env = api_key_env
         self.timeout = timeout
-        self.max_tokens = max_tokens
+        self.thinking_enabled = thinking_enabled
+        # thinking 开启时 completion 预算会被 reasoning 吃掉，须加大 max_tokens 防 JSON 截断。
+        self.reasoning_effort = reasoning_effort or ("low" if thinking_enabled else None)
+        self.max_tokens = max_tokens or (6000 if thinking_enabled else 2400)
         self.client = client
 
     def choose_plan(
@@ -262,43 +406,49 @@ class OpenAICompatibleCommander(LLMCommander):
         if not api_key:
             raise RuntimeError(f"{self.api_key_env} is not configured")
         prompt: dict[str, Any] = {
-            "observation": engine.observe(game_id, side).model_dump(mode="json"),
+            "board": render_board(state, engine, side),
+            "world_state": export_frame(state, engine, side),
             "legal_actions": [item.model_dump(mode="json") for item in engine.legal_actions(game_id, side)],
             "order_batch_json_schema": OrderBatch.model_json_schema(),
             "plan_sheet_json_schema": AIPlanSheet.model_json_schema(),
-            "instruction": (
-                "Return one JSON AIPlanSheet object. Its orders field must be a complete OrderBatch for "
-                "the bound side and current phase. Use only observed information and listed legal actions."
-            ),
+            "few_shot_example_output": _few_shot_for(state, side),
         }
+        payload: dict[str, Any] = {
+            "model": self.model,
+            "temperature": 0,
+            "max_tokens": self.max_tokens,
+            "response_format": {"type": "json_object"},
+            "thinking": {"type": "enabled" if self.thinking_enabled else "disabled"},
+            "messages": [
+                {"role": "system", "content": _DISCIPLINE_SYSTEM_PROMPT},
+                {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)},
+            ],
+        }
+        if self.thinking_enabled and self.reasoning_effort:
+            payload["reasoning_effort"] = self.reasoning_effort
         audits: list[LLMCallAudit] = []
         for attempt in range(1, 4):
             started = time.perf_counter()
             errors: list[str] = []
             request_id: str | None = None
             usage: dict[str, Any] = {}
+            reasoning_preview: str | None = None
             try:
                 client = self.client or httpx.Client(timeout=self.timeout)
                 response = client.post(
                     f"{self.endpoint}/chat/completions",
                     headers={"Authorization": f"Bearer {api_key}"},
-                    json={
-                        "model": self.model,
-                        "thinking": {"type": "disabled"},
-                        "temperature": 0,
-                        "max_tokens": self.max_tokens,
-                        "response_format": {"type": "json_object"},
-                        "messages": [
-                            {"role": "system", "content": "Output JSON only. Do not reveal private reasoning."},
-                            {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)},
-                        ],
-                    },
+                    json=payload,
                 )
                 response.raise_for_status()
                 body = response.json()
                 request_id = body.get("id")
                 usage = body.get("usage") or {}
-                plan = AIPlanSheet.model_validate_json(body["choices"][0]["message"]["content"])
+                message = body["choices"][0]["message"]
+                reasoning = message.get("reasoning_content") or ""
+                if reasoning:
+                    reasoning_preview = reasoning[:500] + "…"
+                plan = AIPlanSheet.model_validate_json(message["content"])
                 batch = OrderBatch.model_validate(plan.orders)
                 validation = engine.validate_orders(game_id, batch)
                 if plan.turn != state.turn or plan.phase != state.phase:
@@ -308,13 +458,15 @@ class OpenAICompatibleCommander(LLMCommander):
                 errors.extend(validation.errors)
                 if not errors:
                     audits.append(self._audit(
-                        state.turn, state.phase, side, attempt, started, request_id, usage, True, []
+                        state.turn, state.phase, side, attempt, started, request_id, usage,
+                        True, [], reasoning_preview,
                     ))
                     return plan, batch, audits
             except (httpx.HTTPError, KeyError, TypeError, ValueError) as error:
                 errors.append(type(error).__name__)
             audits.append(self._audit(
-                state.turn, state.phase, side, attempt, started, request_id, usage, False, errors
+                state.turn, state.phase, side, attempt, started, request_id, usage,
+                False, errors, reasoning_preview,
             ))
             prompt["validation_errors"] = errors
         raise ValueError({"message": "LLM failed to self-correct within two retries", "audits": audits})
@@ -330,6 +482,7 @@ class OpenAICompatibleCommander(LLMCommander):
         usage: dict[str, Any],
         valid: bool,
         errors: list[str],
+        reasoning_preview: str | None = None,
     ) -> LLMCallAudit:
         details = usage.get("prompt_tokens_details") or {}
         return LLMCallAudit(
@@ -345,6 +498,7 @@ class OpenAICompatibleCommander(LLMCommander):
             cache_hit_tokens=int(details.get("cached_tokens") or 0),
             valid=valid,
             validation_errors=errors,
+            reasoning_preview=reasoning_preview,
         )
 
 

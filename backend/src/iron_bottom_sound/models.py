@@ -592,6 +592,7 @@ class LLMCallAudit(BaseModel):
     cache_hit_tokens: int = Field(default=0, ge=0)
     valid: bool
     validation_errors: list[str] = Field(default_factory=list)
+    reasoning_preview: str | None = Field(default=None, max_length=600)
 
 
 class MatchReport(BaseModel):

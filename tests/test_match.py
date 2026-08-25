@@ -89,8 +89,76 @@ def test_deepseek_adapter_retries_invalid_json_then_self_corrects(monkeypatch) -
     assert payload["model"] == "deepseek-v4-flash"
     assert payload["thinking"] == {"type": "disabled"}
     assert payload["response_format"] == {"type": "json_object"}
-    assert payload["temperature"] == 0 and payload["max_tokens"] == 1200
+    assert payload["temperature"] == 0 and payload["max_tokens"] == 2400
     assert "test-only-placeholder" not in "".join(audit.model_dump_json() for audit in audits)
+    # 投影一：prompt 携带棋盘 + 世界态帧 + few-shot 示范，且示例只用 SAMPLE- 占位符。
+    user_prompt = json.loads(payload["messages"][-1]["content"])
+    assert "board" in user_prompt and "world_state" in user_prompt
+    assert "A  B  C" in user_prompt["board"]
+    assert user_prompt["world_state"]["game"] == state.game_id
+    assert user_prompt["few_shot_example_output"]["turn"] == 1
+    assert user_prompt["few_shot_example_output"]["phase"] == "reinforcement"
+
+
+def test_deepseek_adapter_captures_reasoning_content_when_thinking_enabled(monkeypatch) -> None:
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-only-placeholder")
+    requests: list[httpx.Request] = []
+    valid_batch = OrderBatch(side=Side.AXIS, phase=Phase.REINFORCEMENT)
+    valid_plan = AIPlanSheet(
+        turn=1,
+        phase=Phase.REINFORCEMENT,
+        situation_summary="己方无增援。",
+        phase_goal="确认阶段",
+        orders=valid_batch.model_dump(mode="json"),
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(
+            200,
+            json={
+                "id": "request-reasoning",
+                "choices": [{
+                    "message": {
+                        "content": valid_plan.model_dump_json(),
+                        "reasoning_content": "方案A…方案B…再检查一遍入口格。确定选第一个入口。",
+                    },
+                }],
+                "usage": {"prompt_tokens": 20, "completion_tokens": 10},
+            },
+        )
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", 1)
+    commander = OpenAICompatibleCommander(client=client, thinking_enabled=True)
+    plan, batch, audits = commander.choose_plan(engine, state.game_id, Side.AXIS)
+    assert plan == valid_plan and batch == valid_batch
+    payload = json.loads(requests[-1].content)
+    assert payload["thinking"] == {"type": "enabled"}
+    assert payload["reasoning_effort"] == "low"
+    assert payload["max_tokens"] == 6000
+    assert audits[-1].reasoning_preview is not None
+    assert audits[-1].reasoning_preview.startswith("方案A…方案B…")
+    # 截断上限 600 字符
+    assert len(audits[-1].reasoning_preview) <= 600
+
+
+def test_match_artifacts_include_frames_and_boards(tmp_path) -> None:
+    artifacts = tmp_path / "frames"
+    report, _, _ = run_match("IBS-S-03", seed=2, artifact_dir=artifacts)
+    assert report.passed
+    frames_path = artifacts / f"{report.game_id}-frames.jsonl"
+    assert frames_path.exists()
+    lines = frames_path.read_text(encoding="utf-8").strip().splitlines()
+    assert lines
+    first = json.loads(lines[0])
+    assert set(first) >= {"game", "turn", "phase", "side", "sequence", "ships", "recent_events"}
+    for side in ("axis", "allies"):
+        board_path = artifacts / f"{report.game_id}-board-{side}.txt"
+        assert board_path.exists()
+        text = board_path.read_text(encoding="utf-8")
+        assert "turn 1" in text and "A  B  C" in text
 
 
 def test_match_runner_enforces_request_limit_and_player_names() -> None:
