@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from .engine import IronBottomEngine
 from .data import ROOT
+from .llm import OpenAICompatibleCommander
 from .state_export import export_frame, render_board
 from .tactical import PROFILES, TacticalCommander
 from .models import GameOptions, GunneryAssistRequest, MovementPreviewRequest, MovementTrajectoriesRequest, OrderBatch, Phase, Side, TorpedoAssistRequest
@@ -136,6 +137,19 @@ class AIOpponentRequest(BaseModel):
     profile: str = "balanced"
 
 
+class LLMOpponentRequest(BaseModel):
+    timeout: float = Field(default=90, gt=0)
+    thinking_enabled: bool = False
+
+
+def _make_llm_commander(timeout: float, thinking_enabled: bool) -> OpenAICompatibleCommander:
+    return OpenAICompatibleCommander(timeout=timeout, thinking_enabled=thinking_enabled)
+
+
+# 测试可注入 mock 指挥官的小工厂（保持端点默认走真实 DeepSeek）。
+llm_commander_factory = _make_llm_commander
+
+
 @app.post("/games/{game_id}/ai-opponent")
 def ai_opponent(game_id: str, request: AIOpponentRequest | None = None, x_player_side: Annotated[str | None, Header()] = None):
     """人机大战：提交玩家对侧的 AI 订单（按 X-Player-Side 求对侧、风格 profile
@@ -160,6 +174,66 @@ def ai_opponent(game_id: str, request: AIOpponentRequest | None = None, x_player
         raise HTTPException(409, result.errors)
     repository.save(engine.get(game_id))
     return {"valid": True, "ai_submitted": True}
+
+
+def _public_audit(audit) -> dict:
+    """audits 公开子集：不含订单/计划等私有内容，只有耗时/令牌/校验/思考预览。"""
+    return {
+        "side": audit.side.value,
+        "turn": audit.turn,
+        "phase": audit.phase.value,
+        "attempt": audit.attempt,
+        "model": audit.model,
+        "elapsed_ms": audit.elapsed_ms,
+        "input_tokens": audit.input_tokens,
+        "output_tokens": audit.output_tokens,
+        "valid": audit.valid,
+        "validation_errors": audit.validation_errors,
+        "reasoning_preview": audit.reasoning_preview,
+    }
+
+
+@app.post("/games/{game_id}/llm-opponent")
+def llm_opponent(
+    game_id: str,
+    request: LLMOpponentRequest | None = None,
+    x_player_side: Annotated[str | None, Header()] = None,
+):
+    """LLM 模式：提交玩家对侧的 DeepSeek 订单（按 X-Player-Side 求对侧）。
+
+    保持同步 def（FastAPI 线程池，不阻塞事件循环）。守卫顺序：
+    404 → 403（非 llm mode）→ 400（缺 header）→ 503（无 DEEPSEEK_API_KEY，
+    在一切 LLM 调用前）→ 409（玩家未提交）→ 幂等短路（对侧已提交）。
+    订单仍由 `submit_orders` 校验，AI 不直接改状态；返回 audits 公开子集，
+    不返回私有订单。
+    """
+    state = get_game(game_id)
+    if state.options.mode != "llm":
+        raise HTTPException(403, "LLM opponent is available only in llm mode")
+    player_side = side_from_header(x_player_side)
+    ai_side = player_side.opponent
+    if not os.environ.get("DEEPSEEK_API_KEY"):
+        raise HTTPException(503, "DEEPSEEK_API_KEY is not configured")
+    if player_side.value not in state.submitted_orders:
+        raise HTTPException(409, "Submit the player's orders first")
+    if ai_side.value in state.submitted_orders:
+        return {"valid": True, "ai_submitted": True, "audits": []}
+    timeout = request.timeout if request is not None else 90
+    thinking = request.thinking_enabled if request is not None else False
+    commander = llm_commander_factory(timeout=timeout, thinking_enabled=thinking)
+    try:
+        _, batch, audits = commander.choose_plan(engine, game_id, ai_side)
+    except ValueError as error:
+        raise HTTPException(409, str(error)) from error
+    result = engine.submit_orders(game_id, batch)
+    if not result.valid:
+        raise HTTPException(409, result.errors)
+    repository.save(engine.get(game_id))
+    return {
+        "valid": True,
+        "ai_submitted": True,
+        "audits": [_public_audit(audit) for audit in audits],
+    }
 
 
 @app.post("/games/{game_id}/movement-preview")
