@@ -253,3 +253,207 @@
 6. 验收 O14 沿 O 列方向 3 金标、六方向图片旋转、逐格航迹、事件回放、全量 Python、TypeScript 和 Vite 生产构建；浏览器自动读取若仍受本机 URL 策略阻止，则以运行中 API/数据库和用户视觉复核作为证据。
 
 批次结果：规则书第 11 页八轨迹图和第 12 页青叶范例重新视觉核验，纠正旧 YAML 为左舷 `-1/-2/-3/-4`、右舷 `+1/+2/+3/+4`。卡尔舰首 4、左舷 A 现得到方向 3；真实新局从 O14 航行 8 格后为 O22，事件逐格保存 O14→O15→…→O22。青叶舰首 2、左舷 X 金标同步改为方向 5。鱼雷棋子按素材固有方向 5 旋转到引擎航向，悬停显示发射格、舷侧/角度、航向、航迹、已走格数和剩余射程。全量 `110 passed`，TypeScript 与 Vite 37 模块生产构建通过；运行中 API 验证局 `fa63c499-ec4d-45f8-8333-7bdc0d54a35a` 返回航向 3 和 O 列完整航迹。旧局已产生的错误航迹不做静默状态改写，新局使用修正规则。
+
+## 鱼雷计划逐 MF 舰首标注与发射航向回验批次
+
+状态：实施中
+
+来源与边界：`IBS-R-08.2`（规则书第 11–12 页）定义鱼雷射角相对舰首，发射方向 = 发射时点舰首 + 左/右舷 `A/B/X/Y` 相对偏移。同步移动按 MF 脉冲推进，舰首可能在发射 MF 之前转向，因此发射时点的舰首必须取密封移动轨迹在该 MF 的记录值，而非计划阶段的恒定初始舰首。
+
+1. 复核引擎结算：发射 MF 的 `launch_heading` 必须来自 `paths[ship.id][impulse][1]`（该 MF 舰首）；新增金标验证 60° 中途转向与 120° 原地转向脉冲两种情形，禁止回退到恒定舰首。
+2. 计划标注：鱼雷发射 MF 下拉与已编排发射行显示 `MF k · 原版格号 · 舰首 h`；已编排行按引擎提供数据展示 `舰首 h + 舷侧/角度 → 绝对航向 x`。
+3. 前端不得复制 `relative_heading` 常量；由 `legal_actions` 把 `relative_heading` 作为结构化规则数据下发，UI 只做展示换算。
+4. 验收：逐 MF 舰首标注、转向后发射航向金标、全量 Python、TypeScript 与 Vite 生产构建通过。
+
+## 移动逐格交互·战报损伤摘要·鱼雷辅助批次
+
+状态：实施中
+
+来源与边界：三项 UI/交互改进以引擎既有裁决为唯一事实来源——可达格/移动预览/鱼雷命中推荐全部由引擎只读计算下发，前端只画线、只提交 `plan`/`commands`，禁止复制规则常量。移动命令合法性与 `_movement_program` 语义一致（首命令 advance、转后必接 advance、末仅免费 60°、120° 计 1 MF、费用落合法区间）。战报损伤摘要来自引擎结算点 payload 的归一化快照 diff，不新建事件类型、不改消息文本；隐藏损伤过滤沿用 `_hidden_damage_event`，字段随事件一起被过滤。鱼雷推荐器仅用可见目标信息（当前航向/航速匀速外推），命中阈值与 `_resolve_torpedoes` 共用 `torpedo_hit_count` 防漂移；`target_aspect_modifier.torpedo_bow_stern` 引擎未用则推荐器亦不用。
+
+1. 陆地只保留接口、不接线：`state.land_hexes`/`_terrain_impassable` 原样保留（当前想定无陆地，数据恒空）；不接入 terrain-overlays.yaml，不做主图对齐 QA。可达格/移动预览/鱼雷触陆按全海图处理，与既有结算一致。
+2. 移动逐格交互：`movement_candidates`（可达格 BFS）、`movement_preview`（前缀推进+下一步枚举）、`path_to_commands`（拖拽路径→命令）、`commands_to_plan`；`POST /games/{id}/movement-preview` 只读端点；MOVEMENT_PLANNING schema_hint 增 `movement_candidates`；观察增本方 forced 约束字段（陆地展示字段不新增）。前端 HexMap 格点击/拖拽/高亮 + 新建 HexMoveEditor 逐格推进（点击=1 MF、Q/E=±60°、A/D=±120°、Backspace 回退、Esc 退出），PlanSheet 逐舰开关与文本模式共存，只写现有 `plan`+`speed`。
+3. 战报损伤摘要：`_damage_snapshot`/`_damage_delta` 在 gunnery_result/torpedo_result/special_damage/fire_check/ship_sunk 五个结算点并入归一化损伤字段与 `attacker_name/target_name`；`_damage_hull`/`_lose_speed` 返回实际值；`_add_fire` 记录 `fire_source_attacker` 使火灾沉没可追溯点火者；`ShipCombatEntry` 增 `payload`。前端战报弹窗、实时日志、逐舰船表渲染损伤摘要。
+4. 鱼雷辅助：`torpedo_hit_count`（从结算提取，共用防漂移）、`expected_torpedo_hits`（2D6 穷举期望）、`_project_torpedo_path`（与 `_resolve_movement` 鱼雷循环一致）、`_project_target_position`（可见信息外推）、`torpedo_assist`（按期望命中降序推荐+预测航迹）；`POST /games/{id}/torpedo-assist` 只读端点。前端目标下拉→Top-N 推荐→"采用"自动填鱼雷订单 + 地图预测航迹叠加。
+5. 验收：可达格/移动预览/陆地/结算 payload/沉没追溯/鱼雷概率与引擎一致性测试；想定 1/3 自动终局不回退；回放字节等价；TypeScript 与 Vite 生产构建通过。
+
+批次结果（批次 C 功能2后端，2026-08-25）：五结算点 gunnery_result/torpedo_result/special_damage/fire_check/ship_sunk 在损伤前取 `_damage_snapshot`、事件前并入 `_damage_delta` 归一化损伤字段（hull_lost/speed_lost/fire_added/fire_remaining/gun_mounts_destroyed/torpedo_launchers_destroyed/sank/flags）与 `attacker_name/target_name`；`_damage_hull`/`_lose_speed` 返回实际扣格/跨速；`_add_fire` 统一加火源并记录首次点火者 `fire_source_attacker`，`cause=='fire'` 沉没可追溯到点火者；`ship_sunk` payload 增 `attacker/attacker_name/position`；`ShipCombatEntry.payload` 携带损伤字段（隐藏损伤字段随事件过滤，无泄漏）。新增 `tests/test_damage_payload.py` 12 例：五事件 delta 与真实状态差一致、沉没归属、火灾追溯、首发点火不被覆盖、船表 payload、隐藏损伤无泄漏、回放字节等价。全量 `147 passed`。
+
+批次结果（批次 D 功能2前端，2026-08-25）：`types.ts` `ShipCombatEntry` 增 `payload?`；新建 `damageSummary.tsx` 共享 `damageChips`/`DamageChips`（只读引擎下发的归一化损伤，不复制裁决常量），战报弹窗 `EventRow` 与逐舰攻击结算卡片、实时日志、舰船记录表 CombatColumn 全部渲染损伤 chips（-X 船体 / 失速 / 起火 / 余火 / -X 炮位 / -X 鱼雷管 / 沉没 / 特殊 flags：射击指挥仪、雷达、舰桥、舵机、舰长阵亡/负伤、炮塔卡死、极限转向、被迫直行/旋回、限制速度）；战报汇总新增"损伤船体"统计（6 列）。`tsc -b` 通过，Vite 生产构建 39 模块通过。
+
+批次结果（批次 E 功能3后端，2026-08-25）：引擎新增 `torpedo_hit_count`（从 `_resolve_torpedoes` 提取，引擎与推荐器共用防漂移，结算行为不变）、`expected_torpedo_hits`/`torpedo_hit_probability`（2D6 36 结果穷举）、`_project_torpedo_path`（与 `_resolve_movement` 鱼雷循环一致的纯几何直线投影，含射程/触界截停）、`_project_target_position`（可见信息匀速外推+触界钳制）、`_assist_intercept`/`_assist_launch_combos`/`_assist_launch_from_dict`/`_assist_evaluate`（逐 impulse 交点/距离/舷侧/修正/概率期望）、`torpedo_assist`（合法组合按期望命中降序返回 Top12+预测航迹，仅用可见目标信息，不读敌方封存计划）；`TorpedoAssistRequest` 模型 + `POST /games/{id}/torpedo-assist` 只读端点（TORPEDO_PLANNING 外 409）。新增 `tests/test_torpedo_assist.py` 10 例：阈值与规则书一致、期望/概率与 36 穷举相等、直线/射程/南缘触界投影（A10→A20 10 格、A22 触界 A27 余 5）、目标恒速外推与钳制、拦截组合推荐（KARL 舰首 1 左舷 A 北向直达 M8 距离 4 舷侧 bow_stern 修正 7）、组合可被 TorpedoOrder 采用并通过引擎校验、单发射叠加路径、IBS-S-01 轴心第 4 回合前禁射、API 形状/只读/错误阶段 409。全量 `157 passed`。
+
+批次结果（批次 F 功能3前端，2026-08-25）：`hexGeometry.ts` 新增 `hexFromLabel`（引擎格号→轴向坐标的纯几何逆变换，含往返不变量）；`types.ts` 增 `TorpedoAssistCombo`/`TorpedoAssistResponse`；`api.ts` 增 `torpedoAssist`；PlanSheet 鱼雷分支新增"鱼雷辅助·可见信息推演"区块——目标下拉（敌方在位舰）→ 进入鱼雷计划阶段自动加载 → 引擎只读 torpedo-assist → Top-8 推荐表（发射组合/MF/格/鱼雷航向/距离/舷侧/命中率/期望命中），点行叠加预测航迹与拦截点，"采用"按组合覆盖或新建该发射器 TorpedoOrder（launch_hex/bearing/launch_side/angle/setting_index 全部来自引擎，speed 映射 setting_index，不复制规则常量）；App 持有叠加状态并把 `torpedoAssistPaths` 传给 HexMap（仅鱼雷计划阶段），HexMap 用 headingVector 同构几何绘制青色虚线航迹 + 终点 + 红色拦截点。`tsc -b` 通过，Vite 生产构建 39 模块通过。
+
+## 射击安排优化·船表火控/火炮/装甲批次
+
+状态：已完成
+
+批次结果（批次 G，2026-08-25）：引擎 `_gunnery_candidates` 目标增 `range`/`modifier`（单人单目标固有修正，不含集火/多目标惩罚），新增只读 `gunnery_assist(state, side, assigned=None)`（越受限先分配 → 每舰炮位最多档 → 档内修正最佳 → `GUNNERY_ASSIST_BAND`(3) 带内选负载最小目标分散火力；assigned 排除已编排舰并计入负载）+ `GunneryAssistRequest` + `POST /games/{id}/gunnery-assist` 只读端点；`PublicShip` 增 owner-only `mfc_destroyed/radar_destroyed/bridge_destroyed/rudder_destroyed/captain_status`。前端 PlanSheet 逐舰/全舰齐射自动选择升级（全舰走引擎推荐并回退逐舰最优）、名册显示首选目标与修正；ShipStatusCard 炮位补装甲 `装 X"`、新增"火控情况"行。新增 `tests/test_gunnery_assist.py` 9 例，全量 `166 passed`；`tsc -b` 与 Vite 生产构建 39 模块通过；8000 后端已重启，端点经 5173 代理可达。
+
+来源与边界：用户要求"为全部安排齐射计划"按钮自动选择可开火炮最多、修正最佳（距离+各类修正）的目标，并在质量相近时尽量分散避免多舰集火同一目标；同时船表缺少火控情况、火炮尺寸、装甲尺寸。炮击命中修正的计算（距离/目标速度/纵射/口径对目标/射击指挥仪损毁/起火/雷达或照明弹/探照灯/烟幕）由引擎 `_gunnery_modifiers` 唯一裁决，**不复制到前端**：`_gunnery_candidates` 目标增 `range`/`modifier`（集火附加射手、多目标惩罚两项分配相关修正除外，按单人单目标 1/1 计算），并由引擎只读 `gunnery_assist` 推荐全舰分配。火控/损伤字段沿用 PublicShip 仅本方 owner-only 模式（敌方 None），炮位口径/装甲经既有 `gun_mounts` 下发，前端只渲染。
+
+1. 后端：
+   - `_gunnery_candidates` 每个目标增 `range`（格距）与 `modifier`（`_gunnery_modifier(..., attackers=1, caliber=max(可射炮位口径), target_count=1)`）。
+   - 新增 `gunnery_assist(state, side, assigned=None)`：`assigned` 为草稿中既有齐射 `{ship_id,target_id}`（排除已编排舰并计入目标负载）。分配算法：越受限越先（目标少者先），每舰取射界炮位最多档 → 该档内修正最佳者 → 与最佳修正差 ≤ `GUNNERY_ASSIST_BAND`（3，UI 偏好非规则常量）的档位内选负载最小（其次修正、再最近），返回 `{recommendations:[{ship_id,target_id,mount_ids,range,modifier}], excluded:[{ship_id,reason}]}`。
+   - `GunneryAssistRequest{assigned?:[{ship_id,target_id}]}` 模型 + `POST /games/{id}/gunnery-assist` 只读端点（GUNNERY 外 409，只可查询本方舰）。
+   - `PublicShip` 增 owner-only 火控/损伤字段 `mfc_destroyed/radar_destroyed/bridge_destroyed/rudder_destroyed/captain_status`（`observe` 以 `ship.side == side` 过滤，敌方 False/None）。
+2. 前端：
+   - `types.ts`：`GunMount` 已有 `caliber/armour`；`Ship` 增五个火控字段；`GunneryCandidate` 目标增 `range/modifier`；增 `GunneryAssistResponse/Recommendation/Request`。
+   - `api.ts` 增 `gunneryAssist`；PlanSheet："为该舰安排齐射"改选炮位最多档内修正最佳目标；"为全部安排齐射"调 gunnery-assist（把草稿既有齐射作为 assigned）填入选入推荐的全部舰，加载/错误提示，失败回退到逐舰最优选择。
+   - ShipStatusCard：炮位 token 补装甲 `装 X"`（口径已显，保持醒目）；新增"指挥与损伤"行按 owner-only 字段显示火控/雷达/舰桥/舵机/舰长状态（复用 damageSummary 的旗标文案，未知/未公开不显示）。
+3. 验收：`gunnery_assist` 单测（多舰不集火、最受限先分配、修正带内分散、assigned 排除与负载、blocked 排除）；PublicShip 火控字段本方可见敌方隐藏；炮击端到端回放不漂移；全量 Python + TypeScript + Vite 生产构建通过。
+
+## 射界方位判定修正批次（用户报告：IBS-S-01 第 1 回合）
+
+状态：已完成
+
+批次结果（2026-08-25）：`_bearing_between` 由"最近邻格方向"近似改为**规则 8.1a 中心连线屏幕角度**最近六方向。旧算法在 flat-top odd-q 错位网格上误判约三成方位（种子 1 全盘 91 对中 29 对，31.9%），典型病例即用户报告的邓肯（X8，舰首 4）→ 吹雪（P14）：视觉上目标仅偏舰首 11°（正前方），旧算法判为 bearing 3 / rel 5（左舷），使全部 5 个带左舷射界的炮位都能射击；修正后判为 rel 0（舰艏），仅 P1/P2 两门舰艏炮可射，初雪（舷侧）仍全 5 门。方位同时影响 `_mount_can_bear`（射界）与 `_target_aspect`（纵射判定），修正后纵射判定随之纠偏（邓肯对吹雪为 broadside，不再误加纵射修正）。**不是**改任何规则常量——只是把方位几何从错误近似换成规则书定义（中心连线），相邻格方位两种算法完全相同，逐格移动不受影响。另确认第二个投诉"为何都选衣笠而不选最近的青叶"不是 bug：修正忠实来自已验证规则表（6-9 格射程 -6、10-15 格 0；纵射 6-9 格 -6、10-15 格 -4），博伊西对青叶(7 格)=-12、衣笠(11 格)=-4，远处目标确实更好；规则第 9 页正文"距离越近越容易命中"与表格/示例矛盾，已记入 `docs/rules/open_questions.md`（IBS-Q-004），不静默改表。新增 `tests/test_bearing.py` 5 例（相邻格精确、全盘与 8.1a 参考一致、邓肯-吹雪舰艏仅 2 炮、邓肯-初雪舷侧全 5 炮、纵射修正不误加），全量 `171 passed`；仅后端改动，前端无规则常量复制。
+
+来源与边界：用户测试埃斯佩兰斯角海战第 1 回合报告两点——(1) 邓肯为什么能用全部火炮攻击"只在正前方"的吹雪；(2) 为什么齐射计划都选衣笠而不选最近的青叶，"你真的计算过修正吗"。第 1 点确认为真实几何 bug（旧"最近邻格"方位在错位网格误判正前方为左舷 60°），第 2 点为规则表如实执行（远处修正更好，见上）。边界：方位几何仅影响射界（`_mount_can_bear`）与纵射（`_target_aspect`）两条判定，不触碰命中阈值/修正值本身；`_path_to_commands`（line ~1409）只处理相邻格，两种算法一致不受影响。
+
+1. 后端：
+   - `_bearing_between`（engine.py ~3111）改为：由 two-hex 中心连线在渲染屏幕空间的角度（`atan2`，与前端 flat-top odd-q 同构），选 6 个舰首方向角（330/30/90/150/210/270）中最接近者；相邻格时与旧算法逐格一致。`import math`。
+   - 不改 `_mount_can_bear`/`_target_aspect` 的射界表与纵射逻辑本身（它们只是消费修正后的方位）。
+2. 前端：无改动（射界/方位由引擎裁决，前端不复制几何）。
+3. 验收：新增 `tests/test_bearing.py` 5 例；全量 `171 passed`；想定 1/3 自动终局不回退。
+
+## 齐射推荐修正方向纠错批次（用户确认 D66 骰点越小越好）
+
+状态：已完成
+
+批次结果（2026-08-25）：用户纠正"炮击命中表骰点越小越好、骰点是六进制 D66"——核对了命中表（玩家辅助 2 页：火力 1 时骰点 11→1 发命中、13+→0，低段命中更多）与 `d66_adjust`（修正沿 36 档 D66 阶梯移动，负修正移向 11 = 更容易命中），**引擎裁决方向本来正确**（`_resolve_gunnery`：`d66_adjust(raw, modifier)` 后查 `hit_count`，负修正 = 更容易）。但齐射推荐器的"修正最佳"方向取反了：`gunnery_assist` 与前端 `pickBestTarget` 都用 `max`（修正越大越好），而 D66 是**越小越好、修正为负更好**，导致推荐选了修正更差的目标（如博伊西被推荐 11 格的衣笠 mod -4，而 7 格的青叶 mod -12 才是最佳）。修正：引擎 `gunnery_assist` 最佳修正改 `min`、带内判定改 `<= best+BAND`、并列改按 `t["modifier"]` 升序；前端 `pickBestTarget` 同样改 `modifier<best`。修复后 IBS-S-01 第 1 回合盟军：博伊西 → 青叶（7 格 -12）、海伦娜 → 青叶、盐湖城 → 初雪、旧金山 → 古鹰，DD（法伦霍尔特/拉菲/布坎南/麦卡拉）因只有初雪为 -12 档而集火初雪（无法在不牺牲质量下分散，符合"修正最好前提下分散"）。IBS-S-03：德舰三 DD 在 -20 档内分散到标枪/克什米尔/泽西。**同时更正上一条目结论**："衣笠更好"与"IBS-Q-004 射程修正矛盾"均为高骰点更好误读的产物；低骰点更好下射程表与正文一致，IBS-Q-004 已 resolved。
+
+来源与边界：用户指出"在炮击命中表里骰点越小越好，还有其他修正引擎做了吗，还有航速修正，这里骰点是六进制"。核对结论：命中表低段命中更多（低骰点更好）✓；骰子为 D66（两枚 d6 十位+个位）✓；`_gunnery_modifiers` 已实现全部 11 项修正（射程、目标航速 0/-4/-9/-18、纵射、口径对目标、射击指挥仪损毁、集火附加射手、多目标、目标起火、雷达/照明弹、探照灯、烟幕），并全部并入裁决 `modifier=sum(...)` ✓；目标航速修正确实生效 ✓。仅推荐器的"最佳修正"比较方向错误（把负修正当差、实际是奖励）。边界：不改任何修正常量与裁决路径；鱼雷为独立 2D6 高骰点系统（≥11/≥13），无此方向问题，不动。
+
+1. 后端：`gunnery_assist`（engine.py ~551）最佳修正 `max→min`、带内 `>= best-BAND → <= best+BAND`、并列键 `-t["modifier"] → t["modifier"]`；docstring 注明 D66 低骰点更好。
+2. 前端：PlanSheet.tsx `pickBestTarget` `target.modifier>best.modifier → <`（逐舰齐射与"首选目标"提示共用）。
+3. 验收：`tests/test_gunnery_assist.py` 方向断言改 `min`/带内 `<=`，LODY 断言改为取 -20 档泽西（不再取更差的 -12 标枪）；全量 `171 passed`；`tsc -b` 与 Vite 生产构建通过；8000 后端重启，live `gunnery-assist` 返回博伊西→青叶。
+
+## 增援入场 + 移动计划航迹批次（用户改进点 1/2）
+
+状态：已完成
+
+批次结果（2026-08-25）：用户报告两个改进点——(1) 埃斯佩兰斯角海战想定有增援却一直没有出现；(2) 移动计划阶段，舰船移动后应在目标格留下一个浅色算子、沿途留下连线。根因：(1) **引擎增援机制完整且工作正常**（第 3 回合 REINFORCEMENT 阶段推进时掷 1D6 检定、`succeeds_on=[1]` 约 1/6 成功率、第 4 回合入场、E17–U27 51 格最短六角边走廊 `_reinforcement_entry_legal`、校验要求全部 8 舰且入口格互不重复）——"一直没有"是**前端缺口**：增援分支永远显示"本阶段没有可用增援"，没有入场表、没有检定结果显示，玩家无法提交增援订单，于是增援从未入场。(2) 引擎 `movement_preview` 本就计算逐舰航迹，但无批量接口，前端无法把草稿全部移动计划一次画到地图上。
+
+修复（后端只读、前端只画线/只提交订单，规则常量不复制）：
+- `_reinforcement_candidates(state, side)`（engine.py ~570）：只列本方 `reinforcement_turn == 当前回合` 且未入场的舰，按 `_reinforcement_entry_legal` 枚举入口走廊格，取最后一条 `reinforcement_roll` 事件作为检定结果 → `{group_available, arrival_turn, trigger_turn, succeeds_on, roll_result, entry_range, entry_hexes, ships:[{ship_id,name,asset,max_speed}]}`。接入 `legal_actions` REINFORCEMENT 的 schema_hint（~449）。
+- `movement_plan_trajectories(state, side, plans)`（engine.py ~617）：逐舰复用 `movement_preview`，非本方/沉没/无位舰返回 invalid 条目而不抛错（批量草稿宽容），→ `{trajectories:[{ship_id,plan,cost,valid,commitable,errors,trajectory,end_hex,end_heading}]}`。新增 `MovementTrajectoriesRequest` + `POST /games/{id}/movement-trajectories` 只读端点（MOVEMENT_PLANNING 外 409）。
+- 前端：types/api 增 `MovementTrajectory/MovementTrajectoriesResponse/ReinforcementCandidates` 与 `movementTrajectories`；App 在 movement_planning 阶段对草稿 250ms 防抖批量拉取航迹；HexMap 画"浅色连线"（去重连续同格后的起点→各中间格 polyline，虚线 65% 透明度）+ 目标格"浅色算子"（舰船素材 42% 透明度、按 end_heading 旋转、带舰名）；PlanSheet 增援分支改为完整入场表——检定结果状态条（成功/失败/骰点）、入口走廊说明、"自动分配互不重复入口格"按钮、逐舰入口格下拉（走廊 51 格）+ 舰首 + 速度，入口格重复时标红提示；检定失败时提示"本回合无增援入场，提交确认即可"，无增援想定/回合保持原"没有可用增援"文案。
+
+来源与边界：用户"埃斯佩兰斯角海战剧本不是有增援吗，一直没有呀"（增援 UI 缺口）与"移动计划一艘船移动完在目标点留下一个浅一点的算子，在走过各自留下连线"（航迹叠加）。边界：增援检定与入场校验完全由引擎 `_resolve_reinforcements`/`submit_orders` 裁决，前端只提交 `{ship_id, entry_hex, heading, speed}` 订单；入口走廊/检定结果由 `_reinforcement_candidates` 下发，前端不复制 51 格走廊坐标与 `succeeds_on`；航迹由 `movement_preview` 计算，前端只画 polyline 与目标算子。移动计划批接口与逐舰 `movement-preview` 同属只读，不落库、不改裁决路径。
+
+1. 后端：
+   - `_reinforcement_candidates` + `movement_plan_trajectories`（如上）；`legal_actions` REINFORCEMENT schema_hint 增 `reinforcement_candidates`。
+   - `models.py` 增 `MovementTrajectoryEntry/MovementTrajectoriesRequest`；`api.py` 增 `POST /games/{id}/movement-trajectories`（只读、MOVEMENT_PLANNING 外 409、非本方舰返回 invalid 条目）。
+2. 前端：
+   - `types.ts` 增三类型；`api.ts` 增 `movementTrajectories`；App 防抖拉取 + 交接/开局清空；HexMap 增 `plannedTrajectories` 渲染；PlanSheet 增援入场表。
+3. 验收：新增 `tests/test_reinforcement_candidates.py` 6 例（成功种子 3：group/roll/corridor 51 格/8 舰、失败种子 1、触发前空、仅本方、legal_actions 嵌入、API 序列化）+ `tests/test_movement_trajectories.py` 5 例（与 movement_preview 一致、stationary、非本方 invalid、无位舰 invalid、API 形状/敌方 invalid/错误阶段 409）；全量 `182 passed`；`tsc -b` 通过；Vite 生产构建 39 模块通过；8000 后端重启，live HTTP 驱动种子 3 到第 4 回合增援成功入场（轴心地图 5+8=13 舰）、`movement-trajectories` 返回 KARL GALSTER `1S1` 航迹。
+
+
+## 射界热力图批次（用户：两方射界图开关）
+
+状态：已完成（计划先行 → 后端 + 前端 + 验收均完成）；追加"选舰"子模式（用户："选中哪个就展示那个船的火力热力"，已完成）
+
+目标：地图上加一个"两方射界图"开关，对地图每格汇总两方各舰每门火炮的"射界 + 射程范围"，按火炮强度与该格距离修正加权生成热力图；热力跨舰/跨炮叠加，两方可同时叠加显示。
+
+设计要点（治理：热值/命中表/距离修正全部由引擎唯一计算，前端只渲染颜色与开关）：
+- 引擎新增只读 `field_of_fire_heatmap(state, viewer, ship_id=None, target_speed=4)`：对双方分别算 `{hex_label: heat}`，只含 heat>0 的格。**热值 = Σ 可指向该格的炮位 firepower × 该格 D66 期望命中数**（期望命中 = `range_modifier("gunnery", distance)` + `target_speed_modifier("gunnery", target_speed)` 移档后对 36 档 D66 全举 `hit_count` 求均值——包含"火炮强度"与"那格的距离修正"；默认目标航速 4，其修正按已验证表取 0（0→-18、1→-9、2-3→-4、4+→0），近格修正更负 → 期望命中更高 → 更热）。
+- 修复（用户演示核对发现）：初版实现只加期望命中数、**漏乘 firepower**，与公式不符；`_ship_fire_heat` 改 `heat[label] += mount.firepower * expected_hits(...)`，测试对照助手同步补乘。
+- 射界几何：抽取 `_relative_aspect(origin, heading, target)` 静态助手（bearing 取六方向 + 舰首方位 rel → BOW/STARBOARD/STERN/PORT，与 `_mount_can_bear` 完全同源），`_mount_can_bear` 改为复用它，防两处漂移。
+- 本方：真实状态，已毁炮位剔除；敌方：按记录全炮位（**不泄漏隐藏损伤**），且只含 `_visible_to` 可见的敌舰（**不泄漏隐蔽舰船位置**）。
+- 端点 `POST /games/{id}/field-of-fire`（viewer 走 `X-Player-Side` header），任意阶段可用（战术叠加层），返回 `{viewer, sides:{axis:{hexes,max_heat,ships}, allies:{hexes,max_heat,ships}}}`；可选 body `{ship_id}` → 只算该舰（所属侧填充、另一侧为空；本方真实炮位、敌方记录炮位、敌方舰仍须可见）。
+- 前端：地图区开关"射界热力图：关 / 轴心 / 同盟 / 双方 / 选舰"；HexMap 增 `fireHeatmaps` prop——**双方统一红色**（用户要求），"双方"模式合并两侧热值；每个有热值的六角格**显示热值数字**（覆盖坐标标注，`heatData` 合并 map + `heat-value` 文字样式）。"选舰"模式选中哪艘展示哪艘（`_ship_fire_heat` 复用同一公式），左上角显示当前舰名。
+
+来源与边界：用户原话"做一个两方射界图开关，举个例子，每个船的每一门炮的射界射程范围，按照火炮强度，那格的距离修正，做一个热力图，热力可叠加"。边界：热力图是可见信息推演类战术辅助（舰船身份/位置/航向均公开，敌方炮位按记录值），不泄漏隐蔽舰位置与隐藏损伤；引擎无硬性炮射程上限（距离修正表 21+ 收 +4），远格期望命中自然衰减近零，归一化后几乎不可见，符合规则裁决（远距仍可射击但极难命中）。
+
+1. 后端：抽取 `_relative_aspect`（`_mount_can_bear` 复用）；新增 `field_of_fire_heatmap` + `POST /games/{id}/field-of-fire` 端点。
+2. 前端：App 开关状态 + 防抖拉取；HexMap 热力色块渲染。
+3. 验收：新测试（36 档穷举与期望命中一致、射界与 `_mount_can_bear` 同源、隐蔽敌舰排除、隐藏损伤不泄漏、API 形状/只读）；全量 pytest；`tsc -b` + Vite 构建。
+
+## 战报火灾图标纠错 · 失速循环条 · 逐舰攻击结算分栏批次
+
+状态：已完成（用户报告"战报上怎么成功命中都是用火灾的棋子"，并顺带提出"失速的血条也在状态那显示"与"逐舰攻击结算最好左边显示轴心战果，右边显示同盟战果"）
+
+批次结果（2026-08-25）：根因——`BattleReportModal.resultIcon` 用 `/fire|火/.test(JSON.stringify(payload))` 字符串匹配 payload，命中表键名 `fire_added/fire_remaining`（即使值为 0 也存在）导致每次命中都渲染 `起火.png`。修复为只读引擎下发的 `damage` 对象：`fire_added + fire_remaining > 0` 才显示起火、`damage.sank` 或 `ship_sunk` 显示沉没，不再匹配键名。失速条：`PublicShip` 增 owner-only `speed_damage_crossed`/`speed_damage_track`（引擎 `_damage_snapshot` 同源），舰船状态表新增"失速循环"整宽行——按三回合循环逐行渲染速度损伤轨，已划去格（`index < crossed`）标红 ×；敌舰两字段保持 `null`（与 `max_speed` 同规则）。逐舰攻击结算：`gun_mount_attack`/`torpedo_attack` payload 增 `attacker_side`/`target_side`，战报"逐舰攻击结算"改为左"轴心战果"/右"同盟战果"双栏（无该侧攻击时显示空提示，未归类事件单列"其他攻击"），卡片复用同一渲染器。全量 `197 passed`（新增 3 例：炮击/鱼雷攻击事件 side 字段、观察本方暴露失速/敌方隐藏）；`tsc -b` 通过；Vite 生产构建 39 模块通过；8000 后端重启，live `observe` 返回本方 `speed_damage_crossed/track`、敌方 `null`，live 炮击 `gun_mount_attack` 返回 `attacker_side=axis`，`gunnery_result` 的 `fire_added/fire_remaining` 均为 0（修复后不再显示起火图标）。
+
+来源与边界：图标/失速/分栏全部只消费引擎下发数据——损伤 `damage`、速度损伤轨、攻击 side 字段，前端不复制任何裁决常量。速度损伤轨数值来自想定逐舰记录（`speed_damage_track`）与引擎 `_lose_speed` 结算结果，前端只画格。敌舰速度损伤沿用隐藏损伤边界不外泄。`attacker_side` 只标注双方都已可见的"谁攻击谁"，不新增信息。
+
+1. 后端：`gun_mount_attack`/`torpedo_attack` payload 增 `attacker_side/target_side`；`PublicShip` 增 `speed_damage_crossed`/`speed_damage_track`（本方，敌方 None）。
+2. 前端：`resultIcon` 改读 `damage.fire_added/fire_remaining/sank`；ShipStatusCard 增"失速循环"整宽行；BattleReportModal 逐舰攻击结算改轴心/同盟双栏。
+3. 验收：新 3 测试 + 全量 pytest；`tsc -b` + Vite 构建；live API 观察与炮击事件核对。
+
+## 鱼雷射角方向映射修正批次（用户权威规则 + 报告的 AA12 金例）
+
+状态：已完成（用户给出权威规则 → 改映射 → 更新/新增测试 → 全量验收 → live 核对）
+
+目标：修复鱼雷辅助的发射方向。用户报告：AA12（航向 4）舰左舷 B 应朝向 AA13-AA14（方向 3），左舷 X 应朝向 AA13-HH16 的东南斜线（方向 2），引擎此前给出 B→2、X→1。用户给出权威规则：假设船头朝向 m，左舷 A=所在格方向 m-1、B=所在格朝船头反方向一格方向 m-1、X=所在格朝船头方向前进一格方向 m-2、Y=所在格方向 m-2（减到 0 变成 6）；右舷镜像为 m+1/m+1/m+2/m+2（加到 7 变成 1）。
+
+设计要点（治理：方向映射唯一存放在 `torpedo-launch-directions.yaml`，引擎 `_torpedo_launch_heading` 读取，前端只消费引擎下发的 `relative_heading`/`torpedo_heading`，不复制常量）：
+- 来源：规则书 8.2.3 b（PDF 11 页）"两个方位共 8 种鱼雷发射轨道（每个舷侧 4 种）"；规则文本与用户权威规则一致 → 映射修正为 `port {A:-1,B:-1,X:-2,Y:-2}`、`starboard {A:+1,B:+1,X:+2,Y:+2}`（此前 `A:-1,B:-2,X:-3,Y:-4`/`+1,+2,+3,+4` 是错误推导）。
+- **只修方向、不改锚点**：全部鱼雷轨仍以舰所在发射格为起点。用户规则中"朝船头反方向一格/朝船头方向前进一格"若按字面实现为 B/X 锚点外移 1 格，将与用户自己报告的金例矛盾（B 线从船格起穿过 AA13-AA14）——方向映射已完全满足报告症状；锚点偏移作为开放问题记录（见 open_questions.md IBS-Q-005），待用户澄清。
+- 收敛的派生核对：舰首 4 时 左B→3（AA12→AA13→AA14）、左X→2（AA12→BB12→CC13→DD13→EE14→…东南斜线）；规则书 Aoba 例（舰首 2、左X）= m-2=0→6，旧注释"port-X=5"基于错误旧表，已修正。
+
+1. 后端：`resources/derived/structured/rules/torpedo-launch-directions.yaml` 改 `relative_heading`（含注释）；引擎 `_torpedo_launch_heading`/`_project_torpedo_path`/`_resolve_movement` 鱼雷循环零改动（全部读 yaml）。受影响测试同步更新：`test_engine.py` ABXY 全表、`relative_heading` 断言、两处 120° 转向发射航向断言、starboard-X 接触几何测试（Javelin 由 O14 改 N14，因新方向 m+2=5 走 O15→N14）。
+2. 测试：新增 `test_torpedo_launch_headings_match_authoritative_abxy_rule`——6 舰首 × 8 (side,angle) 全表对照权威规则参考式 + 用户金例（舰首 4：左B=3、左X=2、AA12→AA14 沿线）。
+3. 验收：全量 `198 passed`；`tsc -b` 通过；Vite 生产构建 39 模块成功；live：torpedo-assist 对舰首 4 舰返回左A/B=heading 3；`_project_torpedo_path` 从 AA12 投影 左B→`['AA12','AA13','AA14',…]`、左X→`['AA12','BB12','CC13','DD13',…]`，与用户报告一致。
+
+## 鱼雷锚点偏移 · 调试模式 · 鱼雷阶段航迹保留 · 鱼雷历史轨迹 · 船表完整战果批次
+
+状态：已完成（实现、回归、构建与测试全部通过，待用户浏览器视觉复核）
+
+来源与边界：用户两条指令——(1)"锚点按我说的改，加一个调试模式可以看到两边，船的运动轨迹在后面的鱼雷计划阶段保留"；(2)"鱼雷要加入鱼雷历史轨迹，在哪里发射的，船状态表的日志战果我希望展示完整"。锚点为用户权威规则（`IBS-R-08.2` b 项"朝船头反方向/前进一格"）字面实施，覆盖 IBS-Q-005 开放问题；调试模式只解锁观察（双方全可见）不参与任何裁决路径；鱼雷阶段航迹从已封存移动计划只读重放，敌方计划默认不泄漏；鱼雷历史轨迹/发射点/完整战果全部只消费引擎下发数据，前端不复制规则常量。
+
+1. 后端锚点：`torpedo-launch-directions.yaml` 增 `launch_anchor {A:0, B:-1, X:1, Y:0}`（左右舷共用，B 船尾外 1 格、X 船头外 1 格）；引擎新增 `_torpedo_anchor_hex(launch_hex, 发射时舰首, angle)`（锚点越界退回舰格），`_launch_torpedo_order` 的 `position/launch_position/traversed_hexes` 与 `_project_torpedo_path`/`_assist_intercept` 的起点统一经它计算；`_assist_evaluate` 传入 `launch_angle` 与舰首。方向（`relative_heading`）不变。
+2. 后端调试模式：`observe(game_id, side, debug=False)`——debug 时全舰可见、隐藏损伤与规划硬件全展示、鱼雷轨/事件/标记/比分不隐藏；`GET /games/{id}/view?debug=true` 透传。
+3. 后端鱼雷阶段航迹：新增 `sealed_movement_trajectories(state, side, debug=False)` 从 `_sealed_batches(MOVEMENT_PLANNING)` 只读重放逐舰 `movement_preview`（默认仅本方，debug 含敌方）；`GET /games/{id}/sealed-trajectories`（仅 TORPEDO_PLANNING，debug 可选）。
+4. 前端：App 增"调试"开关（header，切换即带 `debug` 重拉 view）；plannedTrajectories effect 增鱼雷计划阶段分支（`sealedTrajectories`，debug 透传）；HexMap 航迹区分敌我（敌方红线 85% 透明度 + 目标算子 60%）；鱼雷轨叠加历史航迹虚线（`torpedo-trail`）与发射点标记（`torpedo-launch-marker` 金色圆圈 + 角度字母）；ShipStatusCard 战果/受伤双栏去掉 `.slice(-8)` 截断、完整倒序展示并加 `max-height` 滚动。
+5. 验收：新增 3 测试（锚点全角度金标 AA12 舰首 4：B→BB11、X→Z12、A/Y→AA12；debug 观察全舰/隐藏损伤/比分；sealed 航迹仅本方/调试含敌方）+ 更新 2 接触几何测试（starboard-X 锚点 O16→N15、launch_position=锚点）；全量 `201 passed`；`tsc -b` 通过；Vite 生产构建 39 模块成功。`docs/rules/open_questions.md` IBS-Q-005 由 open 改 resolved 并记录用户裁决与金例说明。
+
+## 简单战术 AI（TacticalCommander）批次
+
+状态：已完成
+
+批次结果（2026-08-25）：按用户三要素实现确定性启发式战术 AI——(1) 炮击采纳 `gunnery_assist` 齐射推荐；(2) 移动打分为"去敌方火力热力小处 + 让敌方处于我方火力覆盖内"；(3) 鱼雷仅当距离较近且自动鱼雷系统 `expected_hits` 置信度高时才发射。接入范围＝教程对手 + 命令行（用户已确认"都接"）。研究依据（塔萨法隆加夜战"超射程乱射无益、近距才有效"；crossing the T 抢占 T 字横头；ATLATL/AlphaSCS/Panopticon/WarAgent）只用于定权重量纲，未引入训练模型。
+
+引擎只读/等价重构（规则常量唯一留在引擎，命中公式仍只在 `expected_gunnery_hits`）：
+- 新增 `expected_gunnery_hits(firepower, distance, target_speed=4)`——把热力闭包内 D66 36 档命中期望公式提为方法，闭包委托、记忆化保留，行为逐位不变（现有 heatmap 测试即回归护栏）。
+- 新增 `ship_gun_pressure(state, ship, position=None, heading=None, target_hexes=None)`——假想位/航向下单舰火力压力＝Σ 未毁炮位（`_relative_aspect` 在射界内）× firepower × 期望命中；默认目标格＝`_visible_to` 可见敌舰格（与 observe 同源，不泄漏隐蔽舰）。
+- 抽出共享枚举器 `_movement_expand`（首命令 advance、转后必 advance、末 60° 免费、120° 计 1MF、forced/界/陆约束），`_movement_reachable` 主循环改从它取转移（遍历顺序逐位不变）。
+- 新增 `movement_path(state, ship, target_hex, heading=None)`——用 `_movement_expand` 做 **0-1 BFS**（0 成本转向边 appendleft、1 成本推进边 append、dist 不含 cost 的键）带 parent 还原，返回 `{valid, commands, plan, cost, end_hex, end_heading}`；与 `movement_candidates` 同源，候选格必可达。
+
+新模块 `tactical.py`：`TacticalCommander(DeterministicCommander)`（复用父类 CONTACT_SETUP/REINFORCEMENT），`model="tactical-v1"`。顶部可调启发式权重/阈值（非规则常量）：`W_ENEMY_HEAT=1.0`、`W_FIRE_PRESSURE=1.0`、`W_APPROACH=0.5`、`APPROACH_RANGE=12`、`TORPEDO_MAX_RANGE=10`、`TORPEDO_MIN_EXPECTED=0.30`、`TOP_K_CANDIDATES=5`。`_plan_movement` 覆盖全部在位本方舰（满足 submitted==expected），敌方信息一律经 observe；对 `movement_candidates` 每个可达 (格, 末航向) 打分 `score = -W_ENEMY_HEAT·(敌热力/敌方max) + W_FIRE_PRESSURE·(本舰压力/候选空间max压力)`＋炮射程外接近项，确定性排序后对 TOP_K 候选逐个 `movement_path`→`movement_preview` 复核取合法计划，失败走回退链 `"0" → 直行 max_cost → 首个可达格`。`_plan_torpedoes` 对最近可见敌舰调 `torpedo_assist`，仅取 `distance ≤ 10` 且 `expected_hits ≥ 0.30` 且未 blocked 的组合，每发射器一条订单（launch_hex 经 `HexCoord.from_label`，天然匹配封存轨迹校验）。`_plan_gunnery` 直接采纳 `gunnery_assist["recommendations"]`。
+
+接线：`match.py` `make_session` 加 `"tactical"` 分支、CLI `--axis/--allies` choices 扩为 `("deterministic","tactical","deepseek")`；`api.py` 的 `suggested_orders` 与 `tutorial_opponent` 换用 `TacticalCommander()`（教程对手＝可对打的 AI，suggested-orders 仍是只读建议）。
+
+顺带修复的引擎 bug（AI 对 AI 压出）：
+- **同格 distance=0 三处 StopIteration**：碰撞检定失败的两舰合法同格 → 射程表/纵射表/穿透表查表越界。`_range_value` 下限钳到 `max(1, distance)`（单点覆盖全部射程表查表）、`penetration` 顶部 `max(1, distance)`。
+- **`movement_path` 原 FIFO 非最短**：0 成本转向边使 FIFO 可能返回非最短路径（实测 cost 6 vs 候选最小 4），改 0-1 BFS。
+- **确定性对手 `"0"` 计划对强迫舰非法**（桥楼/舵损伤 forced_circle/forced_speed）：新增 `_stationary_plan` 回退链 `"0" → 直行 max_cost → 首个可达格路径`，`DeterministicCommander` MOVEMENT 改用之（此前战术 AI 引发更多战斗→损伤态→6/36 压出该失败）。
+- **移动打分曾被火力压力项主导**（敌方热力归一 [0,1]、压力未归一 0–40，KARL-GALSTER 冲进更高敌热）：压力项按本舰候选空间最大压力归一，两项同量纲各权重 1.0。修复后种子扫掠 `mean_delta=-1.0`、16/24 not_worse。
+
+来源与边界：用户"火炮发射就按之前做的自动，移动尽量去敌方火力热力图小的地方同时保持敌方处于我方火力热力图大的地方，鱼雷距离较近、置信度高的时候发射"；接线范围按用户确认"教程对手 + 命令行都接"。边界：AI 只产订单不裁决，命中公式/规则常量唯一在引擎；敌方信息只经 `observe`/`_visible_to` 守卫的只读方法（不泄漏隐蔽舰位置与隐藏损伤）；权重/阈值为 tactical.py 顶部启发式常量，可调不触裁决；IBS-S-01 想定禁射（turn1 无炮击、turn4 前无鱼雷）由引擎 `blocked_reason`/推荐器自动覆盖，AI 不做绕过。
+
+1. 后端：引擎 `expected_gunnery_hits`/`ship_gun_pressure`/`_movement_expand`/`movement_path`（0-1 BFS）；`tactical.py` `TacticalCommander`；`llm.py` `_stationary_plan` 回退链；`match.py`/`api.py` 接线；同格 distance=0 三处钳制。
+2. 前端：本批次无前端改动（AI 产出与既有建议订单/教程对手共用同一前端提交路径）。
+3. 验收：新增 `tests/test_tactical_ai.py` 26 例（引擎新方法、AI 各阶段、集成）；全量 `227 passed`（`--basetemp=.pytest-verify`）；AI 对 AI 多 seed 终局 6 组合 × 6 seed＝36/36 COMPLETE 且确定（同 seed 两次一致）；CLI `python -m iron_bottom_sound.match --scenario IBS-S-03 --axis tactical --allies deterministic --seed 9` → passed=True、completed=True、winner=axis、request_count=32；`--scenario IBS-S-01` 双方向同样终局完成。
+
+## 人机大战 · AI 对抗评分 · 六风格 profile 批次
+
+状态：已完成
+
+用户两项请求：(1) UI 可以选择人机大战（玩家选一方 + 选对手 AI 风格，标准想定对打）；(2) AI 状态机改进——做决定时考虑对手下一回合也会动（对抗评分，默认开启），并培养不同风格（均衡/大舰队编队/长纵队/乱阵近战/鱼雷专精/猥琐保守）。
+
+来源与边界：AI 只产订单、走 `submit_orders`，引擎仍唯一裁决，规则常量不复制到前端；对抗评分为 1-ply——预测每艘可见敌舰下一回合最优落点（敌视角，只依赖敌当前可见信息、剥 `forced_*` 隐藏损伤、用 `_visible_to` 过滤我方可见舰，不泄漏隐蔽信息），我方威胁＝Σ 敌在其预测落点对我格的 `ship_gun_pressure`、压力＝我对敌预测落点集合的压力；`w_predict_opponent<=0` 退化为"预测=敌当前位置"静态语义（可关）。风格经 `TacticalProfile` 七个现有超参 + `w_formation/formation_spacing/line_ahead/w_predict_opponent` 表达，6 预设；模块级常量保留为 balanced 别名兼容既有 import，实现一律读 `self.profile.*`。`expected_gunnery_hits` 加实例级缓存（对抗后每次决策约 60k 次命中查表，无缓存 2-3s、缓存后 <100ms，行为纯等价）。
+
+1. 后端：`GameOptions.mode` 增 `"vs_ai"` + `ai_profile` 字段；`tactical.py` 新增 `TacticalProfile`/`PROFILES`（6 预设）与 `_MovementContext`/`_build_movement_context`/`_predict_enemy_move`/`_enemy_move_score`/`_formation_factor`，`_movement_order_for`/`_score_hex`/`_plan_torpedoes` 读 `self.profile.*`；`engine.py` `expected_gunnery_hits` 缓存；`api.py` 新增通用 `POST /games/{id}/ai-opponent`（X-Player-Side + body.profile，幂等，不含订单）；`match.py` `make_session`/CLI 加 `--axis-profile/--allies-profile`。
+2. 前端：`api.ts` `createGame` mode 扩 `"vs_ai"` + 可选 aiProfile、新增 `aiOpponent`；`App.tsx` mode 三态、Landing 增人机大战入口（想定+玩家阵营+对手风格）、`act()` 增 vs_ai 分支（submit → aiOpponent → advance → refresh，无交接屏）、header 显示「对手：{风格}」。
+3. 测试：重写 `test_tactical_ai.py` 5 例（13/14/15/16/22，签名/语义随对抗化变化，22 改 profile copy 替代 monkeypatch 常量）+ 新增（预测合法性与确定性、敌规避我方热力、队形间距、长纵队共线、多 profile 移动差异、多 profile run_match 确定性、ai-opponent 端点 409/幂等/422/推进、现有 tutorial/hotseat/match 用例实证跑通）。
+4. 验收：全量 pytest、`tsc -b`、Vite 生产构建、CLI 多 profile 确定性（同 seed 两次 match-report.json 一致）、浏览器人机大战逐阶段推进 + 6 风格阵型差异肉眼核对；完成后向 `havedone.md` 追加。
+
+## AI 态势感知（残血/血量/状态/火炮/VP）+ 随机射击 + 存档格式设计批次
+
+状态：实现、测试、CLI 验证与设计文档完成；git 提交待用户决定（分支存在大块未提交基准）
+
+批次结果（2026-08-25）：用户四项改进——① 残血时应远离；② 决策考虑血量/状态/剩余炮门/VP；③ 炮击+移动落点评分归一化 softmax 抽样加随机（种子化可复现）；④ 存档/状态表示设计（本批只出文档）。引擎只读增量：`PublicShip.vp`、`_gunnery_candidates` 每目标 `expected_hits`（命中公式唯一在引擎，AI 不复制）、`gunnery_assist` 透传、薄封装 `gunnery_target_options`。`tactical.py`：`TacticalProfile` 增 8 个可调字段（产品默认 `retreat_hull_threshold=0.35/w_retreat=1.0/w_protect_own=0.5/w_vp=0.3/w_finish=0.5/w_self_status=0.3/temperature=0.5/rng_seed_off=0`）；`_value_factor`（VP+补刀加权）、`_own_value`（残血/高价值/带伤→退避强度，满血=0）、`_value_pressure`（逐候选价值加权火力压力）、残血退避项（`own_value·w_retreat·Δdist/approach_range`）、`_sample_weighted` softmax 抽样（temp≤0→argmax 不耗 RNG）；AI 独立种子化 RNG `Random(seed·1000003+turn·10007+side·101+phase·11+off)`，纯整数派生、与引擎骰子流隔离、不用 game_id/hash()/set 序。炮击改为逐舰对全部候选目标按 `expected_hits×价值` softmax 抽一个（可多舰集火），敌情一律走 observe() 不泄漏隐藏损伤。全量 `254 passed`；CLI 复验同 seed 两遍逐位一致、temperature 0/0.5/2.0 下 MOVEMENT/GUNNERY 均不同、残血 GALSTER 距敌预测格 1.0→8.5 显著退避（BEITZEN/LODY 因火力优势位留守＝打分决策，调参留后续）。设计文档 `docs/architecture/state-representation.md`：一个真相源（SQLite）+ 两投影——投影一 JSONL 世界态 + cell-aligned ASCII/整数棋盘（918 格、坐标表头+图例，TopoBench +30-40pp），投影二 918 格多通道特征张量 .npz（11 通道复用 `field_of_fire_heatmap` 扫格 + 动作合法掩码），静态/动态切分，文献/GitHub 清单（TopoBench/GVGAI-LLM/ResTNet/antiyoy-ai/NuZero/SMAC 等），分步实施路线；本批不写导出代码。
+
