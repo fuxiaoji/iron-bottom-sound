@@ -327,6 +327,7 @@ class IronBottomEngine:
             ships=ships,
             torpedo_tracks=tracks,
             markers=markers,
+            wrecks=deepcopy(state.wrecks),
             score=(
                 deepcopy(state.score)
                 if debug or not (state.options.optional_rules.hidden_damage and state.phase != Phase.COMPLETE)

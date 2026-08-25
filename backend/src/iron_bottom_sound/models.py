@@ -551,6 +551,7 @@ class PlayerObservation(BaseModel):
     ships: list[PublicShip]
     torpedo_tracks: list[TorpedoTrack] = Field(default_factory=list)
     markers: list[MarkerState] = Field(default_factory=list)
+    wrecks: list[WreckState] = Field(default_factory=list)
     score: dict[str, int]
     recent_events: list[GameEvent]
     winner: Side | None
