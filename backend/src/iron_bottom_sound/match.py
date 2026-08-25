@@ -8,6 +8,7 @@ from pathlib import Path
 from .engine import ORDER_PHASES, IronBottomEngine
 from .llm import DeterministicCommander, LLMPlayerSession, OpenAICompatibleCommander
 from .models import GameOptions, MatchReport, OptionalRules, Phase, Side
+from .state_export import export_frame, render_board
 from .tactical import PROFILES, TacticalCommander
 
 
@@ -40,9 +41,15 @@ def run_match(
         Side.AXIS: make_session(Side.AXIS, axis, axis_profile),
         Side.ALLIES: make_session(Side.ALLIES, allies, allies_profile),
     }
+    frames: list[dict] = []
+    boards: dict[Side, list[tuple[int, Phase, str]]] = {Side.AXIS: [], Side.ALLIES: []}
     failure: str | None = None
     try:
         while state.phase != Phase.COMPLETE:
+            # 投影一：每个阶段对双方各累积一帧世界态 + 一份棋盘（含自动阶段）。
+            for side in Side:
+                frames.append({**export_frame(state, engine, side, recent_limit=20), "side": side.value})
+                boards[side].append((state.turn, state.phase, render_board(state, engine, side)))
             if state.phase in ORDER_PHASES:
                 for side in Side:
                     if sum(len(session.audits) for session in sessions.values()) >= request_limit:
@@ -75,17 +82,35 @@ def run_match(
         failure_reason=failure,
     )
     if artifact_dir is not None:
-        write_match_artifacts(Path(artifact_dir), report, state, sessions)
+        write_match_artifacts(Path(artifact_dir), report, state, sessions, frames=frames, boards=boards)
     return report, engine, sessions
 
 
-def write_match_artifacts(directory: Path, report, state, sessions) -> None:
+def write_match_artifacts(
+    directory: Path, report, state, sessions,
+    frames: list[dict] | None = None,
+    boards: dict[Side, list[tuple[int, Phase, str]]] | None = None,
+) -> None:
     directory.mkdir(parents=True, exist_ok=True)
     (directory / "match-report.json").write_text(report.model_dump_json(indent=2), encoding="utf-8")
     (directory / "event-replay.json").write_text(
         json.dumps([event.model_dump(mode="json") for event in state.events], ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
+    if frames:
+        (directory / f"{state.game_id}-frames.jsonl").write_text(
+            "\n".join(json.dumps(frame, ensure_ascii=False) for frame in frames),
+            encoding="utf-8",
+        )
+    if boards:
+        for side, entries in boards.items():
+            parts = [
+                f"# turn {turn} · {phase.value} · {side.value}\n{board}"
+                for turn, phase, board in entries
+            ]
+            (directory / f"{state.game_id}-board-{side.value}.txt").write_text(
+                "\n\n".join(parts), encoding="utf-8"
+            )
     for side, session in sessions.items():
         private = {
             "side": side.value,
