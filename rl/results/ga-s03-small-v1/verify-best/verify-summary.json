@@ -1,0 +1,137 @@
+{
+  "scenario": "IBS-S-03",
+  "genes": [
+    0.8111108683772686,
+    0.7565240069635011,
+    -0.13557557479092358,
+    1.4759788215641252,
+    -1.6589410142241678,
+    1.628702638835168,
+    0.9892114842430458,
+    0.7849098435262691,
+    0.4837586472536405,
+    0.0,
+    0.0,
+    0.3396176891571525,
+    0.3519118174053405,
+    0.5004914707543072,
+    8.814498936886002,
+    13.908247672788953
+  ],
+  "opponents": {
+    "balanced": {
+      "axis": {
+        "games": 12,
+        "win_rate": 0.0,
+        "avg_margin": 0.0,
+        "wins": 6,
+        "draws": 0,
+        "losses": 6
+      },
+      "allies": {
+        "games": 12,
+        "win_rate": 0.1667,
+        "avg_margin": 0.0,
+        "wins": 7,
+        "draws": 0,
+        "losses": 5
+      },
+      "combined_win_rate": 0.0833
+    },
+    "fleet": {
+      "axis": {
+        "games": 12,
+        "win_rate": -0.5,
+        "avg_margin": 0.0,
+        "wins": 3,
+        "draws": 0,
+        "losses": 9
+      },
+      "allies": {
+        "games": 12,
+        "win_rate": 0.0,
+        "avg_margin": 0.0,
+        "wins": 6,
+        "draws": 0,
+        "losses": 6
+      },
+      "combined_win_rate": -0.25
+    },
+    "line": {
+      "axis": {
+        "games": 12,
+        "win_rate": -0.3333,
+        "avg_margin": 0.0,
+        "wins": 4,
+        "draws": 0,
+        "losses": 8
+      },
+      "allies": {
+        "games": 12,
+        "win_rate": 0.8333,
+        "avg_margin": 0.0,
+        "wins": 11,
+        "draws": 0,
+        "losses": 1
+      },
+      "combined_win_rate": 0.25
+    },
+    "brawl": {
+      "axis": {
+        "games": 12,
+        "win_rate": -0.5,
+        "avg_margin": 0.0,
+        "wins": 3,
+        "draws": 0,
+        "losses": 9
+      },
+      "allies": {
+        "games": 12,
+        "win_rate": 0.0,
+        "avg_margin": 0.0,
+        "wins": 6,
+        "draws": 0,
+        "losses": 6
+      },
+      "combined_win_rate": -0.25
+    },
+    "torpedo": {
+      "axis": {
+        "games": 12,
+        "win_rate": -0.1667,
+        "avg_margin": 0.0,
+        "wins": 5,
+        "draws": 0,
+        "losses": 7
+      },
+      "allies": {
+        "games": 12,
+        "win_rate": 0.5,
+        "avg_margin": 0.0,
+        "wins": 9,
+        "draws": 0,
+        "losses": 3
+      },
+      "combined_win_rate": 0.1667
+    },
+    "cautious": {
+      "axis": {
+        "games": 12,
+        "win_rate": 0.1667,
+        "avg_margin": 0.0,
+        "wins": 7,
+        "draws": 0,
+        "losses": 5
+      },
+      "allies": {
+        "games": 12,
+        "win_rate": -0.1667,
+        "avg_margin": 0.0,
+        "wins": 5,
+        "draws": 0,
+        "losses": 7
+      },
+      "combined_win_rate": 0.0
+    }
+  }
+}

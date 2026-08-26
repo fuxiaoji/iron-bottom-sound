@@ -1,0 +1,24 @@
+{
+  "w_enemy_heat": 0.8111108683772686,
+  "w_fire_pressure": 0.7565240069635011,
+  "w_approach": -0.13557557479092358,
+  "approach_range": 9,
+  "torpedo_max_range": 14,
+  "torpedo_min_expected": 0.3396176891571525,
+  "top_k_candidates": 5,
+  "w_formation": 1.4759788215641252,
+  "formation_spacing": [
+    2,
+    4
+  ],
+  "line_ahead": -1.6589410142241678,
+  "w_predict_opponent": 1.628702638835168,
+  "retreat_hull_threshold": 0.3519118174053405,
+  "w_retreat": 0.9892114842430458,
+  "w_protect_own": 0.7849098435262691,
+  "w_vp": 0.4837586472536405,
+  "w_finish": 0.0,
+  "w_self_status": 0.0,
+  "temperature": 0.5004914707543072,
+  "rng_seed_off": 0
+}

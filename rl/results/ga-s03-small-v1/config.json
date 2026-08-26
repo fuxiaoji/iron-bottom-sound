@@ -1,0 +1,27 @@
+{
+  "scenario": "IBS-S-03",
+  "gens": 10,
+  "pop_size": 16,
+  "opponents": [
+    "balanced"
+  ],
+  "games_per_opp": 4,
+  "workers": 8,
+  "seed": 20260826,
+  "out": "rl/results/ga-s03-small-v1",
+  "tournament_k": 3,
+  "elite_fraction": 0.15,
+  "hall_of_fame": 4,
+  "recombine_prob": 0.8,
+  "uniform_crossover_prob": 0.3,
+  "blx_alpha": 0.5,
+  "mutation_prob_hi": 0.4,
+  "mutation_prob_lo": 0.15,
+  "sigma_frac_hi": 0.2,
+  "sigma_frac_lo": 0.05,
+  "reset_prob": 0.03,
+  "novelty_lambda": 0.5,
+  "novelty_k": 3,
+  "vp_weight": 0.01,
+  "seed_base": 1000
+}

@@ -2,6 +2,16 @@
 
 本文件只追加完成记录；每次发布前补充对应提交哈希。
 
+## 2026-08-26（批次 5）：人类下订单可选状态机 AI 半自动指导 + 部署线上
+
+- **需求（用户）**：「我希望在人类对战时可以选择不同风格的状态机ai做半自动指导，就是自动选择，完成后同步服务器」。经 AskUserQuestion：**选择器范围 = 所有人类下订单的模式**（hotseat 双人 + vs_ai 人机 + llm 人类一方，教程关除外），每方各自选风格。
+- **后端（`api.py` suggested-orders，1 处改动）**：新增 `profile: str = "balanced"` query 参数，解析 `CHAMPIONS.get(profile, PROFILES.get(profile))`（与 ai-opponent 完全一致，未知名 `HTTPException(422)`），`TacticalCommander(profile=style).choose_orders(...)` 按所选风格返回引擎已校验的可编辑 OrderBatch → 人类在编辑器确认/手改后提交。半自动=AI 只预填草稿，最终仍人类确认、引擎唯一裁决；建议不进战报 ai_action。
+- **前端**：`api.ts` suggestedOrders 带 `?profile=`；`App.tsx` 加 `guideProfiles: Record<Side,string>`（每方独立记忆），订单编辑器内、PlanSheet 上方加「自动指导风格」bar（`mode!=="tutorial"` 显示，AI_PROFILES optgroup 分「内置风格/进化冠军」，切换即 `suggestedOrders` 自动重填本阶段草稿 + 显示所选风格 intro 一行「仅建议可手改」）；`style.css` 加 `.guide-bar/.guide-intro`。
+- **测试**：`test_api_ai_opponent.py` 新增 `test_suggested_orders_profile_selects_ai_style`（`?profile=evolved` 返回 batch 且 `POST /orders` 200；`?profile=torpedo` 同；`?profile=nope` → 422）。全量 **336 passed**（含批次 4 之前的 335 + 新增 1）。
+- **部署**（沿用批次 4 paramiko 流 + 记忆两个坑）：打包排除 `.git/tmp/node_modules/artifacts/dist/backend/reports/__pycache__/.venv/.pytest-*/.pt-run-*/.env` 及 `*.sqlite3*`（101MB/475 项，资源 PDF 未变但随包重传，安全第一）；服务器 `.venv/bin/python` 导入检查 OK；`npm install && npm run build -- --base=/tiedi/` → 新 bundle `index-CNZdkanC.js`（含「guide-bar」「自动指导风格」）；`systemctl restart tiedi` active；验证局 `e3191f1f-...`（seed 31，hotseat）写入线上 DB（无科研同意，不碍事）。
+- **线上验证**：三端点 200（scenarios/root/counter，127.0.0.1:8001 直测）+ 公共域名 `https://fuwenji.asia/tiedi/` 200；`suggested-orders?profile=torpedo` → **200**、`?profile=nope` → **422**（风格解析真上线）；grep 服务器 `api.py:173` 新分支 + bundle 新字符串确认新代码。
+- **部署脚本**：`/tmp/ibs_deploy.py`（打包→SFTP→解包→导入检查→npm build→restart→curl/grep，支持 `dry`/`deploy`/`verify` 三模式），未入库。
+
 ## 2026-08-23
 
 - 完成全部来源的只读盘点、哈希核验与逐页首轮视觉检查。
@@ -356,3 +366,24 @@
 - **前端（Landing）**：新增「LLM API 密钥」password 输入（提示仅会话内存、不上传/不落盘，可一键清除）+「科研用途同意」勾选（勾选后显示称呼输入，maxLength=40）；`createGame`/`llmOpponent` 传参（llmOpponent 请求体带 api_key，每次行动走本次密钥）。
 - **测试**：新增 tests/test_research_consent.py 13 例（密钥仅内存不落库、注入/请求级/服务器 env 三优先级、advance 叙事用注入密钥、同意落库+通知、拒绝只落库不通知、未传不落、落库失败不影响建局、Server酱 URL/标题/正文、非 0 码/异常→False、channel 未配置→False）；更新 test_api_llm_opponent.py 适配 `api_key` 工厂签名与新 503 文案。全量 `334 passed`。
 - **本地环境注意**：仓库路径含中文（铁底湾），pytest 默认 basetemp `.pytest-tmp` 被残留进程/ACL 锁住 → 用 `-p no:cacheprovider --basetemp=$TEMP/ibs-pytest-tmp` 规避；另残留的本地 dev server（`python -m iron_bottom_sound`）需先 `taskkill` 释放 DB 锁。前端本机无 node，构建在服务器验证。
+
+## 2026-08-26（批次 3）：选出的状态机 AI 加入本地端 + 服务端（标注胜率、写简介）
+
+- **需求（用户）**："现在先把这些选出来的状态机加入本地端和服务端，调各个风格的冠军，标注胜率，介绍一下"。经 AskUserQuestion：**训练规模 = 就用现在训练完的**（不跑新的 6 场风格锚定 GA）；**阵容 = 6 内置风格 + 全局进化冠军**。
+- **测量赛（不训练只测量，~10 分钟）**：`rl/style_tourney.py` 扩展为多想定（--scenario 逗号分隔），跑 7 profile（6 内置 + 全局进化冠军）× 双想定（S-03+S-01）× 12 局/槽 × 双阵营 = 2016 局，`rl/results/style-tourney-final/`（games.jsonl + style-summary.json，含逐想定×阵营 + 两两矩阵）。
+- **双想定综合胜率差分（288 局/风格）**：balanced **+0.018** · fleet +0.017 · brawl +0.007 · torpedo +0.003 · line −0.073 · **evolved −0.077** · cautious −0.145。S-03 全无平局（目标制、轴心侧全负）、S-01 平局 ~60%（胜利点差<4）。
+- **⚠ 重要诚实结论**：**进化冠军在 7 阵容全体互殴里排倒数第二**——此前 fresh-seed 验证的 +36 Elo 只对 balanced 单独有效；对上 torpedo（两想定合成 −0.333）尤其吃亏。"进化冠军"的价值是**打法个性（防守反击：热点集火+高撤退+抢胜利点）而非更强**，胜率标注与实际对局一致。若想要各风格独立的进化冠军，需另跑 6 场风格锚定 GA（~2.5-3h）。
+- **接入（后端，本地端+服务端共用）**：新建 `champions.py`（`CHAMPIONS["evolved"]`，16+3 字段代码常量自包含，不依赖 rl/ 文件，生产部署可用；附 `CHAMPION_INFO` 元数据）；`match.py make_session` 加 `_resolve_profile`（字符串先查 CHAMPIONS 再查 PROFILES，本地引擎可 `axis_profile="evolved"`）；`api.py ai-opponent` 校验/取值改 `PROFILES | CHAMPIONS`（`CHAMPIONS.get(name, PROFILES.get(name))`，未知名仍 422）；`models.py GameOptions.ai_profile` 注释更新。
+- **前端（本地端 UI）**：`App.tsx` `AI_PROFILES` 改富结构 `{id,label,group,intro,win}`，下拉 `<optgroup>` 分「内置风格/进化冠军」两组，select 下方 `.vs-persona` 显示所选简介 + 胜率标注，对局徽章按 label 显示。7 个简介文案按基因+实测行为写。**本机无 node**（`npx` 不存在，全盘已检索过），tsc/vite 构建留服务器做，TSX 改动人工核对语法。
+- **测试**：新增 `test_vs_ai_accepts_evolved_champion_profile`（建局 ai_profile=evolved → 玩家提交 → ai-opponent 200）；全量 **331 passed**（0 失败）。本地引擎冒烟：`run_match(axis_profile='evolved')` 一局跑通。
+- **产物**：`rl/results/style-tourney-final/`（胜率表）· `backend/src/iron_bottom_sound/champions.py`（注册表）· 前端 `App.tsx`/`style.css` · 结论入 `rl/DESIGN.md §10`、`rl/README.md`。
+
+## 2026-08-26（批次 4）：状态机 AI 阵容部署到线上（fuwenji.asia/tiedi）
+
+- **需求（用户）**："接入服务器了吗" → 提供线上 root 凭据（密码仅瞬时环境变量传参，绝不落盘/进仓库）要求部署。
+- **部署路径（无 git remote，rsync 替代）**：本机无 sshpass/rsync → `paramiko`（SFTP 传 tarball + SSH exec）。打包排除 `.git/tmp/node_modules/artifacts/backend/reports/backend/*.sqlite3*/rl/dist/__pycache__/.venv/.pnpm-store/.pytest-tmp/.pt-run-*`（88MB/460 项），SFTP 上传 59s，服务器 `tar xzf` 解到 `/opt/tiedi`，**线上 DB（3.8MB+WAL）与 .venv/密钥文件未触碰**。
+- **后端**：无需重装（editable install 直接读 src），冒烟 `_resolve_profile('evolved')` → 冠军基因（w_enemy_heat 2.51 / w_retreat 3.0）就位。
+- **前端（服务器构建）**：`npm install --no-audit --no-fund && npm run build -- --base=/tiedi/` → **tsc 通过** + vite 1.57s 产出 `dist/assets/index-CsaiKKjG.js`（含「进化冠军/GA 进化·防守反击/内置风格」字符串）。
+- **重启 + 全链路线上验证（公共域名直测）**：`/tiedi/` 200；scenarios API 正常；建 `ai_profile=evolved` 人机局 → 玩家未提交时 `ai-opponent(profile=evolved)` **409 而非 422**（风格过校验）；玩家提交增援后冠军真出招 `{"valid":true,"ai_submitted":true}`。systemd 无启动报错。
+- **线上遗留**：验证局 `5c5afda2-...`（IBS-S-03 seed 5，ai_profile=evolved）写入线上 DB（1 局，无科研同意，不碍事）。
+- **部署教训**：SFTP 对某特定文件名 open 瞬时 ENOENT（同名大文件换名即好，怀疑残留/tmp 状态）→ 遇到即换名重传；大文件 SFTP 在本链路 ~1.4MB/s，59s 传 88MB，确认后删临时包。

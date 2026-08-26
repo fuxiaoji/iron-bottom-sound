@@ -120,7 +120,7 @@
 .roster-row-meta{display:flex;flex-wrap:wrap;gap:.12rem .5rem;font-size:.62rem;color:#9eaaa6}
 
 /* 人机大战入口卡片与对手徽标 */
-.vs-card{display:grid;gap:.4rem;border:1px solid #9e8350;background:linear-gradient(145deg,#2d3d38,#202b2a);padding:1rem;min-width:260px;text-align:left}.vs-card>b{font-size:1.12rem}.vs-form{display:grid;gap:.45rem;margin-top:.4rem}.vs-form select{width:100%;background:#0e181a;color:#e9e2d0;border:1px solid #52615f;padding:.5rem;font:inherit}.vs-form button{background:#5b4829;border-color:#c0a05f}
+.vs-card{display:grid;gap:.4rem;border:1px solid #9e8350;background:linear-gradient(145deg,#2d3d38,#202b2a);padding:1rem;min-width:260px;text-align:left}.vs-card>b{font-size:1.12rem}.vs-form{display:grid;gap:.45rem;margin-top:.4rem}.vs-form select{width:100%;background:#0e181a;color:#e9e2d0;border:1px solid #52615f;padding:.5rem;font:inherit}.vs-form button{background:#5b4829;border-color:#c0a05f}.vs-persona{display:grid;gap:.2rem;border-left:2px solid #9e8350;padding:.2rem .55rem;font-size:.72rem;color:#c9c0a8}.vs-persona b{color:#e9d9a8;font-weight:600}
 .opponent-badge{display:inline-block;margin-top:.35rem;border:1px solid #66856d;background:#1d3028;color:#9ac8a7;padding:.18rem .5rem;font-size:.68rem}
 /* 战报系统：起始勾选 / 回合页签 / 叙事 / 双视角缩略图 / lightbox / 下载 */
 .record-report{display:flex;align-items:center;gap:.5rem;margin:.6rem 0 .4rem;padding:.55rem .8rem;border:1px solid #40504e;background:#1b292b;color:#aeb9b5;font-size:.8rem}.record-report.on{border-color:#9e8350;color:#e9e2d0}
@@ -129,8 +129,31 @@
 /* 用户自备 LLM API 密钥（会话内存，不上传/不落盘） */
 .llm-key-row{display:flex;align-items:center;gap:.5rem;margin:.35rem 0 1.1rem;padding:.55rem .8rem;border:1px solid #40504e;background:#152126;color:#aeb9b5;font-size:.8rem}.llm-key{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}.llm-key input{width:22rem;background:#0e181a;color:#e9e2d0;border:1px solid #52615f;padding:.4rem .5rem;font:inherit}.clear-key{padding:.3rem .6rem;border-color:#6b423f;background:#3a2320;color:#e0a59d;font-size:.72rem}
 .report-tabs{display:flex;gap:.4rem;flex-wrap:wrap;padding:.7rem 1.4rem 0;border-bottom:1px solid #52615f;background:#111b1d}.report-tabs button{padding:.35rem .7rem;border-color:#40504e;background:#203033;color:#aeb9b5;font-size:.78rem}.report-tabs button.active{border-color:#b99d67;background:#293b3c;color:#f0d99f}
+.report-note{color:#9eaaa6;font-size:.72rem;margin-left:auto}
+.game.report .workspace{grid-template-columns:1fr}
+.game.report .map-zoom-controls{display:none}
+.game.report .map-column .heatmap-toggle{display:none}
 .report-narrative p{margin:.45rem 0;color:#d7ded8;line-height:1.8}
-.report-captures .capture-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:.8rem}.capture-thumb{margin:0;cursor:zoom-in;border:1px solid #3c4d4c;background:#0d1517}.capture-thumb img{display:block;width:100%;height:auto}.capture-thumb figcaption{padding:.4rem .6rem;font-size:.72rem;color:#9eaaa6}
+.report-captures .capture-row,.report-phase .capture-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:.8rem}.capture-thumb{margin:0;cursor:zoom-in;border:1px solid #3c4d4c;background:#0d1517}.capture-thumb img{display:block;width:100%;height:auto}.capture-thumb figcaption{padding:.4rem .6rem;font-size:.72rem;color:#9eaaa6}
+.report-phase{padding:1.1rem 1.4rem;border-bottom:1px solid #304143}
+.report-phase h3{font:1rem Georgia,serif;color:#e6d7ad;margin:.4rem 0 .6rem;display:flex;align-items:baseline;gap:.6rem}
+.report-phase h3 small{color:#9eaaa6;font:normal .7rem system-ui;font-weight:400}
+.phase-narrative p{margin:.5rem 0;color:#d7ded8;line-height:1.85}
+.phase-plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:.8rem;margin:.9rem 0}
+.ai-plan{background:#182426;border:1px solid #3c4d4c;padding:.7rem .8rem;border-radius:6px}
+.ai-plan h4{margin:.15rem 0 .55rem;display:flex;align-items:baseline;justify-content:space-between;color:#c6a766;font:1rem Georgia,serif}
+.ai-plan h4 small{color:#9eaaa6;font:normal .68rem system-ui}
+.plan-table{width:100%;border-collapse:collapse;font-size:.74rem}
+.plan-table th{text-align:left;color:#9eaaa6;font-weight:normal;white-space:nowrap;border-bottom:1px solid #3f5050;padding:.32rem .55rem .32rem 0;vertical-align:top;width:5.5rem}
+.plan-table td{border-bottom:1px solid #2c3d3e;padding:.32rem 0;color:#e9e2d0;line-height:1.55}
+.ai-reasoning{margin:.55rem 0 0}
+.ai-reasoning summary{cursor:pointer;color:#d9b968;font-size:.72rem}
+.ai-reasoning p{margin:.45rem 0 0;color:#c9cfca;line-height:1.7;font-size:.76rem;white-space:pre-wrap;border-left:3px solid #5b4829;padding-left:.7rem}
 .lightbox{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:2rem;background:#000000d9;backdrop-filter:blur(2px)}.lightbox figure{margin:0;max-width:min(1330px,96vw);max-height:94vh;display:grid;gap:.6rem;justify-items:center}.lightbox img{max-width:100%;max-height:86vh;border:1px solid #52615f}.lightbox figcaption{color:#d7ded8;font-size:.8rem}.lightbox button{padding:.4rem .7rem}
 .battle-report>footer .footer-actions{margin-left:auto;display:flex;gap:.6rem}.battle-report>footer .footer-actions button{margin-left:0}
 @media(max-width:700px){.capture-row{grid-template-columns:1fr}.report-tabs{padding-left:1rem;padding-right:1rem}}
+/* 自动指导风格（状态机 AI 半自动填单） */
+.guide-bar{display:grid;grid-template-columns:auto 1fr;gap:.45rem .6rem;align-items:center;background:#0e181a;border:1px solid #52615f;border-radius:6px;padding:.55rem .7rem;margin-bottom:.6rem}
+.guide-bar>label{font-size:.74rem;color:#d7ded8;white-space:nowrap}
+.guide-bar select{background:#0e181a;color:#e9e2d0;border:1px solid #52615f;padding:.38rem .5rem;font:inherit;font-size:.78rem}
+.guide-intro{grid-column:1/-1;font-size:.72rem;color:#9eaaa6;line-height:1.5}

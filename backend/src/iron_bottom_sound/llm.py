@@ -268,10 +268,18 @@ _DISCIPLINE_SYSTEM_PROMPT = (
     "「覆盖每艘活动舰」之列；movement 只覆盖 status 无 sunk 且 hex 非空的本方舰。\n"
     "- TorpedoOrder：先在该舰 torpedo_candidates 的 launch_positions 里选一个发射 MF 序号 i"
     "（第 0 项=开火前，之后每项=第 i 个机动点）。launch_at_mf=i，launch_hex=launch_positions[i].hex，"
-    "bearing=launch_positions[i].heading。bearing 是发射瞬间舰船航向（1..6），不是鱼雷行进方向；"
-    "不要用 relative_heading 或 launch_side/launch_angle 去换算 bearing。launcher_id 取该舰 launchers 里 "
-    "loaded>0 且 sides 含所需舷的；launch_side 取该发射器 sides 之一，launch_angle 取 angles 之一"
-    "（A/B/X/Y），setting_index 取 settings 里的 index。\n"
+    "bearing=launch_positions[i].heading。bearing 是发射瞬间舰船航向（1..6），引擎强制等于该 MF 的 "
+    "heading，不要改它。launcher_id 取该舰 launchers 里 loaded>0 且 sides 含所需舷的；launch_side 取 "
+    "该发射器 sides 之一，launch_angle 取 angles 之一（A/B/X/Y），setting_index 取 settings 里的 index。\n"
+    "罗盘（航向=行进方向）：1=东北(+1,-1) 2=东南(+1,0) 3=南(0,+1) 4=西南(-1,+1) 5=西北(-1,0) "
+    "6=北(0,-1)。\n"
+    "鱼雷行进方向（≠bearing）：鱼雷实际航向 = ((该 MF 舰船航向 − 1 + relative) 在 1..6 回绕) + 1，"
+    "relative 见 torpedo_candidates 的 relative_heading：左舷 A/B=−1、X/Y=−2；右舷 A/B=+1、X/Y=+2。"
+    "例：舰船航向 3（南）配左舷/A → 鱼雷航向 2（东南）；配右舷/A → 航向 4（西南）；航向 1（东北）配"
+    "左舷/X(−2) → 回绕到航向 5（西北）。\n"
+    "瞄准：先用世界态帧算 舰→目标 的轴向位移 (Δq, Δr)，对到最接近的罗盘航向 D；再在 launch_positions "
+    "里选 MF 与 launch_side/launch_angle，使上面公式算出的鱼雷航向最接近 D。没有任何组合能让鱼雷指向 "
+    "目标（目标过近、或所选 MF 航向推离目标等）时，torpedoes 留空，绝不盲射。\n"
     "- GunneryOrder：只对 gunnery_candidates 里 targets 非空的候选开火，mount_id 必须原样取自"
     "该候选 targets 的 mount_ids（禁止自造或仿照示例）。targets 为空或 blocked_reason 非空的舰"
     "本回合没有任何合法射击，不得写入 gunnery；gunnery 数组允许留空。\n"
@@ -464,6 +472,7 @@ class OpenAICompatibleCommander(LLMCommander):
             errors: list[str] = []
             request_id: str | None = None
             usage: dict[str, Any] = {}
+            reasoning_content: str | None = None
             reasoning_preview: str | None = None
             try:
                 client = self.client or httpx.Client(timeout=self.timeout)
@@ -479,6 +488,7 @@ class OpenAICompatibleCommander(LLMCommander):
                 message = body["choices"][0]["message"]
                 reasoning = message.get("reasoning_content") or ""
                 if reasoning:
+                    reasoning_content = reasoning  # 全文：只进战报/本地存档
                     reasoning_preview = reasoning[:500] + "…"
                 plan = AIPlanSheet.model_validate_json(message["content"])
                 batch = OrderBatch.model_validate(plan.orders)
@@ -491,14 +501,14 @@ class OpenAICompatibleCommander(LLMCommander):
                 if not errors:
                     audits.append(self._audit(
                         state.turn, state.phase, side, attempt, started, request_id, usage,
-                        True, [], reasoning_preview,
+                        True, [], reasoning_preview, reasoning_content,
                     ))
                     return plan, batch, audits
             except (httpx.HTTPError, KeyError, TypeError, ValueError) as error:
                 errors.append(type(error).__name__)
             audits.append(self._audit(
                 state.turn, state.phase, side, attempt, started, request_id, usage,
-                False, errors, reasoning_preview,
+                False, errors, reasoning_preview, reasoning_content,
             ))
             prompt["validation_errors"] = errors
         raise ValueError({"message": "LLM failed to self-correct within two retries", "audits": audits})
@@ -546,6 +556,7 @@ class OpenAICompatibleCommander(LLMCommander):
         valid: bool,
         errors: list[str],
         reasoning_preview: str | None = None,
+        reasoning_content: str | None = None,
     ) -> LLMCallAudit:
         details = usage.get("prompt_tokens_details") or {}
         return LLMCallAudit(
@@ -562,6 +573,7 @@ class OpenAICompatibleCommander(LLMCommander):
             valid=valid,
             validation_errors=errors,
             reasoning_preview=reasoning_preview,
+            reasoning_content=reasoning_content,
         )
 
 

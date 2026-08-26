@@ -13,12 +13,14 @@ from .battle_report import (
     build_report_data,
     build_report_markdown,
     capture_after_advance,
+    capture_ai_action,
     capture_phase_snapshot,
 )
 from .engine import IronBottomEngine
 from .data import ROOT
 from .llm import OpenAICompatibleCommander
 from .state_export import export_frame, render_board
+from .champions import CHAMPIONS
 from .tactical import PROFILES, TacticalCommander
 from .models import GameOptions, GunneryAssistRequest, MovementPreviewRequest, MovementTrajectoriesRequest, OrderBatch, Phase, ResearchConsent, Side, TorpedoAssistRequest
 from .notify import notify_research_consent
@@ -154,12 +156,23 @@ def game_export(game_id: str, x_player_side: Annotated[str | None, Header()] = N
 
 
 @app.get("/games/{game_id}/suggested-orders")
-def suggested_orders(game_id: str, x_player_side: Annotated[str | None, Header()] = None):
-    """Return an editable, engine-validated starting batch without exposing enemy data."""
+def suggested_orders(
+    game_id: str,
+    profile: str = "balanced",
+    x_player_side: Annotated[str | None, Header()] = None,
+):
+    """Return an editable, engine-validated starting batch without exposing enemy data.
+
+    profile 选择状态机 AI 风格（内置 PROFILES / 进化冠军 CHAMPIONS，与 ai-opponent 一致）：
+    半自动指导——按所选风格生成建议订单，人类在编辑器里确认/手改后再提交。
+    """
     get_game(game_id)
     side = side_from_header(x_player_side)
+    style = CHAMPIONS.get(profile, PROFILES.get(profile))
+    if style is None:
+        raise HTTPException(422, f"Unknown AI profile {profile}")
     try:
-        return TacticalCommander().choose_orders(engine, game_id, side)
+        return TacticalCommander(profile=style).choose_orders(engine, game_id, side)
     except ValueError as error:
         raise HTTPException(409, str(error)) from error
 
@@ -217,19 +230,28 @@ def ai_opponent(game_id: str, request: AIOpponentRequest | None = None, x_player
     player_side = side_from_header(x_player_side)
     ai_side = player_side.opponent
     profile_name = request.profile if request is not None and request.profile else "balanced"
-    if profile_name not in PROFILES:
+    profile = CHAMPIONS.get(profile_name, PROFILES.get(profile_name))
+    if profile is None:
         raise HTTPException(422, f"Unknown AI profile {profile_name}")
     if player_side.value not in state.submitted_orders:
         raise HTTPException(409, "Submit the player's orders first")
     if ai_side.value in state.submitted_orders:
         return {"valid": True, "ai_submitted": True}
     try:
-        batch = TacticalCommander(profile=PROFILES[profile_name]).choose_orders(engine, game_id, ai_side)
+        plan, batch, audits = TacticalCommander(profile=profile).choose_plan(engine, game_id, ai_side)
     except ValueError as error:
         raise HTTPException(409, str(error)) from error
     result = engine.submit_orders(game_id, batch)
     if not result.valid:
         raise HTTPException(409, result.errors)
+    if state.options.battle_report:
+        try:
+            capture_ai_action(
+                repository, game_id, state.turn, state.phase.value, ai_side.value,
+                plan, None, audits, state,
+            )
+        except Exception:
+            pass  # 战报失败绝不影响对局
     repository.save(engine.get(game_id))
     return {"valid": True, "ai_submitted": True}
 
@@ -282,12 +304,21 @@ def llm_opponent(
     thinking = request.thinking_enabled if request is not None else False
     commander = llm_commander_factory(timeout=timeout, thinking_enabled=thinking, api_key=key)
     try:
-        _, batch, audits = commander.choose_plan(engine, game_id, ai_side)
+        plan, batch, audits = commander.choose_plan(engine, game_id, ai_side)
     except ValueError as error:
         raise HTTPException(409, str(error)) from error
     result = engine.submit_orders(game_id, batch)
     if not result.valid:
         raise HTTPException(409, result.errors)
+    if state.options.battle_report:
+        try:
+            reasoning = audits[-1].reasoning_content if audits else None
+            capture_ai_action(
+                repository, game_id, state.turn, state.phase.value, ai_side.value,
+                plan, reasoning, audits, state,
+            )
+        except Exception:
+            pass  # 战报失败绝不影响对局
     repository.save(engine.get(game_id))
     return {
         "valid": True,

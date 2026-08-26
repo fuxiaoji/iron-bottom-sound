@@ -12,6 +12,8 @@ LLM 叙事只从 `DEEPSEEK_API_KEY` 环境变量读取密钥（调用时读，�
 from __future__ import annotations
 
 import base64
+import html as _html
+import json
 import math
 import os
 from pathlib import Path
@@ -270,13 +272,49 @@ PHASE_ORDER = [
     "movement_resolution", "gunnery", "torpedo_effects", "fire_end",
 ]
 
+# 阶段显示名（呈现层，非规则）。
+PHASE_NAMES = {
+    "contact_setup": "隐蔽标记部署",
+    "reinforcement": "增援",
+    "movement_planning": "移动计划",
+    "torpedo_planning": "鱼雷计划",
+    "movement_resolution": "同步移动",
+    "gunnery": "炮击",
+    "torpedo_effects": "鱼雷效果",
+    "fire_end": "起火与回合结束",
+    "summary": "回合总结",
+    "complete": "想定结束",
+}
+
+# 战报条目主键是 (game_id, sequence, side)。事件 sequence 很小，与 capture 同侧会冲突，
+# 故 ai_action / 每阶段叙事用高位段稳定序号：1e9 + turn*1000 + 阶段序*10 + 侧序。
+_SIDE_INDEX = {"axis": 0, "allies": 1, "both": 2}
+
+
+def _report_sequence(turn: int, phase: str, side: str) -> int:
+    phase_index = PHASE_ORDER.index(phase) if phase in PHASE_ORDER else 99
+    return 1_000_000_000 + turn * 1000 + phase_index * 10 + _SIDE_INDEX.get(side, 2)
+
+
 NARRATIVE_SYSTEM_PROMPT = (
-    "你是一位太平洋夜战编年史官，正为一场海战撰写中立战报。\n"
+    "你是一位太平洋夜战编年史官，正为一场海战撰写中立战报的回合总结。\n"
     "纪律：\n"
     "- 只依据下方给出的【本回合公开事件】与【双方公开态势】写作，不虚构、不推测、"
     "不提及任何一方的订单、计划或未公开信息。\n"
     "- 不偏向任何一方，不使用任何一方的内部视角词（如“我舰”“我军计划”）。\n"
-    "- 用叙事化、克制的编年史笔法，写 150-250 字，分 2-3 段。\n"
+    "- 用叙事化、克制的编年史笔法，写 250-400 字，分 3-4 段，按此结构："
+    "① 本回合双方的行动与关键交锋；② 此刻双方的阵位与损失；③ 对后续战局的影响或悬念。\n"
+    "- 只输出正文本身，不要标题、不要“战报：”前缀、不要引用事件编号。"
+)
+
+_PHASE_NARRATIVE_SYSTEM_PROMPT = (
+    "你是一位太平洋夜战编年史官，正为一场海战撰写中立战报中【本阶段】的叙述。\n"
+    "纪律：\n"
+    "- 只依据下方给出的【本阶段公开事件】与【双方公开态势】写作，不虚构、不推测、"
+    "不提及任何一方的订单、计划或未公开信息（包括尚未公开的航迹与秘密计划）。\n"
+    "- 不偏向任何一方，不使用任何一方的内部视角词（如“我舰”“我军计划”）。\n"
+    "- 用叙事化、克制的编年史笔法，写 200-350 字，分 2-3 段，按此结构："
+    "① 本阶段双方的行动与交战；② 此刻双方的态势（阵位、损失）；③ 对后续战局的影响或悬念。\n"
     "- 只输出正文本身，不要标题、不要“战报：”前缀、不要引用事件编号。"
 )
 
@@ -309,19 +347,33 @@ def _public_score(state: GameState, engine: IronBottomEngine) -> dict[str, int]:
 
 
 def build_narrative_prompt(
-    state: GameState, engine: IronBottomEngine, turn: int
+    state: GameState, engine: IronBottomEngine, turn: int, phase: str | None = None
 ) -> tuple[str, str]:
-    """(system, user)：中立战史提示词。事件只带引擎 message+公开骰子，不传 payload。"""
+    """(system, user)：中立战史提示词。事件只带引擎 message+公开骰子，不传 payload。
+
+    phase 为空 → 回合总结（全回合事件）；否则只给该阶段事件 + 阶段专用提示词。
+    """
+    events = public_events_for_turn(state, engine, turn)
+    if phase is not None:
+        events = [event for event in events if event.phase.value == phase]
     by_phase: dict[str, list[str]] = {}
-    for event in public_events_for_turn(state, engine, turn):
+    for event in events:
         by_phase.setdefault(event.phase.value, []).append(_describe_event(event))
-    lines = [f"【回合 {turn}/{state.max_turns}】", "【本回合公开事件（按阶段）】"]
-    for phase in PHASE_ORDER:
-        if phase not in by_phase:
-            continue
-        lines.append(f"· {phase}")
-        for item in by_phase[phase]:
+    if phase is not None:
+        lines = [
+            f"【回合 {turn}/{state.max_turns}】",
+            f"【阶段：{PHASE_NAMES.get(phase, phase)} · 本阶段公开事件】",
+        ]
+        for item in by_phase.get(phase, []):
             lines.append(f"  - {item}")
+    else:
+        lines = [f"【回合 {turn}/{state.max_turns}】", "【本回合公开事件（按阶段）】"]
+        for phase_name in PHASE_ORDER:
+            if phase_name not in by_phase:
+                continue
+            lines.append(f"· {phase_name}")
+            for item in by_phase[phase_name]:
+                lines.append(f"  - {item}")
     lines.append("【双方公开态势】")
     for side in Side:
         obs = engine.observe(state.game_id, side)
@@ -330,17 +382,24 @@ def build_narrative_prompt(
             for ship in obs.ships
         ) or "无可见舰船"
         lines.append(f"- {side.value}: {ships}  比分={obs.score}")
-    return NARRATIVE_SYSTEM_PROMPT, "\n".join(lines)
+    system = NARRATIVE_SYSTEM_PROMPT if phase is None else _PHASE_NARRATIVE_SYSTEM_PROMPT
+    return system, "\n".join(lines)
 
 
 def deterministic_fallback_narrative(
-    state: GameState, engine: IronBottomEngine, turn: int
+    state: GameState, engine: IronBottomEngine, turn: int, phase: str | None = None
 ) -> str:
     """无密钥/叙事失败时的事实摘要（确定性、不联网、只列公开事件）。"""
-    lines = [f"第 {turn} 回合（共 {state.max_turns} 回合）",
-             "叙事模型未配置，以下为本回合公开事件事实摘要："]
+    events = public_events_for_turn(state, engine, turn)
+    if phase is None:
+        lines = [f"第 {turn} 回合（共 {state.max_turns} 回合）",
+                 "叙事模型未配置，以下为本回合公开事件事实摘要："]
+    else:
+        events = [event for event in events if event.phase.value == phase]
+        lines = [f"第 {turn} 回合 · {PHASE_NAMES.get(phase, phase)}",
+                 "叙事模型未配置，以下为本阶段公开事件事实摘要："]
     current_phase = None
-    for event in public_events_for_turn(state, engine, turn):
+    for event in events:
         if event.phase != current_phase:
             current_phase = event.phase
             lines.append(f"· {current_phase.value}")
@@ -357,14 +416,22 @@ def write_turn_narrative(
     state: GameState, engine: IronBottomEngine, turn: int,
     commander: Any = None,
 ) -> str:
-    """有叙事 commander 且调用成功 → LLM 叙事；否则确定性摘要。战报失败绝不影响对局。"""
+    """回合总结叙事（全回合事件）；失败 → 确定性摘要。战报失败绝不影响对局。"""
+    return write_phase_narrative(state, engine, turn, None, commander)
+
+
+def write_phase_narrative(
+    state: GameState, engine: IronBottomEngine, turn: int, phase: str | None,
+    commander: Any = None,
+) -> str:
+    """按阶段（phase 为空=全回合总结）生成中立叙事：LLM 成功用 LLM，否则确定性摘要。"""
     if commander is not None:
         try:
-            system, user = build_narrative_prompt(state, engine, turn)
+            system, user = build_narrative_prompt(state, engine, turn, phase)
             return commander.write_narrative(system, user)
         except Exception:
             pass
-    return deterministic_fallback_narrative(state, engine, turn)
+    return deterministic_fallback_narrative(state, engine, turn, phase)
 
 
 # ---------------------------------------------------------------------------
@@ -378,18 +445,25 @@ def _image_dir(root, game_id: str) -> Path:
 
 def capture_phase_snapshot(
     repository, root, state: GameState, engine: IronBottomEngine,
-    turn: int, phase: str, sequence: int | None = None,
+    turn: int, phase: str, sequence: int | None = None, renderer: Any = None,
 ) -> list[dict[str, Any]]:
     """双侧 PNG + DB 行（幂等：同 (game_id, sequence, side) INSERT OR REPLACE）。
-    返回条目字典列表（match.py 累积用）。"""
+    返回条目字典列表（match.py 累积用）。
+
+    renderer 可选：`(state, engine, side, save_path) -> None`，替换默认 PIL 渲染
+    （runner 传真实 UI 截图回调）；缺省行为不变。
+    """
     if sequence is None:
         sequence = state.events[-1].sequence if state.events else 0
     entries: list[dict[str, Any]] = []
     for side in Side:
-        image = render_map_image(state, engine, side)
         rel = f"turn-{turn}-{phase}-{side.value}-{sequence}.png"
-        (Path(root) / state.game_id / rel).parent.mkdir(parents=True, exist_ok=True)
-        image.save(Path(root) / state.game_id / rel, format="PNG")
+        save_path = Path(root) / state.game_id / rel
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        if renderer is not None:
+            renderer(state, engine, side, save_path)
+        else:
+            render_map_image(state, engine, side).save(save_path, format="PNG")
         entry = {
             "game_id": state.game_id, "sequence": sequence, "turn": turn,
             "phase": phase, "side": side.value, "kind": "capture", "image_path": rel,
@@ -404,38 +478,108 @@ def capture_phase_snapshot(
 
 def capture_after_advance(
     repository, root, state: GameState, engine: IronBottomEngine,
-    prev_phase, commander: Any = None,
+    prev_phase, commander: Any = None, renderer: Any = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
     """`engine.advance` 之后调用（state 已是结算后）。label=prev_phase（结算后快照）。
 
-    返回 (新捕获条目列表, 新叙事条目或 None)。FIRE_END 同时触发上一回合叙事（幂等：
-    有库时靠 battle_narrative_exists，无库时每局各触发一次）。任何异常由调用方吞掉。
+    返回 (条目列表, 回合总结条目或 None)。条目列表 = 双视角截图 + **每阶段叙述**；
+    FIRE_END 额外触发**回合总结**（幂等：有库时靠 battle_narrative_exists）。任何异常由
+    调用方吞掉。
     """
     turn = state.turn
     label_phase = prev_phase.value
-    narrative_turn: int | None = None
+    narrative_turn = state.turn
     if prev_phase == Phase.FIRE_END:
         label_phase = "fire_end"
         narrative_turn = state.turn - 1 if state.phase == Phase.REINFORCEMENT else state.turn
         turn = narrative_turn
-    entries = capture_phase_snapshot(repository, root, state, engine, turn, label_phase)
+    entries = capture_phase_snapshot(
+        repository, root, state, engine, turn, label_phase, renderer=renderer
+    )
+    # 每阶段一段叙述（幂等：高位段稳定序号 INSERT OR REPLACE）。
+    phase_narrative = write_phase_narrative(state, engine, narrative_turn, label_phase, commander)
+    phase_sequence = _report_sequence(narrative_turn, label_phase, "both")
+    phase_entry: dict[str, Any] = {
+        "game_id": state.game_id, "sequence": phase_sequence, "turn": narrative_turn,
+        "phase": label_phase, "side": "both", "kind": "narrative",
+        "image_path": None, "content": phase_narrative,
+    }
+    if repository is not None:
+        repository.save_battle_entry(
+            state.game_id, phase_sequence, narrative_turn, label_phase, "both",
+            "narrative", content=phase_narrative,
+        )
+    entries.append(phase_entry)
     narrative_entry: dict[str, Any] | None = None
     if prev_phase == Phase.FIRE_END:
-        assert narrative_turn is not None
-        if repository is None or not repository.battle_narrative_exists(state.game_id, narrative_turn):
+        if repository is None or not repository.battle_narrative_exists(state.game_id, narrative_turn, "summary"):
             narrative = write_turn_narrative(state, engine, narrative_turn, commander)
             sequence = state.events[-1].sequence if state.events else 0
             narrative_entry = {
                 "game_id": state.game_id, "sequence": sequence, "turn": narrative_turn,
-                "phase": "fire_end", "side": "both", "kind": "narrative",
+                "phase": "summary", "side": "both", "kind": "narrative",
                 "image_path": None, "content": narrative,
             }
             if repository is not None:
                 repository.save_battle_entry(
-                    state.game_id, sequence, narrative_turn, "fire_end", "both",
+                    state.game_id, sequence, narrative_turn, "summary", "both",
                     "narrative", content=narrative,
                 )
     return entries, narrative_entry
+
+
+def capture_ai_action(
+    repository, game_id: str, turn: int, phase: str, side: str,
+    plan: Any, reasoning: str | None = None, audits: list[Any] | None = None,
+    state: GameState | None = None,
+) -> dict[str, Any] | None:
+    """AI 订单捕获：AIPlanSheet + LLM 思考全文 → kind='ai_action' 的 JSON 行。
+
+    幂等（高位段稳定序号）；失败由调用方吞掉，绝不影响对局。返回条目字典或 None。
+    """
+    try:
+        plan_data = plan.model_dump(mode="json") if plan is not None else {}
+        if state is not None:
+            intents = plan_data.get("unit_intents", {})
+            plan_data["unit_intents"] = {
+                _unit_label(state, key): value for key, value in intents.items()
+            }
+        model = audits[-1].model if audits else "unknown"
+        audits = audits or []
+        elapsed_ms = sum(int(audit.elapsed_ms) for audit in audits)
+        input_tokens = sum(int(audit.input_tokens) for audit in audits)
+        output_tokens = sum(int(audit.output_tokens) for audit in audits)
+        content = json.dumps({
+            "plan": plan_data,
+            "reasoning": reasoning,
+            "model": model,
+            "elapsed_ms": elapsed_ms,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+        }, ensure_ascii=False)
+        sequence = _report_sequence(turn, phase, side)
+        entry = {
+            "game_id": game_id, "sequence": sequence, "turn": turn,
+            "phase": phase, "side": side, "kind": "ai_action",
+            "image_path": None, "content": content,
+        }
+        if repository is not None:
+            repository.save_battle_entry(
+                game_id, sequence, turn, phase, side, "ai_action", content=content
+            )
+        return entry
+    except Exception:
+        return None
+
+
+def _unit_label(state: GameState, key: str) -> str:
+    """unit_intents 的键（ship/marker id）→ 可读名；找不到则原样返回。"""
+    ship = state.ships.get(key)
+    if ship is not None:
+        return f"{ship.name}（{key}）"
+    if any(marker.id == key for marker in state.markers):
+        return f"接触标记 {key}"
+    return key
 
 
 # ---------------------------------------------------------------------------
@@ -444,26 +588,46 @@ def capture_after_advance(
 def build_report_data(
     state: GameState, engine: IronBottomEngine, entries: list[dict[str, Any]] | list[Any],
 ) -> dict[str, Any]:
-    """中立战报 JSON（api 端点与 match json 共用）。captures 按 (turn, phase) 归组。"""
+    """中立战报 JSON（api 端点与 match json 共用）。captures/narratives/ai_actions 按
+    (turn, phase) 归组；回合总结叙事单独存 turn.narrative。"""
     captures: dict[tuple[int, str], list[dict[str, str]]] = {}
-    narratives: dict[int, str] = {}
-    for entry in entries:
-        if entry["kind"] == "capture":
+    narratives: dict[tuple[int, str], str] = {}
+    summaries: dict[int, str] = {}
+    ai_actions: dict[tuple[int, str], dict[str, Any]] = {}
+    # 兼容 dict（api._report_entries / match 累积）与 BattleReportEntry 对象。
+    normalized = [entry if isinstance(entry, dict) else entry.model_dump(mode="json")
+                  for entry in entries]
+    for entry in normalized:
+        kind = entry["kind"]
+        if kind == "capture":
             captures.setdefault((entry["turn"], entry["phase"]), []).append(
                 {"side": entry["side"], "image_path": entry["image_path"]}
             )
+        elif kind == "ai_action":
+            try:
+                payload = json.loads(entry["content"]) if entry.get("content") else {}
+            except (ValueError, TypeError):
+                payload = {}
+            ai_actions.setdefault((entry["turn"], entry["phase"]), {})[entry["side"]] = payload
+        elif entry["phase"] == "summary":
+            summaries[entry["turn"]] = entry["content"]
         else:
-            narratives[entry["turn"]] = entry["content"]
+            narratives[(entry["turn"], entry["phase"])] = entry["content"]
     turns: list[dict[str, Any]] = []
     for turn in range(1, state.turn + 1):
         phases = [
-            {"phase": phase, "captures": captures[(turn, phase)]}
+            {
+                "phase": phase,
+                "captures": captures.get((turn, phase), []),
+                "narrative": narratives.get((turn, phase)),
+                "ai_actions": ai_actions.get((turn, phase), {}),
+            }
             for phase in PHASE_ORDER
-            if (turn, phase) in captures
+            if (turn, phase) in captures or (turn, phase) in narratives or (turn, phase) in ai_actions
         ]
         turns.append({
             "turn": turn,
-            "narrative": narratives.get(turn),
+            "narrative": summaries.get(turn),
             "phases": phases,
             "events": [
                 {"sequence": event.sequence, "phase": event.phase.value,
@@ -496,14 +660,49 @@ def _read_image_b64(root, game_id: str, rel: str) -> str:
     return base64.b64encode(path.read_bytes()).decode("ascii")
 
 
+def _plan_table(ai_action: dict[str, Any]) -> list[str]:
+    """一个 AI 的计划表（Markdown 表格）。"""
+    plan = ai_action.get("plan") or {}
+    lines = ["| 项目 | 内容 |", "| --- | --- |"]
+    lines.append(f"| 态势判断 | {plan.get('situation_summary', '—')} |")
+    lines.append(f"| 阶段目标 | {plan.get('phase_goal', '—')} |")
+    intents = plan.get("unit_intents") or {}
+    intent_text = "；".join(f"{k}→{v}" for k, v in intents.items()) or "—"
+    lines.append(f"| 单元意图 | {intent_text} |")
+    contingency = plan.get("contingency") or []
+    lines.append(f"| 应变预案 | {'；'.join(contingency) or '—'} |")
+    orders = plan.get("orders") or {}
+    counts = [f"{key}×{len(value)}" for key, value in orders.items()
+              if isinstance(value, list) and value]
+    lines.append(f"| 订单 | {('，'.join(counts)) or '无'} |")
+    return lines
+
+
+def _ai_action_markdown(side_label: str, ai_action: dict[str, Any]) -> list[str]:
+    """一侧的 AI 行动小节：计划表 +（LLM 时）思考过程。"""
+    lines = [f"**{side_label}计划表**（{ai_action.get('model', '—')}）", ""]
+    lines.extend(_plan_table(ai_action))
+    reasoning = ai_action.get("reasoning")
+    if reasoning:
+        lines.extend([
+            "",
+            f"**{side_label}思考过程**（LLM）",
+            "",
+            "> " + reasoning.replace("\n", "\n> "),
+        ])
+    return lines
+
+
 def build_report_markdown(root, data: dict[str, Any], game_id: str) -> str:
-    """自包含 MD：截图以 data:image/png;base64 内嵌，可直接分享。"""
+    """自包含 MD：截图以 data:image/png;base64 内嵌，可直接分享。每个阶段都有
+    文字叙述 + 双视角地图 + AI 计划表（含 LLM 思考过程）。"""
     meta = data["meta"]
     score = meta["score"] or {}
     lines = ["# 铁底湾的回响 IV · 战报", ""]
     lines.append(f"- **想定**：{meta['scenario_title']}（{meta['scenario_id']}）")
     lines.append(f"- **模式**：{meta['mode']}　**种子**：{meta['seed']}")
-    lines.append(f"- **进度**：第 {meta['turn']}/{meta['max_turns']} 回合 · {meta['phase']}")
+    lines.append(f"- **进度**：第 {meta['turn']}/{meta['max_turns']} 回合 · "
+                 f"{PHASE_NAMES.get(meta['phase'], meta['phase'])}")
     lines.append(f"- **比分**：轴心 {score.get(Side.AXIS.value, 0)} : "
                  f"{score.get(Side.ALLIES.value, 0)} 盟军")
     if meta["winner"]:
@@ -515,18 +714,201 @@ def build_report_markdown(root, data: dict[str, Any], game_id: str) -> str:
         narrative = turn_data.get("narrative")
         if narrative:
             lines.append("")
+            lines.append("### 回合总结")
+            lines.append("")
             lines.append(narrative)
         for phase_data in turn_data.get("phases", []):
-            for cap in phase_data["captures"]:
-                lines.append("")
-                lines.append(
-                    f"![第{turn}回合 {phase_data['phase']} {cap['side']}视角]"
-                    f"(data:image/png;base64,{_read_image_b64(root, game_id, cap['image_path'])})"
-                )
+            phase = phase_data["phase"]
+            phase_label = PHASE_NAMES.get(phase, phase)
+            lines.extend(["", f"### {phase_label}（第 {turn} 回合）"])
+            phase_narrative = phase_data.get("narrative")
+            if phase_narrative:
+                lines.extend(["", phase_narrative])
+            captures = phase_data.get("captures") or []
+            if captures:
+                lines.extend(["", "**双方视角地图**", ""])
+                for cap in captures:
+                    side_label = "轴心" if cap["side"] == Side.AXIS.value else "同盟"
+                    lines.append(
+                        f"![第{turn}回合 {phase_label} {side_label}视角]"
+                        f"(data:image/png;base64,{_read_image_b64(root, game_id, cap['image_path'])})"
+                    )
+            ai_actions = phase_data.get("ai_actions") or {}
+            for side_key in ("axis", "allies"):
+                if side_key in ai_actions:
+                    side_label = "轴心" if side_key == Side.AXIS.value else "同盟"
+                    lines.extend(["", *_ai_action_markdown(side_label, ai_actions[side_key])])
         if turn_data.get("events"):
-            lines.append("")
-            lines.append("### 公开事件")
+            lines.extend(["", "### 公开事件"])
             for event in turn_data["events"]:
                 lines.append(f"- {event['message']}")
         lines.append("")
     return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# 轻量战报：不内嵌 base64，引用本地图片（浏览器/编辑器秒开）。
+# 产物须与图片目录同级（backend/reports/），相对路径 {game_id}/{image_path} 才有效。
+# ---------------------------------------------------------------------------
+def build_report_markdown_lite(data: dict[str, Any], game_id: str) -> str:
+    """轻量 MD：图片用相对路径引用（非 base64），文件仅几十 KB。"""
+    meta = data["meta"]
+    score = meta["score"] or {}
+    lines = ["# 铁底湾的回响 IV · 战报", ""]
+    lines.append(f"- **想定**：{meta['scenario_title']}（{meta['scenario_id']}）")
+    lines.append(f"- **模式**：{meta['mode']}　**种子**：{meta['seed']}")
+    lines.append(f"- **进度**：第 {meta['turn']}/{meta['max_turns']} 回合 · "
+                 f"{PHASE_NAMES.get(meta['phase'], meta['phase'])}")
+    lines.append(f"- **比分**：轴心 {score.get(Side.AXIS.value, 0)} : "
+                 f"{score.get(Side.ALLIES.value, 0)} 盟军")
+    if meta["winner"]:
+        lines.append(f"- **胜负**：{meta['winner']} 获胜（{meta['victory_reason']}）")
+    lines.append("")
+    lines.append("> 轻量版：图片为相对路径引用，需与本文件同级的图片目录一起打开；"
+                 "完整自包含版见 `<game_id>-battle-report.md`。")
+    lines.append("")
+    for turn_data in data["turns"]:
+        turn = turn_data["turn"]
+        lines.append(f"## 第 {turn} 回合")
+        narrative = turn_data.get("narrative")
+        if narrative:
+            lines.extend(["", "### 回合总结", "", narrative])
+        for phase_data in turn_data.get("phases", []):
+            phase = phase_data["phase"]
+            phase_label = PHASE_NAMES.get(phase, phase)
+            lines.extend(["", f"### {phase_label}（第 {turn} 回合）"])
+            phase_narrative = phase_data.get("narrative")
+            if phase_narrative:
+                lines.extend(["", phase_narrative])
+            captures = phase_data.get("captures") or []
+            if captures:
+                lines.extend(["", "**双方视角地图**", ""])
+                for cap in captures:
+                    side_label = "轴心" if cap["side"] == Side.AXIS.value else "同盟"
+                    rel = f"{game_id}/{cap['image_path']}"
+                    lines.append(
+                        f"![第{turn}回合 {phase_label} {side_label}视角]({rel})"
+                    )
+            ai_actions = phase_data.get("ai_actions") or {}
+            for side_key in ("axis", "allies"):
+                if side_key in ai_actions:
+                    side_label = "轴心" if side_key == Side.AXIS.value else "同盟"
+                    lines.extend(["", *_ai_action_markdown(side_label, ai_actions[side_key])])
+        if turn_data.get("events"):
+            lines.extend(["", "### 公开事件"])
+            for event in turn_data["events"]:
+                lines.append(f"- {event['message']}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def _plan_table_html(ai_action: dict[str, Any]) -> list[str]:
+    """一侧 AI 计划表的 HTML 表格。"""
+    plan = ai_action.get("plan") or {}
+    rows = [
+        ("态势判断", plan.get("situation_summary") or "—"),
+        ("阶段目标", plan.get("phase_goal") or "—"),
+        ("单元意图",
+         "；".join(f"{k}→{v}" for k, v in (plan.get("unit_intents") or {}).items()) or "—"),
+        ("应变预案", "；".join(plan.get("contingency") or []) or "—"),
+        ("订单",
+         "，".join(f"{k}×{len(v)}" for k, v in (plan.get("orders") or {}).items()
+                   if isinstance(v, list) and v) or "无"),
+    ]
+    lines = ["<table>", "<thead><tr><th style='width:80px'>项目</th><th>内容</th></tr></thead>",
+             "<tbody>"]
+    for key, value in rows:
+        lines.append(f"<tr><td>{_html.escape(key)}</td><td>{_html.escape(str(value))}</td></tr>")
+    lines.append("</tbody></table>")
+    return lines
+
+
+def build_report_html(data: dict[str, Any], game_id: str) -> str:
+    """轻量 HTML 战报：<img src> 相对路径引用本地截图，浏览器双击秒开。"""
+    meta = data["meta"]
+    score = meta["score"] or {}
+    o = []
+    o.append("<!DOCTYPE html>")
+    o.append('<html lang="zh-CN"><head><meta charset="utf-8">')
+    o.append("<title>铁底湾的回响 IV · 战报</title>")
+    o.append("<style>"
+             "body{font-family:'Microsoft YaHei',system-ui,sans-serif;max-width:880px;margin:0 auto;"
+             "padding:24px;line-height:1.7;color:#222;background:#fafafa}"
+             "h1{border-bottom:2px solid #34495e;padding-bottom:8px}"
+             "h2{margin-top:42px;border-left:4px solid #34495e;padding-left:10px}"
+             "h3{margin-top:30px;color:#34495e}"
+             "img{max-width:100%;display:block;margin:6px auto;border:1px solid #ccc;"
+             "background:#eee}"
+             "figure{margin:10px 0;text-align:center}"
+             "figcaption{font-size:13px;color:#666;margin-top:2px}"
+             "table{border-collapse:collapse;margin:8px 0;width:100%;font-size:14px}"
+             "th,td{border:1px solid #bbb;padding:4px 8px;text-align:left;vertical-align:top}"
+             "th{background:#eef2f7}"
+             ".reasoning{background:#f4f4f4;border-left:3px solid #999;padding:8px 12px;"
+             "white-space:pre-wrap;font-size:13px;color:#333;margin:8px 0;border-radius:4px}"
+             ".summary{background:#fff;padding:12px 16px;border-radius:6px;"
+             "box-shadow:0 1px 3px rgba(0,0,0,.08)}"
+             ".meta{color:#555;font-size:14px;margin-bottom:8px}"
+             "ul.events{font-size:13px;color:#444}"
+             ".plan{font-size:13px;color:#666;margin:6px 0 0}"
+             ".toc{font-size:14px;columns:2;line-height:1.9}"
+             "</style></head><body>")
+    o.append("<h1>铁底湾的回响 IV · 战报</h1>")
+    o.append("<div class='meta'>"
+             f"想定：{_html.escape(meta['scenario_title'])}（{_html.escape(meta['scenario_id'])}）　"
+             f"模式：{_html.escape(meta['mode'])}　种子：{meta['seed']}<br>"
+             f"进度：第 {meta['turn']}/{meta['max_turns']} 回合 · "
+             f"{_html.escape(PHASE_NAMES.get(meta['phase'], meta['phase']))}　"
+             f"比分：轴心 {score.get(Side.AXIS.value, 0)} : {score.get(Side.ALLIES.value, 0)} 盟军")
+    if meta["winner"]:
+        o[-1] += f"　<strong>胜负：{_html.escape(meta['winner'])} 获胜"
+        if meta["victory_reason"]:
+            o[-1] += f"（{_html.escape(meta['victory_reason'])}）"
+        o[-1] += "</strong>"
+    o.append("</div>")
+    if data["turns"]:
+        o.append("<ul class='toc'>")
+        for turn_data in data["turns"]:
+            o.append(f"<li><a href='#turn-{turn_data['turn']}'>第 {turn_data['turn']} 回合</a></li>")
+        o.append("</ul>")
+    for turn_data in data["turns"]:
+        turn = turn_data["turn"]
+        o.append(f"<h2 id='turn-{turn}'>第 {turn} 回合</h2>")
+        narrative = turn_data.get("narrative")
+        if narrative:
+            o.append("<div class='summary'>" + _html.escape(narrative).replace("\n", "<br>")
+                     + "</div>")
+        for phase_data in turn_data.get("phases", []):
+            phase = phase_data["phase"]
+            phase_label = PHASE_NAMES.get(phase, phase)
+            o.append(f"<h3>{_html.escape(phase_label)}（第 {turn} 回合）</h3>")
+            phase_narrative = phase_data.get("narrative")
+            if phase_narrative:
+                o.append("<p>" + _html.escape(phase_narrative).replace("\n", "<br>") + "</p>")
+            for cap in phase_data.get("captures") or []:
+                side_label = "轴心" if cap["side"] == Side.AXIS.value else "同盟"
+                rel = f"{game_id}/{cap['image_path']}"
+                o.append(f"<figure><img src='{_html.escape(rel)}' "
+                         f"alt='第{turn}回合 {_html.escape(phase_label)} {side_label}视角' "
+                         f"loading='lazy'><figcaption>{side_label}视角</figcaption></figure>")
+            ai_actions = phase_data.get("ai_actions") or {}
+            for side_key in ("axis", "allies"):
+                if side_key in ai_actions:
+                    side_label = "轴心" if side_key == Side.AXIS.value else "同盟"
+                    action = ai_actions[side_key]
+                    model = _html.escape(action.get("model") or "—")
+                    o.append(f"<div class='plan'><strong>{side_label}计划表</strong>"
+                             f"（{model}）</div>")
+                    o.extend(_plan_table_html(action))
+                    reasoning = action.get("reasoning")
+                    if reasoning:
+                        o.append("<div class='reasoning'><strong>" + side_label
+                                 + "思考过程</strong>\n\n" + _html.escape(reasoning)
+                                 + "</div>")
+        if turn_data.get("events"):
+            o.append("<h4>公开事件</h4><ul class='events'>")
+            for event in turn_data["events"]:
+                o.append("<li>" + _html.escape(event["message"]) + "</li>")
+            o.append("</ul>")
+    o.append("</body></html>")
+    return "\n".join(o)

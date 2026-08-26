@@ -23,7 +23,17 @@ export interface Marker{id:string;kind:string;position:HexCoord|null;ship_id:str
 export interface Observation{game_id:string;scenario_id:string;scenario_title:string;side:Side;turn:number;max_turns:number;phase:Phase;visibility:number;ships:Ship[];torpedo_tracks:TorpedoTrack[];markers:Marker[];score:Record<string,number>;recent_events:Event[];winner:Side|null;victory_reason:string|null}
 export interface LegalAction{kind:string;ship_id?:string|null;schema_hint:Record<string,unknown>}
 export interface BattleReportCapture{side:Side;image_path:string}
-export interface BattleReportPhase{phase:string;captures:BattleReportCapture[]}
+export interface BattleReportPlan{
+ turn?:number;phase?:string;
+ situation_summary?:string|null;phase_goal?:string|null;
+ unit_intents?:Record<string,string>;contingency?:string[];
+ orders?:Record<string,unknown>;
+}
+export interface BattleReportAiAction{
+ plan:BattleReportPlan;reasoning:string|null;model:string;
+ elapsed_ms:number;input_tokens:number;output_tokens:number;
+}
+export interface BattleReportPhase{phase:string;captures:BattleReportCapture[];narrative:string|null;ai_actions:Record<string,BattleReportAiAction>}
 export interface BattleReportTurnEvent{sequence:number;phase:string;type:string;message:string}
 export interface BattleReportTurn{turn:number;narrative:string|null;phases:BattleReportPhase[];events:BattleReportTurnEvent[]}
 export interface BattleReportMeta{game_id:string;scenario_id:string;scenario_title:string;mode:string;seed:number;turn:number;max_turns:number;phase:string;winner:Side|null;victory_reason:string|null;score:Record<string,number>}

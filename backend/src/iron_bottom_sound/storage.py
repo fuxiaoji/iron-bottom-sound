@@ -120,11 +120,14 @@ class GameRepository:
         ).fetchall()
         return [BattleReportEntry(**dict(row)) for row in rows]
 
-    def battle_narrative_exists(self, game_id: str, turn: int) -> bool:
-        """该回合叙事是否已落库（幂等门控：重放/重启不重复生成）。"""
+    def battle_narrative_exists(self, game_id: str, turn: int, phase: str = "summary") -> bool:
+        """该 (回合, 阶段) 叙事是否已落库（幂等门控：重放/重启不重复生成）。
+
+        phase 默认 'summary'（回合总结）；每阶段叙述用各自阶段名（如 'gunnery'）。
+        """
         row = self.connection.execute(
-            "SELECT 1 FROM battle_report WHERE game_id = ? AND turn = ? AND kind = 'narrative' LIMIT 1",
-            (game_id, turn),
+            "SELECT 1 FROM battle_report WHERE game_id = ? AND turn = ? AND kind = 'narrative' AND phase = ? LIMIT 1",
+            (game_id, turn, phase),
         ).fetchone()
         return row is not None
 

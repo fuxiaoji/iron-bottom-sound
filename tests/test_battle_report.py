@@ -18,8 +18,10 @@ from iron_bottom_sound.engine import IronBottomEngine
 from iron_bottom_sound.llm import OpenAICompatibleCommander
 from iron_bottom_sound.match import run_match
 from iron_bottom_sound.models import (
+    AIPlanSheet,
     GameOptions,
     HexCoord,
+    LLMCallAudit,
     OptionalRules,
     OrderBatch,
     Phase,
@@ -153,8 +155,9 @@ def test_battle_narrative_exists_gate(tmp_path) -> None:
     repository = GameRepository(tmp_path / "r.sqlite3")
     try:
         assert repository.battle_narrative_exists("g1", 1) is False
-        repository.save_battle_entry("g1", 10, 1, "fire_end", "both", "narrative", content="x")
+        repository.save_battle_entry("g1", 10, 1, "summary", "both", "narrative", content="x")
         assert repository.battle_narrative_exists("g1", 1) is True
+        assert repository.battle_narrative_exists("g1", 1, "gunnery") is False
     finally:
         repository.close()
 
@@ -179,8 +182,14 @@ def test_create_captures_initial_and_advance_persists() -> None:
     captures = [entry for entry in entries if entry.kind == "capture"]
     assert len(captures) >= 14  # 至少 7 个结算后阶段 × 2 侧
     narratives = [entry for entry in entries if entry.kind == "narrative"]
-    assert len(narratives) == 1 and narratives[0].turn == 1
-    assert "第 1 回合" in narratives[0].content  # 无密钥 → 确定性回退
+    summaries = [entry for entry in narratives if entry.phase == "summary"]
+    assert len(summaries) == 1 and summaries[0].turn == 1
+    assert "第 1 回合" in summaries[0].content  # 无密钥 → 确定性回退
+    # 每个阶段都有文字叙述（含自动阶段），且阶段叙述与回合总结分开落库。
+    phase_narratives = [entry for entry in narratives if entry.phase != "summary"]
+    assert len(phase_narratives) >= 3
+    assert any("第 1 回合" in entry.content for entry in phase_narratives)
+    assert {entry.phase for entry in phase_narratives} <= set(br.PHASE_ORDER)
 
 
 def test_battle_report_off_writes_nothing() -> None:
@@ -248,7 +257,11 @@ def test_narrative_llm_path_no_response_format_and_no_leak(monkeypatch) -> None:
     assert "orders_submitted" not in user
     assert "submitted" not in user and "order_batch" not in user  # 不喂私有订单
     narratives = [entry for entry in api.repository.battle_entries(game_id) if entry.kind == "narrative"]
-    assert len(narratives) == 1 and narratives[0].content == fixed
+    # 每阶段一段 + 回合总结，mock 恒定文本 → 全部等于 fixed。
+    assert len(narratives) > 1
+    assert all(entry.content == fixed for entry in narratives)
+    assert any(entry.phase == "summary" for entry in narratives)
+    assert any(entry.phase in br.PHASE_ORDER for entry in narratives)
 
 
 def test_public_events_exclude_orders_submitted() -> None:
@@ -305,6 +318,8 @@ def test_battle_report_json_shape_and_image_endpoint() -> None:
         assert {cap["side"] for cap in phase["captures"]} == {"axis", "allies"}
         for cap in phase["captures"]:
             assert cap["image_path"]
+        assert phase["narrative"]  # 每阶段都有文字
+        assert phase["ai_actions"] == {}  # 纯热座局无 AI 计划表
     for event in turn1["events"]:
         assert set(event) <= {"sequence", "phase", "type", "message"}  # 不携带私有 payload
 
@@ -338,7 +353,111 @@ def test_match_battle_report_artifacts_and_default_off(tmp_path) -> None:
     md_text = md.read_text(encoding="utf-8")
     assert md_text.startswith("﻿")  # UTF-8 带 BOM，编辑器才不会误判 GBK 乱码
     assert "data:image/png;base64," in md_text
+    # 对战战报已嵌入双方 AI 计划表（match.py run_match 调 capture_ai_action）：
+    # 含订单的阶段都有 axis+allies 的 ai_action，plan 带态势判断；战术司令无思考（reasoning=None）。
+    actions = [
+        (phase["phase"], side, action)
+        for turn in data["turns"] for phase in turn["phases"]
+        for side, action in phase["ai_actions"].items()
+    ]
+    assert actions
+    assert {side for _, side, _ in actions} == {"axis", "allies"}
+    assert all(action["plan"].get("situation_summary") for _, _, action in actions)
+    assert all(action["reasoning"] is None for _, _, action in actions)
+    assert "计划表" in md_text
 
     artifact_off = tmp_path / "match-off"
     run_match("IBS-S-03", seed=5, artifact_dir=artifact_off, battle_report=False)
     assert not list(artifact_off.glob("*-battle-report.md"))
+
+
+# ---------------------------------------------------------------------------
+# AI 计划表（capture_ai_action）+ 渲染器注入。
+# ---------------------------------------------------------------------------
+def test_capture_ai_action_persists_plan_and_reasoning(tmp_path) -> None:
+    repository = GameRepository(tmp_path / "r.sqlite3")
+    engine, state = _engine_and_state()
+    ship_id = next(iter(state.ships))
+    batch = OrderBatch(side=Side.AXIS, phase=Phase.REINFORCEMENT)
+    plan = AIPlanSheet(
+        turn=1, phase=Phase.REINFORCEMENT, situation_summary="确认无增援",
+        phase_goal="确认阶段", unit_intents={ship_id: "保持阵位"},
+        orders=batch.model_dump(mode="json"), contingency=["入口被占则顺延"],
+    )
+    entry = br.capture_ai_action(
+        repository, state.game_id, 1, "reinforcement", "axis",
+        plan, reasoning="先评估入口格，本回合无增援。", audits=[], state=state,
+    )
+    assert entry is not None and entry["kind"] == "ai_action"
+    assert state.ships[ship_id].name in entry["content"]  # 单元意图已映射为舰名
+
+    data = br.build_report_data(state, engine, repository.battle_entries(state.game_id))
+    turn1 = data["turns"][0]
+    phase = next(p for p in turn1["phases"] if p["phase"] == "reinforcement")
+    ai = phase["ai_actions"]["axis"]
+    assert ai["plan"]["situation_summary"] == "确认无增援"
+    assert ai["plan"]["unit_intents"]
+    assert ai["reasoning"] == "先评估入口格，本回合无增援。"
+    assert ai["model"] == "unknown"
+
+
+def test_capture_ai_action_idempotent_replaces(tmp_path) -> None:
+    repository = GameRepository(tmp_path / "r.sqlite3")
+    engine, state = _engine_and_state()
+    batch = OrderBatch(side=Side.AXIS, phase=Phase.REINFORCEMENT)
+    plan = AIPlanSheet(turn=1, phase=Phase.REINFORCEMENT, situation_summary="v1",
+                       phase_goal="确认", orders=batch.model_dump(mode="json"))
+    br.capture_ai_action(repository, state.game_id, 1, "reinforcement", "axis", plan, "r1")
+    plan2 = plan.model_copy(update={"situation_summary": "v2"})
+    br.capture_ai_action(repository, state.game_id, 1, "reinforcement", "axis", plan2, "r2")
+    entries = repository.battle_entries(state.game_id)
+    assert len([entry for entry in entries if entry.kind == "ai_action"]) == 1
+    data = br.build_report_data(state, engine, entries)
+    phase = next(p for p in data["turns"][0]["phases"] if p["phase"] == "reinforcement")
+    assert phase["ai_actions"]["axis"]["plan"]["situation_summary"] == "v2"
+
+
+def test_capture_phase_snapshot_uses_renderer_injection(tmp_path) -> None:
+    repository = GameRepository(tmp_path / "r.sqlite3")
+    engine, state = _engine_and_state()
+    written: dict[str, str] = {}
+
+    def fake_renderer(state, engine, side, path) -> None:
+        written[side.value] = str(path)
+        path.write_bytes(b"UI-PNG")
+
+    entries = br.capture_phase_snapshot(
+        repository, tmp_path / "reports", state, engine, 1, "gunnery",
+        sequence=7, renderer=fake_renderer,
+    )
+    assert {entry["side"] for entry in entries} == {"axis", "allies"}
+    assert written["axis"] and written["allies"]
+    for entry in entries:
+        png = tmp_path / "reports" / state.game_id / entry["image_path"]
+        assert png.read_bytes() == b"UI-PNG"
+
+
+def test_markdown_contains_plan_table_and_reasoning(tmp_path) -> None:
+    repository = GameRepository(tmp_path / "r.sqlite3")
+    engine, state = _engine_and_state()
+    for side, model, reasoning in [
+        (Side.AXIS, "evolved", None),
+        (Side.ALLIES, "deepseek-v4-pro", "先评估入口格，再确认无增援，选保守动作。"),
+    ]:
+        batch = OrderBatch(side=side, phase=Phase.REINFORCEMENT)
+        plan = AIPlanSheet(turn=1, phase=Phase.REINFORCEMENT, situation_summary="确认无增援",
+                           phase_goal="确认阶段", orders=batch.model_dump(mode="json"))
+        audits = [LLMCallAudit(
+            side=side, turn=1, phase=Phase.REINFORCEMENT, attempt=1,
+            model=model, elapsed_ms=5, valid=True,
+        )]
+        br.capture_ai_action(repository, state.game_id, 1, "reinforcement", side.value,
+                             plan, reasoning, audits=audits)
+    br.capture_phase_snapshot(repository, tmp_path / "reports", state, engine, 1, "reinforcement")
+    data = br.build_report_data(state, engine, repository.battle_entries(state.game_id))
+    md = br.build_report_markdown(tmp_path / "reports", data, state.game_id)
+    assert "**轴心计划表**" in md and "**同盟计划表**" in md
+    assert "deepseek-v4-pro" in md
+    assert "**同盟思考过程**" in md and "先评估入口格" in md
+    assert "| 态势判断 | 确认无增援 |" in md
+    assert "第 1 回合" in md

@@ -142,6 +142,8 @@ def test_deepseek_adapter_captures_reasoning_content_when_thinking_enabled(monke
     assert audits[-1].reasoning_preview.startswith("方案A…方案B…")
     # 截断上限 600 字符
     assert len(audits[-1].reasoning_preview) <= 600
+    # 思考全文保留在审计（只进战报 DB / 本地存档，不进公共 API 响应）。
+    assert audits[-1].reasoning_content == "方案A…方案B…再检查一遍入口格。确定选第一个入口。"
 
 
 def test_match_artifacts_include_frames_and_boards(tmp_path) -> None:

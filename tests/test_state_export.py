@@ -130,6 +130,7 @@ def test_render_board_dimensions_header_and_legend():
     karl = _karl_id(state)
     assert karl in board  # 图例带真实 id
     assert "..=海" in board
+    assert "1=东北" in board and "6=北" in board  # 罗盘图例（AI 看图即知方向）
 
 
 def test_render_board_places_ship_at_label():

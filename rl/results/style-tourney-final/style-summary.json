@@ -1,0 +1,786 @@
+{
+  "scenarios": [
+    "IBS-S-03",
+    "IBS-S-01"
+  ],
+  "games_per_slot": 12,
+  "seed_base": 60000,
+  "roster": [
+    "balanced",
+    "fleet",
+    "line",
+    "brawl",
+    "torpedo",
+    "cautious",
+    "champion"
+  ],
+  "styles": {
+    "balanced": {
+      "scenarios": {
+        "IBS-S-03": {
+          "axis": {
+            "games": 72,
+            "wins": 19,
+            "draws": 0,
+            "losses": 53,
+            "score_diff": -0.472,
+            "true_win_rate": 0.264,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 32,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 21,
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 16,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 3
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 52,
+            "draws": 0,
+            "losses": 20,
+            "score_diff": 0.444,
+            "true_win_rate": 0.722,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 38,
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 15,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 14,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 5
+            }
+          },
+          "combined": -0.014
+        },
+        "IBS-S-01": {
+          "axis": {
+            "games": 72,
+            "wins": 6,
+            "draws": 45,
+            "losses": 21,
+            "score_diff": -0.208,
+            "true_win_rate": 0.083,
+            "decisive_rate": 0.375,
+            "avg_margin": -1.61,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 45,
+              "想定1胜利点领先 4 分": 8,
+              "想定1胜利点领先 5 分": 4,
+              "想定1胜利点领先 7 分": 3,
+              "想定1胜利点领先 6 分": 3,
+              "想定1胜利点领先 9 分": 3,
+              "想定1胜利点领先 8 分": 3,
+              "想定1胜利点领先 10 分": 2,
+              "想定1胜利点领先 12 分": 1
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 26,
+            "draws": 42,
+            "losses": 4,
+            "score_diff": 0.306,
+            "true_win_rate": 0.361,
+            "decisive_rate": 0.417,
+            "avg_margin": 2.26,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 42,
+              "想定1胜利点领先 4 分": 10,
+              "想定1胜利点领先 5 分": 7,
+              "想定1胜利点领先 7 分": 5,
+              "想定1胜利点领先 6 分": 3,
+              "想定1胜利点领先 8 分": 2,
+              "想定1胜利点领先 11 分": 2,
+              "想定1胜利点领先 10 分": 1
+            }
+          },
+          "combined": 0.049
+        }
+      },
+      "combined": 0.018,
+      "matrix": {
+        "fleet": -0.104,
+        "line": 0.083,
+        "brawl": 0.146,
+        "torpedo": 0.0,
+        "cautious": 0.021,
+        "champion": -0.042
+      },
+      "matrix_by_scenario": {
+        "IBS-S-03": {
+          "fleet": -0.167,
+          "line": 0.167,
+          "brawl": 0.0,
+          "torpedo": -0.167,
+          "cautious": 0.083,
+          "champion": 0.0
+        },
+        "IBS-S-01": {
+          "fleet": -0.042,
+          "line": 0.0,
+          "brawl": 0.292,
+          "torpedo": 0.167,
+          "cautious": -0.042,
+          "champion": -0.083
+        }
+      }
+    },
+    "fleet": {
+      "scenarios": {
+        "IBS-S-03": {
+          "axis": {
+            "games": 72,
+            "wins": 18,
+            "draws": 0,
+            "losses": 54,
+            "score_diff": -0.5,
+            "true_win_rate": 0.25,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 34,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 20,
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 12,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 6
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 52,
+            "draws": 0,
+            "losses": 20,
+            "score_diff": 0.444,
+            "true_win_rate": 0.722,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 35,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 17,
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 12,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 8
+            }
+          },
+          "combined": -0.028
+        },
+        "IBS-S-01": {
+          "axis": {
+            "games": 72,
+            "wins": 5,
+            "draws": 42,
+            "losses": 25,
+            "score_diff": -0.278,
+            "true_win_rate": 0.069,
+            "decisive_rate": 0.417,
+            "avg_margin": -1.86,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 42,
+              "想定1胜利点领先 4 分": 11,
+              "想定1胜利点领先 6 分": 7,
+              "想定1胜利点领先 5 分": 5,
+              "想定1胜利点领先 7 分": 3,
+              "想定1胜利点领先 8 分": 3,
+              "想定1胜利点领先 10 分": 1
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 34,
+            "draws": 33,
+            "losses": 5,
+            "score_diff": 0.403,
+            "true_win_rate": 0.472,
+            "decisive_rate": 0.542,
+            "avg_margin": 2.97,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 33,
+              "想定1胜利点领先 4 分": 11,
+              "想定1胜利点领先 5 分": 7,
+              "想定1胜利点领先 7 分": 7,
+              "想定1胜利点领先 6 分": 5,
+              "想定1胜利点领先 8 分": 4,
+              "想定1胜利点领先 9 分": 3,
+              "想定1胜利点领先 10 分": 1,
+              "想定1胜利点领先 14 分": 1
+            }
+          },
+          "combined": 0.062
+        }
+      },
+      "combined": 0.017,
+      "matrix": {
+        "balanced": -0.042,
+        "line": -0.021,
+        "brawl": 0.083,
+        "torpedo": 0.062,
+        "cautious": -0.083,
+        "champion": 0.104
+      },
+      "matrix_by_scenario": {
+        "IBS-S-03": {
+          "balanced": 0.083,
+          "line": -0.083,
+          "brawl": 0.083,
+          "torpedo": -0.083,
+          "cautious": -0.083,
+          "champion": -0.083
+        },
+        "IBS-S-01": {
+          "balanced": -0.167,
+          "line": 0.042,
+          "brawl": 0.083,
+          "torpedo": 0.208,
+          "cautious": -0.083,
+          "champion": 0.292
+        }
+      }
+    },
+    "line": {
+      "scenarios": {
+        "IBS-S-03": {
+          "axis": {
+            "games": 72,
+            "wins": 25,
+            "draws": 0,
+            "losses": 47,
+            "score_diff": -0.306,
+            "true_win_rate": 0.347,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 30,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 17,
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 16,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 9
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 51,
+            "draws": 0,
+            "losses": 21,
+            "score_diff": 0.417,
+            "true_win_rate": 0.708,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 37,
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 15,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 14,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 6
+            }
+          },
+          "combined": 0.055
+        },
+        "IBS-S-01": {
+          "axis": {
+            "games": 72,
+            "wins": 4,
+            "draws": 29,
+            "losses": 39,
+            "score_diff": -0.486,
+            "true_win_rate": 0.056,
+            "decisive_rate": 0.597,
+            "avg_margin": -4.06,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 29,
+              "想定1胜利点领先 6 分": 8,
+              "想定1胜利点领先 8 分": 6,
+              "想定1胜利点领先 4 分": 6,
+              "想定1胜利点领先 5 分": 6,
+              "想定1胜利点领先 12 分": 5,
+              "想定1胜利点领先 7 分": 4,
+              "想定1胜利点领先 10 分": 4,
+              "想定1胜利点领先 9 分": 3,
+              "想定1胜利点领先 11 分": 1
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 17,
+            "draws": 44,
+            "losses": 11,
+            "score_diff": 0.083,
+            "true_win_rate": 0.236,
+            "decisive_rate": 0.389,
+            "avg_margin": 0.64,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 44,
+              "想定1胜利点领先 5 分": 8,
+              "想定1胜利点领先 4 分": 7,
+              "想定1胜利点领先 6 分": 6,
+              "想定1胜利点领先 8 分": 2,
+              "想定1胜利点领先 9 分": 2,
+              "想定1胜利点领先 7 分": 2,
+              "想定1胜利点领先 10 分": 1
+            }
+          },
+          "combined": -0.201
+        }
+      },
+      "combined": -0.073,
+      "matrix": {
+        "balanced": -0.125,
+        "fleet": 0.0,
+        "brawl": -0.104,
+        "torpedo": 0.0,
+        "cautious": -0.146,
+        "champion": -0.062
+      },
+      "matrix_by_scenario": {
+        "IBS-S-03": {
+          "balanced": 0.083,
+          "fleet": -0.083,
+          "brawl": 0.0,
+          "torpedo": 0.167,
+          "cautious": 0.0,
+          "champion": 0.167
+        },
+        "IBS-S-01": {
+          "balanced": -0.333,
+          "fleet": 0.083,
+          "brawl": -0.208,
+          "torpedo": -0.167,
+          "cautious": -0.292,
+          "champion": -0.292
+        }
+      }
+    },
+    "brawl": {
+      "scenarios": {
+        "IBS-S-03": {
+          "axis": {
+            "games": 72,
+            "wins": 29,
+            "draws": 0,
+            "losses": 43,
+            "score_diff": -0.194,
+            "true_win_rate": 0.403,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 29,
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 21,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 14,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 8
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 47,
+            "draws": 0,
+            "losses": 25,
+            "score_diff": 0.306,
+            "true_win_rate": 0.653,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 35,
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 20,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 12,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 5
+            }
+          },
+          "combined": 0.056
+        },
+        "IBS-S-01": {
+          "axis": {
+            "games": 72,
+            "wins": 7,
+            "draws": 40,
+            "losses": 25,
+            "score_diff": -0.25,
+            "true_win_rate": 0.097,
+            "decisive_rate": 0.444,
+            "avg_margin": -2.11,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 40,
+              "想定1胜利点领先 4 分": 11,
+              "想定1胜利点领先 5 分": 11,
+              "想定1胜利点领先 9 分": 3,
+              "想定1胜利点领先 11 分": 3,
+              "想定1胜利点领先 7 分": 2,
+              "想定1胜利点领先 14 分": 1,
+              "想定1胜利点领先 8 分": 1
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 21,
+            "draws": 42,
+            "losses": 9,
+            "score_diff": 0.167,
+            "true_win_rate": 0.292,
+            "decisive_rate": 0.417,
+            "avg_margin": 1.46,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 42,
+              "想定1胜利点领先 4 分": 8,
+              "想定1胜利点领先 5 分": 7,
+              "想定1胜利点领先 8 分": 5,
+              "想定1胜利点领先 9 分": 3,
+              "想定1胜利点领先 6 分": 3,
+              "想定1胜利点领先 7 分": 3,
+              "想定1胜利点领先 10 分": 1
+            }
+          },
+          "combined": -0.041
+        }
+      },
+      "combined": 0.007,
+      "matrix": {
+        "balanced": 0.042,
+        "fleet": 0.125,
+        "line": -0.146,
+        "torpedo": 0.083,
+        "cautious": -0.021,
+        "champion": -0.042
+      },
+      "matrix_by_scenario": {
+        "IBS-S-03": {
+          "balanced": 0.083,
+          "fleet": 0.333,
+          "line": -0.167,
+          "torpedo": 0.167,
+          "cautious": 0.0,
+          "champion": -0.083
+        },
+        "IBS-S-01": {
+          "balanced": 0.0,
+          "fleet": -0.083,
+          "line": -0.125,
+          "torpedo": 0.0,
+          "cautious": -0.042,
+          "champion": 0.0
+        }
+      }
+    },
+    "torpedo": {
+      "scenarios": {
+        "IBS-S-03": {
+          "axis": {
+            "games": 72,
+            "wins": 21,
+            "draws": 0,
+            "losses": 51,
+            "score_diff": -0.417,
+            "true_win_rate": 0.292,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 39,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 12,
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 12,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 9
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 48,
+            "draws": 0,
+            "losses": 24,
+            "score_diff": 0.333,
+            "true_win_rate": 0.667,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 25,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 23,
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 15,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 9
+            }
+          },
+          "combined": -0.042
+        },
+        "IBS-S-01": {
+          "axis": {
+            "games": 72,
+            "wins": 6,
+            "draws": 38,
+            "losses": 28,
+            "score_diff": -0.306,
+            "true_win_rate": 0.083,
+            "decisive_rate": 0.472,
+            "avg_margin": -1.99,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 38,
+              "想定1胜利点领先 4 分": 10,
+              "想定1胜利点领先 6 分": 8,
+              "想定1胜利点领先 5 分": 7,
+              "想定1胜利点领先 7 分": 5,
+              "想定1胜利点领先 8 分": 3,
+              "想定1胜利点领先 9 分": 1
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 35,
+            "draws": 31,
+            "losses": 6,
+            "score_diff": 0.403,
+            "true_win_rate": 0.486,
+            "decisive_rate": 0.569,
+            "avg_margin": 2.9,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 31,
+              "想定1胜利点领先 6 分": 11,
+              "想定1胜利点领先 7 分": 9,
+              "想定1胜利点领先 4 分": 9,
+              "想定1胜利点领先 5 分": 4,
+              "想定1胜利点领先 9 分": 4,
+              "想定1胜利点领先 8 分": 2,
+              "想定1胜利点领先 11 分": 2
+            }
+          },
+          "combined": 0.049
+        }
+      },
+      "combined": 0.003,
+      "matrix": {
+        "balanced": 0.021,
+        "fleet": 0.0,
+        "line": 0.104,
+        "brawl": 0.125,
+        "cautious": 0.042,
+        "champion": -0.271
+      },
+      "matrix_by_scenario": {
+        "IBS-S-03": {
+          "balanced": 0.0,
+          "fleet": -0.167,
+          "line": -0.083,
+          "brawl": 0.333,
+          "cautious": 0.167,
+          "champion": -0.5
+        },
+        "IBS-S-01": {
+          "balanced": 0.042,
+          "fleet": 0.167,
+          "line": 0.292,
+          "brawl": -0.083,
+          "cautious": -0.083,
+          "champion": -0.042
+        }
+      }
+    },
+    "cautious": {
+      "scenarios": {
+        "IBS-S-03": {
+          "axis": {
+            "games": 72,
+            "wins": 28,
+            "draws": 0,
+            "losses": 44,
+            "score_diff": -0.222,
+            "true_win_rate": 0.389,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 33,
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 21,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 11,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 7
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 29,
+            "draws": 0,
+            "losses": 43,
+            "score_diff": -0.194,
+            "true_win_rate": 0.403,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 37,
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 24,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 6,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 5
+            }
+          },
+          "combined": -0.208
+        },
+        "IBS-S-01": {
+          "axis": {
+            "games": 72,
+            "wins": 3,
+            "draws": 41,
+            "losses": 28,
+            "score_diff": -0.347,
+            "true_win_rate": 0.042,
+            "decisive_rate": 0.431,
+            "avg_margin": -2.69,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 41,
+              "想定1胜利点领先 5 分": 10,
+              "想定1胜利点领先 4 分": 6,
+              "想定1胜利点领先 7 分": 4,
+              "想定1胜利点领先 6 分": 4,
+              "想定1胜利点领先 9 分": 3,
+              "想定1胜利点领先 10 分": 2,
+              "想定1胜利点领先 8 分": 1,
+              "想定1胜利点领先 12 分": 1
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 22,
+            "draws": 41,
+            "losses": 9,
+            "score_diff": 0.181,
+            "true_win_rate": 0.306,
+            "decisive_rate": 0.431,
+            "avg_margin": 1.57,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 41,
+              "想定1胜利点领先 6 分": 9,
+              "想定1胜利点领先 4 分": 8,
+              "想定1胜利点领先 5 分": 5,
+              "想定1胜利点领先 7 分": 3,
+              "想定1胜利点领先 9 分": 3,
+              "想定1胜利点领先 8 分": 2,
+              "想定1胜利点领先 10 分": 1
+            }
+          },
+          "combined": -0.083
+        }
+      },
+      "combined": -0.145,
+      "matrix": {
+        "balanced": -0.167,
+        "fleet": -0.292,
+        "line": -0.062,
+        "brawl": -0.25,
+        "torpedo": 0.021,
+        "champion": -0.125
+      },
+      "matrix_by_scenario": {
+        "IBS-S-03": {
+          "balanced": -0.167,
+          "fleet": -0.417,
+          "line": -0.25,
+          "brawl": -0.5,
+          "torpedo": 0.167,
+          "champion": -0.083
+        },
+        "IBS-S-01": {
+          "balanced": -0.167,
+          "fleet": -0.167,
+          "line": 0.125,
+          "brawl": 0.0,
+          "torpedo": -0.125,
+          "champion": -0.167
+        }
+      }
+    },
+    "champion": {
+      "scenarios": {
+        "IBS-S-03": {
+          "axis": {
+            "games": 72,
+            "wins": 21,
+            "draws": 0,
+            "losses": 51,
+            "score_diff": -0.417,
+            "true_win_rate": 0.292,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 36,
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 18,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 15,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 3
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 41,
+            "draws": 0,
+            "losses": 31,
+            "score_diff": 0.139,
+            "true_win_rate": 0.569,
+            "decisive_rate": 1.0,
+            "avg_margin": 0.0,
+            "victory_reasons": {
+              "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2": 33,
+              "德军战术胜利：无德舰被击沉或减速至2-2-2": 19,
+              "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰": 12,
+              "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2": 8
+            }
+          },
+          "combined": -0.139
+        },
+        "IBS-S-01": {
+          "axis": {
+            "games": 72,
+            "wins": 3,
+            "draws": 44,
+            "losses": 25,
+            "score_diff": -0.306,
+            "true_win_rate": 0.042,
+            "decisive_rate": 0.389,
+            "avg_margin": -2.01,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 44,
+              "想定1胜利点领先 5 分": 9,
+              "想定1胜利点领先 6 分": 6,
+              "想定1胜利点领先 4 分": 6,
+              "想定1胜利点领先 8 分": 4,
+              "想定1胜利点领先 9 分": 2,
+              "想定1胜利点领先 7 分": 1
+            }
+          },
+          "allies": {
+            "games": 72,
+            "wins": 27,
+            "draws": 38,
+            "losses": 7,
+            "score_diff": 0.278,
+            "true_win_rate": 0.375,
+            "decisive_rate": 0.472,
+            "avg_margin": 2.22,
+            "victory_reasons": {
+              "平局：胜利点差小于4": 38,
+              "想定1胜利点领先 5 分": 8,
+              "想定1胜利点领先 4 分": 8,
+              "想定1胜利点领先 6 分": 5,
+              "想定1胜利点领先 7 分": 5,
+              "想定1胜利点领先 11 分": 2,
+              "想定1胜利点领先 9 分": 2,
+              "想定1胜利点领先 8 分": 2,
+              "想定1胜利点领先 10 分": 1,
+              "想定1胜利点领先 13 分": 1
+            }
+          },
+          "combined": -0.014
+        }
+      },
+      "combined": -0.077,
+      "matrix": {
+        "balanced": -0.125,
+        "fleet": 0.021,
+        "line": -0.042,
+        "brawl": 0.0,
+        "torpedo": -0.333,
+        "cautious": 0.021
+      },
+      "matrix_by_scenario": {
+        "IBS-S-03": {
+          "balanced": -0.25,
+          "fleet": 0.167,
+          "line": -0.25,
+          "brawl": -0.083,
+          "torpedo": -0.417,
+          "cautious": 0.0
+        },
+        "IBS-S-01": {
+          "balanced": 0.0,
+          "fleet": -0.125,
+          "line": 0.167,
+          "brawl": 0.083,
+          "torpedo": -0.25,
+          "cautious": 0.042
+        }
+      }
+    }
+  }
+}

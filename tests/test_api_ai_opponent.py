@@ -65,6 +65,31 @@ def test_vs_ai_game_stores_profile_and_ai_opponent_submits_only_after_player() -
     assert api_engine.get(game_id).phase == Phase.MOVEMENT_PLANNING
 
 
+def test_vs_ai_accepts_evolved_champion_profile() -> None:
+    """进化冠军（champions.CHAMPIONS["evolved"]）与内置风格同样可被 ai-opponent 使用。"""
+    client = TestClient(app)
+    created = client.post(
+        "/games",
+        json={
+            "scenario_id": "IBS-S-03", "seed": 5,
+            "options": {"mode": "vs_ai", "ai_profile": "evolved"},
+        },
+    ).json()
+    game_id = created["game_id"]
+    assert client.post(
+        f"/games/{game_id}/orders",
+        headers={"X-Player-Side": "axis"},
+        json=player_batch(Side.AXIS, Phase.REINFORCEMENT).model_dump(mode="json"),
+    ).status_code == 200
+    response = client.post(
+        f"/games/{game_id}/ai-opponent",
+        headers={"X-Player-Side": "axis"},
+        json={"profile": "evolved"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"valid": True, "ai_submitted": True}
+
+
 def test_ai_opponent_unknown_profile_is_422() -> None:
     client = TestClient(app)
     created = client.post(
@@ -101,6 +126,34 @@ def test_ai_opponent_works_on_hotseat_game_generically() -> None:
     )
     assert response.status_code == 200
     assert response.json() == {"valid": True, "ai_submitted": True}
+
+
+def test_suggested_orders_profile_selects_ai_style() -> None:
+    """半自动指导：suggested-orders 支持 profile 选状态机 AI 风格（解析与 ai-opponent 一致）。"""
+    for profile, expected_status in (("evolved", 200), ("torpedo", 200), ("nope", 422)):
+        client = TestClient(app)
+        created = client.post(
+            "/games",
+            json={
+                "scenario_id": "IBS-S-03", "seed": 21,
+                "options": {"mode": "hotseat"},
+            },
+        ).json()
+        game_id = created["game_id"]
+        response = client.get(
+            f"/games/{game_id}/suggested-orders?profile={profile}",
+            headers={"X-Player-Side": "axis"},
+        )
+        assert response.status_code == expected_status, f"profile={profile}"
+        if expected_status != 200:
+            continue
+        batch = response.json()
+        assert batch["side"] == "axis"
+        assert client.post(
+            f"/games/{game_id}/orders",
+            headers={"X-Player-Side": "axis"},
+            json=batch,
+        ).status_code == 200
 
 
 def test_vs_ai_reaches_second_turn_on_either_player_side() -> None:

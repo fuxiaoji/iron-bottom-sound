@@ -124,7 +124,7 @@ class ResearchConsent(BaseModel):
 
 class GameOptions(BaseModel):
     mode: Literal["hotseat", "tutorial", "llm", "vs_ai"] = "hotseat"
-    # 人机大战时对手 AI 的风格 profile（tactical.PROFILES 键）；其余模式恒为 None。
+    # 人机大战时对手 AI 的风格 profile（tactical.PROFILES 或 champions.CHAMPIONS 键）；其余模式恒为 None。
     ai_profile: str | None = None
     optional_rules: OptionalRules = Field(default_factory=OptionalRules)
     # 战报系统开关（默认关：既有测试/无头调用保持 hermetic；前端起始勾选默认开→发 True）。
@@ -617,6 +617,8 @@ class LLMCallAudit(BaseModel):
     valid: bool
     validation_errors: list[str] = Field(default_factory=list)
     reasoning_preview: str | None = Field(default=None, max_length=600)
+    # LLM 思考全文（只进战报 DB / 本地 match 存档，不进公共 API 响应）。
+    reasoning_content: str | None = Field(default=None)
 
 
 class MatchReport(BaseModel):

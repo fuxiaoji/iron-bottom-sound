@@ -9,22 +9,35 @@ from .battle_report import (
     build_report_data,
     build_report_markdown,
     capture_after_advance,
+    capture_ai_action,
 )
 from .engine import ORDER_PHASES, IronBottomEngine
 from .llm import DeterministicCommander, LLMPlayerSession, OpenAICompatibleCommander
 from .models import GameOptions, MatchReport, OptionalRules, Phase, Side
 from .randomai import RandomCommander
 from .state_export import export_frame, render_board
-from .tactical import PROFILES, TacticalCommander
+from .champions import CHAMPIONS
+from .tactical import PROFILES, TacticalCommander, TacticalProfile
+
+
+def _resolve_profile(profile: str | TacticalProfile | None) -> TacticalProfile:
+    """字符串风格名 → TacticalProfile：先查进化冠军（champions），再查内置风格（PROFILES）。"""
+    if isinstance(profile, TacticalProfile):
+        return profile
+    name = profile or "balanced"
+    if name in CHAMPIONS:
+        return CHAMPIONS[name]
+    return PROFILES.get(name, PROFILES["balanced"])
 
 
 def make_session(
-    side: Side, player: str, profile: str | None = None, model: str | None = None
+    side: Side, player: str, profile: str | TacticalProfile | None = None, model: str | None = None
 ) -> LLMPlayerSession:
     if player == "deterministic":
         return LLMPlayerSession(side, DeterministicCommander())
     if player == "tactical":
-        return LLMPlayerSession(side, TacticalCommander(profile=PROFILES.get(profile or "balanced", PROFILES["balanced"])))
+        # 允许直接传入 TacticalProfile 对象（遗传训练等批量评估用）；字符串走风格名/冠军名。
+        return LLMPlayerSession(side, TacticalCommander(profile=_resolve_profile(profile)))
     if player == "random":
         return LLMPlayerSession(side, RandomCommander())
     if player == "deepseek":
@@ -79,6 +92,16 @@ def run_match(
                     result = engine.submit_orders(state.game_id, batch)
                     if not result.valid:
                         raise RuntimeError(f"Validated session batch was rejected: {result.errors}")
+                    if battle_report and report_root is not None:
+                        session = sessions[side]
+                        reasoning = session.audits[-1].reasoning_content if session.audits else None
+                        entry = capture_ai_action(
+                            None, state.game_id, state.turn, state.phase.value,
+                            side.value, session.plan_sheets[-1], reasoning,
+                            session.audits, state,
+                        )
+                        if entry:
+                            report_entries.append(entry)
             prev_phase = state.phase
             engine.advance(state.game_id)
             if battle_report:

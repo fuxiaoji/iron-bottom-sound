@@ -227,6 +227,8 @@ def _board_cells(
         legend_parts.append("cN=隐蔽接触标记")
 
     legend_parts.append("..=海  残血*  起火~")
+    # 罗盘：与 models.direction_delta 一致，供 AI 把图内方位换算成航向。
+    legend_parts.append("航向:1=东北 2=东南 3=南 4=西南 5=西北 6=北")
     return grid, legend_parts, ship_index
 
 

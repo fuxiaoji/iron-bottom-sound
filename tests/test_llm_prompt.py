@@ -109,9 +109,11 @@ def test_reasoning_preview_none_when_absent(monkeypatch) -> None:
     assert audits[-1].reasoning_preview is None
 
 
-def test_discipline_prompt_torpedo_bearing_rule_precise(monkeypatch) -> None:
-    """TorpedoOrder.bearing 必须直接取 launch_positions[i].heading（发射瞬间航向），
-    不得引导模型用 relative_heading/launch_side 换算——那正是实况对局卡死的点。"""
+def test_discipline_prompt_torpedo_aiming_guidance(monkeypatch) -> None:
+    """TorpedoOrder.bearing 仍须取 launch_positions[i].heading（引擎强制）；同时提示词
+    必须给出罗盘 + 鱼雷行进方向公式 + 瞄准配方，让模型能选对 launch_side/launch_angle 把鱼雷打向
+    目标——旧措辞把 relative_heading 划为禁区（「不要用 relative_heading」），模型因此不瞄准、
+    任意选舷，实况对局鱼雷反向发射。"""
     monkeypatch.setenv("DEEPSEEK_API_KEY", "test-only-placeholder")
     captured: dict = {}
     engine = IronBottomEngine()
@@ -120,9 +122,16 @@ def test_discipline_prompt_torpedo_bearing_rule_precise(monkeypatch) -> None:
     system = captured["payload"]["messages"][0]["content"]
     assert "bearing=launch_positions[i].heading" in system
     assert "launch_at_mf=i，launch_hex=launch_positions[i].hex" in system
-    # 旧措辞（用 launch_side/launch_angle 转出相对航向）已删除，防止误导模型重算
-    assert "转出的相对航向" not in system
-    assert "不要用 relative_heading" in system
+    # 罗盘：模型必须能把图内方位对号入座
+    assert "罗盘" in system and "1=东北" in system and "6=北" in system
+    # 鱼雷行进方向公式（≠bearing）：relative 修正正负向明确
+    assert "鱼雷实际航向" in system and "relative_heading" in system
+    assert "X/Y=−2" in system and "X/Y=+2" in system
+    # 瞄准配方 + 绝不盲射
+    assert "瞄准" in system and "舰→目标" in system
+    assert "绝不盲射" in system and "torpedoes 留空" in system
+    # 旧误导措辞已删：曾经把 relative_heading 划为禁区，模型因此不瞄准任意选舷
+    assert "不要用 relative_heading" not in system
     # 地图边缘纪律：防止整队驶出棋盘触发引擎世界平移中止
     assert "地图边缘" in system and "驶出棋盘边缘" in system
 
