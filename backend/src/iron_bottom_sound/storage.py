@@ -3,7 +3,7 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
-from .models import GameEvent, GameState
+from .models import BattleReportEntry, GameEvent, GameState
 
 
 class GameRepository:
@@ -32,6 +32,18 @@ class GameRepository:
               sequence INTEGER NOT NULL,
               state_json TEXT NOT NULL,
               PRIMARY KEY (game_id, sequence)
+            );
+            CREATE TABLE IF NOT EXISTS battle_report (
+              game_id TEXT NOT NULL,
+              sequence INTEGER NOT NULL,
+              turn INTEGER NOT NULL,
+              phase TEXT NOT NULL,
+              side TEXT NOT NULL,       -- 'axis'|'allies'（capture）| 'both'（narrative）
+              kind TEXT NOT NULL,       -- 'capture'|'narrative'
+              image_path TEXT,
+              content TEXT,
+              created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              PRIMARY KEY (game_id, sequence, side)
             );
             """
         )
@@ -73,6 +85,41 @@ class GameRepository:
             (game_id, after),
         ).fetchall()
         return [GameEvent.model_validate_json(row["event_json"]) for row in rows]
+
+    def save_battle_entry(
+        self,
+        game_id: str,
+        sequence: int,
+        turn: int,
+        phase: str,
+        side: str,
+        kind: str,
+        image_path: str | None = None,
+        content: str | None = None,
+    ) -> None:
+        """INSERT OR REPLACE：重复捕获/叙事对同 (game_id, sequence, side) 幂等。"""
+        with self.connection:
+            self.connection.execute(
+                """INSERT OR REPLACE INTO battle_report
+                   (game_id, sequence, turn, phase, side, kind, image_path, content)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                (game_id, sequence, turn, phase, side, kind, image_path, content),
+            )
+
+    def battle_entries(self, game_id: str) -> list[BattleReportEntry]:
+        rows = self.connection.execute(
+            "SELECT * FROM battle_report WHERE game_id = ? ORDER BY sequence, side",
+            (game_id,),
+        ).fetchall()
+        return [BattleReportEntry(**dict(row)) for row in rows]
+
+    def battle_narrative_exists(self, game_id: str, turn: int) -> bool:
+        """该回合叙事是否已落库（幂等门控：重放/重启不重复生成）。"""
+        row = self.connection.execute(
+            "SELECT 1 FROM battle_report WHERE game_id = ? AND turn = ? AND kind = 'narrative' LIMIT 1",
+            (game_id, turn),
+        ).fetchone()
+        return row is not None
 
     def close(self) -> None:
         self.connection.close()

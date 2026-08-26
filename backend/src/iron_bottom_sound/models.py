@@ -118,6 +118,8 @@ class GameOptions(BaseModel):
     # 人机大战时对手 AI 的风格 profile（tactical.PROFILES 键）；其余模式恒为 None。
     ai_profile: str | None = None
     optional_rules: OptionalRules = Field(default_factory=OptionalRules)
+    # 战报系统开关（默认关：既有测试/无头调用保持 hermetic；前端起始勾选默认开→发 True）。
+    battle_report: bool = False
 
 
 class WeaponMount(BaseModel):
@@ -408,6 +410,19 @@ class GameEvent(BaseModel):
     payload: dict[str, Any] = Field(default_factory=dict)
     rule: RuleReference | None = None
     dice: DiceRoll | None = None
+
+
+class BattleReportEntry(BaseModel):
+    """战报条目（捕获截图或回合叙事），与 battle_report 表行一一对应。"""
+    game_id: str
+    sequence: int
+    turn: int
+    phase: str
+    side: str  # 'axis'|'allies'（capture）| 'both'（narrative）
+    kind: str  # 'capture'|'narrative'
+    image_path: str | None = None
+    content: str | None = None
+    created_at: str | None = None
 
 
 class ShipCombatEntry(BaseModel):

@@ -5,9 +5,16 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import FastAPI, Header, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from .battle_report import (
+    build_report_data,
+    build_report_markdown,
+    capture_after_advance,
+    capture_phase_snapshot,
+)
 from .engine import IronBottomEngine
 from .data import ROOT
 from .llm import OpenAICompatibleCommander
@@ -28,9 +35,14 @@ class FieldOfFireRequest(BaseModel):
     target_speed: int = 4
 
 
+_frontend_dist = Path(__file__).resolve().parents[3] / "frontend" / "dist"
+
 engine = IronBottomEngine()
 _default_db = Path(__file__).resolve().parents[3] / "backend" / "iron-bottom-sound.sqlite3"
 repository = GameRepository(os.environ.get("IBS_DB_PATH", str(_default_db)))
+_default_reports_dir = Path(__file__).resolve().parents[3] / "backend" / "reports"
+reports_root = os.environ.get("IBS_REPORTS_DIR", str(_default_reports_dir))
+narrative_commander_factory = lambda: OpenAICompatibleCommander(timeout=30, max_tokens=800)
 app = FastAPI(title="铁底湾的回响 IV", version="0.1.0")
 app.mount(
     "/assets/counters",
@@ -60,6 +72,19 @@ def get_game(game_id: str):
         return state
 
 
+if _frontend_dist.is_dir():
+    # 生产式单进程托管：/api 前缀剥离（复刻 vite 代理 rewrite）+ 静态挂载 dist。
+    # 开发期前端由 vite dev（:5173）代理 /api → :8000；构建后由本后端直接服务。
+    @app.middleware("http")
+    async def _strip_api_prefix(request, call_next):
+        path = request.url.path
+        if path.startswith("/api"):
+            request.scope["path"] = path[4:] or "/"
+            if request.scope.get("raw_path") is not None:
+                request.scope["raw_path"] = request.scope["path"].encode()
+        return await call_next(request)
+
+
 @app.get("/scenarios")
 def scenarios():
     return engine.scenarios()
@@ -72,6 +97,12 @@ def create_game(request: CreateGame):
     except (KeyError, ValueError) as error:
         raise HTTPException(422, str(error)) from error
     repository.save(state)
+    if state.options.battle_report:
+        try:
+            capture_phase_snapshot(repository, reports_root, state, engine,
+                                   state.turn, state.phase.value)
+        except Exception:
+            pass  # 战报失败绝不影响对局
     return {"game_id": state.game_id, "scenario_id": state.scenario_id, "phase": state.phase}
 
 
@@ -336,15 +367,23 @@ def handoff(game_id: str):
 def advance(game_id: str, x_player_side: Annotated[str | None, Header()] = None):
     state = get_game(game_id)
     side = side_from_header(x_player_side)
+    prev_phase = state.phase  # advance 原地改 phase，须在推进前记下
     try:
         events = engine.advance(game_id)
     except ValueError as error:
         raise HTTPException(409, str(error)) from error
-    repository.save(engine.get(game_id))
+    next_state = engine.get(game_id)
+    if next_state.options.battle_report:
+        try:
+            capture_after_advance(repository, reports_root, next_state, engine,
+                                  prev_phase, commander=narrative_commander_factory())
+        except Exception:
+            pass  # 战报失败绝不影响对局
+    repository.save(next_state)
     return [
         event for event in events
         if event.payload.get("secret_side") in (None, side.value)
-        and not engine._hidden_damage_event(state, event, side)
+        and not engine._hidden_damage_event(next_state, event, side)
     ]
 
 
@@ -360,6 +399,44 @@ def events(game_id: str, after: int = Query(default=0, ge=0), x_player_side: Ann
     ]
 
 
+def _report_entries(game_id: str) -> list[dict]:
+    """battle_report 表行 → dict（build_report_data 输入格式）。"""
+    return [entry.model_dump(mode="json") for entry in repository.battle_entries(game_id)]
+
+
+@app.get("/games/{game_id}/battle-report")
+def battle_report(game_id: str):
+    """战报 JSON（中立历史文档，无需 side 头）。纯只读，不参与裁决。"""
+    state = get_game(game_id)
+    return build_report_data(state, engine, _report_entries(game_id))
+
+
+@app.get("/games/{game_id}/battle-report/image/{rel_path:path}")
+def battle_report_image(game_id: str, rel_path: str):
+    """返回战报截图 PNG。路径穿越守卫：解析后必须落在该局的报告目录内。"""
+    get_game(game_id)
+    base = (Path(reports_root) / game_id).resolve()
+    target = (base / rel_path).resolve()
+    if not target.is_relative_to(base) or not target.is_file():
+        raise HTTPException(404, "Not found")
+    return FileResponse(str(target), media_type="image/png")
+
+
+@app.get("/games/{game_id}/battle-report.md")
+def battle_report_markdown(game_id: str):
+    """自包含 MD 战报下载（截图以 base64 内嵌，可直接分享）。"""
+    state = get_game(game_id)
+    data = build_report_data(state, engine, _report_entries(game_id))
+    #  BOM 前缀：UTF-8 带 BOM，中文 Windows 编辑器才不会误判成 GBK 显示乱码。
+    content = "﻿" + build_report_markdown(reports_root, data, game_id)
+    filename = f"{game_id}-battle-report.md"
+    return Response(
+        content=content,
+        media_type="text/markdown; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 @app.websocket("/games/{game_id}")
 async def websocket(game_id: str, websocket: WebSocket, side: Side = Query()):
     get_game(game_id)
@@ -371,3 +448,12 @@ async def websocket(game_id: str, websocket: WebSocket, side: Side = Query()):
             await websocket.send_json(engine.observe(game_id, side).model_dump(mode="json"))
     except WebSocketDisconnect:
         return
+
+
+# 静态前端：挂在最后，仅接管未被 API/资产路由匹配的路径（/、/assets/index-*.js 等）。
+if _frontend_dist.is_dir():
+    app.mount(
+        "/",
+        StaticFiles(directory=str(_frontend_dist), html=True),
+        name="frontend-dist",
+    )

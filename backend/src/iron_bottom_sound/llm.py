@@ -173,7 +173,7 @@ class DeterministicCommander(LLMCommander):
         ship = state.ships[ship_id]
         if engine.movement_preview(state, ship, plan="0")["commitable"]:
             return "0"
-        candidates = engine.movement_candidates(state, ship)
+        candidates = engine.movement_candidates(state, ship, include_plans=False)
         if candidates["max_cost"] > 0:
             plan = str(candidates["max_cost"])
             if engine.movement_preview(state, ship, plan=plan)["commitable"]:
@@ -261,18 +261,29 @@ _DISCIPLINE_SYSTEM_PROMPT = (
     "- 【合法动作】里的 movement_candidates / torpedo_candidates / gunnery_candidates 是引擎算好的"
     "合法值（可达格、speed 范围、launcher/sides/angles/settings/launch_positions、mount_ids）。直接采用"
     "候选组合，不要自己重算方位、射程、速度或齐射修正。\n"
-    "- MovementOrder：plan 的直航 MF 总数必须等于声明的 speed；不移动就 plan=\"0\" 且 speed 留 0 或 null。\n"
+    "- MovementOrder：直接在该舰 movement_candidates 的 reachable 里选一个目标格，plan 照抄该格的"
+    "plan 串、speed 填该格的 cost；reachable 不含当前格（无 cost 0）时本舰必须移动，不得原地不动。"
+    "候选 plan 已含强制转弯/首动 advance 等引擎约束，不要自己编命令序列。\n"
+    "- 沉没/倾覆舰（世界态帧 status 含 sunk 或棋盘带 ~）不是可动舰：绝不给它们填 movement，也不在"
+    "「覆盖每艘活动舰」之列；movement 只覆盖 status 无 sunk 且 hex 非空的本方舰。\n"
     "- TorpedoOrder：先在该舰 torpedo_candidates 的 launch_positions 里选一个发射 MF 序号 i"
     "（第 0 项=开火前，之后每项=第 i 个机动点）。launch_at_mf=i，launch_hex=launch_positions[i].hex，"
     "bearing=launch_positions[i].heading。bearing 是发射瞬间舰船航向（1..6），不是鱼雷行进方向；"
     "不要用 relative_heading 或 launch_side/launch_angle 去换算 bearing。launcher_id 取该舰 launchers 里 "
     "loaded>0 且 sides 含所需舷的；launch_side 取该发射器 sides 之一，launch_angle 取 angles 之一"
     "（A/B/X/Y），setting_index 取 settings 里的 index。\n"
+    "- GunneryOrder：只对 gunnery_candidates 里 targets 非空的候选开火，mount_id 必须原样取自"
+    "该候选 targets 的 mount_ids（禁止自造或仿照示例）。targets 为空或 blocked_reason 非空的舰"
+    "本回合没有任何合法射击，不得写入 gunnery；gunnery 数组允许留空。\n"
+    "- ReinforcementOrder：只增援 reinforcement_candidates.ships 里列出的舰，entry_hex 必须取自"
+    "其 entry_hexes（入口格被占则换该列表里其它格）；group_available 为 False 或 ships 为空时，"
+    "reinforcements 数组必须留空，不得编造舰船或入口。\n"
     "- 地图边缘：舰船不要驶出棋盘边缘（棋盘 34 列×27 行，边缘行号见帧里各舰的 hex）。舰队接近"
     "上下边缘时应减速或转向，避免整队压线；若同时有其它算子（鱼雷/残骸/舰）贴住对侧边缘，引擎"
     "无法平移整个世界，对局会中止。鱼雷发射也要选择让鱼雷航迹留在图内的方位。\n"
-    "所有 ship_id / marker_id / target_id 必须来自【世界态帧】或【合法动作】；示例里的 "
-    "SAMPLE- 开头 id 是占位符，照抄会被引擎判非法并在重试时告知。"
+    "所有 ship_id / marker_id / target_id / mount_id / launcher_id 必须来自【世界态帧】或"
+    "【合法动作】；示例里的 SAMPLE- 开头 id（含 SAMPLE-M 炮位、SAMPLE-L 发射器）是占位符，"
+    "照抄会被引擎判非法并在重试时告知。"
 )
 
 # 每订单阶段一个完整 AIPlanSheet 示范（orders 字段与 OrderBatch 结构一致）。
@@ -484,6 +495,39 @@ class OpenAICompatibleCommander(LLMCommander):
             ))
             prompt["validation_errors"] = errors
         raise ValueError({"message": "LLM failed to self-correct within two retries", "audits": audits})
+
+    def write_narrative(self, system: str, user: str, temperature: float = 0.7) -> str:
+        """纯文本叙事（战报）：无 JSON response_format、无思考、无重试/自纠。
+
+        与 choose_plan 同一条 key/timeout 管线（密钥只在调用时从环境变量读）。
+        任何失败由调用方（battle_report.write_turn_narrative）吞掉 → 确定性回退。
+        """
+        api_key = os.environ.get(self.api_key_env)
+        if not api_key:
+            raise RuntimeError(f"{self.api_key_env} is not configured")
+        payload: dict[str, Any] = {
+            "model": self.model,
+            "temperature": temperature,
+            "max_tokens": 800,
+            "thinking": {"type": "disabled"},
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+        }
+        client = self.client or httpx.Client(timeout=self.timeout)
+        try:
+            response = client.post(
+                f"{self.endpoint}/chat/completions",
+                headers={"Authorization": f"Bearer {api_key}"},
+                json=payload,
+            )
+            response.raise_for_status()
+            body = response.json()
+            return body["choices"][0]["message"]["content"].strip()
+        finally:
+            if self.client is None:
+                client.close()
 
     def _audit(
         self,

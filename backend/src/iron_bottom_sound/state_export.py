@@ -156,14 +156,18 @@ def _column_labels() -> list[str]:
     return labels
 
 
-def render_board(state: GameState, engine: IronBottomEngine, side: Side) -> str:
-    """cell-aligned 34×27 ASCII 棋盘（投影一）。按 label 定位，只画可见集。"""
+def _board_cells(
+    state: GameState, engine: IronBottomEngine, side: Side
+) -> tuple[list[list[str]], list[str], dict[str, str]]:
+    """34×27 token 网格 + 图例 + 舰→token 映射（呈现层，非规则）。
+
+    render_board 与 PIL 战报渲染共用，保证符号/编号完全一致。全从
+    `engine.observe` 可见集派生（战争迷雾一致）。
+    """
     observation = engine.observe(state.game_id, side)
-    columns = _column_labels()
     height = 27
     grid: list[list[str]] = [[".."] * 34 for _ in range(height)]
     legend_parts: list[str] = []
-    side_letter = "a" if side == Side.AXIS else "e"
 
     def put(coord, token: str) -> None:
         if coord is None:
@@ -223,9 +227,16 @@ def render_board(state: GameState, engine: IronBottomEngine, side: Side) -> str:
         legend_parts.append("cN=隐蔽接触标记")
 
     legend_parts.append("..=海  残血*  起火~")
+    return grid, legend_parts, ship_index
+
+
+def render_board(state: GameState, engine: IronBottomEngine, side: Side) -> str:
+    """cell-aligned 34×27 ASCII 棋盘（投影一）。按 label 定位，只画可见集。"""
+    grid, legend_parts, _ = _board_cells(state, engine, side)
+    columns = _column_labels()
     header = "   " + " ".join(label.rjust(2) for label in columns)
     lines = [header]
-    for display_row in range(height):
+    for display_row in range(27):
         cells = " ".join(grid[display_row])
         lines.append(f"{display_row + 1:>2} {cells}")
     return "\n".join(lines) + "\n\n图例: " + " | ".join(legend_parts)

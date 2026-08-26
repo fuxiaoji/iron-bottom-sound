@@ -1,0 +1,532 @@
+"""战报系统：每阶段双视角 PNG 地图截图 + 每回合中立 LLM 叙事 + 自包含 MD 战报。
+
+对引擎状态**只读**（只用 `observe`/`get`/`engine.event_visible_to`，绝不改状态/裁决）。
+全部地图渲染只从 `engine.observe` 可见集派生（战争迷雾一致）：敌方 hidden_damage →
+hull=None 不画残血星、超视距敌舰根本不出现。规则常量不复制；地图几何投影复刻前端
+`hexGeometry`（odd-q 平顶，HEX_SIZE=24 为外接圆半径）。
+
+LLM 叙事只从 `DEEPSEEK_API_KEY` 环境变量读取密钥（调用时读，不写文件）；任何叙事
+失败/无密钥 → 确定性事实摘要，绝不影响对局。
+"""
+
+from __future__ import annotations
+
+import base64
+import math
+import os
+from pathlib import Path
+from typing import Any
+
+from PIL import Image, ImageDraw, ImageFont
+
+from .engine import IronBottomEngine
+from .models import GameEvent, GameState, HexCoord, Phase, Side
+from .state_export import _board_cells
+
+# ---------------------------------------------------------------------------
+# 地图几何（与前端 hexGeometry.ts / HexMap.tsx 完全一致：flat-top odd-q）。
+# HEX_SIZE=24 是外接圆半径，不是宽度；同排格心距 1.5*24=36，相邻格心距 √3*24≈41.57。
+# ---------------------------------------------------------------------------
+HEX_SIZE = 24
+HEX_ROW_HEIGHT = HEX_SIZE * math.sqrt(3)  # ≈41.569
+COLUMN_COUNT = 34
+ROW_COUNT = 27
+# 左/上边距（56=行号区，44=列标区）加前端 hexGeometry 的基准偏移 (38, 35)。
+ORIGIN_X = 56 + 38
+ORIGIN_Y = 44 + 35
+IMAGE_WIDTH = 1330
+IMAGE_HEIGHT = 1359
+LEGEND_TOP = 1226
+
+# 呈现色（非规则常量）。
+OCEAN = (16, 40, 62)
+LAND = (52, 88, 52)
+COAST = (64, 96, 104)
+HEX_BORDER = (30, 58, 88)
+AXIS_COLOR = (178, 60, 46)
+ALLIES_COLOR = (48, 94, 182)
+TEXT_COLOR = (225, 232, 240)
+DIM_TEXT = (150, 165, 180)
+
+
+def hex_center(q: int, r: int) -> tuple[float, float]:
+    """轴向格 (q, r) → 像素中心。逐字复刻前端 hexGeometry.hexCenter
+    （第二个参数是轴向行 r，不是显示行；显示行 = r + floor(q/2)）。"""
+    x = ORIGIN_X + q * HEX_SIZE * 1.5
+    y = ORIGIN_Y + (r + q / 2) * HEX_ROW_HEIGHT
+    return x, y
+
+
+def hex_vertices(q: int, r: int) -> list[tuple[float, float]]:
+    cx, cy = hex_center(q, r)
+    return [
+        (cx + HEX_SIZE * math.cos(math.radians(60 * i)), cy + HEX_SIZE * math.sin(math.radians(60 * i)))
+        for i in range(6)
+    ]
+
+
+def heading_direction(heading: int) -> tuple[float, float]:
+    """航向 1-6（IBS 罗盘）→ 该航向相邻格心的单位像素方向。"""
+    dq, dr = HexCoord.direction_delta(heading)
+    dx = dq * HEX_SIZE * 1.5
+    dy = (dr + dq / 2) * HEX_ROW_HEIGHT
+    norm = math.hypot(dx, dy)
+    return dx / norm, dy / norm
+
+
+def _column_labels() -> list[str]:
+    labels: list[str] = []
+    for q in range(COLUMN_COUNT):
+        if q < 26:
+            labels.append(chr(ord("A") + q))
+        else:
+            labels.append("A" + chr(ord("A") + q - 26))
+    return labels
+
+
+# ---------------------------------------------------------------------------
+# 中文字体（多候选 + IBS_REPORT_FONT 覆盖；全失败退化 ASCII，不影响对局）。
+# ---------------------------------------------------------------------------
+_FONT_CACHE: dict[int, ImageFont.FreeTypeFont | ImageFont.ImageFont] = {}
+
+
+def _cjk_font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    if size in _FONT_CACHE:
+        return _FONT_CACHE[size]
+    override = os.environ.get("IBS_REPORT_FONT")
+    names = [override] if override else []
+    names += ["msyh.ttc", "simhei.ttf", "simsun.ttc", "Deng.ttf", "PingFang.ttc",
+              "NotoSansCJK-Regular.ttc", "wqy-microhei.ttc"]
+    directories = ["C:/Windows/Fonts", "/System/Library/Fonts",
+                   "/usr/share/fonts", "/usr/local/share/fonts"]
+    for name in names:
+        if not name:
+            continue
+        for directory in directories:
+            path = Path(directory) / name
+            if path.is_file():
+                try:
+                    font = ImageFont.truetype(str(path), size)
+                    _FONT_CACHE[size] = font
+                    return font
+                except OSError:
+                    continue
+    font = ImageFont.load_default()
+    _FONT_CACHE[size] = font
+    return font
+
+
+# ---------------------------------------------------------------------------
+# 地图渲染（全从观察可见集 + 公开地形）。
+# ---------------------------------------------------------------------------
+def _draw_terrain(draw: ImageDraw.ImageDraw, state: GameState) -> None:
+    for row in range(ROW_COUNT):
+        for q in range(COLUMN_COUNT):
+            # row 是显示行；hex_vertices 现在收轴向行（与 HexCoord.r 一致）。
+            draw.polygon(hex_vertices(q, row - q // 2), fill=OCEAN, outline=HEX_BORDER)
+    for label in state.land_hexes:
+        coord = HexCoord.from_label(label)
+        draw.polygon(hex_vertices(coord.q, coord.r), fill=LAND, outline=HEX_BORDER)
+    for label in state.coast_hexes:
+        coord = HexCoord.from_label(label)
+        draw.polygon(hex_vertices(coord.q, coord.r), fill=COAST, outline=HEX_BORDER)
+
+
+def _draw_markers(draw: ImageDraw.ImageDraw, observation: Any) -> None:
+    for marker in observation.markers:
+        if marker.position is None:
+            continue
+        cx, cy = hex_center(marker.position.q, marker.position.r)
+        kind = marker.kind
+        if kind == "contact":
+            draw.ellipse([cx - 9, cy - 9, cx + 9, cy + 9], outline=TEXT_COLOR, width=2)
+            draw.text((cx, cy), "?", fill=TEXT_COLOR, font=_cjk_font(14), anchor="mm")
+        elif kind == "fire":
+            draw.ellipse([cx - 7, cy - 7, cx + 7, cy + 7], fill=(255, 120, 0))
+        elif kind == "smoke":
+            draw.ellipse([cx - 7, cy - 7, cx + 7, cy + 7], fill=(140, 140, 148))
+        elif kind == "star_shell":
+            draw.ellipse([cx - 6, cy - 6, cx + 6, cy + 6], fill=(255, 250, 200))
+        elif kind == "searchlight":
+            draw.ellipse([cx - 5, cy - 5, cx + 5, cy + 5], outline=(190, 235, 255), width=2)
+        elif kind == "squall":
+            draw.ellipse([cx - 10, cy - 6, cx + 10, cy + 6], fill=(150, 155, 162))
+
+
+def _draw_torpedoes(draw: ImageDraw.ImageDraw, observation: Any) -> None:
+    for track in observation.torpedo_tracks:
+        cx, cy = hex_center(track.position.q, track.position.r)
+        dx, dy = heading_direction(track.heading)
+        x0, y0 = cx - dx * 10, cy - dy * 10
+        x1, y1 = cx + dx * 10, cy + dy * 10
+        draw.line([(x0, y0), (x1, y1)], fill=TEXT_COLOR, width=2)
+        px, py = -dy, dx
+        head = (x1 + dx * 5, y1 + dy * 5)
+        draw.polygon([(x1, y1), (head[0] - px * 4, head[1] - py * 4), (head[0] + px * 4, head[1] + py * 4)],
+                     fill=TEXT_COLOR)
+
+
+def _draw_wrecks(draw: ImageDraw.ImageDraw, observation: Any) -> None:
+    for wreck in observation.wrecks:
+        cx, cy = hex_center(wreck.position.q, wreck.position.r)
+        draw.text((cx, cy), "xx", fill=(105, 112, 122), font=_cjk_font(13), anchor="mm")
+
+
+def _draw_ships(
+    draw: ImageDraw.ImageDraw, observation: Any, ship_index: dict[str, str]
+) -> None:
+    for ship in observation.ships:
+        if ship.position is None:
+            continue
+        cx, cy = hex_center(ship.position.q, ship.position.r)
+        dx, dy = heading_direction(ship.heading)
+        px, py = -dy, dx
+        color = AXIS_COLOR if ship.side == Side.AXIS else ALLIES_COLOR
+        bow = (cx + dx * 14, cy + dy * 14)
+        stern = (cx - dx * 12, cy - dy * 12)
+        draw.polygon(
+            [bow, (stern[0] + px * 7, stern[1] + py * 7), (stern[0] - px * 7, stern[1] - py * 7)],
+            fill=color, outline=(255, 255, 255),
+        )
+        token = ship_index.get(ship.id, "")
+        draw.text((cx - dx * 2, cy - dy * 2), token, fill="white",
+                  font=_cjk_font(12), anchor="mm")
+        if ship.fire_markers > 0:
+            for i in range(min(ship.fire_markers, 3)):
+                fx, fy = cx + dx * (14 - i * 5), cy + dy * (14 - i * 5)
+                draw.ellipse([fx - 3, fy - 3, fx + 3, fy + 3], fill=(255, 150, 40))
+        if ship.hull is not None and ship.max_hull and ship.hull / ship.max_hull < 0.35:
+            sx, sy = cx - dx * 12 + px * 11, cy - dy * 12 + py * 11
+            draw.text((sx, sy), "*", fill=(255, 225, 60), font=_cjk_font(15), anchor="mm")
+
+
+def _draw_annotations(
+    draw: ImageDraw.ImageDraw, state: GameState, observation: Any,
+    legend_parts: list[str],
+) -> None:
+    title_font = _cjk_font(16)
+    label_font = _cjk_font(12)
+    legend_font = _cjk_font(14)
+    draw.text((ORIGIN_X, 20), f"{state.scenario_title} · {observation.side.value} 视角",
+              fill=TEXT_COLOR, font=title_font, anchor="lm")
+    columns = _column_labels()
+    for q, label in enumerate(columns):
+        x = ORIGIN_X + q * HEX_SIZE * 1.5
+        draw.text((x, 46), label, fill=DIM_TEXT, font=label_font, anchor="mm")
+    for row in range(ROW_COUNT):
+        y = ORIGIN_Y + (row + 0.25) * HEX_ROW_HEIGHT
+        draw.text((ORIGIN_X - 26, y), str(row + 1), fill=DIM_TEXT, font=label_font, anchor="rm")
+
+    score = observation.score
+    score_text = (
+        f"第 {observation.turn}/{observation.max_turns} 回合 · {observation.phase.value} · "
+        f"比分 轴心{score.get(Side.AXIS.value, 0)} : {score.get(Side.ALLIES.value, 0)} 盟军"
+    )
+    y = LEGEND_TOP
+    draw.text((ORIGIN_X, y), score_text, fill=TEXT_COLOR, font=legend_font, anchor="lm")
+    y += 26
+    legend = " | ".join(legend_parts)
+    for line in _wrap_text(draw, legend, legend_font, IMAGE_WIDTH - ORIGIN_X - 48):
+        draw.text((ORIGIN_X, y), line, fill=DIM_TEXT, font=legend_font, anchor="lm")
+        y += 22
+
+
+def _wrap_text(draw: ImageDraw.ImageDraw, text: str, font, max_width: int) -> list[str]:
+    lines: list[str] = []
+    current = ""
+    for char in text:
+        if draw.textlength(current + char, font=font) > max_width and current:
+            lines.append(current)
+            current = char
+        else:
+            current += char
+    if current:
+        lines.append(current)
+    return lines
+
+
+def render_map_image(state: GameState, engine: IronBottomEngine, side: Side) -> Image.Image:
+    """单侧地图截图（RGB PNG，约 1330×1359）。只画该侧观察可见集 + 公开地形。"""
+    observation = engine.observe(state.game_id, side)
+    image = Image.new("RGB", (IMAGE_WIDTH, IMAGE_HEIGHT), OCEAN)
+    draw = ImageDraw.Draw(image)
+    _draw_terrain(draw, state)
+    _draw_markers(draw, observation)
+    _draw_torpedoes(draw, observation)
+    _draw_wrecks(draw, observation)
+    _, legend_parts, ship_index = _board_cells(state, engine, side)
+    _draw_ships(draw, observation, ship_index)
+    _draw_annotations(draw, state, observation, legend_parts)
+    return image
+
+
+# ---------------------------------------------------------------------------
+# 公开事件并集 + 叙事。
+# ---------------------------------------------------------------------------
+EXCLUDED_EVENT_TYPES = {"orders_submitted", "phase_changed", "game_created"}
+
+PHASE_ORDER = [
+    "contact_setup", "reinforcement", "movement_planning", "torpedo_planning",
+    "movement_resolution", "gunnery", "torpedo_effects", "fire_end",
+]
+
+NARRATIVE_SYSTEM_PROMPT = (
+    "你是一位太平洋夜战编年史官，正为一场海战撰写中立战报。\n"
+    "纪律：\n"
+    "- 只依据下方给出的【本回合公开事件】与【双方公开态势】写作，不虚构、不推测、"
+    "不提及任何一方的订单、计划或未公开信息。\n"
+    "- 不偏向任何一方，不使用任何一方的内部视角词（如“我舰”“我军计划”）。\n"
+    "- 用叙事化、克制的编年史笔法，写 150-250 字，分 2-3 段。\n"
+    "- 只输出正文本身，不要标题、不要“战报：”前缀、不要引用事件编号。"
+)
+
+
+def public_events_for_turn(
+    state: GameState, engine: IronBottomEngine, turn: int
+) -> list[GameEvent]:
+    """该回合「至少一侧可见」的公开事件并集。orders_submitted/phase_changed/
+    game_created 一律排除（orders_submitted 携带完整私有 order_batch）。"""
+    result: list[GameEvent] = []
+    for event in state.events:
+        if event.turn != turn or event.type in EXCLUDED_EVENT_TYPES:
+            continue
+        if any(engine.event_visible_to(state, event, side) for side in Side):
+            result.append(event)
+    return result
+
+
+def _describe_event(event: GameEvent) -> str:
+    text = event.message
+    if event.dice is not None:
+        rolled = event.dice.adjusted if event.dice.adjusted is not None else event.dice.raw
+        text += f"（骰子 {event.dice.notation} → {rolled}）"
+    return text
+
+
+def _public_score(state: GameState, engine: IronBottomEngine) -> dict[str, int]:
+    """双方公开比分（hidden_damage 局内双方观察都归零；用任一侧观察）。"""
+    return engine.observe(state.game_id, Side.AXIS).score
+
+
+def build_narrative_prompt(
+    state: GameState, engine: IronBottomEngine, turn: int
+) -> tuple[str, str]:
+    """(system, user)：中立战史提示词。事件只带引擎 message+公开骰子，不传 payload。"""
+    by_phase: dict[str, list[str]] = {}
+    for event in public_events_for_turn(state, engine, turn):
+        by_phase.setdefault(event.phase.value, []).append(_describe_event(event))
+    lines = [f"【回合 {turn}/{state.max_turns}】", "【本回合公开事件（按阶段）】"]
+    for phase in PHASE_ORDER:
+        if phase not in by_phase:
+            continue
+        lines.append(f"· {phase}")
+        for item in by_phase[phase]:
+            lines.append(f"  - {item}")
+    lines.append("【双方公开态势】")
+    for side in Side:
+        obs = engine.observe(state.game_id, side)
+        ships = "; ".join(
+            f"{ship.name}@{ship.position.label if ship.position else '—'}（航向{ship.heading}）"
+            for ship in obs.ships
+        ) or "无可见舰船"
+        lines.append(f"- {side.value}: {ships}  比分={obs.score}")
+    return NARRATIVE_SYSTEM_PROMPT, "\n".join(lines)
+
+
+def deterministic_fallback_narrative(
+    state: GameState, engine: IronBottomEngine, turn: int
+) -> str:
+    """无密钥/叙事失败时的事实摘要（确定性、不联网、只列公开事件）。"""
+    lines = [f"第 {turn} 回合（共 {state.max_turns} 回合）",
+             "叙事模型未配置，以下为本回合公开事件事实摘要："]
+    current_phase = None
+    for event in public_events_for_turn(state, engine, turn):
+        if event.phase != current_phase:
+            current_phase = event.phase
+            lines.append(f"· {current_phase.value}")
+        lines.append(f"  - {_describe_event(event)}")
+    score = _public_score(state, engine)
+    lines.append(f"比分：轴心 {score.get(Side.AXIS.value, 0)} : "
+                 f"{score.get(Side.ALLIES.value, 0)} 盟军")
+    if state.winner is not None:
+        lines.append(f"胜负：{state.winner.value} 获胜（{state.victory_reason or '—'}）")
+    return "\n".join(lines)
+
+
+def write_turn_narrative(
+    state: GameState, engine: IronBottomEngine, turn: int,
+    commander: Any = None,
+) -> str:
+    """有叙事 commander 且调用成功 → LLM 叙事；否则确定性摘要。战报失败绝不影响对局。"""
+    if commander is not None:
+        try:
+            system, user = build_narrative_prompt(state, engine, turn)
+            return commander.write_narrative(system, user)
+        except Exception:
+            pass
+    return deterministic_fallback_narrative(state, engine, turn)
+
+
+# ---------------------------------------------------------------------------
+# 捕获编排（api 与 match 共用；repository=None 只落 PNG 不写库）。
+# ---------------------------------------------------------------------------
+def _image_dir(root, game_id: str) -> Path:
+    directory = Path(root) / game_id
+    directory.mkdir(parents=True, exist_ok=True)
+    return directory
+
+
+def capture_phase_snapshot(
+    repository, root, state: GameState, engine: IronBottomEngine,
+    turn: int, phase: str, sequence: int | None = None,
+) -> list[dict[str, Any]]:
+    """双侧 PNG + DB 行（幂等：同 (game_id, sequence, side) INSERT OR REPLACE）。
+    返回条目字典列表（match.py 累积用）。"""
+    if sequence is None:
+        sequence = state.events[-1].sequence if state.events else 0
+    entries: list[dict[str, Any]] = []
+    for side in Side:
+        image = render_map_image(state, engine, side)
+        rel = f"turn-{turn}-{phase}-{side.value}-{sequence}.png"
+        (Path(root) / state.game_id / rel).parent.mkdir(parents=True, exist_ok=True)
+        image.save(Path(root) / state.game_id / rel, format="PNG")
+        entry = {
+            "game_id": state.game_id, "sequence": sequence, "turn": turn,
+            "phase": phase, "side": side.value, "kind": "capture", "image_path": rel,
+        }
+        if repository is not None:
+            repository.save_battle_entry(
+                state.game_id, sequence, turn, phase, side.value, "capture", image_path=rel
+            )
+        entries.append(entry)
+    return entries
+
+
+def capture_after_advance(
+    repository, root, state: GameState, engine: IronBottomEngine,
+    prev_phase, commander: Any = None,
+) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
+    """`engine.advance` 之后调用（state 已是结算后）。label=prev_phase（结算后快照）。
+
+    返回 (新捕获条目列表, 新叙事条目或 None)。FIRE_END 同时触发上一回合叙事（幂等：
+    有库时靠 battle_narrative_exists，无库时每局各触发一次）。任何异常由调用方吞掉。
+    """
+    turn = state.turn
+    label_phase = prev_phase.value
+    narrative_turn: int | None = None
+    if prev_phase == Phase.FIRE_END:
+        label_phase = "fire_end"
+        narrative_turn = state.turn - 1 if state.phase == Phase.REINFORCEMENT else state.turn
+        turn = narrative_turn
+    entries = capture_phase_snapshot(repository, root, state, engine, turn, label_phase)
+    narrative_entry: dict[str, Any] | None = None
+    if prev_phase == Phase.FIRE_END:
+        assert narrative_turn is not None
+        if repository is None or not repository.battle_narrative_exists(state.game_id, narrative_turn):
+            narrative = write_turn_narrative(state, engine, narrative_turn, commander)
+            sequence = state.events[-1].sequence if state.events else 0
+            narrative_entry = {
+                "game_id": state.game_id, "sequence": sequence, "turn": narrative_turn,
+                "phase": "fire_end", "side": "both", "kind": "narrative",
+                "image_path": None, "content": narrative,
+            }
+            if repository is not None:
+                repository.save_battle_entry(
+                    state.game_id, sequence, narrative_turn, "fire_end", "both",
+                    "narrative", content=narrative,
+                )
+    return entries, narrative_entry
+
+
+# ---------------------------------------------------------------------------
+# 战报数据 / Markdown。
+# ---------------------------------------------------------------------------
+def build_report_data(
+    state: GameState, engine: IronBottomEngine, entries: list[dict[str, Any]] | list[Any],
+) -> dict[str, Any]:
+    """中立战报 JSON（api 端点与 match json 共用）。captures 按 (turn, phase) 归组。"""
+    captures: dict[tuple[int, str], list[dict[str, str]]] = {}
+    narratives: dict[int, str] = {}
+    for entry in entries:
+        if entry["kind"] == "capture":
+            captures.setdefault((entry["turn"], entry["phase"]), []).append(
+                {"side": entry["side"], "image_path": entry["image_path"]}
+            )
+        else:
+            narratives[entry["turn"]] = entry["content"]
+    turns: list[dict[str, Any]] = []
+    for turn in range(1, state.turn + 1):
+        phases = [
+            {"phase": phase, "captures": captures[(turn, phase)]}
+            for phase in PHASE_ORDER
+            if (turn, phase) in captures
+        ]
+        turns.append({
+            "turn": turn,
+            "narrative": narratives.get(turn),
+            "phases": phases,
+            "events": [
+                {"sequence": event.sequence, "phase": event.phase.value,
+                 "type": event.type, "message": event.message}
+                for event in public_events_for_turn(state, engine, turn)
+            ],
+        })
+    return {
+        "meta": {
+            "game_id": state.game_id,
+            "scenario_id": state.scenario_id,
+            "scenario_title": state.scenario_title,
+            "mode": state.options.mode,
+            "seed": state.seed,
+            "turn": state.turn,
+            "max_turns": state.max_turns,
+            "phase": state.phase.value,
+            "winner": state.winner.value if state.winner else None,
+            "victory_reason": state.victory_reason,
+            "score": state.score,
+        },
+        "turns": turns,
+    }
+
+
+def _read_image_b64(root, game_id: str, rel: str) -> str:
+    path = Path(root) / game_id / rel
+    if not path.is_file():
+        return ""
+    return base64.b64encode(path.read_bytes()).decode("ascii")
+
+
+def build_report_markdown(root, data: dict[str, Any], game_id: str) -> str:
+    """自包含 MD：截图以 data:image/png;base64 内嵌，可直接分享。"""
+    meta = data["meta"]
+    score = meta["score"] or {}
+    lines = ["# 铁底湾的回响 IV · 战报", ""]
+    lines.append(f"- **想定**：{meta['scenario_title']}（{meta['scenario_id']}）")
+    lines.append(f"- **模式**：{meta['mode']}　**种子**：{meta['seed']}")
+    lines.append(f"- **进度**：第 {meta['turn']}/{meta['max_turns']} 回合 · {meta['phase']}")
+    lines.append(f"- **比分**：轴心 {score.get(Side.AXIS.value, 0)} : "
+                 f"{score.get(Side.ALLIES.value, 0)} 盟军")
+    if meta["winner"]:
+        lines.append(f"- **胜负**：{meta['winner']} 获胜（{meta['victory_reason']}）")
+    lines.append("")
+    for turn_data in data["turns"]:
+        turn = turn_data["turn"]
+        lines.append(f"## 第 {turn} 回合")
+        narrative = turn_data.get("narrative")
+        if narrative:
+            lines.append("")
+            lines.append(narrative)
+        for phase_data in turn_data.get("phases", []):
+            for cap in phase_data["captures"]:
+                lines.append("")
+                lines.append(
+                    f"![第{turn}回合 {phase_data['phase']} {cap['side']}视角]"
+                    f"(data:image/png;base64,{_read_image_b64(root, game_id, cap['image_path'])})"
+                )
+        if turn_data.get("events"):
+            lines.append("")
+            lines.append("### 公开事件")
+            for event in turn_data["events"]:
+                lines.append(f"- {event['message']}")
+        lines.append("")
+    return "\n".join(lines)
