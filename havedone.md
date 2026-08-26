@@ -346,3 +346,13 @@
 - **风格状态机对战基准框架（bench.py + tests/test_bench.py）**：`python -m iron_bottom_sound.bench --games N --workers W --profiles ... --out ...`。轮转分布到全部有序非镜像组合（6 风格×5=30 组，同组合共享连续 seed 集）；`ProcessPoolExecutor` 多进程并行（CPU 密集纯 Python，GIL 下线程无效）；每局走 `match.run_match`，只收 `MatchReport` 公开字段，引擎唯一裁决、零共享状态；聚合"作轴心/作盟军/合计"胜率 + 组合矩阵 + 结局分布，写 bench-report.json/.md。确定性：50 局复跑共享 50 局 0 分歧。**性能**：50 局 11.6s、90 局 18.0s（8 进程；串行约 0.96s/局）。**测试**：+5（组合构造/轮转分布/小规模并行/串行确定性/md 渲染）；全量 306 passed (88.9s)。
 - **50 局基准结果（想定1 IBS-S-03，6 风格）**：`tmp/bench-50/`。50 局过 30 组合（20 组 2 局+10 组 1 局），各风格轴心胜率全是 40% —— 是**稀疏采样假象**（轴心风格确实生效：同 seed1 下 balanced(轴) 胜 brawl(盟) 而 fleet(轴) 败 brawl(盟)）。
 - **90 局均分确认（3 局/组，`tmp/bench-90/`，轴心总体 47.8%）**：真实结构浮现 = **风格效果随阵营角色而变**（想定胜负不对称：德方"无德驱被击沉/减速=胜"，英方"击沉德驱=胜"）。作盟军（进攻使命）line/brawl 66.7%、balanced 60%、cautious 20%（不敢打不杀）；作轴心（生存使命）cautious 66.7%、line 26.7%（冲锋被击杀）。结局交叉验证：cautious 作轴心胜=全"德军战术胜利"（存活）、作盟军败=全"德军战术胜利"（不杀）；line 作盟军胜=全"英军战术胜利"（击沉）。**无全局最优风格，只有角色最优**：balanced/torpedo/brawl 全才，cautious 偏守、line/fleet 偏攻。多 seed 才稳定 → 框架默认按组合轮转 seed。
+
+## 2026-08-26（批次 2）：用户自备 LLM 密钥 + 科研用途同意（落库 + Server酱通知），本地/线上同步
+
+- **需求（用户）**：战报与 LLM 对战需要 LLM API——改为**用户主动提供自己的密钥**；开局提供「是否愿意把对战记录用于科研论文」选项，愿意可留称呼；同意保存到服务器并用服务器通知模块通知作者（用户选 **Server酱 / 微信推送**）。
+- **用户密钥（内存专用，绝不落盘）**：api.py `CreateGame`/`LLMOpponentRequest` 增 `llm_api_key`/`api_key`；进程内存 `_user_llm_keys[game_id]`（重启即清、不写库/盘）；llm.py `OpenAICompatibleCommander.__init__` 增 `api_key`，`_resolve_api_key()` = 用户密钥 > `os.environ[DEEPSEEK_API_KEY]`。解析优先级：本次请求 api_key > 开局注入 > 服务器 env；全无 → 503「请先提供你自己的 LLM API 密钥」（一切 LLM 调用前短路，测试断言不发起调用）。战报叙事 advance 钩子同优先级用用户密钥（`OpenAICompatibleCommander(api_key=...)`）。
+- **科研同意**：`ResearchConsent{allow, handle≤40}` 随 create_game 传入 → 新表 `research_consent(game_id PK, allow, handle, scenario, created_at)` 落库（INSERT OR REPLACE，失败吞掉不影响建局）；`allow=True` 时后台 `BackgroundTasks` 推送一条通知（异步、失败静默、绝不携带订单/损伤/密钥，只含想定/局号/是否同意/称呼）。
+- **通知模块 notify.py（可插拔渠道）**：`IBS_NOTIFY_CHANNEL=serverchan|none`（默认 none，只落库不推送）、`IBS_NOTIFY_SERVERCHAN_KEY`；Server酱 `POST https://sctapi.ftqq.com/<key>.send`（title=铁底湾：新的科研用途同意，desp 含想定/局号/同意状态/称呼），`code==0`→True，任何异常吞掉返回 False。
+- **前端（Landing）**：新增「LLM API 密钥」password 输入（提示仅会话内存、不上传/不落盘，可一键清除）+「科研用途同意」勾选（勾选后显示称呼输入，maxLength=40）；`createGame`/`llmOpponent` 传参（llmOpponent 请求体带 api_key，每次行动走本次密钥）。
+- **测试**：新增 tests/test_research_consent.py 13 例（密钥仅内存不落库、注入/请求级/服务器 env 三优先级、advance 叙事用注入密钥、同意落库+通知、拒绝只落库不通知、未传不落、落库失败不影响建局、Server酱 URL/标题/正文、非 0 码/异常→False、channel 未配置→False）；更新 test_api_llm_opponent.py 适配 `api_key` 工厂签名与新 503 文案。全量 `334 passed`。
+- **本地环境注意**：仓库路径含中文（铁底湾），pytest 默认 basetemp `.pytest-tmp` 被残留进程/ACL 锁住 → 用 `-p no:cacheprovider --basetemp=$TEMP/ibs-pytest-tmp` 规避；另残留的本地 dev server（`python -m iron_bottom_sound`）需先 `taskkill` 释放 DB 锁。前端本机无 node，构建在服务器验证。

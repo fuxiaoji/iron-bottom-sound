@@ -1,8 +1,8 @@
 """LLM 对手端点 `POST /games/{id}/llm-opponent`（llm 模式，玩家对侧 DeepSeek 下单）。
 
-守卫顺序：404 → 403（非 llm mode）→ 400（缺 header）→ 503（无密钥，调用前）→
-409（玩家未提交）→ 幂等短路。返回 audits 公开子集，不返回私有订单。测试用
-monkeypatch 注入 stub 指挥官，绝不发真实 HTTP 请求。
+守卫顺序：404 → 403（非 llm mode）→ 400（缺 header）→ 503（用户/服务器均无密钥，
+调用前）→ 409（玩家未提交）→ 幂等短路。返回 audits 公开子集，不返回私有订单。
+测试用 monkeypatch 注入 stub 指挥官，绝不发真实 HTTP 请求。
 """
 
 import os
@@ -61,12 +61,15 @@ def test_llm_opponent_503_without_key_makes_no_call(monkeypatch) -> None:
     client = TestClient(app)
     game_id = _create(client, "llm")
     calls: list = []
-    monkeypatch.setattr(api, "llm_commander_factory", lambda timeout, thinking_enabled: calls.append(timeout))
+    monkeypatch.setattr(
+        api, "llm_commander_factory",
+        lambda timeout, thinking_enabled, api_key=None: calls.append(timeout),
+    )
     response = client.post(
         f"/games/{game_id}/llm-opponent", headers={"X-Player-Side": "axis"}
     )
     assert response.status_code == 503
-    assert "DEEPSEEK_API_KEY" in response.text
+    assert "请先提供你自己的 LLM API 密钥" in response.text
     assert calls == []  # 密钥缺失时绝不发起任何 LLM 调用
 
 
@@ -75,7 +78,10 @@ def test_llm_opponent_409_before_player_submits(monkeypatch) -> None:
     client = TestClient(app)
     game_id = _create(client, "llm")
     calls: list = []
-    monkeypatch.setattr(api, "llm_commander_factory", lambda timeout, thinking_enabled: calls.append(1))
+    monkeypatch.setattr(
+        api, "llm_commander_factory",
+        lambda timeout, thinking_enabled, api_key=None: calls.append(1),
+    )
     response = client.post(
         f"/games/{game_id}/llm-opponent", headers={"X-Player-Side": "axis"}
     )
@@ -89,7 +95,10 @@ def test_llm_opponent_submits_opponent_and_returns_public_audits(monkeypatch) ->
     client = TestClient(app)
     game_id = _create(client, "llm")
     stub = StubCommander(_player_batch(Side.ALLIES), audits=[_audit()])
-    monkeypatch.setattr(api, "llm_commander_factory", lambda timeout, thinking_enabled: stub)
+    monkeypatch.setattr(
+        api, "llm_commander_factory",
+        lambda timeout, thinking_enabled, api_key=None: stub,
+    )
     assert client.post(
         f"/games/{game_id}/orders",
         headers={"X-Player-Side": "axis"},
@@ -113,7 +122,10 @@ def test_llm_opponent_idempotent_short_circuit(monkeypatch) -> None:
     client = TestClient(app)
     game_id = _create(client, "llm")
     stub = StubCommander(_player_batch(Side.ALLIES), audits=[_audit()])
-    monkeypatch.setattr(api, "llm_commander_factory", lambda timeout, thinking_enabled: stub)
+    monkeypatch.setattr(
+        api, "llm_commander_factory",
+        lambda timeout, thinking_enabled, api_key=None: stub,
+    )
     client.post(
         f"/games/{game_id}/orders",
         headers={"X-Player-Side": "axis"},
@@ -137,7 +149,10 @@ def test_llm_opponent_rejects_illegal_ai_orders_without_silent_fix(monkeypatch) 
     illegal = _player_batch(Side.ALLIES)
     illegal.movement = [{"ship_id": "NO-SUCH-SHIP", "plan": "0"}]
     stub = StubCommander(illegal)
-    monkeypatch.setattr(api, "llm_commander_factory", lambda timeout, thinking_enabled: stub)
+    monkeypatch.setattr(
+        api, "llm_commander_factory",
+        lambda timeout, thinking_enabled, api_key=None: stub,
+    )
     client.post(
         f"/games/{game_id}/orders",
         headers={"X-Player-Side": "axis"},

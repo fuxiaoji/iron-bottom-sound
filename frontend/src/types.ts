@@ -1,4 +1,5 @@
 export type Side="axis"|"allies";
+export interface ResearchConsent{allow:boolean;handle?:string|null}
 export type Phase="contact_setup"|"reinforcement"|"movement_planning"|"torpedo_planning"|"movement_resolution"|"gunnery"|"torpedo_effects"|"fire_end"|"complete";
 export interface HexCoord{q:number;r:number}
 export interface GunMount{id:string;kind:"primary"|"secondary";position:string;firepower:number;caliber:number;arcs:string[];armour:number|null;destroyed:boolean;fired_this_phase:boolean}

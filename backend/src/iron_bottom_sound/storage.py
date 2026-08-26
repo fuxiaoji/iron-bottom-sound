@@ -45,6 +45,13 @@ class GameRepository:
               created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
               PRIMARY KEY (game_id, sequence, side)
             );
+            CREATE TABLE IF NOT EXISTS research_consent (
+              game_id TEXT PRIMARY KEY,
+              allow INTEGER NOT NULL DEFAULT 0,
+              handle TEXT,
+              scenario TEXT,
+              created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
             """
         )
 
@@ -120,6 +127,23 @@ class GameRepository:
             (game_id, turn),
         ).fetchone()
         return row is not None
+
+    def save_research_consent(
+        self, game_id: str, allow: bool, handle: str | None, scenario: str
+    ) -> None:
+        """科研用途同意记录（用户主动声明；对同一 game_id 幂等覆盖）。"""
+        with self.connection:
+            self.connection.execute(
+                """INSERT OR REPLACE INTO research_consent(game_id, allow, handle, scenario)
+                   VALUES (?, ?, ?, ?)""",
+                (game_id, int(allow), handle, scenario),
+            )
+
+    def research_consents(self) -> list[dict]:
+        rows = self.connection.execute(
+            "SELECT * FROM research_consent ORDER BY created_at DESC"
+        ).fetchall()
+        return [dict(row) for row in rows]
 
     def close(self) -> None:
         self.connection.close()

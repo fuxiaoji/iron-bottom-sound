@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import FastAPI, Header, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Query, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -20,7 +20,8 @@ from .data import ROOT
 from .llm import OpenAICompatibleCommander
 from .state_export import export_frame, render_board
 from .tactical import PROFILES, TacticalCommander
-from .models import GameOptions, GunneryAssistRequest, MovementPreviewRequest, MovementTrajectoriesRequest, OrderBatch, Phase, Side, TorpedoAssistRequest
+from .models import GameOptions, GunneryAssistRequest, MovementPreviewRequest, MovementTrajectoriesRequest, OrderBatch, Phase, ResearchConsent, Side, TorpedoAssistRequest
+from .notify import notify_research_consent
 from .storage import GameRepository
 
 
@@ -28,6 +29,10 @@ class CreateGame(BaseModel):
     scenario_id: str = "IBS-S-03"
     seed: int = 1
     options: GameOptions = Field(default_factory=GameOptions)
+    # 用户主动提供的 LLM 密钥：仅按局存进程内存（_user_llm_keys），绝不落库/落盘。
+    llm_api_key: str | None = None
+    # 科研论文用途同意（可留称呼）：落库 research_consent 表 + 通知。
+    research_consent: ResearchConsent | None = None
 
 
 class FieldOfFireRequest(BaseModel):
@@ -43,6 +48,8 @@ repository = GameRepository(os.environ.get("IBS_DB_PATH", str(_default_db)))
 _default_reports_dir = Path(__file__).resolve().parents[3] / "backend" / "reports"
 reports_root = os.environ.get("IBS_REPORTS_DIR", str(_default_reports_dir))
 narrative_commander_factory = lambda: OpenAICompatibleCommander(timeout=30, max_tokens=800)
+# 用户主动提供的 LLM 密钥（按 game_id）：进程内存，重启即清空，绝不写盘/写库。
+_user_llm_keys: dict[str, str] = {}
 app = FastAPI(title="铁底湾的回响 IV", version="0.1.0")
 app.mount(
     "/assets/counters",
@@ -91,12 +98,27 @@ def scenarios():
 
 
 @app.post("/games", status_code=201)
-def create_game(request: CreateGame):
+def create_game(request: CreateGame, background_tasks: BackgroundTasks):
     try:
         state = engine.reset(request.scenario_id, request.seed, request.options)
     except (KeyError, ValueError) as error:
         raise HTTPException(422, str(error)) from error
     repository.save(state)
+    if request.llm_api_key:
+        _user_llm_keys[state.game_id] = request.llm_api_key  # 仅内存，绝不落盘
+    consent = request.research_consent
+    if consent is not None:
+        try:
+            repository.save_research_consent(
+                state.game_id, consent.allow, consent.handle, state.scenario_id
+            )
+        except Exception:
+            pass  # 同意落库失败不影响建局
+        if consent.allow:
+            # 异步推送，建局不受通知延迟影响；失败静默。
+            background_tasks.add_task(
+                notify_research_consent, state.game_id, True, consent.handle, state.scenario_id
+            )
     if state.options.battle_report:
         try:
             capture_phase_snapshot(repository, reports_root, state, engine,
@@ -171,10 +193,15 @@ class AIOpponentRequest(BaseModel):
 class LLMOpponentRequest(BaseModel):
     timeout: float = Field(default=90, gt=0)
     thinking_enabled: bool = False
+    api_key: str | None = None  # 用户主动提供的密钥（可省略：优先用开局时注入的）
 
 
-def _make_llm_commander(timeout: float, thinking_enabled: bool) -> OpenAICompatibleCommander:
-    return OpenAICompatibleCommander(timeout=timeout, thinking_enabled=thinking_enabled)
+def _make_llm_commander(
+    timeout: float, thinking_enabled: bool, api_key: str | None = None
+) -> OpenAICompatibleCommander:
+    return OpenAICompatibleCommander(
+        timeout=timeout, thinking_enabled=thinking_enabled, api_key=api_key
+    )
 
 
 # 测试可注入 mock 指挥官的小工厂（保持端点默认走真实 DeepSeek）。
@@ -243,15 +270,17 @@ def llm_opponent(
         raise HTTPException(403, "LLM opponent is available only in llm mode")
     player_side = side_from_header(x_player_side)
     ai_side = player_side.opponent
-    if not os.environ.get("DEEPSEEK_API_KEY"):
-        raise HTTPException(503, "DEEPSEEK_API_KEY is not configured")
+    # 用户主动提供的密钥（本次请求 > 开局时注入）> 服务器环境变量。
+    key = (request.api_key if request is not None else None) or _user_llm_keys.get(game_id)
+    if not key and not os.environ.get("DEEPSEEK_API_KEY"):
+        raise HTTPException(503, "请先提供你自己的 LLM API 密钥（开局时或在本次请求中传入 api_key）")
     if player_side.value not in state.submitted_orders:
         raise HTTPException(409, "Submit the player's orders first")
     if ai_side.value in state.submitted_orders:
         return {"valid": True, "ai_submitted": True, "audits": []}
     timeout = request.timeout if request is not None else 90
     thinking = request.thinking_enabled if request is not None else False
-    commander = llm_commander_factory(timeout=timeout, thinking_enabled=thinking)
+    commander = llm_commander_factory(timeout=timeout, thinking_enabled=thinking, api_key=key)
     try:
         _, batch, audits = commander.choose_plan(engine, game_id, ai_side)
     except ValueError as error:
@@ -375,8 +404,14 @@ def advance(game_id: str, x_player_side: Annotated[str | None, Header()] = None)
     next_state = engine.get(game_id)
     if next_state.options.battle_report:
         try:
+            # 用户主动提供的密钥优先；无用户密钥时用服务器 env（无 env 则确定性回退）。
+            key = _user_llm_keys.get(game_id)
+            commander = (
+                OpenAICompatibleCommander(api_key=key, timeout=30, max_tokens=800)
+                if key else narrative_commander_factory()
+            )
             capture_after_advance(repository, reports_root, next_state, engine,
-                                  prev_phase, commander=narrative_commander_factory())
+                                  prev_phase, commander=commander)
         except Exception:
             pass  # 战报失败绝不影响对局
     repository.save(next_state)

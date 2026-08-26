@@ -407,6 +407,7 @@ class OpenAICompatibleCommander(LLMCommander):
         endpoint: str = "https://api.deepseek.com",
         model: str = "deepseek-v4-flash",
         api_key_env: str = "DEEPSEEK_API_KEY",
+        api_key: str | None = None,
         timeout: float = 45,
         max_tokens: int | None = None,
         thinking_enabled: bool = False,
@@ -416,6 +417,8 @@ class OpenAICompatibleCommander(LLMCommander):
         self.endpoint = endpoint.rstrip("/")
         self.model = model
         self.api_key_env = api_key_env
+        # 用户主动提供的密钥：仅在内存中按次注入，绝不落库/落盘；缺省回退环境变量。
+        self.api_key = api_key
         self.timeout = timeout
         self.thinking_enabled = thinking_enabled
         # thinking 开启时 completion 预算会被 reasoning 吃掉，须加大 max_tokens 防 JSON 截断。
@@ -423,13 +426,17 @@ class OpenAICompatibleCommander(LLMCommander):
         self.max_tokens = max_tokens or (6000 if thinking_enabled else 2400)
         self.client = client
 
+    def _resolve_api_key(self) -> str:
+        key = self.api_key or os.environ.get(self.api_key_env)
+        if not key:
+            raise RuntimeError(f"{self.api_key_env} is not configured")
+        return key
+
     def choose_plan(
         self, engine: IronBottomEngine, game_id: str, side: Side
     ) -> tuple[AIPlanSheet, OrderBatch, list[LLMCallAudit]]:
         state = engine.get(game_id)
-        api_key = os.environ.get(self.api_key_env)
-        if not api_key:
-            raise RuntimeError(f"{self.api_key_env} is not configured")
+        api_key = self._resolve_api_key()
         prompt: dict[str, Any] = {
             "board": render_board(state, engine, side),
             "world_state": export_frame(state, engine, side),
@@ -502,9 +509,7 @@ class OpenAICompatibleCommander(LLMCommander):
         与 choose_plan 同一条 key/timeout 管线（密钥只在调用时从环境变量读）。
         任何失败由调用方（battle_report.write_turn_narrative）吞掉 → 确定性回退。
         """
-        api_key = os.environ.get(self.api_key_env)
-        if not api_key:
-            raise RuntimeError(f"{self.api_key_env} is not configured")
+        api_key = self._resolve_api_key()
         payload: dict[str, Any] = {
             "model": self.model,
             "temperature": temperature,

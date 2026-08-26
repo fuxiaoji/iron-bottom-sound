@@ -113,6 +113,15 @@ class OptionalRules(BaseModel):
     blind_torpedoes: bool = False
 
 
+class ResearchConsent(BaseModel):
+    """开局时用户主动声明的科研用途同意（允许保留对战记录；可留称呼）。
+
+    仅经 create_game 请求体传入、落库到 research_consent 表；不进入 GameState。
+    """
+    allow: bool = False
+    handle: str | None = Field(default=None, max_length=40)
+
+
 class GameOptions(BaseModel):
     mode: Literal["hotseat", "tutorial", "llm", "vs_ai"] = "hotseat"
     # 人机大战时对手 AI 的风格 profile（tactical.PROFILES 键）；其余模式恒为 None。
