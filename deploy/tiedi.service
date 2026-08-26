@@ -1,0 +1,28 @@
+# 铁底湾后端 systemd 单元 —— 复制到服务器 /etc/systemd/system/tiedi.service
+#
+#   sudo cp deploy/tiedi.service /etc/systemd/system/tiedi.service
+#   sudo systemctl daemon-reload && sudo systemctl enable --now tiedi
+#   日志：journalctl -u tiedi -f
+#
+# 密钥纪律：DEEPSEEK_API_KEY 只经 EnvironmentFile=/etc/tiedi.env 注入
+# （服务器 root 专属，chmod 600，绝不出现在仓库/git 中）。无密钥时战报
+# 叙事自动走确定性回退，LLM 对手不可用——对局功能不受影响。
+
+[Unit]
+Description=铁底湾的回响 IV backend (uvicorn, serves /tiedi API for fuwenji.asia)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/tiedi
+# 数据/截图落盘路径（也都在 .gitignore 内，上传/更新代码不会覆盖）
+Environment=IBS_DB_PATH=/opt/tiedi/backend/iron-bottom-sound.sqlite3
+Environment=IBS_REPORTS_DIR=/opt/tiedi/backend/reports
+EnvironmentFile=/etc/tiedi.env
+ExecStart=/opt/tiedi/.venv/bin/python -m uvicorn iron_bottom_sound.api:app --app-dir backend/src --host 127.0.0.1 --port 8001
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
