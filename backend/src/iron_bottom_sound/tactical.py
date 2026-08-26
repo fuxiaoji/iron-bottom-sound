@@ -380,7 +380,7 @@ class TacticalCommander(DeterministicCommander):
         追求对我可见舰的火力压力、按自身风格接近与编队。只依赖敌当前可见信息，
         不递归预测我方反应。返回 (预测落点, 末航向)。"""
         es = self._public_copy(state, state.ships[enemy.id])
-        candidates = engine.movement_candidates(state, es)["reachable"]
+        candidates = engine.movement_candidates(state, es, include_plans=False)["reachable"]
         if not candidates:
             return es.position, es.heading
         my_positions = [
@@ -480,7 +480,7 @@ class TacticalCommander(DeterministicCommander):
         """对单舰在所有可达 (格, 末航向) 上打分，取最优者（温度>0 且带 RNG 时按
         softmax 概率抽样）生成合法移动计划；抽样只在 `movement_candidates` 合法可达
         集内进行，永不落到非法格。"""
-        candidates = engine.movement_candidates(state, ship)["reachable"]
+        candidates = engine.movement_candidates(state, ship, include_plans=False)["reachable"]
         own_value = self._own_value(state, ship, ctx)
         entries: list[tuple[int, HexCoord, int, float, float, float]] = []
         max_pressure = 0.0
@@ -608,7 +608,7 @@ class TacticalCommander(DeterministicCommander):
         依次回退 `"0"` → 直行 max_cost → 首个可达格路径。"""
         if engine.movement_preview(state, ship, plan="0")["commitable"]:
             return MovementOrder(ship_id=ship.id, plan="0")
-        candidates = engine.movement_candidates(state, ship)
+        candidates = engine.movement_candidates(state, ship, include_plans=False)
         if candidates["max_cost"] > 0:
             plan = str(candidates["max_cost"])
             if engine.movement_preview(state, ship, plan=plan)["commitable"]:

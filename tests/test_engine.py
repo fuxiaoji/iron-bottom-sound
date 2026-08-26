@@ -620,6 +620,34 @@ def test_legal_actions_publish_only_engine_valid_weapon_candidates() -> None:
     assert all(candidate["settings"] for candidate in torpedo_candidates)
 
 
+def test_movement_candidates_exclude_sunk_ships_even_with_pending_drift_position() -> None:
+    """沉没但尚未结算成残骸（漂移待处理、仍占格）的舰不得进入 movement_candidates。
+
+    回归：legal_actions 的 movement_candidates 曾漏过滤 sunk——漂移中的沉船被列为
+    可动舰，误导 LLM 给它下 movement，而校验（owned 排除 sunk）必然拒绝，导致
+    LLM 自纠三连败、对局中止。
+    """
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=51)
+    victim = next(
+        ship for ship in state.ships.values()
+        if ship.side == Side.AXIS and ship.position is not None
+    )
+    victim.sunk = True
+    victim.sinking_drift_pending = True  # 仍占格、漂移未结算的沉船
+    assert victim.position is not None
+    state.phase = Phase.MOVEMENT_PLANNING
+    hint = engine.legal_actions(state.game_id, Side.AXIS)[0].schema_hint
+    candidate_ids = {candidate["ship_id"] for candidate in hint["movement_candidates"]}
+    assert victim.id not in candidate_ids
+    # 其余有位置的本方活动舰仍须列全（校验要求覆盖每艘活动舰）。
+    expected = {
+        ship.id for ship in state.ships.values()
+        if ship.side == Side.AXIS and not ship.sunk and ship.position is not None
+    }
+    assert expected and expected <= candidate_ids
+
+
 def test_gunnery_rejects_destroyed_mount_and_scenario_one_axis_turn_one_fire() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-01", seed=5)
@@ -1762,6 +1790,41 @@ def test_special_damage_31_destroys_radar_even_when_bridge_armour_stops_bridge_e
     assert not target.bridge_destroyed
     assert target.captain_status == "fit"
     assert target.forced_straight_turns == 0
+
+
+def test_special_damage_straight_and_circle_supersede_each_other() -> None:
+    """跨回合两次特殊损伤（圆周→直航 或 直航→圆周）不得让同舰同时带两种互斥
+    转向约束：直航禁一切转向而圆周要求至少转一次，二者叠加会 n_reachable=0
+    使舰无任何合法订单（IBS-U-RN-JACKAL 死锁回归）。后中损伤取代先中损伤。"""
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=7, game_id="sd-supersede")
+    ship = next(s for s in state.ships.values() if s.side == Side.AXIS and s.position)
+    # 第 N 回合中 26（circle_turns: 2）→ 圆周 2；回合末 ship_moved 后引擎统一减 1 → 1。
+    engine._roll_d66 = lambda _: (26, [2, 6])  # type: ignore[method-assign]
+    engine._resolve_special_damage(state, ship, armour_already_penetrated=True)
+    assert ship.forced_circle_turns == 2 and ship.forced_straight_turns == 0
+    ship.forced_circle_turns -= 1
+    # 第 N+1 回合中 25（straight_turns: 3）→ 直航取代圆周，舰仍可动。
+    engine._roll_d66 = lambda _: (25, [2, 5])  # type: ignore[method-assign]
+    engine._resolve_special_damage(state, ship, armour_already_penetrated=True)
+    assert ship.forced_straight_turns == 3
+    assert ship.forced_circle_turns == 0
+    assert ship.forced_turn_side is None
+    assert engine.movement_candidates(state, ship)["reachable"], \
+        "取代后同舰必须仍有可达格（否则无合法订单可下）"
+
+    # 反向：先直航后圆周 → 圆周取代直航，同样不产生死锁。
+    reverse = IronBottomEngine()
+    rev_state = reverse.reset("IBS-S-03", seed=7, game_id="sd-supersede-2")
+    rev_ship = next(s for s in rev_state.ships.values() if s.side == Side.AXIS and s.position)
+    reverse._roll_d66 = lambda _: (25, [2, 5])  # type: ignore[method-assign]
+    reverse._resolve_special_damage(rev_state, rev_ship, armour_already_penetrated=True)
+    assert rev_ship.forced_straight_turns == 3
+    reverse._roll_d66 = lambda _: (26, [2, 6])  # type: ignore[method-assign]
+    reverse._resolve_special_damage(rev_state, rev_ship, armour_already_penetrated=True)
+    assert rev_ship.forced_circle_turns == 2
+    assert rev_ship.forced_straight_turns == 0
+    assert reverse.movement_candidates(rev_state, rev_ship)["reachable"]
 
 
 def test_every_special_damage_d66_result_executes_with_audited_event() -> None:

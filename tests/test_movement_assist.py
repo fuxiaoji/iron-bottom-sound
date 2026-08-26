@@ -292,6 +292,89 @@ def test_movement_preview_honors_forced_circle_side() -> None:
     assert ship.heading not in ahead_entry["final_headings"]
 
 
+def test_immobile_forced_circle_ship_can_legally_stay() -> None:
+    """最大航速归零（引擎失效）+ 圆周强制：舰无法移动、圆周指令无法执行，
+    引擎须放行「原地停留」（plan "0"），否则该舰不存在任何合法订单
+    （IBS-U-USN-DUNCAN 死锁回归：legal_range [0,0] 但强制圆周要求转一次）。"""
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=7, game_id="circle-immobile")
+    ship = axis_ship(engine, state.game_id)
+    ship.speed_damage_track = ((0,), (0,), (0,))
+    ship.speed_damage_crossed = (0, 0, 0)
+    ship.forced_circle_turns = 1
+    ship.forced_turn_side = "port"
+    assert ship.max_speed_for_turn(state.turn) == 0
+    candidates = engine.movement_candidates(state, ship, include_plans=False)
+    assert (candidates["min_cost"], candidates["max_cost"]) == (0, 0)
+    assert any(
+        entry["label"] == ship.position.label and entry["cost"] == 0
+        for entry in candidates["reachable"]
+    ), "原地停留必须是可达状态"
+    preview = engine.movement_preview(state, ship, plan="0")
+    assert preview["commitable"], preview["errors"]
+    # 完整 MOVEMENT_PLANNING 批次复核：该舰 plan "0" 必须被 validate_orders 放行。
+    engine.submit_orders(state.game_id, OrderBatch(side=Side.ALLIES, phase=Phase.REINFORCEMENT))
+    engine.submit_orders(state.game_id, OrderBatch(side=Side.AXIS, phase=Phase.REINFORCEMENT))
+    engine.advance(state.game_id)
+    assert engine.get(state.game_id).phase == Phase.MOVEMENT_PLANNING
+    active = [s for s in engine.get(state.game_id).ships.values() if s.side == Side.AXIS and s.position]
+    movement = []
+    for s in active:
+        if s.id == ship.id:
+            movement.append(MovementOrder(ship_id=s.id, plan="0"))
+            continue
+        reachable = engine.movement_candidates(engine.get(state.game_id), s)["reachable"]
+        movement.append(MovementOrder(ship_id=s.id, plan=reachable[0]["plan"] if reachable else "0"))
+    result = engine.validate_orders(
+        engine.get(state.game_id).game_id,
+        OrderBatch(side=Side.AXIS, phase=Phase.MOVEMENT_PLANNING, movement=movement),
+    )
+    assert result.valid, result.errors
+
+
+def test_cornered_forced_circle_ship_can_legally_stay() -> None:
+    """舰首动 advance 不可进（贴地图边朝场外）+ 圆周强制：无法执行圆周指令，
+    引擎须放行「原地停留」（plan "0"），否则该舰不存在任何合法订单
+    （IBS-U-USN-DUNCAN M1/heading5 贴边圆周死锁回归）。"""
+    from iron_bottom_sound.models import HexCoord
+
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=7, game_id="circle-corner")
+    ship = axis_ship(engine, state.game_id)
+    # 找一个正前方在场外（neighbor 抛 ValueError → 首动 advance 不可进）且自身非陆的贴边格。
+    corner: HexCoord | None = None
+    corner_heading = 1
+    for q in range(34):
+        for row in range(27):
+            pos = HexCoord(q=q, r=row - (q - (q & 1)) // 2)
+            if pos.label in state.land_hexes:
+                continue
+            for heading in range(1, 7):
+                try:
+                    pos.neighbor(heading)
+                except ValueError:
+                    corner, corner_heading = pos, heading
+                    break
+            if corner:
+                break
+        if corner:
+            break
+    assert corner is not None, "地图应存在贴边格"
+    ship.position = corner
+    ship.heading = corner_heading
+    ship.forced_circle_turns = 1
+    ship.forced_turn_side = "port"
+    assert engine._advance_impossible(state, ship)
+    candidates = engine.movement_candidates(state, ship, include_plans=False)
+    assert candidates["min_cost"] == 0
+    assert any(
+        entry["label"] == ship.position.label and entry["cost"] == 0
+        for entry in candidates["reachable"]
+    ), "原地停留必须是可达状态"
+    preview = engine.movement_preview(state, ship, plan="0")
+    assert preview["commitable"], preview["errors"]
+
+
 def test_legal_actions_embeds_movement_candidates() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=7, game_id="legal-actions")

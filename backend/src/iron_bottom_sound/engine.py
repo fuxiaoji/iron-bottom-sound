@@ -390,6 +390,17 @@ class IronBottomEngine:
         return bool(ship_id in state.ships and state.ships[ship_id].side != side)
 
     @staticmethod
+    def event_visible_to(state: GameState, event: GameEvent, side: Side) -> bool:
+        """公开助手：某事件对 `side` 是否可见（与 observe/recent_events 同一套迷雾过滤）。
+
+        战报叙事层用它对双方公开事件取并集；battle_report 不碰私有方法。
+        只读，绝不改状态/裁决。
+        """
+        if event.payload.get("secret_side") not in (None, side.value):
+            return False
+        return not IronBottomEngine._hidden_damage_event(state, event, side)
+
+    @staticmethod
     def _damage_snapshot(ship: ShipState) -> dict[str, Any]:
         """结算前状态快照：五个结算点以此为基准计算归一化损伤摘要。"""
         return {
@@ -472,7 +483,7 @@ class IronBottomEngine:
                     "movement_candidates": [
                         self.movement_candidates(state, ship)
                         for ship in state.ships.values()
-                        if ship.side == side and ship.position is not None
+                        if ship.side == side and not ship.sunk and ship.position is not None
                     ],
                     "confirmation": {"ready": True},
                 },
@@ -1275,7 +1286,8 @@ class IronBottomEngine:
                 errors.append(f"{order.ship_id}: {error}")
                 continue
             minimum, maximum = self._legal_speed_range(ship, state.turn)
-            if not minimum <= cost <= maximum:
+            stay_only = self._advance_impossible(state, ship)
+            if not ((minimum <= cost or stay_only) and cost <= maximum):
                 errors.append(f"{order.ship_id}: movement cost {cost} outside legal range {minimum}-{maximum}")
             if order.speed is not None and order.speed != cost:
                 errors.append(f"{order.ship_id}: declared speed {order.speed} does not match {cost} MF plan")
@@ -1285,9 +1297,9 @@ class IronBottomEngine:
             if ship.forced_straight_turns:
                 if turns:
                     errors.append(f"{order.ship_id}: rudder/bridge damage requires straight movement")
-                if ship.forced_speed is not None and cost != ship.forced_speed:
+                if not stay_only and ship.forced_speed is not None and cost != ship.forced_speed:
                     errors.append(f"{order.ship_id}: bridge damage requires original speed {ship.forced_speed}")
-            if ship.forced_circle_turns:
+            if ship.forced_circle_turns and maximum > 0 and not stay_only:
                 sixty_turns = [command for command in turns if command.endswith("60")]
                 if not sixty_turns or len(sixty_turns) != len(turns):
                     errors.append(f"{order.ship_id}: rudder/bridge damage requires a 60-degree circling turn")
@@ -1451,6 +1463,10 @@ class IronBottomEngine:
         minimum = max(0, ship.previous_speed - deceleration)
         if ship.forced_straight_turns and ship.forced_speed is not None:
             return ship.forced_speed, ship.forced_speed
+        if minimum > maximum:
+            # 损伤把最大航速压到减速下限之下：损伤覆盖减速规则，舰可以（被迫）停到受损航速。
+            # 否则合法速度区间为空 → 该舰不存在任何合法移动订单（对局死锁）。
+            minimum = 0
         return minimum, maximum
 
     def submit_orders(self, game_id: str, batch: OrderBatch) -> ValidationResult:
@@ -1775,6 +1791,21 @@ class IronBottomEngine:
             "forced_speed": ship.forced_speed,
         }
 
+    def _advance_impossible(self, state: GameState, ship: ShipState) -> bool:
+        """首动 advance 的正前方格不可进（贴地图边/陆）→ 本回合无法迈出第一步。
+
+        移动状态机首命令必须是 advance、转向只能跟在 advance 之后；正前方被堵时舰
+        没有任何推进路径，只能原地停留。用于豁免因此无法执行的强制约束（圆周转向、
+        锁定航速、减速下限），否则该舰不存在任何合法订单（IBS-U-USN-DUNCAN 贴边
+        圆周死锁回归）。纯只读，与 `_movement_expand` 的 advance 分支同一判定。"""
+        if not ship.position:
+            return True
+        try:
+            ahead = ship.position.neighbor(ship.heading)
+        except ValueError:
+            return True
+        return self._terrain_impassable(state, ahead)
+
     @staticmethod
     def _movement_expand(
         state: GameState, ship: ShipState,
@@ -1831,6 +1862,7 @@ class IronBottomEngine:
         if not ship.position:
             return {"valid": False, "reason": "ship has no position"}
         minimum, maximum = self._legal_speed_range(ship, state.turn)
+        stay_only = self._advance_impossible(state, ship)
         start: tuple[Any, ...] = (ship.position, ship.heading, None, False)
         dist: dict[tuple[Any, ...], int] = {start: 0}
         parents: dict[tuple[Any, ...], tuple[Any, ...]] = {}
@@ -1841,9 +1873,10 @@ class IronBottomEngine:
             pos, head, last, turned_flag = key
             cost = dist[key]
             terminal = (
-                minimum <= cost <= maximum
+                (minimum <= cost or stay_only)
+                and cost <= maximum
                 and last in (None, "advance", "turn_port_60", "turn_starboard_60")
-                and (not ship.forced_circle_turns or turned_flag)
+                and (not ship.forced_circle_turns or turned_flag or stay_only or maximum == 0)
             )
             if terminal and pos == target_hex and (heading is None or head == heading):
                 commands: list[str] = []
@@ -1890,6 +1923,7 @@ class IronBottomEngine:
         allowed at the end, 120-degree turns cost 1 MF, cost must fall in the
         legal speed range, land and map-edge block advance. Pure read-only."""
         minimum, maximum = self._legal_speed_range(ship, state.turn)
+        stay_only = self._advance_impossible(state, ship)
         finals: dict[HexCoord, dict[int, set[int]]] = {}
         queue: deque[tuple[HexCoord, int, int, str | None, bool]] = deque(
             [(position, heading, spent, None, has_turned)]
@@ -1902,9 +1936,10 @@ class IronBottomEngine:
                 continue
             seen.add(key)
             if (
-                minimum <= cost <= maximum
+                (minimum <= cost or stay_only)
+                and cost <= maximum
                 and last in (None, "advance", "turn_port_60", "turn_starboard_60")
-                and (not ship.forced_circle_turns or turned_flag)
+                and (not ship.forced_circle_turns or turned_flag or stay_only or maximum == 0)
             ):
                 finals.setdefault(pos, {}).setdefault(cost, set()).add(head)
             for new_pos, new_head, new_cost, new_last, new_turned, _action in self._movement_expand(
@@ -1923,8 +1958,15 @@ class IronBottomEngine:
         reachable.sort(key=lambda item: item["label"])
         return reachable, minimum, maximum
 
-    def movement_candidates(self, state: GameState, ship: ShipState) -> dict[str, Any]:
-        """Full reachable-hex overlay for one owned ship at its current state."""
+    def movement_candidates(
+        self, state: GameState, ship: ShipState, *, include_plans: bool = True
+    ) -> dict[str, Any]:
+        """Full reachable-hex overlay for one owned ship at its current state.
+
+        `include_plans=True` 时每个可达格附上引擎算好的精确合法 `plan` 串（含强制
+        转弯/首动 advance 约束）——LLM 提示词路径只挑目标格、照抄 plan 即可；确定性/
+        战术指挥官自行用 `movement_path`，传 False 免掉逐格 BFS 开销。纯只读构造辅助。
+        """
         forced = self._forced_constraints(ship)
         if not ship.position:
             return {
@@ -1940,6 +1982,12 @@ class IronBottomEngine:
         reachable, minimum, maximum = self._movement_reachable(
             state, ship, ship.position, ship.heading, 0, False
         )
+        if include_plans:
+            for entry in reachable:
+                target = HexCoord(q=entry["hex"]["q"], r=entry["hex"]["r"])
+                path = self.movement_path(state, ship, target, heading=entry["final_headings"][0])
+                if path.get("valid"):
+                    entry["plan"] = path["plan"]
         return {
             "ship_id": ship.id,
             "position": {"q": ship.position.q, "r": ship.position.r},
@@ -2013,6 +2061,7 @@ class IronBottomEngine:
         program, final_heading = self._movement_program(ship.position, ship.heading, commands)
         cost = self.movement_cost("", commands)
         minimum, maximum = self._legal_speed_range(ship, state.turn)
+        stay_only = self._advance_impossible(state, ship)
         trajectory = [
             {
                 "hex": {"q": pos.q, "r": pos.r},
@@ -2025,16 +2074,16 @@ class IronBottomEngine:
         current_pos = program[-1][0] if program else ship.position
         current_label = current_pos.label
         turns = [command for command in commands if command != "advance"]
-        if not errors and not minimum <= cost <= maximum:
+        if not errors and not ((minimum <= cost or stay_only) and cost <= maximum):
             errors.append(f"movement cost {cost} outside legal range {minimum}-{maximum}")
         if not errors and ship.turn_limit_degrees == 60 and any(command.endswith("120") for command in turns):
             errors.append("rudder damage limits turns to 60 degrees")
         if not errors and ship.forced_straight_turns:
             if turns:
                 errors.append("rudder/bridge damage requires straight movement")
-            if ship.forced_speed is not None and cost != ship.forced_speed:
+            if not stay_only and ship.forced_speed is not None and cost != ship.forced_speed:
                 errors.append(f"bridge damage requires original speed {ship.forced_speed}")
-        if not errors and ship.forced_circle_turns:
+        if not errors and ship.forced_circle_turns and maximum > 0 and not stay_only:
             sixty_turns = [command for command in turns if command.endswith("60")]
             if not sixty_turns or len(sixty_turns) != len(turns):
                 errors.append("rudder/bridge damage requires a 60-degree circling turn")
@@ -3390,8 +3439,13 @@ class IronBottomEngine:
                     target.turn_limit_degrees = int(result["future_turn_limit_degrees"])
                 if result.get("straight_turns"):
                     target.forced_straight_turns = max(target.forced_straight_turns, int(result["straight_turns"]))
+                    # 直航与圆周约束在移动状态机里互斥（直航禁止一切转向、圆周必须转一次），
+                    # 跨回合累积同舰会 n_reachable=0 使舰无任何合法移动；新损伤取代旧约束。
+                    target.forced_circle_turns = 0
+                    target.forced_turn_side = None
                 if result.get("circle_turns") and not result.get("bridge_hit"):
                     target.forced_circle_turns = max(target.forced_circle_turns, int(result["circle_turns"]))
+                    target.forced_straight_turns = 0
                 if result.get("fire_control"):
                     target.mfc_destroyed = True
             if result.get("bridge_hit") and bridge_penetrated:
@@ -3400,10 +3454,16 @@ class IronBottomEngine:
                     target.turn_limit_degrees = int(result["hold_turn_degrees"])
                 if result.get("circle_turns"):
                     target.forced_circle_turns = max(target.forced_circle_turns, int(result["circle_turns"]))
+                    # 新圆周约束取代旧的直航+锁定航速（二者同源于「次回合按原速直航」损伤）。
+                    target.forced_straight_turns = 0
+                    target.forced_speed = None
+                    target.forced_speed_turns = 0
                 if result.get("next_turn_straight_at_original_speed"):
                     target.forced_straight_turns = max(target.forced_straight_turns, 1)
                     target.forced_speed = target.previous_speed
                     target.forced_speed_turns = 1
+                    target.forced_circle_turns = 0
+                    target.forced_turn_side = None
                 if result.get("captain_killed"):
                     target.captain_status = "killed"
                 elif result.get("captain_wounded") and target.captain_status != "killed":
