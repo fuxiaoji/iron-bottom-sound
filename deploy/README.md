@@ -4,18 +4,19 @@
 > Vite 应用）。铁底湾**纯增量**部署到子路径 `/tiedi`，不动首页。架构：
 >
 > ```
-> 浏览器 ── https://fuwenji.asia/tiedi ──► nginx
->                                       ├── /tiedi/*             → /opt/tiedi/frontend/dist（静态 SPA）
->                                       ├── /tiedi/api/*         → 127.0.0.1:8001 后端（uvicorn）
->                                       └── /tiedi/assets/counters/* → 后端棋子图片挂载
+> 浏览器 ── https://fuwenji.asia/tiedi ──► nginx（单个 /tiedi/ 反向代理块，剥前缀后全交后端）
+>                                        └── 127.0.0.1:8001 后端单进程托管：
+>                                            静态 SPA（dist，挂根路径 html=True）
+>                                            + /api 前缀剥离 + /assets/counters 棋子图 + 战报截图
 > 后端：systemd 服务 tiedi，uvicorn iron_bottom_sound.api:app，DB/SQLite + 战报截图落盘
 > ```
 
 ## 0) 前提（服务器上一次性）
 
-- 已安装 `python3`（≥3.11）与 `node`/`pnpm`（作品集是 Vite 构建，通常已有 node）。
-  无 pnpm 时：`corepack enable && corepack prepare pnpm@latest --activate` 或 `npm i -g pnpm`。
-- 无 node 时无法在前端构建——可在任意有 node 的机器构建 dist 后上传（见 §3 注）。
+- 已安装 `python3.11`（`/usr/bin/python3.11`，EPEL 提供）与 `node`（v22 + npm）。
+  > 本机只有 Python 3.6（项目需 ≥3.11，装了 EPEL 的 python3.11）；前端构建用 npm 即可
+  > （仓库虽有 pnpm-lock.yaml，服务器无 pnpm 且 corepack 的 pnpm 在 workspace 下报
+  > "packages field missing or empty"，改用 `npm install` 已验证可行）。
 
 ## 1) 上传代码到 /opt/tiedi
 
@@ -45,8 +46,8 @@ python3 -m venv .venv
 
 ```bash
 cd /opt/tiedi/frontend
-pnpm install
-pnpm build -- --base=/tiedi/        # => tsc -b && vite build --base=/tiedi/
+npm install --no-audit --no-fund
+npm run build -- --base=/tiedi/    # => tsc -b && vite build --base=/tiedi/
 # 产物 /opt/tiedi/frontend/dist，index.html 内资源为 /tiedi/assets/...；
 # api.ts/assets.ts 用 import.meta.env.BASE_URL 自动派生 /tiedi/api 与 /tiedi/assets/counters。
 ```
@@ -79,15 +80,16 @@ journalctl -u tiedi -n 20 --no-pager     # 确认无启动报错
 
 ## 6) nginx 反代（服务器）
 
-把 `deploy/nginx-tiedi.conf` 里三个 location 追加到 fuwenji.asia 的 server 块
-（`/etc/nginx/sites-available/...` 或 `nginx.conf`），然后：
+把 `deploy/nginx-tiedi.conf` 里两个 location（`= /tiedi` 301 + `/tiedi/` 单块反代）追加到
+fuwenji.asia 的 server 块（`/etc/nginx/conf.d/fuwenji.asia.conf`），然后：
 
 ```bash
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-> 若现有 server 块用了 `location / { try_files $uri $uri/ /index.html; }` 之类的兜底，
-> `/tiedi` 前缀更具体、优先匹配，不冲突。
+> 单块即可覆盖静态 SPA、`/tiedi/api`、`/tiedi/assets/counters`、战报截图全部——后端单进程
+> 托管（dist 挂根路径 + /api 前缀剥离）。若现有 server 块有 `location / { try_files ... }`
+> 兜底，`/tiedi` 前缀更具体、优先匹配，不冲突。
 
 ## 7) 验证清单
 
