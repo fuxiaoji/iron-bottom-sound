@@ -1,61 +1,41 @@
-import {useEffect} from "react";
-import {counterAssetUrl} from "./assets";
-import {DamageChips,damageHullLost} from "./damageSummary";
-import type {Event,TurnBattleReport} from "./types";
+import {useEffect,useRef,useState} from "react";
+import {battleReportDownloadUrl,battleReportImageUrl} from "./api";
+import type {BattleReport,BattleReportTurnEvent} from "./types";
 
 const phaseNames:Record<string,string>={contact_setup:"隐蔽部署",reinforcement:"增援",movement_planning:"移动计划",torpedo_planning:"鱼雷计划",movement_resolution:"同步移动",gunnery:"炮击",torpedo_effects:"鱼雷效果",fire_end:"起火与回合结束",complete:"想定结束"};
+const sideNames:Record<string,string>={axis:"轴心",allies:"同盟"};
+const modeNames:Record<string,string>={hotseat:"同机热座",tutorial:"新手教学",vs_ai:"人机大战",llm:"对战 DeepSeek"};
 const administrative=new Set(["orders_submitted","phase_changed","game_created"]);
 
 const groups=[
- {title:"航行、接触与碰撞",matches:(event:Event)=>/movement|moved|reinforcement|contact|collision/.test(event.type)},
- {title:"炮击与命中",matches:(event:Event)=>/gun_|gunnery|star_shell|searchlight|smoke|malfunction/.test(event.type)},
- {title:"鱼雷行动与效果",matches:(event:Event)=>/torpedo/.test(event.type)},
- {title:"损伤、火灾与沉没",matches:(event:Event)=>/damage|fire_check|sunk|wreck|destroyed/.test(event.type)},
- {title:"回合结果与胜负",matches:(event:Event)=>/victory|score|scenario/.test(event.type)},
+ {title:"航行、接触与碰撞",matches:(event:BattleReportTurnEvent)=>/movement|moved|reinforcement|contact|collision/.test(event.type)},
+ {title:"炮击与命中",matches:(event:BattleReportTurnEvent)=>/gun_|gunnery|star_shell|searchlight|smoke|malfunction/.test(event.type)},
+ {title:"鱼雷行动与效果",matches:(event:BattleReportTurnEvent)=>/torpedo/.test(event.type)},
+ {title:"损伤、火灾与沉没",matches:(event:BattleReportTurnEvent)=>/damage|fire_check|sunk|wreck|destroyed/.test(event.type)},
+ {title:"回合结果与胜负",matches:(event:BattleReportTurnEvent)=>/victory|score|scenario/.test(event.type)},
 ];
 
-function facts(events:Event[]){
- const salvoes=events.filter(event=>event.type==="gun_mount_attack");
- const hits=salvoes.reduce((total,event)=>total+(typeof event.payload?.hits==="number"?event.payload.hits:0),0);
- const hullLost=events.reduce((total,event)=>total+damageHullLost(event.payload?.damage),0);
- return {salvoes:salvoes.length,hits,torpedoes:events.filter(event=>event.type==="torpedo_result").length,fires:events.filter(event=>event.type==="fire_check").length,sunk:events.filter(event=>event.type==="ship_sunk").length,hullLost};
+function EventRow({event}:{event:BattleReportTurnEvent}){
+ return <li><div><span>{phaseNames[event.phase]??event.phase}</span><b>{event.message}</b></div></li>;
 }
 
-function EventRow({event}:{event:Event}){
- return <li><div><span>{phaseNames[event.phase]??event.phase}</span><b>{event.message}</b></div>{event.dice&&<small>掷骰 {event.dice.notation}：{event.dice.raw}{event.dice.adjusted!=null&&event.dice.adjusted!==event.dice.raw?` → 修正后 ${event.dice.adjusted}`:""}</small>}{event.rule&&<code>{event.rule.rule_id}{event.rule.pdf_page?` · 规则书 p.${event.rule.pdf_page}`:""}{event.rule.section?` · ${event.rule.section}`:""}</code>}<DamageChips damage={event.payload?.damage}/></li>;
-}
-
-function attackStories(events:Event[]){
- const attacks=events.filter(event=>event.type==="gun_mount_attack"||event.type==="torpedo_attack");
- return attacks.map((attack,index)=>{
-  const next=attacks[index+1]?.sequence??Number.POSITIVE_INFINITY;
-  const results=events.filter(event=>event.sequence>attack.sequence&&event.sequence<next&&["gunnery_result","torpedo_result","special_damage","ship_sunk"].includes(event.type));
-  const hits=typeof attack.payload?.hits==="number"?attack.payload.hits:0;
-  return {attack,results,hits};
- });
-}
-
-function resultIcon(event:Event){
- if(event.type==="ship_sunk")return "沉没中.png";
- const d=typeof event.payload?.damage==="object"&&event.payload.damage?event.payload.damage as Record<string,unknown>:{};
- const num=(value:unknown)=>typeof value==="number"?value:0;
- if(d.sank)return "沉没中.png";
- return num(d.fire_added)+num(d.fire_remaining)>0?"起火.png":null;
-}
-
-type Story=ReturnType<typeof attackStories>[number];
-
-export function BattleReportModal({report,onClose}:{report:TurnBattleReport;onClose:()=>void}){
- useEffect(()=>{const close=(event:KeyboardEvent)=>{if(event.key==="Escape")onClose()};window.addEventListener("keydown",close);return()=>window.removeEventListener("keydown",close)},[onClose]);
- const publicEvents=report.events.filter(event=>!administrative.has(event.type));
- const summary=facts(publicEvents);
+function TurnEvents({events}:{events:BattleReportTurnEvent[]}){
+ const publicEvents=events.filter(event=>!administrative.has(event.type));
  const assigned=new Set<number>();
  const sections=groups.map(group=>{const events=publicEvents.filter(event=>group.matches(event));events.forEach(event=>assigned.add(event.sequence));return {...group,events}});
  const other=publicEvents.filter(event=>!assigned.has(event.sequence));
- const stories=attackStories(publicEvents);
- const axisStories=stories.filter(({attack})=>attack.payload?.attacker_side==="axis");
- const alliesStories=stories.filter(({attack})=>attack.payload?.attacker_side==="allies");
- const otherStories=stories.filter(({attack})=>attack.payload?.attacker_side!=="axis"&&attack.payload?.attacker_side!=="allies");
- const renderStoryCard=({attack,results,hits}:Story)=><article className={hits?"hit":"miss"} key={attack.sequence}>{attack.type==="torpedo_attack"&&<img src={counterAssetUrl("鱼雷2（日）.png")} alt="鱼雷攻击"/>}<div className="attack-head"><span>{attack.type==="torpedo_attack"?"鱼雷齐射":"舰炮齐射"}</span><b>{attack.message}</b>{attack.dice&&<small>{attack.dice.notation} {attack.dice.raw}{attack.dice.adjusted!=null&&` → ${attack.dice.adjusted}`}</small>}</div><div className="attack-outcome">{results.length?results.map(result=>{const icon=resultIcon(result);return <div key={result.sequence}>{icon&&<img src={counterAssetUrl(icon)} alt="状态"/>}<span>{result.message}</span>{result.dice&&<small>{result.dice.notation} {result.dice.raw}{result.dice.adjusted!=null&&` → ${result.dice.adjusted}`}</small>}<DamageChips damage={result.payload?.damage}/></div>}):<strong>{hits===0?"水柱落空，目标未受损。":"命中已记录，本次没有额外公开损伤结果。"}</strong>}</div><code>{attack.rule?.rule_id}{attack.rule?.pdf_page?` · p.${attack.rule.pdf_page}`:""}</code></article>;
- return <div className="report-backdrop" role="presentation" onMouseDown={event=>{if(event.currentTarget===event.target)onClose()}}><section className="battle-report" role="dialog" aria-modal="true" aria-labelledby="battle-report-title"><header><div><p className="eyebrow">AFTER ACTION REPORT</p><h2 id="battle-report-title">第 {report.turn} 回合结算战报</h2><p>{report.scenarioTitle} · 谁攻击了谁、造成了什么结果</p></div><button type="button" aria-label="关闭战报" onClick={onClose}>关闭 ×</button></header><div className="report-summary"><div><span>炮击齐射</span><b>{summary.salvoes}</b></div><div><span>炮弹命中</span><b>{summary.hits}</b></div><div><span>鱼雷效果</span><b>{summary.torpedoes}</b></div><div><span>火灾检定</span><b>{summary.fires}</b></div><div><span>损伤船体</span><b>{summary.hullLost}</b></div><div><span>沉没</span><b>{summary.sunk}</b></div></div><div className="report-score"><span>轴心 {report.score.axis??0} VP</span><span>同盟 {report.score.allies??0} VP</span>{report.victoryReason&&<strong>{report.winner?`${report.winner==="axis"?"轴心":"同盟"}胜利：`:""}{report.victoryReason}</strong>}</div><div className="report-sections">{stories.length>0&&<section className="engagement-report"><h3>逐舰攻击结算<small>{stories.length} 次攻击</small></h3><div className="engagement-columns"><div className="engagement-column axis"><h4>轴心战果<small>{axisStories.length} 次</small></h4>{axisStories.length?<div className="engagement-cards">{axisStories.map(renderStoryCard)}</div>:<p className="empty-plan">本回合没有可向当前阵营公开的轴心攻击。</p>}</div><div className="engagement-column allies"><h4>同盟战果<small>{alliesStories.length} 次</small></h4>{alliesStories.length?<div className="engagement-cards">{alliesStories.map(renderStoryCard)}</div>:<p className="empty-plan">本回合没有可向当前阵营公开的同盟攻击。</p>}</div></div>{otherStories.length>0&&<div className="engagement-other"><h4>其他攻击<small>{otherStories.length} 次</small></h4>{otherStories.map(renderStoryCard)}</div>}</section>}{sections.filter(section=>section.events.length>0).map(section=><section key={section.title}><h3>{section.title}<small>{section.events.length} 项</small></h3><ol>{section.events.map(event=><EventRow event={event} key={event.sequence}/>)}</ol></section>)}{other.length>0&&<section><h3>其他公开裁决<small>{other.length} 项</small></h3><ol>{other.map(event=><EventRow event={event} key={event.sequence}/>)}</ol></section>}{publicEvents.length===0&&<p className="empty-plan">本回合没有可向当前阵营公开的裁决事件。</p>}</div><footer><p>战报只显示当前阵营可观察的引擎事件；隐藏损伤和秘密计划不会出现在这里。</p><button type="button" onClick={onClose}>读完战报，继续游戏</button></footer></section></div>;
+ if(publicEvents.length===0)return <section><h3>公开事件<small>0 项</small></h3><p className="empty-plan">本回合没有公开事件。</p></section>;
+ return <>{sections.filter(section=>section.events.length>0).map(section=><section key={section.title}><h3>{section.title}<small>{section.events.length} 项</small></h3><ol>{section.events.map(event=><EventRow event={event} key={event.sequence}/>)}</ol></section>)}{other.length>0&&<section><h3>其他公开事件<small>{other.length} 项</small></h3><ol>{other.map(event=><EventRow event={event} key={event.sequence}/>)}</ol></section>}</>;
+}
+
+export function BattleReportModal({report,onClose}:{report:BattleReport;onClose:()=>void}){
+ const [turnIndex,setTurnIndex]=useState(report.turns.length?report.turns.length-1:0);
+ const [lightbox,setLightbox]=useState<{src:string;caption:string}|null>(null);
+ const downloadRef=useRef<HTMLAnchorElement>(null);
+ useEffect(()=>{const close=(event:KeyboardEvent)=>{if(event.key==="Escape"){if(lightbox)setLightbox(null);else onClose()}};window.addEventListener("keydown",close);return()=>window.removeEventListener("keydown",close)},[onClose,lightbox]);
+ const meta=report.meta;
+ const turn=report.turns[turnIndex];
+ const score=meta.score??{};
+ const captureCaption=(cap:{side:string},phase:string)=>{const t=turn?.turn??meta.turn;return `第 ${t} 回合 ${phaseNames[phase]??phase} · ${sideNames[cap.side]??cap.side} 视角`};
+ return <div className="report-backdrop" role="presentation" onMouseDown={event=>{if(event.currentTarget===event.target&&!lightbox)onClose()}}><section className="battle-report" role="dialog" aria-modal="true" aria-labelledby="battle-report-title"><header><div><p className="eyebrow">BATTLE REPORT</p><h2 id="battle-report-title">铁底湾战报</h2><p>{meta.scenario_title} · {modeNames[meta.mode]??meta.mode} · 第 {meta.turn}/{meta.max_turns} 回合</p></div><button type="button" aria-label="关闭战报" onClick={onClose}>关闭 ×</button></header><div className="report-score"><span>轴心 {score.axis??0} VP</span><span>同盟 {score.allies??0} VP</span>{meta.winner&&<strong>{sideNames[meta.winner]??meta.winner}胜利：{meta.victory_reason}</strong>}</div>{report.turns.length>1&&<nav className="report-tabs" role="tablist" aria-label="选择回合">{report.turns.map((t,i)=><button key={t.turn} type="button" role="tab" aria-selected={i===turnIndex} className={i===turnIndex?"active":""} onClick={()=>setTurnIndex(i)}>第 {t.turn} 回合</button>)}</nav>}<div className="report-sections">{!turn?<p className="empty-plan">本局尚未记录战报。</p>:<><section className="report-narrative"><h3>叙事战报</h3>{turn.narrative?turn.narrative.split(/\n+/).filter(Boolean).map((paragraph,index)=><p key={index}>{paragraph}</p>):<p className="empty-plan">本回合还没有叙事战报。</p>}</section>{turn.phases.map(phase=><section key={phase.phase} className="report-captures"><h3>{phaseNames[phase.phase]??phase.phase}<small>{phase.captures.length} 张</small></h3><div className="capture-row">{phase.captures.map(cap=>{const caption=captureCaption(cap,phase.phase);return <figure key={cap.side} className="capture-thumb" onClick={()=>setLightbox({src:battleReportImageUrl(meta.game_id,cap.image_path),caption})}><img src={battleReportImageUrl(meta.game_id,cap.image_path)} alt={caption} loading="lazy"/><figcaption>{sideNames[cap.side]??cap.side}视角</figcaption></figure>})}</div></section>)}<TurnEvents events={turn.events}/></>}</div><footer><p>战报为中立历史文档，展示双方公开视角；隐藏损伤与秘密计划不会出现。</p><div className="footer-actions"><a ref={downloadRef} href={battleReportDownloadUrl(meta.game_id)} download style={{display:"none"}}/><button type="button" onClick={()=>downloadRef.current?.click()}>下载战报 (.md)</button><button type="button" onClick={onClose}>读完战报，继续游戏</button></div></footer></section>{lightbox&&<div className="lightbox" onMouseDown={event=>{if(event.currentTarget===event.target)setLightbox(null)}}><figure><img src={lightbox.src} alt={lightbox.caption}/><figcaption>{lightbox.caption}</figcaption><button type="button" aria-label="关闭大图" onClick={()=>setLightbox(null)}>关闭 ×</button></figure></div>}</div>;
 }

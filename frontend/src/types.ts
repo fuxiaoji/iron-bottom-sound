@@ -21,7 +21,12 @@ export interface TorpedoTrack{id:string;side:Side;launcher_ship_id:string;torped
 export interface Marker{id:string;kind:string;position:HexCoord|null;ship_id:string|null;target_ship_id:string|null;heading:number|null}
 export interface Observation{game_id:string;scenario_id:string;scenario_title:string;side:Side;turn:number;max_turns:number;phase:Phase;visibility:number;ships:Ship[];torpedo_tracks:TorpedoTrack[];markers:Marker[];score:Record<string,number>;recent_events:Event[];winner:Side|null;victory_reason:string|null}
 export interface LegalAction{kind:string;ship_id?:string|null;schema_hint:Record<string,unknown>}
-export interface TurnBattleReport{scenarioTitle:string;turn:number;events:Event[];score:Record<string,number>;winner:Side|null;victoryReason:string|null}
+export interface BattleReportCapture{side:Side;image_path:string}
+export interface BattleReportPhase{phase:string;captures:BattleReportCapture[]}
+export interface BattleReportTurnEvent{sequence:number;phase:string;type:string;message:string}
+export interface BattleReportTurn{turn:number;narrative:string|null;phases:BattleReportPhase[];events:BattleReportTurnEvent[]}
+export interface BattleReportMeta{game_id:string;scenario_id:string;scenario_title:string;mode:string;seed:number;turn:number;max_turns:number;phase:string;winner:Side|null;victory_reason:string|null;score:Record<string,number>}
+export interface BattleReport{meta:BattleReportMeta;turns:BattleReportTurn[]}
 export interface TorpedoAssistCombo{
  ship_id:string;launcher_id:string;launch_at_mf:number;launch_hex:string;launch_heading:number;
  launch_side:"port"|"starboard";launch_angle:"A"|"B"|"X"|"Y";setting_index:number;salvo_size:number;
