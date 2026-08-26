@@ -2398,8 +2398,11 @@ class IronBottomEngine:
 
         # Validate the complete translation before mutating state.  The
         # printed rule does not define the pathological case where another
-        # counter is already on the opposite edge, so it is rejected instead
-        # of silently clipping or inventing wrap-around movement.
+        # counter is already on the opposite edge.  We still raise so the
+        # caller (`_resolve_movement`) can decide; it converts this into
+        # `movement_blocked_by_edge` — the exiting ship stops on its edge hex
+        # and nothing is shifted — instead of aborting the match. No counter
+        # is ever clipped off the map and no wrap-around movement is invented.
         current_coords: list[HexCoord] = [
             ship.position
             for ship in state.ships.values()
@@ -2633,15 +2636,33 @@ class IronBottomEngine:
                     continue
                 except ValueError:
                     pass
-                self._shift_world_for_map_edge(
-                    state,
-                    moving_ship_id=ship_id,
-                    heading=heading,
-                    impulse=impulse,
-                    ship_paths=paths,
-                    contact_paths=contact_paths,
-                    torpedo_orders=torpedo_orders,
-                )
+                try:
+                    self._shift_world_for_map_edge(
+                        state,
+                        moving_ship_id=ship_id,
+                        heading=heading,
+                        impulse=impulse,
+                        ship_paths=paths,
+                        contact_paths=contact_paths,
+                        torpedo_orders=torpedo_orders,
+                    )
+                except ValueError:
+                    # 6.1.8 病态：对侧边缘已有算子，平移会把其推出地图（打印规则未
+                    # 定义此情形）。按 6.1.8「把出界舰留在边缘格」的意图：不平移，
+                    # 该舰停在当前边缘格，其余算子照常结算，对局不中止。
+                    stopped.add(ship_id)
+                    self._event(
+                        state,
+                        "movement_blocked_by_edge",
+                        f"{state.ships[ship_id].name} 停在边缘格 "
+                        f"{state.ships[ship_id].position.label}：地图两端均有算子，世界无法平移",
+                        payload={
+                            "ship_id": ship_id,
+                            "edge_hex": state.ships[ship_id].position.label,
+                            "movement_impulse": impulse + 1,
+                        },
+                        rule=self._rule("IBS-R-06.1.8", 7, "6.1 移动机制第8条"),
+                    )
             destinations: dict[str, HexCoord] = {}
             for ship_id, path in paths.items():
                 ship = state.ships[ship_id]

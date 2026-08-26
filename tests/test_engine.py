@@ -380,6 +380,34 @@ def test_leaving_map_shifts_every_other_counter_and_emits_rule_event() -> None:
     assert event.payload["movement_impulse"] == 1
 
 
+def test_pathological_map_edge_stops_ship_instead_of_aborting_match() -> None:
+    """6.1.8 病态：出界舰要对侧边缘已有算子、平移会把它推出地图时，引擎不再抛错
+    中止对局，而是把出界舰留在边缘格、其余算子不平移、对局可继续。"""
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=3)
+    mover = state.ships["IBS-U-KM-KARL-GALSTER"]
+    mover.position = HexCoord.from_label("R27")  # 南缘（display row 26）
+    mover.heading = 4  # 向南（SW）出界
+    other = state.ships["IBS-U-RN-JAVELIN"]
+    other.position = HexCoord.from_label("C1")  # 北缘（display row 0，偶 q）：南向平移会被推出地图
+    original_other = other.position
+    state.sealed_orders["1:movement_planning"] = {
+        Side.AXIS.value: OrderBatch(
+            side=Side.AXIS,
+            phase=Phase.MOVEMENT_PLANNING,
+            movement=[MovementOrder(ship_id=mover.id, plan="1")],
+        )
+    }
+
+    engine._resolve_movement(state)  # 不得抛 ValueError 中止对局
+
+    assert mover.position == HexCoord.from_label("R27")
+    assert other.position == original_other  # 世界不平移
+    event = next(event for event in state.events if event.type == "movement_blocked_by_edge")
+    assert event.rule and event.rule.rule_id == "IBS-R-06.1.8"
+    assert event.payload["edge_hex"] == "R27"
+
+
 def test_structured_land_blocks_ship_plan_and_torpedo_track() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=3)

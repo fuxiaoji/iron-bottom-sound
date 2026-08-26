@@ -60,6 +60,7 @@ def test_prompt_contains_board_frame_schema_and_discipline(monkeypatch) -> None:
     system = captured["payload"]["messages"][0]["content"]
     assert "【思考纪律】" in system
     assert "六角格轴向距离" in system and "|Δq|" in system
+    assert "领域指导" in system and "torpedo_candidates" in system
     assert "SAMPLE-" in system  # 照抄占位符会被引擎判非法
     prompt = _captured_prompt(captured["payload"])
     assert "legal_actions" in prompt
@@ -106,6 +107,24 @@ def test_reasoning_preview_none_when_absent(monkeypatch) -> None:
         engine, state.game_id, Side.AXIS
     )
     assert audits[-1].reasoning_preview is None
+
+
+def test_discipline_prompt_torpedo_bearing_rule_precise(monkeypatch) -> None:
+    """TorpedoOrder.bearing 必须直接取 launch_positions[i].heading（发射瞬间航向），
+    不得引导模型用 relative_heading/launch_side 换算——那正是实况对局卡死的点。"""
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-only-placeholder")
+    captured: dict = {}
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", 1)
+    _commander(_mock_once(captured, _valid_plan())).choose_plan(engine, state.game_id, Side.AXIS)
+    system = captured["payload"]["messages"][0]["content"]
+    assert "bearing=launch_positions[i].heading" in system
+    assert "launch_at_mf=i，launch_hex=launch_positions[i].hex" in system
+    # 旧措辞（用 launch_side/launch_angle 转出相对航向）已删除，防止误导模型重算
+    assert "转出的相对航向" not in system
+    assert "不要用 relative_heading" in system
+    # 地图边缘纪律：防止整队驶出棋盘触发引擎世界平移中止
+    assert "地图边缘" in system and "驶出棋盘边缘" in system
 
 
 def test_default_payload_thinking_disabled_and_max_tokens_2400(monkeypatch) -> None:
