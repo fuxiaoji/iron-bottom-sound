@@ -347,7 +347,7 @@
 - **50 局基准结果（想定1 IBS-S-03，6 风格）**：`tmp/bench-50/`。50 局过 30 组合（20 组 2 局+10 组 1 局），各风格轴心胜率全是 40% —— 是**稀疏采样假象**（轴心风格确实生效：同 seed1 下 balanced(轴) 胜 brawl(盟) 而 fleet(轴) 败 brawl(盟)）。
 - **90 局均分确认（3 局/组，`tmp/bench-90/`，轴心总体 47.8%）**：真实结构浮现 = **风格效果随阵营角色而变**（想定胜负不对称：德方"无德驱被击沉/减速=胜"，英方"击沉德驱=胜"）。作盟军（进攻使命）line/brawl 66.7%、balanced 60%、cautious 20%（不敢打不杀）；作轴心（生存使命）cautious 66.7%、line 26.7%（冲锋被击杀）。结局交叉验证：cautious 作轴心胜=全"德军战术胜利"（存活）、作盟军败=全"德军战术胜利"（不杀）；line 作盟军胜=全"英军战术胜利"（击沉）。**无全局最优风格，只有角色最优**：balanced/torpedo/brawl 全才，cautious 偏守、line/fleet 偏攻。多 seed 才稳定 → 框架默认按组合轮转 seed。
 
-## 2026-08-26（批次 2）：用户自备 LLM 密钥 + 科研用途同意（落库 + Server酱通知），本地/线上同步
+## 2026-08-26（批次 2）：用户自备 LLM 密钥 + 科研用途同意（落库 + Server酱通知），本地/线上同步（提交 `901a271`）
 
 - **需求（用户）**：战报与 LLM 对战需要 LLM API——改为**用户主动提供自己的密钥**；开局提供「是否愿意把对战记录用于科研论文」选项，愿意可留称呼；同意保存到服务器并用服务器通知模块通知作者（用户选 **Server酱 / 微信推送**）。
 - **用户密钥（内存专用，绝不落盘）**：api.py `CreateGame`/`LLMOpponentRequest` 增 `llm_api_key`/`api_key`；进程内存 `_user_llm_keys[game_id]`（重启即清、不写库/盘）；llm.py `OpenAICompatibleCommander.__init__` 增 `api_key`，`_resolve_api_key()` = 用户密钥 > `os.environ[DEEPSEEK_API_KEY]`。解析优先级：本次请求 api_key > 开局注入 > 服务器 env；全无 → 503「请先提供你自己的 LLM API 密钥」（一切 LLM 调用前短路，测试断言不发起调用）。战报叙事 advance 钩子同优先级用用户密钥（`OpenAICompatibleCommander(api_key=...)`）。
