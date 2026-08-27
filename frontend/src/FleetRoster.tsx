@@ -31,6 +31,8 @@ export function FleetRoster({ships,viewerSide,selectedId,onSelect}:{ships:Ship[]
        <span>{ship.position?hexLabel(ship.position):ship.sunk?"—":"?"}</span>
        <span>航向 {ship.heading||"?"}</span>
        <span>速 {ship.current_speed}</span>
+       {ship.formation_id&&<span>编队 {ship.formation_id}</span>}
+       {ship.command_status&&ship.command_status!=="attached"&&<span className="damage-chip flag">{ship.command_status==="retreating"?"自主撤退":ship.command_status==="withdrawn"?"已撤出":"正在脱队"}</span>}
        <span>{ship.hull!=null&&ship.max_hull!=null?`船体 ${ship.hull}/${ship.max_hull}`:"船体 ?"}</span>
        {ship.fire_markers>0&&<span className="damage-chip fire">起火×{ship.fire_markers}</span>}
       </div>

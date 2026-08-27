@@ -18,6 +18,7 @@ from .randomai import RandomCommander
 from .state_export import export_frame, render_board
 from .champions import CHAMPIONS
 from .tactical import PROFILES, TacticalCommander, TacticalProfile
+from .realistic_command import RealisticCommander
 
 
 def _resolve_profile(profile: str | TacticalProfile | None) -> TacticalProfile:
@@ -31,13 +32,15 @@ def _resolve_profile(profile: str | TacticalProfile | None) -> TacticalProfile:
 
 
 def make_session(
-    side: Side, player: str, profile: str | TacticalProfile | None = None, model: str | None = None
+    side: Side, player: str, profile: str | TacticalProfile | None = None, model: str | None = None,
+    realistic: bool = False,
 ) -> LLMPlayerSession:
     if player == "deterministic":
-        return LLMPlayerSession(side, DeterministicCommander())
+        return LLMPlayerSession(side, RealisticCommander(profile=_resolve_profile(profile)) if realistic else DeterministicCommander())
     if player == "tactical":
         # 允许直接传入 TacticalProfile 对象（遗传训练等批量评估用）；字符串走风格名/冠军名。
-        return LLMPlayerSession(side, TacticalCommander(profile=_resolve_profile(profile)))
+        commander = RealisticCommander(profile=_resolve_profile(profile)) if realistic else TacticalCommander(profile=_resolve_profile(profile))
+        return LLMPlayerSession(side, commander)
     if player == "random":
         return LLMPlayerSession(side, RandomCommander())
     if player == "deepseek":
@@ -69,8 +72,8 @@ def run_match(
     engine = IronBottomEngine()
     state = engine.reset(scenario_id, seed, options or GameOptions(mode="llm"))
     sessions = {
-        Side.AXIS: make_session(Side.AXIS, axis, axis_profile, deepseek_model),
-        Side.ALLIES: make_session(Side.ALLIES, allies, allies_profile, deepseek_model),
+        Side.AXIS: make_session(Side.AXIS, axis, axis_profile, deepseek_model, state.options.realistic_command),
+        Side.ALLIES: make_session(Side.ALLIES, allies, allies_profile, deepseek_model, state.options.realistic_command),
     }
     frames: list[dict] = []
     boards: dict[Side, list[tuple[int, Phase, str]]] = {Side.AXIS: [], Side.ALLIES: []}
@@ -197,7 +200,7 @@ def write_battle_report_artifacts(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run an isolated dual-player Iron Bottom Sound IV match")
-    parser.add_argument("--scenario", default="IBS-S-03", choices=("IBS-S-01", "IBS-S-03"))
+    parser.add_argument("--scenario", default="IBS-S-03", choices=("IBS-S-01", "IBS-S-03", "IBS-S-EM-01"))
     parser.add_argument("--axis", default="deterministic", choices=("deterministic", "tactical", "random", "deepseek"))
     parser.add_argument("--allies", default="deterministic", choices=("deterministic", "tactical", "random", "deepseek"))
     parser.add_argument("--axis-profile", default=None, choices=tuple(PROFILES))
@@ -207,6 +210,7 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--request-limit", type=int, default=128)
     parser.add_argument("--all-optional", action="store_true")
+    parser.add_argument("--realistic-command", action="store_true")
     parser.add_argument("--artifacts", type=Path)
     parser.add_argument("--battle-report", action="store_true",
                         help="每阶段双视角 PNG + 每回合叙事 + 自包含 MD 战报（写进 artifact 目录）")
@@ -216,6 +220,7 @@ def main() -> int:
         optional_rules=OptionalRules(**{
             name: args.all_optional for name in OptionalRules.model_fields
         }),
+        realistic_command=args.realistic_command,
     )
     artifacts = args.artifacts or Path("artifacts") / "matches" / f"{args.scenario}-{args.seed}"
     report, _, _ = run_match(

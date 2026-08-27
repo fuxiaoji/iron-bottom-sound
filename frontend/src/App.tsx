@@ -1,5 +1,5 @@
 import {useEffect,useState} from "react";
-import {advance,aiOpponent,battleReport,createGame,fieldOfFire,handoff,legalActions,llmOpponent,movementTrajectories,sealedTrajectories,submitOrders,suggestedOrders,tutorialOpponent,viewGame} from "./api";
+import {advance,aiOpponent,battleReport,createGame as createGameApi,fieldOfFire,formationMovementPreview,handoff,legalActions,llmOpponent,movementTrajectories,sealedTrajectories,submitOrders,suggestedOrders,tutorialOpponent,viewGame} from "./api";
 import type {LLMConnectionConfig} from "./api";
 import {BattleReportModal} from "./BattleReportModal";
 import {DamageChips} from "./damageSummary";
@@ -9,10 +9,11 @@ import {HexMoveEditor} from "./HexMoveEditor";
 import {PlanSheet} from "./PlanSheet";
 import {ShipStatusCard} from "./ShipStatusCard";
 import {TutorialPanel} from "./TutorialPanel";
+import {StartScreen} from "./StartScreen";
 import type {BattleReport,FireHeatmapMode,FireHeatmapResponse,HexCoord,MovementTrajectory,Observation,Ship,Side} from "./types";
 import "./style.css";
 
-const phaseNames:Record<string,string>={contact_setup:"隐蔽标记部署",reinforcement:"增援",movement_planning:"移动计划",torpedo_planning:"鱼雷计划",movement_resolution:"同步移动",gunnery:"炮击",torpedo_effects:"鱼雷效果",fire_end:"起火与回合结束",complete:"想定结束"};
+const phaseNames:Record<string,string>={formation_setup:"编队初设",contact_setup:"隐蔽标记部署",reinforcement:"增援",movement_planning:"移动计划",torpedo_planning:"鱼雷计划",movement_resolution:"同步移动",gunnery:"炮击",torpedo_effects:"鱼雷效果",fire_end:"起火与回合结束",complete:"想定结束"};
 const heatmapModes:[FireHeatmapMode,string][]=[["off","关"],["axis","轴心"],["allies","同盟"],["both","双方"],["ship","选舰"]];
 type AIPersona={id:string;label:string;group:string;intro:string;win:string};
 // 人机大战对手阵容：内置风格（tactical.PROFILES）+ 进化冠军（champions.CHAMPIONS）。
@@ -26,7 +27,7 @@ const AI_PROFILES:AIPersona[]=[
  {id:"cautious",label:"猥琐保守",group:"内置风格",intro:"避战保船、稳守反击",win:"-0.145"},
  {id:"evolved",label:"进化冠军",group:"进化冠军",intro:"GA 进化·防守反击：热点集火+高撤退+抢胜利点",win:"-0.077"},
 ];
-const orderPhases=new Set(["contact_setup","reinforcement","movement_planning","torpedo_planning","gunnery"]);
+const orderPhases=new Set(["formation_setup","contact_setup","reinforcement","movement_planning","torpedo_planning","gunnery"]);
 
 function explainError(error:unknown){
  const raw=String(error);
@@ -42,7 +43,7 @@ function explainError(error:unknown){
 function defaultBatch(view:Observation,side:Side){
  const own=view.ships.filter(ship=>ship.side===side&&!ship.sunk&&ship.position);
  return {
-  side,phase:view.phase,reinforcements:[],contacts:[],contact_movement:[],
+  side,phase:view.phase,formation_setup:[],formation_movement:[],formation_speed_decisions:[],reinforcements:[],contacts:[],contact_movement:[],
   movement:view.phase==="movement_planning"?own.map(ship=>({ship_id:ship.id,plan:"0"})):[],
   gunnery:[],torpedoes:[],smoke_ships:[],smoke:[],illumination:[],searchlights:[],confirmation:{ready:true}
  };
@@ -50,7 +51,9 @@ function defaultBatch(view:Observation,side:Side){
 
 export default function App(){
  const [game,setGame]=useState<string>();const [view,setView]=useState<Observation>();const [side,setSide]=useState<Side>("axis");const [mode,setMode]=useState<"hotseat"|"tutorial"|"vs_ai"|"llm">("hotseat");const [aiProfile,setAiProfile]=useState("balanced");const [vsScenario,setVsScenario]=useState("IBS-S-03");const [vsSide,setVsSide]=useState<Side>("axis");const [vsProfile,setVsProfile]=useState("balanced");const [llmScenario,setLlmScenario]=useState("IBS-S-03");const [llmSide,setLlmSide]=useState<Side>("axis");const [llmBusy,setLlmBusy]=useState(false);const [locked,setLocked]=useState(false);const [selected,setSelected]=useState<Ship>();const [error,setError]=useState("");const [draft,setDraft]=useState("");const [planIntent,setPlanIntent]=useState("");const [actionHints,setActionHints]=useState<Record<string,unknown>>({});const [serverReport,setServerReport]=useState<BattleReport>();const [reportOpen,setReportOpen]=useState(false);const [recordReport,setRecordReport]=useState(true);const [reportEnabled,setReportEnabled]=useState(true);const [llmKey,setLlmKey]=useState("");const [llmProvider,setLlmProvider]=useState<"deepseek"|"zhipu">("zhipu");const [llmModel,setLlmModel]=useState("glm-5.3-flash");const [llmVision,setLlmVision]=useState(true);const [researchAllow,setResearchAllow]=useState(false);const [researchHandle,setResearchHandle]=useState("");const [moveEditorShip,setMoveEditorShip]=useState<string|null>(null);const [torpedoAssistOverlay,setTorpedoAssistOverlay]=useState<{path:HexCoord[];intercept:HexCoord|null}|null>(null);const [plannedTrajectories,setPlannedTrajectories]=useState<MovementTrajectory[]|null>(null);const [fireHeatmapMode,setFireHeatmapMode]=useState<FireHeatmapMode>("off");const [fireHeatmap,setFireHeatmap]=useState<FireHeatmapResponse|null>(null);const [debug,setDebug]=useState(false);const [reportMode,setReportMode]=useState(false);const [guideProfiles,setGuideProfiles]=useState<Record<Side,string>>({axis:"balanced",allies:"balanced"});
+ const [realisticCommand,setRealisticCommand]=useState(false);
  const llmConfig:LLMConnectionConfig={provider:llmProvider,model:llmModel.trim(),vision_enabled:llmVision};
+ const createGame=(scenarioId:string,seed:number,nextMode:"hotseat"|"tutorial"|"vs_ai"|"llm"="hotseat",profile?:string,report=true,key?:string|null,consent?:Parameters<typeof createGameApi>[6],config?:LLMConnectionConfig|null)=>createGameApi(scenarioId,seed,nextMode,profile,report,key,consent,config,realisticCommand);
  // URL 深链：?game=&side=&debug=&report=1 直接进入某局（报告视图供战报截图驱动）。
  useEffect(()=>{const params=new URLSearchParams(window.location.search);const g=params.get("game");if(g){const s=(params.get("side") as Side)??"axis";const d=params.get("debug")==="1";const rep=params.get("report")==="1";setGame(g);setSide(s);setDebug(d);setReportMode(rep);viewGame(g,s,d).then(next=>{setView(next);setError("")}).catch(e=>setError(String(e)))}},[]);
  const refresh=async(id=game,s=side)=>{if(id){const next=await viewGame(id,s,debug);setView(next);return next}};
@@ -70,7 +73,8 @@ export default function App(){
   const timer=window.setTimeout(()=>{
    let plans:{ship_id:string;plan:string}[]=[];
    try{
-    const parsed=JSON.parse(draft) as {movement?:{ship_id:string;plan?:string|null;speed?:number|null}[]};
+    const parsed=JSON.parse(draft) as {movement?:{ship_id:string;plan?:string|null;speed?:number|null}[];formation_movement?:unknown[]};
+    if(parsed.formation_movement?.length){formationMovementPreview(game,side,parsed.formation_movement).then(result=>{if(!cancelled)setPlannedTrajectories(result.trajectories)}).catch(()=>{if(!cancelled)setPlannedTrajectories(null)});return}
     plans=(parsed.movement??[]).filter(entry=>entry&&entry.ship_id).map(entry=>({ship_id:entry.ship_id,plan:String(entry.plan??"0")}));
    }catch{ if(!cancelled)setPlannedTrajectories(null);return }
    if(!plans.length){if(!cancelled)setPlannedTrajectories([]);return}
@@ -101,7 +105,7 @@ const changeGuide=async(profile:string)=>{setGuideProfiles(prev=>({...prev,[side
   setError("");
  }catch(e){setError(explainError(e))}};
  const unlock=async()=>{if(!game)return;const next:Side=side==="axis"?"allies":"axis";setSide(next);setView(await viewGame(game,next,debug));setSelected(undefined);setLocked(false)};
- if(!game)return <main className="landing"><p className="eyebrow">AUDITABLE NAVAL WARGAME</p><h1>铁底湾的回响 IV</h1><p>确定性裁决 · 规则出处 · 同机交接</p><label className={`record-report${recordReport?" on":""}`}><input type="checkbox" checked={recordReport} onChange={e=>setRecordReport(e.target.checked)}/>自动记录战报（每阶段双方视角截图 + 每回合 LLM 叙事，随时可下载）</label><div className="research-consent"><label className={`research-toggle${researchAllow?" on":""}`}><input type="checkbox" checked={researchAllow} onChange={e=>setResearchAllow(e.target.checked)}/>我愿意把这局对战记录（含战报与行动序列）用于科研论文研究{researchAllow&&<span className="research-handle">称呼（可选）：<input type="text" placeholder="留空则匿名" value={researchHandle} onChange={e=>setResearchHandle(e.target.value)} maxLength={40}/></span>}</label></div><section className="llm-settings"><div className="llm-setting-grid"><label>接口供应商<select value={llmProvider} onChange={e=>{const provider=e.target.value as "deepseek"|"zhipu";setLlmProvider(provider);setLlmModel(provider==="zhipu"?"glm-5.3-flash":"deepseek-v4-flash")}}><option value="zhipu">智谱 BigModel</option><option value="deepseek">DeepSeek</option></select></label><label>模型（可手动填写）<input list="llm-model-options" value={llmModel} onChange={e=>setLlmModel(e.target.value)} autoComplete="off"/><datalist id="llm-model-options"><option value="glm-5.3-flash"/><option value="glm-5v-turbo"/><option value="deepseek-v4-flash"/></datalist></label></div><div className="llm-key-row"><label className="llm-key">API 密钥（仅发送给所选供应商；浏览器与后端只存当前进程内存，不写数据库、战报或日志）<input type="password" placeholder="粘贴 API 密钥" value={llmKey} onChange={e=>setLlmKey(e.target.value)} autoComplete="new-password"/></label>{llmKey&&<button className="clear-key" onClick={()=>setLlmKey("")}>清除</button>}</div><label className={`vision-toggle${llmVision?" on":""}`}><input type="checkbox" checked={llmVision} onChange={e=>setLlmVision(e.target.checked)}/>每个命令阶段发送该阵营可见地图 PNG（不含秘密计划与调试图层）</label>{llmProvider==="zhipu"&&llmModel.toLowerCase()==="glm-5.3-flash"&&<p className="model-note">该模型名按你的选择原样发送；若供应商提示模型不存在或不支持图片，系统会显示原始状态，不会静默换模型。官方当前视觉示例模型为 glm-5v-turbo。</p>}</section><div className="scenario-grid"><button className="tutorial-choice" onClick={()=>start("IBS-S-03","tutorial")}><b>新手教学关</b><span>教官带你完成移动、鱼雷、炮击与损伤</span></button><button onClick={()=>start("IBS-S-03")}><b>想定 3</b><span>通道行动 · 4 回合</span></button><button onClick={()=>start("IBS-S-01")}><b>想定 1</b><span>埃斯佩兰斯角海战 · 7 回合</span></button><button onClick={()=>start("IBS-S-EM-01")}><b>扩展想定 · 二马</b><span>第二次马里亚纳海战 · 8 回合 · 合法预置编队</span></button><div className="vs-card"><b>人机大战</b><span>选想定、你的阵营与对手风格</span><div className="vs-form"><select value={vsScenario} onChange={e=>setVsScenario(e.target.value)}><option value="IBS-S-03">想定 3 · 通道行动</option><option value="IBS-S-01">想定 1 · 埃斯佩兰斯角</option><option value="IBS-S-EM-01">扩展 · 第二次马里亚纳海战</option></select><select value={vsSide} onChange={e=>setVsSide(e.target.value as Side)}><option value="axis">我指挥轴心</option><option value="allies">我指挥同盟</option></select><select value={vsProfile} onChange={e=>setVsProfile(e.target.value)}>{[...new Set(AI_PROFILES.map(p=>p.group))].map(g=><optgroup key={g} label={g}>{AI_PROFILES.filter(p=>p.group===g).map(p=><option key={p.id} value={p.id}>{p.label}</option>)}</optgroup>)}</select>{(()=>{const p=AI_PROFILES.find(x=>x.id===vsProfile);return p?<div className="vs-persona"><span>{p.intro}</span>{p.win!=="—"&&<b>双想定综合胜率差 {p.win}</b>}</div>:null})()}<button onClick={()=>start(vsScenario,"vs_ai",vsSide,vsProfile)}>开始</button></div></div><div className="vs-card llm-card"><b>对战 {llmProvider==="zhipu"?"智谱":"DeepSeek"}</b><span>多模态 LLM · 可见地图 + 结构化观察 + 合法动作</span><div className="vs-form"><select value={llmScenario} onChange={e=>setLlmScenario(e.target.value)}><option value="IBS-S-03">想定 3 · 通道行动</option><option value="IBS-S-01">想定 1 · 埃斯佩兰斯角</option><option value="IBS-S-EM-01">扩展 · 第二次马里亚纳海战</option></select><select value={llmSide} onChange={e=>setLlmSide(e.target.value as Side)}><option value="axis">我指挥轴心</option><option value="allies">我指挥同盟</option></select><button onClick={()=>start(llmScenario,"llm",llmSide)}>开始</button></div></div></div>{error&&<pre>{error}</pre>}</main>;
+ if(!game)return <StartScreen realistic={realisticCommand} setRealistic={setRealisticCommand} recordReport={recordReport} setRecordReport={setRecordReport} researchAllow={researchAllow} setResearchAllow={setResearchAllow} researchHandle={researchHandle} setResearchHandle={setResearchHandle} llmProvider={llmProvider} setLlmProvider={setLlmProvider} llmModel={llmModel} setLlmModel={setLlmModel} llmKey={llmKey} setLlmKey={setLlmKey} llmVision={llmVision} setLlmVision={setLlmVision} onStart={start} error={error}/>;
  if(locked)return <main className="handoff"><div><p>上一方观察、草稿和选择已销毁</p><h1>请交给另一方</h1><button onClick={unlock}>确认无人旁观，进入 {side==="axis"?"同盟":"轴心"} 方</button></div></main>;
  if(!view)return null;
  if(reportMode)return <main className={`game report ${mode}`}><header><div><p className="eyebrow">{view.scenario_id}</p><h1>{view.scenario_title}</h1></div><div className="turn">第 {view.turn}/{view.max_turns} 回合<br/><b>{phaseNames[view.phase]}</b></div><span className="report-note">报告视图 · {side==="axis"?"轴心":"同盟"}视角</span>{reportEnabled&&<button className="report-button" onClick={openServerReport}>战报</button>}</header><section className="workspace report-workspace"><div className="map-column"><HexMap ships={view.ships} torpedoTracks={view.torpedo_tracks} markers={view.markers} onSelect={setSelected} viewerSide={side} visibility={view.visibility} showVisibility={mode==="tutorial"}/></div></section>{reportOpen&&serverReport&&<BattleReportModal report={serverReport} onClose={()=>setReportOpen(false)}/>}{error&&<div className="error"><b>还不能继续：</b><br/>{error}</div>}</main>;

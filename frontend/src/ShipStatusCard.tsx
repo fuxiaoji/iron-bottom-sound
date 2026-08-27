@@ -32,6 +32,7 @@ export function ShipStatusCard({ship}:{ship:Ship|undefined}){
  return <section className="ship-status record-strip">
   <h2>舰船记录表</h2>
   <div className="record-title">{ship.asset&&<img src={counterAssetUrl(ship.asset)} alt={`${ship.name} 棋子`}/>}<div><h3>{ship.name}</h3><p>{ship.ship_type} · 舰首方向 <strong>{ship.heading}</strong></p></div><span className={`readiness ${ship.sunk?"bad":""}`}>{ship.sunk?"沉没":ship.fired?"已开火":"可行动"}</span></div>
+  {ship.formation_id&&<div className="condition-row formation-status"><span>所属编队 <b>{ship.formation_id}</b></span><span>指挥状态 <b>{ship.command_status==="retreating"?"自主撤退":ship.command_status==="withdrawn"?"已撤出":ship.command_status==="detaching"?"正在脱队":"在队"}</b></span>{ship.withdrawal_edge&&<span>撤退边缘 <b>{ship.withdrawal_edge}</b></span>}</div>}
   <div className="record-tracks">
    <div><span>舰体</span><b>{ship.hull??"?"}/{ship.max_hull??"?"}</b><div className="box-track hull-track" aria-label={`舰体 ${hull}/${maxHull}`}>{Array.from({length:maxHull},(_,index)=><i className={index<hull?"intact":"lost"} key={index}>{index<hull?"":"×"}</i>)}</div></div>
    <div><span>速度循环上限</span><b>{ship.max_speed??"?"} MF</b>{maxSpeed>0?<div className="box-track speed-track" aria-label={`速度循环上限 ${maxSpeed}`}>{Array.from({length:maxSpeed+1},(_,speed)=><i className={speed===ship.current_speed?"current":""} key={speed}>{speed}</i>)}</div>:<em>隐藏</em>}</div>

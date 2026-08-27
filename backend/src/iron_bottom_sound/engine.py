@@ -19,6 +19,7 @@ from .models import (
     GameEvent,
     GameOptions,
     GameState,
+    FormationMovementOrder,
     GunneryOrder,
     HexCoord,
     LegalAction,
@@ -53,6 +54,7 @@ PHASES = [
 ]
 ORDER_PHASES = {Phase.REINFORCEMENT, Phase.MOVEMENT_PLANNING, Phase.TORPEDO_PLANNING, Phase.GUNNERY}
 ORDER_PHASES.add(Phase.CONTACT_SETUP)
+ORDER_PHASES.add(Phase.FORMATION_SETUP)
 # 齐射推荐器的"质量相近"容差（UI 偏好，非规则常量）：同档炮位数量下，与最佳修正差
 # 不超过该值时优先分散目标以避集火；差更大则仍选修正最佳者。
 GUNNERY_ASSIST_BAND = 3
@@ -295,6 +297,8 @@ class IronBottomEngine:
                     rudder_destroyed=ship.rudder_destroyed if reveal else False,
                     captain_status=ship.captain_status if reveal else None,
                     combat_history=self._ship_combat_history(state, ship.id, all_safe_events),
+                    formation_id=ship.formation_id if reveal else None,
+                    command_status=ship.command_status if reveal else None,
                 )
             )
         safe_events = all_safe_events[-40:]
@@ -332,6 +336,11 @@ class IronBottomEngine:
             torpedo_tracks=tracks,
             markers=markers,
             wrecks=deepcopy(state.wrecks),
+            formations=[
+                formation.model_copy(deep=True)
+                for formation in state.formations.values()
+                if debug or formation.side == side
+            ],
             score=(
                 deepcopy(state.score)
                 if debug or not (state.options.optional_rules.hidden_damage and state.phase != Phase.COMPLETE)
@@ -500,6 +509,16 @@ class IronBottomEngine:
             return []
         if state.phase in ORDER_PHASES and side.value not in state.submitted_orders:
             schemas: dict[Phase, dict[str, Any]] = {
+                Phase.FORMATION_SETUP: {
+                    "formation_setup": "1-4 formations; ordered ships, leader, flagship, reserve, spacing",
+                    "suggested_formations": [
+                        item.model_dump(mode="json")
+                        for item in __import__(
+                            "iron_bottom_sound.realistic_command", fromlist=["default_setup_orders"]
+                        ).default_setup_orders(state, side)
+                    ],
+                    "confirmation": {"ready": True},
+                },
                 Phase.CONTACT_SETUP: {"contacts": "four edge markers; two real formations and two decoys"},
                 Phase.REINFORCEMENT: {
                     "reinforcements": "entry_hex, heading, speed",
@@ -508,6 +527,18 @@ class IronBottomEngine:
                 },
                 Phase.MOVEMENT_PLANNING: {
                     "movement": {"ship_id": "owned ship", "speed": "legal MF", "commands": "advance/turn_*"},
+                    "formation_movement": [
+                        {
+                            "formation_id": formation.id,
+                            "leader_id": formation.leader_id,
+                            "spacing": formation.spacing,
+                            "speed_range": self._formation_speed_range(state, formation),
+                            "command_disrupted": formation.disruption_turn == state.turn,
+                            "locked_heading": formation.locked_heading,
+                            "locked_speed": formation.locked_speed,
+                        }
+                        for formation in state.formations.values() if formation.side == side
+                    ] if state.options.realistic_command else [],
                     "movement_candidates": [
                         self.movement_candidates(state, ship)
                         for ship in state.ships.values()
@@ -531,6 +562,17 @@ class IronBottomEngine:
             }
             return [LegalAction(kind="submit_phase_orders", schema_hint=schemas[state.phase])]
         return [LegalAction(kind="advance")] if state.phase not in ORDER_PHASES or len(state.submitted_orders) == 2 else []
+
+    def _formation_speed_range(self, state: GameState, formation) -> dict[str, int | None]:
+        ranges = [
+            self._legal_speed_range(state.ships[ship_id], state.turn)
+            for ship_id in formation.ship_ids
+            if state.ships[ship_id].position and not state.ships[ship_id].sunk
+            and state.ships[ship_id].command_status == "attached"
+        ]
+        if not ranges:
+            return {"minimum": None, "maximum": None}
+        return {"minimum": max(item[0] for item in ranges), "maximum": min(item[1] for item in ranges)}
 
     def _gunnery_candidates(self, state: GameState, side: Side) -> list[dict[str, Any]]:
         candidates: list[dict[str, Any]] = []
@@ -1292,9 +1334,18 @@ class IronBottomEngine:
             "combos": top,
         }
 
-    def validate_orders(self, game_id: str, batch: OrderBatch) -> ValidationResult:
+    def validate_orders(self, game_id: str, batch: OrderBatch, _prepared: bool = False) -> ValidationResult:
         state = self.get(game_id)
         errors: list[str] = []
+        if state.options.realistic_command and not _prepared:
+            from .realistic_command import expand_movement_orders, prepare_gunnery
+            if state.phase == Phase.MOVEMENT_PLANNING:
+                prepared, expansion_errors, _detach = expand_movement_orders(self, state, batch)
+                if expansion_errors:
+                    return ValidationResult(valid=False, errors=expansion_errors)
+                return self.validate_orders(game_id, prepared, _prepared=True)
+            if state.phase == Phase.GUNNERY:
+                return self.validate_orders(game_id, prepare_gunnery(self, state, batch), _prepared=True)
         if state.phase not in ORDER_PHASES:
             errors.append(f"Orders may not be submitted during {state.phase}")
         if batch.phase is not None and batch.phase != state.phase:
@@ -1303,20 +1354,24 @@ class IronBottomEngine:
             errors.append("This side already submitted orders")
         owned = {ship.id: ship for ship in state.ships.values() if ship.side == batch.side and not ship.sunk}
         allowed_fields = {
+            Phase.FORMATION_SETUP: {"formation_setup"},
             Phase.CONTACT_SETUP: {"contacts"},
             Phase.REINFORCEMENT: {"reinforcements"},
-            Phase.MOVEMENT_PLANNING: {"movement", "contact_movement"},
+            Phase.MOVEMENT_PLANNING: {"movement", "contact_movement", "formation_movement", "formation_speed_decisions"},
             Phase.TORPEDO_PLANNING: {"torpedoes"},
             Phase.GUNNERY: {"gunnery", "smoke", "smoke_ships", "illumination", "searchlights"},
         }.get(state.phase, set())
         populated = {
-            name for name in ("contacts", "reinforcements", "movement", "contact_movement", "torpedoes", "gunnery", "smoke", "smoke_ships", "illumination", "searchlights")
+            name for name in ("formation_setup", "formation_movement", "formation_speed_decisions", "contacts", "reinforcements", "movement", "contact_movement", "torpedoes", "gunnery", "smoke", "smoke_ships", "illumination", "searchlights")
             if getattr(batch, name)
         }
         for name in sorted(populated - allowed_fields):
             errors.append(f"{name} orders are not legal during {state.phase}")
         if state.phase == Phase.CONTACT_SETUP:
             self._validate_contact_setup(state, batch, errors)
+        if state.phase == Phase.FORMATION_SETUP:
+            from .realistic_command import validate_setup
+            errors.extend(validate_setup(self, state, batch))
         for order in batch.movement if state.phase == Phase.MOVEMENT_PLANNING else []:
             ship = owned.get(order.ship_id)
             if not ship:
@@ -1334,7 +1389,8 @@ class IronBottomEngine:
                 continue
             minimum, maximum = self._legal_speed_range(ship, state.turn)
             stay_only = self._advance_impossible(state, ship)
-            if not ((minimum <= cost or stay_only) and cost <= maximum):
+            formation_stop = state.options.realistic_command and order.formation_emergency_stop and cost == 0
+            if not ((minimum <= cost or stay_only or formation_stop) and cost <= maximum):
                 errors.append(f"{order.ship_id}: movement cost {cost} outside legal range {minimum}-{maximum}")
             if order.speed is not None and order.speed != cost:
                 errors.append(f"{order.ship_id}: declared speed {order.speed} does not match {cost} MF plan")
@@ -1452,6 +1508,9 @@ class IronBottomEngine:
             if not ship or not ship.torpedo or ship.torpedo.destroyed:
                 errors.append(f"{order.ship_id} cannot fire torpedoes")
                 continue
+            if state.options.realistic_command and ship.command_status != "attached":
+                errors.append(f"{order.ship_id}: detached ships may not receive torpedo orders")
+                continue
             if state.scenario_id == "IBS-S-01" and state.turn < 4 and batch.side == Side.AXIS:
                 errors.append("Japanese ships may not launch torpedoes before scenario 1 turn 4")
             if ship.ship_type in {"BB", "BC"} and ship.current_speed >= 4:
@@ -1518,15 +1577,28 @@ class IronBottomEngine:
 
     def submit_orders(self, game_id: str, batch: OrderBatch) -> ValidationResult:
         state = self.get(game_id)
-        validation = self.validate_orders(game_id, batch)
+        prepared = batch
+        detach_ids: list[str] = []
+        if state.options.realistic_command:
+            from .realistic_command import expand_movement_orders, prepare_gunnery
+            if state.phase == Phase.MOVEMENT_PLANNING:
+                prepared, errors, detach_ids = expand_movement_orders(self, state, batch)
+                if errors:
+                    return ValidationResult(valid=False, errors=errors)
+            elif state.phase == Phase.GUNNERY:
+                prepared = prepare_gunnery(self, state, batch)
+        validation = self.validate_orders(game_id, prepared, _prepared=True)
         if not validation.valid:
             return validation
-        state.submitted_orders[batch.side.value] = batch
+        if detach_ids:
+            from .realistic_command import apply_detachments
+            apply_detachments(self, state, detach_ids)
+        state.submitted_orders[prepared.side.value] = prepared
         self._event(
             state,
             "orders_submitted",
-            f"{batch.side.value} 已封存秘密计划",
-            payload={"secret_side": batch.side.value, "order_batch": batch.model_dump(mode="json")},
+            f"{prepared.side.value} 已封存秘密计划",
+            payload={"secret_side": prepared.side.value, "order_batch": prepared.model_dump(mode="json")},
             rule=self._rule("IBS-R-05", 6, "5.0 B-C"),
         )
         return validation
@@ -1546,7 +1618,15 @@ class IronBottomEngine:
         before = len(state.events)
         if state.phase == Phase.COMPLETE:
             return []
-        if state.phase == Phase.CONTACT_SETUP:
+        if state.phase == Phase.FORMATION_SETUP:
+            if set(state.submitted_orders) != {Side.AXIS.value, Side.ALLIES.value}:
+                raise ValueError("Both sides must submit formation setup before advancing")
+            self._seal_orders(state)
+            from .realistic_command import resolve_setup
+            resolve_setup(self, state)
+            state.phase = state.formation_resume_phase or Phase.REINFORCEMENT
+            state.formation_resume_phase = None
+        elif state.phase == Phase.CONTACT_SETUP:
             if set(state.submitted_orders) != {Side.AXIS.value, Side.ALLIES.value}:
                 raise ValueError("Both sides must submit hidden contact setup before advancing")
             self._seal_orders(state)
@@ -1573,18 +1653,30 @@ class IronBottomEngine:
             state.phase = Phase.MOVEMENT_RESOLUTION
         elif state.phase == Phase.MOVEMENT_RESOLUTION:
             self._resolve_movement(state)
+            if state.options.realistic_command:
+                from .realistic_command import after_movement
+                after_movement(self, state)
             state.phase = Phase.GUNNERY
         elif state.phase == Phase.GUNNERY:
             if set(state.submitted_orders) != {Side.AXIS.value, Side.ALLIES.value}:
                 raise ValueError("Both sides must submit gunnery orders before advancing")
             self._seal_orders(state)
             self._resolve_gunnery(state)
+            if state.options.realistic_command:
+                from .realistic_command import refresh_command_chain
+                refresh_command_chain(self, state)
             state.phase = Phase.TORPEDO_EFFECTS
         elif state.phase == Phase.TORPEDO_EFFECTS:
             self._resolve_torpedoes(state)
+            if state.options.realistic_command:
+                from .realistic_command import refresh_command_chain
+                refresh_command_chain(self, state)
             state.phase = Phase.FIRE_END
         elif state.phase == Phase.FIRE_END:
             self._resolve_fire(state)
+            if state.options.realistic_command:
+                from .realistic_command import refresh_command_chain
+                refresh_command_chain(self, state)
             state.markers = [
                 marker
                 for marker in state.markers
@@ -1628,9 +1720,11 @@ class IronBottomEngine:
                     projected = OrderBatch(
                         side=side,
                         phase=state.phase,
+                        formation_setup=source.formation_setup if state.phase == Phase.FORMATION_SETUP else [],
                         contacts=source.contacts if state.phase == Phase.CONTACT_SETUP else [],
                         reinforcements=source.reinforcements if state.phase == Phase.REINFORCEMENT else [],
                         movement=source.movement if state.phase == Phase.MOVEMENT_PLANNING else [],
+                        formation_movement=source.formation_movement if state.phase == Phase.MOVEMENT_PLANNING else [],
                         contact_movement=source.contact_movement if state.phase == Phase.MOVEMENT_PLANNING else [],
                         torpedoes=source.torpedoes if state.phase == Phase.TORPEDO_PLANNING else [],
                         gunnery=source.gunnery if state.phase == Phase.GUNNERY else [],
@@ -2837,6 +2931,41 @@ class IronBottomEngine:
                         payload={"ship_id": ship_id, "land_hex": destination.label, "movement_impulse": impulse + 1},
                         rule=self._rule("IBS-R-06.1", 7, "6.1 海上移动"),
                     )
+            if state.options.realistic_command:
+                # A guide may be stopped by an enemy collision or wreck after
+                # orders were sealed. Trailing ships react to the guide chain
+                # instead of ramming their own stopped leader.
+                changed = True
+                while changed:
+                    changed = False
+                    grouped: dict[tuple[str, str], list[str]] = {}
+                    for ship_id, destination in destinations.items():
+                        formation_id = state.ships[ship_id].formation_id
+                        if formation_id and state.ships[ship_id].command_status == "attached":
+                            grouped.setdefault((formation_id, destination.label), []).append(ship_id)
+                    for (formation_id, _label), ids in grouped.items():
+                        if len(ids) < 2:
+                            continue
+                        formation = state.formations.get(formation_id)
+                        if not formation:
+                            continue
+                        order_index = {ship_id: index for index, ship_id in enumerate(formation.ship_ids)}
+                        keep = min(ids, key=lambda ship_id: order_index.get(ship_id, 999))
+                        for ship_id in ids:
+                            if ship_id == keep:
+                                continue
+                            current = state.ships[ship_id].position
+                            if current is None or destinations[ship_id] == current:
+                                continue
+                            destinations[ship_id] = current
+                            stopped.add(ship_id)
+                            changed = True
+                            self._event(
+                                state, "formation_emergency_stop",
+                                f"{state.ships[ship_id].name} 紧急停车，避免撞上本编队前舰",
+                                payload={"ship_id": ship_id, "formation_id": formation_id, "movement_impulse": impulse + 1},
+                                rule=self._rule("IBS-R-RC-03", None, "真实模式：编队尾随"),
+                            )
             by_hex: dict[str, list[str]] = {}
             for ship_id, position in destinations.items():
                 by_hex.setdefault(position.label, []).append(ship_id)
@@ -2849,6 +2978,26 @@ class IronBottomEngine:
                     right = state.ships[right_id]
                     if destinations[left_id] == right.position and destinations[right_id] == left.position:
                         collision_sets.add(frozenset((left_id, right_id)))
+            if state.options.realistic_command:
+                # Friendly commanders share the same deconfliction doctrine.
+                # A simultaneous same-hex entry or swap therefore produces a
+                # deterministic emergency stop, never a die-rolled friendly
+                # ram. This applies across formations and to a newly detached
+                # ship executing an original-rule forced movement.
+                for collision_set in collision_sets:
+                    ids = sorted(collision_set)
+                    if len(ids) < 2 or len({state.ships[ship_id].side for ship_id in ids}) != 1:
+                        continue
+                    for ship_id in ids:
+                        destinations[ship_id] = state.ships[ship_id].position  # type: ignore[assignment]
+                        stopped.add(ship_id)
+                    self._event(
+                        state,
+                        "formation_emergency_stop",
+                        "、".join(state.ships[ship_id].name for ship_id in ids) + " 紧急停车，避免友舰相撞",
+                        payload={"ship_ids": ids, "movement_impulse": impulse + 1},
+                        rule=self._rule("IBS-R-RC-03", None, "真实模式：友舰航路解冲突"),
+                    )
             for collision_set in sorted(collision_sets, key=lambda group: sorted(group)):
                 ids = sorted(collision_set)
                 for left_index, left_id in enumerate(ids):
@@ -2863,6 +3012,31 @@ class IronBottomEngine:
                     continue
                 if self._resolve_wreck_collision(state, state.ships[ship_id], wreck_positions[destination]):
                     stopped.add(ship_id)
+            if state.options.realistic_command:
+                # Collision/wreck adjudication above may newly stop a guide at
+                # its pre-impulse hex. Propagate that stop astern before ship
+                # positions are committed, so the sealed wake cannot create a
+                # secondary friendly collision in the same impulse.
+                propagated = True
+                while propagated:
+                    propagated = False
+                    for formation in state.formations.values():
+                        active = [ship_id for ship_id in formation.ship_ids if ship_id in destinations]
+                        for ahead_id, follower_id in zip(active, active[1:]):
+                            ahead = state.ships[ahead_id]
+                            follower = state.ships[follower_id]
+                            if ahead_id not in stopped or not ahead.position or follower_id in stopped:
+                                continue
+                            if destinations[follower_id] == ahead.position:
+                                destinations[follower_id] = follower.position  # type: ignore[assignment]
+                                stopped.add(follower_id)
+                                propagated = True
+                                self._event(
+                                    state, "formation_emergency_stop",
+                                    f"{follower.name} 跟随前舰紧急停车",
+                                    payload={"ship_id": follower_id, "formation_id": formation.id, "movement_impulse": impulse + 1},
+                                    rule=self._rule("IBS-R-RC-03", None, "真实模式：编队尾随"),
+                                )
             for ship_id, position in destinations.items():
                 if ship_id not in stopped:
                     state.ships[ship_id].position = position

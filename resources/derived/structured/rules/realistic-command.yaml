@@ -1,0 +1,50 @@
+schema_version: 1
+authority: project_extension
+namespace: IBS-R-RC
+notice: >-
+  本文件不是《铁底湾的回响 IV》原版规则。原版特殊损伤 31 规定被击中舰下回合原速直航且舰长阵亡；
+  42 只规定舰长阵亡。编队、继承、指挥中断和自动撤退均为“真实模式”项目扩展。
+sources:
+  original_player_aid:
+    path: resources/originals/rules/player-aid-tables-zh.pdf
+    pdf_page: 4
+    scope: special_damage_31_42_only
+  historical_design_context:
+    - https://www.ibiblio.org/hyperwar/USN/ref/WarInst/WarInst-12.html
+    - https://www.ibiblio.org/hyperwar/USN/USN-CN-Esperance/USN-CN-Esperance-3.html
+rules:
+  - id: IBS-R-RC-01
+    title: 编队初设与私密指挥关系
+    status: tested
+    executable_at: realistic_command.resolve_setup
+    tests: [test_default_setup_assigns_every_ship_once_and_is_private, test_setup_rejects_fifth_formation_and_duplicate_membership]
+  - id: IBS-R-RC-02
+    title: 领舰航路与逐脉冲尾随
+    status: tested
+    executable_at: realistic_command.expand_movement_orders
+    tests: [test_leader_order_expands_to_every_attached_member]
+  - id: IBS-R-RC-03
+    title: 编队碰撞预防与紧急停车
+    status: tested
+    executable_at: engine._resolve_movement
+    tests: [test_realistic_state_machine_completes_scenario_three_without_fallback]
+  - id: IBS-R-RC-04
+    title: 共同航速、永久脱队与自动撤退
+    status: tested
+    executable_at: realistic_command.apply_detachments
+    tests: [test_detached_ship_gets_atomic_withdrawal_order_and_no_torpedoes]
+  - id: IBS-R-RC-05
+    title: 旗舰继承与下一回合指挥中断
+    status: tested
+    executable_at: realistic_command.refresh_command_chain
+    tests: [test_flagship_death_uses_reserve_and_locks_next_turn]
+  - id: IBS-R-RC-06
+    title: 撤退舰安全边缘、自动炮击与撤出
+    status: tested
+    executable_at: realistic_command.after_movement
+    tests: [test_detached_ship_gets_atomic_withdrawal_order_and_no_torpedoes]
+  - id: IBS-R-RC-07
+    title: 阵营隔离的真实模式状态机 AI
+    status: tested
+    executable_at: realistic_command.RealisticCommander
+    tests: [test_realistic_commander_emits_only_formation_movement_orders, test_realistic_state_machine_completes_scenario_three_without_fallback]

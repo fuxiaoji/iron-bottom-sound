@@ -17,6 +17,7 @@ class Side(StrEnum):
 
 
 class Phase(StrEnum):
+    FORMATION_SETUP = "formation_setup"
     CONTACT_SETUP = "contact_setup"
     REINFORCEMENT = "reinforcement"
     MOVEMENT_PLANNING = "movement_planning"
@@ -129,6 +130,8 @@ class GameOptions(BaseModel):
     optional_rules: OptionalRules = Field(default_factory=OptionalRules)
     # 战报系统开关（默认关：既有测试/无头调用保持 hermetic；前端起始勾选默认开→发 True）。
     battle_report: bool = False
+    # 项目扩展：编队指挥链。默认关闭，保证旧存档和经典模式逐位兼容。
+    realistic_command: bool = False
 
 
 class WeaponMount(BaseModel):
@@ -268,6 +271,9 @@ class ShipState(BaseModel):
     forced_speed: int | None = Field(default=None, ge=0)
     forced_speed_turns: int = Field(default=0, ge=0)
     guns_disabled_turns: int = Field(default=0, ge=0)
+    formation_id: str | None = None
+    command_status: Literal["attached", "detaching", "retreating", "withdrawn"] = "attached"
+    withdrawal_edge: Literal["north", "east", "south", "west"] | None = None
 
     def max_speed_for_turn(self, turn: int) -> int:
         row_index = (turn - 1) % 3
@@ -285,6 +291,65 @@ class MovementOrder(BaseModel):
     plan: str = "0"
     speed: int | None = Field(default=None, ge=0)
     commands: list[MovementCommand] = Field(default_factory=list)
+    formation_emergency_stop: bool = False
+
+
+class FormationSetupOrder(BaseModel):
+    formation_id: str = Field(min_length=1, max_length=64)
+    name: str = Field(min_length=1, max_length=40)
+    ship_ids: list[str] = Field(min_length=2)
+    leader_id: str
+    flagship_id: str
+    reserve_flagship_id: str
+    spacing: Literal[1, 2] = 1
+    heading: int | None = Field(default=None, ge=1, le=6)
+
+
+class FormationSpeedDecision(BaseModel):
+    formation_id: str
+    action: Literal["reduce", "detach"]
+    speed: int | None = Field(default=None, ge=0, le=8)
+    detach_ship_ids: list[str] = Field(default_factory=list)
+    emergency_stop: bool = False
+
+
+class FormationMovementOrder(BaseModel):
+    formation_id: str
+    leader_plan: str = "0"
+    spacing: Literal[1, 2] | None = None
+    speed_decision: FormationSpeedDecision | None = None
+
+
+class FormationState(BaseModel):
+    id: str
+    name: str
+    side: Side
+    ship_ids: list[str]
+    leader_id: str
+    flagship_id: str
+    reserve_flagship_id: str
+    succession_order: list[str] = Field(default_factory=list)
+    spacing: Literal[1, 2] = 1
+    heading: int = Field(ge=1, le=6)
+    speed: int = Field(default=0, ge=0, le=8)
+    status: Literal["formed", "assembling", "command_disrupted", "dissolved"] = "formed"
+    disruption_turn: int | None = None
+    locked_heading: int | None = Field(default=None, ge=1, le=6)
+    locked_speed: int | None = Field(default=None, ge=0, le=8)
+    guide_trail: list[HexCoord] = Field(default_factory=list)
+
+
+class CommandSuccession(BaseModel):
+    formation_id: str
+    previous_flagship_id: str
+    new_flagship_id: str
+    effective_turn: int
+
+
+class WithdrawalState(BaseModel):
+    ship_id: str
+    edge: Literal["north", "east", "south", "west"]
+    status: Literal["retreating", "withdrawn"] = "retreating"
 
 
 class MovementPreviewRequest(BaseModel):
@@ -393,6 +458,9 @@ class OrderBatch(BaseModel):
     smoke: list[SmokeOrder] = Field(default_factory=list)
     illumination: list[IlluminationOrder] = Field(default_factory=list)
     searchlights: list[SearchlightOrder] = Field(default_factory=list)
+    formation_setup: list[FormationSetupOrder] = Field(default_factory=list)
+    formation_movement: list[FormationMovementOrder] = Field(default_factory=list)
+    formation_speed_decisions: list[FormationSpeedDecision] = Field(default_factory=list)
     confirmation: PhaseConfirmation = Field(default_factory=PhaseConfirmation)
 
     @field_validator("smoke_ships")
@@ -518,6 +586,10 @@ class GameState(BaseModel):
     contact_reserve_positions: dict[str, HexCoord] = Field(default_factory=dict)
     contact_formations: dict[str, list[str]] = Field(default_factory=dict)
     contact_offsets: dict[str, dict[str, tuple[int, int]]] = Field(default_factory=dict)
+    formations: dict[str, FormationState] = Field(default_factory=dict)
+    formation_resume_phase: Phase | None = None
+    command_successions: list[CommandSuccession] = Field(default_factory=list)
+    withdrawals: dict[str, WithdrawalState] = Field(default_factory=dict)
     reinforcement_trigger_turn: int | None = None
     reinforcement_arrival_turn: int | None = None
     reinforcement_succeeds_on: tuple[int, ...] = ()
@@ -568,6 +640,8 @@ class PublicShip(BaseModel):
     rudder_destroyed: bool = False
     captain_status: Literal["fit", "wounded", "killed"] | None = None
     combat_history: list[ShipCombatEntry] = Field(default_factory=list)
+    formation_id: str | None = None
+    command_status: Literal["attached", "detaching", "retreating", "withdrawn"] | None = None
 
 
 class PlayerObservation(BaseModel):
@@ -583,6 +657,7 @@ class PlayerObservation(BaseModel):
     torpedo_tracks: list[TorpedoTrack] = Field(default_factory=list)
     markers: list[MarkerState] = Field(default_factory=list)
     wrecks: list[WreckState] = Field(default_factory=list)
+    formations: list[FormationState] = Field(default_factory=list)
     score: dict[str, int]
     recent_events: list[GameEvent]
     winner: Side | None

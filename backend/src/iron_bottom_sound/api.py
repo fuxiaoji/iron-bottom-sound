@@ -22,7 +22,8 @@ from .llm import OpenAICompatibleCommander
 from .state_export import export_frame, render_board
 from .champions import CHAMPIONS
 from .tactical import PROFILES, TacticalCommander
-from .models import GameOptions, GunneryAssistRequest, MovementPreviewRequest, MovementTrajectoriesRequest, OrderBatch, Phase, ResearchConsent, Side, TorpedoAssistRequest
+from .models import FormationMovementOrder, FormationSetupOrder, GameOptions, GunneryAssistRequest, MovementPreviewRequest, MovementTrajectoriesRequest, OrderBatch, Phase, ResearchConsent, Side, TorpedoAssistRequest
+from .realistic_command import RealisticCommander, expand_movement_orders, validate_setup
 from .notify import notify_research_consent
 from .storage import GameRepository
 
@@ -48,6 +49,14 @@ class CreateGame(BaseModel):
 class FieldOfFireRequest(BaseModel):
     ship_id: str | None = None
     target_speed: int = 4
+
+
+class FormationPreviewRequest(BaseModel):
+    formations: list[FormationSetupOrder]
+
+
+class FormationMovementPreviewRequest(BaseModel):
+    formations: list[FormationMovementOrder]
 
 
 _frontend_dist = Path(__file__).resolve().parents[3] / "frontend" / "dist"
@@ -149,13 +158,13 @@ def view_game(
     x_player_side: Annotated[str | None, Header()] = None,
     debug: bool = False,
 ):
-    get_game(game_id)
+    state = get_game(game_id)
     return engine.observe(game_id, side_from_header(x_player_side), debug=debug)
 
 
 @app.get("/games/{game_id}/legal-actions")
 def legal_actions(game_id: str, x_player_side: Annotated[str | None, Header()] = None):
-    get_game(game_id)
+    state = get_game(game_id)
     return engine.legal_actions(game_id, side_from_header(x_player_side))
 
 
@@ -179,13 +188,14 @@ def suggested_orders(
     profile 选择状态机 AI 风格（内置 PROFILES / 进化冠军 CHAMPIONS，与 ai-opponent 一致）：
     半自动指导——按所选风格生成建议订单，人类在编辑器里确认/手改后再提交。
     """
-    get_game(game_id)
+    state = get_game(game_id)
     side = side_from_header(x_player_side)
     style = CHAMPIONS.get(profile, PROFILES.get(profile))
     if style is None:
         raise HTTPException(422, f"Unknown AI profile {profile}")
     try:
-        return TacticalCommander(profile=style).choose_orders(engine, game_id, side)
+        commander = RealisticCommander(profile=style) if state.options.realistic_command else TacticalCommander(profile=style)
+        return commander.choose_orders(engine, game_id, side)
     except ValueError as error:
         raise HTTPException(409, str(error)) from error
 
@@ -202,7 +212,8 @@ def tutorial_opponent(game_id: str, x_player_side: Annotated[str | None, Header(
     if Side.ALLIES.value in state.submitted_orders:
         return {"valid": True, "instructor_submitted": True}
     try:
-        batch = TacticalCommander().choose_orders(engine, game_id, Side.ALLIES)
+        commander = RealisticCommander() if state.options.realistic_command else TacticalCommander()
+        batch = commander.choose_orders(engine, game_id, Side.ALLIES)
     except ValueError as error:
         raise HTTPException(409, str(error)) from error
     result = engine.submit_orders(game_id, batch)
@@ -276,7 +287,8 @@ def ai_opponent(game_id: str, request: AIOpponentRequest | None = None, x_player
     if ai_side.value in state.submitted_orders:
         return {"valid": True, "ai_submitted": True}
     try:
-        plan, batch, audits = TacticalCommander(profile=profile).choose_plan(engine, game_id, ai_side)
+        commander = RealisticCommander(profile=profile) if state.options.realistic_command else TacticalCommander(profile=profile)
+        plan, batch, audits = commander.choose_plan(engine, game_id, ai_side)
     except ValueError as error:
         raise HTTPException(409, str(error)) from error
     result = engine.submit_orders(game_id, batch)
@@ -389,6 +401,37 @@ def movement_preview(game_id: str, request: MovementPreviewRequest, x_player_sid
         plan=request.plan,
         hexes=request.hexes or None,
     )
+
+
+@app.post("/games/{game_id}/formation-preview")
+def formation_preview(game_id: str, request: FormationPreviewRequest, x_player_side: Annotated[str | None, Header()] = None):
+    """Validate an editable formation setup without mutating or exposing the opponent."""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.realistic_command or state.phase != Phase.FORMATION_SETUP:
+        raise HTTPException(409, "Formation preview is available only during realistic setup")
+    batch = OrderBatch(side=side, phase=state.phase, formation_setup=request.formations)
+    errors = validate_setup(engine, state, batch)
+    return {"valid": not errors, "errors": errors}
+
+
+@app.post("/games/{game_id}/formation-movement-preview")
+def formation_movement_preview(game_id: str, request: FormationMovementPreviewRequest, x_player_side: Annotated[str | None, Header()] = None):
+    """Expand leader orders to private per-ship trajectories without saving them."""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.realistic_command or state.phase != Phase.MOVEMENT_PLANNING:
+        raise HTTPException(409, "Formation movement preview is available only during realistic movement")
+    batch = OrderBatch(side=side, phase=state.phase, formation_movement=request.formations)
+    prepared, errors, detach_ids = expand_movement_orders(engine, state, batch)
+    return {
+        "valid": not errors,
+        "errors": errors,
+        "detach_ship_ids": detach_ids,
+        **engine.movement_plan_trajectories(
+            state, side, [order.model_dump(mode="json") for order in prepared.movement]
+        ),
+    }
 
 
 @app.post("/games/{game_id}/movement-trajectories")

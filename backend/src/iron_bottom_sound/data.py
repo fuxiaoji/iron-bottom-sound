@@ -192,4 +192,10 @@ def build_initial_state(game_id: str, scenario_id: str, seed: int, options: Game
                         contact_truth="real" if index <= 2 else "decoy",
                     )
                 )
+    if options.realistic_command:
+        from .realistic_command import SUPPORTED_SCENARIOS
+        if scenario_id not in SUPPORTED_SCENARIOS:
+            raise ValueError(f"Realistic command is not available for scenario {scenario_id}")
+        state.formation_resume_phase = state.phase
+        state.phase = Phase.FORMATION_SETUP
     return state
