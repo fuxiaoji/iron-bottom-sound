@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 import os
 import time
+import base64
 from abc import ABC, abstractmethod
+from io import BytesIO
 from typing import Any
 
 import httpx
@@ -404,7 +406,7 @@ def _few_shot_for(state: GameState, side: Side) -> dict[str, Any]:
 
 
 class OpenAICompatibleCommander(LLMCommander):
-    """DeepSeek/OpenAI-compatible JSON adapter with no silent fallback.
+    """OpenAI-compatible JSON adapter with optional side-filtered map vision.
 
     提示词 = 棋盘 + 世界态帧 + 合法动作 + few-shot 示范 + 【思考纪律】。可选
     `thinking_enabled`：开启时 DeepSeek 返回 reasoning_content，采集进
@@ -420,6 +422,8 @@ class OpenAICompatibleCommander(LLMCommander):
         max_tokens: int | None = None,
         thinking_enabled: bool = False,
         reasoning_effort: str | None = None,
+        vision_enabled: bool = False,
+        supports_thinking: bool = True,
         client: httpx.Client | None = None,
     ) -> None:
         self.endpoint = endpoint.rstrip("/")
@@ -432,7 +436,44 @@ class OpenAICompatibleCommander(LLMCommander):
         # thinking 开启时 completion 预算会被 reasoning 吃掉，须加大 max_tokens 防 JSON 截断。
         self.reasoning_effort = reasoning_effort or ("low" if thinking_enabled else None)
         self.max_tokens = max_tokens or (6000 if thinking_enabled else 2400)
+        self.vision_enabled = vision_enabled
+        self.supports_thinking = supports_thinking
         self.client = client
+
+    @staticmethod
+    def _visible_map_data_url(
+        state: GameState, engine: IronBottomEngine, side: Side
+    ) -> str:
+        """Render a PNG strictly from the same side-filtered observation as the prompt.
+
+        This deliberately reuses the server battle-map renderer instead of taking a browser
+        screenshot: DOM drafts, debug overlays and the opposing side's private plan can never
+        enter the model image.
+        """
+        from .battle_report import render_map_image
+
+        buffer = BytesIO()
+        render_map_image(state, engine, side).save(buffer, format="PNG", optimize=True)
+        encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
+        return f"data:image/png;base64,{encoded}"
+
+    def _user_message(
+        self, prompt: dict[str, Any], state: GameState,
+        engine: IronBottomEngine, side: Side,
+    ) -> dict[str, Any]:
+        text = json.dumps(prompt, ensure_ascii=False)
+        if not self.vision_enabled:
+            return {"role": "user", "content": text}
+        return {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": text},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": self._visible_map_data_url(state, engine, side)},
+                },
+            ],
+        }
 
     def _resolve_api_key(self) -> str:
         key = self.api_key or os.environ.get(self.api_key_env)
@@ -458,16 +499,22 @@ class OpenAICompatibleCommander(LLMCommander):
             "temperature": 0,
             "max_tokens": self.max_tokens,
             "response_format": {"type": "json_object"},
-            "thinking": {"type": "enabled" if self.thinking_enabled else "disabled"},
             "messages": [
                 {"role": "system", "content": _DISCIPLINE_SYSTEM_PROMPT},
-                {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)},
+                self._user_message(prompt, state, engine, side),
             ],
         }
-        if self.thinking_enabled and self.reasoning_effort:
+        if self.supports_thinking:
+            payload["thinking"] = {
+                "type": "enabled" if self.thinking_enabled else "disabled"
+            }
+        if self.supports_thinking and self.thinking_enabled and self.reasoning_effort:
             payload["reasoning_effort"] = self.reasoning_effort
         audits: list[LLMCallAudit] = []
         for attempt in range(1, 4):
+            # Validation feedback is added to ``prompt`` after a failed attempt, so rebuild
+            # only the user message before retrying (and keep the image side-filtered).
+            payload["messages"][-1] = self._user_message(prompt, state, engine, side)
             started = time.perf_counter()
             errors: list[str] = []
             request_id: str | None = None
@@ -504,6 +551,20 @@ class OpenAICompatibleCommander(LLMCommander):
                         True, [], reasoning_preview, reasoning_content,
                     ))
                     return plan, batch, audits
+            except httpx.HTTPStatusError as error:
+                # Keep the useful provider status/message, never headers or Authorization.
+                detail = ""
+                try:
+                    body = error.response.json()
+                    provider_error = body.get("error", body)
+                    if isinstance(provider_error, dict):
+                        detail = str(provider_error.get("message") or provider_error.get("code") or "")
+                except (ValueError, AttributeError):
+                    pass
+                errors.append(
+                    f"Provider HTTP {error.response.status_code}"
+                    + (f": {detail[:240]}" if detail else "")
+                )
             except (httpx.HTTPError, KeyError, TypeError, ValueError) as error:
                 errors.append(type(error).__name__)
             audits.append(self._audit(
@@ -524,12 +585,13 @@ class OpenAICompatibleCommander(LLMCommander):
             "model": self.model,
             "temperature": temperature,
             "max_tokens": 800,
-            "thinking": {"type": "disabled"},
             "messages": [
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
             ],
         }
+        if self.supports_thinking:
+            payload["thinking"] = {"type": "disabled"}
         client = self.client or httpx.Client(timeout=self.timeout)
         try:
             response = client.post(

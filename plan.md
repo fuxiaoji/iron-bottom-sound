@@ -1,5 +1,21 @@
 # 阶段 1 实施计划
 
+## 当前批次：多模态 LLM 可见地图接入（2026-08-27）
+
+状态：实现与离线验收完成；真实供应商调用待运行时授权
+
+目标与边界：
+
+1. 将 LLM 对手配置从固定 DeepSeek 解耦为请求级 `provider / endpoint / model / api_key`；玩家在首页手动选择供应商与模型，密钥只保存在浏览器当前内存和后端进程内存，不进入游戏状态、SQLite、战报、事件或日志。
+2. 每个需要 LLM 下令的阶段，把该 LLM 阵营的 `PlayerObservation`、合法行动、Schema、文字棋盘以及由同一观察服务端渲染的 PNG 地图一并发送；禁止使用浏览器全屏截图，避免秘密计划、调试态或另一方观察泄漏。
+3. 通用 OpenAI-compatible 适配器支持纯文本与 `image_url` 混合内容；不同供应商的可选字段由能力配置控制，不能把 DeepSeek 专属 `thinking` 参数强塞给其他端点。
+4. 首个预设为智谱 BigModel。按用户指定尝试 `GLM-5.3-Flash`，但模型名及视觉能力须以端点实测为准；不静默改成其他模型。官方当前多模态示例使用 `glm-5v-turbo`，UI 同时提供可编辑模型名。
+5. 增加脱敏连通性端点：仅返回模型名、是否支持图像、延迟、请求 ID 与错误摘要，绝不回显密钥、Authorization、完整请求或模型私有推理。
+
+验收：模拟客户端断言图像为 `data:image/png;base64`、图像像素只来自阵营过滤观察；轴心/同盟输入图不同且隐藏敌舰不进入图像；API 与 UI 可手选模型；既有 DeepSeek 路径保持兼容；前端构建与相关 Python 测试通过。真实测试只允许密钥经运行时内存注入，测试工件及 Git 全仓扫描不得出现密钥。
+
+批次结果：后端新增 `deepseek/zhipu` 两个供应商预设与手填模型 ID，智谱走官方 `https://open.bigmodel.cn/api/paas/v4`；多模态命令把阵营过滤的世界态、合法动作和服务端 PNG 放入同一 OpenAI-compatible 消息，智谱路径不发送 DeepSeek 专属 thinking 字段。首页已提供供应商、模型、密钥和“发送可见地图”控件，浏览器实测切换供应商会在 `glm-5.3-flash` / `deepseek-v4-flash` 间更新默认值。LLM/战报相关 `61 passed`，TypeScript 与 Vite 生产构建通过。全量套件仅有用户并行“二马”扩展引入的旧断言失败（记录数从 30 增到 54），与本批次无关且未回退。真实密钥未写入命令、文件或浏览器，真实 `glm-5.3-flash` 调用仍需在发送密钥与阵营地图前取得即时确认。
+
 更新时间：2026-08-24
 
 ## 当前执行批次：P3 确定性原版规则引擎
@@ -474,4 +490,16 @@
 状态：已完成（本批次尚未提交，提交哈希待补）
 
 批次结果（2026-08-26）：用户「用 LLM 对战状态机 AI 打一局、输出战报验证」——想定7 仅 catalogued 无数据文件（经询问选想定1，正好 7 回合）。**实况压出一个真引擎 bug 并修复**：`legal_actions.movement_candidates` 过滤漏 `not ship.sunk`，沉没但仍占格的舰（漂移未结算）被当可动舰候选，与校验 `owned` 不一致 → LLM 三连败规划沉船（T7）。修法与 `_gunnery_candidates`/`_torpedo_candidates`/确定性指挥官一致。**结构性改进**：`movement_candidates` 每个可达格附引擎 `movement_path` 算好的精确 `plan` 串（`include_plans` 参数，确定性/战术指挥官传 False 免开销）——AI 只挑目标格照抄 plan，强制转弯/首动 advance 由引擎保证。**提示词纪律 4 处**：沉没舰不入 movement 且不覆盖；gunnery 只对 targets 非空候选开火、mount_id 取自候选（LLM 曾自造 KINUGASA-M1/M2）；reinforcement 只增援 candidates.ships、入口取自 entry_hexes；movement 照抄候选 plan、reachable 无 cost0 则必须移动。**--model CLI**（默认仍 deepseek-v4-flash，deepseek-chat/reasoner 均可用但用户指示用 flash）。**对局收敛（5 局）**：T7 沉船→T6 自造炮位→T4 自造增援→T5 强制转弯→第 5 局成功 `passed=true, completed=true, winner=allies`（想定1 第7回合）、50 请求、轴/盟各 25 plan、121.6s。**战报全量验证**：7 回合全叙事、90 张 PNG（turn1=6 开局局部、turn2-7=14/回合）、MD 10.5MB 自包含 90 base64、meta 完整（winner=allies、score{axis:4, allies:11}、phase=complete）。全量 `301 passed`。**提醒**：本次贴出的 DeepSeek 密钥仅内存注入未写文件，请轮换。下一步：投影二导出与训练管线；战报异步叙事/降采样/多局汇总。
+# 二马扩展想定、状态机 AI 接入与模块瘦身批次（2026-08-27）
 
+状态：资料盘点完成，来源核验与架构识别中
+
+范围：只读导入 `D:\desktop\铁底湾\二马` 中的规范来源，提取想定初设、特殊规则、双方船表及非“舰娘”版棋子剪影；识别并接入用户近期实现的状态机/战术 AI。现有用户提交 `596694f` 及其前序改动视为基线，不回退、不覆盖。通用规则继续由现有结构化规则权威裁决；本想定特例优先级高于通用规则。
+
+1. 建立来源清单：记录 PDF/PNG/JPG 的 SHA-256、尺寸、规范路径、重复素材和用途；PDF、船表、想定图逐页/逐图视觉核验，OCR 只用于定位。
+2. 为扩展想定分配稳定 `IBS-S-*` 标识；结构化标题、回合、初始阶段、地图、能见度、双方编成、初始格/舰首/速度、增援、退出、VP、胜负及全部特殊规则。不确定字段进入 `docs/rules/open_questions.md` 并阻止发布为 playable。
+3. 从双方船表逐舰录入舰体、速度循环、装甲、炮位/GF/口径/射界、鱼雷、雷达、火控、特殊能力、摧毁顺序和 VP；复用已有舰型字段，不在引擎或 UI 写想定常量。
+4. 只导入规范“国家-舰种-舰名.png”棋子剪影；“舰娘”图作为未启用别名保留来源记录，不进入默认 UI。复用已有状态、鱼雷、地图素材时以哈希去重。
+5. 识别 `tactical.py`、随机 AI、LLM 适配、API/UI 新入口及状态导出链，定义统一 AI 玩家协议；让新想定经相同 `observe/legal_actions/submit_orders/advance` 接口进入状态机 AI，不给 AI 私有状态写权限。
+6. 以职责和测试为依据拆分臃肿文件，优先拆解规则裁决、合法行动提示、想定特例和前端计划编辑；保持公共 API、事件格式、存档兼容与现有测试不变。
+7. 验收：来源/数据完整性、船表边界、初设加载、特殊规则、确定性回放、状态机 AI 至少完整终局一盘、API/UI 想定选择、隐藏信息、全量 Python、TypeScript、Vite 构建；完成后追加 `havedone.md`、提交哈希和运行证据。

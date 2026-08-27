@@ -63,7 +63,7 @@ def test_llm_opponent_503_without_key_makes_no_call(monkeypatch) -> None:
     calls: list = []
     monkeypatch.setattr(
         api, "llm_commander_factory",
-        lambda timeout, thinking_enabled, api_key=None: calls.append(timeout),
+        lambda timeout, thinking_enabled, api_key=None, config=None: calls.append(timeout),
     )
     response = client.post(
         f"/games/{game_id}/llm-opponent", headers={"X-Player-Side": "axis"}
@@ -80,7 +80,7 @@ def test_llm_opponent_409_before_player_submits(monkeypatch) -> None:
     calls: list = []
     monkeypatch.setattr(
         api, "llm_commander_factory",
-        lambda timeout, thinking_enabled, api_key=None: calls.append(1),
+        lambda timeout, thinking_enabled, api_key=None, config=None: calls.append(1),
     )
     response = client.post(
         f"/games/{game_id}/llm-opponent", headers={"X-Player-Side": "axis"}
@@ -97,7 +97,7 @@ def test_llm_opponent_submits_opponent_and_returns_public_audits(monkeypatch) ->
     stub = StubCommander(_player_batch(Side.ALLIES), audits=[_audit()])
     monkeypatch.setattr(
         api, "llm_commander_factory",
-        lambda timeout, thinking_enabled, api_key=None: stub,
+        lambda timeout, thinking_enabled, api_key=None, config=None: stub,
     )
     assert client.post(
         f"/games/{game_id}/orders",
@@ -117,6 +117,47 @@ def test_llm_opponent_submits_opponent_and_returns_public_audits(monkeypatch) ->
     assert Side.ALLIES.value in state.submitted_orders
 
 
+def test_llm_opponent_uses_player_selected_zhipu_model_without_persisting_key(monkeypatch) -> None:
+    client = TestClient(app)
+    secret = "runtime-zhipu-placeholder"
+    response = client.post("/games", json={
+        "scenario_id": "IBS-S-03",
+        "seed": 221,
+        "options": {"mode": "llm"},
+        "llm_api_key": secret,
+        "llm_config": {
+            "provider": "zhipu",
+            "model": "glm-5.3-flash",
+            "vision_enabled": True,
+        },
+    })
+    assert response.status_code == 201
+    game_id = response.json()["game_id"]
+    stub = StubCommander(_player_batch(Side.ALLIES), audits=[_audit()])
+    captured: dict = {}
+
+    def factory(timeout, thinking_enabled, api_key=None, config=None):
+        captured.update(api_key=api_key, config=config)
+        return stub
+
+    monkeypatch.setattr(api, "llm_commander_factory", factory)
+    assert client.post(
+        f"/games/{game_id}/orders",
+        headers={"X-Player-Side": "axis"},
+        json=_player_batch(Side.AXIS).model_dump(mode="json"),
+    ).status_code == 200
+    assert client.post(
+        f"/games/{game_id}/llm-opponent", headers={"X-Player-Side": "axis"}
+    ).status_code == 200
+    assert captured["api_key"] == secret
+    assert captured["config"].provider == "zhipu"
+    assert captured["config"].model == "glm-5.3-flash"
+    assert captured["config"].vision_enabled is True
+    # Repository serialization contains GameState only, never runtime credentials/provider config.
+    persisted = api.repository.load(game_id).model_dump_json()
+    assert secret not in persisted and "glm-5.3-flash" not in persisted
+
+
 def test_llm_opponent_idempotent_short_circuit(monkeypatch) -> None:
     monkeypatch.setenv("DEEPSEEK_API_KEY", "test-only-placeholder")
     client = TestClient(app)
@@ -124,7 +165,7 @@ def test_llm_opponent_idempotent_short_circuit(monkeypatch) -> None:
     stub = StubCommander(_player_batch(Side.ALLIES), audits=[_audit()])
     monkeypatch.setattr(
         api, "llm_commander_factory",
-        lambda timeout, thinking_enabled, api_key=None: stub,
+        lambda timeout, thinking_enabled, api_key=None, config=None: stub,
     )
     client.post(
         f"/games/{game_id}/orders",
@@ -151,7 +192,7 @@ def test_llm_opponent_rejects_illegal_ai_orders_without_silent_fix(monkeypatch) 
     stub = StubCommander(illegal)
     monkeypatch.setattr(
         api, "llm_commander_factory",
-        lambda timeout, thinking_enabled, api_key=None: stub,
+        lambda timeout, thinking_enabled, api_key=None, config=None: stub,
     )
     client.post(
         f"/games/{game_id}/orders",

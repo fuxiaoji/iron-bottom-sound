@@ -83,8 +83,9 @@ def _submit(client: TestClient, game_id: str, side: Side) -> None:
 
 
 def _capturing_factory(captured: dict, stub: _StubCommander):
-    def factory(timeout, thinking_enabled, api_key=None):
+    def factory(timeout, thinking_enabled, api_key=None, config=None):
         captured["api_key"] = api_key
+        captured["config"] = config
         return stub
     return factory
 

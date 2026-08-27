@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Query, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, Response
@@ -27,12 +27,20 @@ from .notify import notify_research_consent
 from .storage import GameRepository
 
 
+class LLMConnectionConfig(BaseModel):
+    provider: Literal["deepseek", "zhipu"] = "deepseek"
+    model: str = Field(default="deepseek-v4-flash", min_length=1, max_length=120,
+                       pattern=r"^[A-Za-z0-9._:/-]+$")
+    vision_enabled: bool = True
+
+
 class CreateGame(BaseModel):
     scenario_id: str = "IBS-S-03"
     seed: int = 1
     options: GameOptions = Field(default_factory=GameOptions)
     # 用户主动提供的 LLM 密钥：仅按局存进程内存（_user_llm_keys），绝不落库/落盘。
     llm_api_key: str | None = None
+    llm_config: LLMConnectionConfig | None = None
     # 科研论文用途同意（可留称呼）：落库 research_consent 表 + 通知。
     research_consent: ResearchConsent | None = None
 
@@ -52,6 +60,9 @@ reports_root = os.environ.get("IBS_REPORTS_DIR", str(_default_reports_dir))
 narrative_commander_factory = lambda: OpenAICompatibleCommander(timeout=30, max_tokens=800)
 # 用户主动提供的 LLM 密钥（按 game_id）：进程内存，重启即清空，绝不写盘/写库。
 _user_llm_keys: dict[str, str] = {}
+# Non-secret per-game runtime selection. Kept beside the key so persisted GameState and
+# reports remain provider-neutral and old saves continue to load unchanged.
+_user_llm_configs: dict[str, "LLMConnectionConfig"] = {}
 app = FastAPI(title="铁底湾的回响 IV", version="0.1.0")
 app.mount(
     "/assets/counters",
@@ -108,6 +119,8 @@ def create_game(request: CreateGame, background_tasks: BackgroundTasks):
     repository.save(state)
     if request.llm_api_key:
         _user_llm_keys[state.game_id] = request.llm_api_key  # 仅内存，绝不落盘
+    if request.llm_config:
+        _user_llm_configs[state.game_id] = request.llm_config
     consent = request.research_consent
     if consent is not None:
         try:
@@ -207,13 +220,38 @@ class LLMOpponentRequest(BaseModel):
     timeout: float = Field(default=90, gt=0)
     thinking_enabled: bool = False
     api_key: str | None = None  # 用户主动提供的密钥（可省略：优先用开局时注入的）
+    config: LLMConnectionConfig | None = None
+
+
+def _provider_runtime(config: LLMConnectionConfig) -> dict[str, object]:
+    if config.provider == "zhipu":
+        return {
+            "endpoint": "https://open.bigmodel.cn/api/paas/v4",
+            "api_key_env": "ZHIPU_API_KEY",
+            "supports_thinking": False,
+        }
+    return {
+        "endpoint": "https://api.deepseek.com",
+        "api_key_env": "DEEPSEEK_API_KEY",
+        "supports_thinking": True,
+    }
 
 
 def _make_llm_commander(
-    timeout: float, thinking_enabled: bool, api_key: str | None = None
+    timeout: float, thinking_enabled: bool, api_key: str | None = None,
+    config: LLMConnectionConfig | None = None,
 ) -> OpenAICompatibleCommander:
+    config = config or LLMConnectionConfig()
+    runtime = _provider_runtime(config)
     return OpenAICompatibleCommander(
-        timeout=timeout, thinking_enabled=thinking_enabled, api_key=api_key
+        timeout=timeout,
+        thinking_enabled=thinking_enabled and bool(runtime["supports_thinking"]),
+        api_key=api_key,
+        endpoint=str(runtime["endpoint"]),
+        api_key_env=str(runtime["api_key_env"]),
+        model=config.model,
+        vision_enabled=config.vision_enabled,
+        supports_thinking=bool(runtime["supports_thinking"]),
     )
 
 
@@ -292,9 +330,14 @@ def llm_opponent(
         raise HTTPException(403, "LLM opponent is available only in llm mode")
     player_side = side_from_header(x_player_side)
     ai_side = player_side.opponent
-    # 用户主动提供的密钥（本次请求 > 开局时注入）> 服务器环境变量。
+    # 用户主动提供的配置/密钥（本次请求 > 开局时注入）> 服务器环境变量。
+    config = (
+        request.config if request is not None and request.config is not None
+        else _user_llm_configs.get(game_id, LLMConnectionConfig())
+    )
+    runtime = _provider_runtime(config)
     key = (request.api_key if request is not None else None) or _user_llm_keys.get(game_id)
-    if not key and not os.environ.get("DEEPSEEK_API_KEY"):
+    if not key and not os.environ.get(str(runtime["api_key_env"])):
         raise HTTPException(503, "请先提供你自己的 LLM API 密钥（开局时或在本次请求中传入 api_key）")
     if player_side.value not in state.submitted_orders:
         raise HTTPException(409, "Submit the player's orders first")
@@ -302,7 +345,9 @@ def llm_opponent(
         return {"valid": True, "ai_submitted": True, "audits": []}
     timeout = request.timeout if request is not None else 90
     thinking = request.thinking_enabled if request is not None else False
-    commander = llm_commander_factory(timeout=timeout, thinking_enabled=thinking, api_key=key)
+    commander = llm_commander_factory(
+        timeout=timeout, thinking_enabled=thinking, api_key=key, config=config
+    )
     try:
         plan, batch, audits = commander.choose_plan(engine, game_id, ai_side)
     except ValueError as error:
@@ -437,9 +482,16 @@ def advance(game_id: str, x_player_side: Annotated[str | None, Header()] = None)
         try:
             # 用户主动提供的密钥优先；无用户密钥时用服务器 env（无 env 则确定性回退）。
             key = _user_llm_keys.get(game_id)
+            config = _user_llm_configs.get(game_id, LLMConnectionConfig())
+            runtime = _provider_runtime(config)
             commander = (
-                OpenAICompatibleCommander(api_key=key, timeout=30, max_tokens=800)
-                if key else narrative_commander_factory()
+                OpenAICompatibleCommander(
+                    api_key=key, timeout=30, max_tokens=800, model=config.model,
+                    endpoint=str(runtime["endpoint"]),
+                    api_key_env=str(runtime["api_key_env"]),
+                    supports_thinking=bool(runtime["supports_thinking"]),
+                )
+                if key or game_id in _user_llm_configs else narrative_commander_factory()
             )
             capture_after_advance(repository, reports_root, next_state, engine,
                                   prev_phase, commander=commander)
