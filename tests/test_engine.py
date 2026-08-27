@@ -408,6 +408,35 @@ def test_pathological_map_edge_stops_ship_instead_of_aborting_match() -> None:
     assert event.payload["edge_hex"] == "R27"
 
 
+def test_map_edge_shift_preflights_remaining_paths_atomically() -> None:
+    """当前格可平移、但另一舰的剩余航路不可平移时，世界不得发生部分修改。"""
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=3)
+    mover = state.ships["IBS-U-KM-KARL-GALSTER"]
+    mover.position = HexCoord.from_label("R27")
+    mover.heading = 4
+    other = state.ships["IBS-U-RN-JAVELIN"]
+    other.position = HexCoord.from_label("C2")
+    other.heading = 6
+    state.sealed_orders["1:movement_planning"] = {
+        Side.AXIS.value: OrderBatch(
+            side=Side.AXIS, phase=Phase.MOVEMENT_PLANNING,
+            movement=[MovementOrder(ship_id=mover.id, plan="1")],
+        ),
+        Side.ALLIES.value: OrderBatch(
+            side=Side.ALLIES, phase=Phase.MOVEMENT_PLANNING,
+            movement=[MovementOrder(ship_id=other.id, plan="1")],
+        ),
+    }
+
+    engine._resolve_movement(state)
+
+    assert mover.position == HexCoord.from_label("R27")
+    assert other.position == HexCoord.from_label("C1")
+    assert not any(event.type == "world_shifted" for event in state.events)
+    assert any(event.type == "movement_blocked_by_edge" for event in state.events)
+
+
 def test_structured_land_blocks_ship_plan_and_torpedo_track() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=3)

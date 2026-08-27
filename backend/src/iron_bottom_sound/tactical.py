@@ -7,6 +7,7 @@ from typing import Any, Callable
 
 from pydantic import BaseModel
 
+from .data import load_scenario
 from .engine import IronBottomEngine
 from .llm import DeterministicCommander
 from .models import (
@@ -460,11 +461,45 @@ class TacticalCommander(DeterministicCommander):
         obs = engine.observe(state.game_id, side)
         enemies = [ship for ship in obs.ships if ship.side != side and not ship.sunk and ship.position]
         ctx = self._build_movement_context(engine, state, side, enemies, rng)
-        movement = [
-            self._movement_order_for(engine, state, ship, ctx)
-            for ship in state.ships.values()
+        active = {
+            ship.id: ship for ship in state.ships.values()
             if ship.side == side and not ship.sunk and ship.position
-        ]
+        }
+        groups = self._movement_groups(state, side, list(active))
+        movement: list[MovementOrder] = []
+        reserved: list[tuple[ShipState, MovementOrder]] = []
+        for group in groups:
+            leader = active[group[0]]
+            straight = MovementOrder(ship_id=leader.id, plan=str(leader.current_speed))
+            if (
+                self.profile.line_ahead
+                and engine.movement_preview(state, leader, plan=straight.plan)["commitable"]
+                and not self._movement_conflicts(engine, state, leader, straight, reserved)
+            ):
+                leader_order = straight
+            else:
+                leader_order = self._movement_order_for(engine, state, leader, ctx, reserved)
+            coordinated = self._coordinated_group_orders(
+                engine, state, [active[ship_id] for ship_id in group], leader_order, reserved
+            )
+            if coordinated:
+                for ship, order in coordinated:
+                    movement.append(order)
+                    reserved.append((ship, order))
+                continue
+            # 共同机动因边缘/损伤不可行：先规划可达集最小的受约束舰，避免自由度
+            # 高的队首先占掉它唯一能停留/转出的格位。
+            constrained = sorted(
+                (active[ship_id] for ship_id in group),
+                key=lambda ship: (
+                    len(engine.movement_candidates(state, ship, include_plans=False)["reachable"]),
+                    ship.id,
+                ),
+            )
+            for follower in constrained:
+                order = self._movement_order_for(engine, state, follower, ctx, reserved)
+                movement.append(order)
+                reserved.append((follower, order))
         contact_movement = [
             ContactMovementOrder(marker_id=marker.id, plan="4")
             for marker in obs.markers
@@ -474,8 +509,83 @@ class TacticalCommander(DeterministicCommander):
         intents.update({order.marker_id: "保持隐蔽编队推进" for order in contact_movement})
         return movement, contact_movement, intents
 
+    def _coordinated_group_orders(
+        self, engine: IronBottomEngine, state, ships: list[ShipState],
+        preferred: MovementOrder, reserved: list[tuple[ShipState, MovementOrder]],
+    ) -> list[tuple[ShipState, MovementOrder]]:
+        """为整支纵队寻找所有成员均合法且逐脉冲安全的共同机动。
+
+        先尝试队首的战术最优计划；若队尾因地图边缘或损伤无法复制，则枚举队首
+        其它合法命令串，避免把队首已经选定的危险机动强塞给全队。
+        """
+        if len(ships) == 1:
+            return [(ships[0], preferred)]
+        plans = [preferred.plan]
+        leader = ships[0]
+        for entry in engine.movement_candidates(state, leader, include_plans=False)["reachable"]:
+            hexc = HexCoord(q=entry["hex"]["q"], r=entry["hex"]["r"])
+            for heading in entry["final_headings"]:
+                plan = self._path_to(engine, state, leader, hexc, heading)
+                if plan is not None and plan not in plans:
+                    plans.append(plan)
+        for plan in plans:
+            local: list[tuple[ShipState, MovementOrder]] = []
+            for ship in ships:
+                order = MovementOrder(ship_id=ship.id, plan=plan)
+                preview = engine.movement_preview(state, ship, plan=plan)
+                if not preview["commitable"]:
+                    local = []
+                    break
+                # A close column that finishes bow-on to the printed edge will
+                # be unsalvageable next turn: the front ship must stop while
+                # the following ship's mandatory first advance enters it.
+                # Keep one clear bow hex as a one-turn safety horizon.
+                end = HexCoord(q=preview["current_hex"]["q"], r=preview["current_hex"]["r"])
+                try:
+                    ahead = end.neighbor(preview["current_heading"])
+                except ValueError:
+                    local = []
+                    break
+                if engine._terrain_impassable(state, ahead):
+                    local = []
+                    break
+                if self._movement_conflicts(engine, state, ship, order, reserved + local):
+                    local = []
+                    break
+                local.append((ship, order))
+            if local:
+                return local
+        return []
+
+    def _movement_groups(self, state, side: Side, active_ids: list[str]) -> list[list[str]]:
+        """返回本方移动编组，优先读取想定的默认纵队元数据。
+
+        元数据是 AI/便利部署信息，不是裁决规则。已有纵队的所有战术风格都先按队
+        协调一个共同机动，具体机动仍由各 profile 评分；未列出的舰保持单舰编组，
+        因而不会影响旧想定或增援舰。
+        """
+        active_set = set(active_ids)
+        setup = load_scenario(state.scenario_id).get("setup", {})
+        definitions = setup.get("engine_default_formations", {}).get(side.value, [])
+        groups: list[list[str]] = []
+        assigned: set[str] = set()
+        for definition in definitions:
+            members = [ship_id for ship_id in definition.get("ships", []) if ship_id in active_set]
+            if members:
+                groups.append(members)
+                assigned.update(members)
+        if self.profile.line_ahead and groups:
+            # Long-column doctrine manoeuvres every parallel column with the
+            # same helm/speed programme. This preserves spacing between the
+            # columns as well as within each column and prevents two columns
+            # independently turning head-on several turns later.
+            groups = [[ship_id for group in groups for ship_id in group]]
+        groups.extend([[ship_id] for ship_id in active_ids if ship_id not in assigned])
+        return groups
+
     def _movement_order_for(
         self, engine: IronBottomEngine, state, ship, ctx: _MovementContext,
+        reserved: list[tuple[ShipState, MovementOrder]] | None = None,
     ) -> MovementOrder:
         """对单舰在所有可达 (格, 末航向) 上打分，取最优者（温度>0 且带 RNG 时按
         softmax 概率抽样）生成合法移动计划；抽样只在 `movement_candidates` 合法可达
@@ -517,11 +627,47 @@ class TacticalCommander(DeterministicCommander):
             chosen = self._sample_weighted(scored, self.profile.temperature, ctx.rng)
             ordered = [item for item in scored if (item[1], item[2], item[3]) == chosen]
             ordered.extend(item for item in scored if (item[1], item[2], item[3]) != chosen)
-        for _score, _cost, hexc, heading in ordered[:self.profile.top_k_candidates]:
+        reserved = reserved or []
+        preferred = ordered[:self.profile.top_k_candidates]
+        remaining = ordered[self.profile.top_k_candidates:]
+        for _score, _cost, hexc, heading in preferred + remaining:
             plan = self._path_to(engine, state, ship, hexc, heading)
-            if plan is not None:
-                return MovementOrder(ship_id=ship.id, plan=plan)
-        return self._fallback_movement(engine, state, ship)
+            if plan is None:
+                continue
+            order = MovementOrder(ship_id=ship.id, plan=plan)
+            if not self._movement_conflicts(engine, state, ship, order, reserved):
+                return order
+        return self._fallback_movement(engine, state, ship, reserved)
+
+    @staticmethod
+    def _movement_positions(
+        engine: IronBottomEngine, state, ship: ShipState, order: MovementOrder,
+    ) -> list[HexCoord]:
+        preview = engine.movement_preview(state, ship, plan=order.plan)
+        return [ship.position] + [
+            HexCoord(q=item["hex"]["q"], r=item["hex"]["r"])
+            for item in preview["trajectory"]
+        ]
+
+    def _movement_conflicts(
+        self, engine: IronBottomEngine, state, ship: ShipState, order: MovementOrder,
+        reserved: list[tuple[ShipState, MovementOrder]],
+    ) -> bool:
+        """逐脉冲检查同格与交换格，镜像引擎同步移动的友舰碰撞判定。"""
+        left = self._movement_positions(engine, state, ship, order)
+        for other, other_order in reserved:
+            right = self._movement_positions(engine, state, other, other_order)
+            impulses = max(len(left), len(right)) - 1
+            for impulse in range(impulses):
+                left_before = left[min(impulse, len(left) - 1)]
+                right_before = right[min(impulse, len(right) - 1)]
+                left_after = left[min(impulse + 1, len(left) - 1)]
+                right_after = right[min(impulse + 1, len(right) - 1)]
+                if left_after == right_after:
+                    return True
+                if left_after == right_before and right_after == left_before:
+                    return True
+        return False
 
     def _score_hex(
         self, engine: IronBottomEngine, state, ship,
@@ -603,22 +749,78 @@ class TacticalCommander(DeterministicCommander):
             return None
         return result["plan"]
 
-    def _fallback_movement(self, engine: IronBottomEngine, state, ship) -> MovementOrder:
+    def _fallback_movement(
+        self, engine: IronBottomEngine, state, ship,
+        reserved: list[tuple[ShipState, MovementOrder]] | None = None,
+    ) -> MovementOrder:
         """保证任意舰都有合法计划：`"0"` 在 forced_speed>0 / forced_circle 下非法，
         依次回退 `"0"` → 直行 max_cost → 首个可达格路径。"""
+        reserved = reserved or []
         if engine.movement_preview(state, ship, plan="0")["commitable"]:
-            return MovementOrder(ship_id=ship.id, plan="0")
+            order = MovementOrder(ship_id=ship.id, plan="0")
+            if not self._movement_conflicts(engine, state, ship, order, reserved):
+                return order
         candidates = engine.movement_candidates(state, ship, include_plans=False)
         if candidates["max_cost"] > 0:
             plan = str(candidates["max_cost"])
             if engine.movement_preview(state, ship, plan=plan)["commitable"]:
-                return MovementOrder(ship_id=ship.id, plan=plan)
+                order = MovementOrder(ship_id=ship.id, plan=plan)
+                if not self._movement_conflicts(engine, state, ship, order, reserved):
+                    return order
         for entry in candidates["reachable"]:
             hexc = HexCoord(q=entry["hex"]["q"], r=entry["hex"]["r"])
             plan = self._path_to(engine, state, ship, hexc, None)
             if plan is not None:
-                return MovementOrder(ship_id=ship.id, plan=plan)
-        raise ValueError(f"{ship.id}: 无任何合法移动计划（不应发生）")
+                order = MovementOrder(ship_id=ship.id, plan=plan)
+                if not self._movement_conflicts(engine, state, ship, order, reserved):
+                    return order
+        # `movement_path` may choose a different shortest route to the same
+        # endpoint and thereby miss the safe "copy the ship ahead" solution.
+        # Replaying an already reserved same-heading manoeuvre preserves the
+        # relative offset and is the final collision-free emergency option.
+        for other, other_order in reversed(reserved):
+            if other.heading != ship.heading:
+                continue
+            order = MovementOrder(ship_id=ship.id, plan=other_order.plan)
+            if not engine.movement_preview(state, ship, plan=order.plan)["commitable"]:
+                continue
+            if not self._movement_conflicts(engine, state, ship, order, reserved):
+                return order
+        # Greedy batch planning can create a local dead end even though the
+        # fleet has a safe assignment. Re-plan one previously reserved ship
+        # together with the blocked ship; mutating the existing order object
+        # also updates the already assembled OrderBatch entry.
+        current_candidates = self._candidate_movement_orders(engine, state, ship)
+        for index in range(len(reserved) - 1, -1, -1):
+            other, other_order = reserved[index]
+            fixed = reserved[:index] + reserved[index + 1:]
+            for alternative in self._candidate_movement_orders(engine, state, other):
+                if self._movement_conflicts(engine, state, other, alternative, fixed):
+                    continue
+                revised = fixed + [(other, alternative)]
+                for current in current_candidates:
+                    if self._movement_conflicts(engine, state, ship, current, revised):
+                        continue
+                    other_order.plan = alternative.plan
+                    reserved[index] = (other, other_order)
+                    return current
+        raise ValueError(f"{ship.id}: 无友舰冲突的合法移动计划")
+
+    def _candidate_movement_orders(
+        self, engine: IronBottomEngine, state, ship: ShipState,
+    ) -> list[MovementOrder]:
+        """枚举一舰的确定性合法计划集，供批次死端的一步回溯使用。"""
+        plans: list[str] = []
+        if engine.movement_preview(state, ship, plan="0")["commitable"]:
+            plans.append("0")
+        candidates = engine.movement_candidates(state, ship, include_plans=False)
+        for entry in candidates["reachable"]:
+            hexc = HexCoord(q=entry["hex"]["q"], r=entry["hex"]["r"])
+            for heading in entry["final_headings"]:
+                plan = self._path_to(engine, state, ship, hexc, heading)
+                if plan is not None and plan not in plans:
+                    plans.append(plan)
+        return [MovementOrder(ship_id=ship.id, plan=plan) for plan in plans]
 
     # ------------------------------------------------------------------ 鱼雷
 
@@ -637,7 +839,7 @@ class TacticalCommander(DeterministicCommander):
         orders: list[TorpedoOrder] = []
         used: set[tuple[str, str]] = set()
         for combo in assist["combos"]:
-            if combo["blocked_reason"]:
+            if combo["blocked_reason"] or combo.get("friendly_risk"):
                 continue
             if combo["distance"] > self.profile.torpedo_max_range or combo["expected_hits"] < self.profile.torpedo_min_expected:
                 continue

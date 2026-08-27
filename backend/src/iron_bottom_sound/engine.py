@@ -1162,6 +1162,7 @@ class IronBottomEngine:
 
     def _assist_evaluate(
         self, state: GameState, target: ShipState, combo: dict[str, Any],
+        friendly_routes: dict[str, set[str]] | None = None,
     ) -> dict[str, Any]:
         """对单个组合投影鱼雷航迹、推算与目标外推的交点、命中概率与期望命中。"""
         ship = state.ships[combo["ship_id"]]
@@ -1195,6 +1196,13 @@ class IronBottomEngine:
             "predicted_end": projection["end_hex"],
             "blocked_reason": obstacle,
         }
+        route_hexes = set(projection["path"])
+        friendly_ship_ids = sorted(
+            ship_id for ship_id, labels in (friendly_routes or {}).items()
+            if ship_id != ship.id and route_hexes.intersection(labels)
+        )
+        result["friendly_ship_ids"] = friendly_ship_ids
+        result["friendly_risk"] = bool(friendly_ship_ids)
         if intercept_hex:
             source_bearing = ((torpedo_heading + 2) % 6) + 1
             relative = (source_bearing - target.heading) % 6
@@ -1224,13 +1232,24 @@ class IronBottomEngine:
                 target = min(enemies, key=lambda enemy: min(enemy.position.distance(ship.position) for ship in own))
         if target is None:
             return {"target_id": None, "target_name": None, "projected_target": None, "combos": []}
+        friendly_routes: dict[str, set[str]] = {}
+        for own_ship in state.ships.values():
+            if own_ship.side == side and not own_ship.sunk and own_ship.position:
+                friendly_routes[own_ship.id] = {own_ship.position.label}
+        for trajectory in self.sealed_movement_trajectories(state, side)["trajectories"]:
+            friendly_routes.setdefault(trajectory["ship_id"], set()).update(
+                item["label"] for item in trajectory["trajectory"]
+            )
         if launch is not None:
             combo = self._assist_launch_from_dict(state, side, launch)
-            combos = [self._assist_evaluate(state, target, combo)] if combo else []
+            combos = [self._assist_evaluate(state, target, combo, friendly_routes)] if combo else []
         else:
-            combos = [self._assist_evaluate(state, target, combo) for combo in self._assist_launch_combos(state, side)]
+            combos = [
+                self._assist_evaluate(state, target, combo, friendly_routes)
+                for combo in self._assist_launch_combos(state, side)
+            ]
         combos = [combo for combo in combos if combo]
-        combos.sort(key=lambda combo: (-combo["expected_hits"], combo["distance"]))
+        combos.sort(key=lambda combo: (combo["friendly_risk"], -combo["expected_hits"], combo["distance"]))
         top = combos[:12]
         best_turn = top[0]["intercept_turn"] if top and top[0]["intercept_hex"] else 0
         projected = self._project_target_position(state, target, best_turn)
@@ -2462,6 +2481,22 @@ class IronBottomEngine:
         current_coords.extend(track.position for track in state.torpedo_tracks)
         current_coords.extend(wreck.position for wreck in state.wrecks)
         current_coords.extend(marker.position for marker in state.markers if marker.position)
+        current_coords.extend(
+            position
+            for ship_id, path in ship_paths.items()
+            if ship_id != moving_ship_id
+            for position, _pulse_heading, _shift_heading in path[impulse:]
+        )
+        current_coords.extend(
+            position
+            for path in contact_paths.values()
+            for position, _pulse_heading in path[impulse:]
+        )
+        current_coords.extend(
+            order.launch_hex
+            for order in torpedo_orders
+            if order.ship_id != moving_ship_id and order.launch_hex
+        )
         for coord in current_coords:
             self._translated_hex(coord, dq, dr)
 

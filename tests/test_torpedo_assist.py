@@ -287,9 +287,27 @@ def test_torpedo_assist_api_shape_and_read_only() -> None:
         "ship_id", "launcher_id", "launch_at_mf", "launch_hex", "launch_side",
         "launch_angle", "setting_index", "torpedo_heading", "salvo_size", "distance",
         "aspect", "modifier", "hit_probability", "expected_hits", "predicted_path",
+        "friendly_risk", "friendly_ship_ids",
     ):
         assert key in body["combos"][0]
     assert len(api_engine.get(game_id).events) == before  # pure read-only
+
+
+def test_torpedo_assist_marks_friendly_ship_on_predicted_lane() -> None:
+    engine = IronBottomEngine()
+    state, _karl, target = karl_vs_javelin(engine, "friendly-lane")
+    assist = engine.torpedo_assist(state, Side.AXIS, target_id=target.id)
+    combo = next(item for item in assist["combos"] if len(item["predicted_path"]) > 1)
+    friend = next(
+        ship for ship in state.ships.values()
+        if ship.side == Side.AXIS and ship.id != combo["ship_id"] and not ship.sunk
+    )
+    friend.position = HexCoord.from_label(combo["predicted_path"][-1])
+    checked = engine.torpedo_assist(
+        state, Side.AXIS, target_id=assist["target_id"], launch=combo,
+    )["combos"][0]
+    assert checked["friendly_risk"] is True
+    assert friend.id in checked["friendly_ship_ids"]
 
 
 def test_torpedo_assist_api_wrong_phase_rejected() -> None:

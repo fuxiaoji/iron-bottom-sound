@@ -18,10 +18,11 @@ from pathlib import Path
 
 import pytest
 
+from iron_bottom_sound.data import load_scenario
 from iron_bottom_sound.engine import D66_VALUES, IronBottomEngine, ORDER_PHASES, d66_adjust
 from iron_bottom_sound.llm import DeterministicCommander, LLMPlayerSession
 from iron_bottom_sound.match import run_match
-from iron_bottom_sound.models import HexCoord, Phase, Side, TorpedoOrder
+from iron_bottom_sound.models import HexCoord, MovementOrder, Phase, Side, TorpedoOrder
 from iron_bottom_sound import tactical
 from iron_bottom_sound.tactical import APPROACH_RANGE, TacticalCommander
 
@@ -514,6 +515,17 @@ def test_torpedo_threshold_gate_and_dedup_per_launcher() -> None:
     assert batch.torpedoes == []
 
 
+def test_tactical_ai_rejects_torpedo_combo_with_friendly_route_risk(monkeypatch) -> None:
+    engine, state = torpedo_planning_state()
+    monkeypatch.setattr(engine, "torpedo_assist", lambda *_args, **_kwargs: {"combos": [{
+        "blocked_reason": None,
+        "friendly_risk": True,
+        "distance": 2,
+        "expected_hits": 99.0,
+    }]})
+    assert TacticalCommander()._plan_torpedoes(engine, state, Side.AXIS) == []
+
+
 def test_torpedo_ibs_s01_axis_blocked_before_turn_4() -> None:
     """IBS-S-01 日军第 4 回合前禁射：第 2 回合鱼雷计划阶段轴心方无鱼雷订单。"""
     engine = IronBottomEngine()
@@ -597,6 +609,53 @@ def test_line_ahead_prefers_collinear_friend() -> None:
     on_line = HexCoord(q=5, r=6)   # 舰位正前 1 格，与友舰同线
     off_line = HexCoord(q=6, r=6)  # 斜侧（友舰距离 2，队形项相当）
     assert line._formation_factor(ship_pos, on_line, 3, own) > line._formation_factor(ship_pos, off_line, 3, own)
+
+
+def test_batch_conflict_guard_detects_same_hex_and_swap() -> None:
+    engine, state = movement_planning_state(3)
+    left, right = axis_ships(state)[:2]
+    commander = TacticalCommander()
+    destination = HexCoord.from_label("M12")
+    left.position = destination.neighbor(4)
+    left.heading = 1
+    right.position = destination.neighbor(5)
+    right.heading = 2
+    assert commander._movement_conflicts(
+        engine, state, right, MovementOrder(ship_id=right.id, plan="1"),
+        [(left, MovementOrder(ship_id=left.id, plan="1"))],
+    )
+
+    left.position = destination
+    left.heading = 1
+    right.position = destination.neighbor(1)
+    right.heading = 4
+    assert commander._movement_conflicts(
+        engine, state, right, MovementOrder(ship_id=right.id, plan="1"),
+        [(left, MovementOrder(ship_id=left.id, plan="1"))],
+    )
+
+
+def test_erma_line_profile_keeps_each_default_column_on_shared_manoeuvre() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-EM-01", seed=23, game_id="erma-line-columns")
+    line = TacticalCommander(profile=tactical.PROFILES["line"])
+    sessions = {
+        Side.AXIS: LLMPlayerSession(Side.AXIS, line),
+        Side.ALLIES: LLMPlayerSession(
+            Side.ALLIES, TacticalCommander(profile=tactical.PROFILES["line"])
+        ),
+    }
+    state = drive_to(engine, state.game_id, sessions, Phase.MOVEMENT_PLANNING)
+    _plan, batch, _audits = line.choose_plan(engine, state.game_id, Side.AXIS)
+    by_ship = {order.ship_id: order for order in batch.movement}
+    groups = load_scenario("IBS-S-EM-01")["setup"]["engine_default_formations"]["axis"]
+    for group in groups:
+        assert len({by_ship[ship_id].plan for ship_id in group["ships"]}) == 1
+    reserved = []
+    for order in batch.movement:
+        ship = state.ships[order.ship_id]
+        assert not line._movement_conflicts(engine, state, ship, order, reserved)
+        reserved.append((ship, order))
 
 
 def test_profiles_produce_distinct_movement_plans() -> None:
