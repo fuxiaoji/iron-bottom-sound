@@ -408,6 +408,42 @@ def test_leaving_map_shifts_every_other_counter_and_emits_rule_event() -> None:
     assert other_resolution.payload["secret_side"] == Side.ALLIES.value
 
 
+def test_observe_repairs_legacy_bent_torpedo_trail_without_mutating_state() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=13)
+    legacy_path = [
+        HexCoord.from_label("Q17"),
+        HexCoord.from_label("R16"),
+        HexCoord.from_label("R15"),  # old mixed coordinate frame: apparent turn
+        HexCoord.from_label("S14"),
+    ]
+    state.torpedo_tracks.append(TorpedoTrack(
+        id="legacy-bent-track",
+        side=Side.AXIS,
+        launcher_ship_id="IBS-U-KM-KARL-GALSTER",
+        torpedo_type="G7a",
+        position=legacy_path[-1],
+        heading=1,
+        speed_cycle=(6, 5, 5),
+        range_remaining=10,
+        distance_travelled=3,
+        launched_turn=1,
+        launch_position=legacy_path[0],
+        traversed_hexes=legacy_path,
+    ))
+
+    observed = engine.observe(state.game_id, Side.AXIS)
+    displayed = next(track for track in observed.torpedo_tracks if track.id == "legacy-bent-track")
+
+    assert all(
+        left.neighbor(displayed.heading) == right
+        for left, right in zip(displayed.traversed_hexes, displayed.traversed_hexes[1:])
+    )
+    assert displayed.traversed_hexes[-1] == displayed.position
+    assert displayed.launch_position == displayed.traversed_hexes[0]
+    assert state.torpedo_tracks[0].traversed_hexes == legacy_path
+
+
 def test_pathological_map_edge_stops_ship_instead_of_aborting_match() -> None:
     """6.1.8 病态：出界舰要对侧边缘已有算子、平移会把它推出地图时，引擎不再抛错
     中止对局，而是把出界舰留在边缘格、其余算子不平移、对局可继续。"""

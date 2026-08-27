@@ -306,6 +306,8 @@ class IronBottomEngine:
             or track.side == side
             or bool(track.contact_ship_ids)
         ]
+        for track in tracks:
+            self._normalize_torpedo_display_history(track)
         markers: list[MarkerState] = []
         for marker in state.markers:
             if marker.kind == "contact":
@@ -338,6 +340,30 @@ class IronBottomEngine:
             recent_events=safe_events,
             winner=state.winner,
             victory_reason=state.victory_reason,
+        )
+
+    @classmethod
+    def _normalize_torpedo_display_history(cls, track: TorpedoTrack) -> None:
+        """Return a straight, current-coordinate trail, including for legacy saves.
+
+        Older saves may contain history points from several world-coordinate
+        frames.  Rebuild the visible tail backwards from the live counter;
+        this touches only the copied observation, never adjudication state.
+        """
+        dq, dr = HexCoord.direction_delta(track.heading)
+        visible_reversed = [track.position]
+        cursor = track.position
+        for _ in range(track.distance_travelled):
+            q, r = cursor.q - dq, cursor.r - dr
+            if not cls._coord_on_map(q, r):
+                break
+            cursor = HexCoord(q=q, r=r)
+            visible_reversed.append(cursor)
+        track.traversed_hexes = list(reversed(visible_reversed))
+        track.launch_position = (
+            track.traversed_hexes[0]
+            if len(track.traversed_hexes) == track.distance_travelled + 1
+            else None
         )
 
     @staticmethod
