@@ -8,6 +8,18 @@ columns:
   count: 34
   labels: [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, BB, CC, DD, EE, FF, GG, HH]
 rows: {first: 1, last: 27, count: 27}
+play_area:
+  policy_id: IBS-R-MAP-01
+  status: tested
+  kind: fixed_expanded_sea_buffer
+  columns: {first: A, last: TT, count: 46}
+  rows: {first: 1, last: 39, count: 39}
+  printed_map_columns: {first: A, last: HH, count: 34}
+  printed_map_rows: {first: 1, last: 27, count: 27}
+  buffer_terrain: sea
+  world_shift_enabled: false
+  final_edge_behavior: stop_without_coordinate_translation
+  authority_note: 用户要求的项目稳定性扩展；不是原版印刷地图规则。
 layout: flat_top_odd_q
 heading_compass:
   source: "IBS-M-MAIN lower-left printed compass, visually verified 2026-08-24"

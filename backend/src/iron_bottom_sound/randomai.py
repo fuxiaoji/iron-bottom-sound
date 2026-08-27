@@ -26,6 +26,8 @@ from .models import (
     GunMountOrder,
     GunneryOrder,
     HexCoord,
+    MAP_COLUMNS,
+    MAP_ROWS,
     LLMCallAudit,
     MovementOrder,
     OrderBatch,
@@ -160,7 +162,7 @@ class RandomCommander(DeterministicCommander):
         occupied = {ship.position.label for ship in state.ships.values() if ship.position and not ship.sunk}
         entries = [
             HexCoord(q=q, r=row - (q - (q & 1)) // 2)
-            for q in range(34) for row in range(27)
+            for q in range(MAP_COLUMNS) for row in range(MAP_ROWS)
         ]
         entries = [
             entry for entry in entries

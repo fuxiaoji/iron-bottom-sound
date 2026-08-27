@@ -22,7 +22,7 @@ from typing import Any
 from PIL import Image, ImageDraw, ImageFont
 
 from .engine import IronBottomEngine
-from .models import GameEvent, GameState, HexCoord, Phase, Side
+from .models import GameEvent, GameState, HexCoord, MAP_COLUMNS, MAP_ROWS, Phase, Side, index_to_column
 from .state_export import _board_cells
 
 # ---------------------------------------------------------------------------
@@ -31,14 +31,15 @@ from .state_export import _board_cells
 # ---------------------------------------------------------------------------
 HEX_SIZE = 24
 HEX_ROW_HEIGHT = HEX_SIZE * math.sqrt(3)  # ≈41.569
-COLUMN_COUNT = 34
-ROW_COUNT = 27
+
+COLUMN_COUNT = MAP_COLUMNS
+ROW_COUNT = MAP_ROWS
 # 左/上边距（56=行号区，44=列标区）加前端 hexGeometry 的基准偏移 (38, 35)。
 ORIGIN_X = 56 + 38
 ORIGIN_Y = 44 + 35
-IMAGE_WIDTH = 1330
-IMAGE_HEIGHT = 1359
-LEGEND_TOP = 1226
+IMAGE_WIDTH = int(ORIGIN_X + (COLUMN_COUNT - 1) * HEX_SIZE * 1.5 + 72)
+LEGEND_TOP = int(ORIGIN_Y + (ROW_COUNT + 0.5) * HEX_ROW_HEIGHT + 36)
+IMAGE_HEIGHT = LEGEND_TOP + 180
 
 # 呈现色（非规则常量）。
 OCEAN = (16, 40, 62)
@@ -77,13 +78,7 @@ def heading_direction(heading: int) -> tuple[float, float]:
 
 
 def _column_labels() -> list[str]:
-    labels: list[str] = []
-    for q in range(COLUMN_COUNT):
-        if q < 26:
-            labels.append(chr(ord("A") + q))
-        else:
-            labels.append("A" + chr(ord("A") + q - 26))
-    return labels
+    return [index_to_column(q) for q in range(COLUMN_COUNT)]
 
 
 # ---------------------------------------------------------------------------
@@ -248,7 +243,7 @@ def _wrap_text(draw: ImageDraw.ImageDraw, text: str, font, max_width: int) -> li
 
 
 def render_map_image(state: GameState, engine: IronBottomEngine, side: Side) -> Image.Image:
-    """单侧地图截图（RGB PNG，约 1330×1359）。只画该侧观察可见集 + 公开地形。"""
+    """单侧固定扩展海图截图。只画该侧观察可见集 + 公开地形。"""
     observation = engine.observe(state.game_id, side)
     image = Image.new("RGB", (IMAGE_WIDTH, IMAGE_HEIGHT), OCEAN)
     draw = ImageDraw.Draw(image)

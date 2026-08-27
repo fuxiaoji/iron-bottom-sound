@@ -22,6 +22,8 @@ from .models import (
     FormationMovementOrder,
     GunneryOrder,
     HexCoord,
+    MAP_COLUMNS,
+    MAP_ROWS,
     LegalAction,
     MarkerState,
     MovementOrder,
@@ -789,8 +791,8 @@ class IronBottomEngine:
 
         cells = [
             HexCoord(q=q, r=row - (q - (q & 1)) // 2)
-            for q in range(34)
-            for row in range(27)
+            for q in range(MAP_COLUMNS)
+            for row in range(MAP_ROWS)
         ]
         own_positions = [
             ship.position for ship in state.ships.values()
@@ -2414,12 +2416,12 @@ class IronBottomEngine:
     @staticmethod
     def _map_edge(coord: HexCoord) -> bool:
         display_row = coord.r + (coord.q - (coord.q & 1)) // 2
-        return coord.q in {0, 33} or display_row in {0, 26}
+        return coord.q in {0, MAP_COLUMNS - 1} or display_row in {0, MAP_ROWS - 1}
 
     @staticmethod
     def _coord_on_map(q: int, r: int) -> bool:
         display_row = r + (q - (q & 1)) // 2
-        return 0 <= q <= 33 and 0 <= display_row <= 26
+        return 0 <= q < MAP_COLUMNS and 0 <= display_row < MAP_ROWS
 
     @staticmethod
     def _terrain_impassable(state: GameState, coord: HexCoord) -> bool:
@@ -2568,7 +2570,7 @@ class IronBottomEngine:
     def _translated_hex(coord: HexCoord, dq: int, dr: int) -> HexCoord:
         translated = HexCoord(q=coord.q + dq, r=coord.r + dr)
         display_row = translated.r + (translated.q - (translated.q & 1)) // 2
-        if not 0 <= display_row <= 26:
+        if not 0 <= display_row < MAP_ROWS:
             raise ValueError("Map-edge world shift would move a counter beyond the opposite edge")
         return translated
 
@@ -2583,6 +2585,11 @@ class IronBottomEngine:
         contact_paths: dict[str, list[tuple[HexCoord, int]]],
         torpedo_orders: list[TorpedoOrder],
     ) -> tuple[int, int]:
+        # Retained only so older internal callers fail loudly instead of
+        # silently reviving coordinate translation.  New adjudication never
+        # calls this method (IBS-R-MAP-01).
+        raise RuntimeError("World shifting is disabled by IBS-R-MAP-01")
+
         leaving_dq, leaving_dr = HexCoord.direction_delta(heading)
         dq, dr = -leaving_dq, -leaving_dr
 
@@ -2804,6 +2811,8 @@ class IronBottomEngine:
         movement_starts: dict[str, HexCoord] = {}
         movement_plan_labels: dict[str, str] = {}
         planned_end_labels: dict[str, str] = {}
+        # Compatibility payloads remain zero for old replay/report readers.
+        # IBS-R-MAP-01 never changes the coordinate frame at runtime.
         world_shift_deltas: dict[str, list[int]] = {}
         world_shift_counts: dict[str, int] = {}
         for ship in state.ships.values():
@@ -2857,10 +2866,10 @@ class IronBottomEngine:
                 track_allowance[track.id] = max(0, track.speed_cycle[0] - order.launch_at_mf)
                 moved_tracks[track.id] = 0
         for impulse in range(maximum_impulses):
-            # 6.1.8: when a ship would leave the printed map, keep that ship on
-            # its edge hex and translate every other counter in the opposite
-            # direction.  Translating the remaining planned coordinates keeps
-            # simultaneous movement relative after the reference-map shift.
+            # IBS-R-MAP-01: the play area has a fixed sea buffer outside the
+            # printed 34×27 map.  At the final buffer edge the exiting ship
+            # stops; no ship, torpedo, wreck, marker or sealed route is ever
+            # translated into a new coordinate frame.
             edge_attempts = [
                 (ship_id, path[impulse][1])
                 for ship_id, path in paths.items()
@@ -2870,47 +2879,24 @@ class IronBottomEngine:
                 ship = state.ships[ship_id]
                 if not ship.position:
                     continue
-                try:
-                    # An earlier simultaneous map shift may already have made
-                    # this movement legal.
-                    destination = ship.position.neighbor(heading)
-                    paths[ship_id][impulse] = (destination, heading, None)
-                    continue
-                except ValueError:
-                    pass
-                try:
-                    shift_dq, shift_dr = self._shift_world_for_map_edge(
-                        state,
-                        moving_ship_id=ship_id,
-                        heading=heading,
-                        impulse=impulse,
-                        ship_paths=paths,
-                        contact_paths=contact_paths,
-                        torpedo_orders=torpedo_orders,
-                    )
-                    for affected_id in world_shift_deltas:
-                        if affected_id == ship_id:
-                            continue
-                        world_shift_deltas[affected_id][0] += shift_dq
-                        world_shift_deltas[affected_id][1] += shift_dr
-                        world_shift_counts[affected_id] += 1
-                except ValueError:
-                    # 6.1.8 病态：对侧边缘已有算子，平移会把其推出地图（打印规则未
-                    # 定义此情形）。按 6.1.8「把出界舰留在边缘格」的意图：不平移，
-                    # 该舰停在当前边缘格，其余算子照常结算，对局不中止。
-                    stopped.add(ship_id)
-                    self._event(
-                        state,
-                        "movement_blocked_by_edge",
-                        f"{state.ships[ship_id].name} 停在边缘格 "
-                        f"{state.ships[ship_id].position.label}：地图两端均有算子，世界无法平移",
-                        payload={
-                            "ship_id": ship_id,
-                            "edge_hex": state.ships[ship_id].position.label,
-                            "movement_impulse": impulse + 1,
-                        },
-                        rule=self._rule("IBS-R-06.1.8", 7, "6.1 移动机制第8条"),
-                    )
+                stopped.add(ship_id)
+                self._event(
+                    state,
+                    "movement_blocked_by_edge",
+                    f"{ship.name} 停在扩展海图边缘格 {ship.position.label}；其他算子坐标保持不变",
+                    payload={
+                        "ship_id": ship_id,
+                        "edge_hex": ship.position.label,
+                        "attempted_heading": heading,
+                        "movement_impulse": impulse + 1,
+                        "coordinate_frame_changed": False,
+                    },
+                    rule=RuleReference(
+                        rule_id="IBS-R-MAP-01",
+                        document="docs/rules/fixed-expanded-map.md",
+                        section="固定扩展海图边缘",
+                    ),
+                )
             destinations: dict[str, HexCoord] = {}
             for ship_id, path in paths.items():
                 ship = state.ships[ship_id]

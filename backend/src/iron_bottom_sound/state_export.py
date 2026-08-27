@@ -17,7 +17,7 @@ from __future__ import annotations
 from typing import Any
 
 from .engine import IronBottomEngine
-from .models import GameState, PublicShip, Side
+from .models import GameState, MAP_COLUMNS, MAP_ROWS, PublicShip, Side, index_to_column
 
 
 def _display_row(q: int, r: int) -> int:
@@ -147,33 +147,27 @@ def export_frame(
 
 
 def _column_labels() -> list[str]:
-    labels: list[str] = []
-    for q in range(34):
-        if q < 26:
-            labels.append(chr(ord("A") + q))
-        else:
-            labels.append("A" + chr(ord("A") + q - 26))
-    return labels
+    return [index_to_column(q) for q in range(MAP_COLUMNS)]
 
 
 def _board_cells(
     state: GameState, engine: IronBottomEngine, side: Side
 ) -> tuple[list[list[str]], list[str], dict[str, str]]:
-    """34×27 token 网格 + 图例 + 舰→token 映射（呈现层，非规则）。
+    """固定扩展海图 token 网格 + 图例 + 舰→token 映射（呈现层，非规则）。
 
     render_board 与 PIL 战报渲染共用，保证符号/编号完全一致。全从
     `engine.observe` 可见集派生（战争迷雾一致）。
     """
     observation = engine.observe(state.game_id, side)
-    height = 27
-    grid: list[list[str]] = [[".."] * 34 for _ in range(height)]
+    height = MAP_ROWS
+    grid: list[list[str]] = [[".."] * MAP_COLUMNS for _ in range(height)]
     legend_parts: list[str] = []
 
     def put(coord, token: str) -> None:
         if coord is None:
             return
         row = _display_row(coord.q, coord.r)
-        if 0 <= row < height and 0 <= coord.q < 34:
+        if 0 <= row < height and 0 <= coord.q < MAP_COLUMNS:
             grid[row][coord.q] = token
 
     # 船（优先级最高）：轴心 a1..、盟军 e1..，按各自可见顺序编号。
@@ -233,12 +227,12 @@ def _board_cells(
 
 
 def render_board(state: GameState, engine: IronBottomEngine, side: Side) -> str:
-    """cell-aligned 34×27 ASCII 棋盘（投影一）。按 label 定位，只画可见集。"""
+    """固定扩展海图 ASCII 棋盘（投影一）。按 label 定位，只画可见集。"""
     grid, legend_parts, _ = _board_cells(state, engine, side)
     columns = _column_labels()
     header = "   " + " ".join(label.rjust(2) for label in columns)
     lines = [header]
-    for display_row in range(27):
+    for display_row in range(MAP_ROWS):
         cells = " ".join(grid[display_row])
         lines.append(f"{display_row + 1:>2} {cells}")
     return "\n".join(lines) + "\n\n图例: " + " | ".join(legend_parts)

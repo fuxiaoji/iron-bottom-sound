@@ -132,8 +132,8 @@ def test_discipline_prompt_torpedo_aiming_guidance(monkeypatch) -> None:
     assert "绝不盲射" in system and "torpedoes 留空" in system
     # 旧误导措辞已删：曾经把 relative_heading 划为禁区，模型因此不瞄准任意选舷
     assert "不要用 relative_heading" not in system
-    # 地图边缘纪律：防止整队驶出棋盘触发引擎世界平移中止
-    assert "地图边缘" in system and "驶出棋盘边缘" in system
+    # 固定扩展海图纪律：明确不再世界平移，最终边缘只停车。
+    assert "地图边缘" in system and "不会平移任何舰船、鱼雷或历史航迹" in system
 
 
 def test_default_payload_thinking_disabled_and_max_tokens_2400(monkeypatch) -> None:

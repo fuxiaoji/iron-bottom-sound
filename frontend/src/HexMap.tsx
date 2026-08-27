@@ -1,13 +1,14 @@
 import {useEffect,useMemo,useRef,useState} from "react";
 import type {FireHeatmapMode,FireHeatmapResponse,HexCoord,Marker,MovementPreview,MovementTrajectory,Ship,Side,TorpedoTrack} from "./types";
 import {counterAssetUrl} from "./assets";
-import {columnLabel,displayRowToAxial,headingRotation,headingVector,hexCenter,hexDistance,hexFromLabel,hexLabel,torpedoCounterRotation,HEX_SIZE,HEX_ROW_HEIGHT} from "./hexGeometry";
+import {columnLabel,displayRowToAxial,headingRotation,headingVector,hexCenter,hexDistance,hexFromLabel,hexLabel,torpedoCounterRotation,HEX_SIZE,HEX_ROW_HEIGHT,MAP_COLUMNS,MAP_ROWS,PRINTED_MAP_COLUMNS,PRINTED_MAP_ROWS} from "./hexGeometry";
 
 export interface TorpedoAssistPath{label:string;hexes:HexCoord[];intercept?:HexCoord|null}
 
 const points=(cx:number,cy:number)=>Array.from({length:6},(_,i)=>{const a=Math.PI/180*(60*i);return `${cx+HEX_SIZE*Math.cos(a)},${cy+HEX_SIZE*Math.sin(a)}`}).join(" ");
 const torpedoAsset=(track:TorpedoTrack)=>track.side==="axis"?`鱼雷${Math.min(3,track.salvo_size)}（日）.png`:`鱼雷${Math.min(2,track.salvo_size)}（美）.png`;
-const MAP_W=1280;const MAP_H=1180;  // 与 svg viewBox 一致，pan/zoom 与 screenToHex 共用
+const MAP_W=1720;const MAP_H=1700;  // 固定 46×39 扩展海图，与 svg viewBox / screenToHex 共用
+const DEFAULT_VIEWPORT={tx:-100,ty:-250,k:1.8}; // 默认聚焦原想定交战区；“全图”可查看全部缓冲海域
 
 export interface MapMoveMode{
  shipId:string;
@@ -38,9 +39,9 @@ function screenToHex(svg:SVGSVGElement,clientX:number,clientY:number,viewport:{t
  let best:HexCoord|null=null;let bestDistance=Infinity;
  for(let dq=-1;dq<=1;dq++)for(let dr=-1;dr<=1;dr++){
   const q=q0+dq,r=r0+dr;
-  if(q<0||q>33)continue;
+  if(q<0||q>=MAP_COLUMNS)continue;
   const displayRow=r+Math.floor(q/2);
-  if(displayRow<0||displayRow>26)continue;
+  if(displayRow<0||displayRow>=MAP_ROWS)continue;
   const center=hexCenter(q,r);
   const distance=Math.hypot(center.x-vx,center.y-vy);
   if(distance<bestDistance){bestDistance=distance;best={q,r}}
@@ -50,7 +51,7 @@ function screenToHex(svg:SVGSVGElement,clientX:number,clientY:number,viewport:{t
 
 export function HexMap({ships,torpedoTracks,markers,onSelect,viewerSide,visibility,showVisibility=false,moveMode,torpedoAssistPaths,plannedTrajectories,fireHeatmaps,fireHeatmapMode}:{ships:Ship[];torpedoTracks:TorpedoTrack[];markers:Marker[];onSelect:(ship:Ship)=>void;viewerSide:Side;visibility:number;showVisibility?:boolean;moveMode?:MapMoveMode;torpedoAssistPaths?:TorpedoAssistPath[];plannedTrajectories?:(MovementTrajectory&{side?:Side})[];fireHeatmaps?:FireHeatmapResponse;fireHeatmapMode?:FireHeatmapMode}){
  // —— 地图视口（pan/zoom）：translate + scale 包住全部世界图层，罗盘除外 ——
- const [viewport,setViewport]=useState({tx:0,ty:0,k:1});
+ const [viewport,setViewport]=useState(DEFAULT_VIEWPORT);
  const [panning,setPanning]=useState(false);
  const svgRef=useRef<SVGSVGElement>(null);
  const panRef=useRef({active:false,x:0,y:0,tx:0,ty:0});
@@ -131,10 +132,10 @@ export function HexMap({ships,torpedoTracks,markers,onSelect,viewerSide,visibili
   const opacity=0.12+(heat/heatData.max)*0.5;
   return <polygon key={label} className="heat-cell" points={points(center.x,center.y)} style={{fill:"#e05c3a",fillOpacity:opacity}}><title>{`射界热力 · ${label} · 热值 ${heat.toFixed(2)}`}</title></polygon>;
  }):null;
- const hexes=[];for(let q=0;q<34;q++)for(let row=0;row<27;row++){const r=displayRowToAxial(q,row);const center=hexCenter(q,r);const label=`${columnLabel(q)}${row+1}`;const highlight=highlightByLabel.get(label);const observed=showVisibility&&observers.some(position=>hexDistance({q,r},position)<=visibility);const heatNumber=heatData?.merged.get(label);hexes.push(<g key={`${q}:${r}`} onClick={moveMode?()=>moveMode.onHexClick({q,r}):undefined}><polygon className={observed?"in-visibility":highlight?`move-${highlight}`:undefined} points={points(center.x,center.y)}/><text x={center.x} y={center.y+3} className={heatNumber!==undefined?"heat-value":undefined}>{heatNumber!==undefined?heatNumber.toFixed(1):`${columnLabel(q)}${row+1}`}</text></g>) }
+ const hexes=[];for(let q=0;q<MAP_COLUMNS;q++)for(let row=0;row<MAP_ROWS;row++){const r=displayRowToAxial(q,row);const center=hexCenter(q,r);const label=`${columnLabel(q)}${row+1}`;const highlight=highlightByLabel.get(label);const observed=showVisibility&&observers.some(position=>hexDistance({q,r},position)<=visibility);const heatNumber=heatData?.merged.get(label);const buffer=q>=PRINTED_MAP_COLUMNS||row>=PRINTED_MAP_ROWS;const classes=[buffer?"map-buffer":null,observed?"in-visibility":highlight?`move-${highlight}`:null].filter(Boolean).join(" ");hexes.push(<g key={`${q}:${r}`} onClick={moveMode?()=>moveMode.onHexClick({q,r}):undefined}><polygon className={classes||undefined} points={points(center.x,center.y)}><title>{buffer?`${label} · 扩展纯海缓冲区`:`${label} · 原印刷海图`}</title></polygon><text x={center.x} y={center.y+3} className={heatNumber!==undefined?"heat-value":buffer?"buffer-label":undefined}>{heatNumber!==undefined?heatNumber.toFixed(1):`${columnLabel(q)}${row+1}`}</text></g>) }
  const directions=[1,2,3,4,5,6].map(heading=>({heading,tip:headingVector(heading,42),label:headingVector(heading,55)}));
  const dragPolyline=dragPath.length>0?dragPath.map(hex=>{const center=hexCenter(hex.q,hex.r);return `${center.x},${center.y}`}).join(" "):null;
- return <div className="map-frame"><svg ref={svgRef} viewBox="0 0 1280 1180" role="img" aria-label="A 至 HH、1 至 27 六角格战术地图" className={panning?"panning":undefined} style={{touchAction:"none"}} onPointerDown={onSvgPointerDown} onPointerMove={onSvgPointerMove} onPointerUp={onSvgPointerEnd} onPointerCancel={onSvgPointerEnd}><defs><marker id="heading-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path fill="#f4d88c" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs><g className="map-viewport" transform={`translate(${viewport.tx} ${viewport.ty}) scale(${viewport.k})`}>{heatCells}
+ return <div className="map-frame"><svg ref={svgRef} viewBox={`0 0 ${MAP_W} ${MAP_H}`} role="img" aria-label="A 至 TT、1 至 39 固定扩展六角格战术地图；A 至 HH、1 至 27 为原印刷区" className={panning?"panning":undefined} style={{touchAction:"none"}} onPointerDown={onSvgPointerDown} onPointerMove={onSvgPointerMove} onPointerUp={onSvgPointerEnd} onPointerCancel={onSvgPointerEnd}><defs><marker id="heading-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path fill="#f4d88c" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs><g className="map-viewport" transform={`translate(${viewport.tx} ${viewport.ty}) scale(${viewport.k})`}>{heatCells}
   <g className="hexes">{hexes}</g>
   {trajectoryPoints&&<polyline className="move-trajectory" points={trajectoryPoints}/>}
   {dragPolyline&&<polyline className="move-drag-path" points={dragPolyline}/>}
@@ -169,5 +170,5 @@ export function HexMap({ships,torpedoTracks,markers,onSelect,viewerSide,visibili
   })}
   {moveMode&&ships.filter(ship=>ship.id===moveMode.shipId&&ship.position).map(ship=>{const center=hexCenter(ship.position!.q,ship.position!.r);return <circle className="move-origin" key={ship.id} cx={center.x} cy={center.y} r="4"><title>真实起始位置 {hexLabel(ship.position!)}</title></circle>})}
   {markers.filter(marker=>marker.position&&!['fire','sunk'].includes(marker.kind)).map(marker=>{const center=hexCenter(marker.position!.q,marker.position!.r);return <circle className={`map-marker ${marker.kind}`} key={marker.id} cx={center.x} cy={center.y} r="7"><title>{marker.kind}</title></circle>})}
-  </g><g className="heading-compass" transform="translate(82 1088)" aria-label="舰首方向：1右上、2右下、3下、4左下、5左上、6上"><rect x="-70" y="-70" width="140" height="150" rx="8"/><text className="compass-title" x="0" y="72">舰首方向</text>{directions.map(({heading,tip,label})=><g key={heading}><line x1="0" y1="0" x2={tip.x} y2={tip.y} markerEnd="url(#heading-arrow)"/><text x={label.x} y={label.y+3}>{heading}</text></g>)}<circle r="5"/></g></svg><div className="map-zoom-controls" role="group" aria-label="地图缩放"><button title="缩小" onClick={()=>zoomAtCenter(Math.exp(-0.1))}>−</button><button title="放大" onClick={()=>zoomAtCenter(Math.exp(0.1))}>＋</button><button title="重置 1:1" onClick={()=>setViewport({tx:0,ty:0,k:1})}>1:1</button></div></div>;
+  </g><g className="heading-compass" transform={`translate(82 ${MAP_H-92})`} aria-label="舰首方向：1右上、2右下、3下、4左下、5左上、6上"><rect x="-70" y="-70" width="140" height="150" rx="8"/><text className="compass-title" x="0" y="72">舰首方向</text>{directions.map(({heading,tip,label})=><g key={heading}><line x1="0" y1="0" x2={tip.x} y2={tip.y} markerEnd="url(#heading-arrow)"/><text x={label.x} y={label.y+3}>{heading}</text></g>)}<circle r="5"/></g></svg><div className="map-zoom-controls" role="group" aria-label="地图缩放"><button title="缩小" onClick={()=>zoomAtCenter(Math.exp(-0.1))}>−</button><button title="放大" onClick={()=>zoomAtCenter(Math.exp(0.1))}>＋</button><button title="聚焦交战区" onClick={()=>setViewport(DEFAULT_VIEWPORT)}>交战区</button><button title="查看完整扩展海图" onClick={()=>setViewport({tx:0,ty:0,k:1})}>全图</button></div><div className="map-area-legend"><span>原印刷区 A–HH / 1–27</span><span>浅色：扩展纯海缓冲区</span><b>坐标固定 · 不世界平移</b></div></div>;
 }

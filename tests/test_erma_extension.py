@@ -96,7 +96,8 @@ def test_erma_state_machine_ai_match_completes_without_fallback() -> None:
     assert report.request_count == 58
     assert report.fallback_count == 0
     final_state = engine.get(report.game_id)
-    assert final_state.score == {"axis": 5, "allies": 5}
+    assert final_state.score == {"axis": 4, "allies": 0}
+    assert not any(event.type == "world_shifted" for event in final_state.events)
     assert engine.replay(report.game_id).model_dump(mode="json") == final_state.model_dump(mode="json")
 
 

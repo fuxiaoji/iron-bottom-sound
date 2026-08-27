@@ -7,6 +7,16 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field, field_validator
 
 
+# IBS-M-MAIN is the 34×27 printed map.  The engine uses a fixed 12-column /
+# 12-row sea buffer to the east and south so no live counter ever changes its
+# coordinate frame.  This is project extension IBS-R-MAP-01, not source map
+# data; terrain overlays still exist only inside PRINTED_*.
+PRINTED_MAP_COLUMNS = 34
+PRINTED_MAP_ROWS = 27
+MAP_COLUMNS = 46
+MAP_ROWS = 39
+
+
 class Side(StrEnum):
     AXIS = "axis"
     ALLIES = "allies"
@@ -48,23 +58,23 @@ def column_to_index(label: str) -> int:
     normalized = label.upper()
     if len(normalized) == 1 and "A" <= normalized <= "Z":
         return ord(normalized) - 65
-    if len(normalized) == 2 and normalized[0] == normalized[1] and "A" <= normalized[0] <= "H":
+    if len(normalized) == 2 and normalized[0] == normalized[1] and "A" <= normalized[0] <= "T":
         return 26 + ord(normalized[0]) - 65
-    raise ValueError(f"Invalid map column {label!r}; expected A-Z or AA-HH")
+    raise ValueError(f"Invalid map column {label!r}; expected A-Z or AA-TT")
 
 
 def index_to_column(index: int) -> str:
     if 0 <= index <= 25:
         return chr(65 + index)
-    if 26 <= index <= 33:
+    if 26 <= index < MAP_COLUMNS:
         character = chr(65 + index - 26)
         return character * 2
-    raise ValueError("Map column index must be 0 through 33")
+    raise ValueError(f"Map column index must be 0 through {MAP_COLUMNS - 1}")
 
 
 class HexCoord(BaseModel, frozen=True):
-    q: int = Field(ge=0, le=33)
-    r: int = Field(ge=-40, le=40)
+    q: int = Field(ge=0, le=MAP_COLUMNS - 1)
+    r: int = Field(ge=-64, le=64)
 
     @classmethod
     def from_label(cls, label: str) -> "HexCoord":
@@ -85,7 +95,7 @@ class HexCoord(BaseModel, frozen=True):
         dq, dr = self.direction_delta(heading)
         candidate = HexCoord(q=self.q + dq, r=self.r + dr)
         display_row = candidate.r + (candidate.q - (candidate.q & 1)) // 2
-        if not 0 <= display_row <= 26:
+        if not 0 <= display_row < MAP_ROWS:
             raise ValueError("Movement leaves the map")
         return candidate
 

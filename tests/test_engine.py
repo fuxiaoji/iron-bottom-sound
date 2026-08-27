@@ -6,6 +6,8 @@ from iron_bottom_sound.models import (
     GunMountOrder,
     GunneryOrder,
     HexCoord,
+    MAP_COLUMNS,
+    MAP_ROWS,
     IlluminationOrder,
     MarkerState,
     MovementCommand,
@@ -329,7 +331,7 @@ def test_atlanta_rulebook_movement_example_costs_six_mf_for_3pp2() -> None:
     assert final_heading == ((ship.heading - 3) % 6) + 1
 
 
-def test_leaving_map_shifts_every_other_counter_and_emits_rule_event() -> None:
+def test_leaving_fixed_expanded_map_stops_without_translating_any_counter() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=3)
     mover = state.ships["IBS-U-KM-KARL-GALSTER"]
@@ -378,24 +380,25 @@ def test_leaving_map_shifts_every_other_counter_and_emits_rule_event() -> None:
     engine._resolve_movement(state)
 
     assert mover.position == HexCoord.from_label("A10")
-    assert other.position == HexCoord(q=original_other.q + 1, r=original_other.r)
-    assert state.torpedo_tracks[0].position == HexCoord(q=originals[0].q + 1, r=originals[0].r)
-    shifted_track = state.torpedo_tracks[0]
-    expected_track_path = [HexCoord(q=coord.q + 1, r=coord.r) for coord in torpedo_path]
-    assert shifted_track.traversed_hexes == expected_track_path
-    assert shifted_track.launch_position == expected_track_path[0]
-    assert shifted_track.traversed_hexes[-1] == shifted_track.position
+    assert other.position == original_other
+    assert state.torpedo_tracks[0].position == originals[0]
+    fixed_track = state.torpedo_tracks[0]
+    assert fixed_track.traversed_hexes == torpedo_path
+    assert fixed_track.launch_position == torpedo_path[0]
+    assert fixed_track.traversed_hexes[-1] == fixed_track.position
     assert all(
-        left.neighbor(shifted_track.heading) == right
+        left.neighbor(fixed_track.heading) == right
         for left, right in zip(
-            shifted_track.traversed_hexes,
-            shifted_track.traversed_hexes[1:],
+            fixed_track.traversed_hexes,
+            fixed_track.traversed_hexes[1:],
         )
     )
-    assert state.wrecks[0].position == HexCoord(q=originals[1].q + 1, r=originals[1].r)
-    assert state.markers[0].position == HexCoord(q=originals[2].q + 1, r=originals[2].r)
-    event = next(event for event in state.events if event.type == "world_shifted")
-    assert event.rule and event.rule.rule_id == "IBS-R-06.1.8"
+    assert state.wrecks[0].position == originals[1]
+    assert state.markers[0].position == originals[2]
+    assert not any(event.type == "world_shifted" for event in state.events)
+    event = next(event for event in state.events if event.type == "movement_blocked_by_edge")
+    assert event.rule and event.rule.rule_id == "IBS-R-MAP-01"
+    assert event.payload["coordinate_frame_changed"] is False
     assert event.payload["movement_impulse"] == 1
     other_resolution = next(
         event for event in state.events
@@ -403,8 +406,8 @@ def test_leaving_map_shifts_every_other_counter_and_emits_rule_event() -> None:
     )
     assert other_resolution.payload["planned_end_hex"] == original_other.label
     assert other_resolution.payload["actual_end_hex"] == other.position.label
-    assert other_resolution.payload["world_shift_count"] == 1
-    assert other_resolution.payload["world_shift_delta"] == {"dq": 1, "dr": 0}
+    assert other_resolution.payload["world_shift_count"] == 0
+    assert other_resolution.payload["world_shift_delta"] == {"dq": 0, "dr": 0}
     assert other_resolution.payload["secret_side"] == Side.ALLIES.value
 
 
@@ -444,13 +447,12 @@ def test_observe_repairs_legacy_bent_torpedo_trail_without_mutating_state() -> N
     assert state.torpedo_tracks[0].traversed_hexes == legacy_path
 
 
-def test_pathological_map_edge_stops_ship_instead_of_aborting_match() -> None:
-    """6.1.8 病态：出界舰要对侧边缘已有算子、平移会把它推出地图时，引擎不再抛错
-    中止对局，而是把出界舰留在边缘格、其余算子不平移、对局可继续。"""
+def test_fixed_expanded_map_final_edge_stops_ship_instead_of_aborting_match() -> None:
+    """最终缓冲区边缘停车，其他算子保持固定坐标且对局继续。"""
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=3)
     mover = state.ships["IBS-U-KM-KARL-GALSTER"]
-    mover.position = HexCoord.from_label("R27")  # 南缘（display row 26）
+    mover.position = HexCoord.from_label("R39")  # 固定扩展海图南缘
     mover.heading = 4  # 向南（SW）出界
     other = state.ships["IBS-U-RN-JAVELIN"]
     other.position = HexCoord.from_label("C1")  # 北缘（display row 0，偶 q）：南向平移会被推出地图
@@ -465,15 +467,15 @@ def test_pathological_map_edge_stops_ship_instead_of_aborting_match() -> None:
 
     engine._resolve_movement(state)  # 不得抛 ValueError 中止对局
 
-    assert mover.position == HexCoord.from_label("R27")
+    assert mover.position == HexCoord.from_label("R39")
     assert other.position == original_other  # 世界不平移
     event = next(event for event in state.events if event.type == "movement_blocked_by_edge")
-    assert event.rule and event.rule.rule_id == "IBS-R-06.1.8"
-    assert event.payload["edge_hex"] == "R27"
+    assert event.rule and event.rule.rule_id == "IBS-R-MAP-01"
+    assert event.payload["edge_hex"] == "R39"
 
 
-def test_map_edge_shift_preflights_remaining_paths_atomically() -> None:
-    """当前格可平移、但另一舰的剩余航路不可平移时，世界不得发生部分修改。"""
+def test_printed_south_edge_is_now_navigable_buffer_without_world_shift() -> None:
+    """原印刷地图第 27 行不再是可玩区边缘，航行不会平移世界。"""
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=3)
     mover = state.ships["IBS-U-KM-KARL-GALSTER"]
@@ -495,10 +497,10 @@ def test_map_edge_shift_preflights_remaining_paths_atomically() -> None:
 
     engine._resolve_movement(state)
 
-    assert mover.position == HexCoord.from_label("R27")
+    assert mover.position == HexCoord.from_label("Q28")
     assert other.position == HexCoord.from_label("C1")
     assert not any(event.type == "world_shifted" for event in state.events)
-    assert any(event.type == "movement_blocked_by_edge" for event in state.events)
+    assert not any(event.type == "movement_blocked_by_edge" for event in state.events)
 
 
 def test_structured_land_blocks_ship_plan_and_torpedo_track() -> None:
@@ -1663,12 +1665,12 @@ def test_hidden_contacts_setup_seals_two_real_formations_and_two_decoys_per_side
     assert not [ship for ship in state.ships.values() if ship.position]
 
     edge_coords = []
-    for q in range(34):
-        for display_row in (0, 26):
+    for q in range(MAP_COLUMNS):
+        for display_row in (0, MAP_ROWS - 1):
             edge_coords.append(HexCoord(q=q, r=display_row - (q - (q & 1)) // 2))
-    for display_row in range(1, 26):
+    for display_row in range(1, MAP_ROWS - 1):
         edge_coords.append(HexCoord(q=0, r=display_row))
-        edge_coords.append(HexCoord(q=33, r=display_row - 16))
+        edge_coords.append(HexCoord(q=MAP_COLUMNS - 1, r=display_row - (MAP_COLUMNS - 2) // 2))
     used: set[str] = set()
 
     def entry_for(group: list[str]) -> HexCoord:
@@ -1691,7 +1693,7 @@ def test_hidden_contacts_setup_seals_two_real_formations_and_two_decoys_per_side
         display_row = coord.r + (coord.q - (coord.q & 1)) // 2
         if coord.q == 0:
             return 2
-        if coord.q == 33:
+        if coord.q == MAP_COLUMNS - 1:
             return 5
         return 3 if display_row == 0 else 6
 

@@ -23,6 +23,8 @@ from .models import (
     GunMountOrder,
     GunneryOrder,
     HexCoord,
+    MAP_COLUMNS,
+    MAP_ROWS,
     MovementOrder,
     OrderBatch,
     Phase,
@@ -248,7 +250,12 @@ def resolve_setup(engine: "IronBottomEngine", state: GameState) -> None:
 
 def _edge_distance(position: HexCoord, edge: str) -> int:
     row = int("".join(filter(str.isdigit, position.label))) - 1
-    return {"west": position.q, "east": 33 - position.q, "north": row, "south": 26 - row}[edge]
+    return {
+        "west": position.q,
+        "east": MAP_COLUMNS - 1 - position.q,
+        "north": row,
+        "south": MAP_ROWS - 1 - row,
+    }[edge]
 
 
 def choose_withdrawal_edge(state: GameState, ship_id: str) -> str:

@@ -92,6 +92,7 @@
 .heatmap-ship-label{position:absolute;top:2.9rem;left:.6rem;z-index:7;border:1px solid #485554;background:#182426ee;border-radius:6px;padding:.28rem .6rem;font-size:.72rem;color:#f3d797;box-shadow:0 2px 8px #0008}
 
 .hexes text.heat-value{fill:#fff;font-size:7px;font-weight:700;opacity:.94;paint-order:stroke;stroke:#10191b;stroke-width:1.5px}
+.hexes polygon.map-buffer{fill:#9bb8b3;fill-opacity:.14;stroke:#c3d8d2;stroke-dasharray:2 2}.hexes text.buffer-label{fill:#c8ddd7;opacity:.58}.map-area-legend{position:absolute;left:.65rem;top:.65rem;z-index:7;display:grid;gap:.15rem;border:1px solid #60736f;background:#142123e8;padding:.45rem .6rem;font-size:.64rem;color:#bdcbc7;pointer-events:none}.map-area-legend b{color:#efd68e}.map-area-legend span+span{color:#8fb0a8}
 
 /* —— 地图缩放控件 —— */
 .map-zoom-controls{position:absolute;top:.6rem;right:.6rem;z-index:7;display:flex;gap:.25rem;border:1px solid #485554;background:#182426ee;border-radius:6px;padding:.25rem;box-shadow:0 2px 8px #0008}
@@ -118,6 +119,7 @@
 .roster-row-head .readiness.bad{border-color:#a35c51;color:#ef9c90}
 .roster-row-head .readiness.fired{border-color:#a37c31;color:#f0d99f}
 .roster-row-meta{display:flex;flex-wrap:wrap;gap:.12rem .5rem;font-size:.62rem;color:#9eaaa6}
+.roster-formation{border:1px solid #3c514e;background:#111d1f;padding:.28rem;display:grid;gap:.25rem}.roster-formation.detached{border-color:#765f45}.roster-formation-toggle{display:grid;grid-template-columns:1fr auto;gap:.15rem .4rem;align-items:center;width:100%;padding:.35rem .4rem;text-align:left;border:0;border-bottom:1px solid #344744;background:#20302f;color:#ebd69d}.roster-formation-toggle:hover{background:#2b403e}.roster-formation-toggle.static{cursor:default}.roster-formation-toggle small{font-size:.6rem;color:#9eaaa6}.roster-formation-toggle span{grid-column:1/-1;font-size:.6rem;color:#8fc19d}.formation-command-strip{display:grid;grid-template-columns:1fr;gap:.12rem;padding:.2rem .4rem;font-size:.58rem;color:#aebbb6}.formation-ship{display:grid;grid-template-columns:20px minmax(0,1fr);align-items:stretch;gap:.2rem}.formation-role{display:grid;place-items:center;border:1px solid #806f46;background:#352e1d;color:#f3d37b;font:bold .65rem Georgia}.formation-ship .roster-row{min-width:0}
 
 /* 人机大战入口卡片与对手徽标 */
 .vs-card{display:grid;gap:.4rem;border:1px solid #9e8350;background:linear-gradient(145deg,#2d3d38,#202b2a);padding:1rem;min-width:260px;text-align:left}.vs-card>b{font-size:1.12rem}.vs-form{display:grid;gap:.45rem;margin-top:.4rem}.vs-form select{width:100%;background:#0e181a;color:#e9e2d0;border:1px solid #52615f;padding:.5rem;font:inherit}.vs-form button{background:#5b4829;border-color:#c0a05f}.vs-persona{display:grid;gap:.2rem;border-left:2px solid #9e8350;padding:.2rem .55rem;font-size:.72rem;color:#c9c0a8}.vs-persona b{color:#e9d9a8;font-weight:600}

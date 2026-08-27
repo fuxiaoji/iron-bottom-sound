@@ -132,12 +132,12 @@ def test_project_torpedo_path_straight_range_and_edge() -> None:
     assert medium["distance_travelled"] == 14
     assert medium["end_hex"] == "A24"
     # the southern map edge truncates the path with the range still unconsumed
-    a22 = HexCoord.from_label("A22")
-    edge = engine._project_torpedo_path(state, "de-nl-21", a22, 3, 1, 0)
+    a35 = HexCoord.from_label("A35")
+    edge = engine._project_torpedo_path(state, "de-nl-21", a35, 3, 1, 0)
     assert edge["obstacle"] == "edge"
-    assert edge["end_hex"] == "A27"
-    assert edge["distance_travelled"] == 5
-    assert edge["range_remaining"] == 9
+    assert edge["end_hex"] == "A39"
+    assert edge["distance_travelled"] == 4
+    assert edge["range_remaining"] == 10
 
 
 def test_torpedo_launch_anchor_offset_per_authoritative_rule() -> None:
@@ -182,10 +182,10 @@ def test_project_target_position_constant_motion_and_clamp() -> None:
     ship.current_speed = 0
     assert engine._project_target_position(state, ship, 5) == HexCoord.from_label("A10")
     # clamp at the map edge instead of leaving it
-    ship.position = HexCoord.from_label("A24")
+    ship.position = HexCoord.from_label("A36")
     ship.heading = 3
     ship.current_speed = 4
-    assert engine._project_target_position(state, ship, 1) == HexCoord.from_label("A27")
+    assert engine._project_target_position(state, ship, 1) == HexCoord.from_label("A39")
     ship.position = None
     assert engine._project_target_position(state, ship, 1) is None
 

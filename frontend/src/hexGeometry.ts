@@ -1,5 +1,9 @@
 export const HEX_SIZE=24;
 export const HEX_ROW_HEIGHT=HEX_SIZE*Math.sqrt(3);
+export const PRINTED_MAP_COLUMNS=34;
+export const PRINTED_MAP_ROWS=27;
+export const MAP_COLUMNS=46;
+export const MAP_ROWS=39;
 
 export function displayRowToAxial(q:number,row:number){
  return row-Math.floor(q/2);
@@ -59,4 +63,4 @@ if(compassRotations.some((rotation,index)=>headingRotation(index+1)!==rotation))
 const torpedoRotations=[120,180,240,300,0,60];
 if(torpedoRotations.some((rotation,index)=>torpedoCounterRotation(index+1)!==rotation))throw new Error("torpedo counter heading invariant failed");
 if(hexLabel({q:17,r:7})!=="R16"||hexLabel({q:16,r:7})!=="Q16"||hexLabel({q:0,r:0})!=="A1"||hexLabel({q:33,r:10})!=="HH27")throw new Error("IBS-M-MAIN coordinate label invariant failed");
-if(hexLabel(hexFromLabel("HH27"))!=="HH27"||hexFromLabel(hexLabel({q:17,r:7})).q!==17||hexFromLabel("R16").r!==7)throw new Error("hexFromLabel round-trip invariant failed");
+if(hexLabel({q:45,r:16})!=="TT39"||hexLabel(hexFromLabel("TT39"))!=="TT39"||hexLabel(hexFromLabel("HH27"))!=="HH27"||hexFromLabel(hexLabel({q:17,r:7})).q!==17||hexFromLabel("R16").r!==7)throw new Error("fixed expanded map round-trip invariant failed");

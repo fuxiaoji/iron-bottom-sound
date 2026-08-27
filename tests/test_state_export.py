@@ -121,12 +121,12 @@ def test_render_board_dimensions_header_and_legend():
     engine, state = _fresh_engine()
     board = render_board(state, engine, Side.AXIS)
     header_cells = board.splitlines()[0].split()
-    assert header_cells[0] == "A" and header_cells[25] == "Z" and header_cells[33] == "AH"
-    assert len(header_cells) == 34
+    assert header_cells[0] == "A" and header_cells[25] == "Z" and header_cells[33] == "HH" and header_cells[45] == "TT"
+    assert len(header_cells) == 46
     content = _board_content_lines(board)
-    assert len(content) == 27
+    assert len(content) == 39
     for line in content:
-        assert len(line[3:].split(" ")) == 34
+        assert len(line[3:].split(" ")) == 46
     karl = _karl_id(state)
     assert karl in board  # 图例带真实 id
     assert "..=海" in board

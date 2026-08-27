@@ -18,6 +18,8 @@ from .models import (
     ContactSetupOrder,
     GameState,
     HexCoord,
+    MAP_COLUMNS,
+    MAP_ROWS,
     LLMCallAudit,
     MovementOrder,
     OrderBatch,
@@ -48,12 +50,12 @@ class DeterministicCommander(LLMCommander):
     @staticmethod
     def _edge_coords() -> list[HexCoord]:
         result: list[HexCoord] = []
-        for q in range(34):
-            for display_row in (0, 26):
+        for q in range(MAP_COLUMNS):
+            for display_row in (0, MAP_ROWS - 1):
                 result.append(HexCoord(q=q, r=display_row - (q - (q & 1)) // 2))
-        for display_row in range(1, 26):
+        for display_row in range(1, MAP_ROWS - 1):
             result.append(HexCoord(q=0, r=display_row))
-            result.append(HexCoord(q=33, r=display_row - 16))
+            result.append(HexCoord(q=MAP_COLUMNS - 1, r=display_row - (MAP_COLUMNS - 2) // 2))
         return result
 
     @staticmethod
@@ -61,11 +63,11 @@ class DeterministicCommander(LLMCommander):
         display_row = coord.r + (coord.q - (coord.q & 1)) // 2
         if display_row == 0:
             return 3
-        if display_row == 26:
+        if display_row == MAP_ROWS - 1:
             return 6
         if coord.q == 0:
             return 2
-        if coord.q == 33:
+        if coord.q == MAP_COLUMNS - 1:
             return 5
         raise ValueError(f"{coord.label} is not on a map edge")
 
@@ -150,7 +152,7 @@ class DeterministicCommander(LLMCommander):
         occupied = {ship.position.label for ship in state.ships.values() if ship.position and not ship.sunk}
         entries = [
             HexCoord(q=q, r=row - (q - (q & 1)) // 2)
-            for q in range(34) for row in range(27)
+            for q in range(MAP_COLUMNS) for row in range(MAP_ROWS)
         ]
         entries = [
             entry for entry in entries
@@ -288,9 +290,9 @@ _DISCIPLINE_SYSTEM_PROMPT = (
     "- ReinforcementOrder：只增援 reinforcement_candidates.ships 里列出的舰，entry_hex 必须取自"
     "其 entry_hexes（入口格被占则换该列表里其它格）；group_available 为 False 或 ships 为空时，"
     "reinforcements 数组必须留空，不得编造舰船或入口。\n"
-    "- 地图边缘：舰船不要驶出棋盘边缘（棋盘 34 列×27 行，边缘行号见帧里各舰的 hex）。舰队接近"
-    "上下边缘时应减速或转向，避免整队压线；若同时有其它算子（鱼雷/残骸/舰）贴住对侧边缘，引擎"
-    "无法平移整个世界，对局会中止。鱼雷发射也要选择让鱼雷航迹留在图内的方位。\n"
+    "- 地图边缘：舰船不要驶出固定扩展海图边缘（棋盘 46 列×39 行）；A–HH、1–27 是原印刷区，"
+    "东、南侧为纯海缓冲区。上下边缘附近应减速或转向；引擎不会平移任何舰船、鱼雷或历史航迹，"
+    "到达最终边缘只会停车。鱼雷发射也要选择让鱼雷航迹留在图内的方位。\n"
     "所有 ship_id / marker_id / target_id / mount_id / launcher_id 必须来自【世界态帧】或"
     "【合法动作】；示例里的 SAMPLE- 开头 id（含 SAMPLE-M 炮位、SAMPLE-L 发射器）是占位符，"
     "照抄会被引擎判非法并在重试时告知。"
