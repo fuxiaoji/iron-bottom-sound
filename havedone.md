@@ -457,3 +457,10 @@
 - **结构化数据**：`scenario-erma.yaml` 与想定目录统一为 `turns: 12`，胜负元数据为 `end_of_turn_12`；同时保留 `source_turns: 8` 和扩展权威标记。前端继续读取观察中的 `max_turns`，没有复制二马回合常量。
 - **自动终局与回放**：seed 23 的两个状态机 AI 从第 1 回合炮击运行至第 12 回合自动结束，共 90 次阶段决策、0 回退；终局 `turn=max_turns=12`，纯事件回放与在线状态一致。
 - **验证**：二马专项 **7 passed**；全量 **369 passed**（退出码 0，仅既有 Starlette TestClient 弃用提示）；`git diff --check` 通过。重启本地后端后，浏览器新建二马确认显示“第 1/12 回合”且初始阶段仍为炮击。
+
+## 2026-08-27：真实模式、二马与 12 回合补丁增量部署线上
+
+- **增量范围**：以最后一次已记录线上部署提交 `596694f` 为基线，只上传 32 个生产运行文件（178,348 bytes），覆盖后端/前端源码、结构化规则/想定和二马棋子；未上传测试、全套原始规则资料、临时目录、SQLite、战报、`.venv` 或环境密钥。
+- **存档保护**：应用补丁前使用 SQLite Backup API 将在线主库一致性备份到 `/opt/tiedi/backups/pre-5dd2965-20260827-01/iron-bottom-sound.sqlite3`；补丁归档不含 `backend/*.sqlite3*`，没有删除或覆盖旧对局。部署后只新增验证局 `fd8c5afd-bc87-4cf0-b92a-af71615b090f`（无科研同意、无战报）。
+- **构建与服务**：服务器 `npm run build -- --base=/tiedi/` 通过，Vite 43 modules transformed，生成 `index-CSYto-0r.js`；后端导入断言 `ERMA_TURNS=12`，`systemctl restart tiedi` 后服务为 active。
+- **公网验收**：`https://fuwenji.asia/tiedi/` 返回 200 并引用新 bundle；想定目录返回二马 `turns=12/status=playable`；验证局视图为 `turn=1/max_turns=12/phase=gunnery`。
