@@ -338,6 +338,11 @@ def test_leaving_map_shifts_every_other_counter_and_emits_rule_event() -> None:
     mover.heading = 5
     other.position = HexCoord.from_label("R16")
     original_other = other.position
+    torpedo_path = [
+        HexCoord.from_label("Q17"),
+        HexCoord.from_label("R16"),
+        HexCoord.from_label("S16"),
+    ]
     state.torpedo_tracks.append(TorpedoTrack(
         id="edge-track",
         side=Side.AXIS,
@@ -348,6 +353,8 @@ def test_leaving_map_shifts_every_other_counter_and_emits_rule_event() -> None:
         speed_cycle=(0, 0, 0),
         range_remaining=1,
         launched_turn=1,
+        launch_position=torpedo_path[0],
+        traversed_hexes=torpedo_path,
     ))
     state.wrecks.append(WreckState(
         id="edge-wreck", position=HexCoord.from_label("T16"), source_ship_id="test"
@@ -373,11 +380,32 @@ def test_leaving_map_shifts_every_other_counter_and_emits_rule_event() -> None:
     assert mover.position == HexCoord.from_label("A10")
     assert other.position == HexCoord(q=original_other.q + 1, r=original_other.r)
     assert state.torpedo_tracks[0].position == HexCoord(q=originals[0].q + 1, r=originals[0].r)
+    shifted_track = state.torpedo_tracks[0]
+    expected_track_path = [HexCoord(q=coord.q + 1, r=coord.r) for coord in torpedo_path]
+    assert shifted_track.traversed_hexes == expected_track_path
+    assert shifted_track.launch_position == expected_track_path[0]
+    assert shifted_track.traversed_hexes[-1] == shifted_track.position
+    assert all(
+        left.neighbor(shifted_track.heading) == right
+        for left, right in zip(
+            shifted_track.traversed_hexes,
+            shifted_track.traversed_hexes[1:],
+        )
+    )
     assert state.wrecks[0].position == HexCoord(q=originals[1].q + 1, r=originals[1].r)
     assert state.markers[0].position == HexCoord(q=originals[2].q + 1, r=originals[2].r)
     event = next(event for event in state.events if event.type == "world_shifted")
     assert event.rule and event.rule.rule_id == "IBS-R-06.1.8"
     assert event.payload["movement_impulse"] == 1
+    other_resolution = next(
+        event for event in state.events
+        if event.type == "movement_plan_resolved" and event.payload.get("ship_id") == other.id
+    )
+    assert other_resolution.payload["planned_end_hex"] == original_other.label
+    assert other_resolution.payload["actual_end_hex"] == other.position.label
+    assert other_resolution.payload["world_shift_count"] == 1
+    assert other_resolution.payload["world_shift_delta"] == {"dq": 1, "dr": 0}
+    assert other_resolution.payload["secret_side"] == Side.ALLIES.value
 
 
 def test_pathological_map_edge_stops_ship_instead_of_aborting_match() -> None:

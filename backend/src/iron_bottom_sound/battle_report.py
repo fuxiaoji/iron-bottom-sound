@@ -675,6 +675,15 @@ def _plan_table(ai_action: dict[str, Any]) -> list[str]:
     counts = [f"{key}×{len(value)}" for key, value in orders.items()
               if isinstance(value, list) and value]
     lines.append(f"| 订单 | {('，'.join(counts)) or '无'} |")
+    movement_details = []
+    for item in orders.get("movement", []):
+        if not isinstance(item, dict):
+            continue
+        ship_id = item.get("ship_id", "未知舰")
+        plan_text = item.get("plan") or "0"
+        movement_details.append(f"{ship_id}：{plan_text}")
+    if movement_details:
+        lines.append(f"| 移动明细 | {'；'.join(movement_details)} |")
     return lines
 
 
@@ -805,6 +814,13 @@ def build_report_markdown_lite(data: dict[str, Any], game_id: str) -> str:
 def _plan_table_html(ai_action: dict[str, Any]) -> list[str]:
     """一侧 AI 计划表的 HTML 表格。"""
     plan = ai_action.get("plan") or {}
+    orders = plan.get("orders") or {}
+    movement_details = []
+    for item in orders.get("movement", []):
+        if isinstance(item, dict):
+            movement_details.append(
+                f"{item.get('ship_id', '未知舰')}：{item.get('plan') or '0'}"
+            )
     rows = [
         ("态势判断", plan.get("situation_summary") or "—"),
         ("阶段目标", plan.get("phase_goal") or "—"),
@@ -812,9 +828,11 @@ def _plan_table_html(ai_action: dict[str, Any]) -> list[str]:
          "；".join(f"{k}→{v}" for k, v in (plan.get("unit_intents") or {}).items()) or "—"),
         ("应变预案", "；".join(plan.get("contingency") or []) or "—"),
         ("订单",
-         "，".join(f"{k}×{len(v)}" for k, v in (plan.get("orders") or {}).items()
+         "，".join(f"{k}×{len(v)}" for k, v in orders.items()
                    if isinstance(v, list) and v) or "无"),
     ]
+    if movement_details:
+        rows.append(("移动明细", "；".join(movement_details)))
     lines = ["<table>", "<thead><tr><th style='width:80px'>项目</th><th>内容</th></tr></thead>",
              "<tbody>"]
     for key, value in rows:

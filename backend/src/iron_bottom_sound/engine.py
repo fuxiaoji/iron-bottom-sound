@@ -2462,7 +2462,7 @@ class IronBottomEngine:
         ship_paths: dict[str, list[tuple[HexCoord, int, int | None]]],
         contact_paths: dict[str, list[tuple[HexCoord, int]]],
         torpedo_orders: list[TorpedoOrder],
-    ) -> None:
+    ) -> tuple[int, int]:
         leaving_dq, leaving_dr = HexCoord.direction_delta(heading)
         dq, dr = -leaving_dq, -leaving_dr
 
@@ -2504,7 +2504,30 @@ class IronBottomEngine:
             if ship.id != moving_ship_id and not ship.sunk and ship.position:
                 ship.position = self._translated_hex(ship.position, dq, dr)
         for track in state.torpedo_tracks:
+            # A world shift changes the printed-map reference frame, not a
+            # torpedo's course.  Keep every display coordinate in that same
+            # frame; otherwise the UI connects pre-shift history to the
+            # shifted current position and draws a fake turn.
             track.position = self._translated_hex(track.position, dq, dr)
+            translated_history: list[HexCoord] = []
+            for position in track.traversed_hexes:
+                try:
+                    translated_history.append(self._translated_hex(position, dq, dr))
+                except ValueError:
+                    # Historical points may leave the newly referenced printed
+                    # map. They are not live counters and must not veto the
+                    # atomic shift; omit only the no-longer-visible tail.
+                    continue
+            if not translated_history or translated_history[-1] != track.position:
+                translated_history.append(track.position)
+            track.traversed_hexes = translated_history
+            if track.launch_position:
+                try:
+                    track.launch_position = self._translated_hex(
+                        track.launch_position, dq, dr
+                    )
+                except ValueError:
+                    track.launch_position = None
         for wreck in state.wrecks:
             wreck.position = self._translated_hex(wreck.position, dq, dr)
         for marker in state.markers:
@@ -2541,6 +2564,7 @@ class IronBottomEngine:
             },
             rule=self._rule("IBS-R-06.1.8", 7, "6.1 移动机制第8条"),
         )
+        return dq, dr
 
     def _launch_torpedo_order(
         self,
@@ -2657,11 +2681,20 @@ class IronBottomEngine:
             marker.movement_rate = self.movement_cost(order.plan, commands)
         paths: dict[str, list[tuple[HexCoord, int, int | None]]] = {}
         final_headings: dict[str, int] = {}
+        movement_starts: dict[str, HexCoord] = {}
+        movement_plan_labels: dict[str, str] = {}
+        planned_end_labels: dict[str, str] = {}
+        world_shift_deltas: dict[str, list[int]] = {}
+        world_shift_counts: dict[str, int] = {}
         for ship in state.ships.values():
             if ship.sunk or not ship.position:
                 continue
+            movement_starts[ship.id] = ship.position
+            world_shift_deltas[ship.id] = [0, 0]
+            world_shift_counts[ship.id] = 0
             order = movement_orders.get(ship.id, MovementOrder(ship_id=ship.id, plan="0"))
             commands = self.movement_commands(order)
+            movement_plan_labels[ship.id] = self.commands_to_plan(commands)
             if ship.forced_circle_turns and not ship.forced_turn_side:
                 turn = next((command for command in commands if command != "advance"), None)
                 if turn:
@@ -2669,6 +2702,9 @@ class IronBottomEngine:
             trajectory, heading = self._movement_program(ship.position, ship.heading, commands)
             paths[ship.id] = trajectory
             final_headings[ship.id] = heading
+            planned_end_labels[ship.id] = (
+                trajectory[-1][0].label if trajectory else ship.position.label
+            )
             ship.current_speed = self.movement_cost(order.plan, commands)
         track_allowance = {
             track.id: track.speed_cycle[(state.turn - track.launched_turn) % 3]
@@ -2723,7 +2759,7 @@ class IronBottomEngine:
                 except ValueError:
                     pass
                 try:
-                    self._shift_world_for_map_edge(
+                    shift_dq, shift_dr = self._shift_world_for_map_edge(
                         state,
                         moving_ship_id=ship_id,
                         heading=heading,
@@ -2732,6 +2768,12 @@ class IronBottomEngine:
                         contact_paths=contact_paths,
                         torpedo_orders=torpedo_orders,
                     )
+                    for affected_id in world_shift_deltas:
+                        if affected_id == ship_id:
+                            continue
+                        world_shift_deltas[affected_id][0] += shift_dq
+                        world_shift_deltas[affected_id][1] += shift_dr
+                        world_shift_counts[affected_id] += 1
                 except ValueError:
                     # 6.1.8 病态：对侧边缘已有算子，平移会把其推出地图（打印规则未
                     # 定义此情形）。按 6.1.8「把出界舰留在边缘格」的意图：不平移，
@@ -2885,8 +2927,46 @@ class IronBottomEngine:
                 state,
                 "ship_moved",
                 f"{ship.name} 移动至 {ship.position.label if ship.position else '场外'}",
-                payload={"ship_id": ship.id, "position": ship.position.label if ship.position else None, "heading": ship.heading},
+                payload={
+                    "ship_id": ship.id,
+                    "position": ship.position.label if ship.position else None,
+                    "heading": ship.heading,
+                },
                 rule=self._rule("IBS-R-06", 7, "6.0"),
+            )
+            movement_plan = movement_plan_labels.get(ship_id, "0")
+            shift_delta = world_shift_deltas.get(ship_id, [0, 0])
+            shift_count = world_shift_counts.get(ship_id, 0)
+            stop_note = "；受阻后提前停止" if ship_id in stopped else ""
+            shift_note = (
+                f"；另有 {shift_count} 次地图世界平移，坐标修正 "
+                f"dq={shift_delta[0]}, dr={shift_delta[1]}"
+                if shift_count
+                else ""
+            )
+            self._event(
+                state,
+                "movement_plan_resolved",
+                f"{ship.name}：计划 {movement_plan}，"
+                f"{movement_starts[ship_id].label} → 原计划终点 "
+                f"{planned_end_labels[ship_id]}；同步结算实际终点 "
+                f"{ship.position.label if ship.position else '场外'}{shift_note}{stop_note}",
+                payload={
+                    "secret_side": ship.side.value,
+                    "ship_id": ship.id,
+                    "plan": movement_plan,
+                    "start_hex": movement_starts[ship_id].label,
+                    "planned_end_hex": planned_end_labels[ship_id],
+                    "actual_end_hex": ship.position.label if ship.position else None,
+                    "world_shift_count": shift_count,
+                    "world_shift_delta": {"dq": shift_delta[0], "dr": shift_delta[1]},
+                    "stopped_early": ship_id in stopped,
+                },
+                rule=(
+                    self._rule("IBS-R-06.1.8", 7, "6.1 移动机制第8条")
+                    if shift_count
+                    else self._rule("IBS-R-06", 7, "6.0")
+                ),
             )
             if ship.forced_straight_turns:
                 ship.forced_straight_turns -= 1

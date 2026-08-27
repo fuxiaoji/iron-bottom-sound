@@ -22,6 +22,7 @@ from iron_bottom_sound.models import (
     GameOptions,
     HexCoord,
     LLMCallAudit,
+    MovementOrder,
     OptionalRules,
     OrderBatch,
     Phase,
@@ -461,3 +462,31 @@ def test_markdown_contains_plan_table_and_reasoning(tmp_path) -> None:
     assert "**同盟思考过程**" in md and "先评估入口格" in md
     assert "| 态势判断 | 确认无增援 |" in md
     assert "第 1 回合" in md
+
+
+def test_plan_table_lists_each_ship_movement_plan() -> None:
+    batch = OrderBatch(
+        side=Side.AXIS,
+        phase=Phase.MOVEMENT_PLANNING,
+        movement=[
+            MovementOrder(ship_id="IBS-U-KM-KARL-GALSTER", plan="2P3"),
+            MovementOrder(ship_id="IBS-U-KM-RICHARD-BEITZEN", plan="5"),
+        ],
+    )
+    action = {
+        "plan": AIPlanSheet(
+            turn=1,
+            phase=Phase.MOVEMENT_PLANNING,
+            situation_summary="保持队形",
+            phase_goal="同步推进",
+            orders=batch.model_dump(mode="json"),
+        ).model_dump(mode="json")
+    }
+
+    markdown = "\n".join(br._plan_table(action))
+    html = "\n".join(br._plan_table_html(action))
+
+    assert "| 移动明细 |" in markdown
+    assert "IBS-U-KM-KARL-GALSTER：2P3" in markdown
+    assert "IBS-U-KM-RICHARD-BEITZEN：5" in markdown
+    assert "移动明细" in html and "IBS-U-KM-KARL-GALSTER：2P3" in html
