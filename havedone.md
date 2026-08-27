@@ -387,3 +387,12 @@
 - **重启 + 全链路线上验证（公共域名直测）**：`/tiedi/` 200；scenarios API 正常；建 `ai_profile=evolved` 人机局 → 玩家未提交时 `ai-opponent(profile=evolved)` **409 而非 422**（风格过校验）；玩家提交增援后冠军真出招 `{"valid":true,"ai_submitted":true}`。systemd 无启动报错。
 - **线上遗留**：验证局 `5c5afda2-...`（IBS-S-03 seed 5，ai_profile=evolved）写入线上 DB（1 局，无科研同意，不碍事）。
 - **部署教训**：SFTP 对某特定文件名 open 瞬时 ENOENT（同名大文件换名即好，怀疑残留/tmp 状态）→ 遇到即换名重传；大文件 SFTP 在本链路 ~1.4MB/s，59s 传 88MB，确认后删临时包。
+
+## 2026-08-27：多模态 LLM 可见地图与智谱接口
+
+- 提交 `d7ede17`：将固定 DeepSeek 对手解耦为请求级供应商/模型配置，新增智谱 BigModel 官方兼容端点；玩家可在首页选择 `zhipu/deepseek`、手填模型并开关可见地图。
+- 每个 LLM 命令阶段发送阵营过滤的 `PlayerObservation`、合法动作 Schema、文字棋盘和服务端 PNG；图像复用战报地图渲染器，不读取浏览器 DOM、调试图层或任何一方秘密计划。智谱消息使用 `text + image_url(data:image/png;base64)`，且不发送 DeepSeek 专属 `thinking/reasoning_effort`。
+- 密钥仍仅存在浏览器 React 内存与后端 `_user_llm_keys` 进程内存；新增配置也不进入 `GameState`、SQLite、事件、战报或审计。供应商错误仅保留状态码与脱敏消息摘要。
+- 证据：`tests/test_llm_multimodal.py` 覆盖智谱端点、指定模型不静默替换、PNG 签名/尺寸、双阵营图像不同且同种子确定、密钥不进入审计；LLM/战报相关 `61 passed`。TypeScript 检查通过，Vite `40 modules transformed` 生产构建通过；浏览器确认默认“智谱 BigModel + glm-5.3-flash + 发送可见地图”，供应商切换会更新建议模型。
+- 全量测试运行到 `335` 项时仅 `tests/test_ship_records.py::test_all_playable_and_reinforcement_ships_have_verified_records` 失败：用户并行“二马”扩展已把加载记录从 30 增为 54，旧测试仍硬编码 30；该失败不在本提交文件内，本批次未回退或改写其未提交数据。
+- 真实调用状态：官方文档当前以 `glm-5v-turbo` 演示图像输入，未核实 `glm-5.3-flash`。用户密钥未写入命令或测试；真实端点调用待发送密钥及阵营地图前的即时授权。
