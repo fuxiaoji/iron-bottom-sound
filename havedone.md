@@ -396,3 +396,11 @@
 - 证据：`tests/test_llm_multimodal.py` 覆盖智谱端点、指定模型不静默替换、PNG 签名/尺寸、双阵营图像不同且同种子确定、密钥不进入审计；LLM/战报相关 `61 passed`。TypeScript 检查通过，Vite `40 modules transformed` 生产构建通过；浏览器确认默认“智谱 BigModel + glm-5.3-flash + 发送可见地图”，供应商切换会更新建议模型。
 - 全量测试运行到 `335` 项时仅 `tests/test_ship_records.py::test_all_playable_and_reinforcement_ships_have_verified_records` 失败：用户并行“二马”扩展已把加载记录从 30 增为 54，旧测试仍硬编码 30；该失败不在本提交文件内，本批次未回退或改写其未提交数据。
 - 真实调用状态：官方文档当前以 `glm-5v-turbo` 演示图像输入，未核实 `glm-5.3-flash`。用户密钥未写入命令或测试；真实端点调用待发送密钥及阵营地图前的即时授权。
+
+## 2026-08-27：导入“二马”扩展想定并接入状态机 AI（提交 `3f23f69`）
+
+- **来源与审计**：逐页核验 `二马_想定.pdf` 和日美船表图，导入规范 PDF、想定页、船表总览/分国记录图及非舰娘棋子剪影；扩展来源清单进入 `resources/originals/extensions/erma/source-manifest.yaml`，根清单更新为 **311 个规范文件 / 315 条来源路径**。同名“大和”棋子哈希冲突使用 `日本-BB-大和-二马.png` 隔离，原素材保持原哈希。
+- **想定与船表**：新增可玩 `IBS-S-EM-01`（第二次马里亚纳海战，8 回合，日方能见度 15、美方 13，第 1 回合从炮击开始），完整保存自由部署区域、交替部署、101+ 炮击命中扩展、日方 3.9 英寸穿甲特例和第 8 回合计分/25 分差胜负；录入双方各 12 艘共 **24 艘**舰船的舰体行、速度、装甲、主/副/高射炮、鱼雷装载/备雷、雷达、MFC 与 VP。引擎默认编队仅用于立即开局，不改变来源规定的自由部署约束。
+- **解耦与接入**：船表加载器改为基础数据 + `ships/extensions/*.yaml` 扩展发现；想定加载按 catalog 的 `definition` 解耦，不再假设纯数字 ID；新增 `scenario_rules.py`，把想定 1/3/二马的命中、穿甲和胜负例外从臃肿的通用引擎抽出。没有复制用户新 AI：新想定直接复用 `TacticalCommander` 的 `observe → legal_actions → submit_orders → advance` 接口。
+- **完整终局证据**：`IBS-S-EM-01` 双方状态机 AI、seed 23 从第 1 回合炮击运行至第 8 回合自动终局；共 **58 次阶段决策、0 回退、0 人工状态修改、700 个事件**，最终轴心 42：同盟 13，轴心以 29 分差获胜；终局事件回放重建与在线状态完全一致。
+- **验证**：扩展定向 **10 passed**；全量 **345 passed**（唯一提示为既有 Starlette TestClient 弃用警告）；TypeScript `tsc -b` 通过，Vite **40 modules transformed** 生产构建通过；`git diff --check` 通过；新增 PDF/PNG 均由 Git LFS 管理，未写入真实 API 密钥。
