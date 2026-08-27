@@ -4,7 +4,7 @@
 
 - 稳定想定 ID：`IBS-S-EM-01`
 - 标题：第二次马里亚纳海战（内南洋水雷强袭战）
-- 日期：1944-06-21；8 回合
+- 日期：1944-06-21；当前项目设定为 12 回合（原扩展资料为 8 回合）
 - 想定来源：`resources/originals/extensions/erma/scenario/second-battle-of-the-philippine-sea-zh.pdf`（2 页）
 - 船表来源：`resources/originals/extensions/erma/records/erma-ship-records-overview.png`（日军第 1 页、美军第 2 页）
 - 原始路径、SHA-256、重复别名与页数由 `resources/originals/manifest.json` 和扩展内 `source-manifest.yaml` 追踪。
@@ -17,6 +17,7 @@
 | `IBS-S-EM-01-R2` | 炮击命中表增加 101–120、121+ 两行，全部 18 个 D66 单元逐格转录。 | 想定 PDF 第 2 页 | `verified_source → structured → executable → tested` |
 | `IBS-S-EM-01-R3` | 日军 3.9 英寸炮仍遵守 4 英寸炮射程限制；穿甲检定改用 3 英寸炮数据。 | 想定 PDF 第 2 页 | `verified_source → structured → executable → tested` |
 | `IBS-S-EM-01-R4` | 第 8 回合结束计分：每 3 点舰体损失 1 分；BB 的 MFC、雷达、每座主炮各损失 1 分，每 2 点速力损失 1 分；领先 25 分胜，否则平局。 | 想定 PDF 第 2 页 | `verified_source → structured → executable → tested` |
+| `IBS-S-EM-01-R5` | 将对局上限与 R4 的终局计分时点延后到第 12 回合；计分公式和 25 分门槛不变。此项是用户指定的项目扩展，不是原 PDF 内容。 | 用户需求，2026-08-27 | `structured → executable → tested` |
 
 ## 初设实现边界
 

@@ -13,9 +13,20 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_erma_catalog_definition_and_counter_assets_are_complete() -> None:
-    assert any(item["id"] == "IBS-S-EM-01" and item["status"] == "playable" for item in scenario_catalog())
+    catalog_entry = next(item for item in scenario_catalog() if item["id"] == "IBS-S-EM-01")
+    assert catalog_entry["status"] == "playable"
+    assert catalog_entry["turns"] == 12
     scenario = load_scenario("IBS-S-EM-01")
-    assert scenario["turns"] == 8
+    assert scenario["turns"] == 12
+    assert scenario["source_turns"] == 8
+    assert scenario["victory"]["evaluated_at"] == "end_of_turn_12"
+    assert next(rule for rule in scenario["scenario_rules"] if rule["id"] == "IBS-S-EM-01-R5") == {
+        "id": "IBS-S-EM-01-R5",
+        "kind": "user_extended_turn_limit",
+        "turns": 12,
+        "replaces_source_turn_limit": 8,
+        "authority": "user_requested_project_extension",
+    }
     assert scenario["visibility"] == {"axis": 15, "allies": 13}
     assert scenario["setup"]["zones"]["axis"] == {
         "from": "A14", "to": "Q1", "side": "northwest", "include_line": False,
@@ -93,10 +104,10 @@ def test_erma_state_machine_ai_match_completes_without_fallback() -> None:
     )
     assert report.passed, report.failure_reason
     assert report.completed
-    assert report.request_count == 58
+    assert report.request_count == 90
     assert report.fallback_count == 0
     final_state = engine.get(report.game_id)
-    assert final_state.score == {"axis": 4, "allies": 0}
+    assert final_state.turn == final_state.max_turns == 12
     assert not any(event.type == "world_shifted" for event in final_state.events)
     assert engine.replay(report.game_id).model_dump(mode="json") == final_state.model_dump(mode="json")
 

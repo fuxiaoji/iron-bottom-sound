@@ -4,7 +4,9 @@ title: 第二次马里亚纳海战（内南洋水雷强袭战）
 date: 1944-06-21
 status: playable
 source: {document: extensions/erma/scenario/second-battle-of-the-philippine-sea-zh.pdf, pdf_pages: [1, 2], status: verified_source}
-turns: 8
+turns: 12
+source_turns: 8
+turn_limit_authority: user_requested_project_extension
 initial_phase: gunnery
 visibility: {axis: 15, allies: 13}
 optional_rules: []
@@ -34,9 +36,10 @@ scenario_rules:
   - {id: IBS-S-EM-01-R2, kind: gunnery_hit_table_extension, table: erma-gunnery-hit-extension.csv, source_page: 2}
   - {id: IBS-S-EM-01-R3, kind: japanese_3_9_penetrates_as_3_inch, source_page: 2}
   - {id: IBS-S-EM-01-R4, kind: damage_points_victory, margin: 25, source_page: 2}
+  - {id: IBS-S-EM-01-R5, kind: user_extended_turn_limit, turns: 12, replaces_source_turn_limit: 8, authority: user_requested_project_extension}
 victory:
   kind: erma_damage_points
-  evaluated_at: end_of_turn_8
+  evaluated_at: end_of_turn_12
   win_margin: 25
   scoring:
     hull_loss: {per: 3, points: 1}
