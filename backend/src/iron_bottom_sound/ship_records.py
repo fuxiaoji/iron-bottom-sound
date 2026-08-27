@@ -18,12 +18,24 @@ def _merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
 
 
 def load_ship_records() -> dict[str, ShipRecord]:
-    document = read_yaml(STRUCTURED / "ships" / "ship-records.yaml")
-    families = document["families"]
+    paths = [STRUCTURED / "ships" / "ship-records.yaml"]
+    extension_root = STRUCTURED / "ships" / "extensions"
+    if extension_root.exists():
+        paths.extend(sorted(extension_root.glob("*.yaml")))
+    documents = [read_yaml(path) for path in paths]
+    families: dict[str, dict[str, Any]] = {}
+    for document in documents:
+        overlap = set(families) & set(document.get("families", {}))
+        if overlap:
+            raise ValueError(f"Duplicate ship-record families: {sorted(overlap)}")
+        families.update(document.get("families", {}))
     records: dict[str, ShipRecord] = {}
-    for record_id, override in document["records"].items():
-        family_id = override["family"]
-        payload = _merge(families[family_id], {key: value for key, value in override.items() if key != "family"})
-        payload["id"] = record_id
-        records[record_id] = ShipRecord.model_validate(payload)
+    for document in documents:
+        for record_id, override in document.get("records", {}).items():
+            if record_id in records:
+                raise ValueError(f"Duplicate ship record {record_id}")
+            family_id = override["family"]
+            payload = _merge(families[family_id], {key: value for key, value in override.items() if key != "family"})
+            payload["id"] = record_id
+            records[record_id] = ShipRecord.model_validate(payload)
     return records

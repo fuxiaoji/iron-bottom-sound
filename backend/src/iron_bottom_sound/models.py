@@ -141,7 +141,7 @@ class WeaponMount(BaseModel):
 
 class GunMountRecord(BaseModel):
     id: str
-    kind: Literal["primary", "secondary"]
+    kind: Literal["primary", "secondary", "tertiary"]
     position: MountPosition
     firepower: int = Field(gt=0)
     caliber: float = Field(gt=0)
@@ -181,7 +181,7 @@ class ShipRecord(BaseModel):
     name: str
     ship_type: str
     displacement_band: Literal["A", "B", "C", "D", "E", "F", "G", "H", "I"]
-    hull_rows: tuple[int, int, int]
+    hull_rows: tuple[int, ...]
     speed_damage_track: tuple[tuple[int, ...], tuple[int, ...], tuple[int, ...]]
     guns: tuple[GunMountRecord, ...]
     torpedo_launchers: tuple[TorpedoLauncherRecord, ...] = ()
@@ -207,6 +207,13 @@ class ShipRecord(BaseModel):
     def descending_speed_rows(cls, value: tuple[tuple[int, ...], tuple[int, ...], tuple[int, ...]]):
         if any(not row or any(left <= right for left, right in zip(row, row[1:])) for row in value):
             raise ValueError("Each speed-damage row must be non-empty and strictly descending")
+        return value
+
+    @field_validator("hull_rows")
+    @classmethod
+    def positive_hull_rows(cls, value: tuple[int, ...]) -> tuple[int, ...]:
+        if not value or any(boxes <= 0 for boxes in value):
+            raise ValueError("Hull rows must be non-empty and contain only positive box counts")
         return value
 
 

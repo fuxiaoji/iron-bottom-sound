@@ -1,0 +1,284 @@
+schema_version: 1
+source:
+  document: extensions/erma/records/erma-ship-records-overview.png
+  pages: {ijn: 1, usn: 2}
+  status: verified_source
+status: structured
+families:
+  erma-ijn-yamato-bb:
+    ship_type: BB
+    displacement_band: I
+    hull_rows: [9, 9, 9]
+    speed_damage_track: [[5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 45, caliber: 18.1, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 45, caliber: 18.1, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: stern, firepower: 45, caliber: 18.1, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: bow, firepower: 6, caliber: 6.1, arcs: [bow, port, starboard]}
+      - {id: S2, kind: secondary, position: stern, firepower: 6, caliber: 6.1, arcs: [port, starboard, stern]}
+      - {id: T-P1, kind: tertiary, position: port, firepower: 3, caliber: 5, arcs: [port]}
+      - {id: T-P2, kind: tertiary, position: port, firepower: 2, caliber: 5, arcs: [port]}
+      - {id: T-P3, kind: tertiary, position: port, firepower: 3, caliber: 5, arcs: [port]}
+      - {id: T-P4, kind: tertiary, position: port, firepower: 2, caliber: 5, arcs: [port]}
+      - {id: T-P5, kind: tertiary, position: port, firepower: 3, caliber: 5, arcs: [port]}
+      - {id: T-P6, kind: tertiary, position: port, firepower: 2, caliber: 5, arcs: [port]}
+      - {id: T-S1, kind: tertiary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
+      - {id: T-S2, kind: tertiary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
+      - {id: T-S3, kind: tertiary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
+      - {id: T-S4, kind: tertiary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
+      - {id: T-S5, kind: tertiary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
+      - {id: T-S6, kind: tertiary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
+    armour: {primary: 24, secondary: 6, belt: 16, bridge: 18}
+    radar: true
+  erma-ijn-azuma-cb:
+    ship_type: CB
+    displacement_band: F
+    hull_rows: [4, 4, 4, 4]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 23, caliber: 12.2, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 23, caliber: 12.2, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: stern, firepower: 23, caliber: 12.2, arcs: [port, starboard, stern]}
+      - {id: S-P1, kind: secondary, position: port, firepower: 3, caliber: 3.9, arcs: [port]}
+      - {id: S-P2, kind: secondary, position: port, firepower: 2, caliber: 3.9, arcs: [port]}
+      - {id: S-P3, kind: secondary, position: port, firepower: 3, caliber: 3.9, arcs: [port]}
+      - {id: S-P4, kind: secondary, position: port, firepower: 2, caliber: 3.9, arcs: [port]}
+      - {id: S-S1, kind: secondary, position: starboard, firepower: 3, caliber: 3.9, arcs: [starboard]}
+      - {id: S-S2, kind: secondary, position: starboard, firepower: 2, caliber: 3.9, arcs: [starboard]}
+      - {id: S-S3, kind: secondary, position: starboard, firepower: 3, caliber: 3.9, arcs: [starboard]}
+      - {id: S-S4, kind: secondary, position: starboard, firepower: 2, caliber: 3.9, arcs: [starboard]}
+    armour: {primary: 13, secondary: 2, belt: 8.3, bridge: 8.3}
+    radar: true
+  erma-ijn-ishikari-cb:
+    ship_type: CB
+    displacement_band: F
+    hull_rows: [4, 4, 4, 4, 4]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns: &ishikari_guns
+      - {id: P1, kind: primary, position: bow, firepower: 23, caliber: 12.2, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 23, caliber: 12.2, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: stern, firepower: 23, caliber: 12.2, arcs: [port, starboard, stern]}
+      - {id: S-P1, kind: secondary, position: port, firepower: 3, caliber: 3.9, arcs: [port]}
+      - {id: S-P2, kind: secondary, position: port, firepower: 2, caliber: 3.9, arcs: [port]}
+      - {id: S-P3, kind: secondary, position: port, firepower: 3, caliber: 3.9, arcs: [port]}
+      - {id: S-P4, kind: secondary, position: port, firepower: 2, caliber: 3.9, arcs: [port]}
+      - {id: S-S1, kind: secondary, position: starboard, firepower: 3, caliber: 3.9, arcs: [starboard]}
+      - {id: S-S2, kind: secondary, position: starboard, firepower: 2, caliber: 3.9, arcs: [starboard]}
+      - {id: S-S3, kind: secondary, position: starboard, firepower: 3, caliber: 3.9, arcs: [starboard]}
+      - {id: S-S4, kind: secondary, position: starboard, firepower: 2, caliber: 3.9, arcs: [starboard]}
+    torpedo_launchers:
+      - {id: TT-P1, position: port, arcs: [port], torpedoes: 2, reloads: 2}
+      - {id: TT-P2, position: port, arcs: [port], torpedoes: 2, reloads: 2}
+      - {id: TT-S1, position: starboard, arcs: [starboard], torpedoes: 2, reloads: 2}
+      - {id: TT-S2, position: starboard, arcs: [starboard], torpedoes: 2, reloads: 2}
+    torpedo_type: jp-24-type93
+    armour: {primary: 13, secondary: 2, belt: 8.3, bridge: 8.3}
+    radar: true
+  erma-ijn-ibuki-ca:
+    ship_type: CA
+    displacement_band: D
+    hull_rows: [5, 5, 5]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns: &ibuki_guns
+      - {id: P1, kind: primary, position: bow, firepower: 6, caliber: 8, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 5, caliber: 8, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: bow, firepower: 5, caliber: 8, arcs: [bow, port, starboard]}
+      - {id: P4, kind: primary, position: stern, firepower: 5, caliber: 8, arcs: [port, starboard, stern]}
+      - {id: P5, kind: primary, position: stern, firepower: 6, caliber: 8, arcs: [port, starboard, stern]}
+      - {id: S-P1, kind: secondary, position: port, firepower: 3, caliber: 3.9, arcs: [port]}
+      - {id: S-P2, kind: secondary, position: port, firepower: 2, caliber: 3.9, arcs: [port]}
+      - {id: S-S1, kind: secondary, position: starboard, firepower: 3, caliber: 3.9, arcs: [starboard]}
+      - {id: S-S2, kind: secondary, position: starboard, firepower: 2, caliber: 3.9, arcs: [starboard]}
+    torpedo_launchers:
+      - {id: TT-P1, position: port, arcs: [port], torpedoes: 2, reloads: 2}
+      - {id: TT-P2, position: port, arcs: [port], torpedoes: 1, reloads: 1}
+      - {id: TT-S1, position: starboard, arcs: [starboard], torpedoes: 2, reloads: 2}
+      - {id: TT-S2, position: starboard, arcs: [starboard], torpedoes: 1, reloads: 1}
+    torpedo_type: jp-24-type93
+    armour: {primary: 1, secondary: 0, belt: 4, bridge: 4}
+    radar: true
+  erma-ijn-kurama-ca:
+    ship_type: CA
+    displacement_band: D
+    hull_rows: [5, 5, 5]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns: *ibuki_guns
+    torpedo_launchers:
+      - {id: TT-P1, position: port, arcs: [port], torpedoes: 3, reloads: 3}
+      - {id: TT-P2, position: port, arcs: [port], torpedoes: 1, reloads: 1}
+      - {id: TT-C, position: midships, arcs: [port, starboard], torpedoes: 3, reloads: 3}
+      - {id: TT-S1, position: starboard, arcs: [starboard], torpedoes: 3, reloads: 3}
+      - {id: TT-S2, position: starboard, arcs: [starboard], torpedoes: 1, reloads: 1}
+    torpedo_type: jp-24-type93
+    armour: {primary: 1, secondary: 0, belt: 4, bridge: 4}
+    radar: true
+  erma-ijn-gokase-cl:
+    ship_type: CL
+    displacement_band: C
+    hull_rows: [4, 3, 3]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 4, caliber: 6, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 4, caliber: 6, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: stern, firepower: 4, caliber: 6, arcs: [port, starboard, stern]}
+      - {id: P4, kind: primary, position: stern, firepower: 4, caliber: 6, arcs: [port, starboard, stern]}
+      - {id: S-P, kind: secondary, position: port, firepower: 2, caliber: 3, arcs: [port]}
+      - {id: S-S, kind: secondary, position: starboard, firepower: 2, caliber: 3, arcs: [starboard]}
+    torpedo_launchers:
+      - {id: TT-P, position: port, arcs: [port], torpedoes: 2, reloads: 2}
+      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 2, reloads: 2}
+    torpedo_type: jp-24-type93
+    armour: {primary: 1, secondary: 0, belt: 2, bridge: 2}
+    radar: true
+  erma-ijn-shimakaze-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows: [3, 2, 2]
+    speed_damage_track: [[7, 6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1]]
+    guns: &erma_ijn_dd_guns
+      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 5, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: stern, firepower: 3, caliber: 5, arcs: [port, starboard, stern]}
+      - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 5, arcs: [port, starboard, stern]}
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 3, reloads: 0}
+      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 3, reloads: 0}
+      - {id: TT3, position: midships, arcs: [port, starboard], torpedoes: 3, reloads: 0}
+    torpedo_type: jp-24-type93
+    radar: true
+  erma-ijn-yugumo-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows: [2, 2, 2]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns: *erma_ijn_dd_guns
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 2}
+      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 2}
+    torpedo_type: jp-24-type93
+  erma-usn-iowa-bb:
+    ship_type: BB
+    displacement_band: H
+    hull_rows: [7, 7, 7]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 38, caliber: 16, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 38, caliber: 16, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: stern, firepower: 38, caliber: 16, arcs: [port, starboard, stern]}
+      - {id: S-P1, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port]}
+      - {id: S-P2, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port]}
+      - {id: S-P3, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port]}
+      - {id: S-P4, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port]}
+      - {id: S-P5, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port]}
+      - {id: S-S1, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
+      - {id: S-S2, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
+      - {id: S-S3, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
+      - {id: S-S4, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
+      - {id: S-S5, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
+    armour: {primary: 17, secondary: 1, belt: 13, bridge: 17}
+    radar: true
+  erma-usn-alaska-cb:
+    ship_type: CB
+    displacement_band: F
+    hull_rows: [4, 4, 4, 4, 4]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 24, caliber: 12, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 24, caliber: 12, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: stern, firepower: 24, caliber: 12, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: bow, firepower: 2, caliber: 5, arcs: [bow, port, starboard]}
+      - {id: S-P1, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port]}
+      - {id: S-P2, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port]}
+      - {id: S-S1, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
+      - {id: S-S2, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
+      - {id: S2, kind: secondary, position: stern, firepower: 2, caliber: 5, arcs: [port, starboard, stern]}
+    armour: {primary: 13, secondary: 1, belt: 9.5, bridge: 9}
+    radar: true
+  erma-usn-des-moines-ca:
+    ship_type: CA
+    displacement_band: D
+    hull_rows: [4, 3, 3, 3, 3]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 20, caliber: 8, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 20, caliber: 8, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: stern, firepower: 20, caliber: 8, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: bow, firepower: 2, caliber: 5, arcs: [bow, port, starboard]}
+      - {id: S2, kind: secondary, position: stern, firepower: 2, caliber: 5, arcs: [port, starboard, stern]}
+      - {id: T-P1, kind: tertiary, position: port, firepower: 3, caliber: 3, arcs: [port]}
+      - {id: T-P2, kind: tertiary, position: port, firepower: 2, caliber: 3, arcs: [port]}
+      - {id: T-P3, kind: tertiary, position: port, firepower: 2, caliber: 3, arcs: [port]}
+      - {id: T-P4, kind: tertiary, position: port, firepower: 3, caliber: 3, arcs: [port]}
+      - {id: T-S1, kind: tertiary, position: starboard, firepower: 3, caliber: 3, arcs: [starboard]}
+      - {id: T-S2, kind: tertiary, position: starboard, firepower: 2, caliber: 3, arcs: [starboard]}
+      - {id: T-S3, kind: tertiary, position: starboard, firepower: 2, caliber: 3, arcs: [starboard]}
+      - {id: T-S4, kind: tertiary, position: starboard, firepower: 3, caliber: 3, arcs: [starboard]}
+    armour: {primary: 8, secondary: 1, belt: 6, bridge: 6.5}
+    radar: true
+  erma-usn-worcester-cl:
+    ship_type: CL
+    displacement_band: D
+    hull_rows: [5, 4, 4]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 5, caliber: 6, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 5, caliber: 6, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: bow, firepower: 5, caliber: 6, arcs: [bow, port, starboard]}
+      - {id: P4, kind: primary, position: stern, firepower: 5, caliber: 6, arcs: [port, starboard, stern]}
+      - {id: P5, kind: primary, position: stern, firepower: 5, caliber: 6, arcs: [port, starboard, stern]}
+      - {id: P6, kind: primary, position: stern, firepower: 5, caliber: 6, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: bow, firepower: 1, caliber: 3, arcs: [bow, port, starboard]}
+      - {id: S-P1, kind: secondary, position: port, firepower: 2, caliber: 3, arcs: [port]}
+      - {id: S-P2, kind: secondary, position: port, firepower: 1, caliber: 3, arcs: [port]}
+      - {id: S-P3, kind: secondary, position: port, firepower: 2, caliber: 3, arcs: [port]}
+      - {id: S-S1, kind: secondary, position: starboard, firepower: 2, caliber: 3, arcs: [starboard]}
+      - {id: S-S2, kind: secondary, position: starboard, firepower: 1, caliber: 3, arcs: [starboard]}
+      - {id: S-S3, kind: secondary, position: starboard, firepower: 2, caliber: 3, arcs: [starboard]}
+      - {id: S2, kind: secondary, position: stern, firepower: 1, caliber: 3, arcs: [port, starboard, stern]}
+    armour: {primary: 5, secondary: 0, belt: 5, bridge: 5}
+    radar: true
+  erma-usn-sumner-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows: [3, 2, 2]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 5, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 3, caliber: 5, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 5, arcs: [port, starboard, stern]}
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 3, reloads: 0}
+      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 3, reloads: 0}
+    torpedo_type: us-21-mk15-1942
+    radar: true
+records:
+  IBS-U-IJN-ERMA-YAMATO: {family: erma-ijn-yamato-bb, name: 大和, vp: 66, source_page: 1}
+  IBS-U-IJN-ERMA-MUSASHI: {family: erma-ijn-yamato-bb, name: 武藏, vp: 65, source_page: 1}
+  IBS-U-IJN-ERMA-SHINANO: {family: erma-ijn-yamato-bb, name: 信浓, vp: 65, source_page: 1}
+  IBS-U-IJN-ERMA-AZUMA: {family: erma-ijn-azuma-cb, name: 吾妻, vp: 32, source_page: 1}
+  IBS-U-IJN-ERMA-ISHIKARI: {family: erma-ijn-ishikari-cb, name: 石狩, vp: 32, source_page: 1}
+  IBS-U-IJN-ERMA-IBUKI: {family: erma-ijn-ibuki-ca, name: 伊吹, vp: 16, source_page: 1}
+  IBS-U-IJN-ERMA-KURAMA: {family: erma-ijn-kurama-ca, name: 鞍马, vp: 16, source_page: 1}
+  IBS-U-IJN-ERMA-GOKASE: {family: erma-ijn-gokase-cl, name: 五濑, vp: 10, source_page: 1}
+  IBS-U-IJN-ERMA-SHIMAKAZE: {family: erma-ijn-shimakaze-dd, name: 岛风, vp: 7, source_page: 1}
+  IBS-U-IJN-ERMA-KAZEGUMO: {family: erma-ijn-yugumo-dd, name: 风云, vp: 4, source_page: 1}
+  IBS-U-IJN-ERMA-NAGANAMI: {family: erma-ijn-yugumo-dd, name: 长波, vp: 4, source_page: 1}
+  IBS-U-IJN-ERMA-MAKINAMI:
+    family: erma-ijn-yugumo-dd
+    name: 卷波
+    vp: 4
+    source_page: 1
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+  IBS-U-USN-ERMA-IOWA: {family: erma-usn-iowa-bb, name: 衣阿华, vp: 44, source_page: 2}
+  IBS-U-USN-ERMA-NEW-JERSEY: {family: erma-usn-iowa-bb, name: 新泽西, vp: 43, source_page: 2}
+  IBS-U-USN-ERMA-MISSOURI: {family: erma-usn-iowa-bb, name: 密苏里, vp: 43, source_page: 2}
+  IBS-U-USN-ERMA-WISCONSIN: {family: erma-usn-iowa-bb, name: 威斯康星, vp: 43, source_page: 2}
+  IBS-U-USN-ERMA-ALASKA: {family: erma-usn-alaska-cb, name: 阿拉斯加, vp: 30, source_page: 2}
+  IBS-U-USN-ERMA-GUAM: {family: erma-usn-alaska-cb, name: 关岛, vp: 30, source_page: 2}
+  IBS-U-USN-ERMA-DES-MOINES: {family: erma-usn-des-moines-ca, name: 得梅因, vp: 16, source_page: 2}
+  IBS-U-USN-ERMA-SALEM: {family: erma-usn-des-moines-ca, name: 塞勒姆, vp: 16, source_page: 2}
+  IBS-U-USN-ERMA-WORCESTER: {family: erma-usn-worcester-cl, name: 伍斯特, vp: 12, source_page: 2}
+  IBS-U-USN-ERMA-ALLEN-M-SUMNER: {family: erma-usn-sumner-dd, name: 艾伦·M·萨姆纳, vp: 3, source_page: 2}
+  IBS-U-USN-ERMA-INGRAHAM: {family: erma-usn-sumner-dd, name: 英格拉罕, vp: 3, source_page: 2}
+  IBS-U-USN-ERMA-COOPER: {family: erma-usn-sumner-dd, name: 库珀, vp: 3, source_page: 2}

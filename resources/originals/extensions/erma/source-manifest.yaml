@@ -1,0 +1,34 @@
+schema_version: 1
+extension: erma
+source_root: D:\desktop\铁底湾\二马
+documents:
+  - {canonical: resources/originals/extensions/erma/scenario/second-battle-of-the-philippine-sea-zh.pdf, original: 二马_想定.pdf}
+  - {canonical: resources/originals/extensions/erma/records/erma-ship-records-overview.png, original: 二马_船表.png}
+  - {canonical: resources/originals/extensions/erma/records/erma-ijn-ship-records.png, original: images/二马_日军船表.png}
+  - {canonical: resources/originals/extensions/erma/records/erma-usn-ship-records.png, original: images/二马_美军船表.png}
+  - {canonical: resources/originals/extensions/erma/scenario/erma-scenario-sheet.png, original: images/二马_想定.png}
+  - {canonical: resources/originals/assets/images/日本-BB-大和-二马.png, original: images/日本-BB-大和.png}
+assets:
+  - 美国-BB-密苏里.png
+  - 美国-BB-威斯康星.png
+  - 美国-BB-新泽西.png
+  - 美国-BB-衣阿华.png
+  - 美国-CA-得梅因.png
+  - 美国-CA-塞勒姆.png
+  - 美国-CB-阿拉斯加.png
+  - 美国-CB-关岛.png
+  - 美国-CL-伍斯特.png
+  - 美国-DD-艾伦·M·萨姆纳.png
+  - 美国-DD-库珀.png
+  - 美国-DD-英格拉罕.png
+  - 日本-BB-武藏.png
+  - 日本-BB-信浓.png
+  - 日本-CA-鞍马.png
+  - 日本-CA-伊吹.png
+  - 日本-CB-石狩.png
+  - 日本-CB-吾妻.png
+  - 日本-CL-五濑.png
+  - 日本-DD-岛风.png
+  - 日本-DD-风云.png
+  - 日本-DD-长波.png
+  - 日本-DD-卷波.png

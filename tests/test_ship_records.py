@@ -18,9 +18,9 @@ def test_all_playable_and_reinforcement_ships_have_verified_records() -> None:
         scenario = yaml.safe_load((STRUCTURED / "scenarios" / f"scenario-{number:02d}.yaml").read_text(encoding="utf-8"))
         required.update(ship["id"] for ship in scenario["ships"])
         required.update(ship["id"] for ship in scenario.get("reinforcements", {}).get("ships", []))
-    assert len(records) == 30
-    assert required == set(records)
-    assert all(record.source_page in {2, 3, 4, 5} for record in records.values())
+    assert len(records) == 54
+    assert required <= set(records)
+    assert all(record.source_page in {1, 2, 3, 4, 5} for record in records.values())
 
 
 def test_ship_record_mounts_and_tracks_match_source_examples() -> None:

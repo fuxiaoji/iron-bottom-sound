@@ -2,7 +2,7 @@ export type Side="axis"|"allies";
 export interface ResearchConsent{allow:boolean;handle?:string|null}
 export type Phase="contact_setup"|"reinforcement"|"movement_planning"|"torpedo_planning"|"movement_resolution"|"gunnery"|"torpedo_effects"|"fire_end"|"complete";
 export interface HexCoord{q:number;r:number}
-export interface GunMount{id:string;kind:"primary"|"secondary";position:string;firepower:number;caliber:number;arcs:string[];armour:number|null;destroyed:boolean;fired_this_phase:boolean}
+export interface GunMount{id:string;kind:"primary"|"secondary"|"tertiary";position:string;firepower:number;caliber:number;arcs:string[];armour:number|null;destroyed:boolean;fired_this_phase:boolean}
 export interface TorpedoLauncher{id:string;position:string;arcs:string[];torpedoes:number;reloads:number;loaded:number;reloads_remaining:number;destroyed:boolean;reload_turns_remaining:number}
 export interface Event{sequence:number;turn:number;phase:Phase;type:string;message:string;payload?:Record<string,unknown>;rule?:{rule_id:string;document:string;pdf_page?:number;section?:string};dice?:{notation:string;raw:number;adjusted?:number|null}}
 export interface ShipCombatEntry{sequence:number;turn:number;phase:Phase;direction:"inflicted"|"received";event_type:string;message:string;related_ship_id:string|null;related_ship_name:string|null;rule:Event["rule"];dice:Event["dice"];payload?:Record<string,unknown>}

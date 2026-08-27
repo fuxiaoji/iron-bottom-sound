@@ -492,7 +492,7 @@
 批次结果（2026-08-26）：用户「用 LLM 对战状态机 AI 打一局、输出战报验证」——想定7 仅 catalogued 无数据文件（经询问选想定1，正好 7 回合）。**实况压出一个真引擎 bug 并修复**：`legal_actions.movement_candidates` 过滤漏 `not ship.sunk`，沉没但仍占格的舰（漂移未结算）被当可动舰候选，与校验 `owned` 不一致 → LLM 三连败规划沉船（T7）。修法与 `_gunnery_candidates`/`_torpedo_candidates`/确定性指挥官一致。**结构性改进**：`movement_candidates` 每个可达格附引擎 `movement_path` 算好的精确 `plan` 串（`include_plans` 参数，确定性/战术指挥官传 False 免开销）——AI 只挑目标格照抄 plan，强制转弯/首动 advance 由引擎保证。**提示词纪律 4 处**：沉没舰不入 movement 且不覆盖；gunnery 只对 targets 非空候选开火、mount_id 取自候选（LLM 曾自造 KINUGASA-M1/M2）；reinforcement 只增援 candidates.ships、入口取自 entry_hexes；movement 照抄候选 plan、reachable 无 cost0 则必须移动。**--model CLI**（默认仍 deepseek-v4-flash，deepseek-chat/reasoner 均可用但用户指示用 flash）。**对局收敛（5 局）**：T7 沉船→T6 自造炮位→T4 自造增援→T5 强制转弯→第 5 局成功 `passed=true, completed=true, winner=allies`（想定1 第7回合）、50 请求、轴/盟各 25 plan、121.6s。**战报全量验证**：7 回合全叙事、90 张 PNG（turn1=6 开局局部、turn2-7=14/回合）、MD 10.5MB 自包含 90 base64、meta 完整（winner=allies、score{axis:4, allies:11}、phase=complete）。全量 `301 passed`。**提醒**：本次贴出的 DeepSeek 密钥仅内存注入未写文件，请轮换。下一步：投影二导出与训练管线；战报异步叙事/降采样/多局汇总。
 # 二马扩展想定、状态机 AI 接入与模块瘦身批次（2026-08-27）
 
-状态：资料盘点完成，来源核验与架构识别中
+状态：已完成。规范来源与剪影素材已导入并登记；24 艘船表完成结构化；想定已进入统一引擎/UI/状态机 AI；想定例外已从通用引擎抽出；全局回归、确定性回放、前端构建及状态机 AI 完整终局均通过。
 
 范围：只读导入 `D:\desktop\铁底湾\二马` 中的规范来源，提取想定初设、特殊规则、双方船表及非“舰娘”版棋子剪影；识别并接入用户近期实现的状态机/战术 AI。现有用户提交 `596694f` 及其前序改动视为基线，不回退、不覆盖。通用规则继续由现有结构化规则权威裁决；本想定特例优先级高于通用规则。
 
@@ -503,3 +503,5 @@
 5. 识别 `tactical.py`、随机 AI、LLM 适配、API/UI 新入口及状态导出链，定义统一 AI 玩家协议；让新想定经相同 `observe/legal_actions/submit_orders/advance` 接口进入状态机 AI，不给 AI 私有状态写权限。
 6. 以职责和测试为依据拆分臃肿文件，优先拆解规则裁决、合法行动提示、想定特例和前端计划编辑；保持公共 API、事件格式、存档兼容与现有测试不变。
 7. 验收：来源/数据完整性、船表边界、初设加载、特殊规则、确定性回放、状态机 AI 至少完整终局一盘、API/UI 想定选择、隐藏信息、全量 Python、TypeScript、Vite 构建；完成后追加 `havedone.md`、提交哈希和运行证据。
+
+验收摘要：`IBS-S-EM-01` 以合法默认部署从第 1 回合炮击阶段运行至第 8 回合自动结算；双方 `TacticalCommander` 共 58 次阶段决策、0 回退、0 人工改状态，最终轴心 42：同盟 13，轴心以 29 分差获胜。默认部署仅是 UI 立即开局便利数据，来源规定的自由部署区域与交替部署顺序仍独立保存在想定结构中。

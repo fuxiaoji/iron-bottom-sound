@@ -36,8 +36,14 @@ def scenario_catalog() -> list[dict[str, Any]]:
 
 
 def load_scenario(scenario_id: str) -> dict[str, Any]:
-    number = int(scenario_id.rsplit("-", 1)[-1])
-    path = STRUCTURED / "scenarios" / f"scenario-{number:02d}.yaml"
+    entry = next((item for item in scenario_catalog() if item["id"] == scenario_id), None)
+    if entry is None:
+        raise KeyError(f"Unknown scenario {scenario_id}")
+    definition = entry.get("definition")
+    if not definition:
+        number = int(entry["number"])
+        definition = f"scenario-{number:02d}.yaml"
+    path = STRUCTURED / "scenarios" / str(definition)
     if not path.exists():
         raise KeyError(f"Scenario {scenario_id} is catalogued but not playable")
     return read_yaml(path)

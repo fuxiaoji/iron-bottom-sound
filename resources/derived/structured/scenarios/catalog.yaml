@@ -14,3 +14,4 @@ scenarios:
   - {id: IBS-S-12, number: 12, title: 布干维尔岛海战, date: 1928-03-03, turns: 9, status: catalogued}
   - {id: IBS-S-13, number: 13, title: 韦拉拉韦拉岛海战, date: 1943-10-06, turns: 11, status: catalogued}
   - {id: IBS-S-14, number: 14, title: 霍腊纽姆海战, date: 1943-08-18, turns: 12, status: catalogued}
+  - {id: IBS-S-EM-01, number: EM-01, title: 第二次马里亚纳海战（内南洋水雷强袭战）, date: 1944-06-21, turns: 8, status: playable, definition: scenario-erma.yaml, extension: erma}

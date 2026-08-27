@@ -1,0 +1,62 @@
+id: IBS-S-EM-01
+number: EM-01
+title: 第二次马里亚纳海战（内南洋水雷强袭战）
+date: 1944-06-21
+status: playable
+source: {document: extensions/erma/scenario/second-battle-of-the-philippine-sea-zh.pdf, pdf_pages: [1, 2], status: verified_source}
+turns: 8
+initial_phase: gunnery
+visibility: {axis: 15, allies: 13}
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
+setup:
+  mode: free_deployment
+  first_player: highest_1d6
+  order: [large_ships_alternating, small_ships_alternating]
+  large_ship_types: [BB, BC, CB]
+  small_ship_types: [CA, CL, DD]
+  start_after_setup: {turn: 1, phase: gunnery}
+  zones:
+    axis: {from: A14, to: Q1, side: northwest, include_line: false}
+    allies: {from: R27, to: HH14, side: southeast, include_line: false}
+  engine_default_note: 合法的预置编队仅用于直接开局；自由部署约束仍以本节为权威数据。
+scenario_rules:
+  - {id: IBS-S-EM-01-R1, kind: free_deployment, source_page: 1}
+  - {id: IBS-S-EM-01-R2, kind: gunnery_hit_table_extension, table: erma-gunnery-hit-extension.csv, source_page: 2}
+  - {id: IBS-S-EM-01-R3, kind: japanese_3_9_penetrates_as_3_inch, source_page: 2}
+  - {id: IBS-S-EM-01-R4, kind: damage_points_victory, margin: 25, source_page: 2}
+victory:
+  kind: erma_damage_points
+  evaluated_at: end_of_turn_8
+  win_margin: 25
+  scoring:
+    hull_loss: {per: 3, points: 1}
+    battleship_fire_control_destroyed: 1
+    battleship_radar_destroyed: 1
+    battleship_primary_mount_destroyed: 1
+    battleship_speed_loss: {per: 2, points: 1}
+ships:
+  - {id: IBS-U-IJN-ERMA-YAMATO, name: 大和, side: axis, position: J4, heading: 2, speed: 5, asset: 日本-BB-大和-二马.png, flagship: true}
+  - {id: IBS-U-IJN-ERMA-MUSASHI, name: 武藏, side: axis, position: I5, heading: 2, speed: 5, asset: 日本-BB-武藏.png}
+  - {id: IBS-U-IJN-ERMA-SHINANO, name: 信浓, side: axis, position: H6, heading: 2, speed: 5, asset: 日本-BB-信浓.png}
+  - {id: IBS-U-IJN-ERMA-AZUMA, name: 吾妻, side: axis, position: G7, heading: 2, speed: 6, asset: 日本-CB-吾妻.png}
+  - {id: IBS-U-IJN-ERMA-ISHIKARI, name: 石狩, side: axis, position: F8, heading: 2, speed: 6, asset: 日本-CB-石狩.png}
+  - {id: IBS-U-IJN-ERMA-IBUKI, name: 伊吹, side: axis, position: E9, heading: 2, speed: 6, asset: 日本-CA-伊吹.png}
+  - {id: IBS-U-IJN-ERMA-KURAMA, name: 鞍马, side: axis, position: D10, heading: 2, speed: 6, asset: 日本-CA-鞍马.png}
+  - {id: IBS-U-IJN-ERMA-GOKASE, name: 五濑, side: axis, position: C11, heading: 2, speed: 6, asset: 日本-CL-五濑.png}
+  - {id: IBS-U-IJN-ERMA-SHIMAKAZE, name: 岛风, side: axis, position: B12, heading: 2, speed: 7, asset: 日本-DD-岛风.png}
+  - {id: IBS-U-IJN-ERMA-KAZEGUMO, name: 风云, side: axis, position: C10, heading: 2, speed: 6, asset: 日本-DD-风云.png}
+  - {id: IBS-U-IJN-ERMA-NAGANAMI, name: 长波, side: axis, position: D8, heading: 2, speed: 6, asset: 日本-DD-长波.png}
+  - {id: IBS-U-IJN-ERMA-MAKINAMI, name: 卷波, side: axis, position: E6, heading: 2, speed: 6, asset: 日本-DD-卷波.png}
+  - {id: IBS-U-USN-ERMA-IOWA, name: 衣阿华, side: allies, position: Y23, heading: 5, speed: 6, asset: 美国-BB-衣阿华.png, flagship: true}
+  - {id: IBS-U-USN-ERMA-NEW-JERSEY, name: 新泽西, side: allies, position: Z22, heading: 5, speed: 6, asset: 美国-BB-新泽西.png}
+  - {id: IBS-U-USN-ERMA-MISSOURI, name: 密苏里, side: allies, position: AA21, heading: 5, speed: 6, asset: 美国-BB-密苏里.png}
+  - {id: IBS-U-USN-ERMA-WISCONSIN, name: 威斯康星, side: allies, position: BB20, heading: 5, speed: 6, asset: 美国-BB-威斯康星.png}
+  - {id: IBS-U-USN-ERMA-ALASKA, name: 阿拉斯加, side: allies, position: CC19, heading: 5, speed: 6, asset: 美国-CB-阿拉斯加.png}
+  - {id: IBS-U-USN-ERMA-GUAM, name: 关岛, side: allies, position: DD18, heading: 5, speed: 6, asset: 美国-CB-关岛.png}
+  - {id: IBS-U-USN-ERMA-DES-MOINES, name: 得梅因, side: allies, position: EE17, heading: 5, speed: 6, asset: 美国-CA-得梅因.png}
+  - {id: IBS-U-USN-ERMA-SALEM, name: 塞勒姆, side: allies, position: FF16, heading: 5, speed: 6, asset: 美国-CA-塞勒姆.png}
+  - {id: IBS-U-USN-ERMA-WORCESTER, name: 伍斯特, side: allies, position: GG15, heading: 5, speed: 6, asset: 美国-CL-伍斯特.png}
+  - {id: IBS-U-USN-ERMA-ALLEN-M-SUMNER, name: 艾伦·M·萨姆纳, side: allies, position: HH15, heading: 5, speed: 6, asset: 美国-DD-艾伦·M·萨姆纳.png}
+  - {id: IBS-U-USN-ERMA-INGRAHAM, name: 英格拉罕, side: allies, position: GG17, heading: 5, speed: 6, asset: 美国-DD-英格拉罕.png}
+  - {id: IBS-U-USN-ERMA-COOPER, name: 库珀, side: allies, position: FF18, heading: 5, speed: 6, asset: 美国-DD-库珀.png}

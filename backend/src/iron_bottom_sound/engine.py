@@ -37,6 +37,7 @@ from .models import (
     ValidationResult,
     WreckState,
 )
+from .scenario_rules import scenario_rules
 
 
 RULES = ROOT / "resources" / "derived" / "structured" / "rules"
@@ -241,6 +242,7 @@ class IronBottomEngine:
         """调试模式（debug=True）解除战争迷雾：两阵营舰船/损伤/鱼雷/事件/比分全可见，
         仅用于本地调试，不参与任何裁决路径。"""
         state = self.get(game_id)
+        scenario_rules(state.scenario_id).refresh_score(state)
         ships: list[PublicShip] = []
         all_safe_events = [
             event
@@ -2960,7 +2962,7 @@ class IronBottomEngine:
             modifier = sum(modifiers.values())
             raw, dice = self._roll_d66(state)
             adjusted = d66_adjust(raw, modifier)
-            hits = self.rules.hit_count(firepower, adjusted)
+            hits = scenario_rules(state.scenario_id).gunnery_hits(self.rules.hit_count, firepower, adjusted)
             attacker.fired = True
             mount_ids = [mount.id for mount in mounts]
             self._event(
@@ -3206,42 +3208,13 @@ class IronBottomEngine:
     def _check_victory(self, state: GameState) -> None:
         if state.turn < state.max_turns:
             return
-        if state.scenario_id == "IBS-S-03":
-            axis_ships = [ship for ship in state.ships.values() if ship.side == Side.AXIS]
-            qualifying = [
-                ship for ship in axis_ships
-                if ship.sunk or all(speed <= 2 for speed in ship.speed_track)
-            ]
-            sunk_allies = sum(ship.sunk for ship in state.ships.values() if ship.side == Side.ALLIES)
-            if len(qualifying) >= 2:
-                state.winner = Side.ALLIES
-                state.victory_reason = "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2"
-            elif len(qualifying) == 1:
-                state.winner = Side.ALLIES
-                state.victory_reason = "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2"
-            elif sunk_allies >= 2:
-                state.winner = Side.AXIS
-                state.victory_reason = "德军小型战略胜利：无德舰达到英军目标且击沉至少两艘英舰"
-            else:
-                state.winner = Side.AXIS
-                state.victory_reason = "德军战术胜利：无德舰被击沉或减速至2-2-2"
-        elif state.scenario_id == "IBS-S-01":
-            margin = state.score[Side.AXIS.value] - state.score[Side.ALLIES.value]
-            if abs(margin) >= 4:
-                state.winner = Side.AXIS if margin > 0 else Side.ALLIES
-                state.victory_reason = f"想定1胜利点领先 {abs(margin)} 分"
-            else:
-                state.victory_reason = "平局：胜利点差小于4"
-        else:
-            margin = state.score[Side.AXIS.value] - state.score[Side.ALLIES.value]
-            state.winner = Side.AXIS if margin > 0 else (Side.ALLIES if margin < 0 else None)
-            state.victory_reason = "想定结束时胜利点领先" if margin else "平局"
+        state.winner, state.victory_reason, source_page = scenario_rules(state.scenario_id).resolve_victory(state)
         state.phase = Phase.COMPLETE
         self._event(
             state,
             "victory",
             f"{state.winner.value if state.winner else '无胜方'}：{state.victory_reason}",
-            rule=self._scenario_rule(f"{state.scenario_id}-VICTORY", 3 if state.scenario_id == "IBS-S-03" else 1, "胜利条件"),
+            rule=self._scenario_rule(f"{state.scenario_id}-VICTORY", source_page, "胜利条件"),
         )
 
     def _gunnery_modifiers(
@@ -3360,7 +3333,7 @@ class IronBottomEngine:
                 armour = target.primary_armor
             elif "secondary" in result:
                 armour = target.secondary_armor
-            if result.get("armour_check") and not self._penetrates(attacker, armour, distance, caliber):
+            if result.get("armour_check") and not self._penetrates(state, attacker, armour, distance, caliber):
                 return
             self._damage_hull(state, target, int(result.get("hull", 0)), "gunnery", attacker)
             self._lose_speed(target, int(result.get("speed_loss", 0)))
@@ -3389,12 +3362,12 @@ class IronBottomEngine:
         penetrated = True
         if result.get("armour_check") and not armour_already_penetrated:
             penetrated = bool(
-                attacker and distance is not None and self._penetrates(attacker, target.belt_armor, distance, caliber)
+                attacker and distance is not None and self._penetrates(state, attacker, target.belt_armor, distance, caliber)
             )
         bridge_penetrated = True
         if result.get("bridge_armour_check") and not armour_already_penetrated:
             bridge_penetrated = bool(
-                attacker and distance is not None and self._penetrates(attacker, target.bridge_armor, distance, caliber)
+                attacker and distance is not None and self._penetrates(state, attacker, target.bridge_armor, distance, caliber)
             )
         if result.get("radar"):
             target.radar_destroyed = True
@@ -3516,7 +3489,9 @@ class IronBottomEngine:
             dice=DiceRoll(dice=dice, notation="2D6", raw=roll),
         )
 
-    def _penetrates(self, attacker: ShipState, armour: float, distance: int, caliber: float | None = None) -> bool:
+    def _penetrates(
+        self, state: GameState, attacker: ShipState, armour: float, distance: int, caliber: float | None = None
+    ) -> bool:
         if armour <= 0:
             return True
         nation = "JP" if attacker.id.startswith("IBS-U-IJN-") else (
@@ -3524,7 +3499,10 @@ class IronBottomEngine:
                 "UK" if attacker.id.startswith("IBS-U-RN-") else "DE"
             )
         )
-        return self.rules.penetration(nation, caliber or attacker.primary.caliber, distance) >= armour
+        effective_caliber = scenario_rules(state.scenario_id).penetration_caliber(
+            attacker.id, caliber or attacker.primary.caliber
+        )
+        return self.rules.penetration(nation, effective_caliber, distance) >= armour
 
     @staticmethod
     def _result_mount_position(label: str) -> MountPosition | None:
@@ -3571,7 +3549,7 @@ class IronBottomEngine:
                 dice=dice_roll,
             )
         operational = [mount for mount in ship.gun_mounts if mount.kind == kind and not mount.destroyed]
-        aggregate = ship.primary if kind == "primary" else ship.secondary
+        aggregate = ship.primary if kind == "primary" else (ship.secondary if kind == "secondary" else None)
         if aggregate:
             aggregate.destroyed = not operational
         return destroyed
@@ -3647,14 +3625,14 @@ class IronBottomEngine:
         state.hull_damage_taken[ship.side.value] += actual
         if state.scenario_id == "IBS-S-01":
             state.score[ship.side.opponent.value] = state.hull_damage_taken[ship.side.value] // 3
-        elif state.scenario_id not in {"IBS-S-03"}:
+        elif state.scenario_id not in {"IBS-S-03", "IBS-S-EM-01"}:
             state.score[ship.side.opponent.value] += actual
         if ship.hull == 0:
             ship.sunk = True
             ship.sinking_turn = state.turn
             ship.sinking_drift_pending = bool(ship.position and ship.previous_speed > 0)
             sinking_position = ship.position
-            if state.scenario_id not in {"IBS-S-01", "IBS-S-03"}:
+            if state.scenario_id not in {"IBS-S-01", "IBS-S-03", "IBS-S-EM-01"}:
                 state.score[ship.side.opponent.value] += ship.vp
             attacker_id = ship.fire_source_attacker if cause == "fire" else (attacker.id if attacker else None)
             self._event(

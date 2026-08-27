@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "source_root": "D:\\desktop\\铁底湾",
-  "canonical_file_count": 285,
-  "source_path_count": 286,
-  "total_bytes": 93357930,
+  "canonical_file_count": 311,
+  "source_path_count": 315,
+  "total_bytes": 98198936,
   "files": [
     {
       "path": "resources/originals/assets/images/1.png",
@@ -302,12 +302,36 @@
       ]
     },
     {
+      "path": "resources/originals/assets/images/日本-BB-信浓.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\日本-BB-信浓.png"
+      ],
+      "bytes": 14467,
+      "sha256": "b1029de16df345dedfc0741061c066495a0a54ee8709ef83fe37f54a89a7cfbf"
+    },
+    {
+      "path": "resources/originals/assets/images/日本-BB-大和-二马.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\日本-BB-大和.png"
+      ],
+      "bytes": 14785,
+      "sha256": "1077e29706ddfaf8f342448cba00b13da8fd9aee72b8eb4aa7f4de184dab8a29"
+    },
+    {
       "path": "resources/originals/assets/images/日本-BB-大和.png",
       "bytes": 16180,
       "sha256": "5416ed113db40007b79c47c52fbe47cf91342ff75be73c82ffc3b95abe197579",
       "original_paths": [
         "D:\\desktop\\铁底湾\\images\\日本-BB-大和.png"
       ]
+    },
+    {
+      "path": "resources/originals/assets/images/日本-BB-武藏.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\日本-BB-武藏.png"
+      ],
+      "bytes": 14592,
+      "sha256": "63b003675c3444f006ad5ad913dec9b570d2cab70a4d31c39f29b18faffdc396"
     },
     {
       "path": "resources/originals/assets/images/日本-BB-比叡.png",
@@ -364,6 +388,14 @@
       "original_paths": [
         "D:\\desktop\\铁底湾\\images\\日本-BC-赤城.png"
       ]
+    },
+    {
+      "path": "resources/originals/assets/images/日本-CA-伊吹.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\日本-CA-伊吹.png"
+      ],
+      "bytes": 15045,
+      "sha256": "d1e87499761f8d3eee7567a5f61afc870addd603d13e5421617ce00325600355"
     },
     {
       "path": "resources/originals/assets/images/日本-CA-加古1.png",
@@ -438,6 +470,14 @@
       ]
     },
     {
+      "path": "resources/originals/assets/images/日本-CA-鞍马.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\日本-CA-鞍马.png"
+      ],
+      "bytes": 14798,
+      "sha256": "b829409d7c1809a3a258329b81c99c04da8fcb661f37818d5ce923a2f542aa25"
+    },
+    {
       "path": "resources/originals/assets/images/日本-CA-高雄.png",
       "bytes": 17178,
       "sha256": "a36051ef108a45ddb2fac26586d2bc76b3bd205efa2c2bfe5b714600ad7ba549",
@@ -452,6 +492,30 @@
       "original_paths": [
         "D:\\desktop\\铁底湾\\images\\日本-CA-鸟海.png"
       ]
+    },
+    {
+      "path": "resources/originals/assets/images/日本-CB-吾妻.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\日本-CB-吾妻.png"
+      ],
+      "bytes": 12694,
+      "sha256": "67d2eeb5b5f0bc8fb3b9009189c6b9d938db7e578ea37bef37264a0c215880e4"
+    },
+    {
+      "path": "resources/originals/assets/images/日本-CB-石狩.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\日本-CB-石狩.png"
+      ],
+      "bytes": 12650,
+      "sha256": "4a6bb1b1457c4cde062f92763deacce04a78039fd385699f06e062fadbc0c02b"
+    },
+    {
+      "path": "resources/originals/assets/images/日本-CL-五濑.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\日本-CL-五濑.png"
+      ],
+      "bytes": 13453,
+      "sha256": "f5cb5c2650a39b288e3d9f9c8441c6ce0f7953c12c4c978f7de602d2b1caa687"
     },
     {
       "path": "resources/originals/assets/images/日本-CL-夕张.png",
@@ -578,7 +642,8 @@
       "bytes": 15863,
       "sha256": "bda4c4ef9c1478387edb24f2f5bd4cfc776b43944129564c0db9319d07994902",
       "original_paths": [
-        "D:\\desktop\\铁底湾\\images\\日本-DD-卷波.png"
+        "D:\\desktop\\铁底湾\\images\\日本-DD-卷波.png",
+        "D:\\desktop\\铁底湾\\二马\\images\\日本-DD-卷波.png"
       ]
     },
     {
@@ -668,6 +733,14 @@
       "original_paths": [
         "D:\\desktop\\铁底湾\\images\\日本-DD-岚.png"
       ]
+    },
+    {
+      "path": "resources/originals/assets/images/日本-DD-岛风.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\日本-DD-岛风.png"
+      ],
+      "bytes": 12019,
+      "sha256": "ec6fdac3af02b93d087eb252cd31d7882916197c71cf11be10e9be8e5fc68b32"
     },
     {
       "path": "resources/originals/assets/images/日本-DD-敷波.png",
@@ -890,7 +963,8 @@
       "bytes": 15167,
       "sha256": "e3e61009caaccd3411dd684cfb38defa4f815c0622f86ffe3da41bcfce8f3701",
       "original_paths": [
-        "D:\\desktop\\铁底湾\\images\\日本-DD-长波.png"
+        "D:\\desktop\\铁底湾\\images\\日本-DD-长波.png",
+        "D:\\desktop\\铁底湾\\二马\\images\\日本-DD-长波.png"
       ]
     },
     {
@@ -922,7 +996,8 @@
       "bytes": 15035,
       "sha256": "4093c932b726c6f1be45a8a0ce082cb682f078e09d6cd729bb54517e64f3fb14",
       "original_paths": [
-        "D:\\desktop\\铁底湾\\images\\日本-DD-风云.png"
+        "D:\\desktop\\铁底湾\\images\\日本-DD-风云.png",
+        "D:\\desktop\\铁底湾\\二马\\images\\日本-DD-风云.png"
       ]
     },
     {
@@ -1038,12 +1113,44 @@
       ]
     },
     {
+      "path": "resources/originals/assets/images/美国-BB-威斯康星.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\美国-BB-威斯康星.png"
+      ],
+      "bytes": 15329,
+      "sha256": "170b65e8c13ea50c5da8f13cea56ca8f39bfbb7087ad10950a10886b73e657b0"
+    },
+    {
+      "path": "resources/originals/assets/images/美国-BB-密苏里.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\美国-BB-密苏里.png"
+      ],
+      "bytes": 14670,
+      "sha256": "98c13c98be435e5d2e8aa734f412ef3b1f8be848c1e33a0a2235bcdd9edb8c94"
+    },
+    {
+      "path": "resources/originals/assets/images/美国-BB-新泽西.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\美国-BB-新泽西.png"
+      ],
+      "bytes": 14658,
+      "sha256": "486eb3f56fe0647a21fd1bd378830b133c6970bfffb6201c336fa8dc597ebb49"
+    },
+    {
       "path": "resources/originals/assets/images/美国-BB-科罗拉多.png",
       "bytes": 19608,
       "sha256": "426c530fc4f5b3e4f3a84df73cb56c0b104a6274dbbc7f51dec6c30d6e016e32",
       "original_paths": [
         "D:\\desktop\\铁底湾\\images\\美国-BB-科罗拉多.png"
       ]
+    },
+    {
+      "path": "resources/originals/assets/images/美国-BB-衣阿华.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\美国-BB-衣阿华.png"
+      ],
+      "bytes": 14273,
+      "sha256": "5b431cd7bc1f0fa76b453af345e14e52352956cac9f08dc65d88165514d8b000"
     },
     {
       "path": "resources/originals/assets/images/美国-BB-西弗吉尼亚.png",
@@ -1094,12 +1201,28 @@
       ]
     },
     {
+      "path": "resources/originals/assets/images/美国-CA-塞勒姆.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\美国-CA-塞勒姆.png"
+      ],
+      "bytes": 16185,
+      "sha256": "a74d30c1c541ca177c74ec4e20b9396dad1e4191abb203ad980fdb5e29938b18"
+    },
+    {
       "path": "resources/originals/assets/images/美国-CA-彭萨科拉.png",
       "bytes": 20637,
       "sha256": "16cd46232bdd5fe07357e989c6622ef60555c76ea0f492e0575a3bd3f651d264",
       "original_paths": [
         "D:\\desktop\\铁底湾\\images\\美国-CA-彭萨科拉.png"
       ]
+    },
+    {
+      "path": "resources/originals/assets/images/美国-CA-得梅因.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\美国-CA-得梅因.png"
+      ],
+      "bytes": 16038,
+      "sha256": "50a8985b11c28f8a48354b875a0df1241b81568fa13ca1f8229fa2b1f9ee6a74"
     },
     {
       "path": "resources/originals/assets/images/美国-CA-文森斯.png",
@@ -1174,6 +1297,22 @@
       ]
     },
     {
+      "path": "resources/originals/assets/images/美国-CB-关岛.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\美国-CB-关岛.png"
+      ],
+      "bytes": 13999,
+      "sha256": "d34ee9f203f1fdd5d9dd466f631f7ba47ec38658b0f2837e87cd3403b614bfe6"
+    },
+    {
+      "path": "resources/originals/assets/images/美国-CB-阿拉斯加.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\美国-CB-阿拉斯加.png"
+      ],
+      "bytes": 15143,
+      "sha256": "3f3610ecfb620ea00c38b0522341cd0d6dc3ceccc5472e5d29472bc8b8e02cc8"
+    },
+    {
       "path": "resources/originals/assets/images/美国-CL-丹佛.png",
       "bytes": 15597,
       "sha256": "f4451ee38fe236b92e42da1a85fd2af5e0ece1629952af6191fd619238bdd55c",
@@ -1188,6 +1327,14 @@
       "original_paths": [
         "D:\\desktop\\铁底湾\\images\\美国-CL-亚特兰大.png"
       ]
+    },
+    {
+      "path": "resources/originals/assets/images/美国-CL-伍斯特.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\美国-CL-伍斯特.png"
+      ],
+      "bytes": 14391,
+      "sha256": "03f61200bfbbb7bb569d222c5850935754b0e19cd5802a2e6b3b0fe91bac8917"
     },
     {
       "path": "resources/originals/assets/images/美国-CL-克利夫兰.png",
@@ -1414,6 +1561,14 @@
       ]
     },
     {
+      "path": "resources/originals/assets/images/美国-DD-库珀.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\美国-DD-库珀.png"
+      ],
+      "bytes": 13387,
+      "sha256": "dd5e2c7f346d2a171ecc2b81c61e63bf1a54f31adb9f946546181087ec1fa0f6"
+    },
+    {
       "path": "resources/originals/assets/images/美国-DD-康弗斯.png",
       "bytes": 17540,
       "sha256": "ec4e516120044b2065cdd09d998acfed35401abee2e6ece904fbd125e926d0de",
@@ -1612,6 +1767,22 @@
       "original_paths": [
         "D:\\desktop\\铁底湾\\images\\美国-DD-福特.png"
       ]
+    },
+    {
+      "path": "resources/originals/assets/images/美国-DD-艾伦·M·萨姆纳.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\美国-DD-艾伦·M·萨姆纳.png"
+      ],
+      "bytes": 15509,
+      "sha256": "9ec9e84ee977a794d0bd8876ef5ccd505cd61ef3e4fca3a41954015b62a445b8"
+    },
+    {
+      "path": "resources/originals/assets/images/美国-DD-英格拉罕.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\美国-DD-英格拉罕.png"
+      ],
+      "bytes": 14751,
+      "sha256": "0d580621338cfa9f72bf91a4f4b855a864f9d065079ac6ebbe72e4c12580ec64"
     },
     {
       "path": "resources/originals/assets/images/美国-DD-莫里.png",
@@ -2236,6 +2407,47 @@
       "original_paths": [
         "D:\\desktop\\铁底湾\\船表\\美\\DD马汉级.png"
       ]
+    },
+    {
+      "path": "resources/originals/extensions/erma/records/erma-ijn-ship-records.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\二马_日军船表.png"
+      ],
+      "bytes": 734047,
+      "sha256": "0a98a2b3421377144b25f842039868a706269269f8944701bf284808cedc5571"
+    },
+    {
+      "path": "resources/originals/extensions/erma/records/erma-ship-records-overview.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\二马_船表.png"
+      ],
+      "bytes": 1471195,
+      "sha256": "03880d80621d8042fcb29333ada63a622eadf3d40950bc2feec074e3a87ab625"
+    },
+    {
+      "path": "resources/originals/extensions/erma/records/erma-usn-ship-records.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\二马_美军船表.png"
+      ],
+      "bytes": 738566,
+      "sha256": "dced8a44b07a10936ac3f0096c467418717161d80cabbe21f4e91a488f3a1ed0"
+    },
+    {
+      "path": "resources/originals/extensions/erma/scenario/erma-scenario-sheet.png",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\images\\二马_想定.png"
+      ],
+      "bytes": 1068939,
+      "sha256": "42895b51f09f58d09985222692045fb4c0cbe5db8b6e9fdd98f97ebe2c1f06bc"
+    },
+    {
+      "path": "resources/originals/extensions/erma/scenario/second-battle-of-the-philippine-sea-zh.pdf",
+      "original_paths": [
+        "D:\\desktop\\铁底湾\\二马\\二马_想定.pdf"
+      ],
+      "bytes": 525423,
+      "sha256": "9830a3b75be89e306c71fba16feee0678bdfac9adb94474c2b05fa20a845ada8",
+      "pages": 2
     },
     {
       "path": "resources/originals/records/ship-record-manual-1.1-zh.pdf",
