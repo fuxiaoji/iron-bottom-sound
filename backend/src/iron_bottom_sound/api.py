@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Annotated, Literal
 
 from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Query, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -78,6 +78,17 @@ app.mount(
     StaticFiles(directory=ROOT / "resources" / "originals" / "assets" / "images"),
     name="counter-assets",
 )
+
+_realistic_rules_path = ROOT / "docs" / "rules" / "realistic-command.md"
+
+
+@app.get("/rules/realistic-command", response_class=PlainTextResponse)
+def realistic_command_rules() -> PlainTextResponse:
+    """Serve the audited player rules from their single repository source."""
+    return PlainTextResponse(
+        _realistic_rules_path.read_text(encoding="utf-8"),
+        media_type="text/markdown",
+    )
 
 
 def side_from_header(value: str | None) -> Side:

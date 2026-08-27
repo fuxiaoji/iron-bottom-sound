@@ -8,6 +8,7 @@ type Props={
  llmProvider:"deepseek"|"zhipu";setLlmProvider:(value:"deepseek"|"zhipu")=>void;llmModel:string;setLlmModel:(value:string)=>void;
  llmKey:string;setLlmKey:(value:string)=>void;llmVision:boolean;setLlmVision:(value:boolean)=>void;
  onStart:(scenario:string,mode?:Mode,side?:Side,profile?:string)=>void;error:string;
+ onPreviewRealisticRules:()=>void;
 };
 const scenarios=[
  ["IBS-S-03","想定 3 · 通道行动"],
@@ -23,7 +24,7 @@ export function StartScreen(props:Props){
   <p className="eyebrow">AUDITABLE NAVAL WARGAME</p><h1>铁底湾的回响 IV</h1><p>确定性裁决 · 规则出处 · 同机交接</p>
   <section className={`realistic-mode ${props.realistic?"on":""}`}>
    <div><b>真实模式 · 编队指挥链</b><p>先编成最多四支纵队并指定领舰、旗舰和备用旗舰；移动时只操纵领舰，后舰沿共享航迹尾随。</p></div>
-   <button type="button" aria-pressed={props.realistic} onClick={()=>props.setRealistic(!props.realistic)}>{props.realistic?"已开启":"开启真实模式"}</button>
+   <div className="realistic-actions"><button type="button" className="rules-preview-button" onClick={props.onPreviewRealisticRules}>预览完整规则</button><button type="button" aria-pressed={props.realistic} onClick={()=>props.setRealistic(!props.realistic)}>{props.realistic?"已开启":"开启真实模式"}</button></div>
   </section>
   <label className={`record-report${props.recordReport?" on":""}`}><input type="checkbox" checked={props.recordReport} onChange={event=>props.setRecordReport(event.target.checked)}/>自动记录战报</label>
   <label className={`research-toggle${props.researchAllow?" on":""}`}><input type="checkbox" checked={props.researchAllow} onChange={event=>props.setResearchAllow(event.target.checked)}/>允许匿名对战记录用于科研{props.researchAllow&&<input value={props.researchHandle} maxLength={40} placeholder="称呼（可选）" onChange={event=>props.setResearchHandle(event.target.value)}/>}</label>
