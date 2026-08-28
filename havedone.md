@@ -473,3 +473,11 @@
 - **完整状态机基线**：`IBS-S-EM-01-realistic-search-smoke-seed29-fixed2` 自动运行至第 12 回合，轴心以 50 损伤分获胜；1766 个事件、483 次炮击结果、3 次鱼雷攻击、1 次鱼雷结果、8 艘脱队、2 艘撤出，友舰碰撞 0、友军鱼雷命中 0。
 - **GLM 实战证据**：`IBS-S-EM-01-zhipu-vs-realistic-seed32-accepted` 自动运行至第 5 回合，已产生 79 次炮击结果、1 次鱼雷结果和 1 次脱队，友舰碰撞 0、友军鱼雷命中 0；随后供应商返回 HTTP 429“余额不足或无可用资源包”。该中断局不计为正式 12 回合验收通过，补充额度后必须从第 1 回合重跑。
 - **自动验证**：专项 35 项通过；全量 JUnit 记录为 **375 tests、0 failures、0 errors、0 skipped**；TypeScript `tsc -b` 与 Vite 生产构建通过（43 modules transformed）；`git diff --check` 通过。
+
+## 2026-08-28：GLM/二马补丁无损增量部署线上
+
+- **增量范围**：只上传本次 10 个生产运行文件，压缩包 104,909 bytes、SHA-256 `10df1554a7364b6ae33bea41fe689cbbcd084c859671c7849d06d11f0173eee6`；未上传 SQLite、存档、战报、测试、环境文件、API 密钥或原始资料。
+- **双重回滚**：部署前使用应用 Python 3.11 的 SQLite Backup API 创建 `/opt/tiedi/backups/pre-glm-erma-20260828-01/iron-bottom-sound.sqlite3`，64,188,416 bytes，SHA-256 `bb0d5966a3a95a997793408cac445e631e83e293cbbc2fe81564b6c7689a494a`；旧运行文件另存同目录 `runtime-files.tgz`。
+- **存档一致性**：部署前后均为 38 个对局、1931 个事件；最早旧对局 `6505a312-d1cd-4968-ab64-e18d542c49d0` 仍可经阵营过滤的 `/view` API 返回 HTTP 200，未新增或改写在线对局。
+- **构建与公网**：服务器 Vite 构建通过（43 modules transformed），生成 `assets/index-DRlTzKX4.js`；`tiedi.service` 重启后 active，内部想定接口与 `https://fuwenji.asia/tiedi/` 均返回 HTTP 200，二马结构化回合数仍为 12。
+- **本地同步**：最新本地后端与前端分别在 `127.0.0.1:8000`、`127.0.0.1:5173` 以隐藏进程运行，两个健康检查均返回 HTTP 200。
