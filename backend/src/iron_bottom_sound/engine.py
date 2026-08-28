@@ -541,6 +541,10 @@ class IronBottomEngine:
                         }
                         for formation in state.formations.values() if formation.side == side
                     ] if state.options.realistic_command else [],
+                    "suggested_formation_movement": (
+                        self._suggested_formation_movement(state, side)
+                        if state.options.realistic_command else []
+                    ),
                     "movement_candidates": [
                         self.movement_candidates(state, ship)
                         for ship in state.ships.values()
@@ -564,6 +568,19 @@ class IronBottomEngine:
             }
             return [LegalAction(kind="submit_phase_orders", schema_hint=schemas[state.phase])]
         return [LegalAction(kind="advance")] if state.phase not in ORDER_PHASES or len(state.submitted_orders) == 2 else []
+
+    def _suggested_formation_movement(self, state: GameState, side: Side) -> list[dict[str, Any]]:
+        """Engine-valid editable starting orders for realistic formation movement.
+
+        The dedicated commander reads only the same side-filtered observation and public
+        scenario guidance.  Returning its proposal in legal_actions does not submit or
+        mutate it; UI/LLM callers must still return an OrderBatch that passes validation.
+        """
+        commander = __import__(
+            "iron_bottom_sound.realistic_command", fromlist=["RealisticCommander"]
+        ).RealisticCommander()
+        batch = commander.choose_orders(self, state.game_id, side)
+        return [order.model_dump(mode="json") for order in batch.formation_movement]
 
     def _formation_speed_range(self, state: GameState, formation) -> dict[str, int | None]:
         ranges = [

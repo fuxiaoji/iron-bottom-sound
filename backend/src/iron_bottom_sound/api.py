@@ -19,6 +19,7 @@ from .battle_report import (
 from .engine import IronBottomEngine
 from .data import ROOT
 from .llm import OpenAICompatibleCommander
+from .llm_providers import DEFAULT_MODELS, provider_runtime
 from .state_export import export_frame, render_board
 from .champions import CHAMPIONS
 from .tactical import PROFILES, TacticalCommander
@@ -30,9 +31,9 @@ from .storage import GameRepository
 
 class LLMConnectionConfig(BaseModel):
     provider: Literal["deepseek", "zhipu"] = "deepseek"
-    model: str = Field(default="deepseek-v4-flash", min_length=1, max_length=120,
+    model: str = Field(default=DEFAULT_MODELS["deepseek"], min_length=1, max_length=120,
                        pattern=r"^[A-Za-z0-9._:/-]+$")
-    vision_enabled: bool = True
+    vision_enabled: bool = False
 
 
 class CreateGame(BaseModel):
@@ -132,6 +133,15 @@ def scenarios():
 
 @app.post("/games", status_code=201)
 def create_game(request: CreateGame, background_tasks: BackgroundTasks):
+    if request.llm_config is not None:
+        try:
+            provider_runtime(
+                request.llm_config.provider,
+                request.llm_config.model,
+                vision_enabled=request.llm_config.vision_enabled,
+            )
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from error
     try:
         state = engine.reset(request.scenario_id, request.seed, request.options)
     except (KeyError, ValueError) as error:
@@ -246,16 +256,16 @@ class LLMOpponentRequest(BaseModel):
 
 
 def _provider_runtime(config: LLMConnectionConfig) -> dict[str, object]:
-    if config.provider == "zhipu":
-        return {
-            "endpoint": "https://open.bigmodel.cn/api/paas/v4",
-            "api_key_env": "ZHIPU_API_KEY",
-            "supports_thinking": False,
-        }
+    runtime = provider_runtime(
+        config.provider, config.model, vision_enabled=config.vision_enabled
+    )
     return {
-        "endpoint": "https://api.deepseek.com",
-        "api_key_env": "DEEPSEEK_API_KEY",
-        "supports_thinking": True,
+        "endpoint": runtime.endpoint,
+        "api_key_env": runtime.api_key_env,
+        "supports_thinking": runtime.supports_thinking,
+        "thinking_required": runtime.thinking_required,
+        "supports_vision": runtime.supports_vision,
+        "plan_max_tokens": runtime.plan_max_tokens,
     }
 
 
@@ -267,6 +277,7 @@ def _make_llm_commander(
     runtime = _provider_runtime(config)
     return OpenAICompatibleCommander(
         timeout=timeout,
+        max_tokens=int(runtime["plan_max_tokens"]),
         thinking_enabled=thinking_enabled and bool(runtime["supports_thinking"]),
         api_key=api_key,
         endpoint=str(runtime["endpoint"]),
@@ -274,6 +285,7 @@ def _make_llm_commander(
         model=config.model,
         vision_enabled=config.vision_enabled,
         supports_thinking=bool(runtime["supports_thinking"]),
+        thinking_required=bool(runtime["thinking_required"]),
     )
 
 
@@ -358,7 +370,10 @@ def llm_opponent(
         request.config if request is not None and request.config is not None
         else _user_llm_configs.get(game_id, LLMConnectionConfig())
     )
-    runtime = _provider_runtime(config)
+    try:
+        runtime = _provider_runtime(config)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
     key = (request.api_key if request is not None else None) or _user_llm_keys.get(game_id)
     if not key and not os.environ.get(str(runtime["api_key_env"])):
         raise HTTPException(503, "请先提供你自己的 LLM API 密钥（开局时或在本次请求中传入 api_key）")
@@ -544,6 +559,7 @@ def advance(game_id: str, x_player_side: Annotated[str | None, Header()] = None)
                     endpoint=str(runtime["endpoint"]),
                     api_key_env=str(runtime["api_key_env"]),
                     supports_thinking=bool(runtime["supports_thinking"]),
+                    thinking_required=bool(runtime["thinking_required"]),
                 )
                 if key or game_id in _user_llm_configs else narrative_commander_factory()
             )

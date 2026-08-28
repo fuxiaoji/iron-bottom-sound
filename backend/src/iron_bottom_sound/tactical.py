@@ -464,6 +464,7 @@ class TacticalCommander(DeterministicCommander):
         active = {
             ship.id: ship for ship in state.ships.values()
             if ship.side == side and not ship.sunk and ship.position
+            and (not state.options.realistic_command or ship.command_status == "attached")
         }
         groups = self._movement_groups(state, side, list(active))
         movement: list[MovementOrder] = []

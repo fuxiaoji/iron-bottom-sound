@@ -42,10 +42,10 @@ def test_zhipu_vision_payload_contains_filtered_png_and_no_deepseek_fields() -> 
     client = httpx.Client(transport=httpx.MockTransport(handler))
     commander = OpenAICompatibleCommander(
         endpoint="https://open.bigmodel.cn/api/paas/v4",
-        model="glm-5.3-flash",
+        model="glm-5v-turbo",
         api_key="runtime-only-placeholder",
         vision_enabled=True,
-        supports_thinking=False,
+        supports_thinking=True,
         client=client,
     )
     plan, batch, audits = commander.choose_plan(engine, state.game_id, Side.AXIS)
@@ -54,8 +54,8 @@ def test_zhipu_vision_payload_contains_filtered_png_and_no_deepseek_fields() -> 
     request = requests[-1]
     assert str(request.url) == "https://open.bigmodel.cn/api/paas/v4/chat/completions"
     payload = json.loads(request.content)
-    assert payload["model"] == "glm-5.3-flash"
-    assert "thinking" not in payload and "reasoning_effort" not in payload
+    assert payload["model"] == "glm-5v-turbo"
+    assert payload["thinking"] == {"type": "disabled"}
     content = payload["messages"][-1]["content"]
     assert [part["type"] for part in content] == ["text", "image_url"]
     prompt = json.loads(content[0]["text"])
@@ -81,7 +81,7 @@ def test_visible_map_is_side_specific_and_deterministic() -> None:
 
 def test_provider_factory_maps_zhipu_without_silent_model_substitution() -> None:
     config = LLMConnectionConfig(
-        provider="zhipu", model="glm-5.3-flash", vision_enabled=True
+        provider="zhipu", model="glm-5.3-flash", vision_enabled=False
     )
     commander = _make_llm_commander(
         timeout=12, thinking_enabled=True, api_key="placeholder", config=config
@@ -89,6 +89,29 @@ def test_provider_factory_maps_zhipu_without_silent_model_substitution() -> None
     assert commander.endpoint == "https://open.bigmodel.cn/api/paas/v4"
     assert commander.api_key_env == "ZHIPU_API_KEY"
     assert commander.model == "glm-5.3-flash"
-    assert commander.vision_enabled is True
-    assert commander.thinking_enabled is False
-    assert commander.supports_thinking is False
+    assert commander.vision_enabled is False
+    assert commander.thinking_enabled is True
+    assert commander.thinking_required is True
+    assert commander.supports_thinking is True
+
+
+def test_text_model_rejects_map_image_before_network_call() -> None:
+    config = LLMConnectionConfig(provider="zhipu", model="glm-5.2", vision_enabled=True)
+    try:
+        _make_llm_commander(timeout=12, thinking_enabled=False, api_key="x", config=config)
+    except ValueError as error:
+        assert "文本模型" in str(error) and "glm-5v-turbo" in str(error)
+    else:
+        raise AssertionError("text-only GLM unexpectedly accepted a map image")
+
+
+def test_zhipu_json_model_explicitly_disables_thinking() -> None:
+    commander = _make_llm_commander(
+        timeout=12,
+        thinking_enabled=False,
+        api_key="placeholder",
+        config=LLMConnectionConfig(provider="zhipu", model="glm-5.2"),
+    )
+    assert commander.supports_thinking is True
+    assert commander.thinking_required is False
+    assert commander.max_tokens == 6000

@@ -12,6 +12,7 @@ import httpx
 
 from .engine import IronBottomEngine
 from .state_export import export_frame, render_board
+from .scenario_guidance import public_search_target
 from .models import (
     AIPlanSheet,
     ContactMovementOrder,
@@ -268,6 +269,15 @@ _DISCIPLINE_SYSTEM_PROMPT = (
     "- MovementOrder：直接在该舰 movement_candidates 的 reachable 里选一个目标格，plan 照抄该格的"
     "plan 串、speed 填该格的 cost；reachable 不含当前格（无 cost 0）时本舰必须移动，不得原地不动。"
     "候选 plan 已含强制转弯/首动 advance 等引擎约束，不要自己编命令序列。\n"
+    "- 移动串：P=左转60°（航向减1并回绕），S=右转60°（航向加1并回绕），数字=沿当前航向前进。"
+    "写完后必须核对 plan 的最终航向与 phase_goal 一致；例如航向2的 5P 会在前进后转为航向1，"
+    "绝不是继续东南。\n"
+    "- 真实模式：legal_actions 若给出 formation_movement，就必须让 orders.movement 为空，"
+    "orders.formation_movement 必须恰好覆盖每一个 active formation_id；每项只提交 formation_id、"
+    "leader_plan、可选 spacing/speed_decision，后舰航迹由引擎生成。\n"
+    "- 真实模式移动若有 suggested_formation_movement，先完整照抄该列表作为安全起始方案；"
+    "它已处理共同速度、断裂引导航迹、必须脱队与友舰冲突。除非你能从合法预览确定更优方案，"
+    "不要删编队、删 speed_decision 或自行改写领舰路线。\n"
     "- 沉没/倾覆舰（世界态帧 status 含 sunk 或棋盘带 ~）不是可动舰：绝不给它们填 movement，也不在"
     "「覆盖每艘活动舰」之列；movement 只覆盖 status 无 sunk 且 hex 非空的本方舰。\n"
     "- TorpedoOrder：先在该舰 torpedo_candidates 的 launch_positions 里选一个发射 MF 序号 i"
@@ -285,7 +295,9 @@ _DISCIPLINE_SYSTEM_PROMPT = (
     "里选 MF 与 launch_side/launch_angle，使上面公式算出的鱼雷航向最接近 D。没有任何组合能让鱼雷指向 "
     "目标（目标过近、或所选 MF 航向推离目标等）时，torpedoes 留空，绝不盲射。\n"
     "- GunneryOrder：只对 gunnery_candidates 里 targets 非空的候选开火，mount_id 必须原样取自"
-    "该候选 targets 的 mount_ids（禁止自造或仿照示例）。targets 为空或 blocked_reason 非空的舰"
+    "该舰所选目标那一项的 mount_ids（禁止自造、禁止加入同舰其它目标的炮位、禁止默认全选）。"
+    "每舰最多选择一个目标；mounts 必须是该目标 mount_ids 的子集，最保守做法是完全照抄该列表。"
+    "targets 为空或 blocked_reason 非空的舰"
     "本回合没有任何合法射击，不得写入 gunnery；gunnery 数组允许留空。\n"
     "- ReinforcementOrder：只增援 reinforcement_candidates.ships 里列出的舰，entry_hex 必须取自"
     "其 entry_hexes（入口格被占则换该列表里其它格）；group_available 为 False 或 ships 为空时，"
@@ -426,6 +438,7 @@ class OpenAICompatibleCommander(LLMCommander):
         reasoning_effort: str | None = None,
         vision_enabled: bool = False,
         supports_thinking: bool = True,
+        thinking_required: bool = False,
         client: httpx.Client | None = None,
     ) -> None:
         self.endpoint = endpoint.rstrip("/")
@@ -435,9 +448,11 @@ class OpenAICompatibleCommander(LLMCommander):
         self.api_key = api_key
         self.timeout = timeout
         self.thinking_enabled = thinking_enabled
+        self.thinking_required = thinking_required
         # thinking 开启时 completion 预算会被 reasoning 吃掉，须加大 max_tokens 防 JSON 截断。
-        self.reasoning_effort = reasoning_effort or ("low" if thinking_enabled else None)
-        self.max_tokens = max_tokens or (6000 if thinking_enabled else 2400)
+        effective_thinking = thinking_enabled or thinking_required
+        self.reasoning_effort = reasoning_effort or ("low" if effective_thinking else None)
+        self.max_tokens = max_tokens or (6000 if effective_thinking else 2400)
         self.vision_enabled = vision_enabled
         self.supports_thinking = supports_thinking
         self.client = client
@@ -496,6 +511,20 @@ class OpenAICompatibleCommander(LLMCommander):
             "plan_sheet_json_schema": AIPlanSheet.model_json_schema(),
             "few_shot_example_output": _few_shot_for(state, side),
         }
+        if state.options.realistic_command:
+            target = public_search_target(state, side)
+            prompt["realistic_command_guidance"] = {
+                "formation_order_required": True,
+                "individual_movement_must_be_empty": True,
+                "search_target_when_no_enemy_visible": (
+                    target.model_dump(mode="json") | {"label": target.label}
+                    if target is not None else None
+                ),
+                "search_instruction": (
+                    "未发现敌舰时，以公开敌方部署区中心为搜索目标并缩短距离；"
+                    "不得使用或猜测隐藏舰船坐标。"
+                ),
+            }
         payload: dict[str, Any] = {
             "model": self.model,
             "temperature": 0,
@@ -506,11 +535,12 @@ class OpenAICompatibleCommander(LLMCommander):
                 self._user_message(prompt, state, engine, side),
             ],
         }
+        effective_thinking = self.thinking_enabled or self.thinking_required
         if self.supports_thinking:
             payload["thinking"] = {
-                "type": "enabled" if self.thinking_enabled else "disabled"
+                "type": "enabled" if effective_thinking else "disabled"
             }
-        if self.supports_thinking and self.thinking_enabled and self.reasoning_effort:
+        if self.supports_thinking and effective_thinking and self.reasoning_effort:
             payload["reasoning_effort"] = self.reasoning_effort
         audits: list[LLMCallAudit] = []
         for attempt in range(1, 4):
@@ -539,20 +569,28 @@ class OpenAICompatibleCommander(LLMCommander):
                 if reasoning:
                     reasoning_content = reasoning  # 全文：只进战报/本地存档
                     reasoning_preview = reasoning[:500] + "…"
-                plan = AIPlanSheet.model_validate_json(message["content"])
-                batch = OrderBatch.model_validate(plan.orders)
-                validation = engine.validate_orders(game_id, batch)
-                if plan.turn != state.turn or plan.phase != state.phase:
-                    errors.append("Plan sheet turn or phase does not match current state")
-                if batch.side != side:
-                    errors.append("OrderBatch side does not match bound session side")
-                errors.extend(validation.errors)
-                if not errors:
-                    audits.append(self._audit(
-                        state.turn, state.phase, side, attempt, started, request_id, usage,
-                        True, [], reasoning_preview, reasoning_content,
-                    ))
-                    return plan, batch, audits
+                content = message.get("content")
+                if not content:
+                    finish = (body["choices"][0].get("finish_reason") or "unknown")
+                    errors.append(
+                        "Provider returned no JSON order content "
+                        f"(finish_reason={finish}, reasoning_only={bool(reasoning)})"
+                    )
+                else:
+                    plan = AIPlanSheet.model_validate_json(content)
+                    batch = OrderBatch.model_validate(plan.orders)
+                    validation = engine.validate_orders(game_id, batch)
+                    if plan.turn != state.turn or plan.phase != state.phase:
+                        errors.append("Plan sheet turn or phase does not match current state")
+                    if batch.side != side:
+                        errors.append("OrderBatch side does not match bound session side")
+                    errors.extend(validation.errors)
+                    if not errors:
+                        audits.append(self._audit(
+                            state.turn, state.phase, side, attempt, started, request_id, usage,
+                            True, [], reasoning_preview, reasoning_content,
+                        ))
+                        return plan, batch, audits
             except httpx.HTTPStatusError as error:
                 # Keep the useful provider status/message, never headers or Authorization.
                 detail = ""

@@ -13,6 +13,7 @@ from .battle_report import (
 )
 from .engine import ORDER_PHASES, IronBottomEngine
 from .llm import DeterministicCommander, LLMPlayerSession, OpenAICompatibleCommander
+from .llm_providers import DEFAULT_MODELS, provider_runtime
 from .models import GameOptions, MatchReport, OptionalRules, Phase, Side
 from .randomai import RandomCommander
 from .state_export import export_frame, render_board
@@ -33,7 +34,7 @@ def _resolve_profile(profile: str | TacticalProfile | None) -> TacticalProfile:
 
 def make_session(
     side: Side, player: str, profile: str | TacticalProfile | None = None, model: str | None = None,
-    realistic: bool = False,
+    realistic: bool = False, vision_enabled: bool = False,
 ) -> LLMPlayerSession:
     if player == "deterministic":
         return LLMPlayerSession(side, RealisticCommander(profile=_resolve_profile(profile)) if realistic else DeterministicCommander())
@@ -44,7 +45,21 @@ def make_session(
     if player == "random":
         return LLMPlayerSession(side, RandomCommander())
     if player == "deepseek":
-        return LLMPlayerSession(side, OpenAICompatibleCommander(model=model or "deepseek-v4-flash"))
+        runtime = provider_runtime("deepseek", model, vision_enabled=vision_enabled)
+        return LLMPlayerSession(side, OpenAICompatibleCommander(
+            endpoint=runtime.endpoint, api_key_env=runtime.api_key_env, model=runtime.model,
+            max_tokens=runtime.plan_max_tokens,
+            vision_enabled=vision_enabled, supports_thinking=runtime.supports_thinking,
+            thinking_required=runtime.thinking_required,
+        ))
+    if player == "zhipu":
+        runtime = provider_runtime("zhipu", model, vision_enabled=vision_enabled)
+        return LLMPlayerSession(side, OpenAICompatibleCommander(
+            endpoint=runtime.endpoint, api_key_env=runtime.api_key_env, model=runtime.model,
+            max_tokens=runtime.plan_max_tokens,
+            vision_enabled=vision_enabled, supports_thinking=runtime.supports_thinking,
+            thinking_required=runtime.thinking_required,
+        ))
     raise ValueError(f"Unknown player {player}")
 
 
@@ -62,6 +77,7 @@ def run_match(
     axis_profile: str | None = None,
     allies_profile: str | None = None,
     deepseek_model: str | None = None,
+    vision_enabled: bool = False,
     seed: int = 1,
     options: GameOptions | None = None,
     request_limit: int = 128,
@@ -72,8 +88,8 @@ def run_match(
     engine = IronBottomEngine()
     state = engine.reset(scenario_id, seed, options or GameOptions(mode="llm"))
     sessions = {
-        Side.AXIS: make_session(Side.AXIS, axis, axis_profile, deepseek_model, state.options.realistic_command),
-        Side.ALLIES: make_session(Side.ALLIES, allies, allies_profile, deepseek_model, state.options.realistic_command),
+        Side.AXIS: make_session(Side.AXIS, axis, axis_profile, deepseek_model, state.options.realistic_command, vision_enabled),
+        Side.ALLIES: make_session(Side.ALLIES, allies, allies_profile, deepseek_model, state.options.realistic_command, vision_enabled),
     }
     frames: list[dict] = []
     boards: dict[Side, list[tuple[int, Phase, str]]] = {Side.AXIS: [], Side.ALLIES: []}
@@ -201,12 +217,13 @@ def write_battle_report_artifacts(
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run an isolated dual-player Iron Bottom Sound IV match")
     parser.add_argument("--scenario", default="IBS-S-03", choices=("IBS-S-01", "IBS-S-03", "IBS-S-EM-01"))
-    parser.add_argument("--axis", default="deterministic", choices=("deterministic", "tactical", "random", "deepseek"))
-    parser.add_argument("--allies", default="deterministic", choices=("deterministic", "tactical", "random", "deepseek"))
+    parser.add_argument("--axis", default="deterministic", choices=("deterministic", "tactical", "random", "deepseek", "zhipu"))
+    parser.add_argument("--allies", default="deterministic", choices=("deterministic", "tactical", "random", "deepseek", "zhipu"))
     parser.add_argument("--axis-profile", default=None, choices=tuple(PROFILES))
     parser.add_argument("--allies-profile", default=None, choices=tuple(PROFILES))
     parser.add_argument("--model", default=None,
-                        help="deepseek 玩家使用的模型（默认 OpenAICompatibleCommander 默认值）")
+                        help=f"LLM 玩家使用的模型（DeepSeek 默认 {DEFAULT_MODELS['deepseek']}；智谱默认 {DEFAULT_MODELS['zhipu']}）")
+    parser.add_argument("--vision", action="store_true", help="仅对明确支持图片输入的视觉模型发送本方地图")
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--request-limit", type=int, default=128)
     parser.add_argument("--all-optional", action="store_true")
@@ -230,6 +247,7 @@ def main() -> int:
         axis_profile=args.axis_profile,
         allies_profile=args.allies_profile,
         deepseek_model=args.model,
+        vision_enabled=args.vision,
         seed=args.seed,
         options=options,
         request_limit=args.request_limit,

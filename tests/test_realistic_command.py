@@ -1,11 +1,12 @@
 from copy import deepcopy
 
-from iron_bottom_sound.engine import IronBottomEngine
+from iron_bottom_sound.engine import ORDER_PHASES, IronBottomEngine
 from iron_bottom_sound.match import run_match
 from iron_bottom_sound.models import (
     FormationMovementOrder,
     FormationSpeedDecision,
     GameOptions,
+    HexCoord,
     OrderBatch,
     Phase,
     Side,
@@ -16,6 +17,7 @@ from iron_bottom_sound.realistic_command import (
     expand_movement_orders,
     refresh_command_chain,
 )
+from iron_bottom_sound.scenario_guidance import public_search_target
 
 
 def realistic_game(seed: int = 3) -> tuple[IronBottomEngine, str]:
@@ -184,3 +186,64 @@ def test_realistic_commander_emits_only_formation_movement_orders() -> None:
     assert plan.phase == Phase.MOVEMENT_PLANNING
     assert batch.formation_movement
     assert batch.movement == []
+
+
+def test_erma_commander_searches_public_enemy_zone_before_contact() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-EM-01", 28, GameOptions(realistic_command=True))
+    commander = RealisticCommander()
+    for side in Side:
+        setup = commander.choose_orders(engine, state.game_id, side)
+        assert engine.submit_orders(state.game_id, setup).valid
+    engine.advance(state.game_id)
+    while state.phase != Phase.MOVEMENT_PLANNING:
+        if state.phase in ORDER_PHASES:
+            advance_empty_orders(engine, state.game_id)
+        else:
+            engine.advance(state.game_id)
+    for side in Side:
+        target = public_search_target(state, side)
+        assert target is not None
+        before = {
+            formation.id: state.ships[formation.leader_id].position.distance(target)
+            for formation in state.formations.values() if formation.side == side
+        }
+        batch = commander.choose_orders(engine, state.game_id, side)
+        prepared, errors, _ = expand_movement_orders(engine, state, batch)
+        assert not errors
+        for order in prepared.movement:
+            ship = state.ships[order.ship_id]
+            formation = state.formations[ship.formation_id]
+            if ship.id != formation.leader_id:
+                continue
+            preview = engine.movement_preview(state, ship, plan=order.plan)
+            end = HexCoord(**preview["current_hex"])
+            assert end.distance(target) < before[formation.id]
+
+
+def test_realistic_tactical_planner_leaves_retreating_ship_to_withdrawal_controller() -> None:
+    engine, game_id = realistic_game()
+    advance_empty_orders(engine, game_id)
+    state = engine.get(game_id)
+    ship = next(ship for ship in state.ships.values() if ship.side == Side.AXIS)
+    ship.command_status = "retreating"
+    commander = RealisticCommander()
+    movement, _contacts, _intents = commander.tactical._plan_movement(
+        engine, state, Side.AXIS, commander.tactical._ai_rng(state, Side.AXIS)
+    )
+    assert ship.id not in {order.ship_id for order in movement}
+
+
+def test_realistic_legal_actions_include_valid_editable_formation_starting_orders() -> None:
+    engine, game_id = realistic_game()
+    advance_empty_orders(engine, game_id)
+    state = engine.get(game_id)
+    action = engine.legal_actions(game_id, Side.AXIS)[0]
+    suggested = action.schema_hint["suggested_formation_movement"]
+    assert suggested
+    batch = OrderBatch(
+        side=Side.AXIS,
+        phase=Phase.MOVEMENT_PLANNING,
+        formation_movement=suggested,
+    )
+    assert engine.validate_orders(game_id, batch).valid

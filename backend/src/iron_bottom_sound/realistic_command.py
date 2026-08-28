@@ -12,6 +12,7 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 from .data import load_scenario
+from .scenario_guidance import public_search_target
 from .models import (
     AIPlanSheet,
     CommandSuccession,
@@ -642,6 +643,9 @@ class RealisticCommander:
         movement, contact_movement, _unit_intents = self.tactical._plan_movement(
             engine, state, side, self.tactical._ai_rng(state, side)
         )
+        observation = engine.observe(game_id, side)
+        visible_enemy = any(ship.side != side for ship in observation.ships)
+        search_target = None if visible_enemy else public_search_target(state, side)
         tactical_batch = OrderBatch(
             side=side, phase=state.phase,
             movement=movement, contact_movement=contact_movement,
@@ -664,6 +668,8 @@ class RealisticCommander:
             if leader not in members:
                 leader = members[0]
             leader_plan = by_ship.get(leader.id, MovementOrder(ship_id=leader.id, plan="0")).plan
+            if search_target is not None:
+                leader_plan = self._search_plan(engine, state, leader, search_target)
             leader_commands = engine.movement_commands(MovementOrder(ship_id=leader.id, plan=leader_plan))
             if any(command.endswith("120") for command in leader_commands):
                 # A 120-degree in-place impulse cannot propagate down a spaced
@@ -821,7 +827,11 @@ class RealisticCommander:
                             )
                         changed = True
                         continue
-                    if " follower speed " in error or " cannot follow guide trail before advancing" in error or forced_separation:
+                    trail_failure = (
+                        " cannot follow guide trail" in error
+                        or " is no longer on the guide trail" in error
+                    )
+                    if " follower speed " in error or trail_failure or forced_separation:
                         follower = next((ship for ship in members if f": {ship.name} " in error or f": {ship.id} " in error), None)
                         if follower and len(members) >= 1 and (forced_separation or current <= minimum):
                             already = set(
@@ -848,6 +858,26 @@ class RealisticCommander:
             contingency=["共同速度不足则降速", "速度区间断裂则受损舰脱队"],
         )
         return plan, batch, audits
+
+    def _search_plan(
+        self, engine: "IronBottomEngine", state: GameState, leader, target: HexCoord
+    ) -> str:
+        """Choose a legal route toward a published zone before first contact."""
+        choices: list[tuple[int, int, int, str, str]] = []
+        for entry in engine.movement_candidates(state, leader, include_plans=False)["reachable"]:
+            hexc = HexCoord(q=entry["hex"]["q"], r=entry["hex"]["r"])
+            for heading in entry["final_headings"]:
+                plan = self.tactical._path_to(engine, state, leader, hexc, heading)
+                if plan is None:
+                    continue
+                choices.append((
+                    hexc.distance(target),
+                    -int(entry["cost"]),
+                    0 if heading == leader.heading else 1,
+                    hexc.label,
+                    plan,
+                ))
+        return min(choices)[-1] if choices else "0"
 
     def choose_orders(self, engine: "IronBottomEngine", game_id: str, side: Side) -> OrderBatch:
         return self.choose_plan(engine, game_id, side)[1]

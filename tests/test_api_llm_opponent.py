@@ -127,8 +127,8 @@ def test_llm_opponent_uses_player_selected_zhipu_model_without_persisting_key(mo
         "llm_api_key": secret,
         "llm_config": {
             "provider": "zhipu",
-            "model": "glm-5.3-flash",
-            "vision_enabled": True,
+            "model": "glm-5.2",
+            "vision_enabled": False,
         },
     })
     assert response.status_code == 201
@@ -151,11 +151,21 @@ def test_llm_opponent_uses_player_selected_zhipu_model_without_persisting_key(mo
     ).status_code == 200
     assert captured["api_key"] == secret
     assert captured["config"].provider == "zhipu"
-    assert captured["config"].model == "glm-5.3-flash"
-    assert captured["config"].vision_enabled is True
+    assert captured["config"].model == "glm-5.2"
+    assert captured["config"].vision_enabled is False
     # Repository serialization contains GameState only, never runtime credentials/provider config.
     persisted = api.repository.load(game_id).model_dump_json()
-    assert secret not in persisted and "glm-5.3-flash" not in persisted
+    assert secret not in persisted and "glm-5.2" not in persisted
+
+
+def test_create_game_rejects_text_model_with_vision() -> None:
+    response = TestClient(app).post("/games", json={
+        "scenario_id": "IBS-S-03",
+        "options": {"mode": "llm"},
+        "llm_config": {"provider": "zhipu", "model": "glm-5.2", "vision_enabled": True},
+    })
+    assert response.status_code == 422
+    assert "文本模型" in response.text
 
 
 def test_llm_opponent_idempotent_short_circuit(monkeypatch) -> None:
