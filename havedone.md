@@ -464,3 +464,12 @@
 - **存档保护**：应用补丁前使用 SQLite Backup API 将在线主库一致性备份到 `/opt/tiedi/backups/pre-5dd2965-20260827-01/iron-bottom-sound.sqlite3`；补丁归档不含 `backend/*.sqlite3*`，没有删除或覆盖旧对局。部署后只新增验证局 `fd8c5afd-bc87-4cf0-b92a-af71615b090f`（无科研同意、无战报）。
 - **构建与服务**：服务器 `npm run build -- --base=/tiedi/` 通过，Vite 43 modules transformed，生成 `index-CSYto-0r.js`；后端导入断言 `ERMA_TURNS=12`，`systemctl restart tiedi` 后服务为 active。
 - **公网验收**：`https://fuwenji.asia/tiedi/` 返回 200 并引用新 bundle；想定目录返回二马 `turns=12/status=playable`；验证局视图为 `turn=1/max_turns=12/phase=gunnery`。
+
+## 2026-08-28：GLM 兼容与真实模式二马实战修复（提交 `15a4842`）
+
+- **GLM 根因与兼容层**：复现发现原默认 `glm-5.3-flash` 为持续思考模型；未配置 thinking 时会在输出预算内只返回推理而无 JSON，显式关闭 thinking 又会被接口拒绝。新增供应商能力配置，默认改为可关闭思考并稳定输出 JSON 的 `glm-5.2`；文本模型禁止发送地图图片，只有视觉模型族允许启用视觉输入。
+- **密钥纪律**：用户密钥仅作为当前测试进程的临时环境变量使用，调用后清除；源码、配置、测试、事件、战报、数据库和 Git 均未保存密钥值。提交前执行特征串扫描无命中。
+- **二马真实模式修复**：未接敌时，状态机依据双方公开部署区中点生成搜索航路，不读取隐藏舰位或秘密订单；受损编队无法继续沿引导航迹时确定性永久脱队，撤退舰不再被普通战术移动规划器重复下令；`legal_actions` 为真实模式提供引擎验证过但尚未提交的编队移动建议，LLM 仍须返回订单并通过服务端校验。
+- **完整状态机基线**：`IBS-S-EM-01-realistic-search-smoke-seed29-fixed2` 自动运行至第 12 回合，轴心以 50 损伤分获胜；1766 个事件、483 次炮击结果、3 次鱼雷攻击、1 次鱼雷结果、8 艘脱队、2 艘撤出，友舰碰撞 0、友军鱼雷命中 0。
+- **GLM 实战证据**：`IBS-S-EM-01-zhipu-vs-realistic-seed32-accepted` 自动运行至第 5 回合，已产生 79 次炮击结果、1 次鱼雷结果和 1 次脱队，友舰碰撞 0、友军鱼雷命中 0；随后供应商返回 HTTP 429“余额不足或无可用资源包”。该中断局不计为正式 12 回合验收通过，补充额度后必须从第 1 回合重跑。
+- **自动验证**：专项 35 项通过；全量 JUnit 记录为 **375 tests、0 failures、0 errors、0 skipped**；TypeScript `tsc -b` 与 Vite 生产构建通过（43 modules transformed）；`git diff --check` 通过。
