@@ -621,6 +621,11 @@ def refresh_command_chain(engine: "IronBottomEngine", state: GameState) -> None:
 def after_movement(engine: "IronBottomEngine", state: GameState) -> None:
     for formation in state.formations.values():
         active = [state.ships[ship_id] for ship_id in formation.ship_ids if state.ships[ship_id].position and not state.ships[ship_id].sunk and state.ships[ship_id].command_status == "attached"]
+        pending = [
+            state.ships[ship_id] for ship_id in formation.ship_ids
+            if state.ships[ship_id].position is None and not state.ships[ship_id].sunk
+            and state.ships[ship_id].command_status == "attached"
+        ]
         if active:
             leader = state.ships.get(formation.leader_id)
             if leader not in active:
@@ -634,6 +639,11 @@ def after_movement(engine: "IronBottomEngine", state: GameState) -> None:
                 formation.disruption_turn = None
                 formation.locked_heading = None
                 formation.locked_speed = None
+        elif pending:
+            # Formations containing only scheduled reinforcements are dormant,
+            # not destroyed.  Keep their private command chain so the ships
+            # become an active formation when the scenario admits them later.
+            formation.status = "assembling"
         elif formation.status != "dissolved":
             formation.status = "dissolved"
     for ship_id, withdrawal in list(state.withdrawals.items()):

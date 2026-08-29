@@ -308,3 +308,35 @@ def test_realistic_erma_training_regression_seeds_complete_legally(
         and event.payload.get("attacker_side") == event.payload.get("target_side")
         for event in state.events
     )
+
+
+@pytest.mark.parametrize(("allies_profile", "seed"), [
+    ("line", 20270830),
+    ("brawl", 20270829),
+    ("evolved", 20270829),
+])
+def test_realistic_s01_reinforcement_formations_remain_commanded(
+    allies_profile: str, seed: int,
+) -> None:
+    report, engine, _sessions = run_match(
+        "IBS-S-01",
+        axis="tactical",
+        allies="tactical",
+        axis_profile="balanced",
+        allies_profile=allies_profile,
+        seed=seed,
+        options=GameOptions(realistic_command=True),
+        request_limit=180,
+    )
+    assert report.passed, report.failure_reason
+    state = engine.get(report.game_id)
+    assert state.phase == Phase.COMPLETE
+    assert not any(
+        event.type in {"collision", "collision_check"} and event.payload.get("friendly")
+        for event in state.events
+    )
+    assert not any(
+        event.type == "torpedo_hit"
+        and event.payload.get("attacker_side") == event.payload.get("target_side")
+        for event in state.events
+    )
