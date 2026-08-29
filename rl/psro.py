@@ -66,7 +66,8 @@ class Config:
     seeds_per_slot: int = 4
     workers: int = 20
     seed: int = 20260829
-    out: str = "rl/results/psro-torpedo-v1"
+    out: str = "rl/results/psro-realistic-v1"
+    ruleset: str = "realistic-v1"
     dashboard_port: int = 8765
     smoke: bool = False
 
@@ -79,14 +80,28 @@ def _profile_from(data: dict[str, Any]) -> TacticalProfile:
     return TacticalProfile.model_validate(data)
 
 
-def _atomic_json(path: Path, data: Any) -> None:
+def _atomic_json(path: Path, data: Any, *, replace_attempts: int = 20) -> None:
+    """Durably replace a JSON projection, tolerating transient Windows readers.
+
+    Browsers, indexers and antivirus scanners may briefly open the destination
+    without delete sharing, which makes os.replace raise WinError 5 even though
+    both files belong to this process.  Retrying the replace preserves atomicity;
+    rewriting the destination in place would expose partial JSON to the dashboard.
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_suffix(path.suffix + ".tmp")
     with temp.open("w", encoding="utf-8", newline="\n") as handle:
         json.dump(data, handle, ensure_ascii=False, indent=2, sort_keys=True)
         handle.flush()
         os.fsync(handle.fileno())
-    os.replace(temp, path)
+    for attempt in range(replace_attempts):
+        try:
+            os.replace(temp, path)
+            return
+        except PermissionError:
+            if attempt + 1 >= replace_attempts:
+                raise
+            time.sleep(min(0.01 * (2 ** min(attempt, 4)), 0.25))
 
 
 def _append_jsonl(path: Path, row: dict[str, Any]) -> None:
@@ -117,13 +132,13 @@ def _friendly_incidents(state) -> tuple[int, int]:
 def _run_game(job: dict[str, Any]) -> dict[str, Any]:
     started = time.perf_counter()
     try:
-        realistic = job["scenario"] == "IBS-S-EM-01"
+        realistic = bool(job.get("realistic_command", True))
         report, engine, sessions = run_match(
             job["scenario"], axis="tactical", allies="tactical",
             axis_profile=_profile_from(job["axis_profile"]),
             allies_profile=_profile_from(job["allies_profile"]),
             seed=job["seed"], options=GameOptions(realistic_command=realistic),
-            request_limit=180 if realistic else 128,
+            request_limit=180,
         )
         state = engine.get(report.game_id)
         collisions, friendly_torpedoes = _friendly_incidents(state)
@@ -299,8 +314,17 @@ class League:
                 "current_best": self.state.get("current_best"),
                 "primary_scenario": self.config.primary_scenario,
                 "last_error": self.state.get("last_error"),
+                "status_write_error": self.state.get("status_write_error"),
             }
-            _atomic_json(self.status_path, status)
+            try:
+                _atomic_json(self.status_path, status)
+            except PermissionError as error:
+                # status.json is a disposable live projection.  A browser or
+                # scanner holding it must never kill a multi-hour rules run;
+                # keep the last complete file and retry on the next heartbeat.
+                self.state["status_write_error"] = f"{type(error).__name__}: {error}"
+            else:
+                self.state.pop("status_write_error", None)
 
     def _run_jobs(self, jobs: list[tuple[str, dict[str, Any]]]) -> None:
         # Invalid/interrupted rows are evidence, not cache hits. Re-run their
@@ -363,11 +387,14 @@ class League:
                 for scenario_index, scenario in enumerate(self.config.scenarios):
                     for seed_index in range(self.config.seeds_per_slot):
                         seed = self.config.seed + scenario_index * 10_000 + seed_index
-                        key = _game_key("matrix", axis["name"], allies["name"], scenario, seed)
+                        key = _game_key(
+                            self.config.ruleset, "matrix", axis["name"], allies["name"], scenario, seed
+                        )
                         jobs.append((key, {
                             "kind": "matrix", "axis_name": axis["name"], "allies_name": allies["name"],
                             "axis_profile": axis["profile"], "allies_profile": allies["profile"],
                             "scenario": scenario, "seed": seed,
+                            "ruleset": self.config.ruleset, "realistic_command": True,
                         }))
         return jobs
 
@@ -381,6 +408,7 @@ class League:
                     game["utility"] for game in self.state["games"].values()
                     if game.get("kind") == "matrix" and game.get("axis_name") == axis["name"]
                     and game.get("allies_name") == allies["name"]
+                    and game.get("ruleset") == self.config.ruleset
                 ]
                 row.append(sum(values) / max(1, len(values)))
             result.append(row)
@@ -417,13 +445,17 @@ class League:
                             )
                             axis_profile = individual["profile"] if side == "axis" else opponent["profile"]
                             allies_profile = opponent["profile"] if side == "axis" else individual["profile"]
-                            key = _game_key("br", round_index, generation, individual["id"], opponent["name"], scenario, repeat, side)
+                            key = _game_key(
+                                self.config.ruleset, "br", round_index, generation,
+                                individual["id"], opponent["name"], scenario, repeat, side,
+                            )
                             jobs.append((key, {
                                 "kind": "br", "round": round_index, "generation": generation,
                                 "individual": individual["id"], "individual_side": side,
                                 "opponent": opponent["name"], "mixture_weight": mixture[opponent_index],
                                 "axis_profile": axis_profile, "allies_profile": allies_profile,
                                 "scenario": scenario, "seed": seed,
+                                "ruleset": self.config.ruleset, "realistic_command": True,
                             }))
         return jobs
 
@@ -432,6 +464,7 @@ class League:
             game for game in self.state["games"].values()
             if game.get("kind") == "br" and game.get("round") == round_index
             and game.get("generation") == generation and game.get("individual") == individual
+            and game.get("ruleset") == self.config.ruleset
         ]
         values = []
         for game in rows:
@@ -492,7 +525,9 @@ class League:
             self._run_jobs(self._matrix_jobs())
             invalid_matrix = [
                 game for game in self.state["games"].values()
-                if game.get("kind") == "matrix" and not game.get("ok")
+                if game.get("kind") == "matrix"
+                and game.get("ruleset") == self.config.ruleset
+                and not game.get("ok")
             ]
             if invalid_matrix:
                 raise RuntimeError(f"baseline payoff matrix contains {len(invalid_matrix)} invalid games")
@@ -532,7 +567,7 @@ def serve_dashboard(directory: Path, port: int) -> ThreadingHTTPServer:
 
 def parse_args(argv: list[str] | None = None):
     parser = argparse.ArgumentParser(description="Crash-resumable PSRO-lite torpedo league")
-    parser.add_argument("--out", default="rl/results/psro-torpedo-v1")
+    parser.add_argument("--out", default="rl/results/psro-realistic-v1")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--serve-dashboard", action="store_true")
     parser.add_argument("--dashboard-port", type=int, default=8765)

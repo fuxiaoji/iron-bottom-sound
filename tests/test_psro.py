@@ -3,6 +3,7 @@ import time
 
 import pytest
 
+import rl.psro as psro
 from rl.psro import Config, League, TrainingInterrupted, regret_matching
 
 
@@ -72,3 +73,60 @@ def test_status_reports_live_heartbeat_and_stalled_progress(tmp_path) -> None:
     assert status["running_jobs"] == 3
     assert status["progress_age_seconds"] >= 300
     assert time.time() - status["heartbeat"] < 5
+
+
+def test_atomic_json_retries_transient_windows_permission_error(tmp_path, monkeypatch) -> None:
+    target = tmp_path / "status.json"
+    real_replace = psro.os.replace
+    calls = 0
+
+    def flaky_replace(source, destination):
+        nonlocal calls
+        calls += 1
+        if calls < 3:
+            raise PermissionError(5, "temporarily locked")
+        return real_replace(source, destination)
+
+    monkeypatch.setattr(psro.os, "replace", flaky_replace)
+    monkeypatch.setattr(psro.time, "sleep", lambda _seconds: None)
+    psro._atomic_json(target, {"complete": True}, replace_attempts=3)
+    assert calls == 3
+    assert json.loads(target.read_text(encoding="utf-8")) == {"complete": True}
+
+
+def test_status_projection_failure_does_not_abort_training(tmp_path, monkeypatch) -> None:
+    league = League(Config(out=str(tmp_path / "league"), rounds=0, workers=1))
+    real_atomic_json = psro._atomic_json
+
+    def locked_status(path, data, **kwargs):
+        if path == league.status_path:
+            raise PermissionError(5, "dashboard reader holds destination")
+        return real_atomic_json(path, data, **kwargs)
+
+    monkeypatch.setattr(psro, "_atomic_json", locked_status)
+    league._status()
+    assert "PermissionError" in league.state["status_write_error"]
+
+    monkeypatch.setattr(psro, "_atomic_json", real_atomic_json)
+    league._status()
+    status = json.loads(league.status_path.read_text(encoding="utf-8"))
+    assert "PermissionError" in status["status_write_error"]
+    assert "status_write_error" not in league.state
+
+
+def test_all_training_jobs_use_versioned_realistic_ruleset(tmp_path) -> None:
+    league = League(Config(out=str(tmp_path / "league"), rounds=0, workers=1))
+    matrix_jobs = league._matrix_jobs()
+    assert matrix_jobs
+    assert all(key.startswith("realistic-v1|matrix|") for key, _job in matrix_jobs)
+    assert all(job["ruleset"] == "realistic-v1" for _key, job in matrix_jobs)
+    assert all(job["realistic_command"] is True for _key, job in matrix_jobs)
+    assert {job["scenario"] for _key, job in matrix_jobs} == {
+        "IBS-S-03", "IBS-S-01", "IBS-S-EM-01",
+    }
+
+    population = [{"id": 0, "profile": league.state["strategies"][0]["profile"]}]
+    br_jobs = league._br_jobs(0, 0, population, [1.0] * len(league.state["strategies"]))
+    assert br_jobs
+    assert all(key.startswith("realistic-v1|br|") for key, _job in br_jobs)
+    assert all(job["realistic_command"] is True for _key, job in br_jobs)
