@@ -189,6 +189,7 @@ class League:
         self.dashboard_path = self.root / "dashboard.html"
         self.started = time.time()
         self.stop_requested = False
+        self._io_lock = threading.RLock()
         self._init_database()
         if resume:
             if not self.checkpoint_path.exists():
@@ -208,7 +209,7 @@ class League:
             }
             self._checkpoint()
         source_dashboard = Path(__file__).with_name("psro_dashboard.html")
-        if source_dashboard.exists() and not self.dashboard_path.exists():
+        if source_dashboard.exists():
             self.dashboard_path.write_text(source_dashboard.read_text(encoding="utf-8"), encoding="utf-8")
 
     def _connect(self) -> sqlite3.Connection:
@@ -266,32 +267,40 @@ class League:
         return strategies
 
     def _checkpoint(self) -> None:
-        self.state["updated_at"] = time.time()
-        # Per-game payloads live in SQLite WAL.  Keeping them out of the phase checkpoint
-        # avoids O(number_of_games squared) write amplification during multi-hour runs.
-        snapshot = {key: value for key, value in self.state.items() if key != "games"}
-        snapshot["game_count"] = len(self.state.get("games", {}))
-        _atomic_json(self.checkpoint_path, snapshot)
-        self._status()
+        with self._io_lock:
+            self.state["updated_at"] = time.time()
+            # Per-game payloads live in SQLite WAL.  Keeping them out of the phase checkpoint
+            # avoids O(number_of_games squared) write amplification during multi-hour runs.
+            snapshot = {key: value for key, value in self.state.items() if key != "games"}
+            snapshot["game_count"] = len(self.state.get("games", {}))
+            _atomic_json(self.checkpoint_path, snapshot)
+            self._status()
 
     def _status(self) -> None:
-        games = self.state.get("games", {})
-        durations = [row.get("elapsed_ms", 0) / 1000 for row in games.values() if row.get("elapsed_ms")]
-        expected = int(self.state.get("expected_games", len(games)))
-        remaining = max(0, expected - len(games))
-        mean = sum(durations[-200:]) / max(1, len(durations[-200:]))
-        status = {
-            "stage": self.state.get("stage"), "round": self.state.get("round", 0),
-            "completed_games": len(games), "expected_games": expected,
-            "progress": len(games) / expected if expected else 0.0,
-            "eta_seconds": mean * remaining / max(1, self.config.workers),
-            "heartbeat": time.time(), "strategies": [item["name"] for item in self.state["strategies"]],
-            "meta_distribution": self.state.get("meta_distribution", {}),
-            "current_best": self.state.get("current_best"),
-            "primary_scenario": self.config.primary_scenario,
-            "last_error": self.state.get("last_error"),
-        }
-        _atomic_json(self.status_path, status)
+        with self._io_lock:
+            now = time.time()
+            games = self.state.get("games", {})
+            durations = [row.get("elapsed_ms", 0) / 1000 for row in games.values() if row.get("elapsed_ms")]
+            expected = int(self.state.get("expected_games", len(games)))
+            remaining = max(0, expected - len(games))
+            mean = sum(durations[-200:]) / max(1, len(durations[-200:]))
+            progress_age = max(0.0, now - float(self.state.get("last_progress_at", now)))
+            running_jobs = int(self.state.get("running_jobs", 0))
+            status = {
+                "stage": self.state.get("stage"), "round": self.state.get("round", 0),
+                "completed_games": len(games), "expected_games": expected,
+                "progress": len(games) / expected if expected else 0.0,
+                "eta_seconds": mean * remaining / max(1, self.config.workers),
+                "heartbeat": now, "progress_age_seconds": progress_age,
+                "running_jobs": running_jobs,
+                "stalled": running_jobs > 0 and progress_age >= 300,
+                "strategies": [item["name"] for item in self.state["strategies"]],
+                "meta_distribution": self.state.get("meta_distribution", {}),
+                "current_best": self.state.get("current_best"),
+                "primary_scenario": self.config.primary_scenario,
+                "last_error": self.state.get("last_error"),
+            }
+            _atomic_json(self.status_path, status)
 
     def _run_jobs(self, jobs: list[tuple[str, dict[str, Any]]]) -> None:
         # Invalid/interrupted rows are evidence, not cache hits. Re-run their
@@ -311,17 +320,35 @@ class League:
             raise TrainingInterrupted("training interrupted before scheduling more games")
         if not missing:
             return
-        with ProcessPoolExecutor(max_workers=self.config.workers) as pool:
-            futures = {pool.submit(_run_game, job): (key, job) for key, job in missing}
-            for future in as_completed(futures):
-                key, job = futures[future]
-                row = {**job, **future.result(), "key": key, "finished_at": time.time()}
-                self._record_game(key, row)
-                self._checkpoint()
-                if self.stop_requested:
-                    for pending in futures:
-                        pending.cancel()
-                    break
+        self.state["last_progress_at"] = time.time()
+        self.state["running_jobs"] = len(missing)
+        heartbeat_stop = threading.Event()
+
+        def heartbeat() -> None:
+            while not heartbeat_stop.wait(2.0):
+                self._status()
+
+        heartbeat_thread = threading.Thread(target=heartbeat, name="psro-heartbeat", daemon=True)
+        heartbeat_thread.start()
+        try:
+            with ProcessPoolExecutor(max_workers=self.config.workers) as pool:
+                futures = {pool.submit(_run_game, job): (key, job) for key, job in missing}
+                for future in as_completed(futures):
+                    key, job = futures[future]
+                    row = {**job, **future.result(), "key": key, "finished_at": time.time()}
+                    self._record_game(key, row)
+                    self.state["last_progress_at"] = time.time()
+                    self.state["running_jobs"] = max(0, int(self.state["running_jobs"]) - 1)
+                    self._checkpoint()
+                    if self.stop_requested:
+                        for pending in futures:
+                            pending.cancel()
+                        break
+        finally:
+            heartbeat_stop.set()
+            heartbeat_thread.join(timeout=3.0)
+            self.state["running_jobs"] = 0
+            self._status()
         if self.stop_requested:
             self.state["stage"] = "interrupted"
             self.state["last_error"] = None

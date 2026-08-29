@@ -1,4 +1,5 @@
 import json
+import time
 
 import pytest
 
@@ -59,3 +60,15 @@ def test_corrected_invalid_result_clears_dashboard_error_and_keeps_unique_total(
     league._checkpoint()
     assert league.state["last_error"] is None
     assert len(league.state["games"]) == 1
+
+
+def test_status_reports_live_heartbeat_and_stalled_progress(tmp_path) -> None:
+    league = League(Config(out=str(tmp_path / "league"), rounds=0, workers=1))
+    league.state["running_jobs"] = 3
+    league.state["last_progress_at"] = time.time() - 301
+    league._status()
+    status = json.loads((tmp_path / "league" / "status.json").read_text(encoding="utf-8"))
+    assert status["stalled"] is True
+    assert status["running_jobs"] == 3
+    assert status["progress_age_seconds"] >= 300
+    assert time.time() - status["heartbeat"] < 5

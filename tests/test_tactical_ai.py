@@ -701,6 +701,8 @@ def test_tactical_vs_tactical_completes_both_scenarios() -> None:
 @pytest.mark.parametrize(("allies_profile", "seed"), [
     ("line", 20270831),
     ("direct_attack", 20270832),
+    ("crossfire", 20270832),
+    ("evolved", 20270830),
 ])
 def test_s01_training_collision_dead_end_seeds_complete(
     allies_profile: str, seed: int,

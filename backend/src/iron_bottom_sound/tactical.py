@@ -166,6 +166,7 @@ class TacticalCommander(DeterministicCommander):
     def __init__(self, profile: TacticalProfile = PROFILES["balanced"]) -> None:
         self.profile = profile
         self._last_torpedo_audit: TorpedoDecisionAudit | None = None
+        self._movement_candidate_cache: dict[str, list[MovementOrder]] = {}
 
     # ------------------------------------------------------------------ AI 概率抽样基础设施
 
@@ -506,6 +507,10 @@ class TacticalCommander(DeterministicCommander):
     def _plan_movement(
         self, engine: IronBottomEngine, state, side: Side, rng: random.Random | None = None,
     ) -> tuple[list[MovementOrder], list[ContactMovementOrder], dict[str, str]]:
+        # One planning call may revisit the same ship many times while repairing
+        # a local collision dead end.  Cache its legal plan set for this call;
+        # movement state is immutable until the sealed batch is adjudicated.
+        self._movement_candidate_cache.clear()
         obs = engine.observe(state.game_id, side)
         enemies = [ship for ship in obs.ships if ship.side != side and not ship.sunk and ship.position]
         ctx = self._build_movement_context(engine, state, side, enemies, rng)
@@ -843,12 +848,18 @@ class TacticalCommander(DeterministicCommander):
                 continue
             if not self._movement_conflicts(engine, state, ship, order, reserved):
                 return order
+        # RealisticCommander only needs a provisional leader order here: its
+        # formation expander will derive the legal leader/member trajectories.
+        # Searching individual ships defeats formation-level planning and can
+        # explode on a dense line, so fail fast before any local backtracking.
+        if state.options.realistic_command:
+            raise ValueError(f"{ship.id}: 编队移动交由真实模式控制器统一求解")
         # Greedy batch planning can create a local dead end even though the
         # fleet has a safe assignment. Re-plan one previously reserved ship
         # together with the blocked ship; mutating the existing order object
         # also updates the already assembled OrderBatch entry.
         current_candidates = self._candidate_movement_orders(engine, state, ship)
-        for index in range(len(reserved) - 1, -1, -1):
+        for index in range(len(reserved) - 1, max(-1, len(reserved) - 3), -1):
             other, other_order = reserved[index]
             fixed = reserved[:index] + reserved[index + 1:]
             for alternative in self._candidate_movement_orders(engine, state, other):
@@ -861,24 +872,25 @@ class TacticalCommander(DeterministicCommander):
                     other_order.plan = alternative.plan
                     reserved[index] = (other, other_order)
                     return current
-        # One-step repair is insufficient when three or more ships form a
-        # cyclic blocking pattern. Solve the already planned prefix as a
-        # deterministic constraint problem, then mutate its existing order
-        # objects so the assembled batch remains coherent.
-        assignment = self._collision_free_prefix_assignment(
-            engine, state, [other for other, _order in reserved] + [ship],
-            {other.id: order.plan for other, order in reserved},
-        )
-        if assignment:
-            for index, (other, other_order) in enumerate(reserved):
-                other_order.plan = assignment[other.id].plan
-                reserved[index] = (other, other_order)
-            return assignment[ship.id]
+        # Classic rules explicitly adjudicate collisions. If the already
+        # sealed prefix leaves no collision-free route, submit the individually
+        # legal route with the fewest friendly conflicts instead of performing
+        # an unbounded whole-fleet search or declaring the match invalid.
+        if current_candidates:
+            return min(current_candidates, key=lambda order: (
+                sum(
+                    self._movement_conflicts(engine, state, ship, order, [(other, other_order)])
+                    for other, other_order in reserved
+                ),
+                engine.movement_cost(order.plan, engine.movement_commands(order)),
+                order.plan,
+            ))
         raise ValueError(f"{ship.id}: 无友舰冲突的合法移动计划")
 
     def _collision_free_prefix_assignment(
         self, engine: IronBottomEngine, state, ships: list[ShipState],
         preferred: dict[str, str],
+        fixed: list[tuple[ShipState, MovementOrder]] | None = None,
     ) -> dict[str, MovementOrder] | None:
         """Find a collision-free legal assignment for a blocked planning prefix.
 
@@ -886,35 +898,68 @@ class TacticalCommander(DeterministicCommander):
         remaining values and forward checking keep the rare search bounded;
         preferred existing plans are tried first for deterministic stability.
         """
+        fixed = fixed or []
         options: dict[str, list[MovementOrder]] = {}
+        trajectories: dict[tuple[str, int], tuple[HexCoord, ...]] = {}
+        conflicts: dict[tuple[tuple[str, int], tuple[str, int]], bool] = {}
         by_id = {ship.id: ship for ship in ships}
         for ship in ships:
             candidates = self._candidate_movement_orders(engine, state, ship)
+            if fixed:
+                candidates = [
+                    order for order in candidates
+                    if not self._movement_conflicts(engine, state, ship, order, fixed)
+                ]
             candidates.sort(key=lambda order: (
-                0 if order.plan == preferred.get(ship.id) else 1,
                 engine.movement_cost(order.plan, engine.movement_commands(order)),
+                0 if order.plan == preferred.get(ship.id) else 1,
                 order.plan,
             ))
             options[ship.id] = candidates
             if not candidates:
                 return None
+            for index, order in enumerate(candidates):
+                trajectories[(ship.id, index)] = tuple(
+                    self._movement_positions(engine, state, ship, order)
+                )
         nodes = 0
 
-        def compatible(ship_id: str, chosen: list[tuple[ShipState, MovementOrder]]):
-            ship = by_id[ship_id]
+        def pair_conflicts(left_key: tuple[str, int], right_key: tuple[str, int]) -> bool:
+            cache_key = tuple(sorted((left_key, right_key)))
+            cached = conflicts.get(cache_key)
+            if cached is not None:
+                return cached
+            left = trajectories[left_key]
+            right = trajectories[right_key]
+            result = False
+            impulses = max(len(left), len(right)) - 1
+            for impulse in range(impulses):
+                left_before = left[min(impulse, len(left) - 1)]
+                right_before = right[min(impulse, len(right) - 1)]
+                left_after = left[min(impulse + 1, len(left) - 1)]
+                right_after = right[min(impulse + 1, len(right) - 1)]
+                if left_after == right_after or (
+                    left_after == right_before and right_after == left_before
+                ):
+                    result = True
+                    break
+            conflicts[cache_key] = result
+            return result
+
+        def compatible(ship_id: str, chosen: dict[str, int]) -> list[int]:
             return [
-                order for order in options[ship_id]
-                if not self._movement_conflicts(engine, state, ship, order, chosen)
+                index for index in range(len(options[ship_id]))
+                if all(not pair_conflicts((ship_id, index), (other_id, other_index))
+                       for other_id, other_index in chosen.items())
             ]
 
         def search(
             remaining: tuple[str, ...],
-            chosen: list[tuple[ShipState, MovementOrder]],
-            result: dict[str, MovementOrder],
-        ) -> dict[str, MovementOrder] | None:
+            chosen: dict[str, int],
+        ) -> dict[str, int] | None:
             nonlocal nodes
             if not remaining:
-                return dict(result)
+                return dict(chosen)
             ranked = [
                 (compatible(ship_id, chosen), ship_id)
                 for ship_id in remaining
@@ -924,27 +969,30 @@ class TacticalCommander(DeterministicCommander):
             if not candidates:
                 return None
             tail = tuple(item for item in remaining if item != ship_id)
-            ship = by_id[ship_id]
-            for order in candidates:
+            for candidate_index in candidates:
                 nodes += 1
-                if nodes > 100_000:
+                if nodes > 5_000:
                     return None
-                revised = chosen + [(ship, order)]
+                revised = {**chosen, ship_id: candidate_index}
                 if any(not compatible(other_id, revised) for other_id in tail):
                     continue
-                result[ship_id] = order
-                solved = search(tail, revised, result)
+                solved = search(tail, revised)
                 if solved is not None:
                     return solved
-                result.pop(ship_id, None)
             return None
 
-        return search(tuple(sorted(by_id)), [], {})
+        solved = search(tuple(sorted(by_id)), {})
+        if solved is None:
+            return None
+        return {ship_id: options[ship_id][index] for ship_id, index in solved.items()}
 
     def _candidate_movement_orders(
         self, engine: IronBottomEngine, state, ship: ShipState,
     ) -> list[MovementOrder]:
         """枚举一舰的确定性合法计划集，供批次死端的一步回溯使用。"""
+        cached = self._movement_candidate_cache.get(ship.id)
+        if cached is not None:
+            return [order.model_copy() for order in cached]
         plans: list[str] = []
         if engine.movement_preview(state, ship, plan="0")["commitable"]:
             plans.append("0")
@@ -955,7 +1003,9 @@ class TacticalCommander(DeterministicCommander):
                 plan = self._path_to(engine, state, ship, hexc, heading)
                 if plan is not None and plan not in plans:
                     plans.append(plan)
-        return [MovementOrder(ship_id=ship.id, plan=plan) for plan in plans]
+        result = [MovementOrder(ship_id=ship.id, plan=plan) for plan in plans]
+        self._movement_candidate_cache[ship.id] = [order.model_copy() for order in result]
+        return result
 
     # ------------------------------------------------------------------ 鱼雷
 

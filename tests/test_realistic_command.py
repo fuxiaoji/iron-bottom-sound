@@ -278,6 +278,10 @@ def test_realistic_legal_actions_include_valid_editable_formation_starting_order
     ("brawl", "balanced", 20280829),
     ("brawl", "torpedo", 20280829),
     ("brawl", "balanced", 20280832),
+    ("evolved", "area_denial", 20280831),
+    ("evolved", "break_crossing_t", 20280831),
+    ("evolved", "formation_split", 20280830),
+    ("evolved", "crossfire", 20280829),
 ])
 def test_realistic_erma_training_regression_seeds_complete_legally(
     axis_profile: str, allies_profile: str, seed: int,

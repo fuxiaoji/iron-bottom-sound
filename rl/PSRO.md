@@ -20,7 +20,7 @@ $env:PYTHONPATH = 'backend/src;.'
 python -m rl.psro --out rl/results/psro-torpedo-v1 --serve-dashboard --dashboard-port 8765
 ~~~
 
-训练期间访问 http://127.0.0.1:8765/dashboard.html。面板每秒读取一次 status.json，显示阶段、PSRO 轮次、完成/预计对局、ETA、策略混合分布、当前最佳响应和最近错误。
+训练期间访问 http://127.0.0.1:8765/dashboard.html。面板每秒读取一次 status.json，训练器另以两秒周期独立刷新心跳；页面显示阶段、PSRO 轮次、完成/预计对局、ETA、策略混合分布、当前最佳响应和最近错误。只要仍有在途工作且连续 300 秒没有新对局完成，status.json 会置 stalled=true，并显示无进展时长和在途数量；这表示心跳在线但工作进程疑似陷入计算活锁，不应继续相信 ETA。
 
 若需要让训练在隐藏窗口运行：
 
@@ -53,6 +53,7 @@ python -m rl.psro --out rl/results/psro-torpedo-v1 --resume --serve-dashboard --
 ## 故障检查
 
 - status.json 的 heartbeat 长时间不变：先检查进程及 stderr.log，不要直接删除输出目录。
+- heartbeat 持续更新但 stalled=true：记录完成数、progress_age_seconds 和进程 CPU，优雅停止；若工作进程无法退出，再终止父进程树。SQLite 中已完成行仍可用 --resume 复用，禁止删除 results.sqlite3、checkpoint.json 或 games.jsonl。
 - stage=failed：查看 last_error，修复代码后用 --resume；失败状态不会注册冠军。
 - SQLite 存在 -wal 文件：保持三个 SQLite 文件在同一目录，不要单独复制主文件。需要备份时优先停止训练或使用 SQLite Backup API。
 - 训练完成后必须跑 fresh-seed 真实模式二马验收；训练分数本身不能替代引擎终局、友伤和回放检查。
