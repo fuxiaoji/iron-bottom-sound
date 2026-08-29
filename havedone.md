@@ -527,3 +527,12 @@
 - **精确回归**：四组 evolved 对 area_denial、break_crossing_t、formation_split、crossfire 的真实模式二马卡死种子均运行至第 12 回合，0 友军碰撞、0 鱼雷友伤；balanced 对 crossfire 的经典想定 1 完整终局；PSRO 心跳/停滞/恢复测试通过。
 - **全量验证**：pytest 收集并通过 410/410（退出码 0，仅既有 Starlette TestClient 弃用警告）；git diff --check 通过；真实密钥特征扫描无命中。训练尚未在本条记录时重启，下一步从同一 rl/results/psro-torpedo-v1 目录 --resume，先确认完成数越过 636。
 - **断点恢复复核**：在固定实现提交 5db6eac 上以 --resume 启动 PID 20668；首次观察已从 636 推进至 644/1452，running_jobs=808、invalid=0、stalled=false、进度年龄约 4 秒，127.0.0.1:8765 面板监听正常。
+
+## 2026-08-29：全真实模式联赛与 Windows 面板锁修复（提交 46006a9、c4e69ed）
+
+- **第二次退出并非计算卡死**：旧混合联赛推进到 1077/1452 后，Windows 浏览器/扫描器短暂占用 status.json，os.replace 返回 WinError 5；SQLite 的 1077 行均完整。原子替换现在做 20 次有界指数退避；status.json 作为可丢弃投影，重试耗尽只保留旧完整文件，不再终止训练，checkpoint.json 持续失败仍会抛错。
+- **训练域纠正**：用户确认状态机专为真实模式设计后，移除经典想定 1/3 适应度槽位；想定 1、想定 3、二马的矩阵和最佳响应任务全部写入 realistic_command=true，并以 ruleset=realistic-v1 版本化任务键和结果过滤。旧 psro-torpedo-v1 保留审计，新目录为 psro-realistic-v1。
+- **安全迁移**：旧 1077 行中仅迁移 351 行本来就是真实模式的二马合法结果；365 行经典想定 3 和 361 行经典想定 1 不进入新矩阵，也不删除。
+- **单局基准**：balanced 双方 seed 20260899：真实想定 3 为 1.059 秒，真实想定 1 为 2.970 秒，真实二马 12 回合为 42.109 秒；三局均自动终局、0 友军碰撞、0 鱼雷友伤。20 进程下初始 1452 局矩阵约几十分钟，数小时总耗时来自后续三轮 × 六代 × 32 个体的数万场 PSRO/GA 对局，而非 LLM 等待。
+- **增援编队修复**：全真实联赛立即暴露想定 1 的纯预备增援编队在无在图舰时被 after_movement 错误标记 dissolved。现在未来增援成员仍 attached 时编队保持 assembling，入场后继续接受编队层订单。line/brawl/evolved 三个精确失败种子全部完整终局且无友军事故。
+- **验证与恢复**：Windows 原子写、ruleset、任务模式、断点和面板共 8 项 PSRO 测试通过；真实模式与 PSRO 专项 37/37 通过。新联赛恢复后从 435 推进至 493/1452，三个旧无效键全部被合法结果覆盖，invalid=0、stalled=false、status_write_error 为空，面板继续监听 127.0.0.1:8765。
