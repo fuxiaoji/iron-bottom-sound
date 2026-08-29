@@ -20,6 +20,7 @@ type AIPersona={id:string;label:string;group:string;intro:string;win:string};
 // 人机大战对手阵容：内置风格（tactical.PROFILES）+ 进化冠军（champions.CHAMPIONS）。
 // win = 双想定混战赛综合胜率差分（对内置对手池，0=五五开；rl/style-tourney-final 实测快照）。
 const AI_PROFILES:AIPersona[]=[
+ {id:"adaptive",label:"自适应鱼雷战术",group:"新战术 AI",intro:"反事实封路、破 T、切割、交叉雷幕与保雷",win:"训练中"},
  {id:"balanced",label:"均衡",group:"内置风格",intro:"攻守均衡的手调基准",win:"+0.018"},
  {id:"fleet",label:"大舰队编队",group:"内置风格",intro:"抱团编队、火力协同",win:"+0.017"},
  {id:"line",label:"长纵队",group:"内置风格",intro:"纵队突击、队形纪律",win:"-0.073"},
@@ -27,6 +28,12 @@ const AI_PROFILES:AIPersona[]=[
  {id:"torpedo",label:"鱼雷专精",group:"内置风格",intro:"远程雷击、抢分专精",win:"+0.003"},
  {id:"cautious",label:"猥琐保守",group:"内置风格",intro:"避战保船、稳守反击",win:"-0.145"},
  {id:"evolved",label:"进化冠军",group:"进化冠军",intro:"GA 进化·防守反击：热点集火+高撤退+抢胜利点",win:"-0.077"},
+ {id:"direct_attack",label:"直击专家",group:"鱼雷战术专家",intro:"近距高价值目标直接打击",win:"专项"},
+ {id:"area_denial",label:"封锁专家",group:"鱼雷战术专家",intro:"覆盖高概率航路与关键通道",win:"专项"},
+ {id:"break_crossing_t",label:"破 T 专家",group:"鱼雷战术专家",intro:"迫使敌舰放弃 T 头阵位",win:"专项"},
+ {id:"formation_split",label:"切割专家",group:"鱼雷战术专家",intro:"拉长并分裂敌方编队",win:"专项"},
+ {id:"crossfire",label:"交叉雷幕专家",group:"鱼雷战术专家",intro:"多舰多雷道交叉覆盖",win:"专项"},
+ {id:"cover_withdrawal",label:"撤退掩护专家",group:"鱼雷战术专家",intro:"在受损舰与敌军间铺设阻断带",win:"专项"},
 ];
 const orderPhases=new Set(["formation_setup","contact_setup","reinforcement","movement_planning","torpedo_planning","gunnery"]);
 

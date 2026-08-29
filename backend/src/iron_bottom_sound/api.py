@@ -23,6 +23,7 @@ from .llm_providers import DEFAULT_MODELS, provider_runtime
 from .state_export import export_frame, render_board
 from .champions import CHAMPIONS
 from .tactical import PROFILES, TacticalCommander
+from .torpedo_tactics import AdaptiveTorpedoPlanner
 from .models import FormationMovementOrder, FormationSetupOrder, GameOptions, GunneryAssistRequest, MovementPreviewRequest, MovementTrajectoriesRequest, OrderBatch, Phase, ResearchConsent, Side, TorpedoAssistRequest
 from .realistic_command import RealisticCommander, expand_movement_orders, validate_setup
 from .notify import notify_research_consent
@@ -245,7 +246,7 @@ def tutorial_opponent(game_id: str, x_player_side: Annotated[str | None, Header(
 
 
 class AIOpponentRequest(BaseModel):
-    profile: str = "balanced"
+    profile: str = "adaptive"
 
 
 class LLMOpponentRequest(BaseModel):
@@ -301,7 +302,7 @@ def ai_opponent(game_id: str, request: AIOpponentRequest | None = None, x_player
     state = get_game(game_id)
     player_side = side_from_header(x_player_side)
     ai_side = player_side.opponent
-    profile_name = request.profile if request is not None and request.profile else "balanced"
+    profile_name = request.profile if request is not None and request.profile else "adaptive"
     profile = CHAMPIONS.get(profile_name, PROFILES.get(profile_name))
     if profile is None:
         raise HTTPException(422, f"Unknown AI profile {profile_name}")
@@ -327,6 +328,20 @@ def ai_opponent(game_id: str, request: AIOpponentRequest | None = None, x_player
             pass  # 战报失败绝不影响对局
     repository.save(engine.get(game_id))
     return {"valid": True, "ai_submitted": True}
+
+
+@app.get("/games/{game_id}/torpedo-tactics")
+def torpedo_tactics(
+    game_id: str, profile: str = "adaptive",
+    x_player_side: Annotated[str | None, Header()] = None,
+):
+    """Side-filtered, read-only tactical analysis for AI assistance and replay tools."""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    style = CHAMPIONS.get(profile, PROFILES.get(profile))
+    if style is None:
+        raise HTTPException(422, f"Unknown AI profile {profile}")
+    return AdaptiveTorpedoPlanner(style).analyze(engine, state, side)
 
 
 def _public_audit(audit) -> dict:

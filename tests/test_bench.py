@@ -22,7 +22,8 @@ def test_ordered_matchups_exclude_mirror() -> None:
 
 
 def test_build_games_distributes_round_robin() -> None:
-    profiles = list(PROFILES)  # 6 种 → 30 个有序组合；50 局 → 各组 1~2 局
+    # 这项测试验证旧版六策略的轮转分配，不应随新增专家策略数量变化。
+    profiles = ["balanced", "fleet", "line", "brawl", "torpedo", "cautious"]
     pairs = bench.ordered_matchups(profiles)
     games = bench.build_games("IBS-S-03", profiles, total_games=50, seed_base=1)
     assert len(games) == 50
@@ -43,7 +44,7 @@ def test_build_games_distributes_round_robin() -> None:
 
 def test_build_games_per_pair_exact() -> None:
     """--per-pair N：每对有序组合精确 N 局，seed 取 seed_base+1..seed_base+N。"""
-    profiles = [*PROFILES, "random"]  # 7 种 → 42 个有序组合
+    profiles = ["balanced", "fleet", "line", "brawl", "torpedo", "cautious", "random"]
     games = bench.build_games("IBS-S-01", profiles, total_games=0, seed_base=1, per_pair=30)
     assert len(games) == 42 * 30 == 1260
     by_pair: Counter[tuple[str, str]] = Counter()

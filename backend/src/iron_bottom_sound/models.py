@@ -693,6 +693,8 @@ class AIPlanSheet(BaseModel):
     unit_intents: dict[str, str] = Field(default_factory=dict)
     orders: dict[str, Any]
     contingency: list[str] = Field(default_factory=list, max_length=2)
+    # Optional side-private state-machine analysis; old saves and LLM plans omit it.
+    tactical_analysis: dict[str, Any] | None = None
 
 
 class LLMCallAudit(BaseModel):

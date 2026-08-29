@@ -15,19 +15,25 @@ const groups=[
  {title:"回合结果与胜负",matches:(event:BattleReportTurnEvent)=>/victory|score|scenario/.test(event.type)},
 ];
 
+const doctrineNames:Record<string,string>={direct_attack:"直接雷击",area_denial:"区域封锁",break_crossing_t:"破坏 T 头",formation_split:"切割编队",crossfire:"交叉雷幕",cover_withdrawal:"掩护撤退",reserve:"保留鱼雷"};
+function TorpedoReview({analysis}:{analysis:Record<string,unknown>}){
+ const candidates=(Array.isArray(analysis.top_candidates)?analysis.top_candidates:[]) as Record<string,unknown>[];
+ return <details className="torpedo-review"><summary>鱼雷战术复盘 · {doctrineNames[String(analysis.doctrine)]??String(analysis.doctrine)}</summary><p>{String(analysis.situation??"")}</p>{Boolean(analysis.reserve_reason)&&<p className="reserve-reason">保雷：{String(analysis.reserve_reason)}</p>}<ol>{candidates.slice(0,3).map((candidate,index)=>{const response=(candidate.response??{}) as Record<string,unknown>;return <li key={String(candidate.option_id??index)}><b>候选 {index+1}</b><span>{response.route_changed?"迫使敌舰改变最佳航路":"未改变敌舰最佳航路"} · 偏航 {String(response.forced_deviation??0)} 格 · 航速损失 {String(response.speed_loss??0)} MF · 预期命中 {Number(candidate.expected_hits??0).toFixed(2)}</span><code>{String(response.baseline_route??"—")} → {String(response.threatened_route??"—")}</code></li>})}</ol></details>;
+}
+
 function PlanTable({plan}:{plan:BattleReportPlan}){
  const intents=plan.unit_intents??{};
  const intentText=Object.entries(intents).map(([key,value])=>`${key}→${value}`).join("；")||"—";
  const contingency=(plan.contingency??[]).join("；")||"—";
  const orders=plan.orders??{};
  const orderCounts=Object.entries(orders).filter(([,value])=>Array.isArray(value)&&(value as unknown[]).length>0).map(([key,value])=>`${key}×${(value as unknown[]).length}`);
- return <table className="plan-table"><tbody>
+ return <><table className="plan-table"><tbody>
   <tr><th>态势判断</th><td>{plan.situation_summary??"—"}</td></tr>
   <tr><th>阶段目标</th><td>{plan.phase_goal??"—"}</td></tr>
   <tr><th>单元意图</th><td>{intentText}</td></tr>
   <tr><th>应变预案</th><td>{contingency}</td></tr>
   <tr><th>订单</th><td>{orderCounts.join("，")||"无"}</td></tr>
- </tbody></table>;
+ </tbody></table>{plan.tactical_analysis&&<TorpedoReview analysis={plan.tactical_analysis}/>}</>;
 }
 
 function EventRow({event}:{event:BattleReportTurnEvent}){

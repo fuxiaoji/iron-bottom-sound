@@ -1,0 +1,22 @@
+{
+  "completed_games": 2,
+  "current_best": {
+    "fitness": 0.075,
+    "name": "round-0-gen-0"
+  },
+  "eta_seconds": 0.0,
+  "expected_games": 2,
+  "heartbeat": 1787978201.9462907,
+  "last_error": null,
+  "meta_distribution": {
+    "balanced": 1.0
+  },
+  "primary_scenario": "IBS-S-EM-01",
+  "progress": 1.0,
+  "round": 1,
+  "stage": "complete",
+  "strategies": [
+    "balanced",
+    "psro-r1"
+  ]
+}

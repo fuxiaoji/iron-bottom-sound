@@ -15,6 +15,8 @@ frontend/dist/
 *.egg-info/
 backend/*.sqlite3
 backend/reports/
+rl/results/psro-*/results.sqlite3
+rl/results/psro-*/*.tmp
 *.sqlite3-shm
 *.sqlite3-wal
 .env

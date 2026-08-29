@@ -603,6 +603,11 @@ def build_report_data(
                 payload = json.loads(entry["content"]) if entry.get("content") else {}
             except (ValueError, TypeError):
                 payload = {}
+            # Counterfactual doctrine details remain side-private until the game ends.
+            # Existing high-level plan capture behaviour is preserved for compatibility.
+            if state.phase != Phase.COMPLETE:
+                plan = payload.get("plan") or {}
+                plan.pop("tactical_analysis", None)
             ai_actions.setdefault((entry["turn"], entry["phase"]), {})[entry["side"]] = payload
         elif entry["phase"] == "summary":
             summaries[entry["turn"]] = entry["content"]
@@ -679,6 +684,27 @@ def _plan_table(ai_action: dict[str, Any]) -> list[str]:
         movement_details.append(f"{ship_id}：{plan_text}")
     if movement_details:
         lines.append(f"| 移动明细 | {'；'.join(movement_details)} |")
+    tactics = plan.get("tactical_analysis") or {}
+    if tactics:
+        doctrine_names = {
+            "direct_attack": "直接雷击", "area_denial": "区域封锁",
+            "break_crossing_t": "破坏 T 头", "formation_split": "切割编队",
+            "crossfire": "交叉雷幕", "cover_withdrawal": "掩护撤退", "reserve": "保留鱼雷",
+        }
+        doctrine = doctrine_names.get(tactics.get("doctrine"), tactics.get("doctrine", "—"))
+        lines.append(f"| 鱼雷战术 | {doctrine}；{tactics.get('situation', '')} |")
+        if tactics.get("reserve_reason"):
+            lines.append(f"| 保雷原因 | {tactics['reserve_reason']} |")
+        reviews = []
+        for candidate in (tactics.get("top_candidates") or [])[:3]:
+            response = candidate.get("response") or {}
+            changed = "改道" if response.get("route_changed") else "未改变航路"
+            reviews.append(
+                f"{candidate.get('option_id', '候选')}：{changed}，偏航 {response.get('forced_deviation', 0)} 格，"
+                f"减速 {response.get('speed_loss', 0)} MF，预期命中 {candidate.get('expected_hits', 0):.2f}"
+            )
+        if reviews:
+            lines.append(f"| 反事实复盘 | {'；'.join(reviews)} |")
     return lines
 
 

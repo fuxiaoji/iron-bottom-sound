@@ -158,6 +158,22 @@ def test_flagship_death_uses_reserve_and_locks_next_turn() -> None:
     assert state.command_successions[-1].previous_flagship_id == previous
 
 
+def test_flagship_transfer_locks_surviving_leader_actual_speed_not_stale_cache() -> None:
+    engine, game_id = realistic_game()
+    state = engine.get(game_id)
+    formation = next(item for item in state.formations.values() if item.side == Side.AXIS)
+    stale_leader = state.ships[formation.leader_id]
+    stale_leader.position = None
+    survivor = next(state.ships[item] for item in formation.ship_ids if item != stale_leader.id)
+    survivor.current_speed = 4
+    formation.speed = 0
+    state.ships[formation.flagship_id].captain_status = "killed"
+    refresh_command_chain(engine, state)
+    assert formation.leader_id == survivor.id
+    assert formation.locked_speed == 4
+    assert formation.locked_heading == survivor.heading
+
+
 def test_realistic_state_machine_completes_scenario_three_without_fallback() -> None:
     for seed in (3, 9):
         report, engine, _sessions = run_match(

@@ -331,6 +331,22 @@ def test_battle_report_json_shape_and_image_endpoint() -> None:
     assert image.content[:8] == b"\x89PNG\r\n\x1a\n"
 
 
+def test_torpedo_tactical_analysis_is_hidden_until_terminal_report() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=91, game_id="report-torpedo-private")
+    entry = {
+        "game_id": state.game_id, "sequence": 1, "turn": 1,
+        "phase": "torpedo_planning", "side": "axis", "kind": "ai_action",
+        "image_path": None,
+        "content": json.dumps({"plan": {"tactical_analysis": {"doctrine": "area_denial"}}}),
+    }
+    live = br.build_report_data(state, engine, [entry])
+    assert "tactical_analysis" not in live["turns"][0]["phases"][0]["ai_actions"]["axis"]["plan"]
+    state.phase = Phase.COMPLETE
+    terminal = br.build_report_data(state, engine, [entry])
+    assert terminal["turns"][0]["phases"][0]["ai_actions"]["axis"]["plan"]["tactical_analysis"]["doctrine"] == "area_denial"
+
+
 def test_battle_report_image_path_traversal_blocked() -> None:
     client = TestClient(app)
     game_id = _create_battle_report_game(client)

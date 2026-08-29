@@ -25,6 +25,7 @@ from .models import (
     Side,
     TorpedoOrder,
 )
+from .torpedo_tactics import AdaptiveTorpedoPlanner, TorpedoDecisionAudit
 
 
 class TacticalProfile(BaseModel):
@@ -72,6 +73,9 @@ class TacticalProfile(BaseModel):
     w_self_status: float = 0.3
     temperature: float = 0.5
     rng_seed_off: int = 0
+    torpedo_doctrine: str = "legacy"
+    torpedo_min_tactical_score: float = 0.15
+    w_torpedo_avoid: float = 2.5
 
 
 # —— 风格预设（用户要求的 6 种打法）——
@@ -95,6 +99,16 @@ PROFILES: dict[str, TacticalProfile] = {
         w_enemy_heat=2.0, w_fire_pressure=0.5, w_approach=-0.6,
         torpedo_min_expected=0.60, w_formation=0.5,
     ),
+    # Adaptive and its six deterministic specialists share the same legal-action
+    # boundary.  Only the doctrine selector differs; these profiles form the initial
+    # PSRO-lite strategy population without changing classic profile behaviour.
+    "adaptive": TacticalProfile(torpedo_doctrine="adaptive", torpedo_min_tactical_score=0.10),
+    "direct_attack": TacticalProfile(torpedo_doctrine="direct_attack", torpedo_min_tactical_score=0.05),
+    "area_denial": TacticalProfile(torpedo_doctrine="area_denial", torpedo_min_tactical_score=0.05),
+    "break_crossing_t": TacticalProfile(torpedo_doctrine="break_crossing_t", torpedo_min_tactical_score=0.05),
+    "formation_split": TacticalProfile(torpedo_doctrine="formation_split", torpedo_min_tactical_score=0.05),
+    "crossfire": TacticalProfile(torpedo_doctrine="crossfire", torpedo_min_tactical_score=0.05),
+    "cover_withdrawal": TacticalProfile(torpedo_doctrine="cover_withdrawal", torpedo_min_tactical_score=0.05),
 }
 
 # 旧模块级常量保留为 balanced 别名（兼容既有 import / 外部读参）；实现一律读 self.profile.*
@@ -108,7 +122,9 @@ TOP_K_CANDIDATES = PROFILES["balanced"].top_k_candidates
 
 # AI 概率抽样用独立 RNG 的固定相位码（与引擎 `state.rng_counter` 骰子流完全隔离）。
 # 纯整数派生 → 同 seed 跨进程/跨 PYTHONHASHSEED 可复现；不得用 game_id/hash()/set 迭代序。
-_AI_PHASE_INT: dict[Phase, int] = {Phase.MOVEMENT_PLANNING: 3, Phase.GUNNERY: 5}
+_AI_PHASE_INT: dict[Phase, int] = {
+    Phase.MOVEMENT_PLANNING: 3, Phase.TORPEDO_PLANNING: 4, Phase.GUNNERY: 5,
+}
 
 
 @dataclass
@@ -129,6 +145,7 @@ class _MovementContext:
     enemy_value: dict[str, float] = field(default_factory=dict)  # enemy id → value_factor
     max_vp: float = 1.0
     rng: random.Random | None = None  # None → 退化为 argmax（单测/兼容路径）
+    visible_torpedo_threat: dict[str, float] = field(default_factory=dict)
 
 
 class TacticalCommander(DeterministicCommander):
@@ -148,6 +165,7 @@ class TacticalCommander(DeterministicCommander):
 
     def __init__(self, profile: TacticalProfile = PROFILES["balanced"]) -> None:
         self.profile = profile
+        self._last_torpedo_audit: TorpedoDecisionAudit | None = None
 
     # ------------------------------------------------------------------ AI 概率抽样基础设施
 
@@ -275,7 +293,8 @@ class TacticalCommander(DeterministicCommander):
             batch.movement, batch.contact_movement, intents = self._plan_movement(engine, state, side, self._ai_rng(state, side))
         elif state.phase == Phase.TORPEDO_PLANNING:
             batch.torpedoes = self._plan_torpedoes(engine, state, side)
-            intents = {order.ship_id: "近距离高置信鱼雷齐射" for order in batch.torpedoes}
+            doctrine = self._last_torpedo_audit.doctrine.value if self._last_torpedo_audit else "legacy"
+            intents = {order.ship_id: f"鱼雷战术：{doctrine}" for order in batch.torpedoes}
         elif state.phase == Phase.GUNNERY:
             batch.gunnery = self._plan_gunnery(engine, state, side, self._ai_rng(state, side))
             intents = {order.ship_id: "采纳射界齐射推荐" for order in batch.gunnery}
@@ -294,6 +313,10 @@ class TacticalCommander(DeterministicCommander):
             unit_intents=intents,
             orders=batch.model_dump(mode="json"),
             contingency=["若订单被拒绝则回退保持位置/不发射"],
+            tactical_analysis=(
+                self._last_torpedo_audit.model_dump(mode="json")
+                if state.phase == Phase.TORPEDO_PLANNING and self._last_torpedo_audit else None
+            ),
         )
         validation = engine.validate_orders(state.game_id, batch)
         audit = LLMCallAudit(
@@ -369,10 +392,35 @@ class TacticalCommander(DeterministicCommander):
 
         max_vp = max((ship.vp for ship in state.ships.values()), default=1)
         enemy_value = {enemy.id: self._value_factor(enemy, max_vp) for enemy in enemies}
+        torpedo_threat = self._visible_torpedo_threat(engine, state, side)
         return _MovementContext(
             enemies, pred_by_id, pred_hexes, enemy_threat_of, my_positions,
             enemy_value=enemy_value, max_vp=max_vp, rng=rng,
+            visible_torpedo_threat=torpedo_threat,
         )
+
+    @staticmethod
+    def _visible_torpedo_threat(engine: IronBottomEngine, state, side: Side) -> dict[str, float]:
+        """Project only tracks present in the side-filtered observation.
+
+        The map is advisory movement pressure, not adjudication.  A hidden enemy track is
+        absent under ``blind_torpedoes`` and therefore contributes exactly zero.
+        """
+        threat: dict[str, float] = {}
+        for track in engine.observe(state.game_id, side).torpedo_tracks:
+            if track.side == side:
+                continue
+            position = track.position
+            horizon = min(track.range_remaining, max(track.speed_cycle) + 2)
+            for step in range(horizon + 1):
+                threat[position.label] = max(threat.get(position.label, 0.0), 1.0 - step * 0.06)
+                try:
+                    position = position.neighbor(track.heading)
+                except ValueError:
+                    break
+                if position.label in state.land_hexes:
+                    break
+        return threat
 
     def _predict_enemy_move(
         self, engine: IronBottomEngine, state, enemy: PublicShip, my_side: Side,
@@ -699,6 +747,14 @@ class TacticalCommander(DeterministicCommander):
             cand_dist = min(hexc.distance(position) for position in ctx.pred_hexes)
             score += own_value * self.profile.w_retreat * (cand_dist - start_dist) / self.profile.approach_range
         score += self._formation_factor(ship.position, hexc, heading, ctx.my_positions)
+        if ctx.visible_torpedo_threat:
+            exact = ctx.visible_torpedo_threat.get(hexc.label, 0.0)
+            nearby = max(
+                (value * 0.35 for label, value in ctx.visible_torpedo_threat.items()
+                 if HexCoord.from_label(label).distance(hexc) == 1),
+                default=0.0,
+            )
+            score -= self.profile.w_torpedo_avoid * max(exact, nearby)
         return score
 
     def _approach_delta(self, start_dist: int, cand_dist: int) -> float:
@@ -830,6 +886,12 @@ class TacticalCommander(DeterministicCommander):
         且 `expected_hits ≥ torpedo_min_expected` 的组合，每发射器一条订单。
         launch_at_mf/launch_hex/bearing 直接采纳组合（来自己方封存移动计划），
         天然满足校验。想定禁射由引擎 `_torpedo_candidates` blocked 自动覆盖。"""
+        if self.profile.torpedo_doctrine != "legacy":
+            orders, self._last_torpedo_audit = AdaptiveTorpedoPlanner(self.profile).orders(
+                engine, state, side
+            )
+            return orders
+        self._last_torpedo_audit = None
         obs = engine.observe(state.game_id, side)
         own_pos = [ship.position for ship in obs.ships if ship.side == side and not ship.sunk and ship.position]
         enemies = [ship for ship in obs.ships if ship.side != side and not ship.sunk and ship.position]

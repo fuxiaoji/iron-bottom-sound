@@ -1,6 +1,6 @@
 import {useEffect,useMemo,useState} from "react";
-import {gunneryAssist,torpedoAssist} from "./api";
-import type {GunneryAssistResponse,HexCoord,Observation,ReinforcementCandidates,Side,TorpedoAssistCombo,TorpedoAssistResponse} from "./types";
+import {gunneryAssist,torpedoAssist,torpedoTactics} from "./api";
+import type {GunneryAssistResponse,HexCoord,Observation,ReinforcementCandidates,Side,TorpedoAssistCombo,TorpedoAssistResponse,TorpedoTacticsResponse} from "./types";
 import {hexFromLabel,hexLabel} from "./hexGeometry";
 import {FormationMovementPanel,FormationSetupPanel} from "./FormationPanels";
 import type {FormationMovementDraft,FormationSetupDraft} from "./FormationPanels";
@@ -20,6 +20,7 @@ type TorpedoLauncherCandidate={launcher_id:string;loaded:number;sides:("port"|"s
 type TorpedoCandidate={ship_id:string;launchers:TorpedoLauncherCandidate[];launch_positions:{mf:number;hex:HexCoord;heading:number}[];settings:{index:number;speed:number[];range:number}[];blocked_reason:string|null};
 
 const numberValue=(value:string)=>Number.parseInt(value,10)||0;
+const doctrineLabel:Record<string,string>={direct_attack:"直接雷击",area_denial:"区域封锁",break_crossing_t:"破坏 T 头",formation_split:"切割编队",crossfire:"交叉雷幕",cover_withdrawal:"掩护撤退",reserve:"保留鱼雷"};
 // 鱼雷绝对航向 = 发射时点舰首 + 舷侧/角度的相对偏移（IBS-R-08.2）。
 // 偏移表由引擎 legal_actions 下发（relative_heading），前端只做展示换算，不复制规则常量。
 const torpedoHeading=(launcher:TorpedoLauncherCandidate|undefined,shipHeading:number,side:"port"|"starboard"|null,angle:"A"|"B"|"X"|"Y"|null):number|null=>{
@@ -59,6 +60,10 @@ export function PlanSheet({view,side,draft,setDraft,intent,setIntent,actionHints
  const [assistLoading,setAssistLoading]=useState(false);
  const [assistError,setAssistError]=useState("");
  const [assistSelected,setAssistSelected]=useState<TorpedoAssistCombo|null>(null);
+ const [tacticalAnalysis,setTacticalAnalysis]=useState<TorpedoTacticsResponse|null>(null);
+ const [tacticalLoading,setTacticalLoading]=useState(false);
+ const loadTacticalAnalysis=async()=>{if(!game)return;setTacticalLoading(true);setAssistError("");try{setTacticalAnalysis(await torpedoTactics(game,side))}catch(e){setAssistError(String(e))}finally{setTacticalLoading(false)}};
+ const adoptTacticalOrders=()=>commit(next=>{next.torpedoes=(tacticalAnalysis?.orders??[]) as unknown as TorpedoPlan[]});
  const selectAssistCombo=(combo:TorpedoAssistCombo|null)=>{setAssistSelected(combo);onAssistPath(combo?{path:combo.predicted_path.map(hexFromLabel),intercept:combo.intercept_hex?hexFromLabel(combo.intercept_hex):null}:null)};
  const loadAssist=async(targetId:string)=>{
   if(!game||!targetId)return;
@@ -93,6 +98,7 @@ export function PlanSheet({view,side,draft,setDraft,intent,setIntent,actionHints
    {view.phase==="gunnery"&&<ol><li>逐舰名册只显示至少有一个炮位能指向的已观察目标。</li><li>添加齐射后只会自动勾选对当前目标射界合法的炮位；灰色炮位不能参加本次射击。</li><li>换目标时会重新筛选炮位，所有合法齐射仍同时生效。</li></ol>}
   </div>}
   <label className="intent">指挥意图 / 备忘<textarea value={intent} onChange={event=>setIntent(event.target.value)} placeholder="例如：保持队形向西北航行，避免在本回合过早暴露。"/></label>
+  {view.phase==="torpedo_planning"&&<section className="adaptive-tactics"><div className="plan-heading"><h3>自适应鱼雷战术</h3><button type="button" disabled={tacticalLoading} onClick={()=>void loadTacticalAnalysis()}>{tacticalLoading?"正在计算反事实…":"分析封路 / 破 T / 交叉雷幕"}</button></div>{tacticalAnalysis&&<><p><b>{doctrineLabel[tacticalAnalysis.doctrine]??tacticalAnalysis.doctrine}</b> · {tacticalAnalysis.situation}</p>{tacticalAnalysis.reserve_reason&&<p className="success-note">建议保雷：{tacticalAnalysis.reserve_reason}</p>}<ol>{tacticalAnalysis.top_candidates.map((candidate,index)=><li key={candidate.option_id}><b>候选 {index+1}</b>：{candidate.response.route_changed?`迫使改道 ${candidate.response.forced_deviation} 格、减速 ${candidate.response.speed_loss} MF`:"敌方最佳航路不变"}；封锁收益 {candidate.denial_score.toFixed(2)}，预期命中 {candidate.expected_hits.toFixed(2)}</li>)}</ol>{tacticalAnalysis.orders.length>0&&<button type="button" onClick={adoptTacticalOrders}>采用整套合法联合订单（{tacticalAnalysis.orders.length} 个发射器）</button>}</>}</section>}
   {view.phase==="formation_setup"&&<FormationSetupPanel view={view} orders={parsed.formation_setup??[]} onChange={orders=>commit(next=>next.formation_setup=orders)}/>}
   {view.phase==="movement_planning"&&(parsed.formation_movement?.length??0)>0&&<FormationMovementPanel view={view} orders={parsed.formation_movement} onChange={orders=>commit(next=>next.formation_movement=orders)}/>}
   {view.phase==="reinforcement"&&<div><div className="plan-heading"><h3>增援计划</h3><span className="engine-filtered">检定结果由引擎下发</span></div>{!reinforcementCandidates||reinforcementCandidates.ships.length===0?<p className="empty-plan">本阶段没有可用增援，提交即确认。</p>:reinforcementCandidates.group_available===false?<div><p className="form-error">增援检定失败（骰点 {reinforcementCandidates.roll_result?.roll??"—"}，需 {reinforcementCandidates.succeeds_on.join("/")}）——本回合没有增援入场，提交确认即可。</p><p className="empty-plan">待入场舰队：{reinforcementCandidates.ships.map(ship=>shipName(ship.ship_id)).join("、")}。</p></div>:<div><p className="notation-help">增援检定成功（骰点 {reinforcementCandidates.roll_result?.roll}）！请在入口走廊 {reinforcementCandidates.entry_range?.join(" – ")}（共 {reinforcementCandidates.entry_hexes.length} 格）内为每艘舰选择入场格、舰首与速度。全部 {reinforcementCandidates.ships.length} 艘必须安排，入口格不得重复。</p><button type="button" onClick={autoFillReinforcements}>自动分配互不重复的入口格（速度 0 · 舰首 2）</button>{reinforcementCandidates.ships.map(ship=>{const order=parsed.reinforcements.find(item=>item.ship_id===ship.ship_id);const usedBy=order?parsed.reinforcements.filter(item=>item.ship_id!==ship.ship_id&&item.entry_hex.q===order.entry_hex.q&&item.entry_hex.r===order.entry_hex.r):[];const duplicate=usedBy.length>0;return <div className={`plan-row reinforcement ${duplicate?"duplicate":""}`} key={ship.ship_id}><b>{shipName(ship.ship_id)}</b><label>入口格<select value={order?hexLabel(order.entry_hex):""} onChange={event=>{const coord=hexFromLabel(event.target.value);if(coord)setReinforcement(ship.ship_id,{entry_hex:coord})}}><option value="">请选择入口格</option>{reinforcementCandidates.entry_hexes.map(label=><option value={label} key={label}>{label}</option>)}</select></label><label>舰首<select value={order?.heading??2} onChange={event=>setReinforcement(ship.ship_id,{heading:numberValue(event.target.value)})}>{[1,2,3,4,5,6].map(value=><option key={value}>{value}</option>)}</select></label><label>入场速度<input type="number" min="0" max={ship.max_speed??0} value={order?.speed??0} onChange={event=>setReinforcement(ship.ship_id,{speed:numberValue(event.target.value)})}/></label>{duplicate&&<small className="danger-text">入口格与 {usedBy.map(item=>shipName(item.ship_id)).join("、")} 重复，裁决会拒绝。</small>}</div>})}</div>}</div>}

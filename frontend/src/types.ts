@@ -29,6 +29,7 @@ export interface BattleReportPlan{
  situation_summary?:string|null;phase_goal?:string|null;
  unit_intents?:Record<string,string>;contingency?:string[];
  orders?:Record<string,unknown>;
+ tactical_analysis?:Record<string,unknown>|null;
 }
 export interface BattleReportAiAction{
  plan:BattleReportPlan;reasoning:string|null;model:string;
@@ -50,6 +51,12 @@ export interface TorpedoAssistResponse{
  target_id:string|null;target_name:string|null;
  projected_target:{hex:HexCoord|null;label:string|null;heading:number|null;speed:number|null;turns:number}|null;
  combos:TorpedoAssistCombo[];
+}
+export interface TorpedoTacticsResponse{
+ doctrine:"direct_attack"|"area_denial"|"break_crossing_t"|"formation_split"|"crossfire"|"cover_withdrawal"|"reserve";
+ situation:string;reserve_reason:string|null;selected_option_ids:string[];
+ orders:Record<string,unknown>[];
+ top_candidates:{option_id:string;expected_hits:number;denial_score:number;score:number;predicted_path:string[];response:{baseline_route:string;threatened_route:string;forced_deviation:number;speed_loss:number;route_changed:boolean}}[];
 }
 export interface GunneryAssistRecommendation{ship_id:string;target_id:string;mount_ids:string[];range:number;modifier:number}
 export interface GunneryAssistExcluded{ship_id:string;reason:string}

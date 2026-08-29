@@ -1353,6 +1353,55 @@ class IronBottomEngine:
             "combos": top,
         }
 
+    def torpedo_tactical_combos(self, state: GameState, side: Side) -> list[dict[str, Any]]:
+        """Return the full, count-expanded torpedo option set for tactical planning.
+
+        This is deliberately a read-only engine boundary: launcher availability, launch
+        positions, arcs, settings, projected paths and friendly-route intersections still
+        come from the rules core.  Enemy targets are restricted to ``observe`` so callers
+        cannot turn this helper into a hidden-contact oracle.  The tactical layer may rank
+        these rows, but every resulting :class:`TorpedoOrder` is validated again normally.
+        """
+        observation = self.observe(state.game_id, side)
+        visible_enemy_ids = {
+            ship.id for ship in observation.ships
+            if ship.side != side and not ship.sunk and ship.position is not None
+        }
+        friendly_routes: dict[str, set[str]] = {}
+        for own_ship in state.ships.values():
+            if own_ship.side == side and not own_ship.sunk and own_ship.position:
+                friendly_routes[own_ship.id] = {own_ship.position.label}
+        for trajectory in self.sealed_movement_trajectories(state, side)["trajectories"]:
+            friendly_routes.setdefault(trajectory["ship_id"], set()).update(
+                item["label"] for item in trajectory["trajectory"]
+            )
+
+        rows: list[dict[str, Any]] = []
+        launch_combos = self._assist_launch_combos(state, side)
+        for target_id in sorted(visible_enemy_ids):
+            target = state.ships[target_id]
+            for launch_combo in launch_combos:
+                evaluated = self._assist_evaluate(state, target, launch_combo, friendly_routes)
+                if evaluated.get("blocked_reason") or evaluated.get("friendly_risk"):
+                    continue
+                evaluated["target_id"] = target.id
+                evaluated["target_name"] = target.name
+                loaded = int(evaluated["salvo_size"])
+                for count in range(1, loaded + 1):
+                    row = dict(evaluated)
+                    row["salvo_size"] = count
+                    if row.get("aspect") and row.get("modifier") is not None:
+                        row["expected_hits"] = self.expected_torpedo_hits(
+                            row["aspect"], int(row["modifier"]), count
+                        )
+                    rows.append(row)
+        rows.sort(key=lambda row: (
+            row["ship_id"], row["launcher_id"], row["launch_at_mf"],
+            row["launch_side"], row["launch_angle"], row["setting_index"],
+            row["target_id"], row["salvo_size"],
+        ))
+        return rows
+
     def validate_orders(self, game_id: str, batch: OrderBatch, _prepared: bool = False) -> ValidationResult:
         state = self.get(game_id)
         errors: list[str] = []

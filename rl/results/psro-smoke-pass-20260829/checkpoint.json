@@ -1,0 +1,170 @@
+{
+  "config": {
+    "dashboard_port": 8767,
+    "generations": 1,
+    "out": "rl/results/psro-smoke-pass-20260829",
+    "population": 1,
+    "primary_scenario": "IBS-S-EM-01",
+    "rounds": 1,
+    "scenarios": [
+      "IBS-S-EM-01"
+    ],
+    "seed": 20260829,
+    "seeds_per_slot": 1,
+    "smoke": true,
+    "workers": 2
+  },
+  "created_at": 1787977803.865032,
+  "current_best": {
+    "fitness": 0.075,
+    "name": "round-0-gen-0"
+  },
+  "expected_games": 2,
+  "ga": {
+    "0": {
+      "best": {
+        "fitness": 0.075,
+        "id": 0,
+        "profile": {
+          "approach_range": 14,
+          "formation_spacing": [
+            2,
+            4
+          ],
+          "line_ahead": 2.046888712025042,
+          "retreat_hull_threshold": 0.2435488175723448,
+          "rng_seed_off": 0,
+          "temperature": 0.6068507658185971,
+          "top_k_candidates": 5,
+          "torpedo_doctrine": "adaptive",
+          "torpedo_max_range": 10,
+          "torpedo_min_expected": 0.258784647993416,
+          "torpedo_min_tactical_score": 0.0,
+          "w_approach": 1.5131244444217509,
+          "w_enemy_heat": 0.5634476231730416,
+          "w_finish": 0.7470132180053932,
+          "w_fire_pressure": 0.6690361089510488,
+          "w_formation": -0.48758261288560784,
+          "w_predict_opponent": 1.3207663868216784,
+          "w_protect_own": 1.0850100844711876,
+          "w_retreat": 1.4569063502362225,
+          "w_self_status": 0.0796327584021713,
+          "w_torpedo_avoid": 0.96134351982277,
+          "w_vp": 1.4356290227885298
+        }
+      },
+      "generation": 1,
+      "population": [
+        {
+          "fitness": 0.075,
+          "id": 0,
+          "profile": {
+            "approach_range": 14,
+            "formation_spacing": [
+              2,
+              4
+            ],
+            "line_ahead": 2.046888712025042,
+            "retreat_hull_threshold": 0.2435488175723448,
+            "rng_seed_off": 0,
+            "temperature": 0.6068507658185971,
+            "top_k_candidates": 5,
+            "torpedo_doctrine": "adaptive",
+            "torpedo_max_range": 10,
+            "torpedo_min_expected": 0.258784647993416,
+            "torpedo_min_tactical_score": 0.0,
+            "w_approach": 1.5131244444217509,
+            "w_enemy_heat": 0.5634476231730416,
+            "w_finish": 0.7470132180053932,
+            "w_fire_pressure": 0.6690361089510488,
+            "w_formation": -0.48758261288560784,
+            "w_predict_opponent": 1.3207663868216784,
+            "w_protect_own": 1.0850100844711876,
+            "w_retreat": 1.4569063502362225,
+            "w_self_status": 0.0796327584021713,
+            "w_torpedo_avoid": 0.96134351982277,
+            "w_vp": 1.4356290227885298
+          }
+        }
+      ]
+    }
+  },
+  "game_count": 2,
+  "meta_distribution": {
+    "balanced": 1.0
+  },
+  "payoff_matrix": [
+    [
+      0.0
+    ]
+  ],
+  "round": 1,
+  "stage": "complete",
+  "strategies": [
+    {
+      "name": "balanced",
+      "origin": "initial",
+      "profile": {
+        "approach_range": 12,
+        "formation_spacing": [
+          2,
+          4
+        ],
+        "line_ahead": 0.0,
+        "retreat_hull_threshold": 0.35,
+        "rng_seed_off": 0,
+        "temperature": 0.5,
+        "top_k_candidates": 5,
+        "torpedo_doctrine": "legacy",
+        "torpedo_max_range": 10,
+        "torpedo_min_expected": 0.3,
+        "torpedo_min_tactical_score": 0.15,
+        "w_approach": 0.5,
+        "w_enemy_heat": 1.0,
+        "w_finish": 0.5,
+        "w_fire_pressure": 1.0,
+        "w_formation": 0.0,
+        "w_predict_opponent": 1.0,
+        "w_protect_own": 0.5,
+        "w_retreat": 1.0,
+        "w_self_status": 0.3,
+        "w_torpedo_avoid": 2.5,
+        "w_vp": 0.3
+      }
+    },
+    {
+      "fitness": 0.075,
+      "name": "psro-r1",
+      "origin": "best_response",
+      "profile": {
+        "approach_range": 14,
+        "formation_spacing": [
+          2,
+          4
+        ],
+        "line_ahead": 2.046888712025042,
+        "retreat_hull_threshold": 0.2435488175723448,
+        "rng_seed_off": 0,
+        "temperature": 0.6068507658185971,
+        "top_k_candidates": 5,
+        "torpedo_doctrine": "adaptive",
+        "torpedo_max_range": 10,
+        "torpedo_min_expected": 0.258784647993416,
+        "torpedo_min_tactical_score": 0.0,
+        "w_approach": 1.5131244444217509,
+        "w_enemy_heat": 0.5634476231730416,
+        "w_finish": 0.7470132180053932,
+        "w_fire_pressure": 0.6690361089510488,
+        "w_formation": -0.48758261288560784,
+        "w_predict_opponent": 1.3207663868216784,
+        "w_protect_own": 1.0850100844711876,
+        "w_retreat": 1.4569063502362225,
+        "w_self_status": 0.0796327584021713,
+        "w_torpedo_avoid": 0.96134351982277,
+        "w_vp": 1.4356290227885298
+      }
+    }
+  ],
+  "updated_at": 1787978201.945,
+  "version": 1
+}
