@@ -698,6 +698,25 @@ def test_tactical_vs_tactical_completes_both_scenarios() -> None:
         assert engine.get(report.game_id).phase == Phase.COMPLETE
 
 
+@pytest.mark.parametrize(("allies_profile", "seed"), [
+    ("line", 20270831),
+    ("direct_attack", 20270832),
+])
+def test_s01_training_collision_dead_end_seeds_complete(
+    allies_profile: str, seed: int,
+) -> None:
+    report, engine, _ = run_match(
+        "IBS-S-01",
+        axis="tactical",
+        allies="tactical",
+        axis_profile="balanced",
+        allies_profile=allies_profile,
+        seed=seed,
+    )
+    assert report.passed, report.failure_reason
+    assert engine.get(report.game_id).phase == Phase.COMPLETE
+
+
 def test_tactical_match_is_deterministic_across_runs() -> None:
     def outcome(seed: int):
         report, engine, _ = run_match("IBS-S-03", axis="tactical", allies="deterministic", seed=seed)
