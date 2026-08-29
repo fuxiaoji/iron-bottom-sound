@@ -722,7 +722,11 @@ class RealisticCommander:
                 # choose an individually legal route and let the formation
                 # expander/simultaneous resolver perform deterministic
                 # formation emergency stops.
-                order = self.tactical._fallback_movement(engine, state, leader, [])
+                # A zero-cost placeholder may itself be individually
+                # uncommitable. That is intentional here: expansion below
+                # detects it and replaces it with a common-speed, detachment,
+                # or formation-emergency-stop order before submission.
+                order = MovementOrder(ship_id=leader.id, plan="0")
             movement.append(order)
             reserved.append((leader, order))
         contact_movement = [
