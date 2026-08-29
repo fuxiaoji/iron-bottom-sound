@@ -231,13 +231,23 @@ class League:
             }
 
     def _record_game(self, key: str, row: dict[str, Any], *, append_log: bool = True) -> None:
+        previous = self.state.setdefault("games", {}).get(key)
         payload = json.dumps(row, ensure_ascii=False, sort_keys=True)
         with self._connect() as connection:
             connection.execute(
                 "INSERT OR REPLACE INTO games(key, payload, finished_at) VALUES (?, ?, ?)",
                 (key, payload, float(row.get("finished_at", time.time()))),
             )
-        self.state.setdefault("games", {})[key] = row
+        self.state["games"][key] = row
+        if row.get("error"):
+            self.state["last_error"] = row["error"]
+        elif previous is not None and not previous.get("ok"):
+            remaining = [
+                game for game in self.state["games"].values()
+                if not game.get("ok") and game.get("error")
+            ]
+            latest = max(remaining, key=lambda game: game.get("finished_at", 0), default=None)
+            self.state["last_error"] = latest.get("error") if latest else None
         if append_log:
             _append_jsonl(self.games_path, row)
 
@@ -290,7 +300,9 @@ class League:
             (key, job) for key, job in jobs
             if key not in self.state["games"] or not self.state["games"][key].get("ok")
         ]
-        self.state["expected_games"] = len(self.state["games"]) + len(missing)
+        self.state["expected_games"] = len(
+            set(self.state["games"]) | {key for key, _job in jobs}
+        )
         self._checkpoint()
         if self.stop_requested:
             self.state["stage"] = "interrupted"
@@ -305,8 +317,6 @@ class League:
                 key, job = futures[future]
                 row = {**job, **future.result(), "key": key, "finished_at": time.time()}
                 self._record_game(key, row)
-                if row.get("error"):
-                    self.state["last_error"] = row["error"]
                 self._checkpoint()
                 if self.stop_requested:
                     for pending in futures:

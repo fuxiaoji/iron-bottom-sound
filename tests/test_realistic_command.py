@@ -272,6 +272,9 @@ def test_realistic_legal_actions_include_valid_editable_formation_starting_order
     ("balanced", "torpedo", 20280830),
     ("balanced", "balanced", 20280831),
     ("balanced", "brawl", 20280832),
+    ("balanced", "direct_attack", 20280832),
+    ("torpedo", "area_denial", 20280830),
+    ("torpedo", "crossfire", 20280830),
 ])
 def test_realistic_erma_training_regression_seeds_complete_legally(
     axis_profile: str, allies_profile: str, seed: int,

@@ -283,8 +283,13 @@ def _at_edge(position: HexCoord, edge: str) -> bool:
 
 
 def _withdrawal_order(engine: "IronBottomEngine", state: GameState, ship) -> MovementOrder:
-    if not ship.position or not ship.withdrawal_edge or _at_edge(ship.position, ship.withdrawal_edge):
+    if not ship.position or not ship.withdrawal_edge:
         return MovementOrder(ship_id=ship.id, plan="0")
+    if _at_edge(ship.position, ship.withdrawal_edge):
+        # The ship is removed by after_movement; authorize the zero-length
+        # boundary hold even when its damaged speed track normally requires
+        # movement.
+        return MovementOrder(ship_id=ship.id, plan="0", formation_emergency_stop=True)
     enemies = [item for item in state.ships.values() if item.side != ship.side and item.position and not item.sunk]
     candidates = engine.movement_candidates(state, ship, include_plans=True)["reachable"]
     scored: list[tuple[tuple[float, float, int, str], str]] = []
@@ -296,12 +301,27 @@ def _withdrawal_order(engine: "IronBottomEngine", state: GameState, ship) -> Mov
             for enemy in enemies
         )
         score = (float(enemy_distance), -enemy_pressure, -_edge_distance(position, ship.withdrawal_edge), position.label)
-        if entry.get("plan") is not None:
-            preview = engine.movement_preview(state, ship, plan=entry["plan"])
+        plans = [entry["plan"]] if entry.get("plan") is not None else []
+        for heading in entry["final_headings"]:
+            path = engine.movement_path(state, ship, position, heading=heading)
+            if path.get("valid") and path["plan"] not in plans:
+                plans.append(path["plan"])
+        for plan in plans:
+            preview = engine.movement_preview(state, ship, plan=plan)
             if preview["commitable"]:
-                scored.append((score, entry["plan"]))
+                scored.append((score, plan))
     if not scored:
-        return MovementOrder(ship_id=ship.id, plan="0")
+        # Forced-straight damage can make every target-oriented path invalid
+        # even though a plain legal straight programme exists.
+        minimum, maximum = engine._legal_speed_range(ship, state.turn)
+        for speed in range(maximum, minimum - 1, -1):
+            plan = str(speed)
+            if engine.movement_preview(state, ship, plan=plan)["commitable"]:
+                return MovementOrder(ship_id=ship.id, plan=plan)
+        stay = engine.movement_preview(state, ship, plan="0")
+        if stay["commitable"]:
+            return MovementOrder(ship_id=ship.id, plan="0")
+        raise ValueError(f"{ship.id}: withdrawal controller has no legal movement")
     return MovementOrder(ship_id=ship.id, plan=max(scored, key=lambda item: item[0])[1])
 
 
@@ -694,7 +714,15 @@ class RealisticCommander:
                 ), None)
             if leader is None:
                 continue
-            order = self.tactical._movement_order_for(engine, state, leader, context, reserved)
+            try:
+                order = self.tactical._movement_order_for(engine, state, leader, context, reserved)
+            except ValueError:
+                # Formation leaders are only provisional at this layer.  If
+                # independent leader reservations form a cyclic dead end,
+                # choose an individually legal route and let the formation
+                # expander/simultaneous resolver perform deterministic
+                # formation emergency stops.
+                order = self.tactical._fallback_movement(engine, state, leader, [])
             movement.append(order)
             reserved.append((leader, order))
         contact_movement = [

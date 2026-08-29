@@ -45,3 +45,17 @@ def test_requested_stop_is_resumable_not_failed(tmp_path) -> None:
 
     resumed = League(config, resume=True)
     assert resumed.state["stage"] == "interrupted"
+
+
+def test_corrected_invalid_result_clears_dashboard_error_and_keeps_unique_total(tmp_path) -> None:
+    league = League(Config(out=str(tmp_path / "league"), rounds=0, workers=1))
+    league._record_game("same-key", {
+        "kind": "matrix", "ok": False, "error": "old failure", "elapsed_ms": 1,
+    })
+    assert league.state["last_error"] == "old failure"
+    league._record_game("same-key", {
+        "kind": "matrix", "ok": True, "error": None, "elapsed_ms": 1,
+    })
+    league._checkpoint()
+    assert league.state["last_error"] is None
+    assert len(league.state["games"]) == 1
