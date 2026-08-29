@@ -491,3 +491,10 @@
 - **断电恢复与面板**：每局结果提交 SQLite WAL（synchronous=FULL），同时 fsync JSONL；阶段检查点和 status 使用原子替换。主动停止写入 interrupted 且不注册未完成冠军，断电后用 --resume 从 SQLite 继续。dashboard.html 每秒显示进度、ETA、混合策略、当前最佳和错误；运行手册为 rl/PSRO.md。
 - **烟雾证据**：真实模式二马烟雾联赛 2/2 完成；两局均运行到第 12 回合，无错误、无友军碰撞、无鱼雷友伤。SQLite 断点恢复重新载入 2 局并保持 complete；自适应双方 seed 47 完整终局、0 回退且事件回放一致。
 - **自动验证**：最终全量 **389 tests passed**（退出码 0；仅既有 Starlette TestClient 弃用警告）；TypeScript tsc -b 与 Vite 生产构建通过（43 modules transformed）；git diff --check 与敏感信息模式扫描通过。未调用或写入聊天中出现的 API 密钥。
+
+## 2026-08-29：正式训练首批真实模式缺陷修复（提交 d66f336）
+
+- **训练反馈**：正式收益矩阵首批完成 75 局后，面板捕获 13 个无效结果；立即停止进程并保留 SQLite/WAL 检查点，没有让无效基线继续参与冠军选择。
+- **根因修复**：编队解散时残存附属舰现在永久转入自动撤退；受强制直航影响的后舰不再追加尾部转向；安全回退在共同航速区间断裂时选择合法脱队而非非法降速；多次脱队后重新计算剩余成员共同速度。
+- **续训语义**：--resume 将 ok=false 的确定性结果键视为待重跑并覆盖 SQLite 行，既保留审计历史，又不会把旧无效结果当缓存命中。
+- **回归证据**：将 seed 20280829–20280832 的 balanced/balanced、balanced/torpedo、balanced/brawl 四种完整二马对局固化为测试；全部运行到真实模式第 12 回合，无友军碰撞、无鱼雷友伤。最终全量 **394 tests passed**。
