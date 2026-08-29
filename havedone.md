@@ -526,3 +526,4 @@
 - **面板监控**：工作池运行时每两秒独立更新 status.json；300 秒无完成结果即写 stalled=true、progress_age_seconds 和 running_jobs，面板显示“疑似停滞”，即使主完成循环未返回也能观察活锁。
 - **精确回归**：四组 evolved 对 area_denial、break_crossing_t、formation_split、crossfire 的真实模式二马卡死种子均运行至第 12 回合，0 友军碰撞、0 鱼雷友伤；balanced 对 crossfire 的经典想定 1 完整终局；PSRO 心跳/停滞/恢复测试通过。
 - **全量验证**：pytest 收集并通过 410/410（退出码 0，仅既有 Starlette TestClient 弃用警告）；git diff --check 通过；真实密钥特征扫描无命中。训练尚未在本条记录时重启，下一步从同一 rl/results/psro-torpedo-v1 目录 --resume，先确认完成数越过 636。
+- **断点恢复复核**：在固定实现提交 5db6eac 上以 --resume 启动 PID 20668；首次观察已从 636 推进至 644/1452，running_jobs=808、invalid=0、stalled=false、进度年龄约 4 秒，127.0.0.1:8765 面板监听正常。
