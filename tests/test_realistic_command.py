@@ -1,5 +1,7 @@
 from copy import deepcopy
 
+import pytest
+
 from iron_bottom_sound.engine import ORDER_PHASES, IronBottomEngine
 from iron_bottom_sound.match import run_match
 from iron_bottom_sound.models import (
@@ -263,3 +265,36 @@ def test_realistic_legal_actions_include_valid_editable_formation_starting_order
         formation_movement=suggested,
     )
     assert engine.validate_orders(game_id, batch).valid
+
+
+@pytest.mark.parametrize(("axis_profile", "allies_profile", "seed"), [
+    ("balanced", "balanced", 20280829),
+    ("balanced", "torpedo", 20280830),
+    ("balanced", "balanced", 20280831),
+    ("balanced", "brawl", 20280832),
+])
+def test_realistic_erma_training_regression_seeds_complete_legally(
+    axis_profile: str, allies_profile: str, seed: int,
+) -> None:
+    report, engine, _sessions = run_match(
+        "IBS-S-EM-01",
+        axis="tactical",
+        allies="tactical",
+        axis_profile=axis_profile,
+        allies_profile=allies_profile,
+        seed=seed,
+        options=GameOptions(realistic_command=True),
+        request_limit=180,
+    )
+    assert report.passed, report.failure_reason
+    state = engine.get(report.game_id)
+    assert state.phase == Phase.COMPLETE and state.turn == 12
+    assert not any(
+        event.type in {"collision", "collision_check"} and event.payload.get("friendly")
+        for event in state.events
+    )
+    assert not any(
+        event.type == "torpedo_hit"
+        and event.payload.get("attacker_side") == event.payload.get("target_side")
+        for event in state.events
+    )

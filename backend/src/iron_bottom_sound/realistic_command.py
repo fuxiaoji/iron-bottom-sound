@@ -431,15 +431,12 @@ def expand_movement_orders(
             hex_path = route[start_index + 1:final_index + 1]
             try:
                 commands = engine.path_to_commands(ship, hex_path)
-                if ship.forced_straight_turns and any(command != "advance" for command in commands):
-                    errors.append(f"{formation.id}: {ship.id} forced movement prevents formation following")
-                    continue
                 # End bow-on to the next guide segment. A trailing ship that
                 # reaches a bend but keeps its old heading would need to turn
                 # before its mandatory first advance next turn (illegal under
                 # IBS-R-06). A final 60-degree turn is free and preserves the
                 # exact wake for the next formation order.
-                if final_index + 1 < len(route):
+                if final_index + 1 < len(route) and not ship.forced_straight_turns:
                     _program, final_heading = engine._movement_program(ship.position, ship.heading, commands)
                     desired_heading = engine._bearing_between(route[final_index], route[final_index + 1])
                     relative = (desired_heading - final_heading) % 6
@@ -447,6 +444,9 @@ def expand_movement_orders(
                         commands.append("turn_starboard_60")
                     elif relative == 5:
                         commands.append("turn_port_60")
+                if ship.forced_straight_turns and any(command != "advance" for command in commands):
+                    errors.append(f"{formation.id}: {ship.id} forced movement prevents formation following")
+                    continue
                 follower_plan = engine.commands_to_plan(commands)
                 follower_cost = engine.movement_cost(follower_plan, commands)
                 if commands and commands[0] != "advance":
@@ -556,6 +556,16 @@ def refresh_command_chain(engine: "IronBottomEngine", state: GameState) -> None:
         candidates = [formation.reserve_flagship_id] + formation.succession_order + formation.ship_ids
         new_flagship = next((ship_id for ship_id in candidates if ship_id != formation.flagship_id and ship_id in state.ships and not state.ships[ship_id].sunk and state.ships[ship_id].captain_status != "killed" and state.ships[ship_id].command_status == "attached"), None)
         if not new_flagship:
+            formation.status = "dissolved"
+            # A dissolved formation must not leave attached ships without a
+            # formation order.  Remaining survivors permanently enter the
+            # same deterministic withdrawal controller used for detachments.
+            orphaned = [
+                ship_id for ship_id in formation.ship_ids
+                if state.ships[ship_id].position and not state.ships[ship_id].sunk
+                and state.ships[ship_id].command_status == "attached"
+            ]
+            apply_detachments(engine, state, orphaned)
             formation.status = "dissolved"
             continue
         previous = formation.flagship_id
@@ -781,17 +791,38 @@ class RealisticCommander:
                 ]
                 minimum = max((engine._legal_speed_range(ship, state.turn)[0] for ship in members), default=0)
                 maximum = min((engine._legal_speed_range(ship, state.turn)[1] for ship in members), default=0)
-                speed = max(minimum, min(maximum, formation.speed)) if minimum <= maximum else 0
-                safe_orders.append(FormationMovementOrder(
-                    formation_id=formation.id,
-                    leader_plan=str(speed),
-                    spacing=formation.spacing,
-                    speed_decision={
-                        "formation_id": formation.id,
-                        "action": "reduce",
-                        "speed": speed,
-                    },
-                ))
+                if minimum <= maximum:
+                    speed = max(minimum, min(maximum, formation.speed))
+                    safe_orders.append(FormationMovementOrder(
+                        formation_id=formation.id,
+                        leader_plan=str(speed),
+                        spacing=formation.spacing,
+                        speed_decision={
+                            "formation_id": formation.id,
+                            "action": "reduce",
+                            "speed": speed,
+                        },
+                    ))
+                else:
+                    leader = state.ships.get(formation.leader_id)
+                    if leader not in members:
+                        leader = members[0]
+                    speed = engine._legal_speed_range(leader, state.turn)[1]
+                    detach = [
+                        ship.id for ship in members
+                        if not engine._legal_speed_range(ship, state.turn)[0]
+                        <= speed <= engine._legal_speed_range(ship, state.turn)[1]
+                    ]
+                    safe_orders.append(FormationMovementOrder(
+                        formation_id=formation.id,
+                        leader_plan=str(speed),
+                        spacing=formation.spacing,
+                        speed_decision={
+                            "formation_id": formation.id,
+                            "action": "detach",
+                            "detach_ship_ids": detach,
+                        },
+                    ))
                 intents[formation.id] = "航迹冲突：保持纵队直航"
             batch.formation_movement = safe_orders
             # A collision can leave a rear ship several stations away from the
@@ -893,6 +924,35 @@ class RealisticCommander:
                                 action="detach",
                                 detach_ship_ids=sorted(already),
                                 emergency_stop=bool(formation_order.speed_decision and formation_order.speed_decision.emergency_stop),
+                            )
+                            remaining = [ship for ship in members if ship.id not in already]
+                            if remaining:
+                                common_minimum = max(engine._legal_speed_range(ship, state.turn)[0] for ship in remaining)
+                                common_maximum = min(engine._legal_speed_range(ship, state.turn)[1] for ship in remaining)
+                                if common_minimum <= common_maximum:
+                                    formation_order.leader_plan = str(common_maximum)
+                            changed = True
+                    elif "detach decision leaves incompatible formation ships" in error:
+                        leader = state.ships.get(formation.leader_id)
+                        if leader not in members:
+                            leader = members[0]
+                        speed = engine._legal_speed_range(leader, state.turn)[1]
+                        already = set(
+                            formation_order.speed_decision.detach_ship_ids
+                            if formation_order.speed_decision and formation_order.speed_decision.action == "detach"
+                            else []
+                        )
+                        already.update(
+                            ship.id for ship in members
+                            if not engine._legal_speed_range(ship, state.turn)[0]
+                            <= speed <= engine._legal_speed_range(ship, state.turn)[1]
+                        )
+                        if already and len(already) < len(members):
+                            formation_order.leader_plan = str(speed)
+                            formation_order.speed_decision = FormationSpeedDecision(
+                                formation_id=formation.id,
+                                action="detach",
+                                detach_ship_ids=sorted(already),
                             )
                             changed = True
                 if not changed:

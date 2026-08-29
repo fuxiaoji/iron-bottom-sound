@@ -284,7 +284,12 @@ class League:
         _atomic_json(self.status_path, status)
 
     def _run_jobs(self, jobs: list[tuple[str, dict[str, Any]]]) -> None:
-        missing = [(key, job) for key, job in jobs if key not in self.state["games"]]
+        # Invalid/interrupted rows are evidence, not cache hits. Re-run their
+        # deterministic keys after a code fix and replace the SQLite payload.
+        missing = [
+            (key, job) for key, job in jobs
+            if key not in self.state["games"] or not self.state["games"][key].get("ok")
+        ]
         self.state["expected_games"] = len(self.state["games"]) + len(missing)
         self._checkpoint()
         if self.stop_requested:
