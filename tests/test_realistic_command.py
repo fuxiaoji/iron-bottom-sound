@@ -15,6 +15,7 @@ from iron_bottom_sound.models import (
 )
 from iron_bottom_sound.realistic_command import (
     RealisticCommander,
+    _best_formation_cohort,
     default_setup_orders,
     expand_movement_orders,
     refresh_command_chain,
@@ -44,6 +45,31 @@ def advance_empty_orders(engine: IronBottomEngine, game_id: str) -> None:
             game_id, OrderBatch(side=side, phase=state.phase)
         ).valid
     engine.advance(game_id)
+
+
+def test_best_formation_cohort_recomputes_speed_after_forced_detach(monkeypatch) -> None:
+    engine, game_id = realistic_game()
+    state = engine.get(game_id)
+    formation = next(item for item in state.formations.values() if item.side == Side.AXIS)
+    members = [state.ships[ship_id] for ship_id in formation.ship_ids if state.ships[ship_id].position]
+    assert len(members) >= 3
+    ranges = {
+        members[0].id: (4, 6),
+        members[1].id: (0, 3),
+        members[2].id: (2, 5),
+    }
+    for member in members[3:]:
+        ranges[member.id] = (2, 5)
+    monkeypatch.setattr(
+        engine, "_legal_speed_range", lambda ship, _turn: ranges[ship.id],
+    )
+    speed, detach = _best_formation_cohort(
+        engine, state, formation, members, {members[0].id},
+    )
+    assert speed == 3
+    assert members[0].id in detach
+    assert members[1].id not in detach
+    assert members[2].id not in detach
 
 
 def test_realistic_mode_is_opt_in_and_classic_phase_is_unchanged() -> None:

@@ -307,6 +307,11 @@ def _withdrawal_order(engine: "IronBottomEngine", state: GameState, ship) -> Mov
             if path.get("valid") and path["plan"] not in plans:
                 plans.append(path["plan"])
         for plan in plans:
+            commands = engine.movement_commands(MovementOrder(ship_id=ship.id, plan=plan))
+            if ship.turn_limit_degrees == 60 and any(command.endswith("120") for command in commands):
+                continue
+            if ship.forced_straight_turns and any(command != "advance" for command in commands):
+                continue
             preview = engine.movement_preview(state, ship, plan=plan)
             if preview["commitable"]:
                 scored.append((score, plan))
@@ -336,6 +341,46 @@ def _truncate_plan(engine: "IronBottomEngine", ship_id: str, plan: str, speed: i
         kept.append(command)
         cost += delta
     return engine.commands_to_plan(kept)
+
+
+def _best_formation_cohort(
+    engine: "IronBottomEngine", state: GameState, formation: FormationState,
+    members: list[ShipState], forced_detach: set[str] | None = None,
+) -> tuple[int, list[str]]:
+    """Choose the largest remaining cohort sharing one legal straight speed.
+
+    A detachment decision is permanent, so every retry recomputes the complete
+    survivor speed intersection instead of accumulating a stale leader speed.
+    Ties preserve the current leader, stay near formation speed, then prefer the
+    faster deterministic programme.
+    """
+    forced = set(forced_detach or ())
+    available = [ship for ship in members if ship.id not in forced]
+    if not available:
+        return 0, sorted(forced)
+    maximum = max(engine._legal_speed_range(ship, state.turn)[1] for ship in available)
+    choices: list[tuple[tuple[int, int, int, int], int, list[ShipState]]] = []
+    for speed in range(maximum + 1):
+        compatible = [
+            ship for ship in available
+            if engine._legal_speed_range(ship, state.turn)[0]
+            <= speed <= engine._legal_speed_range(ship, state.turn)[1]
+        ]
+        if not compatible:
+            continue
+        score = (
+            len(compatible),
+            int(any(ship.id == formation.leader_id for ship in compatible)),
+            -abs(speed - formation.speed),
+            speed,
+        )
+        choices.append((score, speed, compatible))
+    if not choices:
+        return 0, sorted(ship.id for ship in members)
+    _score, speed, compatible = max(choices, key=lambda item: item[0])
+    retained = {ship.id for ship in compatible}
+    detach = sorted(ship.id for ship in members if ship.id not in retained)
+    return speed, detach
 
 
 def expand_movement_orders(
@@ -791,12 +836,9 @@ class RealisticCommander:
                     leader_plan = str(maximum)
                 intents[formation.id] = "领舰机动，后舰沿共享航迹尾随"
             else:
-                leader_min, leader_max = engine._legal_speed_range(leader, state.turn)
-                speed = leader_max
-                detach = [
-                    ship.id for ship in members
-                    if not engine._legal_speed_range(ship, state.turn)[0] <= speed <= engine._legal_speed_range(ship, state.turn)[1]
-                ]
+                speed, detach = _best_formation_cohort(
+                    engine, state, formation, members,
+                )
                 leader_plan = str(speed)
                 formation_orders.append(FormationMovementOrder(
                     formation_id=formation.id, leader_plan=leader_plan,
@@ -849,12 +891,9 @@ class RealisticCommander:
                     leader = state.ships.get(formation.leader_id)
                     if leader not in members:
                         leader = members[0]
-                    speed = engine._legal_speed_range(leader, state.turn)[1]
-                    detach = [
-                        ship.id for ship in members
-                        if not engine._legal_speed_range(ship, state.turn)[0]
-                        <= speed <= engine._legal_speed_range(ship, state.turn)[1]
-                    ]
+                    speed, detach = _best_formation_cohort(
+                        engine, state, formation, members,
+                    )
                     safe_orders.append(FormationMovementOrder(
                         formation_id=formation.id,
                         leader_plan=str(speed),
@@ -872,7 +911,7 @@ class RealisticCommander:
             # follower still cannot regain station at the formation's minimum
             # legal speed, it is genuinely unable to maintain the column and
             # is permanently detached under IBS-R-RC-04.
-            for _attempt in range(16):
+            for _attempt in range(64):
                 _prepared, retry_errors, _detach = expand_movement_orders(engine, state, batch)
                 if not retry_errors:
                     break
@@ -937,6 +976,76 @@ class RealisticCommander:
                     minimum = max((engine._legal_speed_range(ship, state.turn)[0] for ship in members), default=0)
                     current = int(formation_order.leader_plan) if formation_order.leader_plan.isdigit() else formation.speed
                     forced_separation = " forced movement prevents formation following" in error
+                    trail_failure = (
+                        " cannot follow guide trail" in error
+                        or " is no longer on the guide trail" in error
+                    )
+                    if " follower speed " in error or trail_failure or forced_separation:
+                        follower = next((ship for ship in members if f": {ship.name} " in error or f": {ship.id} " in error), None)
+                        if follower and len(members) >= 1:
+                            already = set(
+                                formation_order.speed_decision.detach_ship_ids
+                                if formation_order.speed_decision and formation_order.speed_decision.action == "detach"
+                                else []
+                            )
+                            already.add(follower.id)
+                            speed, detach = _best_formation_cohort(
+                                engine, state, formation, members, already,
+                            )
+                            formation_order.speed_decision = FormationSpeedDecision(
+                                formation_id=formation.id,
+                                action="detach",
+                                detach_ship_ids=detach,
+                                emergency_stop=bool(formation_order.speed_decision and formation_order.speed_decision.emergency_stop),
+                            )
+                            formation_order.leader_plan = str(speed)
+                            changed = True
+                            continue
+                    if "reduced speed is not legal for every member" in error:
+                        common_minimum = max(
+                            (engine._legal_speed_range(ship, state.turn)[0] for ship in members),
+                            default=0,
+                        )
+                        common_maximum = min(
+                            (engine._legal_speed_range(ship, state.turn)[1] for ship in members),
+                            default=0,
+                        )
+                        if common_minimum <= common_maximum:
+                            speed = max(common_minimum, min(common_maximum, formation.speed))
+                            formation_order.leader_plan = str(speed)
+                            formation_order.speed_decision = FormationSpeedDecision(
+                                formation_id=formation.id, action="reduce", speed=speed,
+                            )
+                        else:
+                            speed, detach = _best_formation_cohort(
+                                engine, state, formation, members,
+                            )
+                            formation_order.leader_plan = str(speed)
+                            formation_order.speed_decision = FormationSpeedDecision(
+                                formation_id=formation.id,
+                                action="detach",
+                                detach_ship_ids=detach,
+                            )
+                        changed = True
+                        continue
+                    if "detach decision leaves incompatible formation ships" in error:
+                        already = set(
+                            formation_order.speed_decision.detach_ship_ids
+                            if formation_order.speed_decision and formation_order.speed_decision.action == "detach"
+                            else []
+                        )
+                        speed, detach = _best_formation_cohort(
+                            engine, state, formation, members, already,
+                        )
+                        if detach and len(detach) < len(members):
+                            formation_order.leader_plan = str(speed)
+                            formation_order.speed_decision = FormationSpeedDecision(
+                                formation_id=formation.id,
+                                action="detach",
+                                detach_ship_ids=detach,
+                            )
+                            changed = True
+                        continue
                     if current > minimum and not forced_separation:
                         current -= 1
                         formation_order.leader_plan = str(current)
@@ -948,55 +1057,6 @@ class RealisticCommander:
                             )
                         changed = True
                         continue
-                    trail_failure = (
-                        " cannot follow guide trail" in error
-                        or " is no longer on the guide trail" in error
-                    )
-                    if " follower speed " in error or trail_failure or forced_separation:
-                        follower = next((ship for ship in members if f": {ship.name} " in error or f": {ship.id} " in error), None)
-                        if follower and len(members) >= 1 and (forced_separation or current <= minimum):
-                            already = set(
-                                formation_order.speed_decision.detach_ship_ids
-                                if formation_order.speed_decision and formation_order.speed_decision.action == "detach"
-                                else []
-                            )
-                            already.add(follower.id)
-                            formation_order.speed_decision = FormationSpeedDecision(
-                                formation_id=formation.id,
-                                action="detach",
-                                detach_ship_ids=sorted(already),
-                                emergency_stop=bool(formation_order.speed_decision and formation_order.speed_decision.emergency_stop),
-                            )
-                            remaining = [ship for ship in members if ship.id not in already]
-                            if remaining:
-                                common_minimum = max(engine._legal_speed_range(ship, state.turn)[0] for ship in remaining)
-                                common_maximum = min(engine._legal_speed_range(ship, state.turn)[1] for ship in remaining)
-                                if common_minimum <= common_maximum:
-                                    formation_order.leader_plan = str(common_maximum)
-                            changed = True
-                    elif "detach decision leaves incompatible formation ships" in error:
-                        leader = state.ships.get(formation.leader_id)
-                        if leader not in members:
-                            leader = members[0]
-                        speed = engine._legal_speed_range(leader, state.turn)[1]
-                        already = set(
-                            formation_order.speed_decision.detach_ship_ids
-                            if formation_order.speed_decision and formation_order.speed_decision.action == "detach"
-                            else []
-                        )
-                        already.update(
-                            ship.id for ship in members
-                            if not engine._legal_speed_range(ship, state.turn)[0]
-                            <= speed <= engine._legal_speed_range(ship, state.turn)[1]
-                        )
-                        if already and len(already) < len(members):
-                            formation_order.leader_plan = str(speed)
-                            formation_order.speed_decision = FormationSpeedDecision(
-                                formation_id=formation.id,
-                                action="detach",
-                                detach_ship_ids=sorted(already),
-                            )
-                            changed = True
                 if not changed:
                     break
         plan = AIPlanSheet(
