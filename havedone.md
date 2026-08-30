@@ -558,3 +558,13 @@
 - **真实控件闭环**：经典教学依次绑定示范航路、逐格推进、确认航路、鱼雷发射器、合法炮击和阶段提交；二马绑定舰间距、巨炮齐射、含真实速度冲突的编队选择框、同步移动、阶段裁决和最终战报。提交步骤只有引擎实际切换阶段才会进入下一课，校验失败不会假完成。
 - **界面收口**：移除右栏冗长的“现在照着做”计划块，保留一段当前机制摘要和规则号；强制教练支持侧栏滚动、小屏布局及减少动画偏好。
 - **验证**：教学/API 聚焦 **12 项全部通过**；TypeScript `tsc -b` 与 Vite 生产构建通过（44 modules transformed）；`git diff --check` 通过；本地 `http://127.0.0.1:8000/` 返回 HTTP 200 并提供新 bundle `index-DJydzrm4.js`。应用内浏览器控制仍被本机 Windows ACL 拒绝启动，因此明确不把静态 DOM/HTTP 检查表述为可视点击验收。
+
+## 2026-08-30：手机/平板适配与生产无损发布（提交 `b1f827d`）
+
+- **触控工作区**：小于等于 1100px 时改为固定底部“舰队 / 海图 / 命令”三页签，三个主区域互斥接收触控；手机阶段按钮独占一行，表单、编队、鱼雷、炮击、舰船记录和战报按可用宽度降为双列或单列，核心控件不低于 44px。
+- **移动浏览器基础**：入口补齐 UTF-8、`width=device-width`、`viewport-fit=cover`、主题色和中文标题；游戏壳使用 `100dvh` 与安全区，手机横屏采用更矮底栏和侧置航路编辑器，避免地址栏与手势区遮挡。
+- **教学联动**：强制教练在定位舰队、地图或命令控件前会自动切换相应移动页签；教练卡固定在底栏上方，不会把当前目标藏在不可见面板。
+- **多视口实测**：使用本机 Edge/Playwright 真实点击二马教学，390×844 下三个页签均能切换且每个按钮为 126×55px，地图、舰队和命令区域互斥可见，命令区独立滚动且无横向溢出；844×390 手机横屏、820×1180 平板竖屏及 1440×900 桌面大厅均无横向溢出，首屏可见教学主入口。截图保存在系统临时目录，不纳入仓库。
+- **回归**：`tests/test_tutorials.py` 与 `tests/test_api_llm_storage.py` 共 **12 项全部通过**；TypeScript 与 Vite 生产构建通过（44 modules transformed），本地产物为 `index-ChZ5GElN.js` / `index-BAYbgQbP.css`。
+- **生产备份**：发布前线上 SQLite 为 46 局、1995 条事件且 `integrity_check=ok`。使用 SQLite Backup API 写入 `/opt/tiedi/backups/pre-mobile-b1f827d-20260830-2110/iron-bottom-sound.sqlite3`（66,623,320 bytes，SHA-256 `cd635cacb912cb971748ed70ef46a03dfef4b02b4db367c6a7b814d8ab04ef90`），同时保存运行文件回滚包 `runtime-files.tgz`（630,722 bytes，SHA-256 `2510a36a8feb845ec498d417afb9fe505098d8e01965e7dbe6b5d12bcbd93fc7`）；备份再次核对为 46 局、1995 事件、完整性 `ok`。
+- **生产验收**：服务器从 Git 归档 `45c004284652380e22a5fdfd7701830873fbe06327ce9cb4f7da2e7722e1da7e` 构建 `/tiedi/`，生成 `index-DhJ1EQBv.js` / `index-BAYbgQbP.css`；`tiedi.service` 为 active，内部首页、想定 API 与公网 `https://fuwenji.asia/tiedi/` 均为 HTTP 200，公网入口含 `viewport-fit=cover`。发布后数据库仍为 46 局、1995 条事件、完整性 `ok`，最早旧对局经阵营过滤 `/view` 返回 HTTP 200。
