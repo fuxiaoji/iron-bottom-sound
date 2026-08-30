@@ -220,8 +220,9 @@ class IronBottomEngine:
     ) -> GameState:
         identifier = game_id or str(uuid.uuid4())
         state = build_initial_state(identifier, scenario_id, seed, options or GameOptions())
-        from .tutorials import validate_tutorial_options
+        from .tutorials import prepare_tutorial_state, record_tutorial_start, validate_tutorial_options
         validate_tutorial_options(state)
+        prepare_tutorial_state(state)
         self._event(
             state,
             "game_created",
@@ -234,6 +235,7 @@ class IronBottomEngine:
             },
             rule=self._rule("IBS-R-05", 6, "5.0"),
         )
+        record_tutorial_start(self, state)
         self.games[identifier] = state
         self.initial_states[identifier] = state.model_copy(deep=True)
         return state

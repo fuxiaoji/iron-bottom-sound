@@ -67,6 +67,22 @@ def test_formal_erma_game_never_receives_tutorial_script_damage() -> None:
     assert not any(item.type == "tutorial_speed_crisis" for item in current.events)
 
 
+def test_erma_tutorial_opens_with_a_real_visible_grand_fleet_salvo() -> None:
+    engine = IronBottomEngine()
+    state = engine.reset(
+        "IBS-S-EM-01",
+        seed=70,
+        options=GameOptions(mode="tutorial", realistic_command=True, tutorial_script="erma_grand_fleet"),
+    )
+    _submit_both(engine, state.game_id)
+    engine.advance(state.game_id)
+    batch = RealisticCommander().choose_orders(engine, state.game_id, Side.AXIS)
+    assert batch.gunnery
+    assert any(order.mounts for order in batch.gunnery)
+    assert engine.validate_orders(state.game_id, batch).valid
+    assert any(item.type == "tutorial_deployment_staged" for item in engine.get(state.game_id).events)
+
+
 def test_erma_tutorial_coach_exposes_an_explicit_editable_reduce_choice() -> None:
     engine = IronBottomEngine()
     state = engine.reset(

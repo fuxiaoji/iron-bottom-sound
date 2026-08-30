@@ -7,6 +7,16 @@ tutorial:
   scenario_id: IBS-S-EM-01
   requires: {mode: tutorial, realistic_command: true}
 events:
+  - id: IBS-TUT-EM-01
+    title: 远程炮战教学部署
+    checkpoint: reset
+    once_flag: erma_close_action_deployment
+    effect:
+      axis_translation: {columns: 4, rows: 5}
+      allies_translation: {columns: -4, rows: -5}
+    purpose: 让双方主力舰在首轮炮击处于想定能见度与合法炮程内。
+    execution: iron_bottom_sound.tutorials.prepare_tutorial_state
+    status: tested
   - id: IBS-TUT-EM-05
     title: 共同航速危机
     checkpoint: after_turn_1_fire

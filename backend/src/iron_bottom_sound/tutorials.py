@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .models import FormationSpeedDecision, GameState, OrderBatch, Phase, RuleReference, Side
+from .models import FormationSpeedDecision, GameState, HexCoord, OrderBatch, Phase, RuleReference, Side, index_to_column
 
 if TYPE_CHECKING:
     from .engine import IronBottomEngine
@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 ERMA_SCRIPT = "erma_grand_fleet"
 ERMA_SPEED_CASUALTY = "IBS-U-IJN-ERMA-ISHIKARI"
 SPEED_CRISIS_FLAG = "erma_speed_crisis_staged"
+DEPLOYMENT_FLAG = "erma_close_action_deployment"
 
 
 def validate_tutorial_options(state: GameState) -> None:
@@ -29,6 +30,42 @@ def validate_tutorial_options(state: GameState) -> None:
         state.scenario_id != "IBS-S-EM-01" or not state.options.realistic_command
     ):
         raise ValueError("erma_grand_fleet requires IBS-S-EM-01 realistic command")
+
+
+def prepare_tutorial_state(state: GameState) -> None:
+    """Move both free-deployment fleets into a legal, visible teaching engagement."""
+    if state.options.tutorial_script != ERMA_SCRIPT:
+        return
+    for ship in state.ships.values():
+        if not ship.position:
+            continue
+        label = ship.position.label
+        row = int("".join(filter(str.isdigit, label)))
+        delta_q, delta_row = ((4, 5) if ship.side == Side.AXIS else (-4, -5))
+        ship.position = HexCoord.from_label(
+            f"{index_to_column(ship.position.q + delta_q)}{row + delta_row}"
+        )
+    state.tutorial_flags.add(DEPLOYMENT_FLAG)
+
+
+def record_tutorial_start(engine: "IronBottomEngine", state: GameState) -> None:
+    if state.options.tutorial_script != ERMA_SCRIPT:
+        return
+    engine._event(
+        state,
+        "tutorial_deployment_staged",
+        "教学部署：双方主力舰队已进入可观察的远程炮战距离",
+        payload={
+            "script_id": "IBS-TUT-EM-01",
+            "axis_translation": {"columns": 4, "rows": 5},
+            "allies_translation": {"columns": -4, "rows": -5},
+        },
+        rule=RuleReference(
+            rule_id="IBS-TUT-EM-01",
+            document="tutorial-script-erma-grand-fleet",
+            section="教学部署：远程炮战接触",
+        ),
+    )
 
 
 def apply_checkpoint(engine: "IronBottomEngine", state: GameState, checkpoint: str) -> None:
