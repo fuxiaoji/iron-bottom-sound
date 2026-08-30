@@ -61,7 +61,7 @@ export function GuidedTutorial({sessionKey,view,variant}:{sessionKey:string;view
  useEffect(()=>{if(previousKey.current!==phaseKey){previousKey.current=phaseKey;setStepIndex(0);setArmed(false);setMessage("");setTarget(null);setRect(null)}},[phaseKey]);
  useEffect(()=>{
   if(!armed||!step)return;
-  const refresh=()=>{const next=firstAvailable(step.selectors);setTarget(current=>current?.element===next?.element&&current?.index===next?.index?current:next);setRect(next?.element.getBoundingClientRect()??null)};
+  const refresh=()=>{const next=firstAvailable(step.selectors);if(next){const panel=next.element.closest(".roster")?"fleet":next.element.closest("aside")?"orders":next.element.closest(".map-column,.move-editor,.map-frame")?"map":null;if(panel&&document.documentElement.dataset.mobilePanel!==panel)window.dispatchEvent(new CustomEvent("ibs:mobile-panel",{detail:panel}))}setTarget(current=>current?.element===next?.element&&current?.index===next?.index?current:next);setRect(next?.element.getBoundingClientRect()??null)};
   refresh();const observer=new MutationObserver(refresh);observer.observe(document.body,{childList:true,subtree:true});window.addEventListener("resize",refresh);window.addEventListener("scroll",refresh,true);
   const timer=window.setTimeout(()=>{const next=firstAvailable(step.selectors);next?.element.scrollIntoView({behavior:"smooth",block:"center",inline:"center"});window.setTimeout(refresh,350)},40);
   return()=>{window.clearTimeout(timer);observer.disconnect();window.removeEventListener("resize",refresh);window.removeEventListener("scroll",refresh,true)};

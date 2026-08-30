@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {Fragment,useEffect,useState} from "react";
 import type {Formation,Ship,Side} from "./types";
 import {hexLabel} from "./hexGeometry";
 
@@ -7,6 +7,14 @@ import {hexLabel} from "./hexGeometry";
 // 只读展示，不产生订单；行点击复用 App 的 onSelect 联动地图与右侧记录卡。
 export function FleetRoster({ships,formations,viewerSide,selectedId,onSelect}:{ships:Ship[];formations:Formation[];viewerSide:Side;selectedId?:string;onSelect:(ship:Ship)=>void}){
  const [open,setOpen]=useState<Record<string,boolean>>({axis:true,allies:true});
+ const [mobilePanel,setMobilePanel]=useState<"fleet"|"map"|"orders">("map");
+ const choosePanel=(panel:"fleet"|"map"|"orders")=>{setMobilePanel(panel);document.documentElement.dataset.mobilePanel=panel};
+ useEffect(()=>{
+  choosePanel("map");
+  const followCoach=(event:Event)=>choosePanel((event as CustomEvent<"fleet"|"map"|"orders">).detail);
+  window.addEventListener("ibs:mobile-panel",followCoach);
+  return()=>{window.removeEventListener("ibs:mobile-panel",followCoach);delete document.documentElement.dataset.mobilePanel};
+ },[]);
  const groups:Side[]=["axis","allies"];
  const shipRow=(ship:Ship)=><div key={ship.id} className={`roster-row${ship.id===selectedId?" selected":""}${ship.sunk?" sunk":""}`} role="button" tabIndex={0} onClick={()=>onSelect(ship)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();onSelect(ship)}}}>
   <div className="roster-row-head">
@@ -20,7 +28,11 @@ export function FleetRoster({ships,formations,viewerSide,selectedId,onSelect}:{s
    {ship.fire_markers>0&&<span className="damage-chip fire">起火×{ship.fire_markers}</span>}
   </div>
  </div>;
- return <section className="roster" aria-label="舰队总览">
+ return <Fragment><nav className="mobile-game-nav" aria-label="移动端游戏区域">
+  <button type="button" className={mobilePanel==="fleet"?"active":""} aria-pressed={mobilePanel==="fleet"} onClick={()=>choosePanel("fleet")}><b>舰队</b><span>状态与编队</span></button>
+  <button type="button" className={mobilePanel==="map"?"active":""} aria-pressed={mobilePanel==="map"} onClick={()=>choosePanel("map")}><b>海图</b><span>态势与航迹</span></button>
+  <button type="button" className={mobilePanel==="orders"?"active":""} aria-pressed={mobilePanel==="orders"} onClick={()=>choosePanel("orders")}><b>命令</b><span>计划与日志</span></button>
+ </nav><section className="roster" aria-label="舰队总览">
   <h2>舰队与编队状态</h2>
   {groups.map(sideKey=>{
    const list=ships.filter(ship=>ship.side===sideKey);
@@ -47,5 +59,5 @@ export function FleetRoster({ships,formations,viewerSide,selectedId,onSelect}:{s
     </>:list.map(ship=>shipRow(ship))}</div>}
    </div>;
   })}
- </section>;
+ </section></Fragment>;
 }
