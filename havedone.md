@@ -568,3 +568,11 @@
 - **回归**：`tests/test_tutorials.py` 与 `tests/test_api_llm_storage.py` 共 **12 项全部通过**；TypeScript 与 Vite 生产构建通过（44 modules transformed），本地产物为 `index-ChZ5GElN.js` / `index-BAYbgQbP.css`。
 - **生产备份**：发布前线上 SQLite 为 46 局、1995 条事件且 `integrity_check=ok`。使用 SQLite Backup API 写入 `/opt/tiedi/backups/pre-mobile-b1f827d-20260830-2110/iron-bottom-sound.sqlite3`（66,623,320 bytes，SHA-256 `cd635cacb912cb971748ed70ef46a03dfef4b02b4db367c6a7b814d8ab04ef90`），同时保存运行文件回滚包 `runtime-files.tgz`（630,722 bytes，SHA-256 `2510a36a8feb845ec498d417afb9fe505098d8e01965e7dbe6b5d12bcbd93fc7`）；备份再次核对为 46 局、1995 事件、完整性 `ok`。
 - **生产验收**：服务器从 Git 归档 `45c004284652380e22a5fdfd7701830873fbe06327ce9cb4f7da2e7722e1da7e` 构建 `/tiedi/`，生成 `index-DhJ1EQBv.js` / `index-BAYbgQbP.css`；`tiedi.service` 为 active，内部首页、想定 API 与公网 `https://fuwenji.asia/tiedi/` 均为 HTTP 200，公网入口含 `viewport-fit=cover`。发布后数据库仍为 46 局、1995 条事件、完整性 `ok`，最早旧对局经阵营过滤 `/view` 返回 HTTP 200。
+
+## 2026-08-30：鱼雷 AI 合法性与适应度恢复（提交 `ae975f6`）
+
+- **编队脱队修复**：真实模式先执行永久脱队，再对留队后的新领舰应用指挥中断、舰桥原速和舵损约束；旧领舰的 6 MF 强制航速不再泄漏给替代领舰或留队成员。
+- **边界撤退修复**：真实模式撤退控制器已经把舰送达安全边界时，内部 `formation_emergency_stop` 可覆盖该脉冲无法继续执行的强制直航、原速及 60° 盘旋约束；经典模式与普通玩家订单不获得此豁免。
+- **训练可信度修复**：任何 `ok=false` 最佳响应统一返回有限无效适应度，不再因候选位于同盟方而把 `-2` 反号成奖励。适应度版本迁移会保留 SQLite 对局账本、重置受污染的 GA/策略投影，并按完整任务载荷复用匹配结果或重算陈旧分支。
+- **可视化**：8765 实时面板新增有效/无效对局分列，仍保留每两秒心跳、停滞检测和断电恢复。
+- **验证**：PSRO 与真实模式专项 **42/42 通过**；隔离烟雾联赛完整执行收益矩阵、最佳响应和冠军注册；三个原失败样本（想定 1 脱队、二马强制盘旋撤退、二马舰桥原速撤退）均自动终局，友军碰撞 0、鱼雷友伤 0；`git diff --check` 通过。规则边界回看玩家辅助表特殊损伤页，真实指挥链豁免仍归属 `IBS-R-RC-*` 扩展而非原版条目。
