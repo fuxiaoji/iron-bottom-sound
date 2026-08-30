@@ -226,3 +226,18 @@
 @media(max-width:900px) and (orientation:landscape){
  .game>header{padding-top:.35rem;padding-bottom:.35rem}.game>header>div:first-child{min-width:240px}.game>header>button:last-child{order:0;flex:0 0 auto;width:auto}.workspace,.tutorial .workspace{padding-bottom:calc(54px + env(safe-area-inset-bottom))}.workspace>.map-column,.workspace>.move-editor,.workspace>.roster,.workspace>aside{bottom:calc(54px + env(safe-area-inset-bottom))}.mobile-game-nav{height:calc(54px + env(safe-area-inset-bottom))}.mobile-game-nav button{min-height:44px}.mobile-game-nav button span{display:none}.forced-coach{bottom:calc(60px + env(safe-area-inset-bottom));max-width:480px}.move-editor-panel{max-height:80%;width:min(330px,45%);left:.5rem;right:auto;top:.5rem;bottom:.5rem}
 }
+
+/* 桌面工作区双侧收纳轨；触屏继续使用底部页签，不叠加第二套导航。 */
+.sidebar-collapse{display:none}
+@media(min-width:1101px){
+ .workspace:not(.report-workspace){--fleet-width:280px;--orders-width:560px;position:relative;grid-template-columns:var(--fleet-width) minmax(0,1fr) var(--orders-width);transition:grid-template-columns .2s ease}
+ .tutorial .workspace{--orders-width:620px;grid-template-columns:var(--fleet-width) minmax(0,1fr) var(--orders-width)}
+ .workspace.fleet-collapsed{--fleet-width:44px}.workspace.orders-collapsed{--orders-width:44px}
+ .workspace.fleet-collapsed>.roster,.workspace.orders-collapsed>aside{overflow:hidden;padding:0}
+ .workspace.fleet-collapsed>.roster>*,.workspace.orders-collapsed>aside>*{display:none}
+ .sidebar-collapse{position:absolute;top:12px;z-index:55;display:grid;place-items:center;width:32px;height:88px;min-height:0;padding:.35rem .2rem;border-color:#8e7a4e;background:#101c1eeF;color:#e5c979;font-size:.68rem;line-height:1.2;writing-mode:vertical-rl;box-shadow:0 3px 12px #0008;transition:left .2s ease,right .2s ease,background .15s ease}
+ .sidebar-collapse:hover{background:#594621}.sidebar-collapse:focus-visible{outline:3px solid #ffd66d;outline-offset:2px}
+ .fleet-sidebar-toggle{left:max(6px,calc(var(--fleet-width) - 38px));border-radius:0 5px 5px 0}
+ .orders-sidebar-toggle{right:max(6px,calc(var(--orders-width) - 38px));border-radius:5px 0 0 5px}
+ .workspace.fleet-collapsed>.fleet-sidebar-toggle,.workspace.orders-collapsed>.orders-sidebar-toggle{background:#4b3c21;color:#ffe09a}
+}
