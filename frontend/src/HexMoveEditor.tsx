@@ -100,7 +100,7 @@ export function HexMoveEditor({game,side,view,ship,onSelect,onCommit,onExit,show
    {notice&&<div className="move-notice">{notice}</div>}
    <div className="move-actions">
     <button type="button" onClick={undo} disabled={history.length<=1}>回退</button>
-    <button type="button" onClick={commit} disabled={!step.commitable} className={step.commitable?"ready":""}>确认 {step.plan}</button>
+    <button type="button" data-tutorial="movement-confirm" onClick={commit} disabled={!step.commitable} className={step.commitable?"ready":""}>确认 {step.plan}</button>
     <button type="button" onClick={onExit}>退出</button>
    </div>
   </aside>
