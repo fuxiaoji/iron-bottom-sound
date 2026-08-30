@@ -220,6 +220,8 @@ class IronBottomEngine:
     ) -> GameState:
         identifier = game_id or str(uuid.uuid4())
         state = build_initial_state(identifier, scenario_id, seed, options or GameOptions())
+        from .tutorials import validate_tutorial_options
+        validate_tutorial_options(state)
         self._event(
             state,
             "game_created",
@@ -1745,6 +1747,8 @@ class IronBottomEngine:
             if state.options.realistic_command:
                 from .realistic_command import refresh_command_chain
                 refresh_command_chain(self, state)
+            from .tutorials import apply_checkpoint
+            apply_checkpoint(self, state, "after_turn_1_fire")
             state.markers = [
                 marker
                 for marker in state.markers

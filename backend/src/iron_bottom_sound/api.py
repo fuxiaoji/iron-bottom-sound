@@ -217,7 +217,9 @@ def suggested_orders(
         raise HTTPException(422, f"Unknown AI profile {profile}")
     try:
         commander = RealisticCommander(profile=style) if state.options.realistic_command else TacticalCommander(profile=style)
-        return commander.choose_orders(engine, game_id, side)
+        batch = commander.choose_orders(engine, game_id, side)
+        from .tutorials import coach_suggested_orders
+        return coach_suggested_orders(state, batch)
     except ValueError as error:
         raise HTTPException(409, str(error)) from error
 

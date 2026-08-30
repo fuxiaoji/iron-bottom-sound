@@ -142,6 +142,8 @@ class GameOptions(BaseModel):
     battle_report: bool = False
     # 项目扩展：编队指挥链。默认关闭，保证旧存档和经典模式逐位兼容。
     realistic_command: bool = False
+    # 教学脚本只负责可审计的预置/固定事件；所有玩家命令仍走正式引擎。
+    tutorial_script: Literal["classic_night", "erma_grand_fleet"] | None = None
 
 
 class WeaponMount(BaseModel):
@@ -582,6 +584,7 @@ class GameState(BaseModel):
     seed: int
     rng_counter: int = 0
     options: GameOptions
+    tutorial_flags: set[str] = Field(default_factory=set)
     visibility: dict[str, int]
     ships: dict[str, ShipState]
     submitted_orders: dict[str, OrderBatch] = Field(default_factory=dict)
