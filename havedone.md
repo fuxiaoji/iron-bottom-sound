@@ -569,6 +569,16 @@
 - **生产备份**：发布前线上 SQLite 为 46 局、1995 条事件且 `integrity_check=ok`。使用 SQLite Backup API 写入 `/opt/tiedi/backups/pre-mobile-b1f827d-20260830-2110/iron-bottom-sound.sqlite3`（66,623,320 bytes，SHA-256 `cd635cacb912cb971748ed70ef46a03dfef4b02b4db367c6a7b814d8ab04ef90`），同时保存运行文件回滚包 `runtime-files.tgz`（630,722 bytes，SHA-256 `2510a36a8feb845ec498d417afb9fe505098d8e01965e7dbe6b5d12bcbd93fc7`）；备份再次核对为 46 局、1995 事件、完整性 `ok`。
 - **生产验收**：服务器从 Git 归档 `45c004284652380e22a5fdfd7701830873fbe06327ce9cb4f7da2e7722e1da7e` 构建 `/tiedi/`，生成 `index-DhJ1EQBv.js` / `index-BAYbgQbP.css`；`tiedi.service` 为 active，内部首页、想定 API 与公网 `https://fuwenji.asia/tiedi/` 均为 HTTP 200，公网入口含 `viewport-fit=cover`。发布后数据库仍为 46 局、1995 条事件、完整性 `ok`，最早旧对局经阵营过滤 `/view` 返回 HTTP 200。
 
+## 2026-08-30：桌面双侧栏收纳与二马棋子补发（提交 `0fb22e2`）
+
+- **桌面收纳**：舰队栏和命令栏各自增加可访问的收起/展开按钮；大于 1100px 时任一侧可缩为 44px 控制轨，两侧可同时收起，地图自动使用释放宽度。手机和平板继续使用底部三页签，不显示重复控制。
+- **教学兼容**：强制教学定位舰队或命令控件时会通过现有区域事件自动展开相应桌面侧栏，同时继续切换移动端页签，避免高亮落在隐藏内容中。
+- **缺图根因**：结构化想定共引用 54 张舰船棋子，发布前线上 21 张二马新增棋子返回 404；URL 基址和旧想定素材正常，根因是此前稳定部署未同步 `resources/originals/assets/images` 新文件。
+- **编码纠正**：首次 ZIP 补发在 Linux 上产生 21 个乱码文件名，未把文件数增加误判为成功。随后使用经本地解包、文件名和 SHA-256 验证的 UTF-8 tar 全量同步规范目录；乱码文件被可恢复地移入备份下的 `mojibake-counters/`，正式素材目录为 262 个文件。
+- **生产素材验收**：从全部结构化想定重新提取引用并逐个请求公网 `/tiedi/assets/counters/`，最终 **54/54 HTTP 200，missing=0**；大和二马与艾伦·M·萨姆纳在后端直连也分别返回 200 和正确字节数。
+- **代码与服务验收**：教学/API 聚焦 12 项全部通过；TypeScript/Vite 构建 44 modules transformed。生产生成 `index-BHQPfDyw.js` / `index-CfRIcKlH.css`，公网 bundle 同时含两侧栏标签及 `fleet-collapsed`、`orders-collapsed` 样式；`tiedi.service` active，数据库发布后仍为 48 局、2084 条事件且完整性 `ok`。应用内浏览器因本地 URL 安全策略拒绝控制，未把 bundle 检查表述为可视点击验收。
+- **回滚证据**：发布前 SQLite Backup API 备份位于 `/opt/tiedi/backups/pre-sidebars-assets-0fb22e2-20260830-2140/iron-bottom-sound.sqlite3`（备份 48 局、2084 事件、完整性 `ok`，SHA-256 `628e01a9817a1d73731c355401209a2aa4eff4026a765640d72d3ecaca809e40`）；旧运行文件和完整棋子目录备份为 `runtime-and-counters.tgz`（SHA-256 `3008da856e1caa869fb61814cca4b0a52c12ff677f0a4da194514f67e1e650f4`）。
+
 ## 2026-08-30：鱼雷 AI 合法性与适应度恢复（提交 `ae975f6`）
 
 - **编队脱队修复**：真实模式先执行永久脱队，再对留队后的新领舰应用指挥中断、舰桥原速和舵损约束；旧领舰的 6 MF 强制航速不再泄漏给替代领舰或留队成员。
