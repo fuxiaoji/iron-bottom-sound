@@ -9,6 +9,7 @@ from iron_bottom_sound.models import (
     FormationSpeedDecision,
     GameOptions,
     HexCoord,
+    MovementOrder,
     OrderBatch,
     Phase,
     Side,
@@ -167,6 +168,62 @@ def test_detached_ship_gets_atomic_withdrawal_order_and_no_torpedoes() -> None:
     assert not errors
     assert detached == [detached_id]
     assert detached_id in {order.ship_id for order in prepared.movement}
+
+
+def test_detaching_forced_old_leader_uses_replacement_leader_plan() -> None:
+    engine, game_id = realistic_game()
+    advance_empty_orders(engine, game_id)
+    state = engine.get(game_id)
+    formation = next(item for item in state.formations.values() if item.side == Side.AXIS)
+    old_leader = state.ships[formation.leader_id]
+    old_leader.forced_straight_turns = 1
+    old_leader.forced_speed = 6
+    survivor_id = next(ship_id for ship_id in formation.ship_ids if ship_id != old_leader.id)
+    detached = [ship_id for ship_id in formation.ship_ids if ship_id != survivor_id]
+    batch = OrderBatch(
+        side=Side.AXIS,
+        phase=state.phase,
+        formation_movement=[FormationMovementOrder(
+            formation_id=formation.id,
+            leader_plan="2",
+            spacing=formation.spacing,
+            speed_decision=FormationSpeedDecision(
+                formation_id=formation.id,
+                action="detach",
+                detach_ship_ids=detached,
+            ),
+        )],
+    )
+    prepared, errors, detach_ids = expand_movement_orders(engine, state, batch)
+    assert not errors
+    assert set(detach_ids) == set(detached)
+    replacement = next(order for order in prepared.movement if order.ship_id == survivor_id)
+    assert replacement.plan == "2"
+    assert replacement.speed == 2
+
+
+def test_realistic_boundary_emergency_stop_overrides_forced_damage_order() -> None:
+    engine, game_id = realistic_game()
+    advance_empty_orders(engine, game_id)
+    state = engine.get(game_id)
+    owned = [ship for ship in state.ships.values() if ship.side == Side.AXIS and ship.position]
+    target = owned[0]
+    target.forced_straight_turns = 1
+    target.forced_circle_turns = 2
+    target.turn_limit_degrees = 60
+    target.forced_speed = 5
+    batch = OrderBatch(
+        side=Side.AXIS,
+        phase=state.phase,
+        movement=[MovementOrder(
+            ship_id=ship.id,
+            plan="0",
+            speed=0,
+            formation_emergency_stop=ship.id == target.id,
+        ) for ship in owned],
+    )
+    result = engine.validate_orders(game_id, batch, _prepared=True)
+    assert result.valid, result.errors
 
 
 def test_flagship_death_uses_reserve_and_locks_next_turn() -> None:

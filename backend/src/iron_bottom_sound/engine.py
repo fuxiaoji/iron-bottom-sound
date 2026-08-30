@@ -1467,14 +1467,14 @@ class IronBottomEngine:
             if order.speed is not None and order.speed != cost:
                 errors.append(f"{order.ship_id}: declared speed {order.speed} does not match {cost} MF plan")
             turns = [command for command in commands if command != "advance"]
-            if ship.turn_limit_degrees == 60 and any(command.endswith("120") for command in turns):
+            if not formation_stop and ship.turn_limit_degrees == 60 and any(command.endswith("120") for command in turns):
                 errors.append(f"{order.ship_id}: rudder damage limits turns to 60 degrees")
-            if ship.forced_straight_turns:
+            if not formation_stop and ship.forced_straight_turns:
                 if turns:
                     errors.append(f"{order.ship_id}: rudder/bridge damage requires straight movement")
                 if not stay_only and ship.forced_speed is not None and cost != ship.forced_speed:
                     errors.append(f"{order.ship_id}: bridge damage requires original speed {ship.forced_speed}")
-            if ship.forced_circle_turns and maximum > 0 and not stay_only:
+            if not formation_stop and ship.forced_circle_turns and maximum > 0 and not stay_only:
                 sixty_turns = [command for command in turns if command.endswith("60")]
                 if not sixty_turns or len(sixty_turns) != len(turns):
                     errors.append(f"{order.ship_id}: rudder/bridge damage requires a 60-degree circling turn")

@@ -50,6 +50,8 @@ GENES: list[tuple[str, float, float]] = [
     ("w_torpedo_avoid", 0.5, 6.0), ("torpedo_min_tactical_score", 0.0, 1.0),
 ]
 INTEGER_GENES = {"approach_range", "torpedo_max_range"}
+FITNESS_REVISION = 2
+INVALID_FITNESS = -2.0
 
 
 class TrainingInterrupted(RuntimeError):
@@ -70,6 +72,7 @@ class Config:
     ruleset: str = "realistic-v1"
     dashboard_port: int = 8765
     smoke: bool = False
+    fitness_revision: int = FITNESS_REVISION
 
 
 def _profile_dict(profile: TacticalProfile) -> dict[str, Any]:
@@ -216,16 +219,46 @@ class League:
             for key, row in legacy_games.items():
                 self._record_game(key, row, append_log=False)
             self.state["games"] = self._load_games()
+            self._migrate_fitness_state()
         else:
             self.state = {
                 "version": 1, "config": asdict(config), "stage": "initializing", "round": 0,
                 "strategies": self._initial_strategies(), "games": {}, "ga": {},
                 "meta_distribution": {}, "created_at": time.time(),
+                "fitness_revision": config.fitness_revision,
             }
             self._checkpoint()
         source_dashboard = Path(__file__).with_name("psro_dashboard.html")
         if source_dashboard.exists():
             self.dashboard_path.write_text(source_dashboard.read_text(encoding="utf-8"), encoding="utf-8")
+
+    def _migrate_fitness_state(self) -> None:
+        """Discard polluted strategy state while retaining reusable game rows.
+
+        Revision 1 inverted the ``-2`` invalid-game sentinel when the evolving
+        individual played Allies, allowing a failed game to improve fitness.
+        The SQLite ledger remains valuable.  Resetting only the strategic
+        projection lets deterministic job definitions reuse matching valid
+        rows while stale descendants are detected and recomputed.
+        """
+        previous = int(self.state.get("fitness_revision", 1))
+        if previous >= self.config.fitness_revision:
+            return
+        self.state.update({
+            "fitness_revision": self.config.fitness_revision,
+            "config": asdict(self.config),
+            "stage": "fitness_revision_migration",
+            "round": 0,
+            "strategies": self._initial_strategies(),
+            "ga": {},
+            "meta_distribution": {},
+        })
+        for key in (
+            "payoff_matrix", "current_best", "last_error", "running_jobs",
+            "expected_games", "last_progress_at",
+        ):
+            self.state.pop(key, None)
+        self._checkpoint()
 
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.database_path, timeout=30)
@@ -295,6 +328,8 @@ class League:
         with self._io_lock:
             now = time.time()
             games = self.state.get("games", {})
+            valid_games = sum(1 for row in games.values() if row.get("ok"))
+            invalid_games = len(games) - valid_games
             durations = [row.get("elapsed_ms", 0) / 1000 for row in games.values() if row.get("elapsed_ms")]
             expected = int(self.state.get("expected_games", len(games)))
             remaining = max(0, expected - len(games))
@@ -304,6 +339,7 @@ class League:
             status = {
                 "stage": self.state.get("stage"), "round": self.state.get("round", 0),
                 "completed_games": len(games), "expected_games": expected,
+                "valid_games": valid_games, "invalid_games": invalid_games,
                 "progress": len(games) / expected if expected else 0.0,
                 "eta_seconds": mean * remaining / max(1, self.config.workers),
                 "heartbeat": now, "progress_age_seconds": progress_age,
@@ -331,7 +367,9 @@ class League:
         # deterministic keys after a code fix and replace the SQLite payload.
         missing = [
             (key, job) for key, job in jobs
-            if key not in self.state["games"] or not self.state["games"][key].get("ok")
+            if key not in self.state["games"]
+            or not self.state["games"][key].get("ok")
+            or any(self.state["games"][key].get(field) != value for field, value in job.items())
         ]
         self.state["expected_games"] = len(
             set(self.state["games"]) | {key for key, _job in jobs}
@@ -466,6 +504,10 @@ class League:
             and game.get("generation") == generation and game.get("individual") == individual
             and game.get("ruleset") == self.config.ruleset
         ]
+        # Invalid adjudications are never outcomes and may not be side-flipped.
+        # A finite sentinel keeps checkpoints strict-JSON compatible.
+        if not rows or any(not game.get("ok") for game in rows):
+            return INVALID_FITNESS
         values = []
         for game in rows:
             utility = game["utility"] if game["individual_side"] == "axis" else -game["utility"]
@@ -523,11 +565,10 @@ class League:
             self.state["round"] = round_index
             self.state["stage"] = f"payoff_matrix_round_{round_index}"
             self._run_jobs(self._matrix_jobs())
+            matrix_keys = {key for key, _job in self._matrix_jobs()}
             invalid_matrix = [
-                game for game in self.state["games"].values()
-                if game.get("kind") == "matrix"
-                and game.get("ruleset") == self.config.ruleset
-                and not game.get("ok")
+                game for key, game in self.state["games"].items()
+                if key in matrix_keys and not game.get("ok")
             ]
             if invalid_matrix:
                 raise RuntimeError(f"baseline payoff matrix contains {len(invalid_matrix)} invalid games")

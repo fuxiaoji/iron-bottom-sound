@@ -409,6 +409,23 @@ def expand_movement_orders(
             formation_leader = members[0]
             leader = formation_leader
         plan = order.leader_plan
+        decision = order.speed_decision
+        # Apply a permanent detachment before deriving any leader-specific
+        # forced movement.  The detached ship may be the old leader (and may
+        # itself carry a bridge/rudder speed lock); that lock must never leak
+        # into the replacement leader or the surviving column.
+        if decision is not None and decision.action == "detach":
+            requested = set(decision.detach_ship_ids)
+            member_ids = {ship.id for ship in members}
+            if not requested or not requested <= member_ids:
+                errors.append(f"{formation.id}: detach decision must name active formation ships")
+                continue
+            detach_ids.extend(sorted(requested))
+            members = [ship for ship in members if ship.id not in requested]
+            if not members:
+                continue
+            if leader.id in requested:
+                leader = members[0]
         if formation.disruption_turn == state.turn:
             locked_speed = formation.locked_speed or 0
             # Command disruption repeats last turn's actual speed, except that
@@ -423,29 +440,6 @@ def expand_movement_orders(
             )
             plan = str(min(forced_speed, engine._legal_speed_range(leader, state.turn)[1]))
         leader_cost = engine.movement_cost(plan, engine.movement_commands(MovementOrder(ship_id=leader.id, plan=plan)))
-        decision = order.speed_decision
-        # Detachment is also the escape hatch for a column that has been
-        # physically split by a collision.  Such a ship can have a perfectly
-        # legal individual speed range yet be unable to regain its station in
-        # this turn.  Honour an explicit permanent detachment before deriving
-        # follower routes, rather than limiting detachment to range mismatch.
-        if decision is not None and decision.action == "detach":
-            requested = set(decision.detach_ship_ids)
-            member_ids = {ship.id for ship in members}
-            if not requested or not requested <= member_ids:
-                errors.append(f"{formation.id}: detach decision must name active formation ships")
-                continue
-            if not requested <= member_ids:
-                errors.append(f"{formation.id}: detach decision contains a non-member ship")
-                continue
-            detach_ids.extend(sorted(requested))
-            members = [ship for ship in members if ship.id not in requested]
-            if not members:
-                continue
-            if leader.id in requested:
-                leader = members[0]
-                plan = str(min(leader_cost, engine._legal_speed_range(leader, state.turn)[1]))
-                leader_cost = engine.movement_cost(plan, engine.movement_commands(MovementOrder(ship_id=leader.id, plan=plan)))
         forced_incompatible = next(
             (ship for ship in members if ship.forced_circle_turns), None
         )
