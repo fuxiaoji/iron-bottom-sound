@@ -17,6 +17,7 @@ from iron_bottom_sound.models import (
 from iron_bottom_sound.realistic_command import (
     RealisticCommander,
     _best_formation_cohort,
+    _withdrawal_order,
     default_setup_orders,
     expand_movement_orders,
     refresh_command_chain,
@@ -224,6 +225,59 @@ def test_realistic_boundary_emergency_stop_overrides_forced_damage_order() -> No
     )
     result = engine.validate_orders(game_id, batch, _prepared=True)
     assert result.valid, result.errors
+
+
+def test_withdrawal_at_map_rim_probes_legal_forced_circle_program(monkeypatch) -> None:
+    engine, game_id = realistic_game()
+    advance_empty_orders(engine, game_id)
+    state = engine.get(game_id)
+    ship = next(ship for ship in state.ships.values() if ship.side == Side.AXIS and ship.position)
+    ship.position = HexCoord.from_label("O2")
+    ship.heading = 6
+    ship.current_speed = 4
+    ship.previous_speed = 4
+    ship.withdrawal_edge = "east"
+    ship.forced_circle_turns = 2
+    ship.turn_limit_degrees = 60
+    monkeypatch.setattr(engine, "movement_candidates", lambda *_args, **_kwargs: {"reachable": []})
+    monkeypatch.setattr(engine, "_legal_speed_range", lambda *_args: (2, 4))
+
+    order = _withdrawal_order(engine, state, ship)
+    preview = engine.movement_preview(state, ship, plan=order.plan)
+
+    assert preview["commitable"], preview["errors"]
+    assert order.plan.startswith("1")
+    assert all(not command.endswith("120") for command in engine.movement_commands(order))
+
+
+def test_disrupted_formation_clamps_locked_speed_to_damage_floor(monkeypatch) -> None:
+    engine, game_id = realistic_game()
+    advance_empty_orders(engine, game_id)
+    state = engine.get(game_id)
+    formation = next(item for item in state.formations.values() if item.side == Side.AXIS)
+    formation.disruption_turn = state.turn
+    formation.locked_speed = 0
+    leader_id = formation.leader_id
+    monkeypatch.setattr(
+        engine,
+        "_legal_speed_range",
+        lambda ship, _turn: (0, 2) if ship.id == leader_id else (1, 1),
+    )
+    batch = OrderBatch(
+        side=Side.AXIS,
+        phase=state.phase,
+        formation_movement=[FormationMovementOrder(
+            formation_id=formation.id,
+            leader_plan="0",
+            spacing=formation.spacing,
+        )],
+    )
+
+    prepared, errors, _detached = expand_movement_orders(engine, state, batch)
+
+    assert not any("reduced speed is not legal" in error for error in errors)
+    leader_order = next(order for order in prepared.movement if order.ship_id == leader_id)
+    assert leader_order.speed == 1
 
 
 def test_flagship_death_uses_reserve_and_locks_next_turn() -> None:

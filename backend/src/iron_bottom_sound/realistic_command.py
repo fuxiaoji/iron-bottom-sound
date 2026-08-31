@@ -316,6 +316,20 @@ def _withdrawal_order(engine: "IronBottomEngine", state: GameState, ship) -> Mov
             if preview["commitable"]:
                 scored.append((score, plan))
     if not scored:
+        # ``movement_candidates`` can have no terminal row when a forced
+        # circling ship reaches the map rim: its first advance is legal, but
+        # the search prunes the intermediate edge state before the free 60°
+        # rudder command is appended.  Probe the two deterministic circling
+        # programmes directly through the authoritative preview boundary.
+        if ship.forced_circle_turns:
+            minimum, maximum = engine._legal_speed_range(ship, state.turn)
+            sides = [ship.forced_turn_side] if ship.forced_turn_side else ["port", "starboard"]
+            token = {"port": "P", "starboard": "S"}
+            for speed in range(maximum, minimum - 1, -1):
+                for side in sides:
+                    plan = "1" + (f"{token[side]}1" * max(0, speed - 1))
+                    if engine.movement_preview(state, ship, plan=plan)["commitable"]:
+                        return MovementOrder(ship_id=ship.id, plan=plan)
         # Forced-straight damage can make every target-oriented path invalid
         # even though a plain legal straight programme exists.
         minimum, maximum = engine._legal_speed_range(ship, state.turn)
@@ -432,8 +446,9 @@ def expand_movement_orders(
             # original-rule damage and collision limits have higher priority.
             # In that case the whole surviving column is truncated to the
             # highest speed every attached member can still make.
+            damage_floor = max(engine._legal_speed_range(ship, state.turn)[0] for ship in members)
             damage_ceiling = min(engine._legal_speed_range(ship, state.turn)[1] for ship in members)
-            plan = str(min(locked_speed, damage_ceiling))
+            plan = str(max(damage_floor, min(locked_speed, damage_ceiling)))
         if leader.forced_straight_turns:
             forced_speed = leader.forced_speed if leader.forced_speed is not None else engine.movement_cost(
                 plan, engine.movement_commands(MovementOrder(ship_id=leader.id, plan=plan))
@@ -504,6 +519,9 @@ def expand_movement_orders(
                     elif relative == 5:
                         commands.append("turn_port_60")
                 if ship.forced_straight_turns and any(command != "advance" for command in commands):
+                    errors.append(f"{formation.id}: {ship.id} forced movement prevents formation following")
+                    continue
+                if ship.turn_limit_degrees == 60 and any(command.endswith("120") for command in commands):
                     errors.append(f"{formation.id}: {ship.id} forced movement prevents formation following")
                     continue
                 follower_plan = engine.commands_to_plan(commands)
@@ -854,6 +872,10 @@ class RealisticCommander:
             contact_movement=tactical_batch.contact_movement,
         )
         _prepared, expansion_errors, _detach = expand_movement_orders(engine, state, batch)
+        if not expansion_errors:
+            expansion_errors = engine.validate_orders(
+                state.game_id, _prepared, _prepared=True,
+            ).errors
         if expansion_errors:
             # Tactical routes may cross a trailing station. Retry with a
             # common straight programme, selected from the full formation's
@@ -908,6 +930,10 @@ class RealisticCommander:
             for _attempt in range(64):
                 _prepared, retry_errors, _detach = expand_movement_orders(engine, state, batch)
                 if not retry_errors:
+                    retry_errors = engine.validate_orders(
+                        state.game_id, _prepared, _prepared=True,
+                    ).errors
+                if not retry_errors:
                     break
                 changed = False
                 for error in retry_errors:
@@ -955,10 +981,18 @@ class RealisticCommander:
                             changed = True
                             break
                         continue
+                    subject = error.split(":", 1)[0]
+                    subject_ship = state.ships.get(subject)
+                    subject_formation_id = subject_ship.formation_id if subject_ship else None
                     formation_order = next(
                         (item for item in batch.formation_movement if error.startswith(f"{item.formation_id}:")),
                         None,
                     )
+                    if formation_order is None and subject_formation_id:
+                        formation_order = next(
+                            (item for item in batch.formation_movement if item.formation_id == subject_formation_id),
+                            None,
+                        )
                     if formation_order is None:
                         continue
                     formation = state.formations[formation_order.formation_id]
@@ -969,13 +1003,20 @@ class RealisticCommander:
                     ]
                     minimum = max((engine._legal_speed_range(ship, state.turn)[0] for ship in members), default=0)
                     current = int(formation_order.leader_plan) if formation_order.leader_plan.isdigit() else formation.speed
-                    forced_separation = " forced movement prevents formation following" in error
+                    forced_separation = (
+                        " forced movement prevents formation following" in error
+                        or "rudder damage limits turns" in error
+                        or "damage requires" in error
+                    )
                     trail_failure = (
                         " cannot follow guide trail" in error
                         or " is no longer on the guide trail" in error
                     )
                     if " follower speed " in error or trail_failure or forced_separation:
-                        follower = next((ship for ship in members if f": {ship.name} " in error or f": {ship.id} " in error), None)
+                        follower = subject_ship if subject_ship in members else next(
+                            (ship for ship in members if f": {ship.name} " in error or f": {ship.id} " in error),
+                            None,
+                        )
                         if follower and len(members) >= 1:
                             already = set(
                                 formation_order.speed_decision.detach_ship_ids
