@@ -1,0 +1,92 @@
+id: IBS-S-04
+number: 4
+title: 塔萨法隆格海战
+date: 1942-11-30
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 4, printed_page: 5, status: verified_source}
+turns: 6
+visibility: {axis: 13, allies: 11}
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
+setup:
+  mode: scenario_positions
+  engine_default_note: engine_default_formations 仅为真实模式直接开局的默认编队提案；一般模式与真实模式部署仍以 ships 初始位置和想定规则为权威。
+  engine_default_formations:
+    axis:
+    - id: axis-tanaka-strike
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-NAGANAMI
+      - IBS-U-IJN-TAKANAMI
+      - IBS-U-IJN-MAKINAMI
+      - IBS-U-IJN-KAGERO
+      - IBS-U-IJN-KUROSHIO
+      - IBS-U-IJN-OYASHIO
+      - IBS-U-IJN-KAWAKAZE
+      - IBS-U-IJN-SUZUKAZE
+      note: 田中赖三驱逐突击队单纵（龙岩作战）
+    allies:
+    - id: allies-van-dd
+      role: line_ahead
+      ships:
+      - IBS-U-USN-FLETCHER
+      - IBS-U-USN-PERKINS
+      - IBS-U-USN-MAURY
+      - IBS-U-USN-DRAYTON
+      note: 前卫驱逐队
+    - id: allies-cruiser-line
+      role: line_ahead
+      ships:
+      - IBS-U-USN-MINNEAPOLIS
+      - IBS-U-USN-NEW-ORLEANS
+      - IBS-U-USN-PENSACOLA
+      - IBS-U-USN-HONOLULU
+      - IBS-U-USN-NORTHAMPTON
+      note: 第67.4特混大队巡洋舰纵列（赖特少将旗舰明尼阿波利斯）
+    - id: allies-rear-dd
+      role: line_ahead
+      ships:
+      - IBS-U-USN-LAMSON
+      - IBS-U-USN-LARDNER
+      note: 后卫驱逐队
+
+victory:
+  kind: victory_points
+  points_per_three_hull_lost: 1
+  leader_margin: 4
+  draw_if_margin_below: 4
+  evaluated_at: end_of_turn_6
+special_rules:
+  - {id: IBS-S-04-R1, text: 岛屿放置：将萨沃岛小地图的X格对应放置在H6格。}
+  - {id: IBS-S-04-R2, text: 美军在第一回合无法发射鱼雷。}
+  - {id: IBS-S-04-R3, text: 因为存在岛屿，任何船只无法从地图南部离开，否则视为被击沉。}
+  - {id: IBS-S-04-R4, text: 在第一到第三回合，日军鱼雷攻击判定掷骰点数+1。}
+  - {id: IBS-S-04-R5, text: '区域存在的大片陆地影响美军重巡的8"火炮火控，它们炮火强度减半（向上取整），但向东侧目标炮击则不受影响。'}
+  - {id: IBS-S-04-R6, text: 日军可能受到增援。仅在第4回合开始时掷1枚骰子，如果掷到1或2，那么增援单位在移动阶段，以任意航速从G27至O27进入地图。“浜风”、“望月”、“三日月”按此顺序单纵队编队，划掉“浜风”的鱼雷再装填，因为它装载了额外的集装箱物资。}
+ships:
+  - {id: IBS-U-IJN-TAKANAMI, name: 高波, side: axis, template: dd-japanese-1942, position: P16, heading: 2, speed: 3, asset: 日本-DD-高波.png}
+  - {id: IBS-U-IJN-OYASHIO, name: 亲潮, side: axis, template: dd-japanese-1942, position: M19, heading: 2, speed: 3, asset: 日本-DD-亲潮.png}
+  - {id: IBS-U-IJN-KUROSHIO, name: 黑潮, side: axis, template: dd-japanese-1942, position: L18, heading: 2, speed: 3, asset: 日本-DD-黑潮.png}
+  - {id: IBS-U-IJN-KAGERO, name: 阳炎, side: axis, template: dd-japanese-1942, position: K18, heading: 2, speed: 3, asset: 日本-DD-阳炎.png}
+  - {id: IBS-U-IJN-MAKINAMI, name: 卷波, side: axis, template: dd-japanese-1942, position: J17, heading: 2, speed: 3, asset: 日本-DD-卷波.png}
+  - {id: IBS-U-IJN-NAGANAMI, name: 长波, side: axis, template: dd-japanese-1942, position: I17, heading: 2, speed: 3, asset: 日本-DD-长波.png, flagship: true}
+  - {id: IBS-U-IJN-KAWAKAZE, name: 江风, side: axis, template: dd-japanese-1942, position: H16, heading: 2, speed: 3, asset: 日本-DD-江风.png}
+  - {id: IBS-U-IJN-SUZUKAZE, name: 凉风, side: axis, template: dd-japanese-1942, position: G16, heading: 2, speed: 3, asset: 日本-DD-凉风.png}
+  - {id: IBS-U-USN-FLETCHER, name: 弗莱彻, side: allies, template: dd-american-1942, position: V12, heading: 5, speed: 4, asset: 美国-DD-弗莱彻.png}
+  - {id: IBS-U-USN-PERKINS, name: 帕金斯, side: allies, template: dd-american-1942, position: W13, heading: 5, speed: 4, asset: 美国-DD-帕金斯.png}
+  - {id: IBS-U-USN-MAURY, name: 莫里, side: allies, template: dd-american-1942, position: X13, heading: 5, speed: 4, asset: 美国-DD-莫里.png}
+  - {id: IBS-U-USN-DRAYTON, name: 德雷顿, side: allies, template: dd-american-1942, position: Y14, heading: 5, speed: 4, asset: 美国-DD-德雷顿.png}
+  - {id: IBS-U-USN-MINNEAPOLIS, name: 明尼阿波里斯, side: allies, template: ca-american-1942, position: AA15, heading: 5, speed: 4, asset: 美国-CA-明尼阿波里斯.png, flagship: true}
+  - {id: IBS-U-USN-NEW-ORLEANS, name: 新奥尔良, side: allies, template: ca-american-1942, position: BB15, heading: 5, speed: 4, asset: 美国-CA-新奥尔良.png}
+  - {id: IBS-U-USN-PENSACOLA, name: 彭萨科拉, side: allies, template: ca-american-1942, position: CC16, heading: 5, speed: 4, asset: 美国-CA-彭萨科拉.png}
+  - {id: IBS-U-USN-HONOLULU, name: 火奴鲁鲁, side: allies, template: cl-american-1942, position: DD16, heading: 5, speed: 4, asset: 美国-CL-火奴鲁鲁.png}
+  - {id: IBS-U-USN-NORTHAMPTON, name: 北安普敦, side: allies, template: ca-american-1942, position: EE17, heading: 5, speed: 4, asset: 美国-CA-北安普敦.png}
+  - {id: IBS-U-USN-LAMSON, name: 拉姆森, side: allies, template: dd-american-1942, position: FF17, heading: 5, speed: 4, asset: 美国-DD-拉姆森.png}
+  - {id: IBS-U-USN-LARDNER, name: 拉德纳, side: allies, template: dd-american-1942, position: GG18, heading: 5, speed: 4, asset: 美国-DD-拉德纳.png}
+reinforcements:
+  trigger: {turn: 4, roll: 1d6, succeeds_on: [1, 2]}
+  arrival: {turn: 4, timing: during_movement, entry_hex_range: [G27, O27], speed: any_legal}  # 页面原文：增援单位在移动阶段入场
+  ships:
+    - {id: IBS-U-IJN-HAMAKAZE, name: 浜风, side: axis, template: dd-japanese-1942, torpedo_reloads: 0, asset: 日本-DD-浜风.png}
+    - {id: IBS-U-IJN-MONCHIZUKI, name: 望月, side: axis, template: dd-japanese-1942, asset: 日本-APD-望月.png}
+    - {id: IBS-U-IJN-MIKAZUKI, name: 三日月, side: axis, template: dd-japanese-1942, asset: 日本-APD-三日月.png}

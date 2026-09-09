@@ -1,0 +1,84 @@
+# S-13 韦拉拉韦拉岛海战（1943年10月6日）
+# 页面：/tmp/ibs-render/scen-14.png（PDF第14页，印刷页码15；页面徽章 Scenario 13）
+# 注：S-10萨沃岛海战跨两页（PDF第10-11页），故此后"PDF页码=想定编号+1"。
+id: IBS-S-13
+number: 13
+title: 韦拉拉韦拉岛海战
+date: 1943-10-06
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 14, printed_page: 15, status: verified_source}
+turns: 11
+visibility: {axis: 24, allies: 20}
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
+setup:
+  mode: scenario_positions
+  engine_default_note: engine_default_formations 仅为真实模式直接开局的默认编队提案；部署权威仍是 ships 初始位置与想定规则。
+  engine_default_formations:
+    axis:
+    - id: axis-strike
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-AKIGUMO
+      - IBS-U-IJN-ISOKAZE
+      - IBS-U-IJN-KAZEKUMO
+      - IBS-U-IJN-YUGUMO
+      note: 掩护突击队（伊集院松治大佐旗舰秋云）
+    - id: axis-transport
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-SHIGURE
+      - IBS-U-IJN-SAMIDARE
+      - IBS-U-IJN-YUNAGI
+      - IBS-U-IJN-FUMIZUKI
+      - IBS-U-IJN-MATSU-KAZE
+      note: 韦拉拉韦拉输送队（西村祥治少将旗舰时雨）
+    allies:
+    - id: allies-desdiv
+      role: line_ahead
+      ships:
+      - IBS-U-USN-SELFRIDGE
+      - IBS-U-USN-CHEVALIER
+      - IBS-U-USN-OBANNON
+      note: 盟军驱逐单纵（赛尔弗里纪旗舰）
+
+victory:
+  kind: custom_score_thresholds
+special_rules:
+  # 能见度行附加条原文
+  - {id: IBS-S-13-R1, text: 所有盟军单位拥有雷达。}
+  # 增援规则原文
+  - {id: IBS-S-13-R2, text: '盟军玩家在游戏开始前秘密写下一个格子编号，在L27-V27之间的。第2回合开始，盟军在回合开始时掷2枚骰子，如果点数和为10或11，则“拉尔夫·托尔伯特”、“泰勒”、“拉瓦利特”按次序单纵队以5-5-5的航速进入地图（之前写下的格子编号）。盟军玩家之后的每回合开始时都掷骰判定，直到第8回合开始时，增援自动进场。'}
+  # 可选增援规则原文
+  - {id: IBS-S-13-R3, text: 日军可以将增援的3艘APD排在五月雨之后的E3、E2、E1。如果这样的话，为了平衡，盟军增援掷骰的成功点数之和改为9-12。}
+  # 胜利条件原文（非标准VP制）
+  - {id: IBS-S-13-R4, text: 回合结束时，如果盟军击沉敌方3艘DD，己方只被击沉1艘DD或更少，则盟军战役级胜利。}
+  - {id: IBS-S-13-R5, text: 如果日军击沉敌方3艘DD，己方无任何DD被击沉，则日军战役级胜利。除此之外的结果为平局。}
+ships:
+  # 日本舰队 配置（旗舰：秋云 —— 伊集院松治大佐）
+  - {id: IBS-U-IJN-AKIGUMO, name: 秋云, side: axis, template: dd-japanese-1942, position: L12, heading: 2, speed: 4, asset: 日本-DD-秋云.png, flagship: true}
+  - {id: IBS-U-IJN-ISOKAZE, name: 矶风, side: axis, template: dd-japanese-1942, position: K13, heading: 2, speed: 4, asset: 日本-DD-矶风.png}
+  - {id: IBS-U-IJN-KAZEKUMO, name: 风云, side: axis, template: dd-japanese-1942, position: J13, heading: 2, speed: 4, asset: 日本-DD-风云.png}
+  - {id: IBS-U-IJN-YUGUMO, name: 夕云, side: axis, template: dd-japanese-1942, position: I14, heading: 2, speed: 4, asset: 日本-DD-夕云.png}
+  - {id: IBS-U-IJN-SHIGURE, name: 时雨, side: axis, template: dd-japanese-1942, position: E5, heading: 3, speed: 5, asset: 日本-DD-时雨.png}
+  - {id: IBS-U-IJN-SAMIDARE, name: 五月雨, side: axis, template: dd-japanese-1942, position: E4, heading: 3, speed: 5, asset: 日本-DD-五月雨.png}
+  # 可选援军（页面“可选援军”框，是否上场由 IBS-S-13-R3 可选增援规则决定）
+  - {id: IBS-U-IJN-YUNAGI, name: 夕凪, side: axis, template: dd-japanese-1942, position: E3, heading: 3, speed: 5, asset: 日本-APD-夕凪.png}
+  - {id: IBS-U-IJN-FUMIZUKI, name: 文月, side: axis, template: dd-japanese-1942, position: E2, heading: 3, speed: 5, asset: 日本-APD-文月.png}
+  - {id: IBS-U-IJN-MATSU-KAZE, name: 松风, side: axis, template: dd-japanese-1942, position: E1, heading: 3, speed: 5, asset: 日本-APD-松风.png}
+  # 盟军舰队 配置（旗舰：赛尔弗里纪 —— 弗兰克·R·沃克上校）援军
+  # 页面/棋子印“赛尔弗里纪”，record-ids 作“赛尔弗里奇”（SELFRIDGE），取 record id
+  - {id: IBS-U-USN-SELFRIDGE, name: 赛尔弗里纪, side: allies, template: dd-american-1942, position: Z7, heading: 4, speed: 5, asset: 美国-DD-赛尔弗里纪.png, flagship: true}
+  - {id: IBS-U-USN-CHEVALIER, name: 谢伐利埃, side: allies, template: dd-american-1942, position: AA7, heading: 4, speed: 5, asset: 美国-DD-谢伐利埃.png}
+  - {id: IBS-U-USN-OBANNON, name: 奥班农, side: allies, template: dd-american-1942, position: BB6, heading: 4, speed: 5, asset: 美国-DD-奥班农.png}
+reinforcements:
+  # 原文机制=第2回合起每回合开始掷2d6（10-11 成功；采用可选增援时 9-12），直到第8回合开始自动进场（IBS-S-13-R2/R3）。
+  # 引擎只支持单次 1d6 触发，无法表达逐回合重掷；按治理仅结构化规则保证的“第8回合自动进场”，
+  # 更早的掷骰入场仍以 R2/R3 原文为准（由玩家自行执行）。
+  trigger: {turn: 7, roll: 1d6, succeeds_on: [1, 2, 3, 4, 5, 6]}
+  arrival: {turn: 8, entry_hex_range: [L27, V27], speed: any_legal}
+  ships:
+    - {id: IBS-U-USN-RALPH-TALBOT, name: 拉尔夫·托尔伯特, side: allies, template: dd-american-1942, speed_track: [5, 5, 5], asset: 美国-DD-拉尔夫·托尔伯特.png}
+    - {id: IBS-U-USN-TAYLOR, name: 泰勒, side: allies, template: dd-american-1942, speed_track: [5, 5, 5], asset: 美国-DD-泰勒.png}
+    - {id: IBS-U-USN-LA-VALLETTE, name: 拉瓦利特, side: allies, template: dd-american-1942, speed_track: [5, 5, 5], asset: 美国-DD-拉瓦利特.png}
+# UNVERIFIED-VICTORY: 胜利条件非标准VP制（按双方击沉DD数判定战役级胜利，见 IBS-S-13-R4/R5），schema 无对应字段，victory.kind 记为 custom_score_thresholds。

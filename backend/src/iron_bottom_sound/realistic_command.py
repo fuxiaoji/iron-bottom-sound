@@ -39,7 +39,24 @@ if TYPE_CHECKING:
     from .engine import IronBottomEngine
 
 
-SUPPORTED_SCENARIOS = {"IBS-S-01", "IBS-S-03", "IBS-S-EM-01"}
+SUPPORTED_SCENARIOS = {
+    "IBS-S-01",
+    "IBS-S-02",
+    "IBS-S-03",
+    "IBS-S-04",
+    "IBS-S-05",
+    "IBS-S-06",
+    "IBS-S-07",
+    "IBS-S-08",
+    "IBS-S-09",
+    "IBS-S-10",
+    "IBS-S-11",
+    "IBS-S-12",
+    "IBS-S-13",
+    "IBS-S-14",
+    "IBS-S-EM-01",
+    "IBS-S-FM-01",
+}
 # 用户裁定：编队上限由 4 放开到 8，支持“全主力+大队驱逐”的巨舰剧本。
 MAX_FORMATIONS_PER_SIDE = 8
 

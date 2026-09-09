@@ -1,0 +1,107 @@
+# S-11 奥古斯塔皇后湾海战（1943年11月2日）
+# 页面：/tmp/ibs-render/scen-12.png（PDF第12页，印刷页码13）
+# 注：S-10萨沃岛海战跨两页（PDF第10-11页），scen-11.png（印刷页12）实为S-10的盟军舰队与增援续页；
+#     本想定（页面徽章 Scenario 11）从PDF第12页起，此后"PDF页码=想定编号+1"。
+id: IBS-S-11
+number: 11
+title: 奥古斯塔皇后湾海战
+date: 1943-11-02
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 12, printed_page: 13, status: verified_source}
+turns: 9
+visibility: {axis: 16, allies: 12}
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
+setup:
+  mode: scenario_positions
+  engine_default_note: engine_default_formations 仅为真实模式直接开局的默认编队提案；部署权威仍是 ships 初始位置与想定规则。
+  engine_default_formations:
+    axis:
+    - id: axis-main
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-MYOKO
+      - IBS-U-IJN-HAGURO
+      note: 主力队（大森仙太郎少将旗舰妙高）
+    - id: axis-sendai-group
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-SENDAI
+      - IBS-U-IJN-SHIGURE
+      - IBS-U-IJN-SAMIDARE
+      - IBS-U-IJN-SHIRATSUYU
+      note: 川内第一警戒队
+    - id: axis-agano-group
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-AGANO
+      - IBS-U-IJN-NAGANAMI
+      - IBS-U-IJN-HATSU-KAZE
+      - IBS-U-IJN-WAKATSUKI
+      note: 阿贺野第二警戒队（输送船团护卫）
+    allies:
+    - id: allies-cruiser-line
+      role: line_ahead
+      ships:
+      - IBS-U-USN-UNNAMED-T01-R28
+      - IBS-U-USN-UNNAMED-T01-R26
+      - IBS-U-USN-UNNAMED-T01-R27
+      - IBS-U-USN-UNNAMED-T01-R29
+      note: 巡洋舰纵列（梅里尔少将旗舰蒙彼利埃）
+    - id: allies-van-dd
+      role: line_ahead
+      ships:
+      - IBS-U-USN-CF-AUSBURNE
+      - IBS-U-USN-DYSON
+      - IBS-U-USN-STANLY
+      - IBS-U-USN-CLAXTON
+      note: 前卫驱逐队（伯克上校）
+    - id: allies-rear-dd
+      role: line_ahead
+      ships:
+      - IBS-U-USN-SPENCE
+      - IBS-U-USN-THATCHER
+      - IBS-U-USN-CONVERSE
+      - IBS-U-USN-FOOTE
+      note: 后卫驱逐队
+
+victory:
+  kind: victory_points
+  points_per_three_hull_lost: 1
+  leader_margin: 4
+  draw_if_margin_below: 4
+  evaluated_at: end_of_turn_9
+special_rules:
+  # 游戏回合原文：9个回合，或所有日军单位离开地图。
+  - {id: IBS-S-11-R1, text: 9个回合，或所有日军单位离开地图。}
+  - {id: IBS-S-11-R2, text: 一架日军侦察机在战场内，双方所有移动命令写完之后，日军可以在地图上任意位置放置一枚照明弹。}
+  - {id: IBS-S-11-R3, text: 由于之前的空袭行动，羽黑舰在划掉1点船体，且航速减少至6-5-5的状态进场。}
+  # 胜利条件附加条（schema 无决定性胜利分差字段）
+  - {id: IBS-S-11-R4, text: 如果差值达到20分，视为决定性胜利。}
+ships:
+  # 日本舰队 配置（旗舰：妙高 —— 大森仙太郎少将）
+  - {id: IBS-U-IJN-MYOKO, name: 妙高, side: axis, template: ca-japanese-1942, position: G16, heading: 2, speed: 5, asset: 日本-CA-妙高.png, flagship: true}
+  - {id: IBS-U-IJN-HAGURO, name: 羽黑, side: axis, template: ca-japanese-1942, position: F15, heading: 2, speed: 5, asset: 日本-CA-羽黑.png}
+  - {id: IBS-U-IJN-SENDAI, name: 川内, side: axis, template: cl-american-1942, position: M11, heading: 2, speed: 5, asset: 日本-CL-川内.png}
+  - {id: IBS-U-IJN-SHIGURE, name: 时雨, side: axis, template: dd-japanese-1942, position: L10, heading: 2, speed: 5, asset: 日本-DD-时雨.png}
+  - {id: IBS-U-IJN-SAMIDARE, name: 五月雨, side: axis, template: dd-japanese-1942, position: K10, heading: 2, speed: 5, asset: 日本-DD-五月雨.png}
+  - {id: IBS-U-IJN-SHIRATSUYU, name: 白露, side: axis, template: dd-japanese-1942, position: J9, heading: 2, speed: 5, asset: 日本-DD-白露.png}  # record-ids 无白露，取 catalog-ids
+  - {id: IBS-U-IJN-AGANO, name: 阿贺野, side: axis, template: cl-american-1942, position: D22, heading: 2, speed: 5, asset: 日本-CL-阿贺野.png}
+  - {id: IBS-U-IJN-NAGANAMI, name: 长波, side: axis, template: dd-japanese-1942, position: C22, heading: 2, speed: 5, asset: 日本-DD-长波.png}
+  - {id: IBS-U-IJN-HATSU-KAZE, name: 初风, side: axis, template: dd-japanese-1942, position: B21, heading: 2, speed: 5, asset: 日本-DD-初风.png}
+  - {id: IBS-U-IJN-WAKATSUKI, name: 若月, side: axis, template: dd-japanese-1942, position: A21, heading: 2, speed: 5, asset: 日本-DD-若月.png}
+  # 盟军舰队 配置（旗舰：蒙彼利埃 —— A.S.梅里尔少将）
+  - {id: IBS-U-USN-UNNAMED-T01-R28, name: 蒙彼利埃, side: allies, template: cl-american-1942, position: EE14, heading: 4, speed: 4, asset: 美国-CL-蒙彼利埃.png, flagship: true}  # record-ids 无，取 catalog-ids
+  - {id: IBS-U-USN-UNNAMED-T01-R26, name: 克利夫兰, side: allies, template: cl-american-1942, position: EE15, heading: 4, speed: 4, asset: 美国-CL-克利夫兰.png}  # record-ids 无，取 catalog-ids
+  - {id: IBS-U-USN-UNNAMED-T01-R27, name: 哥伦比亚, side: allies, template: cl-american-1942, position: EE16, heading: 4, speed: 4, asset: 美国-CL-哥伦比亚.png}  # record-ids 无，取 catalog-ids
+  # 页面印“丹弗”，棋子图文件名为 美国-CL-丹佛.png（同舰 Denver）
+  - {id: IBS-U-USN-UNNAMED-T01-R29, name: 丹弗, side: allies, template: cl-american-1942, position: EE17, heading: 4, speed: 4, asset: 美国-CL-丹佛.png}  # record-ids 无，取 catalog-ids
+  - {id: IBS-U-USN-CF-AUSBURNE, name: 查尔斯·奥斯本, side: allies, template: dd-american-1942, position: CC8, heading: 4, speed: 4, asset: 美国-DD-查尔斯·奥斯本.png}
+  - {id: IBS-U-USN-DYSON, name: 戴森, side: allies, template: dd-american-1942, position: CC9, heading: 4, speed: 4, asset: 美国-DD-戴森.png}
+  - {id: IBS-U-USN-STANLY, name: 斯坦立, side: allies, template: dd-american-1942, position: CC10, heading: 4, speed: 4, asset: 美国-DD-斯坦立.png}
+  - {id: IBS-U-USN-CLAXTON, name: 克拉克斯顿, side: allies, template: dd-american-1942, position: CC11, heading: 4, speed: 4, asset: 美国-DD-克拉克斯顿.png}
+  - {id: IBS-U-USN-SPENCE, name: 斯彭斯, side: allies, template: dd-american-1942, position: GG19, heading: 4, speed: 4, asset: 美国-DD-斯彭斯.png}
+  - {id: IBS-U-USN-THATCHER, name: 撒切尔, side: allies, template: dd-american-1942, position: GG20, heading: 4, speed: 4, asset: 美国-DD-撒切尔.png}
+  - {id: IBS-U-USN-CONVERSE, name: 康弗斯, side: allies, template: dd-american-1942, position: GG21, heading: 4, speed: 4, asset: 美国-DD-康弗斯.png}
+  - {id: IBS-U-USN-FOOTE, name: 福特, side: allies, template: dd-american-1942, position: GG22, heading: 4, speed: 4, asset: 美国-DD-福特.png}
+# UNVERIFIED-VICTORY: 胜利条件含“如果差值达到20分，视为决定性胜利”（IBS-S-11-R4），schema 的 victory 块无决定性胜利分差字段，仅保留标准VP四项。

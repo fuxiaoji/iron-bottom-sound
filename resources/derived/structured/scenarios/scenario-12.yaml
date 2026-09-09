@@ -1,0 +1,89 @@
+# S-12 布干维尔岛海战（第一战队出击！）（页面日期：1928年3月3日，架空想定，逐字照录页面日期）
+# 页面：/tmp/ibs-render/scen-13.png（PDF第13页，印刷页码14；页面徽章 Scenario 12）
+# 注：S-10萨沃岛海战跨两页（PDF第10-11页），故此后"PDF页码=想定编号+1"。
+id: IBS-S-12
+number: 12
+title: 布干维尔岛海战（第一战队出击！）
+date: 1928-03-03
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 13, printed_page: 14, status: verified_source}
+turns: 9
+visibility: {axis: 14, allies: 12}
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
+setup:
+  mode: scenario_positions
+  engine_default_note: engine_default_formations 仅为真实模式直接开局的默认编队提案；部署权威仍是 ships 初始位置与想定规则。
+  engine_default_formations:
+    axis:
+    - id: axis-main-body
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-NAGATO
+      - IBS-U-IJN-MUTSU
+      note: 第一战队（长门旗舰）
+    - id: axis-screen
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-JINTSU-I
+      - IBS-U-IJN-KAMIKAZE
+      - IBS-U-IJN-OITE
+      - IBS-U-IJN-HATSUYUKI
+      note: 警戒队
+    - id: axis-van
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-KAKO-I
+      note: 前卫（加古；不足 2 舰由引擎并入相邻纵队）
+    allies:
+    - id: allies-battle-line
+      role: line_ahead
+      ships:
+      - IBS-U-USN-COLORADO
+      - IBS-U-USN-WEST-VIRGINIA
+      note: 战列舰纵队
+    - id: allies-screen-1
+      role: line_ahead
+      ships:
+      - IBS-U-USN-OMAHA
+      - IBS-U-USN-DAHLGREN
+      - IBS-U-USN-PERRY
+      note: 第一警戒队
+    - id: allies-screen-2
+      role: line_ahead
+      ships:
+      - IBS-U-USN-HULL-I
+      - IBS-U-USN-BAINBRIDGE
+      note: 第二警戒队
+
+victory:
+  kind: victory_points
+  points_per_three_hull_lost: 1
+  leader_margin: 4
+  draw_if_margin_below: 4
+  evaluated_at: end_of_turn_9
+special_rules:
+  - {id: IBS-S-12-R1, text: 双方都对第一次接触很震惊，双方第一回合都无法炮击和发射鱼雷。}
+  # 胜利条件附加条（schema 无战列舰损失判定字段）
+  - {id: IBS-S-12-R2, text: 如果敌方损失1-2艘战列舰，而己方无战列舰损失，视为决定性胜利。}
+ships:
+  # 日本舰队 配置（旗舰：长门 —— 德刚中将）
+  # 页面计数器印“加古(1)”上标注记，按既有惯例写作 加古(I)
+  - {id: IBS-U-IJN-KAKO-I, name: 加古(I), side: axis, template: ca-japanese-1942, position: P9, heading: 2, speed: 4, asset: 日本-CA-加古1.png}
+  - {id: IBS-U-IJN-NAGATO, name: 长门, side: axis, template: ca-american-1942, position: N8, heading: 2, speed: 4, asset: 日本-BB-长门.png, flagship: true}
+  - {id: IBS-U-IJN-MUTSU, name: 陆奥, side: axis, template: ca-american-1942, position: M8, heading: 2, speed: 4, asset: 日本-BB-陆奥.png}
+  - {id: IBS-U-IJN-JINTSU-I, name: 神通(I), side: axis, template: cl-american-1942, position: S8, heading: 2, speed: 4, asset: 日本-CL-神通1.png}
+  - {id: IBS-U-IJN-KAMIKAZE, name: 神风, side: axis, template: dd-japanese-1942, position: R7, heading: 2, speed: 4, asset: 日本-DD-神风.png}
+  - {id: IBS-U-IJN-OITE, name: 追风, side: axis, template: dd-japanese-1942, position: Q7, heading: 2, speed: 4, asset: 日本-DD-追风.png}
+  - {id: IBS-U-IJN-HATSUYUKI, name: 初雪, side: axis, template: dd-japanese-1942, position: P6, heading: 2, speed: 4, asset: 日本-DD-初雪.png}
+  # 盟军舰队 配置（旗舰：科罗拉多 —— 迈克尔·哈德威克少将）
+  - {id: IBS-U-USN-COLORADO, name: 科罗拉多, side: allies, template: ca-american-1942, position: Z19, heading: 5, speed: 3, asset: 美国-BB-科罗拉多.png, flagship: true}
+  - {id: IBS-U-USN-WEST-VIRGINIA, name: 西弗吉尼亚, side: allies, template: ca-american-1942, position: AA20, heading: 5, speed: 3, asset: 美国-BB-西弗吉尼亚.png}
+  - {id: IBS-U-USN-OMAHA, name: 奥马哈, side: allies, template: cl-american-1942, position: V20, heading: 5, speed: 3, asset: 美国-CL-奥马哈.png}
+  - {id: IBS-U-USN-DAHLGREN, name: 达尔格伦, side: allies, template: dd-american-1942, position: W21, heading: 5, speed: 3, asset: 美国-DD-达尔格伦.png}
+  - {id: IBS-U-USN-PERRY, name: 佩里, side: allies, template: dd-american-1942, position: X21, heading: 5, speed: 3, asset: 美国-DD-佩里.png}
+  # 页面计数器印“赫尔(1)”上标注记，按既有惯例写作 赫尔(I)
+  - {id: IBS-U-USN-HULL-I, name: 赫尔(I), side: allies, template: dd-american-1942, position: AA17, heading: 5, speed: 3, asset: 美国-DD-赫尔1.png}
+  - {id: IBS-U-USN-BAINBRIDGE, name: 班布里奇, side: allies, template: dd-american-1942, position: BB17, heading: 5, speed: 3, asset: 美国-DD-班布里奇.png}
+# UNVERIFIED-VICTORY: 胜利条件含“如果敌方损失1-2艘战列舰，而己方无战列舰损失，视为决定性胜利”（IBS-S-12-R2），schema 的 victory 块无对应字段，仅保留标准VP四项。
+# UNVERIFIED-DATE: 页面日期“1928年3月3日”为架空想定日期（长门、陆奥对科罗拉多、西弗吉尼亚），非史实日期，逐字照录。

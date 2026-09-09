@@ -1,0 +1,116 @@
+# S-09 第一次瓜达卡纳尔岛海战（1942年11月13日，星期五）
+# 页面：/tmp/ibs-render/scen-09.png（PDF第9页，印刷页码10）
+id: IBS-S-09
+number: 9
+title: 第一次瓜达卡纳尔岛海战
+date: 1942-11-13
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 9, printed_page: 10, status: verified_source}
+turns: 6
+visibility: {axis: 10, allies: 8}
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
+setup:
+  mode: scenario_positions
+  engine_default_note: engine_default_formations 仅为真实模式直接开局的默认编队提案；部署权威仍是 ships 初始位置与想定规则。
+  engine_default_formations:
+    axis:
+    - id: axis-vanguard-dd
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-YUDACHI
+      - IBS-U-IJN-HARUSAME
+      note: 前卫扫讨队（夕立/春雨）
+    - id: axis-battle-line
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-HIEI
+      - IBS-U-IJN-KIRISHIMA
+      note: 挺身攻击队战列纵队（阿部弘毅中将旗舰比叡）
+    - id: axis-screen
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-NAGARA
+      - IBS-U-IJN-IKAZUCHI
+      - IBS-U-IJN-AKATSUKI
+      - IBS-U-IJN-INAZUMA
+      - IBS-U-IJN-YUKIKAZE
+      - IBS-U-IJN-AMATSU-KAZE
+      - IBS-U-IJN-TERUZUKI
+      note: 直卫警戒列（长良领头）
+    - id: axis-rear-dd
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-ASAGUMO
+      - IBS-U-IJN-MURASAME
+      - IBS-U-IJN-SAMIDARE
+      note: 后卫驱逐队
+    allies:
+    - id: allies-van-dd
+      role: line_ahead
+      ships:
+      - IBS-U-USN-CUSHING
+      - IBS-U-USN-LAFFEY
+      - IBS-U-USN-STERETT
+      - IBS-U-USN-OBANNON
+      note: 前卫驱逐队（库欣上校）
+    - id: allies-cruiser-line
+      role: line_ahead
+      ships:
+      - IBS-U-USN-UNNAMED-T01-R23
+      - IBS-U-USN-SAN-FRANCISCO
+      - IBS-U-USN-UNNAMED-T01-R20
+      - IBS-U-USN-HELENA
+      - IBS-U-USN-UNNAMED-T01-R24
+      note: 巡洋舰纵列（卡拉汉少将旗舰旧金山；亚特兰大队首）
+    - id: allies-rear-dd
+      role: line_ahead
+      ships:
+      - IBS-U-USN-AARON-WARD
+      - IBS-U-USN-BARTON
+      - IBS-U-USN-MONSSEN
+      - IBS-U-USN-FLETCHER
+      note: 后卫驱逐队
+
+victory:
+  kind: victory_points
+  points_per_three_hull_lost: 1
+  leader_margin: 4
+  draw_if_margin_below: 4
+  evaluated_at: end_of_turn_6
+special_rules:
+  - {id: IBS-S-09-R1, text: 瓜达卡纳尔岛在地图东侧外，萨沃岛在地图东北侧外（背景情况，无需放置）。}
+  - {id: IBS-S-09-R2, text: 双方在第1回合都不能发射鱼雷。}
+  - {id: IBS-S-09-R3, text: 日军战列舰BB在第1和第2回合时，任何炮击都无法穿透装甲。因为他们正准备向亨德森机场炮击高爆弹。}
+  - {id: IBS-S-09-R4, text: 旧金山的舰尾主炮于当天早些时候被炸毁，需要先划掉。}
+ships:
+  # 日本舰队 配置（旗舰：比睿——阿部弘毅中将）
+  - {id: IBS-U-IJN-YUDACHI, name: 夕立, side: axis, template: dd-japanese-1942, position: S12, heading: 2, speed: 3, asset: 日本-DD-夕立.png}
+  - {id: IBS-U-IJN-HARUSAME, name: 春雨, side: axis, template: dd-japanese-1942, position: R11, heading: 2, speed: 3, asset: 日本-DD-春雨.png}
+  - {id: IBS-U-IJN-NAGARA, name: 长良, side: axis, template: cl-american-1942, position: O10, heading: 2, speed: 3, asset: 日本-CL-长良.png}
+  - {id: IBS-U-IJN-INAZUMA, name: 电, side: axis, template: dd-japanese-1942, position: K12, heading: 2, speed: 3, asset: 日本-DD-电.png}
+  - {id: IBS-U-IJN-AKATSUKI, name: 晓, side: axis, template: dd-japanese-1942, position: K11, heading: 2, speed: 3, asset: 日本-DD-晓.png}
+  - {id: IBS-U-IJN-IKAZUCHI, name: 雷, side: axis, template: dd-japanese-1942, position: K10, heading: 2, speed: 3, asset: 日本-DD-雷.png}
+  # 页面标题栏印“比睿”（简体写法），计数器与ID表均为“比叡”
+  - {id: IBS-U-IJN-HIEI, name: 比叡, side: axis, template: ca-american-1942, position: K8, heading: 2, speed: 3, asset: 日本-BB-比叡.png, flagship: true}
+  - {id: IBS-U-IJN-KIRISHIMA, name: 雾岛, side: axis, template: ca-american-1942, position: I7, heading: 2, speed: 3, asset: 日本-BB-雾岛.png}
+  - {id: IBS-U-IJN-YUKIKAZE, name: 雪风, side: axis, template: dd-japanese-1942, position: M7, heading: 2, speed: 3, asset: 日本-DD-雪风.png}
+  - {id: IBS-U-IJN-AMATSU-KAZE, name: 天津风, side: axis, template: dd-japanese-1942, position: L6, heading: 2, speed: 3, asset: 日本-DD-天津风.png}
+  - {id: IBS-U-IJN-TERUZUKI, name: 照月, side: axis, template: dd-japanese-1942, position: K6, heading: 2, speed: 3, asset: 日本-DD-照月.png}
+  - {id: IBS-U-IJN-ASAGUMO, name: 朝云, side: axis, template: dd-japanese-1942, position: I4, heading: 1, speed: 3, asset: 日本-DD-朝云.png}
+  - {id: IBS-U-IJN-MURASAME, name: 村雨, side: axis, template: dd-japanese-1942, position: H4, heading: 1, speed: 3, asset: 日本-DD-村雨.png}
+  - {id: IBS-U-IJN-SAMIDARE, name: 五月雨, side: axis, template: dd-japanese-1942, position: G5, heading: 1, speed: 3, asset: 日本-DD-五月雨.png}
+  # 盟军舰队 配置（旗舰：旧金山——丹尼尔·卡拉汉少将）
+  - {id: IBS-U-USN-CUSHING, name: 库欣, side: allies, template: dd-american-1942, position: U17, heading: 6, speed: 4, asset: 美国-DD-库欣.png}
+  - {id: IBS-U-USN-LAFFEY, name: 拉菲, side: allies, template: dd-american-1942, position: U18, heading: 6, speed: 4, asset: 美国-DD-拉菲.png}
+  - {id: IBS-U-USN-STERETT, name: 史特雷特, side: allies, template: dd-american-1942, position: U19, heading: 6, speed: 4, asset: 美国-DD-史特雷特.png}
+  - {id: IBS-U-USN-OBANNON, name: 奥班农, side: allies, template: dd-american-1942, position: U20, heading: 6, speed: 4, asset: 美国-DD-奥班农.png}
+  - {id: IBS-U-USN-UNNAMED-T01-R23, name: 亚特兰大, side: allies, template: cl-american-1942, position: U21, heading: 6, speed: 4, asset: 美国-CL-亚特兰大.png}
+  - {id: IBS-U-USN-SAN-FRANCISCO, name: 旧金山, side: allies, template: ca-american-1942, position: U22, heading: 6, speed: 4, asset: 美国-CA-旧金山.png, flagship: true}
+  - {id: IBS-U-USN-UNNAMED-T01-R20, name: 波特兰, side: allies, template: ca-american-1942, position: U23, heading: 6, speed: 4, asset: 美国-CA-波特兰.png}
+  - {id: IBS-U-USN-HELENA, name: 海伦娜, side: allies, template: cl-american-1942, position: V23, heading: 5, speed: 4, asset: 美国-CL-海伦娜.png}
+  - {id: IBS-U-USN-UNNAMED-T01-R24, name: 朱诺, side: allies, template: cl-american-1942, position: W24, heading: 5, speed: 4, asset: 美国-CL-朱诺.png}
+  - {id: IBS-U-USN-AARON-WARD, name: 亚伦沃德, side: allies, template: dd-american-1942, position: X24, heading: 5, speed: 4, asset: 美国-DD-亚伦沃德.png}
+  - {id: IBS-U-USN-BARTON, name: 巴顿, side: allies, template: dd-american-1942, position: Y25, heading: 5, speed: 4, asset: 美国-DD-巴顿.png}
+  - {id: IBS-U-USN-MONSSEN, name: 蒙森, side: allies, template: dd-american-1942, position: Z25, heading: 5, speed: 4, asset: 美国-DD-蒙森.png}
+  - {id: IBS-U-USN-FLETCHER, name: 弗莱彻, side: allies, template: dd-american-1942, position: AA26, heading: 5, speed: 4, asset: 美国-DD-弗莱彻.png}

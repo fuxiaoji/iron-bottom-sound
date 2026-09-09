@@ -1,0 +1,76 @@
+id: IBS-S-02
+number: 2
+title: 库拉湾海战
+date: 1943-07-06
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 2, printed_page: 3, status: verified_source}
+turns: 9
+visibility: {axis: 16, allies: 12}
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
+setup:
+  mode: scenario_positions
+  engine_default_note: engine_default_formations 仅为真实模式直接开局的默认编队提案；一般模式与真实模式部署仍以 ships 初始位置和想定规则为权威。
+  engine_default_formations:
+    axis:
+    - id: axis-strike-1
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-NIIZUKI
+      - IBS-U-IJN-SUZUKAZE
+      - IBS-U-IJN-TANIKAZE
+      note: 第一突击队（警戒列）
+    - id: axis-transport-2
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-AMAGIRI
+      - IBS-U-IJN-HATSUYUKI
+      - IBS-U-IJN-NAGATSUKI
+      - IBS-U-IJN-SATSUKI
+      note: 第二输送队（东京快车）
+    allies:
+    - id: allies-tf36-1
+      role: line_ahead
+      ships:
+      - IBS-U-USN-NICHOLAS
+      - IBS-U-USN-OBANNON
+      - IBS-U-USN-HONOLULU
+      - IBS-U-USN-HELENA
+      - IBS-U-USN-ST-LOUIS
+      - IBS-U-USN-JENKINS
+      - IBS-U-USN-RADFORD
+      note: TF36.1 安斯沃思单纵队：驱逐前卫-巡洋舰-驱逐后卫
+
+victory:
+  kind: victory_points
+  points_per_three_hull_lost: 1
+  leader_margin: 4
+  draw_if_margin_below: 4
+  evaluated_at: end_of_turn_9
+special_rules:
+  - {id: IBS-S-02-R1, text: 游戏回合：9个回合，或所有日军单位离开地图。}
+  - {id: IBS-S-02-R2, text: 岛屿放置：将萨沃岛小地图的X格对应放置在A-27格。}
+  - {id: IBS-S-02-R3, text: 根据海军条令，美军DD必须始终维持与CL相邻。}
+  - {id: IBS-S-02-R4, text: 日军可能受到增援。仅在第4回合开始时掷1枚骰子，如果掷到1或2，那么增援单位在移动阶段，以任意航速从G27至O27进入地图。“浜风”、“望月”、“三日月”按此顺序单纵队编队，划掉“浜风”的鱼雷再装填，因为它装载了额外的集装箱物资。}
+ships:
+  - {id: IBS-U-IJN-NIIZUKI, name: 新月, side: axis, template: dd-japanese-1942, position: K14, heading: 6, speed: 5, asset: 日本-DD-新月.png, flagship: true}
+  - {id: IBS-U-IJN-SUZUKAZE, name: 凉风, side: axis, template: dd-japanese-1942, position: K15, heading: 6, speed: 5, asset: 日本-DD-凉风.png}
+  - {id: IBS-U-IJN-TANIKAZE, name: 谷风, side: axis, template: dd-japanese-1942, position: K16, heading: 6, speed: 5, asset: 日本-DD-谷风.png}
+  - {id: IBS-U-IJN-AMAGIRI, name: 天雾, side: axis, template: dd-japanese-1942, position: H21, heading: 3, speed: 5, asset: 日本-DD-天雾.png}
+  - {id: IBS-U-IJN-HATSUYUKI, name: 初雪, side: axis, template: dd-japanese-1942, position: H20, heading: 3, speed: 5, asset: 日本-DD-初雪.png}
+  - {id: IBS-U-IJN-NAGATSUKI, name: 长月, side: axis, template: dd-japanese-1942, position: H19, heading: 3, speed: 5, asset: 日本-APD-长月.png}
+  - {id: IBS-U-IJN-SATSUKI, name: 皋月, side: axis, template: dd-japanese-1942, position: H18, heading: 3, speed: 5, asset: 日本-APD-皋月.png}
+  - {id: IBS-U-USN-NICHOLAS, name: 尼古拉斯, side: allies, template: dd-american-1942, position: T6, heading: 4, speed: 4, asset: 美国-DD-尼古拉斯.png}
+  - {id: IBS-U-USN-OBANNON, name: 奥班农, side: allies, template: dd-american-1942, position: U7, heading: 4, speed: 4, asset: 美国-DD-奥班农.png}
+  - {id: IBS-U-USN-HONOLULU, name: 火奴鲁鲁, side: allies, template: cl-american-1942, position: V7, heading: 4, speed: 4, asset: 美国-CL-火奴鲁鲁.png, flagship: true}
+  - {id: IBS-U-USN-HELENA, name: 海伦娜, side: allies, template: cl-american-1942, position: W8, heading: 4, speed: 4, asset: 美国-CL-海伦娜.png}
+  - {id: IBS-U-USN-ST-LOUIS, name: 圣路易斯, side: allies, template: cl-american-1942, position: X8, heading: 4, speed: 4, asset: 美国-CL-圣路易斯.png}
+  - {id: IBS-U-USN-JENKINS, name: 詹金斯, side: allies, template: dd-american-1942, position: Y9, heading: 4, speed: 4, asset: 美国-DD-詹金斯.png}
+  - {id: IBS-U-USN-RADFORD, name: 雷德福德, side: allies, template: dd-american-1942, position: Z9, heading: 4, speed: 4, asset: 美国-DD-雷德福德.png}
+reinforcements:
+  trigger: {turn: 4, roll: 1d6, succeeds_on: [1, 2]}
+  arrival: {turn: 4, timing: during_movement, entry_hex_range: [G27, O27], speed: any_legal}  # 页面原文：增援单位在移动阶段入场
+  ships:
+    - {id: IBS-U-IJN-HAMAKAZE, name: 浜风, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], torpedo_reloads: 0, asset: 日本-DD-浜风.png}
+    - {id: IBS-U-IJN-MONCHIZUKI, name: 望月, side: axis, template: dd-japanese-1942, speed_track: [6, 5, 5], asset: 日本-APD-望月.png}
+    - {id: IBS-U-IJN-MIKAZUKI, name: 三日月, side: axis, template: dd-japanese-1942, speed_track: [6, 5, 5], asset: 日本-APD-三日月.png}

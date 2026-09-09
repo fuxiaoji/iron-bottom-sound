@@ -3,3 +3,6 @@
 export function counterAssetUrl(asset:string|null){
  return asset?`${import.meta.env.BASE_URL}assets/counters/${encodeURIComponent(asset)}`:"";
 }
+// 兼容别名：简报弹窗使用更短的名字。
+export const counterImage=counterAssetUrl;
+export const counterFallbackImage=counterAssetUrl;

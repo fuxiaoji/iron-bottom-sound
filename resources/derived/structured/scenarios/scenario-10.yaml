@@ -1,0 +1,116 @@
+# S-10 萨沃岛海战（1942年8月9日）
+# 页面：/tmp/ibs-render/scen-10.png（PDF第10页，印刷页码11）
+# 注意：页面只有“日本舰队 配置”一个配置框，没有盟军舰队配置表；
+#       盟军突袭规则中提及“堪培拉”“芝加哥”“巴格莱”“帕特森”，但盟军部署数据在本页缺失。
+id: IBS-S-10
+number: 10
+title: 萨沃岛海战
+date: 1942-08-09
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 10, printed_page: 11, status: verified_source}
+turns: 30  # 页面为“无限回合”（见 IBS-S-10-R4）；30 为引擎整回合并上界，非规则值
+visibility: {axis: 16, allies: 8}
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
+initial_phase: gunnery
+setup:
+  mode: scenario_positions
+  engine_default_note: engine_default_formations 仅为真实模式直接开局的默认编队提案；部署权威仍是 ships 初始位置与想定规则。
+  engine_default_formations:
+    axis:
+    - id: axis-cruiser-column
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-CHOKAI
+      - IBS-U-IJN-AOBA
+      - IBS-U-IJN-KAKO-I
+      - IBS-U-IJN-KINUGASA
+      note: 外南洋巡逻部队主力单纵（三川军一中将旗舰鸟海）
+    - id: axis-following
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-FURUTAKA
+      - IBS-U-IJN-TENRYU
+      - IBS-U-IJN-YUBARI
+      - IBS-U-IJN-XIFENG
+      note: 后续追击队（按R1跟随衣笠）
+    allies:
+    - id: allies-southern-force
+      role: line_ahead
+      ships:
+      - IBS-U-RAN-CANBERRA
+      - IBS-U-USN-UNNAMED-T01-R12
+      - IBS-U-USN-PATTERSON
+      - IBS-U-USN-BAGLEY
+      - IBS-U-USN-JARVIS
+      note: 南方舰队（克拉奇利少将旗舰澳大利亚在增援）
+    - id: allies-northern-force
+      role: line_ahead
+      ships:
+      - IBS-U-USN-VINCENNES
+      - IBS-U-USN-QUINCY
+      - IBS-U-USN-ASTORIA
+      - IBS-U-USN-WILSON
+      - IBS-U-USN-HELM
+      note: 北方舰队
+
+victory:
+  kind: custom_score_thresholds
+special_rules:
+  # 配置框内注释原文
+  - {id: IBS-S-10-R1, text: '“天龙”，“夕张” & “夕凪” 排成一列依次跟随“衣笠”（领头），这三艘舰船到达时每艘船占据一个格子。'}
+  - {id: IBS-S-10-R2, text: 将萨沃岛小地图的X格对应放置在A20格。}
+  - {id: IBS-S-10-R3, text: 第1回合时，日军16格，盟军8格。第2回合时，盟军提高到10格。第3回合开始盟军提高到12格。}
+  - {id: IBS-S-10-R4, text: 无限回合，当所有日军单位从地图A27-HH27离开地图时游戏结束。}
+  - {id: IBS-S-10-R5, text: 第1回合从炮击执行阶段开始，移动已经结束。只有日军在第1回合可以炮击。}
+  # 盟军突袭规则
+  - {id: IBS-S-10-R6, text: 在第1回合开始，唯一警戒状态的是盟军南方编队，其他所有盟军单位都是未警戒状态。}
+  - {id: IBS-S-10-R7, text: 未警戒的单位只能保持原有方向和航速直行。}
+  - {id: IBS-S-10-R8, text: 警戒状态的单位第一回合无法炮击，但第二回合可以正常炮击。“堪培拉”，“芝加哥”，“巴格莱” 和 “帕特森” 四艘单位第1回合无法炮击，并且每回合航速只能提升1MF。}
+  - {id: IBS-S-10-R9, text: 当单位达成下列条件之一时，会转换成警戒状态：1，被炮击一次，无论是否被命中。2，被鱼雷命中一次。3，敌舰在可视范围内。}
+  - {id: IBS-S-10-R10, text: 第3回合开始，全部单位自动转换成警戒状态。}
+  - {id: IBS-S-10-R11, text: 在第一回合的炮击执行阶段前，日军可以在地图上放置一枚（飞机投放）的闪光弹。}
+  # 日军分数奖励
+  - {id: IBS-S-10-R12, text: 日军单位可以从HH1至HH16格离开地图，每离开一艘单位日军获得1分。}
+  - {id: IBS-S-10-R13, text: 离开地图前，每消耗1点鱼雷值获得4分。}
+  - {id: IBS-S-10-R14, text: 离开地图的单位可以在下回合从离开格的3格范围内返回地图。}
+  # 胜利条件
+  - {id: IBS-S-10-R15, text: 如果日军比盟军多16分，日军获得战术胜利。}
+  - {id: IBS-S-10-R16, text: 如果日军比盟军多50分，日军获得决定性胜利。}
+  - {id: IBS-S-10-R17, text: 如果分数差小于16分，盟军获得战术胜利。}
+  - {id: IBS-S-10-R18, text: 如果击沉3艘日军重巡，且盟军分数多，则盟军获得决定性胜利。}
+  - {id: IBS-S-10-R19, text: 其他情况为平局。}
+  # 盟军增援（配置（旗舰：澳大利亚——维克托·克拉奇利少将），原文位于 PDF 第 11 页/印刷页 12）
+  - {id: IBS-S-10-R20, text: 盟军玩家可能获得增援。第2回合开始，在日军移动阶段之前，掷2枚骰子，如果点数之和与下面表格对应的结果出现未上场的增援单位，将他们依次以警戒状态进入地图。盟军后续每回合都掷骰判定增援。骰点表：2=澳大利亚、东方部队、拉尔夫·托尔伯特；3=澳大利亚、东方部队、布鲁；4=澳大利亚、东方部队、布鲁；5-9=没有新部队转移或加入；10=澳大利亚；11=澳大利亚、拉尔夫·托尔伯特；12=拉尔夫·托尔伯特 & 布鲁。}
+  - {id: IBS-S-10-R21, text: “澳大利亚”从地图HH22-HH27格进入地图（包含这两格），“拉尔夫·托尔伯特”从A1-A8进入地图（包含这两格），“布鲁”从A21-A27进入地图（包含这两格），东方编队从HH3-HH21进入地图（包含这两格）。上述单位可以以任何航速进入地图，东方编队以任意单位领头，单纵队进入地图。}
+  - {id: IBS-S-10-R22, text: 如果日军单位离开地图，图拉吉护航编队可以进场。进场位置是离开地图的日军单位离开格的5格范围内，日军单位离开地图的2个回合后，图拉吉护航编队以任意航速进入。}
+ships:
+  # 日本舰队 配置（旗舰：鸟海——三川军一少将）
+  - {id: IBS-U-IJN-CHOKAI, name: 鸟海, side: axis, template: ca-japanese-1942, position: H23, heading: 1, speed: 5, asset: 日本-CA-鸟海.png, flagship: true}
+  - {id: IBS-U-IJN-AOBA, name: 青叶, side: axis, template: ca-japanese-1942, position: F24, heading: 1, speed: 5, asset: 日本-CA-青叶.png}
+  - {id: IBS-U-IJN-KAKO-I, name: 加古(I), side: axis, template: ca-japanese-1942, position: D25, heading: 1, speed: 5, asset: 日本-CA-加古1.png}
+  - {id: IBS-U-IJN-KINUGASA, name: 衣笠, side: axis, template: ca-japanese-1942, position: B26, heading: 1, speed: 5, asset: 日本-CA-衣笠.png}
+  # 以下四舰页面未给出位置/方向/速度（照录，不脑补）
+  - {id: IBS-U-IJN-FURUTAKA, name: 古鹰, side: axis, template: ca-japanese-1942, asset: 日本-CA-古鹰.png}
+  - {id: IBS-U-IJN-TENRYU, name: 天龙, side: axis, template: cl-american-1942, asset: 日本-CL-天龙.png}  # 位置按R1依次跟随衣笠（领头）
+  - {id: IBS-U-IJN-YUBARI, name: 夕张, side: axis, template: cl-american-1942, asset: 日本-CL-夕张.png}  # 位置按R1依次跟随衣笠（领头）
+  # UNVERIFIED-ID: 夕风（计数器印作“夕风”；页面R1说明文字写作“夕凪”，疑为同一舰 夕凪=IBS-U-IJN-YUNAGI；record-ids/catalog-ids 均无“夕风”）
+  - {id: IBS-U-IJN-XIFENG, name: 夕风, side: axis, template: dd-japanese-1942, asset: 日本-APD-夕凪.png}  # 无“日本-APD-夕风.png”，取最接近的 日本-APD-夕凪.png；位置按R1依次跟随衣笠（领头）
+  # 盟军舰队（PDF 第 11 页/印刷页 12；南方舰队+北方舰队；速度行原文 2-2-2 / 2-2-1，照录为初始航速 2）
+  - {id: IBS-U-RAN-CANBERRA, name: 堪培拉, side: allies, template: ca-american-1942, position: P24, heading: 5, speed: 2, asset: 澳大利亚-CA-堪培拉.png}
+  - {id: IBS-U-USN-UNNAMED-T01-R12, name: 芝加哥, side: allies, template: ca-american-1942, position: Q25, heading: 5, speed: 2, asset: 美国-CA-芝加哥.png}
+  - {id: IBS-U-USN-PATTERSON, name: 帕特森, side: allies, template: dd-american-1942, position: N25, heading: 5, speed: 2, asset: 美国-DD-帕特森.png}
+  - {id: IBS-U-USN-BAGLEY, name: 巴格莱, side: allies, template: dd-american-1942, position: P22, heading: 5, speed: 2, asset: 美国-DD-巴格莱.png}
+  - {id: IBS-U-USN-JARVIS, name: 贾维斯, side: allies, template: dd-american-1942, position: J16, heading: 4, speed: 2, asset: 美国-DD-贾维斯.png}
+  - {id: IBS-U-USN-VINCENNES, name: 文森斯, side: allies, template: ca-american-1942, position: P8, heading: 5, speed: 2, asset: 美国-CA-文森斯.png}
+  - {id: IBS-U-USN-QUINCY, name: 昆西, side: allies, template: ca-american-1942, position: Q9, heading: 5, speed: 2, asset: 美国-CA-昆西.png}
+  - {id: IBS-U-USN-ASTORIA, name: 阿斯托里亚, side: allies, template: ca-american-1942, position: R9, heading: 5, speed: 2, asset: 美国-CA-阿斯托里亚.png}
+  - {id: IBS-U-USN-WILSON, name: 威尔逊, side: allies, template: dd-american-1942, position: P6, heading: 5, speed: 2, asset: 美国-DD-威尔逊.png}
+  - {id: IBS-U-USN-HELM, name: 赫尔姆, side: allies, template: dd-american-1942, position: N9, heading: 4, speed: 2, asset: 美国-DD-赫尔姆.png}
+# 盟军增援机制说明：2d6 每回合重掷的递进入场机制超出引擎单次增援模型，按治理以规则原文 R20-R22 登记，
+# 不建结构化 reinforcements；增援舰清单：澳大利亚（HH22-HH27）、拉尔夫·托尔伯特（A1-A8）、
+# 布鲁（A21-A27）、东方舰队=圣胡安/霍巴特/蒙森/布坎南（HH3-HH21 单纵队）、图拉吉护航编队=赫尔(I)/杜威/埃利特（条件入场）。
+# UNVERIFIED-REINFORCEMENT: 见 R20-R22；结构化增援块未建。
+# UNVERIFIED-VICTORY: 胜利条件非标准VP制（按分差阈值与击沉日军重巡数判定，见 IBS-S-10-R15 至 R19），schema 无对应字段。
+# UNVERIFIED-TURNS: 页面为“无限回合，当所有日军单位从地图A27-HH27离开地图时游戏结束”，非数字回合格数；文件头 turns: 30 为引擎整回合并上界，非规则值。
+# UNVERIFIED-ALLY-OOB: 已解决——盟军舰队配置表位于手册下一页（PDF 第 11 页，印刷页码 12），盟军数据与增援规则已从该页逐字转录（R20-R22 与 ships 列表）。

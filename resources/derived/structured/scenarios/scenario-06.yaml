@@ -1,0 +1,83 @@
+# 注：页面写明增援必达；引擎以 1d6∈[1..6] 表达确定性到达。
+id: IBS-S-06
+number: 6
+title: 第二次瓜达卡纳尔岛海战
+date: 1942-11-15
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 6, printed_page: 7, status: verified_source}
+turns: 10
+visibility: {axis: 21, allies: 19}
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
+setup:
+  mode: scenario_positions
+  engine_default_note: engine_default_formations 仅为真实模式直接开局的默认编队提案；一般模式与真实模式部署仍以 ships 初始位置和想定规则为权威。
+  engine_default_formations:
+    axis:
+    - id: axis-close-screen
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-SENDAI
+      - IBS-U-IJN-SHIKINAMI
+      - IBS-U-IJN-URANAMI
+      - IBS-U-IJN-AYANAMI
+      note: 近接警戒队（川内旗舰；绫波单舰侧出）
+    - id: axis-main-body
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-NAGARA
+      - IBS-U-IJN-SHIRAYUKI
+      - IBS-U-IJN-HATSUYUKI
+      - IBS-U-IJN-SAMIDARE
+      - IBS-U-IJN-INAZUMA
+      note: 挺身攻击队本队（阿部弘毅中将旗舰比叡在援军中，由长良暂导）
+    allies:
+    - id: allies-van-dd
+      role: line_ahead
+      ships:
+      - IBS-U-USN-WALKE
+      - IBS-U-USN-BENHAM
+      - IBS-U-USN-PRESTON
+      - IBS-U-USN-GWIN
+      note: 前卫驱逐队（沃克上校）
+    - id: allies-battle-line
+      role: line_ahead
+      ships:
+      - IBS-U-USN-WASHINGTON
+      - IBS-U-USN-SOUTH-DAKOTA
+      note: 战列舰纵列（李少将旗舰华盛顿）
+
+victory:
+  kind: victory_points
+  points_per_three_hull_lost: 1
+  leader_margin: 4
+  draw_if_margin_below: 4
+  evaluated_at: end_of_turn_10
+special_rules:
+  - {id: IBS-S-06-R1, text: 岛屿放置：将萨沃岛小地图的X格对应放置在U6格。}
+  - {id: IBS-S-06-R2, text: 第三回合日军增援以任意航速从G1至L1进入地图。“爱宕”、“高雄”、“雾岛”、“朝云”、“照月”按此顺序单纵队编队。}
+ships:
+  - {id: IBS-U-IJN-SENDAI, name: 川内, side: axis, template: cl-american-1942, position: AA6, heading: 3, speed: 5, asset: 日本-CL-川内.png}
+  - {id: IBS-U-IJN-SHIKINAMI, name: 敷波, side: axis, template: dd-japanese-1942, position: AA5, heading: 3, speed: 5, asset: 日本-DD-敷波.png}
+  - {id: IBS-U-IJN-URANAMI, name: 浦波, side: axis, template: dd-japanese-1942, position: AA4, heading: 3, speed: 5, asset: 日本-DD-浦波.png}
+  - {id: IBS-U-IJN-AYANAMI, name: 绫波, side: axis, template: dd-japanese-1942, position: M11, heading: 2, speed: 4, asset: 日本-DD-绫波.png}
+  - {id: IBS-U-IJN-NAGARA, name: 长良, side: axis, template: cl-american-1942, position: H8, heading: 2, speed: 5, asset: 日本-CL-长良.png}
+  - {id: IBS-U-IJN-SHIRAYUKI, name: 白雪, side: axis, template: dd-japanese-1942, position: G8, heading: 2, speed: 5, asset: 日本-DD-白雪.png}
+  - {id: IBS-U-IJN-HATSUYUKI, name: 初雪, side: axis, template: dd-japanese-1942, position: F7, heading: 2, speed: 5, asset: 日本-DD-初雪.png}
+  - {id: IBS-U-IJN-SAMIDARE, name: 五月雨, side: axis, template: dd-japanese-1942, position: F6, heading: 3, speed: 5, asset: 日本-DD-五月雨.png}
+  - {id: IBS-U-IJN-INAZUMA, name: 电, side: axis, template: dd-japanese-1942, position: F5, heading: 3, speed: 5, asset: 日本-DD-电.png}
+  - {id: IBS-U-USN-WALKE, name: 沃克, side: allies, template: dd-american-1942, position: Y20, heading: 5, speed: 4, asset: 美国-DD-沃克.png}
+  - {id: IBS-U-USN-BENHAM, name: 本汉姆, side: allies, template: dd-american-1942, position: Z20, heading: 5, speed: 4, asset: 美国-DD-本汉姆.png}
+  - {id: IBS-U-USN-PRESTON, name: 普雷斯顿, side: allies, template: dd-american-1942, position: AA21, heading: 5, speed: 4, asset: 美国-DD-普雷斯顿.png}
+  - {id: IBS-U-USN-GWIN, name: 葛文, side: allies, template: dd-american-1942, position: BB21, heading: 5, speed: 4, asset: 美国-DD-葛文.png}
+  - {id: IBS-U-USN-WASHINGTON, name: 华盛顿, side: allies, template: ca-american-1942, position: GG24, heading: 5, speed: 4, asset: 美国-BB-华盛顿.png, flagship: true}
+  - {id: IBS-U-USN-SOUTH-DAKOTA, name: 南达科塔, side: allies, template: ca-american-1942, position: HH24, heading: 5, speed: 4, asset: 美国-BB-南达科塔.png}
+reinforcements:
+  trigger: {turn: 3, roll: 1d6, succeeds_on: [1, 2, 3, 4, 5, 6]}  # 页面写明必达；以 1d6∈[1..6] 表达确定性到达
+  arrival: {turn: 3, entry_hex_range: [G1, L1], speed: any_legal}  # 页面无掷骰，第三回合必达；无入场时机说明
+  ships:
+    - {id: IBS-U-IJN-ATAGO, name: 爱宕, side: axis, template: ca-japanese-1942, speed_track: [6, 6, 5], asset: 日本-CA-爱宕.png, flagship: true}
+    - {id: IBS-U-IJN-TAKAO, name: 高雄, side: axis, template: ca-japanese-1942, speed_track: [6, 6, 5], asset: 日本-CA-高雄.png}
+    - {id: IBS-U-IJN-KIRISHIMA, name: 雾岛, side: axis, template: ca-american-1942, speed_track: [5, 5, 5], asset: 日本-BB-雾岛.png}
+    - {id: IBS-U-IJN-ASAGUMO, name: 朝云, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], asset: 日本-DD-朝云.png}
+    - {id: IBS-U-IJN-TERUZUKI, name: 照月, side: axis, template: dd-japanese-1942, speed_track: [6, 5, 5], asset: 日本-DD-照月.png}

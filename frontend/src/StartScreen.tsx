@@ -1,8 +1,9 @@
 import {useEffect,useRef,useState} from "react";
 import type {Side} from "./types";
-import type {CustomScenarioDefinition,SavedGameSummary} from "./api";
-import {customScenarios,savedGames} from "./api";
+import type {CustomScenarioDefinition,SavedGameSummary,ScenarioBriefing} from "./api";
+import {customScenarios,savedGames,scenarioBriefing,scenarioList} from "./api";
 import {CustomScenarioEditor} from "./CustomScenarioEditor";
+import {ScenarioBriefingModal} from "./ScenarioBriefingModal";
 import {bodyRealisticCapable} from "./editor/scenario";
 
 type Mode="hotseat"|"tutorial"|"vs_ai"|"llm";
@@ -16,11 +17,24 @@ type Props={
  onResume:(game:SavedGameSummary,side:Side)=>void;onImport:(bundle:unknown,side:Side)=>Promise<void>;
  error:string;onPreviewRealisticRules:()=>void;
 };
-const scenarios=[
- ["IBS-S-03","通道行动","驱逐舰夜战 · 4 回合"],
- ["IBS-S-01","埃斯佩兰斯角","巡洋舰、增援与轰岸"],
- ["IBS-S-EM-01","第二次马里亚纳海战","24 艘主力舰 · 12 回合"],
-] as const;
+const scenarioDetails:Record<string,string>={
+ "IBS-S-01":"巡洋舰、增援与轰岸 · 7回合",
+ "IBS-S-02":"东京快车输送与雷达夜战 · 9回合",
+ "IBS-S-03":"驱逐舰夜战 · 4回合",
+ "IBS-S-04":"田中赖三的鱼雷突击 · 6回合",
+ "IBS-S-05":"“31节伯克”驱逐追猎 · 10回合",
+ "IBS-S-06":"战列舰对轰：华盛顿 vs 雾岛 · 10回合",
+ "IBS-S-07":"1928架空：条约从未签署 · 7回合",
+ "IBS-S-08":"雷达鱼雷夜战 · 15回合",
+ "IBS-S-09":"比叡、雾岛夜战旧金山 · 6回合",
+ "IBS-S-10":"三川军一的深夜奇袭 · 无限回合",
+ "IBS-S-11":"巡洋舰混战 · 9回合",
+ "IBS-S-12":"1928架空：长门、陆奥出阵 · 9回合",
+ "IBS-S-13":"驱逐输送与秘密援军 · 11回合",
+ "IBS-S-14":"驱逐小队夜袭 · 12回合",
+ "IBS-S-EM-01":"24 艘主力舰 · 12回合",
+ "IBS-S-FM-01":"虚构决战 · 91 艘主力舰 · 92×78 大战场",
+};
 
 export function StartScreen(props:Props){
  const [journey,setJourney]=useState<Journey>("learn");
@@ -33,20 +47,26 @@ export function StartScreen(props:Props){
  const [saves,setSaves]=useState<SavedGameSummary[]>([]);
  const [importBusy,setImportBusy]=useState(false);
  const [importError,setImportError]=useState("");
+ const [builtinList,setBuiltinList]=useState<{id:string;title:string;turns:number;detail:string}[]>([]);
+ const [briefing,setBriefing]=useState<ScenarioBriefing|null>(null);
+ const [briefingError,setBriefingError]=useState("");
  const saveInput=useRef<HTMLInputElement>(null);
  const modeTouched=useRef(false);
- useEffect(()=>{customScenarios().then(list=>setCustoms(list)).catch(()=>setCustoms([]));savedGames().then(list=>setSaves(list)).catch(()=>setSaves([]))},[]);
+ useEffect(()=>{customScenarios().then(list=>setCustoms(list)).catch(()=>setCustoms([]));savedGames().then(list=>setSaves(list)).catch(()=>setSaves([]));
+  scenarioList().then(list=>setBuiltinList(list.filter(item=>!item.custom).map(item=>({id:item.id,title:item.title,turns:item.turns,detail:scenarioDetails[item.id]??`${item.turns}回合`})))).catch(()=>setBuiltinList([]))},[]);
+ const openBriefing=(id:string)=>{setBriefingError("");scenarioBriefing(id).then(data=>setBriefing(data)).catch(error=>setBriefingError(String(error)))};
  const importSave=async(file:File|undefined)=>{if(!file)return;setImportBusy(true);setImportError("");try{const text=await file.text();await props.onImport(JSON.parse(text),side)}catch(error){setImportError(String(error))}finally{setImportBusy(false);if(saveInput.current)saveInput.current.value=""}};
  const startLabel=matchMode==="hotseat"?"建立同机对战":matchMode==="vs_ai"?"开始人机对战":"连接并开始 LLM 对战";
  // 自定义剧本：能力门控（不够真实编队资格的剧强制经典）+ 推荐玩法默认对手。
- const builtinScenario=scenarios.find(item=>item[0]===scenario);
+ const builtinScenario=builtinList.find(item=>item.id===scenario);
  const activeCustom=customs.find(item=>item.id===scenario);
  const activeCapable=activeCustom?bodyRealisticCapable(activeCustom):null;
  const customLocked=activeCustom!==undefined&&activeCapable===false;
  const effectiveRealistic=customLocked?false:props.realistic;
- const chosenTitle=builtinScenario?.[1]??activeCustom?.title??"自定义剧本";
+ const chosenTitle=builtinScenario?.title??activeCustom?.title??"自定义剧本";
  const selectScenario=(id:string)=>{
   setScenario(id);
+  openBriefing(id);
   const item=customs.find(entry=>entry.id===id);
   if(!item)return;
   if(!modeTouched.current&&item.recommended_mode)setMatchMode(item.recommended_mode==="pvp"?"hotseat":"vs_ai");
@@ -99,7 +119,7 @@ export function StartScreen(props:Props){
     <button className={matchMode==="vs_ai"?"active":""} onClick={()=>chooseMode("vs_ai")}><b>状态机 AI</b><span>随时可修改 AI 建议</span></button>
     <button className={matchMode==="llm"?"active":""} onClick={()=>chooseMode("llm")}><b>多模态 LLM</b><span>自行提供模型接口</span></button>
    </div></section>
-   <section className="setup-panel"><h2>2. 选择战场与指挥方式</h2><div className="scenario-picks">{scenarios.map(([id,title,detail])=><button key={id} className={scenario===id?"active":""} onClick={()=>selectScenario(id)}><b>{title}</b><span>{detail}</span></button>)}
+   <section className="setup-panel"><h2>2. 选择战场与指挥方式</h2><div className="scenario-picks">{builtinList.map(item=><button key={item.id} className={scenario===item.id?"active":""} onClick={()=>selectScenario(item.id)}><b>{item.title}</b><span>{item.detail}</span></button>)}
     {customs.length>0&&<div className="scenario-divider" role="separator">你的自定义剧本</div>}
     {customs.map(item=><button key={item.id} className={"custom-scenario"+(scenario===item.id?" active":"")} onClick={()=>selectScenario(item.id!)}><b>{item.title}</b><span>{item.turns}回合 · {item.ships.length}艘{item.recommended_mode?` · 推荐${item.recommended_mode==="pvp"?"PvP":"PvE"}`:""}</span></button>)}
    </div>
@@ -114,11 +134,13 @@ export function StartScreen(props:Props){
     <label>接口供应商<select value={props.llmProvider} onChange={event=>{const provider=event.target.value as "deepseek"|"zhipu";props.setLlmProvider(provider);props.setLlmModel(provider==="zhipu"?"glm-5.2":"deepseek-v4-flash");props.setLlmVision(false)}}><option value="zhipu">智谱 BigModel</option><option value="deepseek">DeepSeek</option></select></label>
     <label>模型<input list="llm-models" value={props.llmModel} onChange={event=>{props.setLlmModel(event.target.value);props.setLlmVision(false)}}/><datalist id="llm-models">{props.llmProvider==="zhipu"?<><option value="glm-5.2"/><option value="glm-5.3-flash"/><option value="glm-5v-turbo"/></>:<option value="deepseek-v4-flash"/>}</datalist></label>
    </div><label className="llm-key">API 密钥（仅在本次会话内存中）<input type="password" value={props.llmKey} autoComplete="new-password" onChange={event=>props.setLlmKey(event.target.value)}/></label><label className="vision-toggle"><input type="checkbox" checked={props.llmVision} disabled={!props.llmModel.toLowerCase().startsWith("glm-5v")} onChange={event=>props.setLlmVision(event.target.checked)}/>每阶段发送本方可见地图</label></section>}
-   <div className="launch-summary"><div><b>{chosenTitle}</b><span>{effectiveRealistic?"真实编队指挥":"经典逐舰指挥"} · {side==="axis"?"轴心席位":"同盟席位"}</span></div><button className="launch" onClick={()=>props.onStart(scenario,matchMode,side,profile,effectiveRealistic)}>{startLabel} →</button></div>
+   <div className="launch-summary"><div><b>{chosenTitle}</b><span>{effectiveRealistic?"真实编队指挥":"经典逐舰指挥"} · {side==="axis"?"轴心席位":"同盟席位"}</span></div><div className="launch-actions"><button className="quiet briefing-btn" onClick={()=>openBriefing(scenario)}>📄 剧本简报</button><button className="launch" onClick={()=>props.onStart(scenario,matchMode,side,profile,effectiveRealistic)}>{startLabel} →</button></div></div>
    </section>
    <details className="start-options"><summary>战报、科研授权与其他选项</summary><label><input type="checkbox" checked={props.recordReport} onChange={event=>props.setRecordReport(event.target.checked)}/>自动记录战报</label><label><input type="checkbox" checked={props.researchAllow} onChange={event=>props.setResearchAllow(event.target.checked)}/>允许匿名对战记录用于科研</label>{props.researchAllow&&<input value={props.researchHandle} maxLength={40} placeholder="称呼（可选）" onChange={event=>props.setResearchHandle(event.target.value)}/>}</details>
    <button className="text-action" onClick={()=>setJourney("learn")}>返回新手教学路线</button>
   </section>}
   {props.error&&<pre className="start-error">{props.error}</pre>}
+  {briefingError&&<pre className="start-error">简报加载失败：{briefingError}</pre>}
+  {briefing&&<ScenarioBriefingModal briefing={briefing} mySide={side} onClose={()=>setBriefing(null)}/>}
  </main>;
 }

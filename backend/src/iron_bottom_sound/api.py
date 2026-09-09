@@ -18,7 +18,7 @@ from .battle_report import (
     capture_phase_snapshot,
 )
 from .engine import IronBottomEngine
-from .data import ROOT, register_custom_scenario, unregister_custom_scenario
+from .data import ROOT, load_scenario, register_custom_scenario, unregister_custom_scenario
 from .llm import OpenAICompatibleCommander
 from .llm_providers import DEFAULT_MODELS, provider_runtime
 from .state_export import export_frame, render_board
@@ -248,6 +248,60 @@ if _frontend_dist.is_dir():
 @app.get("/scenarios")
 def scenarios():
     return engine.scenarios()
+
+
+@app.get("/scenarios/{scenario_id}/briefing")
+def scenario_briefing(scenario_id: str):
+    """想定简报：等同印刷想定手册的公开信息。
+
+    双方编制、初始布阵（位置/方向/航速）、援军、回合数、能见度、特殊规则与
+    胜利条件都是手册里双方开局前共知的纸面数据，不含秘密计划、隐藏部署或
+    未落地的对局状态；自定义想定同样只投影其定义数据。
+    """
+    try:
+        definition = load_scenario(scenario_id)
+    except KeyError as error:
+        raise HTTPException(404, str(error)) from error
+    records = load_ship_records()
+
+    def ship_row(entry: dict) -> dict:
+        record = records.get(entry["id"])
+        return {
+            "id": entry["id"],
+            "name": entry["name"],
+            "side": entry["side"],
+            "ship_type": record.ship_type if record else None,
+            "vp": record.vp if record else None,
+            "recorded": record is not None,
+            "position": entry.get("position"),
+            "heading": entry.get("heading"),
+            "speed": entry.get("speed"),
+            "flagship": bool(entry.get("flagship")),
+            "asset": entry.get("asset"),
+        }
+
+    reinforcements = definition.get("reinforcements")
+    payload = {
+        "id": definition.get("id", scenario_id),
+        "number": definition.get("number"),
+        "title": definition.get("title"),
+        "date": definition.get("date"),
+        "turns": definition.get("turns"),
+        "visibility": definition.get("visibility", {}),
+        "victory": definition.get("victory", {}),
+        "special_rules": definition.get("special_rules", []),
+        "setup_note": definition.get("setup", {}).get("engine_default_note"),
+        "formations": definition.get("setup", {}).get("engine_default_formations"),
+        "ships": [ship_row(entry) for entry in definition.get("ships", [])],
+        "reinforcements": None
+        if not reinforcements
+        else {
+            "trigger": reinforcements.get("trigger", {}),
+            "arrival": reinforcements.get("arrival", {}),
+            "ships": [ship_row(entry) for entry in reinforcements.get("ships", [])],
+        },
+    }
+    return payload
 
 
 @app.get("/games")

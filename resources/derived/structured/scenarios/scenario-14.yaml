@@ -1,0 +1,67 @@
+# S-14 霍腊纽海战（1943年8月18日）
+# 页面：/tmp/ibs-render/scen-15.png（PDF第15页，印刷页码16；页面徽章 Scenario 14）
+# 注：S-10萨沃岛海战跨两页（PDF第10-11页），故此后"PDF页码=想定编号+1"。
+id: IBS-S-14
+number: 14
+title: 霍腊纽海战
+date: 1943-08-18
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 15, printed_page: 16, status: verified_source}
+turns: 12
+visibility: {axis: 27, allies: 25}
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
+setup:
+  mode: scenario_positions
+  engine_default_note: engine_default_formations 仅为真实模式直接开局的默认编队提案；部署权威仍是 ships 初始位置与想定规则。
+  engine_default_formations:
+    axis:
+    - id: axis-pair-1
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-SAZANAMI
+      - IBS-U-IJN-HAMAKAZE
+      note: 第一组（涟旗舰）
+    - id: axis-pair-2
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-ISOKAZE
+      - IBS-U-IJN-SHIGURE
+      note: 第二组
+    allies:
+    - id: allies-desdiv
+      role: line_ahead
+      ships:
+      - IBS-U-USN-NICHOLAS
+      - IBS-U-USN-OBANNON
+      - IBS-U-USN-TAYLOR
+      - IBS-U-USN-CHEVALIER
+      note: 盟军驱逐纵队（尼古拉斯旗舰）
+
+victory:
+  kind: custom_score_thresholds
+special_rules:
+  # 能见度行附加条原文
+  - {id: IBS-S-14-R1, text: 所有盟军单位拥有雷达。南方为明亮的月光，所以任何向南方目标炮击的单位都可以获得火炮修正-2。}
+  - {id: IBS-S-14-R2, text: 除了驳船之外，任何船只都无法离开地图的南方边界。}
+  - {id: IBS-S-14-R3, text: 游戏开始时，战场中有一架日军水上侦察机，在第2回合时可以投放照明弹。（按照9.3的照明弹规则，在第1回合写下格子编号。）第4或第5回合时，日军还有一次写下照明弹位置的机会。}
+  # 日军配置框内假目标说明原文
+  - {id: IBS-S-14-R4, text: 日军在G17和H17的方向3还有两个假目标算子，他们只能以2-1-1的航速移动。参见假目标规则，日军玩家暗自用真假目标的方式区分开它们，视为两艘驳船小编队。}
+  - {id: IBS-S-14-R5, text: 驳船由两枚假目标算子表示，他们将努力活着从南方边界离开。}
+  - {id: IBS-S-14-R6, text: 美军驱逐舰只能在6格或更近距离向驳船单位炮击，必须集中炮击，无法分别炮击多个单位。然后掷2枚骰子，只有点数和为12时，视为击沉驳船。每个击沉的驳船美军获得2分。}
+  # 胜利条件原文（非标准VP制）
+  - {id: IBS-S-14-R7, text: 任何一方领先3分即为战术胜利。如果领先6分，则为战役级胜利。其他情况为平局。}
+ships:
+  # 日本舰队 配置（旗舰：涟 —— 伊集院松治大佐）
+  - {id: IBS-U-IJN-SAZANAMI, name: 涟, side: axis, template: dd-japanese-1942, position: O11, heading: 5, speed: 4, asset: 日本-DD-涟.png, flagship: true}
+  - {id: IBS-U-IJN-HAMAKAZE, name: 浜风, side: axis, template: dd-japanese-1942, position: P11, heading: 5, speed: 4, asset: 日本-DD-浜风.png}
+  - {id: IBS-U-IJN-ISOKAZE, name: 矶风, side: axis, template: dd-japanese-1942, position: N7, heading: 5, speed: 4, asset: 日本-DD-矶风.png}
+  - {id: IBS-U-IJN-SHIGURE, name: 时雨, side: axis, template: dd-japanese-1942, position: N6, heading: 5, speed: 4, asset: 日本-DD-时雨.png}
+  # G17/H17 的两枚假目标算子（方向3、速度2）非舰船，见 IBS-S-14-R4/R5，不计入 ships
+  # 盟军舰队 配置（旗舰：尼古拉斯 —— 汤姆斯·杰·瑞恩上校）
+  - {id: IBS-U-USN-NICHOLAS, name: 尼古拉斯, side: allies, template: dd-american-1942, position: EE24, heading: 5, speed: 5, asset: 美国-DD-尼古拉斯.png, flagship: true}
+  - {id: IBS-U-USN-OBANNON, name: 奥班农, side: allies, template: dd-american-1942, position: FF24, heading: 5, speed: 5, asset: 美国-DD-奥班农.png}
+  - {id: IBS-U-USN-TAYLOR, name: 泰勒, side: allies, template: dd-american-1942, position: GG25, heading: 5, speed: 5, asset: 美国-DD-泰勒.png}
+  - {id: IBS-U-USN-CHEVALIER, name: 谢伐利埃, side: allies, template: dd-american-1942, position: HH25, heading: 5, speed: 5, asset: 美国-DD-谢伐利埃.png}
+# UNVERIFIED-VICTORY: 胜利条件非标准VP制（领先3分战术胜利/领先6分战役级胜利，见 IBS-S-14-R7），schema 无对应字段，victory.kind 记为 custom_score_thresholds。
+# UNVERIFIED-DECOY: 两个假目标算子（驳船）放置于G17、H17、方向3、速度2（见 IBS-S-14-R4），为算子而非舰船，schema 无对应字段，未计入 ships。

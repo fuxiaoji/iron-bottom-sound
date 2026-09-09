@@ -48,3 +48,8 @@ export async function battleReport(id:string):Promise<BattleReport>{const r=awai
 export function battleReportImageUrl(id:string,path:string){return `${API}/games/${id}/battle-report/image/${encodeURIComponent(path)}`}
 export function battleReportDownloadUrl(id:string){return `${API}/games/${id}/battle-report.md`}
 export async function handoff(id:string){await fetch(`${API}/games/${id}/handoff`,{method:"POST"})}
+export interface BriefingShip{id:string;name:string;side:Side;ship_type:string|null;vp:number|null;recorded:boolean;position:string|null;heading:number|null;speed:number|null;flagship:boolean;asset:string|null}
+export interface BriefingFormation{id:string;role:string;ships:string[];note?:string}
+export interface ScenarioBriefing{id:string;number:number|string|null;title:string;date:string|null;turns:number;visibility:{axis:number;allies:number};victory:Record<string,unknown>;special_rules:{id:string;text:string}[];setup_note:string|null;formations:Record<Side,BriefingFormation[]>|null;ships:BriefingShip[];reinforcements:{trigger:Record<string,unknown>;arrival:Record<string,unknown>;ships:BriefingShip[]}|null}
+export async function scenarioBriefing(id:string):Promise<ScenarioBriefing>{const r=await fetch(`${API}/scenarios/${encodeURIComponent(id)}/briefing`);if(!r.ok)throw new Error(await r.text());return r.json()}
+export async function scenarioList():Promise<{id:string;title:string;turns:number;status:string;custom?:boolean}[]>{const r=await fetch(`${API}/scenarios`);if(!r.ok)throw new Error(await r.text());return r.json()}

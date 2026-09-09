@@ -1,5 +1,17 @@
 # 阶段 1 实施计划
 
+## 当前批次：想定全量录入 + 舰级卡建档 + 剧本简报页 + 虚构大剧本（2026-09-10）
+
+状态：已完成（分支 glm/data-entry-and-briefing，待提交）
+
+1. 想定手册 PDF 第 2–15 页逐页视觉转录为 scenario-02、04–14.yaml（萨沃岛跨两页合并）；增援机制按引擎表达力归一化，超范围机制保留原文规则。
+2. 全部想定进入真实模式 SUPPORTED_SCENARIOS 并附 engine_default_formations 历史编队提案。
+3. 船表 38 张舰级卡按「二马船表 ↔ erma.yaml」校准的符号映射转录为 extensions/class-cards.yaml，解锁 34 艘目录锁定舰（记录 180→214），同名同型替身不重复登记。
+4. 新增 /scenarios/{id}/briefing 与前端 ScenarioBriefingModal（纸质手册版式），首页想定列表动态化。
+5. 新增虚构大剧本 IBS-S-FM-01（91 舰、92×78、14 回合、日美各 8 历史编队）。
+
+验收：全部想定一般/真实模式 build_initial_state 通过；load_ship_records()=214；pytest 相关套件通过；tsc 与 Vite 构建通过。
+
 ## 当前批次：Windows 双击一键启动入口（2026-09-05）
 
 状态：已完成（未提交）

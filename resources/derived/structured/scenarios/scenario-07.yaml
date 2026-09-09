@@ -1,0 +1,96 @@
+# S-07 所罗门群岛海战（1928年架空想定：华盛顿海军条约从未签署）
+# 页面：/tmp/ibs-render/scen-07.png（PDF第7页，印刷页码8）
+id: IBS-S-07
+number: 7
+title: 所罗门群岛海战
+date: 1928-07-03
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 7, printed_page: 8, status: verified_source}
+turns: 7
+visibility: {axis: 14, allies: 12}
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
+setup:
+  mode: scenario_positions
+  engine_default_note: engine_default_formations 仅为真实模式直接开局的默认编队提案；一般模式与真实模式部署仍以 ships 初始位置和想定规则为权威。
+  engine_default_formations:
+    axis:
+    - id: axis-battle-squadron
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-OWARI
+      - IBS-U-IJN-AKAGI
+      - IBS-U-IJN-AMAGI
+      note: 第一战队（长浜少将旗舰尾张）
+    - id: axis-screen
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-JINTSU-I
+      - IBS-U-IJN-ASAKAZE
+      - IBS-U-IJN-KAMIKAZE
+      - IBS-U-IJN-OITE
+      - IBS-U-IJN-UZUKI
+      - IBS-U-IJN-MUTSUKI
+      - IBS-U-IJN-TATSUTA
+      note: 警戒队单纵
+    allies:
+    - id: allies-battle-squadron
+      role: line_ahead
+      ships:
+      - IBS-U-USN-UNNAMED-T01-R06
+      - IBS-U-USN-UNNAMED-T01-R08
+      - IBS-U-USN-UNNAMED-T01-R07
+      note: 战列巡洋舰战队（雀曼中将旗舰列克星敦）
+    - id: allies-screen-1
+      role: line_ahead
+      ships:
+      - IBS-U-USN-UNNAMED-T01-R22
+      - IBS-U-USN-DAHLGREN
+      - IBS-U-USN-PERRY
+      - IBS-U-USN-HULL-I
+      - IBS-U-USN-BAINBRIDGE
+      note: 第一警戒队
+    - id: allies-screen-2
+      role: line_ahead
+      ships:
+      - IBS-U-USN-MCDONOUGH
+      - IBS-U-USN-DECATUR
+      - IBS-U-USN-TRUXTON
+      - IBS-U-USN-FOX
+      note: 第二警戒队
+
+victory:
+  kind: victory_points
+  points_per_three_hull_lost: 1
+  leader_margin: 5
+  draw_if_margin_below: 5
+  evaluated_at: end_of_turn_7
+special_rules:
+  - {id: IBS-S-07-R1, text: 第一回合双方都无法发射鱼雷。}
+  - {id: IBS-S-07-R2, text: 游戏第7回合结束时统计胜利分。每造成3点“船体”损失，计入1分。领先5分和以上，并且同时击沉战巡BC比对方多的玩家为胜利者。其他结果为平局。}
+ships:
+  # 日本舰队 配置（旗舰：尾张——长浜和也少将）
+  - {id: IBS-U-IJN-OWARI, name: 尾张, side: axis, template: ca-american-1942, position: J9, heading: 2, speed: 4, asset: 日本-BC-尾张.png, flagship: true}
+  - {id: IBS-U-IJN-AKAGI, name: 赤城, side: axis, template: ca-american-1942, position: I9, heading: 2, speed: 4, asset: 日本-BC-赤城.png}
+  - {id: IBS-U-IJN-AMAGI, name: 天城, side: axis, template: ca-american-1942, position: H8, heading: 2, speed: 4, asset: 日本-BC-天城.png}
+  - {id: IBS-U-IJN-JINTSU-I, name: 神通(I), side: axis, template: cl-american-1942, position: J13, heading: 2, speed: 4, asset: 日本-CL-神通1.png}
+  - {id: IBS-U-IJN-ASAKAZE, name: 朝风, side: axis, template: dd-japanese-1942, position: K13, heading: 2, speed: 4, asset: 日本-DD-朝风.png}
+  - {id: IBS-U-IJN-KAMIKAZE, name: 神风, side: axis, template: dd-japanese-1942, position: H11, heading: 2, speed: 4, asset: 日本-DD-神风.png}
+  - {id: IBS-U-IJN-OITE, name: 追风, side: axis, template: dd-japanese-1942, position: G11, heading: 2, speed: 4, asset: 日本-DD-追风.png}
+  - {id: IBS-U-IJN-UZUKI, name: 卯月(I), side: axis, template: dd-japanese-1942, position: F10, heading: 2, speed: 4, asset: 日本-DD-卯月1.png}
+  - {id: IBS-U-IJN-MUTSUKI, name: 睦月, side: axis, template: dd-japanese-1942, position: E10, heading: 2, speed: 4, asset: 日本-DD-睦月.png}
+  - {id: IBS-U-IJN-TATSUTA, name: 龙田, side: axis, template: cl-american-1942, position: F7, heading: 2, speed: 4, asset: 日本-CL-龙田.png}
+  # 盟军舰队 配置（旗舰：列克星敦——肯特·雀曼中将）
+  - {id: IBS-U-USN-UNNAMED-T01-R22, name: 孟菲斯, side: allies, template: cl-american-1942, position: W17, heading: 4, speed: 4, asset: 美国-CL-孟菲斯.png}
+  - {id: IBS-U-USN-UNNAMED-T01-R06, name: 列克星敦, side: allies, template: ca-american-1942, position: Y18, heading: 4, speed: 4, asset: 美国-BC-列克星敦.png, flagship: true}
+  - {id: IBS-U-USN-UNNAMED-T01-R08, name: 宪法, side: allies, template: ca-american-1942, position: Z18, heading: 4, speed: 4, asset: 美国-BC-宪法.png}
+  - {id: IBS-U-USN-UNNAMED-T01-R07, name: 合众国, side: allies, template: ca-american-1942, position: AA19, heading: 4, speed: 4, asset: 美国-BC-合众国.png}
+  - {id: IBS-U-USN-DAHLGREN, name: 达尔格伦, side: allies, template: dd-american-1942, position: V19, heading: 4, speed: 4, asset: 美国-DD-达尔格伦.png}
+  - {id: IBS-U-USN-PERRY, name: 佩里, side: allies, template: dd-american-1942, position: W20, heading: 4, speed: 4, asset: 美国-DD-佩里.png}
+  - {id: IBS-U-USN-HULL-I, name: 赫尔(I), side: allies, template: dd-american-1942, position: X20, heading: 4, speed: 4, asset: 美国-DD-赫尔1.png}
+  - {id: IBS-U-USN-BAINBRIDGE, name: 班布里奇, side: allies, template: dd-american-1942, position: Y21, heading: 4, speed: 4, asset: 美国-DD-班布里奇.png}
+  - {id: IBS-U-USN-MCDONOUGH, name: 麦克多诺, side: allies, template: dd-american-1942, position: Y15, heading: 4, speed: 4, asset: 美国-DD-麦克多诺.png}
+  - {id: IBS-U-USN-DECATUR, name: 迪凯特, side: allies, template: dd-american-1942, position: Z15, heading: 4, speed: 4, asset: 美国-DD-迪凯特.png}
+  - {id: IBS-U-USN-TRUXTON, name: 特鲁斯顿, side: allies, template: dd-american-1942, position: AA16, heading: 4, speed: 4, asset: 美国-DD-特鲁斯顿.png}
+  - {id: IBS-U-USN-FOX, name: 福克斯, side: allies, template: dd-american-1942, position: BB16, heading: 4, speed: 4, asset: 美国-DD-福克斯.png}
+# UNVERIFIED-VICTORY: 胜利条件非标准VP制——“领先5分和以上”且“同时击沉战巡BC比对方多”才为胜利者，其他结果为平局；schema 无“击沉BC数”字段，原文完整见 IBS-S-07-R2。

@@ -1,0 +1,59 @@
+# 注：页面写明增援必达；引擎以 1d6∈[1..6] 表达确定性到达。
+id: IBS-S-05
+number: 5
+title: 圣乔治角海战
+date: 1943-11-25
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 5, printed_page: 6, status: verified_source}
+turns: 10
+visibility: {axis: 8, allies: 7}
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
+setup:
+  mode: scenario_positions
+  engine_default_note: engine_default_formations 仅为真实模式直接开局的默认编队提案；一般模式与真实模式部署仍以 ships 初始位置和想定规则为权威。
+  engine_default_formations:
+    axis:
+    - id: axis-strike
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-ONAMI
+      - IBS-U-IJN-MAKINAMI
+      note: 香秦作战输送掩护突击队（吉川洁大佐旗舰大波）
+    allies:
+    - id: allies-desron23
+      role: line_ahead
+      ships:
+      - IBS-U-USN-CF-AUSBURNE
+      - IBS-U-USN-CLAXTON
+      - IBS-U-USN-DYSON
+      - IBS-U-USN-CONVERSE
+      - IBS-U-USN-SPENCE
+      note: 第23驱逐舰中队（伯克上校“31节伯克”单纵）
+
+victory:
+  kind: victory_points
+  points_per_three_hull_lost: 1
+  leader_margin: 4
+  draw_if_margin_below: 4
+  evaluated_at: end_of_turn_10
+special_rules:
+  - {id: IBS-S-05-R1, text: 日军在第一回合无法炮击和发射鱼雷。}
+  - {id: IBS-S-05-R2, text: 美军只能在雷达接触的范围发射鱼雷和炮击。}
+  - {id: IBS-S-05-R3, text: 双方都可以从地图北面离开，你也可以随时将它们从离开格正常移回地图，来保持彼此之间的关系。}
+  - {id: IBS-S-05-R4, text: 日军的三艘增援单位在第二回合达到。它们从地图HH9至HH16（也包括这两格）之间以任意航速进入地图。增援编队的次序是天雾、夕雾、卯月。}
+ships:
+  - {id: IBS-U-IJN-ONAMI, name: 大波, side: axis, template: dd-japanese-1942, position: X15, heading: 5, speed: 4, asset: 日本-DD-大波.png, flagship: true}
+  - {id: IBS-U-IJN-MAKINAMI, name: 卷波, side: axis, template: dd-japanese-1942, position: Y16, heading: 5, speed: 4, asset: 日本-DD-卷波.png}
+  - {id: IBS-U-USN-CF-AUSBURNE, name: 查尔斯·奥斯本, side: allies, template: dd-american-1942, position: N18, heading: 4, speed: 4, asset: 美国-DD-查尔斯·奥斯本.png, flagship: true}
+  - {id: IBS-U-USN-CLAXTON, name: 克拉克斯顿, side: allies, template: dd-american-1942, position: M18, heading: 4, speed: 4, asset: 美国-DD-克拉克斯顿.png}
+  - {id: IBS-U-USN-DYSON, name: 戴森, side: allies, template: dd-american-1942, position: L18, heading: 4, speed: 4, asset: 美国-DD-戴森.png}
+  - {id: IBS-U-USN-CONVERSE, name: 康弗斯, side: allies, template: dd-american-1942, position: K20, heading: 4, speed: 4, asset: 美国-DD-康弗斯.png}
+  - {id: IBS-U-USN-SPENCE, name: 斯彭斯, side: allies, template: dd-american-1942, position: K19, heading: 4, speed: 4, asset: 美国-DD-斯彭斯.png}
+reinforcements:
+  trigger: {turn: 2, roll: 1d6, succeeds_on: [1, 2, 3, 4, 5, 6]}  # 页面写明必达；以 1d6∈[1..6] 表达确定性到达
+  arrival: {turn: 2, entry_hex_range: [HH9, HH16], speed: any_legal}  # 页面无掷骰，第二回合必达；无入场时机说明
+  ships:
+    - {id: IBS-U-IJN-AMAGIRI, name: 天雾, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], asset: 日本-DD-天雾.png}
+    - {id: IBS-U-IJN-YUGIRI, name: 夕雾, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], asset: 日本-DD-夕雾.png}
+    - {id: IBS-U-IJN-UZUKI-2, name: 卯月(II), side: axis, template: dd-japanese-1942, speed_track: [6, 5, 5], asset: 日本-APD-卯月2.png}

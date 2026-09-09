@@ -1,0 +1,99 @@
+# S-08 科隆班加拉岛海战（1943年7月13日）
+# 页面：/tmp/ibs-render/scen-08.png（PDF第8页，印刷页码9）
+id: IBS-S-08
+number: 8
+title: 科隆班加拉岛海战
+date: 1943-07-13
+status: playable
+source: {document: scenario-book-zh.pdf, pdf_page: 8, printed_page: 9, status: verified_source}
+turns: 15
+visibility: {axis: 19, allies: 17}
+optional_rules: []
+available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
+setup:
+  mode: scenario_positions
+  engine_default_note: engine_default_formations 仅为真实模式直接开局的默认编队提案；一般模式与真实模式部署仍以 ships 初始位置和想定规则为权威。
+  engine_default_formations:
+    axis:
+    - id: axis-strike-column
+      role: line_ahead
+      ships:
+      - IBS-U-IJN-MIKAZUKI
+      - IBS-U-IJN-JINTSU-I
+      - IBS-U-IJN-YUKIKAZE
+      - IBS-U-IJN-HAMAKAZE
+      - IBS-U-IJN-KIYONAMI
+      - IBS-U-IJN-YUGURE
+      note: 警戒队单纵（伊崎逸二少将旗舰神通）
+    allies:
+    - id: allies-van-dd
+      role: line_ahead
+      ships:
+      - IBS-U-USN-NICHOLAS
+      - IBS-U-USN-OBANNON
+      - IBS-U-USN-TAYLOR
+      - IBS-U-USN-RADFORD
+      - IBS-U-USN-JENKINS
+      note: 前卫驱逐队
+    - id: allies-cruiser-line
+      role: line_ahead
+      ships:
+      - IBS-U-USN-HONOLULU
+      - IBS-U-RN-UNNAMED-T05-R01
+      - IBS-U-USN-ST-LOUIS
+      note: 巡洋舰纵列（安斯沃思少将旗舰火奴鲁鲁）
+    - id: allies-rear-dd
+      role: line_ahead
+      ships:
+      - IBS-U-USN-RALPH-TALBOT
+      - IBS-U-USN-BUCHANAN
+      - IBS-U-USN-GWIN
+      - IBS-U-USN-MAURY
+      - IBS-U-USN-WOODWORTH
+      note: 后卫驱逐队
+
+victory:
+  kind: victory_points
+  points_per_three_hull_lost: 1
+  leader_margin: 4
+  draw_if_margin_below: 4
+  evaluated_at: end_of_turn_7
+special_rules:
+  - {id: IBS-S-08-R1, text: 将萨沃岛小地图的Y格对应放置在B26格。}
+  - {id: IBS-S-08-R2, text: 将暴风雨标记放置在L5、M4、M6和O5。这些格和其相邻格立刻被暴雨影响。}
+  - {id: IBS-S-08-R3, text: 日军可能受到增援。仅在第4回合开始时掷1枚骰子，如果掷到1，那么增援单位在移动阶段开始前，以任意航速全部放置在E17至U27的格子。}
+  - {id: IBS-S-08-R4, text: 划掉所有增援单位的鱼雷再装填，因为它装载了额外的地面部队和物资。}
+ships:
+  # 日本舰队 配置（旗舰：神通——伊崎俊二少将）
+  - {id: IBS-U-IJN-MIKAZUKI, name: 三日月, side: axis, template: dd-japanese-1942, position: F7, heading: 2, speed: 5, asset: 日本-APD-三日月.png}
+  - {id: IBS-U-IJN-JINTSU-I, name: 神通(I), side: axis, template: cl-american-1942, position: E7, heading: 2, speed: 5, asset: 日本-CL-神通1.png, flagship: true}
+  - {id: IBS-U-IJN-YUKIKAZE, name: 雪风, side: axis, template: dd-japanese-1942, position: D6, heading: 2, speed: 5, asset: 日本-DD-雪风.png}
+  - {id: IBS-U-IJN-HAMAKAZE, name: 浜风, side: axis, template: dd-japanese-1942, position: C6, heading: 2, speed: 5, asset: 日本-DD-浜风.png}
+  - {id: IBS-U-IJN-KIYONAMI, name: 清波, side: axis, template: dd-japanese-1942, position: B5, heading: 2, speed: 5, asset: 日本-DD-清波.png}
+  - {id: IBS-U-IJN-YUGURE, name: 夕暮, side: axis, template: dd-japanese-1942, position: A5, heading: 2, speed: 5, asset: 日本-DD-夕暮.png}
+  # 盟军舰队 配置（旗舰：火奴鲁鲁——瓦尔登·李·安斯沃思少将）
+  - {id: IBS-U-USN-NICHOLAS, name: 尼古拉斯, side: allies, template: dd-american-1942, position: V16, heading: 4, speed: 4, asset: 美国-DD-尼古拉斯.png}
+  - {id: IBS-U-USN-OBANNON, name: 奥班农, side: allies, template: dd-american-1942, position: W16, heading: 4, speed: 4, asset: 美国-DD-奥班农.png}
+  - {id: IBS-U-USN-TAYLOR, name: 泰勒, side: allies, template: dd-american-1942, position: X15, heading: 4, speed: 4, asset: 美国-DD-泰勒.png}
+  - {id: IBS-U-USN-RADFORD, name: 雷德福德, side: allies, template: dd-american-1942, position: Y15, heading: 4, speed: 4, asset: 美国-DD-雷德福德.png}
+  - {id: IBS-U-USN-JENKINS, name: 詹金斯, side: allies, template: dd-american-1942, position: Z14, heading: 4, speed: 4, asset: 美国-DD-詹金斯.png}
+  - {id: IBS-U-USN-HONOLULU, name: 火奴鲁鲁, side: allies, template: cl-american-1942, position: AA14, heading: 4, speed: 4, asset: 美国-CL-火奴鲁鲁.png, flagship: true}
+  # 利安得：record-ids 无，取 catalog-ids（其舰种栏标 CA，页面计数器为 CL）；counter 图为新西兰-CL-利安德.png
+  - {id: IBS-U-RN-UNNAMED-T05-R01, name: 利安得, side: allies, template: cl-american-1942, position: BB14, heading: 4, speed: 4, asset: 新西兰-CL-利安德.png}
+  - {id: IBS-U-USN-ST-LOUIS, name: 圣路易斯, side: allies, template: cl-american-1942, position: BB13, heading: 4, speed: 4, asset: 美国-CL-圣路易斯.png}
+  # record-ids 中“拉尔夫·托尔伯特”有两条（IBS-U-USN-RALPH-TALBOT / IBS-U-USN-RALPH-TALBOT-17），此处取基础条目
+  - {id: IBS-U-USN-RALPH-TALBOT, name: 拉尔夫·托尔伯特, side: allies, template: dd-american-1942, position: CC13, heading: 4, speed: 4, asset: 美国-DD-拉尔夫·托尔伯特.png}
+  - {id: IBS-U-USN-BUCHANAN, name: 布坎南, side: allies, template: dd-american-1942, position: DD12, heading: 4, speed: 4, asset: 美国-DD-布坎南.png}
+  - {id: IBS-U-USN-GWIN, name: 葛文, side: allies, template: dd-american-1942, position: EE12, heading: 4, speed: 4, asset: 美国-DD-葛文.png}
+  - {id: IBS-U-USN-MAURY, name: 莫里, side: allies, template: dd-american-1942, position: FF11, heading: 4, speed: 4, asset: 美国-DD-莫里.png}
+  - {id: IBS-U-USN-WOODWORTH, name: 伍德沃斯, side: allies, template: dd-american-1942, position: GG11, heading: 4, speed: 4, asset: 美国-DD-伍德沃斯.png}
+reinforcements:
+  trigger: {turn: 4, roll: 1d6, succeeds_on: [1]}
+  arrival: {turn: 4, timing: before_movement_planning, entry_hex_range: [E17, U27], speed: any_legal}
+  ships:
+    - {id: IBS-U-IJN-SATSUKI, name: 皋月, side: axis, template: dd-japanese-1942, torpedo_reloads: 0, asset: 日本-APD-皋月.png}
+    - {id: IBS-U-IJN-MINAZUKI, name: 水无月, side: axis, template: dd-japanese-1942, torpedo_reloads: 0, asset: 日本-APD-水无月.png}
+    # UNVERIFIED-ID: 夕风（页面计数器印作“夕风”，record-ids/catalog-ids 均无此名；S-10 页面说明文字将同型舰写作“夕凪”，疑为同一舰 夕凪=IBS-U-IJN-YUNAGI）
+    - {id: IBS-U-IJN-XIFENG, name: 夕风, side: axis, template: dd-japanese-1942, torpedo_reloads: 0, asset: 日本-APD-夕凪.png}  # 无“日本-APD-夕风.png”，取最接近的 日本-APD-夕凪.png
+    - {id: IBS-U-IJN-MATSU-KAZE, name: 松风, side: axis, template: dd-japanese-1942, torpedo_reloads: 0, asset: 日本-APD-松风.png}
+# 注：页面“游戏回合：15个回合”，但胜利条件原文写“游戏第7回合结束时统计胜利分”（逐字照录，见 victory.evaluated_at）。

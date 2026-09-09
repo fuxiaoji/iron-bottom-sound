@@ -19,7 +19,7 @@ def test_all_playable_and_reinforcement_ships_have_verified_records() -> None:
         scenario = yaml.safe_load((STRUCTURED / "scenarios" / f"scenario-{number:02d}.yaml").read_text(encoding="utf-8"))
         required.update(ship["id"] for ship in scenario["ships"])
         required.update(ship["id"] for ship in scenario.get("reinforcements", {}).get("ships", []))
-    assert len(records) == 180
+    assert len(records) == 214
     assert required <= set(records)
     assert all(1 <= record.source_page <= 24 for record in records.values())
 
@@ -35,7 +35,7 @@ def test_complete_ship_list_catalog_is_migrated_without_promoting_unverified_sta
 def test_every_complete_record_has_a_verified_counter_asset_binding() -> None:
     records = load_ship_records()
     bindings = all_asset_bindings(records)
-    assert len(bindings) == len(records) == 180
+    assert len(bindings) == len(records) == 214
     assert not validate_asset_bindings(records)
 
 
