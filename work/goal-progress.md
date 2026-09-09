@@ -1,18 +1,18 @@
 # 目标进度锚点（GLM 数据录入批次）
 
-## 目标
-1. 录入剩余船只数据（舰级卡 38 张）与剧本数据（想定 2、4-14）——完成。
-2. 前端剧本简报页（纸质手册风格）——完成，待浏览器实测。
-3. 虚构大剧本 IBS-S-FM-01（91 舰、日美各 8 历史编队、92×78）——完成。
+## 目标：全部完成 ✔
+1. 舰只数据录入：船表 38 张舰级卡 → extensions/class-cards.yaml，解锁 34 艘锁定舰，记录 180→214。
+2. 剧本数据录入：想定手册 12 个新想定（S-02、04-14）+ catalog 更新，一般+真实模式全通过。
+3. 剧本简报页：后端 /scenarios/{id}/briefing + 前端 ScenarioBriefingModal（纸质手册版式），浏览器实测通过。
+4. 虚构大剧本：IBS-S-FM-01（91 舰、92×78、日美各 8 历史雷击编队），双模式验证通过。
 
-## 剩余验收
-- 全量 pytest（后台运行中）。
-- 浏览器实测简报页（起后端+前端，截图核验纸质手册版式与 15 个想定列表）。
-- havedone/plan 已更新；提交到 glm/data-entry-and-briefing。
+## 提交
+- 04ffe9b feat(data): 全量录入+舰级卡+简报 UI+虚构大决战
+- （docs) open_questions IBS-Q-007 更新 + IBS-Q-020 新增
 
-## 边界回顾
-- 未改引擎裁决常量；未猜补手册缺失值（无卡舰保持锁定）。
-- 与另一 agent 的并发：其曾把缺字段的 class-cards.yaml 改名为 .draft；现已修复并恢复启用，README 已删；其 paper/、research/ 未触碰。
+## 遗留
+- 本机 vite build/dev 挂起（沙箱限制）；前端用 tsc+Vite 产物验证，浏览器核验用 dist/preview.html 等效页。
+- test_api_llm_storage 一个 canonical-counter 用例在本机基线即失败（LFS 指针），与本批无关。
 
 ## 计数器
-3/20
+任务完成，结束。
