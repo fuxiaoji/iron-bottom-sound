@@ -21,7 +21,7 @@ export interface MovementPreview{
 }
 export interface TorpedoTrack{id:string;side:Side;launcher_ship_id:string;torpedo_type:string;position:HexCoord;heading:number;range_remaining:number;distance_travelled:number;salvo_size:number;launch_position:HexCoord|null;launch_side:"port"|"starboard"|null;launch_angle:"A"|"B"|"X"|"Y"|null;traversed_hexes:HexCoord[];contact_ship_ids:string[];hidden:boolean}
 export interface Marker{id:string;kind:string;position:HexCoord|null;ship_id:string|null;target_ship_id:string|null;heading:number|null}
-export interface Observation{game_id:string;scenario_id:string;scenario_title:string;side:Side;turn:number;max_turns:number;phase:Phase;visibility:number;ships:Ship[];formations:Formation[];torpedo_tracks:TorpedoTrack[];markers:Marker[];score:Record<string,number>;recent_events:Event[];winner:Side|null;victory_reason:string|null}
+export interface Observation{game_id:string;scenario_id:string;scenario_title:string;side:Side;turn:number;max_turns:number;phase:Phase;visibility:number;map_columns?:number;map_rows?:number;printed_columns?:number|null;printed_rows?:number|null;ships:Ship[];formations:Formation[];torpedo_tracks:TorpedoTrack[];markers:Marker[];score:Record<string,number>;recent_events:Event[];winner:Side|null;victory_reason:string|null}
 export interface LegalAction{kind:string;ship_id?:string|null;schema_hint:Record<string,unknown>}
 export interface BattleReportCapture{side:Side;image_path:string}
 export interface BattleReportPlan{

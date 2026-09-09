@@ -85,7 +85,8 @@ class RandomCommander(DeterministicCommander):
             (marker for marker in state.markers if marker.kind == "contact" and marker.secret_side == side),
             key=lambda marker: marker.id,
         )
-        candidates = self._edge_coords()
+        columns, rows = state.map_columns, state.map_rows
+        candidates = self._edge_coords(columns=columns, rows=rows)
         if side == Side.ALLIES:
             candidates.reverse()
         used: set[str] = set()
@@ -94,9 +95,9 @@ class RandomCommander(DeterministicCommander):
         def has_inward_run(candidate: HexCoord, distance: int) -> bool:
             position = candidate
             try:
-                heading = self._inward_heading(candidate)
+                heading = self._inward_heading(candidate, columns=columns, rows=rows)
                 for _ in range(distance):
-                    position = position.neighbor(heading)
+                    position = position.neighbor(heading, columns=columns, rows=rows)
             except ValueError:
                 return False
             return True
@@ -111,6 +112,7 @@ class RandomCommander(DeterministicCommander):
                 engine._coord_on_map(
                     entry.q + state.contact_reserve_positions[ship_id].q - anchor.q,
                     entry.r + state.contact_reserve_positions[ship_id].r - anchor.r,
+                    columns=columns, rows=rows,
                 )
                 for ship_id in group
             )
@@ -126,7 +128,7 @@ class RandomCommander(DeterministicCommander):
             orders.append(ContactSetupOrder(
                 marker_id=marker.id,
                 entry_hex=entry,
-                heading=self._inward_heading(entry),
+                heading=self._inward_heading(entry, columns=columns, rows=rows),
                 speed=4,
                 ship_ids=group,
             ))
@@ -141,7 +143,7 @@ class RandomCommander(DeterministicCommander):
             orders.append(ContactSetupOrder(
                 marker_id=marker.id,
                 entry_hex=entry,
-                heading=self._inward_heading(entry),
+                heading=self._inward_heading(entry, columns=columns, rows=rows),
                 speed=5,
             ))
         return orders
@@ -162,7 +164,7 @@ class RandomCommander(DeterministicCommander):
         occupied = {ship.position.label for ship in state.ships.values() if ship.position and not ship.sunk}
         entries = [
             HexCoord(q=q, r=row - (q - (q & 1)) // 2)
-            for q in range(MAP_COLUMNS) for row in range(MAP_ROWS)
+            for q in range(state.map_columns) for row in range(state.map_rows)
         ]
         entries = [
             entry for entry in entries

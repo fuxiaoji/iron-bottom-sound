@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 from typing import Annotated, Literal
@@ -17,7 +18,7 @@ from .battle_report import (
     capture_phase_snapshot,
 )
 from .engine import IronBottomEngine
-from .data import ROOT
+from .data import ROOT, register_custom_scenario, unregister_custom_scenario
 from .llm import OpenAICompatibleCommander
 from .llm_providers import DEFAULT_MODELS, provider_runtime
 from .state_export import export_frame, render_board
@@ -28,6 +29,16 @@ from .models import FormationMovementOrder, FormationSetupOrder, GameOptions, Gu
 from .realistic_command import RealisticCommander, expand_movement_orders, validate_setup
 from .notify import notify_research_consent
 from .storage import GameRepository
+from .savegame import build_save_bundle, clone_imported_game, validate_save_bundle
+from .custom_scenarios import (
+    CustomScenarioInput,
+    builtin_as_editable_template,
+    new_id,
+    validate_definition,
+    with_engine_default_formations,
+)
+from .counter_assets import asset_for
+from .ship_records import load_ship_catalog, load_ship_records
 
 
 class LLMConnectionConfig(BaseModel):
@@ -66,6 +77,8 @@ _frontend_dist = Path(__file__).resolve().parents[3] / "frontend" / "dist"
 engine = IronBottomEngine()
 _default_db = Path(__file__).resolve().parents[3] / "backend" / "iron-bottom-sound.sqlite3"
 repository = GameRepository(os.environ.get("IBS_DB_PATH", str(_default_db)))
+for _definition in repository.custom_scenarios():
+    register_custom_scenario(_definition)
 _default_reports_dir = Path(__file__).resolve().parents[3] / "backend" / "reports"
 reports_root = os.environ.get("IBS_REPORTS_DIR", str(_default_reports_dir))
 narrative_commander_factory = lambda: OpenAICompatibleCommander(timeout=30, max_tokens=800)
@@ -80,6 +93,111 @@ app.mount(
     StaticFiles(directory=ROOT / "resources" / "originals" / "assets" / "images"),
     name="counter-assets",
 )
+
+
+def _custom_definition(scenario_id: str) -> dict:
+    try:
+        definition = repository.custom_scenario(scenario_id)
+    except KeyError as error:
+        raise HTTPException(404, str(error)) from error
+    definition["id"] = scenario_id
+    register_custom_scenario(definition)
+    return definition
+
+
+@app.get("/custom-scenarios")
+def custom_scenarios():
+    return repository.custom_scenarios()
+
+
+@app.post("/custom-scenarios", status_code=201)
+def create_custom_scenario(request: CustomScenarioInput):
+    scenario_id = new_id()
+    definition = with_engine_default_formations(request.model_dump(mode="json"))
+    definition["id"] = scenario_id
+    errors = validate_definition(scenario_id, definition)
+    if errors:
+        unregister_custom_scenario(scenario_id)
+        raise HTTPException(422, {"errors": errors})
+    repository.save_custom_scenario(scenario_id, definition)
+    return definition
+
+
+@app.get("/custom-scenarios/{scenario_id}")
+def get_custom_scenario(scenario_id: str):
+    return _custom_definition(scenario_id)
+
+
+@app.put("/custom-scenarios/{scenario_id}")
+def update_custom_scenario(scenario_id: str, request: CustomScenarioInput):
+    _custom_definition(scenario_id)
+    definition = with_engine_default_formations(request.model_dump(mode="json"))
+    definition["id"] = scenario_id
+    errors = validate_definition(scenario_id, definition)
+    if errors:
+        raise HTTPException(422, {"errors": errors})
+    repository.save_custom_scenario(scenario_id, definition)
+    register_custom_scenario(definition)
+    return definition
+
+
+@app.delete("/custom-scenarios/{scenario_id}", status_code=204)
+def delete_custom_scenario(scenario_id: str):
+    try:
+        repository.delete_custom_scenario(scenario_id)
+    except KeyError as error:
+        raise HTTPException(404, str(error)) from error
+    unregister_custom_scenario(scenario_id)
+
+
+@app.get("/ship-catalog")
+def ship_catalog():
+    records = load_ship_records()
+    catalog = load_ship_catalog()
+    # 取“名录 ∪ 记录”：场景扩展（如二马 24 舰）只在 records/剧本里建档，
+    # 未进 catalog.yaml——不并进来的话工坊永远选不到它们。
+    # 名录里“已有同名同型完整记录的替身”去重：同一艘舰只列一条（有完整档案那条）。
+    record_by_name_type = {(record.name, record.ship_type) for record in records.values()}
+
+    def entry(ship_id: str) -> dict | None:
+        record = records.get(ship_id)
+        base = catalog.get(ship_id, {})
+        if record is None:
+            name, ship_type = base.get("name"), base.get("ship_type")
+            if (name, ship_type) in record_by_name_type:
+                return None  # 该名录舰已有可用的完整记录：去掉这份替身，只留那条记录。
+        else:
+            name, ship_type = record.name, record.ship_type
+        # 棋子图：记录舰与锁定（未建档）舰都解析——锁定的查 counter-assets.json 的
+        # catalog 绑定（有图即有棋子预览），没有图的锁定舰保持 None。
+        asset = None
+        if name and ship_type:
+            asset = asset_for(ship_id, str(name), str(ship_type))
+        return {
+            "id": ship_id,
+            "name": record.name if record else base.get("name", ship_id),
+            "ship_type": record.ship_type if record else base.get("ship_type"),
+            "displacement_band": record.displacement_band if record else None,
+            "vp": record.vp if record else None,
+            "asset": asset,
+            "class_name": base.get("class_name"),
+            "complete": record is not None,
+        }
+
+    rows: list[dict] = []
+    for ship_id in sorted(set(catalog) | set(records)):
+        item = entry(ship_id)
+        if item is not None:
+            rows.append(item)
+    return rows
+
+
+@app.get("/builtin-scenarios/{scenario_id}/template")
+def builtin_scenario_template(scenario_id: str):
+    try:
+        return builtin_as_editable_template(scenario_id)
+    except KeyError as error:
+        raise HTTPException(404, str(error)) from error
 
 _realistic_rules_path = ROOT / "docs" / "rules" / "realistic-command.md"
 
@@ -132,6 +250,12 @@ def scenarios():
     return engine.scenarios()
 
 
+@app.get("/games")
+def saved_games():
+    """Resume-card metadata only; never include units or sealed orders."""
+    return repository.game_summaries()
+
+
 @app.post("/games", status_code=201)
 def create_game(request: CreateGame, background_tasks: BackgroundTasks):
     if request.llm_config is not None:
@@ -144,6 +268,8 @@ def create_game(request: CreateGame, background_tasks: BackgroundTasks):
         except ValueError as error:
             raise HTTPException(422, str(error)) from error
     try:
+        if request.scenario_id.startswith("IBS-CUSTOM-"):
+            _custom_definition(request.scenario_id)
         state = engine.reset(request.scenario_id, request.seed, request.options)
     except (KeyError, ValueError) as error:
         raise HTTPException(422, str(error)) from error
@@ -174,6 +300,52 @@ def create_game(request: CreateGame, background_tasks: BackgroundTasks):
     return {"game_id": state.game_id, "scenario_id": state.scenario_id, "phase": state.phase}
 
 
+@app.post("/games/import", status_code=201)
+def import_game(bundle: dict):
+    try:
+        state, snapshots = validate_save_bundle(bundle)
+    except (KeyError, TypeError, ValueError) as error:
+        raise HTTPException(422, str(error)) from error
+
+    custom_definition = bundle.get("custom_scenario")
+    if state.scenario_id.startswith("IBS-CUSTOM-"):
+        if not isinstance(custom_definition, dict):
+            raise HTTPException(422, "自定义想定存档缺少想定定义")
+        if custom_definition.get("id") != state.scenario_id:
+            raise HTTPException(422, "自定义想定标识与存档不一致")
+        try:
+            existing = repository.custom_scenario(state.scenario_id)
+        except KeyError:
+            errors = validate_definition(state.scenario_id, custom_definition)
+            if errors:
+                unregister_custom_scenario(state.scenario_id)
+                raise HTTPException(422, {"errors": errors})
+            repository.save_custom_scenario(state.scenario_id, custom_definition)
+        else:
+            if json.dumps(existing, sort_keys=True) != json.dumps(custom_definition, sort_keys=True):
+                raise HTTPException(409, "服务器上同名自定义想定与存档不同，已拒绝覆盖")
+        register_custom_scenario(custom_definition)
+
+    imported, imported_snapshots = clone_imported_game(state, snapshots)
+    try:
+        repository.import_game(imported, imported_snapshots)
+    except ValueError as error:
+        raise HTTPException(409, str(error)) from error
+    engine.games[imported.game_id] = imported
+    return {
+        "game_id": imported.game_id,
+        "source_game_id": state.game_id,
+        "scenario_id": imported.scenario_id,
+        "scenario_title": imported.scenario_title,
+        "turn": imported.turn,
+        "phase": imported.phase.value,
+        "mode": imported.options.mode,
+        "ai_profile": imported.options.ai_profile,
+        "battle_report": imported.options.battle_report,
+        "realistic_command": imported.options.realistic_command,
+    }
+
+
 @app.get("/games/{game_id}/view")
 def view_game(
     game_id: str,
@@ -197,6 +369,64 @@ def game_export(game_id: str, x_player_side: Annotated[str | None, Header()] = N
     state = get_game(game_id)
     side = side_from_header(x_player_side)
     return {"frame": export_frame(state, engine, side), "board": render_board(state, engine, side)}
+
+
+@app.get("/games/{game_id}/save")
+def download_save(game_id: str):
+    """Download the authoritative state plus audit trail and historical snapshots."""
+    state = get_game(game_id)
+    custom_definition = None
+    if state.scenario_id.startswith("IBS-CUSTOM-"):
+        try:
+            custom_definition = repository.custom_scenario(state.scenario_id)
+        except KeyError as error:
+            raise HTTPException(409, "该对局的自定义想定定义已丢失，无法生成可移植存档") from error
+    bundle = build_save_bundle(repository, state, custom_definition)
+    filename = f"iron-bottom-sound-{game_id}.ibs-save.json"
+    return Response(
+        content=json.dumps(bundle, ensure_ascii=False, separators=(",", ":")),
+        media_type="application/json",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@app.get("/games/{game_id}/replay/checkpoints")
+def replay_checkpoints(game_id: str):
+    get_game(game_id)
+    try:
+        snapshots = repository.snapshots(game_id)
+    except KeyError as error:
+        raise HTTPException(404, str(error)) from error
+    return [
+        {
+            "sequence": sequence,
+            "turn": snapshot.turn,
+            "phase": snapshot.phase.value,
+            "event_type": snapshot.events[-1].type if snapshot.events else None,
+            "event_message": snapshot.events[-1].message if snapshot.events else None,
+        }
+        for sequence, snapshot in snapshots
+    ]
+
+
+@app.get("/games/{game_id}/replay")
+def replay_view(
+    game_id: str,
+    sequence: int | None = Query(default=None, ge=0),
+    x_player_side: Annotated[str | None, Header()] = None,
+):
+    get_game(game_id)
+    side = side_from_header(x_player_side)
+    try:
+        checkpoint_sequence, snapshot = repository.snapshot(game_id, sequence)
+    except KeyError as error:
+        raise HTTPException(404, str(error)) from error
+    replay_engine = IronBottomEngine()
+    replay_engine.games[game_id] = snapshot
+    return {
+        "checkpoint_sequence": checkpoint_sequence,
+        "view": replay_engine.observe(game_id, side),
+    }
 
 
 @app.get("/games/{game_id}/suggested-orders")

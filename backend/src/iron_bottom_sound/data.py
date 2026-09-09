@@ -12,8 +12,14 @@ from .models import (
     GameState,
     GunMountState,
     HexCoord,
+    MAP_COLUMNS,
+    MAP_ROWS,
+    MAX_MAP_COLUMNS,
+    MAX_MAP_ROWS,
     MarkerState,
     Phase,
+    PRINTED_MAP_COLUMNS,
+    PRINTED_MAP_ROWS,
     ShipRecord,
     ShipState,
     Side,
@@ -24,6 +30,17 @@ from .models import (
 
 ROOT = Path(__file__).resolve().parents[3]
 STRUCTURED = ROOT / "resources" / "derived" / "structured"
+_CUSTOM_SCENARIOS: dict[str, dict[str, Any]] = {}
+
+
+def register_custom_scenario(definition: dict[str, Any]) -> None:
+    """Register a validated local scenario for the running process."""
+    scenario_id = str(definition["id"])
+    _CUSTOM_SCENARIOS[scenario_id] = deepcopy(definition)
+
+
+def unregister_custom_scenario(scenario_id: str) -> None:
+    _CUSTOM_SCENARIOS.pop(scenario_id, None)
 
 
 def read_yaml(path: Path) -> dict[str, Any]:
@@ -32,10 +49,17 @@ def read_yaml(path: Path) -> dict[str, Any]:
 
 
 def scenario_catalog() -> list[dict[str, Any]]:
-    return read_yaml(STRUCTURED / "scenarios" / "catalog.yaml")["scenarios"]
+    builtins = read_yaml(STRUCTURED / "scenarios" / "catalog.yaml")["scenarios"]
+    custom = [
+        {"id": item["id"], "title": item["title"], "turns": item["turns"], "status": "playable", "custom": True}
+        for item in _CUSTOM_SCENARIOS.values()
+    ]
+    return builtins + custom
 
 
 def load_scenario(scenario_id: str) -> dict[str, Any]:
+    if scenario_id in _CUSTOM_SCENARIOS:
+        return deepcopy(_CUSTOM_SCENARIOS[scenario_id])
     entry = next((item for item in scenario_catalog() if item["id"] == scenario_id), None)
     if entry is None:
         raise KeyError(f"Unknown scenario {scenario_id}")
@@ -141,6 +165,24 @@ def make_ship(
     )
 
 
+def _scenario_map_dims(scenario: dict[str, Any]) -> tuple[int, int, int, int]:
+    """Resolve the scenario's playable map + printed region (defaults match the
+    fixed IBS-R-MAP-01 46×39 board so every legacy scenario is byte-identical)."""
+    columns = int(scenario.get("map_columns", MAP_COLUMNS))
+    rows = int(scenario.get("map_rows", MAP_ROWS))
+    if not (0 < columns <= MAX_MAP_COLUMNS and 0 < rows <= MAX_MAP_ROWS):
+        raise ValueError(f"Invalid scenario map size {columns}x{rows}")
+    printed_columns = scenario.get("printed_columns")
+    printed_rows = scenario.get("printed_rows")
+    if printed_columns is None:
+        printed_columns = PRINTED_MAP_COLUMNS if columns == MAP_COLUMNS else columns
+    if printed_rows is None:
+        printed_rows = PRINTED_MAP_ROWS if rows == MAP_ROWS else rows
+    if printed_columns > columns or printed_rows > rows:
+        raise ValueError(f"Printed region {printed_columns}x{printed_rows} exceeds the playable map")
+    return columns, rows, printed_columns, printed_rows
+
+
 def build_initial_state(game_id: str, scenario_id: str, seed: int, options: GameOptions) -> GameState:
     from .ship_records import load_ship_records
 
@@ -155,6 +197,7 @@ def build_initial_state(game_id: str, scenario_id: str, seed: int, options: Game
     ships = {entry["id"]: make_ship(entry, templates, records) for entry in entries}
     for key in scenario.get("optional_rules", []):
         setattr(options.optional_rules, key, True)
+    map_columns, map_rows, printed_columns, printed_rows = _scenario_map_dims(scenario)
     state = GameState(
         game_id=game_id,
         scenario_id=scenario_id,
@@ -165,6 +208,10 @@ def build_initial_state(game_id: str, scenario_id: str, seed: int, options: Game
         options=options,
         visibility=scenario["visibility"],
         ships=ships,
+        map_columns=map_columns,
+        map_rows=map_rows,
+        printed_columns=printed_columns,
+        printed_rows=printed_rows,
     )
     if reinforcement:
         state.reinforcement_trigger_turn = int(reinforcement["trigger"]["turn"])
@@ -194,7 +241,7 @@ def build_initial_state(game_id: str, scenario_id: str, seed: int, options: Game
                 )
     if options.realistic_command:
         from .realistic_command import SUPPORTED_SCENARIOS
-        if scenario_id not in SUPPORTED_SCENARIOS:
+        if scenario_id not in SUPPORTED_SCENARIOS and scenario_id not in _CUSTOM_SCENARIOS:
             raise ValueError(f"Realistic command is not available for scenario {scenario_id}")
         state.formation_resume_phase = state.phase
         state.phase = Phase.FORMATION_SETUP

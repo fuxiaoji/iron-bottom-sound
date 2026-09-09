@@ -1,4 +1,4 @@
-$ProjectRoot = Split-Path -Parent $PSScriptRoot
+﻿$ProjectRoot = Split-Path -Parent $PSScriptRoot
 $PidFile = Join-Path $ProjectRoot "tmp\runtime\pids.txt"
 if (-not (Test-Path $PidFile)) {
     Write-Host "没有找到正在运行的本项目服务。"

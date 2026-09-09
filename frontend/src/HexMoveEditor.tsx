@@ -88,7 +88,7 @@ export function HexMoveEditor({game,side,view,ship,onSelect,onCommit,onExit,show
  const advance=step.next_options.advance[0]?.label;
  const turnLabel=(action:string)=>action==="turn_port_60"?"左转60°":action==="turn_starboard_60"?"右转60°":action==="turn_port_120"?"左转120°":"右转120°";
  return <div className="move-editor">
-  <HexMap ships={view.ships} torpedoTracks={view.torpedo_tracks} markers={view.markers} onSelect={onSelect} viewerSide={side} visibility={view.visibility} showVisibility={showVisibility}
+  <HexMap dims={view} ships={view.ships} torpedoTracks={view.torpedo_tracks} markers={view.markers} onSelect={onSelect} viewerSide={side} visibility={view.visibility} showVisibility={showVisibility}
    moveMode={{shipId:ship.id,reachable:step.reachable,currentHex:step.current_hex??{q:0,r:0},currentHeading:step.current_heading??ship.heading,nextAdvance:step.next_options.advance[0]?.hex??null,trajectory:step.trajectory,onHexClick,onDragPath}}/>
   <aside className="move-editor-panel">
    <b>{ship.name}</b> · 舰首 {step.current_heading??"?"} · 当前 {step.current_label??"—"}

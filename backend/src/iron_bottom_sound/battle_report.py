@@ -37,9 +37,18 @@ ROW_COUNT = MAP_ROWS
 # 左/上边距（56=行号区，44=列标区）加前端 hexGeometry 的基准偏移 (38, 35)。
 ORIGIN_X = 56 + 38
 ORIGIN_Y = 44 + 35
-IMAGE_WIDTH = int(ORIGIN_X + (COLUMN_COUNT - 1) * HEX_SIZE * 1.5 + 72)
-LEGEND_TOP = int(ORIGIN_Y + (ROW_COUNT + 0.5) * HEX_ROW_HEIGHT + 36)
-IMAGE_HEIGHT = LEGEND_TOP + 180
+
+
+def _map_geometry(columns: int, rows: int) -> tuple[int, int, int]:
+    """给定列/行的整图尺寸：(宽度, 图例顶部 y, 高度)。默认 46×39 与既有常量一致，
+    大战场（92×78）随之放大。"""
+    width = int(ORIGIN_X + (columns - 1) * HEX_SIZE * 1.5 + 72)
+    legend_top = int(ORIGIN_Y + (rows + 0.5) * HEX_ROW_HEIGHT + 36)
+    height = legend_top + 180
+    return width, legend_top, height
+
+
+IMAGE_WIDTH, LEGEND_TOP, IMAGE_HEIGHT = _map_geometry(COLUMN_COUNT, ROW_COUNT)
 
 # 呈现色（非规则常量）。
 OCEAN = (16, 40, 62)
@@ -77,8 +86,8 @@ def heading_direction(heading: int) -> tuple[float, float]:
     return dx / norm, dy / norm
 
 
-def _column_labels() -> list[str]:
-    return [index_to_column(q) for q in range(COLUMN_COUNT)]
+def _column_labels(columns: int = COLUMN_COUNT) -> list[str]:
+    return [index_to_column(q) for q in range(columns)]
 
 
 # ---------------------------------------------------------------------------
@@ -117,8 +126,8 @@ def _cjk_font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
 # 地图渲染（全从观察可见集 + 公开地形）。
 # ---------------------------------------------------------------------------
 def _draw_terrain(draw: ImageDraw.ImageDraw, state: GameState) -> None:
-    for row in range(ROW_COUNT):
-        for q in range(COLUMN_COUNT):
+    for row in range(state.map_rows):
+        for q in range(state.map_columns):
             # row 是显示行；hex_vertices 现在收轴向行（与 HexCoord.r 一致）。
             draw.polygon(hex_vertices(q, row - q // 2), fill=OCEAN, outline=HEX_BORDER)
     for label in state.land_hexes:
@@ -201,16 +210,17 @@ def _draw_annotations(
     draw: ImageDraw.ImageDraw, state: GameState, observation: Any,
     legend_parts: list[str],
 ) -> None:
+    width, legend_top, _height = _map_geometry(state.map_columns, state.map_rows)
     title_font = _cjk_font(16)
     label_font = _cjk_font(12)
     legend_font = _cjk_font(14)
     draw.text((ORIGIN_X, 20), f"{state.scenario_title} · {observation.side.value} 视角",
               fill=TEXT_COLOR, font=title_font, anchor="lm")
-    columns = _column_labels()
+    columns = _column_labels(state.map_columns)
     for q, label in enumerate(columns):
         x = ORIGIN_X + q * HEX_SIZE * 1.5
         draw.text((x, 46), label, fill=DIM_TEXT, font=label_font, anchor="mm")
-    for row in range(ROW_COUNT):
+    for row in range(state.map_rows):
         y = ORIGIN_Y + (row + 0.25) * HEX_ROW_HEIGHT
         draw.text((ORIGIN_X - 26, y), str(row + 1), fill=DIM_TEXT, font=label_font, anchor="rm")
 
@@ -219,11 +229,11 @@ def _draw_annotations(
         f"第 {observation.turn}/{observation.max_turns} 回合 · {observation.phase.value} · "
         f"比分 轴心{score.get(Side.AXIS.value, 0)} : {score.get(Side.ALLIES.value, 0)} 盟军"
     )
-    y = LEGEND_TOP
+    y = legend_top
     draw.text((ORIGIN_X, y), score_text, fill=TEXT_COLOR, font=legend_font, anchor="lm")
     y += 26
     legend = " | ".join(legend_parts)
-    for line in _wrap_text(draw, legend, legend_font, IMAGE_WIDTH - ORIGIN_X - 48):
+    for line in _wrap_text(draw, legend, legend_font, width - ORIGIN_X - 48):
         draw.text((ORIGIN_X, y), line, fill=DIM_TEXT, font=legend_font, anchor="lm")
         y += 22
 
@@ -243,9 +253,10 @@ def _wrap_text(draw: ImageDraw.ImageDraw, text: str, font, max_width: int) -> li
 
 
 def render_map_image(state: GameState, engine: IronBottomEngine, side: Side) -> Image.Image:
-    """单侧固定扩展海图截图。只画该侧观察可见集 + 公开地形。"""
+    """单侧扩展海图截图。只画该侧观察可见集 + 公开地形。尺寸随局声明（默认 46×39 与既有一致）。"""
     observation = engine.observe(state.game_id, side)
-    image = Image.new("RGB", (IMAGE_WIDTH, IMAGE_HEIGHT), OCEAN)
+    width, _legend_top, height = _map_geometry(state.map_columns, state.map_rows)
+    image = Image.new("RGB", (width, height), OCEAN)
     draw = ImageDraw.Draw(image)
     _draw_terrain(draw, state)
     _draw_markers(draw, observation)

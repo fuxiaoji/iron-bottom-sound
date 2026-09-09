@@ -40,7 +40,8 @@ if TYPE_CHECKING:
 
 
 SUPPORTED_SCENARIOS = {"IBS-S-01", "IBS-S-03", "IBS-S-EM-01"}
-MAX_FORMATIONS_PER_SIDE = 4
+# 用户裁定：编队上限由 4 放开到 8，支持“全主力+大队驱逐”的巨舰剧本。
+MAX_FORMATIONS_PER_SIDE = 8
 
 
 def _source_position(state: GameState, ship_id: str) -> HexCoord | None:
@@ -128,7 +129,9 @@ def _layout_for_order(state: GameState, order: FormationSetupOrder) -> dict[str,
         if _source_position(state, ship_id) is None:
             continue
         for _ in range(order.spacing):
-            cursor = cursor.neighbor(astern)
+            cursor = cursor.neighbor(
+                astern, columns=state.map_columns, rows=state.map_rows
+            )
         layout[ship_id] = cursor
     return layout
 
@@ -137,7 +140,7 @@ def validate_setup(engine: "IronBottomEngine", state: GameState, batch: OrderBat
     errors: list[str] = []
     orders = batch.formation_setup
     if not 1 <= len(orders) <= MAX_FORMATIONS_PER_SIDE:
-        errors.append("Realistic command requires one to four formations per side")
+        errors.append(f"Realistic command requires one to {MAX_FORMATIONS_PER_SIDE} formations per side")
         return errors
     owned = {ship.id for ship in state.ships.values() if ship.side == batch.side}
     listed = [ship_id for order in orders for ship_id in order.ship_ids]
@@ -168,7 +171,9 @@ def validate_setup(engine: "IronBottomEngine", state: GameState, batch: OrderBat
     return errors
 
 
-def _shortest_hex_path(start: HexCoord, end: HexCoord) -> list[HexCoord]:
+def _shortest_hex_path(
+    start: HexCoord, end: HexCoord, *, columns: int = MAP_COLUMNS, rows: int = MAP_ROWS
+) -> list[HexCoord]:
     if start == end:
         return [start]
     queue = deque([start])
@@ -177,7 +182,7 @@ def _shortest_hex_path(start: HexCoord, end: HexCoord) -> list[HexCoord]:
         current = queue.popleft()
         for heading in range(1, 7):
             try:
-                candidate = current.neighbor(heading)
+                candidate = current.neighbor(heading, columns=columns, rows=rows)
             except ValueError:
                 continue
             if candidate in parent:
@@ -198,7 +203,10 @@ def rebuild_guide_trail(state: GameState, formation: FormationState) -> list[Hex
         return []
     trail: list[HexCoord] = []
     for left, right in zip(reversed(active), list(reversed(active))[1:]):
-        segment = _shortest_hex_path(left.position, right.position)  # type: ignore[arg-type]
+        segment = _shortest_hex_path(  # type: ignore[arg-type]
+            left.position, right.position,
+            columns=state.map_columns, rows=state.map_rows,
+        )
         trail.extend(segment[:-1])
     trail.append(active[0].position)  # type: ignore[arg-type]
     return trail
@@ -251,13 +259,15 @@ def resolve_setup(engine: "IronBottomEngine", state: GameState) -> None:
         )
 
 
-def _edge_distance(position: HexCoord, edge: str) -> int:
+def _edge_distance(
+    position: HexCoord, edge: str, *, columns: int = MAP_COLUMNS, rows: int = MAP_ROWS
+) -> int:
     row = int("".join(filter(str.isdigit, position.label))) - 1
     return {
         "west": position.q,
-        "east": MAP_COLUMNS - 1 - position.q,
+        "east": columns - 1 - position.q,
         "north": row,
-        "south": MAP_ROWS - 1 - row,
+        "south": rows - 1 - row,
     }[edge]
 
 
@@ -273,19 +283,34 @@ def choose_withdrawal_edge(state: GameState, ship_id: str) -> str:
         for enemy in enemies:
             if not enemy.position:
                 continue
-            boundary_bonus += _edge_distance(enemy.position, edge)
-        return (boundary_bonus, -_edge_distance(ship.position, edge), edge)
+            boundary_bonus += _edge_distance(
+                enemy.position, edge,
+                columns=state.map_columns, rows=state.map_rows,
+            )
+        return (
+            boundary_bonus,
+            -_edge_distance(
+                ship.position, edge,
+                columns=state.map_columns, rows=state.map_rows,
+            ),
+            edge,
+        )
     return max(edges, key=score)
 
 
-def _at_edge(position: HexCoord, edge: str) -> bool:
-    return _edge_distance(position, edge) == 0
+def _at_edge(
+    position: HexCoord, edge: str, *, columns: int = MAP_COLUMNS, rows: int = MAP_ROWS
+) -> bool:
+    return _edge_distance(position, edge, columns=columns, rows=rows) == 0
 
 
 def _withdrawal_order(engine: "IronBottomEngine", state: GameState, ship) -> MovementOrder:
     if not ship.position or not ship.withdrawal_edge:
         return MovementOrder(ship_id=ship.id, plan="0")
-    if _at_edge(ship.position, ship.withdrawal_edge):
+    if _at_edge(
+        ship.position, ship.withdrawal_edge,
+        columns=state.map_columns, rows=state.map_rows,
+    ):
         # The ship is removed by after_movement; authorize the zero-length
         # boundary hold even when its damaged speed track normally requires
         # movement.
@@ -300,7 +325,14 @@ def _withdrawal_order(engine: "IronBottomEngine", state: GameState, ship) -> Mov
             engine.ship_gun_pressure(state, enemy, position=enemy.position, target_hexes=[position])
             for enemy in enemies
         )
-        score = (float(enemy_distance), -enemy_pressure, -_edge_distance(position, ship.withdrawal_edge), position.label)
+        score = (
+            float(enemy_distance), -enemy_pressure,
+            -_edge_distance(
+                position, ship.withdrawal_edge,
+                columns=state.map_columns, rows=state.map_rows,
+            ),
+            position.label,
+        )
         plans = [entry["plan"]] if entry.get("plan") is not None else []
         for heading in entry["final_headings"]:
             path = engine.movement_path(state, ship, position, heading=heading)
@@ -485,7 +517,9 @@ def expand_movement_orders(
                 errors.append(f"{formation.id}: unsupported speed decision")
                 continue
         generated.append(MovementOrder(ship_id=leader.id, plan=plan, speed=leader_cost, formation_emergency_stop=emergency_stop))
-        leader_trajectory, _ = engine.movement_trajectory(leader, plan)
+        leader_trajectory, _ = engine.movement_trajectory(
+            leader, plan, columns=state.map_columns, rows=state.map_rows
+        )
         route = list(formation.guide_trail or rebuild_guide_trail(state, formation))
         if not route or route[-1] != leader.position:
             route = rebuild_guide_trail(state, formation)
@@ -499,7 +533,7 @@ def expand_movement_orders(
             try:
                 start_index = max(index for index, position in enumerate(route) if position == ship.position)
             except ValueError:
-                errors.append(f"{formation.id}: {ship.name} is no longer on the guide trail")
+                errors.append(f"{formation.id}: {ship.id} ({ship.name}) is no longer on the guide trail")
                 continue
             final_index = max(start_index, len(route) - 1 - member_index * target_spacing)
             hex_path = route[start_index + 1:final_index + 1]
@@ -511,7 +545,10 @@ def expand_movement_orders(
                 # IBS-R-06). A final 60-degree turn is free and preserves the
                 # exact wake for the next formation order.
                 if final_index + 1 < len(route) and not ship.forced_straight_turns:
-                    _program, final_heading = engine._movement_program(ship.position, ship.heading, commands)
+                    _program, final_heading = engine._movement_program(
+                        ship.position, ship.heading, commands,
+                        columns=state.map_columns, rows=state.map_rows,
+                    )
                     desired_heading = engine._bearing_between(route[final_index], route[final_index + 1])
                     relative = (desired_heading - final_heading) % 6
                     if relative == 1:
@@ -527,14 +564,14 @@ def expand_movement_orders(
                 follower_plan = engine.commands_to_plan(commands)
                 follower_cost = engine.movement_cost(follower_plan, commands)
                 if commands and commands[0] != "advance":
-                    errors.append(f"{formation.id}: {ship.name} cannot follow guide trail before advancing")
+                    errors.append(f"{formation.id}: {ship.id} ({ship.name}) cannot follow guide trail before advancing")
                     continue
             except ValueError as error:
-                errors.append(f"{formation.id}: {ship.name} cannot follow guide trail: {error}")
+                errors.append(f"{formation.id}: {ship.id} ({ship.name}) cannot follow guide trail: {error}")
                 continue
             minimum, maximum = engine._legal_speed_range(ship, state.turn)
             if not minimum <= follower_cost <= maximum:
-                errors.append(f"{formation.id}: {ship.name} follower speed {follower_cost} outside {minimum}-{maximum}")
+                errors.append(f"{formation.id}: {ship.id} ({ship.name}) follower speed {follower_cost} outside {minimum}-{maximum}")
                 continue
             generated.append(MovementOrder(ship_id=ship.id, plan=follower_plan, speed=follower_cost, formation_emergency_stop=emergency_stop and follower_cost == 0))
     for ship in state.ships.values():
@@ -561,7 +598,10 @@ def expand_movement_orders(
         if not ship.position:
             continue
         try:
-            trajectory, _heading = engine.movement_trajectory(ship, movement.plan)
+            trajectory, _heading = engine.movement_trajectory(
+                ship, movement.plan,
+                columns=state.map_columns, rows=state.map_rows,
+            )
         except ValueError:
             continue
         paths[ship.id] = [ship.position] + [position for position, _ in trajectory]
@@ -1013,10 +1053,16 @@ class RealisticCommander:
                         or " is no longer on the guide trail" in error
                     )
                     if " follower speed " in error or trail_failure or forced_separation:
+                        # Display names are not unique (duplicated hulls share a
+                        # Chinese name in one column); resolve by ship id first so
+                        # the true offender is detached, not its namesake.
                         follower = subject_ship if subject_ship in members else next(
-                            (ship for ship in members if f": {ship.name} " in error or f": {ship.id} " in error),
-                            None,
+                            (ship for ship in members if f": {ship.id} " in error), None,
                         )
+                        if follower is None:
+                            follower = next(
+                                (ship for ship in members if f": {ship.name} " in error), None,
+                            )
                         if follower and len(members) >= 1:
                             already = set(
                                 formation_order.speed_decision.detach_ship_ids

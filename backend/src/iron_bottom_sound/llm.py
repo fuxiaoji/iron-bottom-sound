@@ -49,26 +49,26 @@ class DeterministicCommander(LLMCommander):
     model = "deterministic-fixture"
 
     @staticmethod
-    def _edge_coords() -> list[HexCoord]:
+    def _edge_coords(*, columns: int = MAP_COLUMNS, rows: int = MAP_ROWS) -> list[HexCoord]:
         result: list[HexCoord] = []
-        for q in range(MAP_COLUMNS):
-            for display_row in (0, MAP_ROWS - 1):
+        for q in range(columns):
+            for display_row in (0, rows - 1):
                 result.append(HexCoord(q=q, r=display_row - (q - (q & 1)) // 2))
-        for display_row in range(1, MAP_ROWS - 1):
+        for display_row in range(1, rows - 1):
             result.append(HexCoord(q=0, r=display_row))
-            result.append(HexCoord(q=MAP_COLUMNS - 1, r=display_row - (MAP_COLUMNS - 2) // 2))
+            result.append(HexCoord(q=columns - 1, r=display_row - (columns - 2) // 2))
         return result
 
     @staticmethod
-    def _inward_heading(coord: HexCoord) -> int:
+    def _inward_heading(coord: HexCoord, *, columns: int = MAP_COLUMNS, rows: int = MAP_ROWS) -> int:
         display_row = coord.r + (coord.q - (coord.q & 1)) // 2
         if display_row == 0:
             return 3
-        if display_row == MAP_ROWS - 1:
+        if display_row == rows - 1:
             return 6
         if coord.q == 0:
             return 2
-        if coord.q == MAP_COLUMNS - 1:
+        if coord.q == columns - 1:
             return 5
         raise ValueError(f"{coord.label} is not on a map edge")
 
@@ -86,7 +86,8 @@ class DeterministicCommander(LLMCommander):
             (marker for marker in state.markers if marker.kind == "contact" and marker.secret_side == side),
             key=lambda marker: marker.id,
         )
-        candidates = self._edge_coords()
+        columns, rows = state.map_columns, state.map_rows
+        candidates = self._edge_coords(columns=columns, rows=rows)
         if side == Side.ALLIES:
             candidates.reverse()
         used: set[str] = set()
@@ -95,9 +96,9 @@ class DeterministicCommander(LLMCommander):
         def has_inward_run(candidate: HexCoord, distance: int) -> bool:
             position = candidate
             try:
-                heading = self._inward_heading(candidate)
+                heading = self._inward_heading(candidate, columns=columns, rows=rows)
                 for _ in range(distance):
-                    position = position.neighbor(heading)
+                    position = position.neighbor(heading, columns=columns, rows=rows)
             except ValueError:
                 return False
             return True
@@ -112,6 +113,7 @@ class DeterministicCommander(LLMCommander):
                     engine._coord_on_map(
                         candidate.q + state.contact_reserve_positions[ship_id].q - anchor.q,
                         candidate.r + state.contact_reserve_positions[ship_id].r - anchor.r,
+                        columns=columns, rows=rows,
                     )
                     for ship_id in group
                 )
@@ -120,7 +122,7 @@ class DeterministicCommander(LLMCommander):
             orders.append(ContactSetupOrder(
                 marker_id=marker.id,
                 entry_hex=entry,
-                heading=self._inward_heading(entry),
+                heading=self._inward_heading(entry, columns=columns, rows=rows),
                 speed=4,
                 ship_ids=group,
             ))
@@ -133,7 +135,7 @@ class DeterministicCommander(LLMCommander):
             orders.append(ContactSetupOrder(
                 marker_id=marker.id,
                 entry_hex=entry,
-                heading=self._inward_heading(entry),
+                heading=self._inward_heading(entry, columns=columns, rows=rows),
                 speed=5,
             ))
         return orders
@@ -153,7 +155,7 @@ class DeterministicCommander(LLMCommander):
         occupied = {ship.position.label for ship in state.ships.values() if ship.position and not ship.sunk}
         entries = [
             HexCoord(q=q, r=row - (q - (q & 1)) // 2)
-            for q in range(MAP_COLUMNS) for row in range(MAP_ROWS)
+            for q in range(state.map_columns) for row in range(state.map_rows)
         ]
         entries = [
             entry for entry in entries
@@ -302,13 +304,29 @@ _DISCIPLINE_SYSTEM_PROMPT = (
     "- ReinforcementOrder：只增援 reinforcement_candidates.ships 里列出的舰，entry_hex 必须取自"
     "其 entry_hexes（入口格被占则换该列表里其它格）；group_available 为 False 或 ships 为空时，"
     "reinforcements 数组必须留空，不得编造舰船或入口。\n"
-    "- 地图边缘：舰船不要驶出固定扩展海图边缘（棋盘 46 列×39 行）；A–HH、1–27 是原印刷区，"
-    "东、南侧为纯海缓冲区。上下边缘附近应减速或转向；引擎不会平移任何舰船、鱼雷或历史航迹，"
-    "到达最终边缘只会停车。鱼雷发射也要选择让鱼雷航迹留在图内的方位。\n"
+    "- 地图边缘：舰船不要驶出固定扩展海图边缘（@MAP_EDGE@）。上下边缘附近应减速或转向；"
+    "引擎不会平移任何舰船、鱼雷或历史航迹，到达最终边缘只会停车。鱼雷发射也要选择让鱼雷航迹留在图内的方位。\n"
     "所有 ship_id / marker_id / target_id / mount_id / launcher_id 必须来自【世界态帧】或"
     "【合法动作】；示例里的 SAMPLE- 开头 id（含 SAMPLE-M 炮位、SAMPLE-L 发射器）是占位符，"
     "照抄会被引擎判非法并在重试时告知。"
 )
+
+def _map_edge_guidance(state: GameState) -> str:
+    """按当前局尺寸生成「地图边缘」提示子句。
+
+    默认 46×39（印刷区 34×27、东/南纯海缓冲区）保持原文，确定性测试提示逐字节不变；
+    大战场（如 92×78 整图印刷）改用参数化描述，避免误导 LLM 缩到 46 列或引用不存在的缓冲区。
+    """
+    columns, rows = state.map_columns, state.map_rows
+    if columns == MAP_COLUMNS and rows == MAP_ROWS:
+        return "棋盘 46 列×39 行；A–HH、1–27 是原印刷区，东、南侧为纯海缓冲区"
+    from .models import index_to_column
+    last_column = index_to_column(columns - 1)
+    return f"棋盘 {columns} 列×{rows} 行；列标签 A–{last_column}、行 1–{rows}，整图为海区"
+
+
+def _discipline_system_prompt(state: GameState) -> str:
+    return _DISCIPLINE_SYSTEM_PROMPT.replace("@MAP_EDGE@", _map_edge_guidance(state))
 
 # 每订单阶段一个完整 AIPlanSheet 示范（orders 字段与 OrderBatch 结构一致）。
 # 全部 id 用 SAMPLE- 保留前缀占位；turn/phase/side 在调用时注入当前值。
@@ -531,7 +549,7 @@ class OpenAICompatibleCommander(LLMCommander):
             "max_tokens": self.max_tokens,
             "response_format": {"type": "json_object"},
             "messages": [
-                {"role": "system", "content": _DISCIPLINE_SYSTEM_PROMPT},
+                {"role": "system", "content": _discipline_system_prompt(state)},
                 self._user_message(prompt, state, engine, side),
             ],
         }

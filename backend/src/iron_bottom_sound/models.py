@@ -15,6 +15,12 @@ PRINTED_MAP_COLUMNS = 34
 PRINTED_MAP_ROWS = 27
 MAP_COLUMNS = 46
 MAP_ROWS = 39
+# Largest playable board a scenario may declare (the "大战场" 92×78 fits well
+# below these).  The column label codec and HexCoord caps must never approach
+# this ceiling, so it can stay a global sanity bound independent of the active
+# scenario's declared map size.
+MAX_MAP_COLUMNS = 128
+MAX_MAP_ROWS = 128
 
 
 class Side(StrEnum):
@@ -55,30 +61,36 @@ class MountPosition(StrEnum):
 
 
 def column_to_index(label: str) -> int:
+    # Repeated-letter scheme, length grows every 26 columns: A..Z (0..25),
+    # AA..ZZ (26..51), AAA..ZZZ (52..77), AAAA.. (78..).  Keeps the legacy
+    # AA/II/KK/TT labels that existing boards and tests rely on.
     normalized = label.upper()
-    if len(normalized) == 1 and "A" <= normalized <= "Z":
-        return ord(normalized) - 65
-    if len(normalized) == 2 and normalized[0] == normalized[1] and "A" <= normalized[0] <= "T":
-        return 26 + ord(normalized[0]) - 65
-    raise ValueError(f"Invalid map column {label!r}; expected A-Z or AA-TT")
+    first = normalized[0] if normalized else ""
+    if not first or not ("A" <= first <= "Z") or any(ch != first for ch in normalized):
+        raise ValueError(f"Invalid map column {label!r}; expected repeated letters like A-Z, AA-TT, ...")
+    index = (len(normalized) - 1) * 26 + (ord(first) - 65)
+    if index >= MAX_MAP_COLUMNS:
+        raise ValueError(f"Map column {label!r} exceeds the {MAX_MAP_COLUMNS}-column ceiling")
+    return index
 
 
 def index_to_column(index: int) -> str:
-    if 0 <= index <= 25:
-        return chr(65 + index)
-    if 26 <= index < MAP_COLUMNS:
-        character = chr(65 + index - 26)
-        return character * 2
-    raise ValueError(f"Map column index must be 0 through {MAP_COLUMNS - 1}")
+    if not 0 <= index < MAX_MAP_COLUMNS:
+        raise ValueError(f"Map column index must be 0 through {MAX_MAP_COLUMNS - 1}")
+    character = chr(65 + (index % 26))
+    return character * (1 + index // 26)
 
 
 class HexCoord(BaseModel, frozen=True):
-    q: int = Field(ge=0, le=MAP_COLUMNS - 1)
-    r: int = Field(ge=-64, le=64)
+    # Structural ceilings only (see MAX_MAP_COLUMNS/MAX_MAP_ROWS); the active
+    # scenario's map size is enforced where the hex is used (neighbor bounds,
+    # engine _coord_on_map, movement edge stops), not here.
+    q: int = Field(ge=0, le=MAX_MAP_COLUMNS - 1)
+    r: int = Field(ge=-MAX_MAP_ROWS, le=MAX_MAP_ROWS)
 
     @classmethod
     def from_label(cls, label: str) -> "HexCoord":
-        match = re.fullmatch(r"([A-Za-z]{1,2})(\d{1,2})", label.strip())
+        match = re.fullmatch(r"([A-Za-z]+)(\d{1,3})", label.strip())
         if not match:
             raise ValueError(f"Invalid hex label {label!r}")
         column = column_to_index(match.group(1))
@@ -91,11 +103,17 @@ class HexCoord(BaseModel, frozen=True):
         display_row = self.r + (self.q - (self.q & 1)) // 2
         return f"{index_to_column(self.q)}{display_row + 1}"
 
-    def neighbor(self, heading: int) -> "HexCoord":
+    def neighbor(
+        self,
+        heading: int,
+        *,
+        columns: int = MAP_COLUMNS,
+        rows: int = MAP_ROWS,
+    ) -> "HexCoord":
         dq, dr = self.direction_delta(heading)
         candidate = HexCoord(q=self.q + dq, r=self.r + dr)
         display_row = candidate.r + (candidate.q - (candidate.q & 1)) // 2
-        if not 0 <= display_row < MAP_ROWS:
+        if not (0 <= candidate.q < columns and 0 <= display_row < rows):
             raise ValueError("Movement leaves the map")
         return candidate
 
@@ -582,6 +600,14 @@ class GameState(BaseModel):
     max_turns: int
     phase: Phase = Phase.REINFORCEMENT
     seed: int
+    # Active map size for this game (defaults to the fixed IBS-R-MAP-01 board).
+    # printed_* may be smaller than map_* (a "printed" inner region the rest of
+    # the board is sea buffer around); None means the whole map is the printed
+    # region (no separate buffer shading).
+    map_columns: int = MAP_COLUMNS
+    map_rows: int = MAP_ROWS
+    printed_columns: int | None = None
+    printed_rows: int | None = None
     rng_counter: int = 0
     options: GameOptions
     tutorial_flags: set[str] = Field(default_factory=set)
@@ -666,6 +692,10 @@ class PlayerObservation(BaseModel):
     max_turns: int
     phase: Phase
     visibility: int
+    map_columns: int = MAP_COLUMNS
+    map_rows: int = MAP_ROWS
+    printed_columns: int | None = None
+    printed_rows: int | None = None
     ships: list[PublicShip]
     torpedo_tracks: list[TorpedoTrack] = Field(default_factory=list)
     markers: list[MarkerState] = Field(default_factory=list)

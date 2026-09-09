@@ -1,0 +1,1439 @@
+schema_version: 1
+source:
+  document: tables/ship-list-zh.docx
+  status: verified_source
+status: catalog
+description: 舰船列表目录层；战斗参数仅在 ship-records.yaml 或其扩展中声明后才可用于裁决。
+records:
+  IBS-U-IJN-YAMATO:
+    name: "大和"
+    english_name: "Yamato"
+    class_name: "大和级一号舰"
+    ship_type: BB
+    source_table: 0
+    source_row: 1
+  IBS-U-IJN-NAGATO:
+    name: "长门"
+    english_name: "Nagato"
+    class_name: "长门级一号舰"
+    ship_type: BB
+    source_table: 0
+    source_row: 2
+  IBS-U-IJN-MUTSU:
+    name: "陆奥"
+    english_name: "Mutsu"
+    class_name: "长门级二号舰"
+    ship_type: BB
+    source_table: 0
+    source_row: 3
+  IBS-U-IJN-HIEI:
+    name: "比叡"
+    english_name: "Hiei"
+    class_name: "金刚级三号舰"
+    ship_type: BC
+    source_table: 0
+    source_row: 4
+  IBS-U-IJN-KIRISHIMA:
+    name: "雾岛"
+    english_name: "Kirishima"
+    class_name: "金刚级四号舰"
+    ship_type: BC
+    source_table: 0
+    source_row: 5
+  IBS-U-IJN-AMAGI:
+    name: "天城"
+    english_name: "Amagi"
+    class_name: "天城级一号舰"
+    ship_type: BC
+    source_table: 0
+    source_row: 6
+  IBS-U-IJN-AKAGI:
+    name: "赤城"
+    english_name: "Akagi"
+    class_name: "天城级二号舰"
+    ship_type: BC
+    source_table: 0
+    source_row: 7
+  IBS-U-IJN-OWARI:
+    name: "尾张"
+    english_name: "Owari"
+    class_name: "纪伊级二号舰"
+    ship_type: BC
+    source_table: 0
+    source_row: 8
+  IBS-U-IJN-FURUTAKA:
+    name: "古鹰"
+    english_name: "Furutaka"
+    class_name: "古鹰级一号舰"
+    ship_type: CA
+    source_table: 0
+    source_row: 9
+  IBS-U-IJN-KAKO:
+    name: "加古Ⅰ"
+    english_name: "Kako"
+    class_name: "古鹰级二号舰"
+    ship_type: CA
+    source_table: 0
+    source_row: 10
+  IBS-U-IJN-KAKO-2:
+    name: "加古Ⅱ"
+    english_name: "Kako"
+    class_name: "古鹰级二号舰"
+    ship_type: CA
+    source_table: 0
+    source_row: 11
+  IBS-U-IJN-AOBA:
+    name: "青叶"
+    english_name: "Aoba"
+    class_name: "青叶级一号舰"
+    ship_type: CA
+    source_table: 0
+    source_row: 12
+  IBS-U-IJN-KINUGASA:
+    name: "衣笠"
+    english_name: "Kinugasa"
+    class_name: "青叶级二号舰"
+    ship_type: CA
+    source_table: 0
+    source_row: 13
+  IBS-U-IJN-MYOKO:
+    name: "妙高"
+    english_name: "Myoko"
+    class_name: "妙高级一号舰"
+    ship_type: CA
+    source_table: 0
+    source_row: 14
+  IBS-U-IJN-NACHI:
+    name: "那智"
+    english_name: "Nachi"
+    class_name: "妙高级二号舰"
+    ship_type: CA
+    source_table: 0
+    source_row: 15
+  IBS-U-IJN-HAGURO:
+    name: "羽黑"
+    english_name: "Haguro"
+    class_name: "妙高级四号舰"
+    ship_type: CA
+    source_table: 0
+    source_row: 16
+  IBS-U-IJN-TAKAO:
+    name: "高雄"
+    english_name: "Takao"
+    class_name: "高雄级一号舰"
+    ship_type: CA
+    source_table: 0
+    source_row: 17
+  IBS-U-IJN-ATAGO:
+    name: "爱宕"
+    english_name: "Atago"
+    class_name: "高雄级二号舰"
+    ship_type: CA
+    source_table: 0
+    source_row: 18
+  IBS-U-IJN-CHOKAI:
+    name: "鸟海"
+    english_name: "Chokai"
+    class_name: "高雄级四号舰"
+    ship_type: CA
+    source_table: 0
+    source_row: 19
+  IBS-U-IJN-TENRYU:
+    name: "天龙"
+    english_name: "Tenryu"
+    class_name: "天龙级一号舰"
+    ship_type: CL
+    source_table: 0
+    source_row: 20
+  IBS-U-IJN-TATSUTA:
+    name: "龙田"
+    english_name: "Tatsuta"
+    class_name: "天龙级一号舰"
+    ship_type: CL
+    source_table: 0
+    source_row: 21
+  IBS-U-IJN-SENDAI:
+    name: "川内"
+    english_name: "Sendai"
+    class_name: "川内级一号舰"
+    ship_type: CL
+    source_table: 0
+    source_row: 22
+  IBS-U-IJN-JINTSU:
+    name: "神通Ⅰ"
+    english_name: "Jintsu"
+    class_name: "川内级二号舰"
+    ship_type: CL
+    source_table: 0
+    source_row: 23
+  IBS-U-IJN-JINTSU-2:
+    name: "神通Ⅱ"
+    english_name: "Jintsu"
+    class_name: "川内级二号舰"
+    ship_type: CL
+    source_table: 0
+    source_row: 24
+  IBS-U-IJN-NAGARA:
+    name: "长良"
+    english_name: "Nagara"
+    class_name: "长良级一号舰"
+    ship_type: CL
+    source_table: 0
+    source_row: 25
+  IBS-U-IJN-AGANO:
+    name: "阿贺野"
+    english_name: "Agano"
+    class_name: "阿贺野级一号舰"
+    ship_type: CL
+    source_table: 0
+    source_row: 26
+  IBS-U-IJN-YUBARI:
+    name: "夕张"
+    english_name: "Yubari"
+    class_name: "夕张级一号舰"
+    ship_type: CL
+    source_table: 0
+    source_row: 27
+  IBS-U-IJN-KAMIKAZE:
+    name: "神风"
+    english_name: "Kamikaze"
+    class_name: "神风级一号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 28
+  IBS-U-IJN-ASAKAZE:
+    name: "朝风"
+    english_name: "Asakaze"
+    class_name: "神风级二号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 29
+  IBS-U-IJN-OITE:
+    name: "追风"
+    english_name: "Oite"
+    class_name: "神风级六号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 30
+  IBS-U-IJN-MUTSUKI:
+    name: "睦月"
+    english_name: "Mutsuki"
+    class_name: "睦月级一号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 31
+  IBS-U-IJN-UZUKI:
+    name: "卯月"
+    english_name: "Uzuki"
+    class_name: "睦月级四号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 32
+  IBS-U-IJN-FUBUKI:
+    name: "吹雪"
+    english_name: "Fubuki"
+    class_name: "吹雪级一号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 33
+  IBS-U-IJN-SHIRAYUKI:
+    name: "白雪"
+    english_name: "Shirayuki"
+    class_name: "吹雪级二号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 34
+  IBS-U-IJN-HATSUYUKI:
+    name: "初雪"
+    english_name: "Hatsuyuki"
+    class_name: "吹雪级三号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 35
+  IBS-U-IJN-MURAKUMO:
+    name: "丛云"
+    english_name: "Murakumo"
+    class_name: "吹雪级五号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 36
+  IBS-U-IJN-URANAMI:
+    name: "浦波"
+    english_name: "Uranami"
+    class_name: "吹雪级十号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 37
+  IBS-U-IJN-AYANAMI:
+    name: "绫波"
+    english_name: "Ayanami"
+    class_name: "绫波级一号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 38
+  IBS-U-IJN-SHIKINAMI:
+    name: "敷波"
+    english_name: "Shikinami"
+    class_name: "绫波级二号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 39
+  IBS-U-IJN-YUGIRI:
+    name: "夕雾"
+    english_name: "Yugiri"
+    class_name: "绫波级四号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 40
+  IBS-U-IJN-AMAGIRI:
+    name: "天雾"
+    english_name: "Amagiri"
+    class_name: "绫波级五号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 41
+  IBS-U-IJN-SAZANAMI:
+    name: "涟"
+    english_name: "Sazanami"
+    class_name: "绫波级九号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 42
+  IBS-U-IJN-AKATSUKI:
+    name: "晓"
+    english_name: "Akatsuki"
+    class_name: "晓级一号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 43
+  IBS-U-IJN-IKAZUCHI:
+    name: "雷"
+    english_name: "Ikazuchi"
+    class_name: "晓级三号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 44
+  IBS-U-IJN-INAZUMA:
+    name: "电"
+    english_name: "Inazuma"
+    class_name: "晓级四号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 45
+  IBS-U-IJN-YUGURE:
+    name: "夕暮"
+    english_name: "Yugure"
+    class_name: "初春级六号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 46
+  IBS-U-IJN-SHIRATSUYU:
+    name: "白露"
+    english_name: "Shiratsuyu"
+    class_name: "白露级一号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 47
+  IBS-U-IJN-SHIGURE:
+    name: "时雨"
+    english_name: "Shigure"
+    class_name: "白露级二号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 48
+  IBS-U-IJN-MURASAME:
+    name: "村雨"
+    english_name: "Murasame"
+    class_name: "白露级三号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 49
+  IBS-U-IJN-YUDACHI:
+    name: "夕立"
+    english_name: "Yudachi"
+    class_name: "白露级四号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 50
+  IBS-U-IJN-HARUSAME:
+    name: "春雨"
+    english_name: "Harusame"
+    class_name: "白露级五号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 51
+  IBS-U-IJN-SAMIDARE:
+    name: "五月雨"
+    english_name: "Samidare"
+    class_name: "白露级六号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 52
+  IBS-U-IJN-KAWAKAZE:
+    name: "江风"
+    english_name: "Kawakaze"
+    class_name: "白露级九号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 53
+  IBS-U-IJN-SUZUKAZE:
+    name: "凉风"
+    english_name: "Suzukaze"
+    class_name: "白露级十号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 54
+  IBS-U-IJN-ASAGUMO:
+    name: "朝云"
+    english_name: "Asagumo"
+    class_name: "朝潮级五号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 55
+  IBS-U-IJN-YAMAGUMO:
+    name: "山云"
+    english_name: "Yamagumo"
+    class_name: "朝潮级六号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 56
+  IBS-U-IJN-NATSUGUMO:
+    name: "夏云"
+    english_name: "Natsugumo"
+    class_name: "朝潮级七号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 57
+  IBS-U-IJN-KAGERO:
+    name: "阳炎"
+    english_name: "Kagero"
+    class_name: "阳炎级一号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 58
+  IBS-U-IJN-KUROSHIO:
+    name: "黑潮"
+    english_name: "Kuroshio"
+    class_name: "阳炎级三号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 59
+  IBS-U-IJN-OYASHIO:
+    name: "亲潮"
+    english_name: "Oyashio"
+    class_name: "阳炎级四号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 60
+  IBS-U-IJN-HATSUKAZE:
+    name: "初风"
+    english_name: "Hatsukaze"
+    class_name: "阳炎级七号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 61
+  IBS-U-IJN-YUKIKAZE:
+    name: "雪风"
+    english_name: "Yukikaze"
+    class_name: "阳炎级八号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 62
+  IBS-U-IJN-AMATSUKAZE:
+    name: "天津风"
+    english_name: "Amatsukaze"
+    class_name: "阳炎级九号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 63
+  IBS-U-IJN-ISOKAZE:
+    name: "矶风"
+    english_name: "Isokaze"
+    class_name: "阳炎级十二号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 64
+  IBS-U-IJN-HAMAKAZE:
+    name: "浜风"
+    english_name: "Hamakaze"
+    class_name: "阳炎级十三号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 65
+  IBS-U-IJN-TANIKAZE:
+    name: "谷风"
+    english_name: "Tanikaze"
+    class_name: "阳炎级十四号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 66
+  IBS-U-IJN-ARASHI:
+    name: "岚"
+    english_name: "Arashi"
+    class_name: "阳炎级十六号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 67
+  IBS-U-IJN-HAGIKAZE:
+    name: "萩风"
+    english_name: "Hagikaze"
+    class_name: "阳炎级十七号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 68
+  IBS-U-IJN-AKIGUMO:
+    name: "秋云"
+    english_name: "Akigumo"
+    class_name: "阳炎级十九号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 69
+  IBS-U-IJN-YUGUMO:
+    name: "夕云"
+    english_name: "Yugumo"
+    class_name: "夕云级一号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 70
+  IBS-U-IJN-KZAZGUMO:
+    name: "风云"
+    english_name: "Kzazgumo"
+    class_name: "夕云级三号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 71
+  IBS-U-IJN-NAGANAMI:
+    name: "长波"
+    english_name: "Naganami"
+    class_name: "夕云级四号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 72
+  IBS-U-IJN-MAKINAMI:
+    name: "卷波"
+    english_name: "Makinami"
+    class_name: "夕云级五号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 73
+  IBS-U-IJN-TAKANAMI:
+    name: "高波"
+    english_name: "Takanami"
+    class_name: "夕云级六号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 74
+  IBS-U-IJN-ONAMI:
+    name: "大波"
+    english_name: "Onami"
+    class_name: "夕云级七号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 75
+  IBS-U-IJN-KIYONAMI:
+    name: "清波"
+    english_name: "Kiyonami"
+    class_name: "夕云级八号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 76
+  IBS-U-IJN-AKIZUKI:
+    name: "秋月"
+    english_name: "Akizuki"
+    class_name: "秋月级一号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 77
+  IBS-U-IJN-TERUZUKI:
+    name: "照月"
+    english_name: "Teruzuki"
+    class_name: "秋月级二号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 78
+  IBS-U-IJN-NIIZUKI:
+    name: "新月"
+    english_name: "Niizuki"
+    class_name: "秋月级五号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 79
+  IBS-U-IJN-WAKATSUKI:
+    name: "若月"
+    english_name: "Wakatsuki"
+    class_name: "秋月级六号舰"
+    ship_type: DD
+    source_table: 0
+    source_row: 80
+  IBS-U-IJN-MATSUKAZE:
+    name: "松风"
+    english_name: "Matsukaze"
+    class_name: "神风级四号舰"
+    ship_type: APD
+    source_table: 0
+    source_row: 81
+  IBS-U-IJN-YUNAGI:
+    name: "夕凪"
+    english_name: "Yunagi"
+    class_name: "神风级九号舰"
+    ship_type: APD
+    source_table: 0
+    source_row: 82
+  IBS-U-IJN-UZUKI-2:
+    name: "卯月"
+    english_name: "Uzuki"
+    class_name: "睦月级四号舰"
+    ship_type: APD
+    source_table: 0
+    source_row: 83
+  IBS-U-IJN-SATSUKI:
+    name: "皋月"
+    english_name: "Satsuki"
+    class_name: "睦月级五号舰"
+    ship_type: APD
+    source_table: 0
+    source_row: 84
+  IBS-U-IJN-MINAZUKI:
+    name: "水无月"
+    english_name: "Minazuki"
+    class_name: "睦月级六号舰"
+    ship_type: APD
+    source_table: 0
+    source_row: 85
+  IBS-U-IJN-FUMIZUKI:
+    name: "文月"
+    english_name: "Fumizuki"
+    class_name: "睦月级七号舰"
+    ship_type: APD
+    source_table: 0
+    source_row: 86
+  IBS-U-IJN-NAGATSUKI:
+    name: "长月"
+    english_name: "Nagatsuki"
+    class_name: "睦月级八号舰"
+    ship_type: APD
+    source_table: 0
+    source_row: 87
+  IBS-U-IJN-MIKAZUKI:
+    name: "三日月"
+    english_name: "Mikazuki"
+    class_name: "睦月级十号舰"
+    ship_type: APD
+    source_table: 0
+    source_row: 88
+  IBS-U-IJN-MONCHIZUKI:
+    name: "望月"
+    english_name: "Monchizuki"
+    class_name: "睦月级十一号舰"
+    ship_type: APD
+    source_table: 0
+    source_row: 89
+  IBS-U-IJN-NISSHIN:
+    name: "日进"
+    english_name: "Nisshin"
+    class_name: "日进级一号舰"
+    ship_type: AV
+    source_table: 0
+    source_row: 90
+  IBS-U-IJN-CHITOSE:
+    name: "千岁"
+    english_name: "Chitose"
+    class_name: "千岁级一号舰"
+    ship_type: AV
+    source_table: 0
+    source_row: 91
+  IBS-U-USN-UNNAMED-T01-R01:
+    name: "科罗拉多"
+    english_name: "Colorado"
+    class_name: "科罗拉多一号舰"
+    ship_type: BB
+    source_table: 1
+    source_row: 1
+  IBS-U-USN-UNNAMED-T01-R02:
+    name: "西弗吉尼亚"
+    english_name: "West Virginia"
+    class_name: "科罗拉多四号舰"
+    ship_type: BB
+    source_table: 1
+    source_row: 2
+  IBS-U-USN-UNNAMED-T01-R03:
+    name: "北卡罗来纳"
+    english_name: "North Carolina"
+    class_name: "北卡罗来纳一号舰"
+    ship_type: BB
+    source_table: 1
+    source_row: 3
+  IBS-U-USN-UNNAMED-T01-R04:
+    name: "华盛顿"
+    english_name: "Washington"
+    class_name: "北卡罗来纳二号舰"
+    ship_type: BB
+    source_table: 1
+    source_row: 4
+  IBS-U-USN-UNNAMED-T01-R05:
+    name: "南达科他"
+    english_name: "South Dakota"
+    class_name: "南达科他一号舰"
+    ship_type: BB
+    source_table: 1
+    source_row: 5
+  IBS-U-USN-UNNAMED-T01-R06:
+    name: "列克星敦"
+    english_name: "Lexington"
+    class_name: "列克星敦一号舰"
+    ship_type: BC
+    source_table: 1
+    source_row: 6
+  IBS-U-USN-UNNAMED-T01-R07:
+    name: "合众国"
+    english_name: "United States"
+    class_name: "列克星敦五号舰"
+    ship_type: BC
+    source_table: 1
+    source_row: 7
+  IBS-U-USN-UNNAMED-T01-R08:
+    name: "宪法"
+    english_name: "constitution"
+    class_name: "列克星敦六号舰"
+    ship_type: BC
+    source_table: 1
+    source_row: 8
+  IBS-U-USN-UNNAMED-T01-R09:
+    name: "彭萨科拉"
+    english_name: "Pensacola"
+    class_name: "彭萨克拉一号舰"
+    ship_type: CA
+    source_table: 1
+    source_row: 9
+  IBS-U-USN-UNNAMED-T01-R10:
+    name: "盐湖城"
+    english_name: "Salt Lake City"
+    class_name: "彭萨科拉二号舰"
+    ship_type: CA
+    source_table: 1
+    source_row: 10
+  IBS-U-USN-UNNAMED-T01-R11:
+    name: "北安普顿"
+    english_name: "Northampton"
+    class_name: "北安普顿一号舰"
+    ship_type: CA
+    source_table: 1
+    source_row: 11
+  IBS-U-USN-UNNAMED-T01-R12:
+    name: "芝加哥"
+    english_name: "chicago"
+    class_name: "北安普顿四号舰"
+    ship_type: CA
+    source_table: 1
+    source_row: 12
+  IBS-U-USN-UNNAMED-T01-R13:
+    name: "休斯顿"
+    english_name: "houston"
+    class_name: "北安普顿五号舰"
+    ship_type: CA
+    source_table: 1
+    source_row: 13
+  IBS-U-USN-UNNAMED-T01-R14:
+    name: "新奥尔良"
+    english_name: "New Orleans"
+    class_name: "新奥尔良级一号舰"
+    ship_type: CA
+    source_table: 1
+    source_row: 14
+  IBS-U-USN-UNNAMED-T01-R15:
+    name: "阿斯托里亚"
+    english_name: "Astoria"
+    class_name: "新奥尔良级二号舰"
+    ship_type: CA
+    source_table: 1
+    source_row: 15
+  IBS-U-USN-UNNAMED-T01-R16:
+    name: "明尼阿波利斯"
+    english_name: "Minneapolis"
+    class_name: "新奥尔良级三号舰"
+    ship_type: CA
+    source_table: 1
+    source_row: 16
+  IBS-U-USN-UNNAMED-T01-R17:
+    name: "昆西"
+    english_name: "Quincy"
+    class_name: "新奥尔良级六号舰"
+    ship_type: CA
+    source_table: 1
+    source_row: 17
+  IBS-U-USN-UNNAMED-T01-R18:
+    name: "旧金山"
+    english_name: "San Francisco"
+    class_name: "新奥尔良级五号舰"
+    ship_type: CA
+    source_table: 1
+    source_row: 18
+  IBS-U-USN-UNNAMED-T01-R19:
+    name: "文森斯"
+    english_name: "Vincennes"
+    class_name: "新奥尔良级七号舰"
+    ship_type: CA
+    source_table: 1
+    source_row: 19
+  IBS-U-USN-UNNAMED-T01-R20:
+    name: "波特兰"
+    english_name: "Portland"
+    class_name: "波特兰级一号舰"
+    ship_type: CA
+    source_table: 1
+    source_row: 20
+  IBS-U-USN-UNNAMED-T01-R21:
+    name: "奥马哈"
+    english_name: "Omaha"
+    class_name: "奥马哈级一号舰"
+    ship_type: CL
+    source_table: 1
+    source_row: 21
+  IBS-U-USN-UNNAMED-T01-R22:
+    name: "孟菲斯"
+    english_name: "Memphis"
+    class_name: "奥马哈十号舰"
+    ship_type: CL
+    source_table: 1
+    source_row: 22
+  IBS-U-USN-UNNAMED-T01-R23:
+    name: "亚特兰大"
+    english_name: "Atlanta"
+    class_name: "亚特兰大级一号舰"
+    ship_type: CL
+    source_table: 1
+    source_row: 23
+  IBS-U-USN-UNNAMED-T01-R24:
+    name: "朱诺"
+    english_name: "Juneau"
+    class_name: "亚特兰大级二号舰"
+    ship_type: CL
+    source_table: 1
+    source_row: 24
+  IBS-U-USN-UNNAMED-T01-R25:
+    name: "圣胡安"
+    english_name: "San Juan"
+    class_name: "亚特兰大级四号舰"
+    ship_type: CL
+    source_table: 1
+    source_row: 25
+  IBS-U-USN-UNNAMED-T01-R26:
+    name: "克利夫兰"
+    english_name: "Cleveland"
+    class_name: "克利夫兰级一号舰"
+    ship_type: CL
+    source_table: 1
+    source_row: 26
+  IBS-U-USN-UNNAMED-T01-R27:
+    name: "哥伦比亚"
+    english_name: "Columbia"
+    class_name: "克利夫兰级二号舰"
+    ship_type: CL
+    source_table: 1
+    source_row: 27
+  IBS-U-USN-UNNAMED-T01-R28:
+    name: "蒙彼利埃"
+    english_name: "Montpelier"
+    class_name: "克利夫兰级三号舰"
+    ship_type: CL
+    source_table: 1
+    source_row: 28
+  IBS-U-USN-UNNAMED-T01-R29:
+    name: "丹弗"
+    english_name: "Denver"
+    class_name: "克利夫兰级四号舰"
+    ship_type: CL
+    source_table: 1
+    source_row: 29
+  IBS-U-USN-UNNAMED-T01-R30:
+    name: "博伊西"
+    english_name: "Boise"
+    class_name: "布鲁克林级六号舰"
+    ship_type: CL
+    source_table: 1
+    source_row: 30
+  IBS-U-USN-UNNAMED-T01-R31:
+    name: "火奴鲁鲁"
+    english_name: "Honolulu"
+    class_name: "布鲁克林级七号舰"
+    ship_type: CL
+    source_table: 1
+    source_row: 31
+  IBS-U-USN-UNNAMED-T01-R32:
+    name: "圣路易斯"
+    english_name: "St. Louis"
+    class_name: "布鲁克林级八号舰"
+    ship_type: CL
+    source_table: 1
+    source_row: 32
+  IBS-U-USN-UNNAMED-T01-R33:
+    name: "海伦娜"
+    english_name: "Helena"
+    class_name: "布鲁克林级九号舰"
+    ship_type: CL
+    source_table: 1
+    source_row: 33
+  IBS-U-USN-UNNAMED-T01-R34:
+    name: "特鲁斯顿"
+    english_name: "Truxtun"
+    class_name: "克莱蒙森级"
+    ship_type: DD
+    source_table: 1
+    source_row: 34
+  IBS-U-USN-UNNAMED-T01-R35:
+    name: "佩里"
+    english_name: "Perry"
+    class_name: "克莱蒙森级"
+    ship_type: DD
+    source_table: 1
+    source_row: 35
+  IBS-U-USN-I:
+    name: "赫尔Ⅰ"
+    english_name: "Hull"
+    class_name: "克莱蒙森级"
+    ship_type: DD
+    source_table: 1
+    source_row: 36
+  IBS-U-USN-UNNAMED-T01-R37:
+    name: "达尔格伦"
+    english_name: "Dahlgren"
+    class_name: "克莱蒙森级"
+    ship_type: DD
+    source_table: 1
+    source_row: 37
+  IBS-U-USN-UNNAMED-T01-R38:
+    name: "福克斯"
+    english_name: "Fox"
+    class_name: "克莱蒙森级"
+    ship_type: DD
+    source_table: 1
+    source_row: 38
+  IBS-U-USN-UNNAMED-T01-R39:
+    name: "班布里奇"
+    english_name: "Bainbridge"
+    class_name: "克莱蒙森级"
+    ship_type: DD
+    source_table: 1
+    source_row: 39
+  IBS-U-USN-UNNAMED-T01-R40:
+    name: "迪凯特"
+    english_name: "Decatur"
+    class_name: "克莱蒙森级"
+    ship_type: DD
+    source_table: 1
+    source_row: 40
+  IBS-U-USN-II:
+    name: "赫尔Ⅱ"
+    english_name: "Hull"
+    class_name: "法拉格特级二号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 41
+  IBS-U-USN-UNNAMED-T01-R42:
+    name: "杜威"
+    english_name: "Dewey"
+    class_name: "法拉格特级三号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 42
+  IBS-U-USN-UNNAMED-T01-R43:
+    name: "麦克多诺"
+    english_name: "Macdonough"
+    class_name: "法拉格特级四号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 43
+  IBS-U-USN-UNNAMED-T01-R44:
+    name: "赛尔福利纪"
+    english_name: "Selfridge"
+    class_name: "波特级二号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 44
+  IBS-U-USN-UNNAMED-T01-R45:
+    name: "巴尔奇"
+    english_name: "Balch"
+    class_name: "波特级八号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 45
+  IBS-U-USN-UNNAMED-T01-R46:
+    name: "德雷顿"
+    english_name: "Drayton"
+    class_name: "马汉级三号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 46
+  IBS-U-USN-UNNAMED-T01-R47:
+    name: "拉姆森"
+    english_name: "Lamson"
+    class_name: "马汉级四号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 47
+  IBS-U-USN-UNNAMED-T01-R48:
+    name: "库欣"
+    english_name: "Cushing"
+    class_name: "马汉级十三号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 48
+  IBS-U-USN-UNNAMED-T01-R49:
+    name: "帕金斯"
+    english_name: "Perkins"
+    class_name: "马汉级十四号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 49
+  IBS-U-USN-UNNAMED-T01-R50:
+    name: "普雷斯顿"
+    english_name: "Preston"
+    class_name: "马汉级十六号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 50
+  IBS-U-USN-UNNAMED-T01-R51:
+    name: "邓拉普"
+    english_name: "Dunlap"
+    class_name: "马汉级十七号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 51
+  IBS-U-USN-UNNAMED-T01-R52:
+    name: "格里德利"
+    english_name: "Gridley"
+    class_name: "格里德利级一号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 52
+  IBS-U-USN-UNNAMED-T01-R53:
+    name: "莫里"
+    english_name: "Maury"
+    class_name: "格里德利级四号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 53
+  IBS-U-USN-UNNAMED-T01-R54:
+    name: "巴格莱"
+    english_name: "Bagley"
+    class_name: "巴格莱级一号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 54
+  IBS-U-USN-UNNAMED-T01-R55:
+    name: "布鲁"
+    english_name: "Blue"
+    class_name: "巴格莱级二号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 55
+  IBS-U-USN-UNNAMED-T01-R56:
+    name: "赫尔姆"
+    english_name: "Helm"
+    class_name: "巴格莱级三号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 56
+  IBS-U-USN-UNNAMED-T01-R57:
+    name: "拉尔夫·托尔伯特"
+    english_name: "Ralph Talbot"
+    class_name: "巴格莱级五号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 57
+  IBS-U-USN-UNNAMED-T01-R58:
+    name: "帕特森"
+    english_name: "Patterson"
+    class_name: "巴格莱级七号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 58
+  IBS-U-USN-UNNAMED-T01-R59:
+    name: "贾维斯"
+    english_name: "Jarvis"
+    class_name: "巴格莱级八号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 59
+  IBS-U-USN-UNNAMED-T01-R60:
+    name: "本汉姆"
+    english_name: "BENHAM"
+    class_name: "本汉姆级一号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 60
+  IBS-U-USN-UNNAMED-T01-R61:
+    name: "埃利特"
+    english_name: "ELLET"
+    class_name: "本汉姆级二号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 61
+  IBS-U-USN-UNNAMED-T01-R62:
+    name: "郎"
+    english_name: "LANG"
+    class_name: "本汉姆级三号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 62
+  IBS-U-USN-UNNAMED-T01-R63:
+    name: "斯塔克"
+    english_name: "STACK"
+    class_name: "本汉姆级八号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 63
+  IBS-U-USN-UNNAMED-T01-R64:
+    name: "史特雷特"
+    english_name: "STERETT"
+    class_name: "本汉姆级九号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 64
+  IBS-U-USN-UNNAMED-T01-R65:
+    name: "威尔逊"
+    english_name: "WILSON"
+    class_name: "本汉姆级十号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 65
+  IBS-U-USN-UNNAMED-T01-R66:
+    name: "沃克"
+    english_name: "Walke"
+    class_name: "西姆斯级八号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 66
+  IBS-U-USN-UNNAMED-T01-R67:
+    name: "拉菲"
+    english_name: "Laffey"
+    class_name: "本森级七号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 67
+  IBS-U-USN-UNNAMED-T01-R68:
+    name: "伍德沃斯"
+    english_name: "WOODWORTH"
+    class_name: "本森级八号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 68
+  IBS-U-USN-UNNAMED-T01-R69:
+    name: "法伦霍尔特"
+    english_name: "Farenholt"
+    class_name: "本森级九号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 69
+  IBS-U-USN-UNNAMED-T01-R70:
+    name: "巴顿"
+    english_name: "Barton"
+    class_name: "本森级十二号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 70
+  IBS-U-USN-UNNAMED-T01-R71:
+    name: "葛文"
+    english_name: "Gwin"
+    class_name: "格里维斯级七号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 71
+  IBS-U-USN-UNNAMED-T01-R72:
+    name: "亚伦沃德"
+    english_name: "Aaron ward"
+    class_name: "格里维斯级二十七号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 72
+  IBS-U-USN-UNNAMED-T01-R73:
+    name: "布坎南"
+    english_name: "Buchanan"
+    class_name: "格里维斯级二十八号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 73
+  IBS-U-USN-UNNAMED-T01-R74:
+    name: "邓肯"
+    english_name: "Duncan"
+    class_name: "格里维斯级二十九号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 74
+  IBS-U-USN-UNNAMED-T01-R75:
+    name: "拉德纳"
+    english_name: "Lardner"
+    class_name: "格里维斯级三十一号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 75
+  IBS-U-USN-UNNAMED-T01-R76:
+    name: "麦卡拉"
+    english_name: "McCalla"
+    class_name: "格里维斯级三十二号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 76
+  IBS-U-USN-UNNAMED-T01-R77:
+    name: "弗莱彻"
+    english_name: "Fletcher"
+    class_name: "弗莱彻级一号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 77
+  IBS-U-USN-UNNAMED-T01-R78:
+    name: "雷德福德"
+    english_name: "Radford"
+    class_name: "弗莱彻级二号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 78
+  IBS-U-USN-UNNAMED-T01-R79:
+    name: "詹金斯"
+    english_name: "Jenkins"
+    class_name: "弗莱彻级三号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 79
+  IBS-U-USN-UNNAMED-T01-R80:
+    name: "拉瓦利特"
+    english_name: "La Vallette"
+    class_name: "弗莱彻级四号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 80
+  IBS-U-USN-UNNAMED-T01-R81:
+    name: "尼古拉斯"
+    english_name: "Nicholas"
+    class_name: "弗莱彻级五号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 81
+  IBS-U-USN-UNNAMED-T01-R82:
+    name: "奥班农"
+    english_name: "O'Bannon"
+    class_name: "弗莱彻级六号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 82
+  IBS-U-USN-UNNAMED-T01-R83:
+    name: "谢伐利埃"
+    english_name: "Chevalier"
+    class_name: "弗莱彻级七号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 83
+  IBS-U-USN-UNNAMED-T01-R84:
+    name: "泰勒"
+    english_name: "Taylor"
+    class_name: "弗莱彻级十一号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 84
+  IBS-U-USN-UNNAMED-T01-R85:
+    name: "斯坦立"
+    english_name: "Stanly"
+    class_name: "弗莱彻级二十一号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 85
+  IBS-U-USN-UNNAMED-T01-R86:
+    name: "康弗斯"
+    english_name: "Converse"
+    class_name: "弗莱彻级三十二号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 86
+  IBS-U-USN-UNNAMED-T01-R87:
+    name: "福特"
+    english_name: "Foote"
+    class_name: "弗莱彻级三十四号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 87
+  IBS-U-USN-UNNAMED-T01-R88:
+    name: "斯彭斯"
+    english_name: "Spence"
+    class_name: "弗莱彻级三十五号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 88
+  IBS-U-USN-UNNAMED-T01-R89:
+    name: "撒切尔"
+    english_name: "Thatcher"
+    class_name: "弗莱彻级三十七号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 89
+  IBS-U-USN-UNNAMED-T01-R90:
+    name: "查尔斯·奥斯本"
+    english_name: "Charles Ausburne"
+    class_name: "弗莱彻级八十六号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 90
+  IBS-U-USN-UNNAMED-T01-R91:
+    name: "克拉克斯顿"
+    english_name: "Claxton"
+    class_name: "弗莱彻级八十七号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 91
+  IBS-U-USN-UNNAMED-T01-R92:
+    name: "戴森"
+    english_name: "Dyson"
+    class_name: "弗莱彻级八十八号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 92
+  IBS-U-USN-UNNAMED-T01-R93:
+    name: "蒙森"
+    english_name: "Monssen"
+    class_name: "弗莱彻级一百六十九号舰"
+    ship_type: DD
+    source_table: 1
+    source_row: 93
+  IBS-U-USN-UNNAMED-T01-R94:
+    name: "布里斯"
+    english_name: ""
+    class_name: ""
+    ship_type: DD
+    source_table: 1
+    source_row: 94
+    unresolved: true
+  IBS-U-USN-UNNAMED-T01-R95:
+    name: "普雷贝尔"
+    english_name: ""
+    class_name: ""
+    ship_type: DD
+    source_table: 1
+    source_row: 95
+    unresolved: true
+  IBS-U-USN-UNNAMED-T01-R96:
+    name: "甘布勒"
+    english_name: ""
+    class_name: ""
+    ship_type: DD
+    source_table: 1
+    source_row: 96
+    unresolved: true
+  IBS-U-USN-UNNAMED-T01-R97:
+    name: "雷德福"
+    english_name: ""
+    class_name: ""
+    ship_type: DD
+    source_table: 1
+    source_row: 97
+    unresolved: true
+  IBS-U-RN-UNNAMED-T02-R01:
+    name: "利安得"
+    english_name: "Leander"
+    class_name: "利安德级一号舰"
+    ship_type: CL
+    source_table: 2
+    source_row: 1
+  IBS-U-KM-Z-4:
+    name: "里夏德·拜茨恩 Z-4"
+    english_name: "R·Beitzen"
+    class_name: "1934年级驱逐舰四号舰"
+    ship_type: DD
+    source_table: 3
+    source_row: 1
+  IBS-U-KM-Z-10:
+    name: "汉斯·洛迪 Z-10"
+    english_name: "Hans Lody"
+    class_name: "1934年级驱逐舰十号舰"
+    ship_type: DD
+    source_table: 3
+    source_row: 2
+  IBS-U-KM-Z-20:
+    name: "卡尔加尔斯特 Z-20"
+    english_name: "Karl Galster"
+    class_name: "1936年级驱逐舰四号舰"
+    ship_type: DD
+    source_table: 3
+    source_row: 3
+  IBS-U-NLD-UNNAMED-T04-R01:
+    name: "爪哇"
+    english_name: "Java"
+    class_name: "爪哇级一号舰"
+    ship_type: CL
+    source_table: 4
+    source_row: 1
+  IBS-U-NLD-UNNAMED-T04-R02:
+    name: "德·鲁伊特"
+    english_name: "De Ruyter"
+    class_name: "德·鲁伊特"
+    ship_type: CL
+    source_table: 4
+    source_row: 2
+  IBS-U-RN-UNNAMED-T05-R01:
+    name: "哈津斯"
+    english_name: "Hawkins"
+    class_name: "哈津斯级一号舰"
+    ship_type: CA
+    source_table: 5
+    source_row: 1
+  IBS-U-RN-UNNAMED-T05-R02:
+    name: "克什米尔"
+    english_name: "Kashmir"
+    class_name: "K级三号舰"
+    ship_type: DD
+    source_table: 5
+    source_row: 2
+  IBS-U-RN-UNNAMED-T05-R03:
+    name: "泽西"
+    english_name: "Jersey"
+    class_name: "J级七号舰"
+    ship_type: DD
+    source_table: 5
+    source_row: 3
+  IBS-U-RN-UNNAMED-T05-R04:
+    name: "豺"
+    english_name: "Jackal"
+    class_name: "J级二号舰"
+    ship_type: DD
+    source_table: 5
+    source_row: 4
+  IBS-U-RN-UNNAMED-T05-R05:
+    name: "标枪"
+    english_name: "Javelin"
+    class_name: "J级六号舰"
+    ship_type: DD
+    source_table: 5
+    source_row: 5
+  IBS-U-RN-UNNAMED-T05-R06:
+    name: "朱庇特"
+    english_name: "Jupiter"
+    class_name: "J级八号舰"
+    ship_type: DD
+    source_table: 5
+    source_row: 6
+  IBS-U-RAN-UNNAMED-T06-R01:
+    name: "堪培拉"
+    english_name: "Canberra"
+    class_name: "肯特级六号舰"
+    ship_type: CA
+    source_table: 6
+    source_row: 1
+  IBS-U-RAN-UNNAMED-T06-R02:
+    name: "澳大利亚"
+    english_name: "Australia"
+    class_name: "肯特级七号舰"
+    ship_type: CA
+    source_table: 6
+    source_row: 2
+  IBS-U-RAN-UNNAMED-T06-R03:
+    name: "帕斯"
+    english_name: "Perth"
+    class_name: "利安德级六号舰"
+    ship_type: CL
+    source_table: 6
+    source_row: 3
+  IBS-U-RAN-UNNAMED-T06-R04:
+    name: "霍巴特"
+    english_name: "Hobart"
+    class_name: "利安德级七号舰"
+    ship_type: CL
+    source_table: 6
+    source_row: 4

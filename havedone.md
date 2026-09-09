@@ -2,6 +2,42 @@
 
 本文件只追加完成记录；每次发布前补充对应提交哈希。
 
+## 2026-09-03：修复真实模式“友军编队相撞并受伤”漏洞（敌方同格时友军仍该急停）
+
+- **需求（用户）**：「我记得之前改进过状态机的逻辑，怎么还是会发生移动阶段不动和移动阶段和其他编队相撞的情况」，进一步确认「会有友军编队相撞情况」。经 AskUserQuestion 拍板本轮范围：**① 修友军碰撞漏洞（本轮）+ ② 计划期纵队解冲突（留后续轮，不做）**，未勾③/④。
+- **复现与根因**：引擎 `_resolve_movement`（engine.py:3039-3058）的真实模式友军保护是**按整格分组“全同侧”才生效**——只要同一脉冲同落一格的几艘船里混入一艘敌舰，`len({side}) != 1 → continue` 整组失去保护；随后伤害循环（3059-3066）不区分阵营，仍把组内友军×友军掷 `_resolve_ship_collision`（4063）并结算 `collision_result` 伤害。复现（想定 3 真实模式 seed 1）：轴军 `卡尔·加尔斯德`+`理夏德·拜岑` 与一艘同盟舰同落 D5 → `collision_check`（真检定）+ 两条 `collision_result`（1H/-4MF）落在两友军身上。
+- **修复（engine.py 一处）**：把“整组同侧才保护”改为**按同侧成组保护**——对每个同落格集合按阵营分组，任一阵营本格 ≥2 艘且尚未被停时，该阵营成员一律原地急停（回写 `destinations`+`stopped`+发 `formation_emergency_stop` IBS-R-RC-03）。语义：纯友军同格 {A,B} 照旧双双急停；**混入敌舰 {A,B,E}（漏洞场景）A/B 急停、E 单独进格，友军绝不被掷碰撞**；单友+单敌 {A,E} 无同侧对、敌我碰撞照旧保留；纯敌舰照旧。
+- **回归测试**：`tests/test_realistic_command.py` 新增 `test_friendly_collision_never_damages_when_enemy_shares_the_hex`——IBS-S-03 真实模式 seed 1 取轴两舰+同盟一舰放同一空白格相邻格各朝向它，分轴/盟两个 batch 各发 `plan="1"`，直接 `_resolve_movement(state)`；断言全程无同侧 `collision_check`/`collision_result`、A/B 留在起点、E 进目标格（该断言与骰子无关）。**fail-first 实证**：`git stash push -- engine.py` 复跑新用例 → 失败在 `collision_check 卡尔·加尔斯德与理夏德·拜岑碰撞检定 5`（友军真检定）；`git stash pop` 还原后通过。复现脚本 `C:/tmp/repro_friendly.py` 同证：修复前友军 `collision_result` 2 条 → 修复后消失，换 `formation_emergency_stop`，A/B 停短在起点 C6/D4、E 单舰进 D5。
+- **验证**：真实模式文件其余既有关键断言绿（18 passed，含全程无友军碰撞的 seed 回归系列；全剧本 legality 重用例在跑）。未部署（沿用「先做本地自查」）。**② 计划期纵队航迹解冲突**（治“本方两队挤停/整回合不推进”）作为后续轮待定。
+
+## 2026-09-03：编队上限放开到 8 + 建立《铁底湾大决战》美日全主力自定义剧本
+
+- **需求（用户）**：「帮我建立一个自定义剧本，包含美日双方所有战舰，提升编队数量为8个，根据历史建立战列线，雷击大队，屏卫大队，双方距离远一点」。经 AskUserQuestion 拍板：**重型全上、DD 每边 30**；**每侧 8 队（全剧 16 队）**；**全局放开到 8 队**；交付方式 = **先做本地自查，不上线**。
+- **上限放开**：`realistic_command.MAX_FORMATIONS_PER_SIDE` 4 → 8（`validate_setup` 文案同步），前端 `scenario.MAX_WELLS_PER_SIDE=8`、工坊「新建分队」与超限提示随动；`tests/test_realistic_command.py` 两条断言改为按常量（目标用例 3 passed，含 8 队上限拒绝），`tsc` 0 错误。
+- **剧本内容（111 艘 = 轴 54 / 同盟 57）**：轴（IJN）BB5 战列线「第一战列战队」（大和/武藏/信浓/长门/陆奥）+ CB2·CA4 巡洋战队 + 两组重巡战队 + 轻巡屏卫 + 三支「水雷战队」各 CL1+DD10；同盟（USN）两列战列线（衣阿华级 4 + 华盛顿/南达科塔/科罗拉多/西弗吉尼亚）+ CB2·CA4 重巡本队 + CA7 重巡前卫 + 轻巡屏卫 + 三支驱逐雷击大队各 CL1+DD10。DD 按 vp 降序取每边前 30。
+- **布阵（历史纵队 × 拉开初距）**：两军各自 8 支纵队并排占海，纵队间距 2 hex、队内纵队间距 1~2（战列线/重巡大队 sp2，驱逐大队 sp1）；轴在西南（领舰锚点 q=13，r=10..24，朝 2 东南接近）、同盟在东北（q=31，r=2..16，朝 5 西北接近），**两军前沿直线距离 18 hex**，全部落位在 46×39 海图内、无重叠（逐舰 label 用引擎同套 `HexCoord.neighbor(尾向)×间距` 推导）。
+- **本地验证（全程未上线）**：离线 `validate_definition` 0 错；重启本地 :8000 后 POST `/custom-scenarios` **201**（`IBS-CUSTOM-21E8908FE969`），GET 详情 111 艘、`setup.engine_default_formations` 轴/盟各 8 队且恰好覆盖全舰各一次；`POST /games` 真实模式热座建局成功，`suggested-orders` 每侧返回作者 8 队、无重复无遗漏；提交双方编队订单 `valid=true` 后推进开局，事件流生成 `axis-grand-1..8` 等 8+8 个 `formation_created`，阶段进入 `reinforcement`——**8 队/16 队真实模式在引擎内完整可玩**。未部署（沿用「先做本地自查」）。
+
+## 2026-09-03：修复剧本工坊「不能创建分队」与「选船未按舰种排序」
+
+- **需求（用户）**：「编组分队哪里不能创建分队，选船哪里按舰种排序，修复一下」。
+- **根因（编队）**：`editor/scenario.ts` 的 `moveShipInto`/`changeShipSide` 原先调 `dropShip`——摘出纵队时连 `ships` 名单一起删掉，拖拽"搬动"会静默删舰，导致只能在已有井里归队、无法新开编队。新增仅摘纵队的 `detachShip`（保留名单），`moveShipInto`/`changeShipSide` 改用它；`dropShip` 仅保留给「取消选择」。
+- **新增分队能力**：新增 `pairSolosIntoWell(state,side,leadId,followerId)`——取两艘散舰开一列新编队（先落者为领舰，index0），受「每侧 ≤4 队 ≥2 舰编队」上限约束。`FormationAssignStep` 头栏新增「＋ 新建分队」按钮（散舰 ≥2 且编队 <4 时可用，取最先两艘散舰）；散舰芯片本身也可作投放目标——把一艘散舰拖到另一艘上即开新队（`stopPropagation` 避免同时落到托盘空投区）。
+- **次要隐患（顺带修复）**：新列 id 原为 `{side}-col-{序号}`，拆分/配对后列序乱掉、序号复用会撞出两列同 id（丢舰）。`makeColumn` 改发全局自增唯一 id（名字与默认锚点仍按 ordinal），配对、拾取、托盘等追加路径全部安全；用 Vite SSR 跑断言验证：搬动/配对全程名单 5→8 不丢、无重复 columnId、配对后 `realisticCapable` 正确翻转、默认锚点纵队无布局错误。
+- **选船排序（按舰种）**：第 1 步「挑选舰船」列表排序从「可选用在前 + id」改为**按舰种分组**：BB→BC→CB→CA→CL→DD→APD→AV（主力舰在前，目录未收录的类型兜底排后），同型内可选舰（完整档案）在前、未建档在后，id 作稳定次序。
+- **验证**：`tsc -p tsconfig.json` 0 错误；Vite dev（:5173）对改动的 `CustomScenarioEditor.tsx`/`FormationAssignStep.tsx`/`scenario.ts` 转换均 200。未部署（沿用「先不上，我自查后再部署」）。
+
+## 2026-09-03（同日补充）：剧本工坊入口提供「导入剧本」选项（他人 .json / 服务器存档）
+
+- **需求（用户）**：「自定义剧本点进后应该提供一个导入剧本选项，可以导入其他人的json剧本或者在服务器上保存的剧本」。
+- **问题**：导入能力原本只在第 5 步（导出/导入/启动）卡片里，而顶栏步骤导航只允许回跳、不允许前跳，必须先从 0 步一路挑满舰船才够到第 5 步——点进工坊想导入根本没有入口。
+- **改动（前端 `CustomScenarioEditor.tsx` + `style.css`）**：
+  - 在步骤进度条下方加常驻工具条按钮「⇪ 导入剧本（他人 .json / 服务器存档）」，进入工坊即见，任一步骤可用。
+  - 点开为导入弹窗（`.editor-modal`，backdrop 点击/Esc 语义关闭）：① 选择他人导出的《铁底湾剧本-*.json》文件载入（复用现有 `onImportFile` 解析/校验）；② 载回服务器上已保存的剧本（列表即开即删，沿用 `customScenarios`/`loadSaved`/`deleteCustomScenario`）；③ 附带仍提供「以内置想定为模板改编」。
+  - `loadBuiltin`/`onImportFile` 改为返回成功布尔；载入成功即回到第 1 步回填编辑状态（`applyBodyWithMeta`），失败留在原页内联报错；已有选舰时导入前 `confirm` 提示会替换当前未保存内容。
+- **验证**：`tsc -p tsconfig.json` 0 错误；Vite dev 对 `CustomScenarioEditor.tsx` 转换 200。未部署。
+
+
 ## 2026-08-26（批次 5）：人类下订单可选状态机 AI 半自动指导 + 部署线上
 
 - **需求（用户）**：「我希望在人类对战时可以选择不同风格的状态机ai做半自动指导，就是自动选择，完成后同步服务器」。经 AskUserQuestion：**选择器范围 = 所有人类下订单的模式**（hotseat 双人 + vs_ai 人机 + llm 人类一方，教程关除外），每方各自选风格。
@@ -601,3 +637,60 @@
 - **精确复跑**：最后停止样本 `realistic-v1|br|0|2|22|formation_split|IBS-S-EM-01|0|allies` 使用原 seed 20783053 和双方原参数，在当前代码完整运行至二马第 12 回合，`ok=true`、友舰碰撞 0、鱼雷友伤 0，确认卷波舵损 120° 问题已由现有修复覆盖。
 - **原位续训**：2026-08-31 14:46 以 `--resume` 在原目录启动 PID 40732，面板端口仍为 8765。首次观察工作队列从 1,165 降至 1,091，持续产生新合法结果，`stalled=false`；旧失败行保留到对应确定性键重跑成功后由 SQLite 原位覆盖，不参与适应度或冠军注册。
 - **边界说明**：本条只记录恢复动作，不宣布训练完成或冠军可用。若出现新的 `ok=false`，训练仍按既定纪律停止并进入下一轮精确合法性收口。
+# 2026-09-02 舰船列表目录迁移
+
+状态：目录层完成；战斗参数全量迁移未宣称完成。
+
+- 证据：外部附件与 `resources/originals/` 副本 SHA-256 一致；DOCX 7 张表共 204 条舰船目录行，PDF 共 28 页且为图像页。
+- 变更：新增 `resources/derived/structured/ships/catalog.yaml`，保留舰名、英译、舰级、舰种、来源表/行及 4 条未决目录行；新增 `load_ship_catalog()` 与 204 条目录完整性测试；按 PDF 第 2–23 页逐舰视觉迁移至 `ship-records.yaml`，战斗记录从54条增至167条，重复卡按稳定 ID 去重。
+- 安全边界：目录层不向引擎提供战斗数值；167 条 PDF 舰卡记录含来源页并经原页视觉核验。目录中的另外139条没有对应具体战斗卡，仍列 IBS-Q-007，不以推测值填充；PDF 第24页仅为空白记录表模板。
+- 测试：`python -m pytest tests/test_ship_records.py -q --basetemp=C:\\temp\\ibs-pytest` → 6 passed；pytest 仍报告中文工作目录 `.pytest_cache` 写入警告，不影响测试结果。
+
+## 2026-09-03：全部棋子图绑定 + 选船名录去重（未提交）
+
+- **背景**：`D:\desktop\铁底湾\images` 的 241 张图是仓库 `resources/originals/assets/images`（262 张）的子集，棋子图早已齐全；真正缺的是「目录舰 → 棋子图」的绑定与重复项。180 条有完整记录的船本就 100% 已绑图（`validate_asset_bindings` 0 缺失）。
+- **绑定**：`counter-assets.json` 增加 135 条 catalog-only（有名录、无记录）舰的绑定（180 → 315）。生成规则 = 舰名归一化（Ⅰ→1、Ⅱ→2）匹配 PNG 文件名 + 舰型 token；人工特例 15 处（比叡/雾岛 art 标 BB、Denver「丹佛 vs 丹弗」、Leander 用新西兰旗图、布里斯级 ML、KM Z 舰、Selfridge 音译、大和取原版不取二马变体）。唯一无主舰图 `美国-ML-德雷福.png`（目录无此舰名）保持孤儿；`南达科他` 等 1 艘锁定舰无对应图。
+- **去重（/ship-catalog）**：名录里「同名同型已有完整记录的替身」不再单列（79 条：科罗拉多/弗莱彻/大和 → 其记录版…），只保留有档案那条；`/ship-catalog` 返回 319 → 240（180 完整 + 60 锁定）。锁定舰仍 `complete:false`，但 asset 按 catalog 绑定解析 → 有图即显示棋子预览。
+- **前端**：工坊选船列表按「完整 → 锁定」排序；锁定行置灰、棋子图去饱和，标「未建档 · 名录舰暂无战力数据，暂不可选」，说明文案注明同名同型已并入完整档案。
+- **保持**：不把未核验战力玩进引擎——约 60 艘真无记录的船照旧锁定（`docs/rules/open_questions.md` IBS-Q-007 已同步）；二马 24 舰 complete+asset 不变。
+- **验证**：`tests/test_ship_records.py`+`test_custom_scenarios.py` **14 passed**（新增去重/锁定 asset 例）；前端 `tsc` 0 错误；重启后端后 HTTP `/api/ship-catalog` = 240，complete 舰 0 缺图，R77/YAMATO 替身已消失，ERMA 仍 24。
+
+## 2026-09-03：大地图可选 + 巨舰剧本 92×78 副本 + 50 局真实自走统计（未部署）
+
+- **背景**：海图长宽乘二成可选「大战场」供工坊使用；在其上对微调后的巨舰自定义剧本打 50 局观察胜率/对局。胜利条件沿用引擎既有通用分支「回合到点 VP 多者胜」（验证局 `victory_reason=想定结束时胜利点领先`）。本地自查，未上线。
+- **尺寸参数化（后端）**：models/data/custom_scenarios/engine/realistic/llm/randomai/state_export/battle_report 把硬编码 46×39/34×27 推广为剧本可选 `map_columns/map_rows/printed_*`，缺省即原常量，内建剧本行为逐字节不变；列标签重复字母编解码推广到 128 列上限（q45→TT、q91→NNNN），`HexCoord` caps 放宽，`neighbor` 尺寸可选。
+- **大地图副本**：由 `IBS-CUSTOM-21E8908FE969`（111 舰 / 8+8 队 / 30 回合 / 真实）生成持久副本 `IBS-CUSTOM-BIG-GRAND`，题尾「 · 大战场 92×78」，`map_columns=92/map_rows=78`、printed=92×78 整图无暗区；排布为重新适配（队形内部紧凑原间距、两军整体拉开、正面间距 G=24 列可调，非机械 ×2）。原 46×39 剧本未动。
+- **前端（本轮无 node/tsc，按代码审读验证，残留风险）**：types/api/hexGeometry/HexMap/EditorDeploymentMap/editor/scenario/CustomScenarioEditor 支持按剧本尺寸渲染与工坊「地图尺寸」选择（标准 46×39 / 大战场 92×78）并往返。
+- **RealisticCommander 修复**：跟从舰归队修复循环此前按「重复中文舰名」归属（axis-grand-7 纵队内两艘都叫「卷波」），把真正违规舰留在纵队导致 64 次空转修复后驳回订单；现四处跟从舰错误信息内嵌 `ship.id`，恢复循环改为 id 优先、名字兜底。真实模式专项 pytest 35/35 绿；深 10 回合冒烟 oob=0。
+- **50 局自走（`sim_bigmap.py`，双 RealisticCommander 全自动）**：顺带修正 `run_match` 把非 LLM 的 RealisticCommander 点单 audit 数误当 LLM 请求、30 回合局在 ~21 回合被 `request_limit=128` 误裁 → `request_limit=100000`；`--db/--out` 相对路径改按仓库根解析。50 局（seed 1–50）10 worker 并行，单局均时 ~719 s，全程 ~1.5 h。
+- **结果（50/50 完成，崩溃 0）**：同盟 32 胜（64.0%）· 轴心 18 胜（36.0%）· 平局 0；平均净分 margin=轴−盟 −52.6（min −482 / max 270）；终盘 VP 轴 252.8 / 盟 305.4；全部打到 30 回合由 VP 分胜负；首接敌回合均 1.9（min 1 / max 4）；场均击沉：轴击沉盟舰 12.8、盟击沉轴舰 15.8（总计 639 / 792）；编队纪律（50 局累计）：紧急停车轴 2412 / 盟 2357，脱队撤退轴 1508 / 盟 1559——脱队体量与此前在源 46×39 图上观测一致，属 111 舰规模下真实指挥链的系统性行为、且两图对称，非大图缺陷。
+- **产物**：`backend/sim-bigmap-raw.jsonl`（50 行逐局）/ `sim-bigmap-report.json` / `sim-bigmap-report.md`（UTF-8 BOM）。
+
+## 2026-09-03：大地图功能部署上线 fuwenji.asia/tiedi（已部署）
+
+- **上线范围**：后端 backend/src（地图尺寸参数化 46×39/92×78 + 大战场副本生成）+ 前端（按剧本尺寸渲染 / 工坊地图尺寸选择）+ resources（catalog.yaml、counter-assets.json 等）+ 自定义剧本数据。前一日及更早批次此前均标注「未部署」，本次按用户指示正式发布。
+- **部署方式**：仓库无 git remote，走 README 的增量路径——本机 tar（排除 .git/rl/artifacts/tmp/node_modules/DB/报告/训练）→ paramiko 上传 → /opt/tiedi 解压 → `.venv/bin/pip install -e . --no-build-isolation` → `npm install && npm run build -- --base=/tiedi/` → systemd 重启 tiedi。
+- **服务器 DB 剧本 seed**：把本库 3 个自定义剧本（IBS-CUSTOM-21E8908FE969 天堂之战·源 / IBS-CUSTOM-BIG-GRAND 大战场 92×78 / IBS-CUSTOM-736BDFF957AB）`INSERT OR REPLACE` 进 `/opt/tiedi/backend/iron-bottom-sound.sqlite3`（新代码首连自动补建 custom_scenarios 表，schema 其余列零漂移）。
+- **大地图无法游玩 bug（已修，非代码缺陷）**：工坊保存/开局 92×78 剧本报 `Invalid hex label 'PPP15'...`——本地 8000 后端进程（17:07 启动）跑的是 models.py 列编解码推广**之前**的旧模块；新代码对全 111 舰 0 解析失败。重启本地后端后 PUT /custom-scenarios/IBS-CUSTOM-BIG-GRAND 200、POST /games 201。
+- **上线验证（全绿）**：`/tiedi/` 200；`/tiedi/api/scenarios` 返回 3 个自定义剧本；`/tiedi/assets/counters/1.png` 200；`POST /tiedi/api/games {scenario_id:IBS-CUSTOM-BIG-GRAND}` 201（game_id 875a2470…，phase reinforcement）；服务端 `tsc -b` 通过（前端 48 modules 构建成功，此前本地无 tsc 的前端残留风险随之消除）。
+
+## 2026-09-04：可携式存档、刷新续玩与阶段复盘（未提交）
+
+- **持久续玩**：首页新增 SQLite 已有对局卡片（只含想定、回合、阶段、模式和更新时间，不暴露舰船/封存订单）；当前局 id、阵营和模式写入浏览器 localStorage，刷新或后端重启后通过原 SQLite 自动恢复。
+- **可携式存档**：局内随时下载版本化 `.ibs-save.json`，包含权威 `GameState`、完整事件轨迹、SQLite 历史快照及必要的自定义想定定义；SHA-256 摘要对浏览器的 `5.0 → 5` JSON 数值规范化稳定。导入会校验格式/版本/摘要/事件连续性/快照前缀/Pydantic 模型，然后以新 game_id 原子克隆，不覆盖原局；LLM 密钥仍只在进程内存，不进存档。
+- **阶段复盘**：新增阵营视角复盘弹层，以滑杆/前后按钮切换真实落库快照，同屏显示当时地图、回合/阶段和裁决事件；每个历史状态都通过 `engine.observe(side)` 投影，不绕过战争迷雾。
+- **自动测试**：新增导出→浏览器数值往返→导入、篡改拒绝、快照定位和阵营投影用例；存档/API 聚焦 14 项通过，完整 Python 套件 **464/464 通过**，`git diff --check` 通过；仅有既有 Starlette 弃用警告和中文工作目录 `.pytest_cache` 写入警告。
+- **前端与真实交互**：TypeScript + Vite 生产构建通过（49 modules）。本地真实浏览器从首页续玩，触发下载，将实际文件重新导入并立即进局，打开复盘，返回后刷新仍恢复对局；390×844 实测存档/复盘/首页三键完整可见，`scrollWidth=clientWidth=390`，无横向溢出。损坏摘要文件在首页显示明确拒绝原因。
+
+## 2026-09-04：完整日志、炮击目标线与双方战果弹窗（未提交）
+
+- **完整日志**：侧栏改从阵营过滤的 `/games/{id}/events` 读取本局全部可见事件，不再受观察对象最近 40 条上限影响；显示总条数并可在“全部 / 最近 40 条”间切换，日志在侧栏内部滚动。
+- **炮击目标线**：炮击阶段实时解析当前 `OrderBatch.gunnery`，地图用金色虚线箭头连接每艘己方射手与已知目标，并标示舰名和投入炮位数；切换目标或炮位后跟随草稿更新，不改裁决状态。
+- **炮击战果**：炮击推进后弹出“我方取得的战果 / 敌方取得的战果”双栏摘要，列出齐射、命中、公开船体损伤及损伤 chips；严格只使用当前阵营收到的裁决事件，隐藏损伤不推测。多组炮位攻击同一目标按相邻 `gun_mount_attack` 的事件序列窗口归组，避免损伤重复计入。
+- **验证**：`tsc -b` 与 Vite 生产构建通过（50 modules）。真实浏览器验证 16 条目标线、1496 条完整日志以及全部/40 条切换；隔离副本完成第 6 回合炮击后，弹窗正确汇总我方 18 次齐射/3 命中、敌方 57 次齐射/11 命中，0 命中条目无重复损伤；桌面双栏及 700px 单栏布局均无遮挡。
+
+## 2026-09-05：Windows 双击一键启动入口（未提交）
+
+- **入口**：项目根目录新增 `start-game.bat`；双击即可自动切换到项目目录，并用放宽当前进程执行策略的 PowerShell 调用既有 `scripts/start-game.ps1`。
+- **失败反馈**：保留 PowerShell 原始退出码；失败时窗口暂停并提示查看 `tmp/runtime/backend-error.log` 与 `frontend-error.log`，避免双击后错误窗口瞬间消失。
+- **验证**：从项目上级目录实际冷启动成功；`http://127.0.0.1:5173` 与 `http://127.0.0.1:8000/scenarios` 均返回 HTTP 200，PID 文件对应 Python/Node 进程存活，`git diff --check` 通过。

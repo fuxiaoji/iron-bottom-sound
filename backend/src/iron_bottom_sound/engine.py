@@ -317,7 +317,9 @@ class IronBottomEngine:
             or bool(track.contact_ship_ids)
         ]
         for track in tracks:
-            self._normalize_torpedo_display_history(track)
+            self._normalize_torpedo_display_history(
+                track, columns=state.map_columns, rows=state.map_rows
+            )
         markers: list[MarkerState] = []
         for marker in state.markers:
             if marker.kind == "contact":
@@ -338,6 +340,10 @@ class IronBottomEngine:
             max_turns=state.max_turns,
             phase=state.phase,
             visibility=int(state.visibility[side.value]),
+            map_columns=state.map_columns,
+            map_rows=state.map_rows,
+            printed_columns=state.printed_columns,
+            printed_rows=state.printed_rows,
             ships=ships,
             torpedo_tracks=tracks,
             markers=markers,
@@ -358,7 +364,9 @@ class IronBottomEngine:
         )
 
     @classmethod
-    def _normalize_torpedo_display_history(cls, track: TorpedoTrack) -> None:
+    def _normalize_torpedo_display_history(
+        cls, track: TorpedoTrack, *, columns: int = MAP_COLUMNS, rows: int = MAP_ROWS
+    ) -> None:
         """Return a straight, current-coordinate trail, including for legacy saves.
 
         Older saves may contain history points from several world-coordinate
@@ -370,7 +378,7 @@ class IronBottomEngine:
         cursor = track.position
         for _ in range(track.distance_travelled):
             q, r = cursor.q - dq, cursor.r - dr
-            if not cls._coord_on_map(q, r):
+            if not cls._coord_on_map(q, r, columns=columns, rows=rows):
                 break
             cursor = HexCoord(q=q, r=r)
             visible_reversed.append(cursor)
@@ -812,8 +820,8 @@ class IronBottomEngine:
 
         cells = [
             HexCoord(q=q, r=row - (q - (q & 1)) // 2)
-            for q in range(MAP_COLUMNS)
-            for row in range(MAP_ROWS)
+            for q in range(state.map_columns)
+            for row in range(state.map_rows)
         ]
         own_positions = [
             ship.position for ship in state.ships.values()
@@ -1006,7 +1014,10 @@ class IronBottomEngine:
             )
             launch_positions: list[dict[str, Any]] = []
             if movement:
-                trajectory, _ = self.movement_trajectory(ship, movement.plan, self.movement_commands(movement))
+                trajectory, _ = self.movement_trajectory(
+                    ship, movement.plan, self.movement_commands(movement),
+                    columns=state.map_columns, rows=state.map_rows,
+                )
                 launch_positions = [{
                     "mf": 0,
                     "hex": ship.position.model_dump(mode="json"),
@@ -1078,7 +1089,10 @@ class IronBottomEngine:
         definition = self.rules.torpedoes[torpedo_type]
         setting = definition["settings"][setting_index]
         cycle = setting["speed"]
-        position = self._torpedo_anchor_hex(launch_hex, ship_heading or heading, launch_angle)
+        position = self._torpedo_anchor_hex(
+            launch_hex, ship_heading or heading, launch_angle,
+            columns=state.map_columns, rows=state.map_rows,
+        )
         path: list[HexCoord] = [position]
         distance_travelled = 0
         range_remaining = int(setting["range"])
@@ -1091,7 +1105,9 @@ class IronBottomEngine:
                 allowance = int(cycle[rel_turn % 3])
                 continue
             try:
-                next_position = position.neighbor(heading)
+                next_position = position.neighbor(
+                    heading, columns=state.map_columns, rows=state.map_rows
+                )
             except ValueError:
                 obstacle = "edge"
                 break
@@ -1120,7 +1136,9 @@ class IronBottomEngine:
             return position
         for _ in range(turns * max(0, ship.current_speed)):
             try:
-                position = position.neighbor(ship.heading)
+                position = position.neighbor(
+                    ship.heading, columns=state.map_columns, rows=state.map_rows
+                )
             except ValueError:
                 break
         return position
@@ -1136,7 +1154,10 @@ class IronBottomEngine:
         definition = self.rules.torpedoes[torpedo_type]
         setting = definition["settings"][setting_index]
         cycle = setting["speed"]
-        position = self._torpedo_anchor_hex(launch_hex, ship_heading or heading, launch_angle)
+        position = self._torpedo_anchor_hex(
+            launch_hex, ship_heading or heading, launch_angle,
+            columns=state.map_columns, rows=state.map_rows,
+        )
         target_position = target.position
         target_speed = max(0, target.current_speed)
         distance = 0
@@ -1146,7 +1167,9 @@ class IronBottomEngine:
         target_moved = min(launch_at_mf, target_speed)
         for _ in range(target_moved):
             try:
-                target_position = target_position.neighbor(target.heading)
+                target_position = target_position.neighbor(
+                    target.heading, columns=state.map_columns, rows=state.map_rows
+                )
             except ValueError:
                 break
         while range_remaining > 0:
@@ -1159,7 +1182,9 @@ class IronBottomEngine:
             for _ in range(max(allowance, target_remaining)):
                 if allowance > 0 and range_remaining > 0:
                     try:
-                        next_position = position.neighbor(heading)
+                        next_position = position.neighbor(
+                            heading, columns=state.map_columns, rows=state.map_rows
+                        )
                     except ValueError:
                         return None, max(1, distance), "edge", rel_turn
                     if self._terrain_impassable(state, next_position):
@@ -1170,7 +1195,9 @@ class IronBottomEngine:
                     allowance -= 1
                 if target_remaining > 0:
                     try:
-                        target_position = target_position.neighbor(target.heading)
+                        target_position = target_position.neighbor(
+                            target.heading, columns=state.map_columns, rows=state.map_rows
+                        )
                     except ValueError:
                         pass
                     target_moved += 1
@@ -1453,7 +1480,10 @@ class IronBottomEngine:
                 commands = self.movement_commands(order)
                 self.validate_movement_commands(commands)
                 cost = self.movement_cost(order.plan, commands)
-                trajectory, _ = self.movement_trajectory(ship, order.plan, commands)
+                trajectory, _ = self.movement_trajectory(
+                    ship, order.plan, commands,
+                    columns=state.map_columns, rows=state.map_rows,
+                )
                 if any(self._terrain_impassable(state, position) for position, _ in trajectory):
                     errors.append(f"{order.ship_id}: movement plan enters land")
             except ValueError as error:
@@ -1615,7 +1645,10 @@ class IronBottomEngine:
                 errors.append(f"{order.ship_id}: missing sealed movement plan")
                 continue
             commands = self.movement_commands(movement)
-            trajectory, _ = self.movement_trajectory(ship, movement.plan, commands)
+            trajectory, _ = self.movement_trajectory(
+                ship, movement.plan, commands,
+                columns=state.map_columns, rows=state.map_rows,
+            )
             if order.launch_at_mf > len(trajectory):
                 errors.append(f"{order.ship_id}: launch MF exceeds movement plan")
             else:
@@ -1896,25 +1929,31 @@ class IronBottomEngine:
         return sum(int(token) if token.isdigit() else (1 if token in {"PP", "SS", "LL", "RR"} else 0) for token in tokens)
 
     def movement_trajectory(
-        self, ship: ShipState, plan: str, commands: list[str] | None = None
+        self, ship: ShipState, plan: str, commands: list[str] | None = None,
+        *, columns: int | None = None, rows: int | None = None,
     ) -> tuple[list[tuple[HexCoord, int]], int]:
         if not ship.position:
             return [], ship.heading
         parsed = commands if commands is not None else self.movement_commands(MovementOrder(ship_id=ship.id, plan=plan))
         if not parsed:
             return [], ship.heading
-        program, heading = self._movement_program(ship.position, ship.heading, parsed)
+        program, heading = self._movement_program(
+            ship.position, ship.heading, parsed, columns=columns, rows=rows
+        )
         return [(position, pulse_heading) for position, pulse_heading, _ in program], heading
 
     def _movement_program(
-        self, position: HexCoord, initial_heading: int, commands: list[str]
+        self, position: HexCoord, initial_heading: int, commands: list[str],
+        *, columns: int | None = None, rows: int | None = None,
     ) -> tuple[list[tuple[HexCoord, int, int | None]], int]:
+        columns = MAP_COLUMNS if columns is None else columns
+        rows = MAP_ROWS if rows is None else rows
         heading = initial_heading
         trajectory: list[tuple[HexCoord, int, int | None]] = []
         for command in commands:
             if command == "advance":
                 try:
-                    position = position.neighbor(heading)
+                    position = position.neighbor(heading, columns=columns, rows=rows)
                     trajectory.append((position, heading, None))
                 except ValueError:
                     trajectory.append((position, heading, heading))
@@ -2016,7 +2055,9 @@ class IronBottomEngine:
         if not ship.position:
             return True
         try:
-            ahead = ship.position.neighbor(ship.heading)
+            ahead = ship.position.neighbor(
+                ship.heading, columns=state.map_columns, rows=state.map_rows
+            )
         except ValueError:
             return True
         return self._terrain_impassable(state, ahead)
@@ -2038,7 +2079,9 @@ class IronBottomEngine:
         circle_side = ship.forced_turn_side if ship.forced_circle_turns else None
         if cost < maximum:
             try:
-                target = position.neighbor(heading)
+                target = position.neighbor(
+                    heading, columns=state.map_columns, rows=state.map_rows
+                )
             except ValueError:
                 target = None
             if target is not None and not IronBottomEngine._terrain_impassable(state, target):
@@ -2250,7 +2293,10 @@ class IronBottomEngine:
             # drag continuation: hexes are appended to the commands prefix and
             # turned from the prefix's end state, not the ship's real position
             prefix = commands or []
-            program, prefix_heading = self._movement_program(ship.position, ship.heading, prefix)
+            program, prefix_heading = self._movement_program(
+                ship.position, ship.heading, prefix,
+                columns=state.map_columns, rows=state.map_rows,
+            )
             end_pos = program[-1][0] if program else ship.position
             try:
                 continuation = IronBottomEngine._path_to_commands(end_pos, prefix_heading, hexes)
@@ -2273,7 +2319,10 @@ class IronBottomEngine:
             self.validate_movement_commands(commands)
         except ValueError as error:
             errors.append(str(error))
-        program, final_heading = self._movement_program(ship.position, ship.heading, commands)
+        program, final_heading = self._movement_program(
+            ship.position, ship.heading, commands,
+            columns=state.map_columns, rows=state.map_rows,
+        )
         cost = self.movement_cost("", commands)
         minimum, maximum = self._legal_speed_range(ship, state.turn)
         stay_only = self._advance_impossible(state, ship)
@@ -2311,7 +2360,9 @@ class IronBottomEngine:
         last = commands[-1] if commands else None
         if cost < maximum:
             try:
-                target = current_pos.neighbor(final_heading)
+                target = current_pos.neighbor(
+                    final_heading, columns=state.map_columns, rows=state.map_rows
+                )
             except ValueError:
                 target = None
             if target is not None and not self._terrain_impassable(state, target):
@@ -2431,7 +2482,9 @@ class IronBottomEngine:
             if not marker:
                 errors.append(f"Non-owned hidden contact {order.marker_id}")
                 continue
-            if not self._map_edge(order.entry_hex):
+            if not self._map_edge(
+                order.entry_hex, columns=state.map_columns, rows=state.map_rows
+            ):
                 errors.append(f"Hidden contact {order.marker_id} must start on a map edge")
             if marker.contact_truth == "real" and not order.ship_ids:
                 errors.append(f"Real hidden contact {order.marker_id} requires a formation")
@@ -2447,7 +2500,9 @@ class IronBottomEngine:
                     for position in original:
                         q = order.entry_hex.q + position.q - anchor.q  # type: ignore[union-attr]
                         r = order.entry_hex.r + position.r - anchor.r  # type: ignore[union-attr]
-                        if not self._coord_on_map(q, r):
+                        if not self._coord_on_map(
+                            q, r, columns=state.map_columns, rows=state.map_rows
+                        ):
                             errors.append(f"{order.marker_id} translated formation leaves the map")
                             break
         expected = {
@@ -2479,21 +2534,28 @@ class IronBottomEngine:
                 cost = self.movement_cost(order.plan, commands)
                 if cost not in {4, 5}:
                     errors.append(f"{marker.id}: hidden contacts must move at 4 or 5 MF")
-                trajectory, _ = self._marker_trajectory(marker, commands)
+                trajectory, _ = self._marker_trajectory(
+                    marker, commands,
+                    columns=state.map_columns, rows=state.map_rows,
+                )
                 if any(self._terrain_impassable(state, position) for position, _ in trajectory):
                     errors.append(f"{marker.id}: hidden contact plan enters land")
             except ValueError as error:
                 errors.append(f"{marker.id}: {error}")
 
     @staticmethod
-    def _map_edge(coord: HexCoord) -> bool:
+    def _map_edge(
+        coord: HexCoord, *, columns: int = MAP_COLUMNS, rows: int = MAP_ROWS
+    ) -> bool:
         display_row = coord.r + (coord.q - (coord.q & 1)) // 2
-        return coord.q in {0, MAP_COLUMNS - 1} or display_row in {0, MAP_ROWS - 1}
+        return coord.q in {0, columns - 1} or display_row in {0, rows - 1}
 
     @staticmethod
-    def _coord_on_map(q: int, r: int) -> bool:
+    def _coord_on_map(
+        q: int, r: int, *, columns: int = MAP_COLUMNS, rows: int = MAP_ROWS
+    ) -> bool:
         display_row = r + (q - (q & 1)) // 2
-        return 0 <= q < MAP_COLUMNS and 0 <= display_row < MAP_ROWS
+        return 0 <= q < columns and 0 <= display_row < rows
 
     @staticmethod
     def _terrain_impassable(state: GameState, coord: HexCoord) -> bool:
@@ -2573,7 +2635,14 @@ class IronBottomEngine:
                 rule=self._rule("IBS-R-09.1", 13, "9.1 隐蔽标记算子"),
             )
 
-    def _marker_trajectory(self, marker: MarkerState, commands: list[str]) -> tuple[list[tuple[HexCoord, int]], int]:
+    def _marker_trajectory(
+        self,
+        marker: MarkerState,
+        commands: list[str],
+        *,
+        columns: int = MAP_COLUMNS,
+        rows: int = MAP_ROWS,
+    ) -> tuple[list[tuple[HexCoord, int]], int]:
         if not marker.position or not marker.heading:
             return [], marker.heading or 1
         heading = marker.heading
@@ -2581,7 +2650,7 @@ class IronBottomEngine:
         trajectory: list[tuple[HexCoord, int]] = []
         for command in commands:
             if command == "advance":
-                position = position.neighbor(heading)
+                position = position.neighbor(heading, columns=columns, rows=rows)
                 trajectory.append((position, heading))
             elif command == "turn_port_60":
                 heading = 6 if heading == 1 else heading - 1
@@ -2801,7 +2870,8 @@ class IronBottomEngine:
             order.launch_angle or "A",
         )
         anchor_hex = self._torpedo_anchor_hex(
-            order.launch_hex, launch_heading, order.launch_angle or "A"
+            order.launch_hex, launch_heading, order.launch_angle or "A",
+            columns=state.map_columns, rows=state.map_rows,
         )
         track = TorpedoTrack(
             id=f"TT-{state.turn}-{ship.id}-{launcher.id}-{len(state.torpedo_tracks)+1}",
@@ -2874,7 +2944,10 @@ class IronBottomEngine:
         for marker_id, marker in contact_markers.items():
             order = contact_orders[marker_id]
             commands = self.movement_commands(MovementOrder(ship_id=marker_id, plan=order.plan))
-            trajectory, heading = self._marker_trajectory(marker, commands)
+            trajectory, heading = self._marker_trajectory(
+                marker, commands,
+                columns=state.map_columns, rows=state.map_rows,
+            )
             contact_paths[marker_id] = trajectory
             contact_headings[marker_id] = heading
             marker.movement_rate = self.movement_cost(order.plan, commands)
@@ -2900,7 +2973,10 @@ class IronBottomEngine:
                 turn = next((command for command in commands if command != "advance"), None)
                 if turn:
                     ship.forced_turn_side = "port" if "port" in turn else "starboard"
-            trajectory, heading = self._movement_program(ship.position, ship.heading, commands)
+            trajectory, heading = self._movement_program(
+                ship.position, ship.heading, commands,
+                columns=state.map_columns, rows=state.map_rows,
+            )
             paths[ship.id] = trajectory
             final_headings[ship.id] = heading
             planned_end_labels[ship.id] = (
@@ -3041,21 +3117,30 @@ class IronBottomEngine:
                 # A simultaneous same-hex entry or swap therefore produces a
                 # deterministic emergency stop, never a die-rolled friendly
                 # ram. This applies across formations and to a newly detached
-                # ship executing an original-rule forced movement.
+                # ship executing an original-rule forced movement.  Protection
+                # is granted per side, not per whole hex group: when an enemy
+                # shares the contested hex, the friendly pair must still be
+                # stopped rather than rolling a die-rolled friendly ram.
                 for collision_set in collision_sets:
                     ids = sorted(collision_set)
-                    if len(ids) < 2 or len({state.ships[ship_id].side for ship_id in ids}) != 1:
-                        continue
+                    by_side: dict[Side, list[str]] = {}
                     for ship_id in ids:
-                        destinations[ship_id] = state.ships[ship_id].position  # type: ignore[assignment]
-                        stopped.add(ship_id)
-                    self._event(
-                        state,
-                        "formation_emergency_stop",
-                        "、".join(state.ships[ship_id].name for ship_id in ids) + " 紧急停车，避免友舰相撞",
-                        payload={"ship_ids": ids, "movement_impulse": impulse + 1},
-                        rule=self._rule("IBS-R-RC-03", None, "真实模式：友舰航路解冲突"),
-                    )
+                        by_side.setdefault(state.ships[ship_id].side, []).append(ship_id)
+                    for side, members in by_side.items():
+                        newly = [ship_id for ship_id in members if ship_id not in stopped]
+                        if len(newly) < 2:
+                            continue
+                        for ship_id in newly:
+                            destinations[ship_id] = state.ships[ship_id].position  # type: ignore[assignment]
+                            stopped.add(ship_id)
+                        self._event(
+                            state,
+                            "formation_emergency_stop",
+                            "、".join(state.ships[ship_id].name for ship_id in newly)
+                            + " 紧急停车，避免友舰相撞",
+                            payload={"ship_ids": newly, "movement_impulse": impulse + 1},
+                            rule=self._rule("IBS-R-RC-03", None, "真实模式：友舰航路解冲突"),
+                        )
             for collision_set in sorted(collision_sets, key=lambda group: sorted(group)):
                 ids = sorted(collision_set)
                 for left_index, left_id in enumerate(ids):
@@ -3128,7 +3213,9 @@ class IronBottomEngine:
                 ):
                     continue
                 try:
-                    next_position = track.position.neighbor(track.heading)
+                    next_position = track.position.neighbor(
+                        track.heading, columns=state.map_columns, rows=state.map_rows
+                    )
                 except ValueError:
                     track.range_remaining = 0
                     continue
@@ -3521,7 +3608,15 @@ class IronBottomEngine:
         relative = int(self.rules.torpedo_launch_directions["relative_heading"][side][angle])
         return ((ship_heading - 1 + relative) % 6) + 1
 
-    def _torpedo_anchor_hex(self, launch_hex: HexCoord, ship_heading: int, angle: str) -> HexCoord:
+    def _torpedo_anchor_hex(
+        self,
+        launch_hex: HexCoord,
+        ship_heading: int,
+        angle: str,
+        *,
+        columns: int = MAP_COLUMNS,
+        rows: int = MAP_ROWS,
+    ) -> HexCoord:
         """鱼雷算子起点：沿舰船头轴偏移（A/Y 在舰格；B 向船尾外 1 格；X 向船头外 1 格）。
 
         偏移取朝向以发射时点舰首为准（"朝船头方向/朝船头反方向一格"），与鱼雷行进方向无关。
@@ -3532,7 +3627,7 @@ class IronBottomEngine:
             return launch_hex
         direction = ship_heading if offset > 0 else ((ship_heading + 2) % 6) + 1
         try:
-            return launch_hex.neighbor(direction)
+            return launch_hex.neighbor(direction, columns=columns, rows=rows)
         except ValueError:
             return launch_hex
 
@@ -4053,7 +4148,9 @@ class IronBottomEngine:
             ):
                 continue
             try:
-                position = ship.position.neighbor(ship.heading)
+                position = ship.position.neighbor(
+                    ship.heading, columns=state.map_columns, rows=state.map_rows
+                )
             except ValueError:
                 # The sinking counter itself remains on the last printed edge
                 # hex; it is then replaced by the wreck marker.
@@ -4252,7 +4349,9 @@ class IronBottomEngine:
             distance = 0 if roll == 1 else (2 if roll == 6 else 1)
             for _ in range(distance):
                 try:
-                    marker.position = marker.position.neighbor(2)
+                    marker.position = marker.position.neighbor(
+                        2, columns=state.map_columns, rows=state.map_rows
+                    )
                 except ValueError:
                     marker.position = None
                     break

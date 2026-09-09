@@ -15,6 +15,7 @@ from iron_bottom_sound.models import (
     Side,
 )
 from iron_bottom_sound.realistic_command import (
+    MAX_FORMATIONS_PER_SIDE,
     RealisticCommander,
     _best_formation_cohort,
     _withdrawal_order,
@@ -92,7 +93,7 @@ def test_default_setup_assigns_every_ship_once_and_is_private() -> None:
         orders = default_setup_orders(state, side)
         owned = {ship.id for ship in state.ships.values() if ship.side == side}
         listed = [ship_id for order in orders for ship_id in order.ship_ids]
-        assert 1 <= len(orders) <= 4
+        assert 1 <= len(orders) <= MAX_FORMATIONS_PER_SIDE
         assert set(listed) == owned
         assert len(listed) == len(set(listed))
         assert all(len(order.ship_ids) >= 2 for order in orders)
@@ -104,7 +105,7 @@ def test_default_setup_assigns_every_ship_once_and_is_private() -> None:
     assert allies.formations and all(item.side == Side.ALLIES for item in allies.formations)
 
 
-def test_setup_rejects_fifth_formation_and_duplicate_membership() -> None:
+def test_setup_rejects_formation_count_beyond_cap_and_duplicate_membership() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", 1, GameOptions(realistic_command=True))
     orders = default_setup_orders(state, Side.ALLIES)
@@ -114,11 +115,11 @@ def test_setup_rejects_fifth_formation_and_duplicate_membership() -> None:
     batch = OrderBatch(
         side=Side.ALLIES,
         phase=Phase.FORMATION_SETUP,
-        formation_setup=orders + [duplicate, deepcopy(duplicate), deepcopy(duplicate), deepcopy(duplicate)],
+        formation_setup=orders + [duplicate] * MAX_FORMATIONS_PER_SIDE,  # pushes len > cap
     )
     result = engine.validate_orders(state.game_id, batch)
     assert not result.valid
-    assert any("one to four" in error for error in result.errors)
+    assert any(f"one to {MAX_FORMATIONS_PER_SIDE}" in error for error in result.errors)
 
 
 def test_leader_order_expands_to_every_attached_member() -> None:
@@ -402,6 +403,69 @@ def test_realistic_legal_actions_include_valid_editable_formation_starting_order
         formation_movement=suggested,
     )
     assert engine.validate_orders(game_id, batch).valid
+
+
+def test_friendly_collision_never_damages_when_enemy_shares_the_hex() -> None:
+    """混战同格既含友军对、又含敌舰时，友军对必须仍被紧急停车，不得掷友军碰撞。
+
+    回归：engine._resolve_movement 的友军保护原先按“整组是否全同侧”生效，
+    同一脉冲同落一格的组里混进一艘敌舰即整体跳过保护，随后伤害循环把组内
+    友军×友军也照常掷 collision_check/collision_result。
+    """
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", 1, GameOptions(realistic_command=True))
+    axis_ships = [ship for ship in state.ships.values() if ship.side == Side.AXIS and ship.position]
+    ally_ships = [ship for ship in state.ships.values() if ship.side == Side.ALLIES and ship.position]
+    a_ship, b_ship = axis_ships[0], axis_ships[1]
+    enemy = ally_ships[0]
+
+    occupied = {ship.position for ship in state.ships.values() if ship.position}
+    target = next(
+        HexCoord(q=q, r=r)
+        for q in range(3, 43) for r in range(2, 36)
+        if HexCoord(q=q, r=r) not in occupied
+        and all(HexCoord(q=q, r=r).neighbor(h) not in occupied for h in range(1, 7))
+    )
+
+    def opposite(heading: int) -> int:
+        return ((heading + 2) % 6) + 1
+
+    starts: dict[str, HexCoord] = {}
+    for ship, heading in ((a_ship, 1), (b_ship, 3), (enemy, 5)):
+        ship.position = target.neighbor(opposite(heading))
+        ship.heading = heading
+        ship.current_speed = 3
+        ship.previous_speed = 3
+        ship.command_status = "attached"
+        starts[ship.id] = ship.position
+
+    state.sealed_orders[f"{state.turn}:{Phase.MOVEMENT_PLANNING.value}"] = {
+        Side.AXIS.value: OrderBatch(
+            side=Side.AXIS,
+            phase=Phase.MOVEMENT_PLANNING,
+            movement=[MovementOrder(ship_id=ship.id, plan="1") for ship in (a_ship, b_ship)],
+        ),
+        Side.ALLIES.value: OrderBatch(
+            side=Side.ALLIES,
+            phase=Phase.MOVEMENT_PLANNING,
+            movement=[MovementOrder(ship_id=enemy.id, plan="1")],
+        ),
+    }
+    before = len(state.events)
+    engine._resolve_movement(state)
+    events = state.events[before:]
+
+    friendly_events = [
+        event for event in events
+        if event.type in {"collision_check", "collision_result"}
+        and event.payload.get("ships")
+        and state.ships[event.payload["ships"][0]].side
+        == state.ships[event.payload["ships"][1]].side
+    ]
+    assert not friendly_events, [event.message for event in friendly_events]
+    assert a_ship.position == starts[a_ship.id]  # 友军对双双急停在起点
+    assert b_ship.position == starts[b_ship.id]
+    assert enemy.position == target  # 敌舰单独进入争议格
 
 
 @pytest.mark.parametrize(("axis_profile", "allies_profile", "seed"), [

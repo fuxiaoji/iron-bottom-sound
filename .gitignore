@@ -15,6 +15,10 @@ frontend/dist/
 *.egg-info/
 backend/*.sqlite3
 backend/reports/
+backend/backend/
+backend/sim-bigmap-raw.jsonl
+backend/sim-bigmap-report.json
+backend/sim-bigmap-report.md
 rl/results/psro-*/results.sqlite3
 rl/results/psro-*/*.tmp
 rl/results/psro-torpedo-v1/

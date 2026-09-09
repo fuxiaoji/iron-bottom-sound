@@ -39,3 +39,24 @@ def load_ship_records() -> dict[str, ShipRecord]:
             payload["id"] = record_id
             records[record_id] = ShipRecord.model_validate(payload)
     return records
+
+
+def load_ship_catalog() -> dict[str, dict[str, Any]]:
+    """Load the complete name/class catalog without making unverified stats playable.
+
+    The catalog is deliberately separate from ``load_ship_records``: the ship-list
+    document identifies ships, while only manually verified record sheets may
+    provide combat data to the engine.
+    """
+    document = read_yaml(STRUCTURED / "ships" / "catalog.yaml")
+    catalog = document.get("records", {})
+    if not isinstance(catalog, dict):
+        raise ValueError("Ship catalog records must be a mapping")
+    required = {"name", "english_name", "class_name", "ship_type", "source_table", "source_row"}
+    for record_id, entry in catalog.items():
+        if not record_id.startswith("IBS-U-"):
+            raise ValueError(f"Invalid ship catalog id {record_id}")
+        missing = required - set(entry)
+        if missing:
+            raise ValueError(f"Ship catalog entry {record_id} missing {sorted(missing)}")
+    return catalog

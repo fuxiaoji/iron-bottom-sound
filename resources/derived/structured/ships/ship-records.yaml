@@ -156,8 +156,287 @@ families:
       - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
       - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: uk-21-mk9
+  ijn-kamikaze-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows: [2, 2, 1]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4.7, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 4.7, arcs: [port, starboard, stern]}
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    torpedo_type: jp-21
+  ijn-mutsuki-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows: [2, 2, 1]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4.7, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 4.7, arcs: [port, starboard, stern]}
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    torpedo_type: jp-24-type90
+  ijn-nagato-bb:
+    ship_type: BB
+    displacement_band: F
+    hull_rows: [5, 5, 4]
+    speed_damage_track: [[5, 4, 3, 2, 1], [4, 3, 2, 1], [4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+      - {id: P4, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+      - {id: P5, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+      - {id: P6, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+    torpedo_launchers:
+      - {id: TT-P, position: port, arcs: [port], torpedoes: 1, reloads: 1}
+      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 1, reloads: 1}
+    torpedo_type: jp-24-type93
+    armour: {primary: 11, belt: 11, bridge: 11}
+    fire_control: true
+    aircraft: true
+  ijn-kako-ca:
+    ship_type: CA
+    displacement_band: C
+    hull_rows: [3, 3, 2]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 7.9, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: stern, firepower: 1, caliber: 7.9, arcs: [port, starboard, stern]}
+    torpedo_launchers:
+      - {id: TT-P, position: port, arcs: [port], torpedoes: 1, reloads: 1}
+      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 1, reloads: 1}
+    torpedo_type: jp-24-type93
+    armour: {primary: 1, belt: 3, bridge: 0}
+    fire_control: true
+    aircraft: true
+  usn-colorado-bb:
+    ship_type: BB
+    displacement_band: F
+    hull_rows: [4, 4, 4]
+    speed_damage_track: [[4, 3, 2, 1], [3, 2, 1], [3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 16, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+      - {id: P4, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+      - {id: P5, kind: primary, position: stern, firepower: 2, caliber: 16, arcs: [port, starboard, stern]}
+      - {id: P6, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: port, firepower: 1, caliber: 5, arcs: [port]}
+      - {id: S2, kind: secondary, position: starboard, firepower: 1, caliber: 5, arcs: [starboard]}
+    armour: {primary: 18, belt: 13, bridge: 16}
+    fire_control: true
+  usn-omaha-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows: [3, 3, 2]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 6, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: stern, firepower: 3, caliber: 6, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: port, firepower: 1, caliber: 3, arcs: [port]}
+      - {id: S2, kind: secondary, position: starboard, firepower: 1, caliber: 3, arcs: [starboard]}
+    torpedo_launchers:
+      - {id: TT-P, position: port, arcs: [port], torpedoes: 1, reloads: 0}
+      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 1, reloads: 0}
+    torpedo_type: us-21-mk15-1942
+    armour: {primary: 2, belt: 3}
+  ijn-jintsu-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows: [2, 2, 2]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 5.5, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 5.5, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: bow, firepower: 1, caliber: 3, arcs: [bow, port, starboard]}
+      - {id: S2, kind: secondary, position: stern, firepower: 1, caliber: 3, arcs: [port, starboard, stern]}
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    torpedo_type: jp-24-type90
+    armour: {primary: 1, belt: 2, bridge: 2}
+  ijn-tatsuta-cl:
+    ship_type: CL
+    displacement_band: A
+    hull_rows: [2, 2, 2]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 5.5, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 5.5, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: midships, firepower: 1, caliber: 3, arcs: [port, starboard]}
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    torpedo_type: jp-21
+    armour: {belt: 2}
+  usn-4in-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows: [2, 2, 1]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: midships, firepower: 1, caliber: 4, arcs: [port, starboard]}
+      - {id: P3, kind: primary, position: stern, firepower: 1, caliber: 4, arcs: [port, starboard, stern]}
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    torpedo_type: us-21-mk15-1942
+  ijn-apd-mutsuki:
+    ship_type: APD
+    displacement_band: A
+    hull_rows: [1, 1, 1]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4.7, arcs: [bow, port, starboard]}
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    torpedo_type: jp-24-type8
+  ijn-chokai-ca:
+    ship_type: CA
+    displacement_band: C
+    hull_rows: [4, 4, 3]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 8, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 8, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 8, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
+      - {id: S2, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
+    torpedo_launchers:
+      - {id: TT-P, position: port, arcs: [port], torpedoes: 2, reloads: 1}
+      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 2, reloads: 1}
+    torpedo_type: jp-24-type93
+    armour: {primary: 1, belt: 4, bridge: 1}
+  ijn-tenryu-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows: [3, 3, 2]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 5.5, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: stern, firepower: 1, caliber: 5.5, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: bow, firepower: 1, caliber: 3, arcs: [bow, port, starboard]}
+      - {id: S2, kind: secondary, position: stern, firepower: 1, caliber: 3, arcs: [port, starboard, stern]}
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    torpedo_type: jp-21
+    armour: {primary: 1, belt: 2, bridge: 2}
+  ijn-yubari-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows: [2, 2, 2]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 5.5, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 5.5, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: midships, firepower: 1, caliber: 3, arcs: [port, starboard]}
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    torpedo_type: jp-24-type90
+    armour: {primary: 1, belt: 2}
+  usn-ca-new-orleans:
+    ship_type: CA
+    displacement_band: C
+    hull_rows: [4, 4, 4]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 8, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 8, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 8, arcs: [port, starboard, stern]}
+      - {id: P4, kind: primary, position: stern, firepower: 2, caliber: 8, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
+      - {id: S2, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
+    armour: {primary: 8, belt: 5, bridge: 3}
+  commonwealth-ca-kent:
+    ship_type: CA
+    displacement_band: C
+    hull_rows: [4, 4, 4]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 8, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: stern, firepower: 3, caliber: 8, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: port, firepower: 2, caliber: 4, arcs: [port]}
+      - {id: S2, kind: secondary, position: starboard, firepower: 2, caliber: 4, arcs: [starboard]}
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    torpedo_type: uk-21-mk7c
+    armour: {primary: 1, belt: 4}
+  ijn-myoko-ca:
+    ship_type: CA
+    displacement_band: C
+    hull_rows: [4, 4, 4]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 8, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 8, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 8, arcs: [port, starboard, stern]}
+      - {id: P4, kind: primary, position: stern, firepower: 2, caliber: 8, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
+      - {id: S2, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
+    torpedo_launchers:
+      - {id: TT-P, position: port, arcs: [port], torpedoes: 2, reloads: 1}
+      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 2, reloads: 1}
+    torpedo_type: jp-24-type93
+    armour: {primary: 1, belt: 4}
+  ijn-sendai-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows: [3, 3, 2]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 5.5, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 5.5, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: bow, firepower: 1, caliber: 5, arcs: [bow, port, starboard]}
+      - {id: S2, kind: secondary, position: stern, firepower: 1, caliber: 5, arcs: [port, starboard, stern]}
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    torpedo_type: jp-24-type90
+    armour: {primary: 1, belt: 2, bridge: 2}
+  ijn-agano-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows: [3, 3, 2]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 6, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: stern, firepower: 1, caliber: 6, arcs: [port, starboard, stern]}
+      - {id: S1, kind: secondary, position: bow, firepower: 1, caliber: 3, arcs: [bow, port, starboard]}
+      - {id: S2, kind: secondary, position: stern, firepower: 1, caliber: 3, arcs: [port, starboard, stern]}
+    torpedo_launchers:
+      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    torpedo_type: jp-24-type90
+    armour: {primary: 1, belt: 2, bridge: 2}
+  usn-washington-bb:
+    ship_type: BB
+    displacement_band: F
+    hull_rows: [6, 6, 6]
+    speed_damage_track: [[5, 4, 3, 2, 1], [4, 3, 2, 1], [4, 3, 2, 1]]
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+      - {id: P3, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+      - {id: P4, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+      - {id: P5, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+      - {id: P6, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+    armour: {primary: 16, belt: 12, bridge: 15}
+    fire_control: true
+    radar: true
+    aircraft: true
 records:
   IBS-U-IJN-AOBA: {family: ijn-aoba-ca, name: 青叶, vp: 12, source_page: 2}
+  IBS-U-IJN-NAGATO: {family: ijn-nagato-bb, name: 长门, vp: 33, source_page: 20}
+  IBS-U-IJN-MUTSU: {family: ijn-nagato-bb, name: 陆奥, vp: 32, source_page: 20}
+  IBS-U-IJN-KAKO-I: {family: ijn-kako-ca, name: 加古(I), vp: 9, source_page: 20}
+  IBS-U-USN-COLORADO: {family: usn-colorado-bb, name: 科罗拉多, vp: 31, source_page: 21}
+  IBS-U-USN-WEST-VIRGINIA: {family: usn-colorado-bb, name: 西弗吉尼亚, vp: 30, source_page: 21}
+  IBS-U-USN-OMAHA: {family: usn-omaha-cl, name: 奥马哈, vp: 6, source_page: 21}
+  IBS-U-USN-MINNEAPOLIS: {family: usn-ca-new-orleans, name: 明尼阿波利斯, vp: 11, source_page: 7, fire_control: true, radar: true, aircraft: true}
+  IBS-U-USN-NEW-ORLEANS: {family: usn-ca-new-orleans, name: 新奥尔良, vp: 10, source_page: 7, fire_control: true, radar: true, aircraft: true}
+  IBS-U-USN-PENSACOLA: {family: usn-ca-new-orleans, name: 彭萨科拉, vp: 10, source_page: 7, fire_control: true, aircraft: true, armour: {primary: 2, belt: 2, bridge: 1}}
+  IBS-U-USN-NORTHAMPTON: {family: usn-ca-new-orleans, name: 北安普敦, vp: 10, source_page: 7, fire_control: true, aircraft: true, armour: {primary: 2, belt: 4, bridge: 1}}
+  IBS-U-USN-WASHINGTON: {family: usn-washington-bb, name: 华盛顿, vp: 37, source_page: 9}
+  IBS-U-USN-SOUTH-DAKOTA: {family: usn-washington-bb, name: 南达科塔, vp: 36, source_page: 9, displacement_band: G, armour: {primary: 18, belt: 12, bridge: 16}}
   IBS-U-IJN-FURUTAKA: {family: ijn-aoba-ca, name: 古鹰, vp: 11, source_page: 2}
   IBS-U-IJN-KINUGASA: {family: ijn-aoba-ca, name: 衣笠, vp: 11, source_page: 2}
   IBS-U-IJN-FUBUKI: {family: ijn-fubuki-dd, name: 吹雪, vp: 3, source_page: 2}
@@ -177,6 +456,150 @@ records:
   IBS-U-IJN-MURAKUMO: {family: ijn-fubuki-dd, name: 丛云, vp: 3, source_page: 2}
   IBS-U-IJN-SHIRAYUKI: {family: ijn-fubuki-dd, name: 白雪, vp: 3, source_page: 2}
   IBS-U-IJN-AKIZUKI: {family: ijn-akizuki-dd, name: 秋月, vp: 5, source_page: 2}
+  IBS-U-IJN-NIIZUKI: {family: ijn-akizuki-dd, name: 新月, vp: 5, source_page: 4}
+  IBS-U-IJN-SUZUKAZE: {family: ijn-fubuki-dd, name: 凉风, vp: 3, source_page: 4}
+  IBS-U-IJN-TANIKAZE: {family: ijn-fubuki-dd, name: 谷风, vp: 4, source_page: 4}
+  IBS-U-IJN-AMAGIRI: {family: ijn-fubuki-dd, name: 天雾, vp: 3, source_page: 4}
+  IBS-U-IJN-HAMAKAZE: {family: ijn-fubuki-dd, name: 浜风, vp: 4, source_page: 4}
+  IBS-U-IJN-NAGANAMI: {family: ijn-fubuki-dd, name: 长波, vp: 5, source_page: 6}
+  IBS-U-IJN-TAKANAMI: {family: ijn-fubuki-dd, name: 高波, vp: 4, source_page: 6}
+  IBS-U-IJN-MAKINAMI: {family: ijn-fubuki-dd, name: 卷波, vp: 4, source_page: 6}
+  IBS-U-IJN-KAGERO: {family: ijn-fubuki-dd, name: 阳炎, vp: 4, source_page: 6}
+  IBS-U-IJN-KUROSHIO: {family: ijn-fubuki-dd, name: 黑潮, vp: 4, source_page: 6}
+  IBS-U-IJN-OYASHIO: {family: ijn-fubuki-dd, name: 亲潮, vp: 4, source_page: 6}
+  IBS-U-IJN-KAWAKAZE: {family: ijn-fubuki-dd, name: 江风, vp: 3, source_page: 6}
+  IBS-U-IJN-YUKIKAZE: {family: ijn-fubuki-dd, name: 雪风, vp: 4, source_page: 12}
+  IBS-U-IJN-KIYONAMI: {family: ijn-fubuki-dd, name: 清波, vp: 4, source_page: 12}
+  IBS-U-IJN-YUGURE: {family: ijn-fubuki-dd, name: 夕暮, vp: 4, source_page: 12}
+  IBS-U-IJN-TERUZUKI: {family: ijn-akizuki-dd, name: 照月, vp: 5, source_page: 14}
+  IBS-U-IJN-YUDACHI: {family: ijn-fubuki-dd, name: 夕立, vp: 3, source_page: 14}
+  IBS-U-IJN-HARUSAME: {family: ijn-fubuki-dd, name: 春雨, vp: 3, source_page: 14}
+  IBS-U-IJN-INAZUMA: {family: ijn-fubuki-dd, name: 电, vp: 3, source_page: 14}
+  IBS-U-IJN-AKATSUKI: {family: ijn-fubuki-dd, name: 晓, vp: 3, source_page: 14}
+  IBS-U-IJN-IKAZUCHI: {family: ijn-fubuki-dd, name: 雷, vp: 3, source_page: 14}
+  IBS-U-IJN-MURASAME: {family: ijn-fubuki-dd, name: 村雨, vp: 3, source_page: 14}
+  IBS-U-IJN-SAMIDARE: {family: ijn-fubuki-dd, name: 五月雨, vp: 3, source_page: 14}
+  IBS-U-IJN-AMATSU-KAZE: {family: ijn-fubuki-dd, name: 天津风, vp: 4, source_page: 14}
+  IBS-U-IJN-URANAMI: {family: ijn-fubuki-dd, name: 浦波, vp: 3, source_page: 8}
+  IBS-U-IJN-AYANAMI: {family: ijn-fubuki-dd, name: 绫波, vp: 3, source_page: 8}
+  IBS-U-IJN-SHIKINAMI: {family: ijn-fubuki-dd, name: 敷波, vp: 3, source_page: 8}
+  IBS-U-USN-HONOLULU: {family: usn-brooklyn-cl, name: 火奴鲁鲁, vp: 12, source_page: 15}
+  IBS-U-USN-ST-LOUIS: {family: usn-brooklyn-cl, name: 圣路易斯, vp: 11, source_page: 15}
+  IBS-U-IJN-MIKAZUKI: {family: ijn-apd-mutsuki, name: 三日月, vp: 3, source_page: 12}
+  IBS-U-IJN-KAKO-II: {family: ijn-aoba-ca, name: 加古(II), vp: 11, source_page: 16}
+  IBS-U-IJN-CHOKAI: {family: ijn-chokai-ca, name: 鸟海, vp: 15, source_page: 16}
+  IBS-U-IJN-TENRYU: {family: ijn-tenryu-cl, name: 天龙, vp: 5, source_page: 16}
+  IBS-U-IJN-YUBARI: {family: ijn-yubari-cl, name: 夕张, vp: 5, source_page: 16}
+  IBS-U-USN-VINCENNES: {family: usn-ca-new-orleans, name: 文森斯, vp: 10, source_page: 17}
+  IBS-U-USN-QUINCY: {family: usn-ca-new-orleans, name: 昆西, vp: 10, source_page: 17}
+  IBS-U-USN-ASTORIA: {family: usn-ca-new-orleans, name: 阿斯托里亚, vp: 10, source_page: 17}
+  IBS-U-RAN-CANBERRA: {family: commonwealth-ca-kent, name: 堪培拉, vp: 11, source_page: 17}
+  IBS-U-RAN-AUSTRALIA: {family: commonwealth-ca-kent, name: 澳大利亚, vp: 12, source_page: 17}
+  IBS-U-IJN-MYOKO: {family: ijn-myoko-ca, name: 妙高, vp: 16, source_page: 18}
+  IBS-U-IJN-HAGURO: {family: ijn-myoko-ca, name: 羽黑, vp: 15, source_page: 18}
+  IBS-U-IJN-SENDAI: {family: ijn-sendai-cl, name: 川内, vp: 7, source_page: 18}
+  IBS-U-IJN-SHIGURE: {family: ijn-fubuki-dd, name: 时雨, vp: 3, source_page: 18}
+  IBS-U-IJN-HATSU-KAZE:
+    family: ijn-fubuki-dd
+    name: 初风
+    vp: 4
+    source_page: 18
+  IBS-U-IJN-AGANO: {family: ijn-agano-cl, name: 阿贺野, vp: 8, source_page: 18}
+  IBS-U-IJN-WAKATSUKI: {family: ijn-akizuki-dd, name: 若月, vp: 5, source_page: 18}
+  IBS-U-IJN-SATSUKI: {family: ijn-apd-mutsuki, name: 皋月, vp: 3, source_page: 12}
+  IBS-U-IJN-MINAZUKI:
+    family: ijn-apd-mutsuki
+    name: 水无月
+    vp: 3
+    source_page: 12
+  IBS-U-IJN-YUNAGI:
+    family: ijn-apd-mutsuki
+    name: 夕凪
+    vp: 3
+    source_page: 12
+    torpedo_type: jp-21
+  IBS-U-IJN-MATSU-KAZE:
+    family: ijn-apd-mutsuki
+    name: 松风
+    vp: 3
+    source_page: 12
+    torpedo_type: jp-21
+  IBS-U-IJN-AKIGUMO: {family: ijn-fubuki-dd, name: 秋云, vp: 5, source_page: 22, torpedo_type: jp-24-type90}
+  IBS-U-IJN-SAZANAMI: {family: ijn-fubuki-dd, name: 涟, vp: 4, source_page: 23, torpedo_type: jp-24-type90}
+  IBS-U-IJN-ISOKAZE: {family: ijn-fubuki-dd, name: 矶风, vp: 4, source_page: 22, torpedo_type: jp-24-type90}
+  IBS-U-IJN-KAZEKUMO: {family: ijn-fubuki-dd, name: 风云, vp: 4, source_page: 22, torpedo_type: jp-24-type90}
+  IBS-U-IJN-YUGUMO: {family: ijn-fubuki-dd, name: 夕云, vp: 4, source_page: 22, torpedo_type: jp-24-type90}
+  IBS-U-IJN-FUMIZUKI: {family: ijn-apd-mutsuki, name: 文月, vp: 3, source_page: 22, torpedo_type: jp-24-type90}
+  IBS-U-IJN-KAMIKAZE: {family: ijn-kamikaze-dd, name: 神风, vp: 2, source_page: 10}
+  IBS-U-IJN-OITE: {family: ijn-kamikaze-dd, name: 追风, vp: 2, source_page: 10}
+  IBS-U-IJN-ASAKAZE: {family: ijn-kamikaze-dd, name: 朝风, vp: 2, source_page: 10}
+  IBS-U-IJN-MUTSUKI: {family: ijn-mutsuki-dd, name: 睦月, vp: 3, source_page: 10}
+  IBS-U-IJN-UZUKI: {family: ijn-mutsuki-dd, name: 卯月, vp: 3, source_page: 10}
+  IBS-U-IJN-JINTSU-I: {family: ijn-jintsu-cl, name: 神通(I), vp: 5, source_page: 10}
+  IBS-U-IJN-TATSUTA: {family: ijn-tatsuta-cl, name: 龙田, vp: 4, source_page: 10}
+  IBS-U-USN-BAINBRIDGE: {family: usn-4in-dd, name: 班布里奇, vp: 2, source_page: 11}
+  IBS-U-USN-DECATUR: {family: usn-4in-dd, name: 迪凯特, vp: 2, source_page: 11}
+  IBS-U-USN-DAHLGREN: {family: usn-4in-dd, name: 达尔格伦, vp: 2, source_page: 11}
+  IBS-U-USN-TRUXTON: {family: usn-4in-dd, name: 特鲁斯顿, vp: 2, source_page: 11}
+  IBS-U-USN-MCDONOUGH: {family: usn-4in-dd, name: 麦克多诺, vp: 2, source_page: 11}
+  IBS-U-USN-PERRY: {family: usn-4in-dd, name: 佩里, vp: 2, source_page: 11}
+  IBS-U-USN-HULL-I:
+    family: usn-4in-dd
+    name: 赫尔(I)
+    vp: 2
+    source_page: 11
+  IBS-U-USN-FOX:
+    family: usn-4in-dd
+    name: 福克斯
+    vp: 2
+    source_page: 11
+    guns:
+      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4, arcs: [bow, port, starboard]}
+      - {id: P2, kind: primary, position: midships, firepower: 2, caliber: 4, arcs: [port, starboard]}
+      - {id: P3, kind: primary, position: stern, firepower: 1, caliber: 4, arcs: [port, starboard, stern]}
+  IBS-U-USN-NICHOLAS: {family: usn-destroyer-5gun, name: 尼古拉斯, vp: 3, source_page: 13}
+  IBS-U-USN-OBANNON: {family: usn-destroyer-5gun, name: 奥班农, vp: 3, source_page: 13}
+  IBS-U-USN-TAYLOR: {family: usn-destroyer-5gun, name: 泰勒, vp: 3, source_page: 13}
+  IBS-U-USN-RADFORD: {family: usn-destroyer-5gun, name: 雷德福德, vp: 3, source_page: 13}
+  IBS-U-USN-JENKINS: {family: usn-destroyer-5gun, name: 詹金斯, vp: 3, source_page: 13}
+  IBS-U-USN-RALPH-TALBOT: {family: usn-destroyer-5gun, name: 拉尔夫·托尔伯特, vp: 2, source_page: 13}
+  IBS-U-USN-GWIN: {family: usn-destroyer-5gun, name: 葛文, vp: 2, source_page: 13}
+  IBS-U-USN-MAURY: {family: usn-destroyer-5gun, name: 莫里, vp: 2, source_page: 13}
+  IBS-U-USN-WOODWORTH: {family: usn-destroyer-5gun, name: 伍德沃斯, vp: 2, source_page: 13}
+  IBS-U-USN-FLETCHER: {family: usn-destroyer-5gun, name: 弗莱彻, vp: 2, source_page: 15}
+  IBS-U-USN-MONSSEN: {family: usn-destroyer-5gun, name: 蒙森, vp: 2, source_page: 15}
+  IBS-U-USN-AARON-WARD: {family: usn-destroyer-5gun, name: 亚伦沃德, vp: 2, source_page: 15}
+  IBS-U-USN-BARTON: {family: usn-destroyer-5gun, name: 巴顿, vp: 2, source_page: 15}
+  IBS-U-USN-CUSHING: {family: usn-destroyer-5gun, name: 库欣, vp: 2, source_page: 15}
+  IBS-U-USN-STERETT: {family: usn-destroyer-5gun, name: 史特雷特, vp: 2, source_page: 15}
+  IBS-U-USN-BAGLEY: {family: usn-destroyer-5gun, name: 巴格莱, vp: 2, source_page: 17}
+  IBS-U-USN-PATTERSON: {family: usn-destroyer-5gun, name: 帕特森, vp: 2, source_page: 17}
+  IBS-U-USN-JARVIS: {family: usn-destroyer-5gun, name: 贾维斯, vp: 2, source_page: 17}
+  IBS-U-USN-BLUE: {family: usn-destroyer-5gun, name: 布鲁, vp: 2, source_page: 17}
+  IBS-U-USN-RALPH-TALBOT-17: {family: usn-destroyer-5gun, name: 拉尔夫·托尔伯特, vp: 2, source_page: 17}
+  IBS-U-USN-WILSON: {family: usn-destroyer-5gun, name: 威尔逊, vp: 2, source_page: 17}
+  IBS-U-USN-HELM: {family: usn-destroyer-5gun, name: 赫尔, vp: 2, source_page: 17}
+  IBS-U-USN-HULL-II: {family: usn-destroyer-5gun, name: 赫尔(II), vp: 2, source_page: 17}
+  IBS-U-USN-DEWEY: {family: usn-destroyer-5gun, name: 杜威, vp: 2, source_page: 17}
+  IBS-U-USN-ELLET: {family: usn-destroyer-5gun, name: 埃利特, vp: 2, source_page: 17}
+  IBS-U-USN-SELFRIDGE: {family: usn-destroyer-5gun, name: 赛尔弗里奇, vp: 4, source_page: 22, radar: true}
+  IBS-U-USN-CHEVALIER: {family: usn-destroyer-5gun, name: 谢伐利埃, vp: 2, source_page: 22, radar: true}
+  IBS-U-USN-LA-VALLETTE: {family: usn-destroyer-5gun, name: 拉瓦利特, vp: 3, source_page: 22, radar: true}
+  IBS-U-USN-DRAYTON: {family: usn-destroyer-5gun, name: 德雷顿, vp: 2, source_page: 7}
+  IBS-U-USN-PERKINS: {family: usn-destroyer-5gun, name: 帕金斯, vp: 2, source_page: 7}
+  IBS-U-USN-LAMSON: {family: usn-destroyer-5gun, name: 拉姆森, vp: 2, source_page: 7}
+  IBS-U-USN-LARDNER: {family: usn-destroyer-5gun, name: 拉德纳, vp: 2, source_page: 7}
+  IBS-U-USN-WALKE: {family: usn-destroyer-5gun, name: 沃克, vp: 2, source_page: 9}
+  IBS-U-USN-BENHAM: {family: usn-destroyer-5gun, name: 本汉姆, vp: 2, source_page: 9}
+  IBS-U-USN-PRESTON: {family: usn-destroyer-5gun, name: 普雷斯顿, vp: 2, source_page: 9}
+  IBS-U-USN-CF-AUSBURNE: {family: usn-destroyer-5gun, name: 查尔斯·奥斯本, vp: 2, source_page: 19}
+  IBS-U-USN-DYSON: {family: usn-destroyer-5gun, name: 戴森, vp: 2, source_page: 19}
+  IBS-U-USN-STANLY: {family: usn-destroyer-5gun, name: 斯坦立, vp: 2, source_page: 19}
+  IBS-U-USN-CLAXTON: {family: usn-destroyer-5gun, name: 克拉克斯顿, vp: 2, source_page: 19}
+  IBS-U-USN-SPENCE: {family: usn-destroyer-5gun, name: 斯彭斯, vp: 2, source_page: 19}
+  IBS-U-USN-THATCHER: {family: usn-destroyer-5gun, name: 撒切尔, vp: 2, source_page: 19}
+  IBS-U-USN-CONVERSE: {family: usn-destroyer-5gun, name: 康弗斯, vp: 2, source_page: 19}
+  IBS-U-USN-FOOTE: {family: usn-destroyer-5gun, name: 福特, vp: 2, source_page: 19}
   IBS-U-USN-SAN-FRANCISCO: {family: usn-san-francisco-ca, name: 旧金山, vp: 11, source_page: 3}
   IBS-U-USN-BOISE:
     family: usn-brooklyn-cl

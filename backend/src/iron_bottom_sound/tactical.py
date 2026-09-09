@@ -416,7 +416,9 @@ class TacticalCommander(DeterministicCommander):
             for step in range(horizon + 1):
                 threat[position.label] = max(threat.get(position.label, 0.0), 1.0 - step * 0.06)
                 try:
-                    position = position.neighbor(track.heading)
+                    position = position.neighbor(
+                        track.heading, columns=state.map_columns, rows=state.map_rows
+                    )
                 except ValueError:
                     break
                 if position.label in state.land_hexes:
@@ -596,7 +598,10 @@ class TacticalCommander(DeterministicCommander):
                 # Keep one clear bow hex as a one-turn safety horizon.
                 end = HexCoord(q=preview["current_hex"]["q"], r=preview["current_hex"]["r"])
                 try:
-                    ahead = end.neighbor(preview["current_heading"])
+                    ahead = end.neighbor(
+                        preview["current_heading"],
+                        columns=state.map_columns, rows=state.map_rows,
+                    )
                 except ValueError:
                     local = []
                     break

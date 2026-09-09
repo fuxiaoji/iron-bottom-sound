@@ -3,8 +3,9 @@ from pathlib import Path
 import yaml
 
 from iron_bottom_sound.engine import IronBottomEngine
+from iron_bottom_sound.counter_assets import all_asset_bindings, validate_asset_bindings
 from iron_bottom_sound.models import FiringArc
-from iron_bottom_sound.ship_records import load_ship_records
+from iron_bottom_sound.ship_records import load_ship_catalog, load_ship_records
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,9 +19,24 @@ def test_all_playable_and_reinforcement_ships_have_verified_records() -> None:
         scenario = yaml.safe_load((STRUCTURED / "scenarios" / f"scenario-{number:02d}.yaml").read_text(encoding="utf-8"))
         required.update(ship["id"] for ship in scenario["ships"])
         required.update(ship["id"] for ship in scenario.get("reinforcements", {}).get("ships", []))
-    assert len(records) == 54
+    assert len(records) == 180
     assert required <= set(records)
-    assert all(record.source_page in {1, 2, 3, 4, 5} for record in records.values())
+    assert all(1 <= record.source_page <= 24 for record in records.values())
+
+
+def test_complete_ship_list_catalog_is_migrated_without_promoting_unverified_stats() -> None:
+    catalog = load_ship_catalog()
+    assert len(catalog) == 204
+    assert len(catalog) == len(set(catalog))
+    assert {entry["ship_type"] for entry in catalog.values()} >= {"BB", "BC", "CA", "CL", "DD", "APD", "AV"}
+    assert sum(1 for entry in catalog.values() if entry.get("unresolved")) == 4
+
+
+def test_every_complete_record_has_a_verified_counter_asset_binding() -> None:
+    records = load_ship_records()
+    bindings = all_asset_bindings(records)
+    assert len(bindings) == len(records) == 180
+    assert not validate_asset_bindings(records)
 
 
 def test_ship_record_mounts_and_tracks_match_source_examples() -> None:
