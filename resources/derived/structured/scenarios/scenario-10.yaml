@@ -25,7 +25,7 @@ setup:
       - IBS-U-IJN-AOBA
       - IBS-U-IJN-KAKO-I
       - IBS-U-IJN-KINUGASA
-      note: 外南洋巡逻部队主力单纵（三川军一中将旗舰鸟海）
+      note: 外南洋巡逻部队主力单纵（三川军一少将旗舰鸟海）
     - id: axis-following
       role: line_ahead
       ships:

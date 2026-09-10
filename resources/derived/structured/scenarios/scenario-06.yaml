@@ -21,7 +21,7 @@ setup:
       - IBS-U-IJN-SHIKINAMI
       - IBS-U-IJN-URANAMI
       - IBS-U-IJN-AYANAMI
-      note: 近接警戒队（川内旗舰；绫波单舰侧出）
+      note: 近接警戒队（川内领头；页面未标旗舰，绫波单舰侧出）
     - id: axis-main-body
       role: line_ahead
       ships:
@@ -30,7 +30,7 @@ setup:
       - IBS-U-IJN-HATSUYUKI
       - IBS-U-IJN-SAMIDARE
       - IBS-U-IJN-INAZUMA
-      note: 挺身攻击队本队（阿部弘毅中将旗舰比叡在援军中，由长良暂导）
+      note: 挺身攻击队本队（史实为阿部弘毅挺身攻击队；本想定援军含雾岛，无比叡）
     allies:
     - id: allies-van-dd
       role: line_ahead

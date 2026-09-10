@@ -78,8 +78,8 @@ ships:
   - {id: IBS-U-USN-RADFORD, name: 雷德福德, side: allies, template: dd-american-1942, position: Y15, heading: 4, speed: 4, asset: 美国-DD-雷德福德.png}
   - {id: IBS-U-USN-JENKINS, name: 詹金斯, side: allies, template: dd-american-1942, position: Z14, heading: 4, speed: 4, asset: 美国-DD-詹金斯.png}
   - {id: IBS-U-USN-HONOLULU, name: 火奴鲁鲁, side: allies, template: cl-american-1942, position: AA14, heading: 4, speed: 4, asset: 美国-CL-火奴鲁鲁.png, flagship: true}
-  # 利安得：record-ids 无，取 catalog-ids（其舰种栏标 CA，页面计数器为 CL）；counter 图为新西兰-CL-利安德.png
-  - {id: IBS-U-RN-UNNAMED-T05-R01, name: 利安得, side: allies, template: cl-american-1942, position: BB14, heading: 4, speed: 4, asset: 新西兰-CL-利安德.png}
+  # 利安德：页面计数器印“利安德”（目录行作“利安得”），name 以页面为准；计数器舰种 CL，目录栏标 CA；counter 图为新西兰-CL-利安德.png
+  - {id: IBS-U-RN-UNNAMED-T05-R01, name: 利安德, side: allies, template: cl-american-1942, position: BB14, heading: 4, speed: 4, asset: 新西兰-CL-利安德.png}
   - {id: IBS-U-USN-ST-LOUIS, name: 圣路易斯, side: allies, template: cl-american-1942, position: BB13, heading: 4, speed: 4, asset: 美国-CL-圣路易斯.png}
   # record-ids 中“拉尔夫·托尔伯特”有两条（IBS-U-USN-RALPH-TALBOT / IBS-U-USN-RALPH-TALBOT-17），此处取基础条目
   - {id: IBS-U-USN-RALPH-TALBOT, name: 拉尔夫·托尔伯特, side: allies, template: dd-american-1942, position: CC13, heading: 4, speed: 4, asset: 美国-DD-拉尔夫·托尔伯特.png}

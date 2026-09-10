@@ -19,7 +19,7 @@ setup:
       ships:
       - IBS-U-IJN-ONAMI
       - IBS-U-IJN-MAKINAMI
-      note: 香秦作战输送掩护突击队（吉川洁大佐旗舰大波）
+      note: 圣乔治角夜战突击队（页面旗舰标注：大波——香川清登大佐）
     allies:
     - id: allies-desron23
       role: line_ahead
