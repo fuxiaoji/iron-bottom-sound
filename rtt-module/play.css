@@ -1,0 +1,37 @@
+/* 铁底湾的回响 IV — RTT 前端样式（贴合原版深色主题） */
+body{background:#10191b;color:#e9e2d0;font-family:Inter,"Noto Sans SC",system-ui}
+header{background:#0b1315;border-bottom:1px solid #465554}
+aside{background:#182426;border-right:1px solid #485554}
+main{background:radial-gradient(circle at 30% 10%,#3b5152,#10191b 70%)}
+#mapwrap{width:100%;height:100%}
+#map{position:relative}
+.hexcell{fill:transparent;stroke:#d7d7c3;stroke-width:.5;opacity:.4}
+.ship{cursor:pointer}
+.ship .hull{fill:#b44a38;stroke:#111;stroke-width:2}
+.ship.allies .hull{fill:#4479a4}
+.ship.selected .hull{stroke:#e8d8ad;stroke-width:3}
+.ship .type,.ship .name,.ship .hullpips{text-anchor:middle;fill:#fff;paint-order:stroke;stroke:#112;stroke-width:3px;font-size:9px;font-weight:700}
+.ship .type{font-size:8px;fill:#ffe9b0}
+.ship .hullpips{fill:#d7ffd9}
+.torpedodot{fill:#9fe3ff;stroke:#123}
+.torpedodot.allies{fill:#b7f0c9}
+#command_panel{position:fixed;right:12px;top:70px;width:340px;max-height:calc(100vh - 90px);overflow:auto;background:#182426ee;border:1px solid #465554;padding:14px;z-index:30}
+#command_panel h2{margin:0 0 10px;font:1.05rem Georgia,serif;color:#e8d8ad}
+#command_panel .plans{max-height:200px;overflow:auto;border:1px solid #304143;margin-bottom:8px}
+.plan-row{display:flex;gap:8px;align-items:baseline;padding:6px 8px;border-bottom:1px solid #304143;cursor:pointer}
+.plan-row.sel{background:#342e1f;outline:1px solid #c8a554}
+.plan-row b{min-width:88px;font-size:.85rem}
+.plan-row span{color:#9eaaa6;font-size:.7rem}
+.plan-row code{color:#e8d8ad;font-family:"Cascadia Mono",monospace}
+.plan-builder{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.plan-builder button{padding:.4rem .55rem;font-size:.75rem}
+.targets{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.targets button{padding:.4rem .6rem;font-size:.75rem}
+button.primary{background:#604a26;border-color:#d4b061;color:#f7edce;font-weight:700;width:100%;padding:.6rem}
+button.quiet{background:#172527;border-color:#41524f;color:#9eaaa6;font-size:.72rem;margin-top:8px}
+.victory{font-size:1.1rem;color:#e8d8ad;font-weight:700}
+.error{color:#ffb3a6;background:#482723;padding:.4rem}
+.draft{color:#c9a866;font-size:.72rem;min-height:1em}
+#log .log-head{color:#c6a766;font-weight:700}
+#log .log-sunk{color:#ff9d8a}
+#log .log-warn{color:#ffe08a}

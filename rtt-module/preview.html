@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>RTT 模块预览（无平台骨架，多模态比对用）</title>
+<link rel="stylesheet" href="play.css?v=20260911v03">
+<script src="data.js?v=20260911v03"></script>
+<script src="modules/hex.js?v=20260911v03"></script>
+<script src="modules/core.js?v=20260911v03"></script>
+<script src="modules/game.js?v=20260911v03"></script>
+<script src="modules/ai.js?v=20260911v03"></script>
+<script>window.exports = {};</script>
+<script src="rules.js?v=20260911v03"></script>
+<script defer src="play.js?v=20260911v03"></script>
+</head>
+<body>
+<header>
+	<div id="toolbar"><details><summary>☰</summary><menu id="mainmenu"></menu></details></div>
+	<div id="prompt"></div><div id="actions"></div>
+</header>
+<aside><div id="roles"></div><div id="log"></div></aside>
+<main data-min-zoom="0.5" data-max-zoom="2.5">
+	<div id="mapwrap"><div id="map"></div></div>
+	<div id="command_panel"></div>
+</main>
+<script>
+// client.js 桩：提供 play.js 依赖的全局与函数
+let view = null
+let player = "Axis"
+const params = { title_id: "iron-bottom-sound", game_id: 1, role: "Axis" }
+let game_log = []
+function send_action(action, arg) {
+	exports.action(game, player, action, arg)
+	refresh()
+}
+function add_main_menu_item(label, fn) {
+	const li = document.createElement("li"); li.textContent = label; li.onclick = fn
+	document.getElementById("mainmenu").appendChild(li)
+}
+function action_button(action, label) {}
+// 本地对局
+const scenario = new URLSearchParams(location.search).get("scenario") || "IBS-S-03"
+const aiSide = new URLSearchParams(location.search).get("ai") || "none"
+var game = exports.setup(2026, scenario, { ai_side: aiSide })
+function refresh() {
+	view = exports.view(game, player)
+	game_log = view.log
+	document.getElementById("actions").innerHTML = ""
+	if (view.actions && view.actions.submit && player !== "Observer") {
+		const b = document.createElement("button")
+		const names = { reinforcement: "确认", movement: "封存移动", torpedo: "封存鱼雷", gunnery: "开火" }
+		b.textContent = names[view.state] || "提交"
+		b.className = "primary"
+		b.onclick = () => send_action("submit", buildPayload())
+		document.getElementById("actions").appendChild(b)
+		if (view.actions.undo) {
+			const u = document.createElement("button"); u.textContent = "撤销"; u.onclick = () => send_action("undo", null)
+			document.getElementById("actions").appendChild(u)
+		}
+	}
+	const logEl = document.getElementById("log")
+	logEl.innerHTML = ""
+	view.log.slice(-80).forEach((line) => { const d = document.createElement("div"); d.textContent = line; logEl.appendChild(d) })
+	document.getElementById("prompt").textContent = view.prompt || ""
+	if (typeof on_update === "function") on_update()
+}
+function buildPayload() {
+	const side = player === "Axis" ? "axis" : "allies"
+	const payload = { plans: {}, torpedoes: [], gunnery: [] }
+	if (view.state === "movement") {
+		for (const s of view.ships.filter((x) => x.side === side && x.position)) payload.plans[s.id] = planDrafts[s.id] || "0"
+		planDrafts = {}
+	} else if (view.state === "torpedo") { payload.torpedoes = torpedoDrafts; torpedoDrafts = [] }
+	else if (view.state === "gunnery") { payload.gunnery = gunneryDrafts; gunneryDrafts = [] }
+	return payload
+}
+// AI 回合桩：若对方为 AI，提交后触发其自动补单（与平台行为一致的模块内自动提交已在 rules.js 内）
+window.addEventListener("load", () => {
+	refresh()
+	// 便捷：按 A 键让 AI 代打当前未提交一方（演示用）
+	document.addEventListener("keydown", (e) => {
+		if (e.key !== "a" && e.key !== "A") return
+		const other = player === "Axis" ? "Allies" : "Axis"
+		if (game.state !== "game_over" && !game.submitted[other]) {
+			const payload = IBS.ai.plan(game, other)
+			game.undoBy[other] = JSON.stringify(game)
+			game.submitted[other] = exports.sanitize ? exports.sanitize(game, other, payload) : payload
+			if (game.submitted.Axis && game.submitted.Allies) {
+				let guard = 0
+				while (game.state !== "game_over" && guard++ < 8) {
+					gameMod_advance()
+				}
+			}
+			refresh()
+		}
+	})
+	function gameMod_advance() {
+		// 直接调模块内部推进：经由一次空提交路径
+		const need = ["Axis", "Allies"].filter((r) => !game.submitted[r])
+		for (const r of need) game.submitted[r] = { plans: {}, torpedoes: [], gunnery: [] }
+		let guard = 0
+		while (game.state !== "game_over" && guard++ < 8) {
+			IBS.game.advancePhase(game)
+			game.submitted = {}
+			if (["movement", "torpedo", "gunnery"].indexOf(game.phase) >= 0) break
+		}
+	}
+})
+</script>
+</body>
+</html>
