@@ -183,6 +183,51 @@ def _scenario_map_dims(scenario: dict[str, Any]) -> tuple[int, int, int, int]:
     return columns, rows, printed_columns, printed_rows
 
 
+def _apply_scenario_setup_rules(state: GameState, scenario: dict[str, Any]) -> None:
+    """想定特例的初始化：编制修改、暴风雨标记、警戒状态与能见度日程。
+
+    全部来自想定定义的 special_rule_kinds 数据；不在此处复制规则常量。
+    """
+    from .scenario_rules import ScenarioRuleSet
+
+    rule_set = ScenarioRuleSet(scenario_id=state.scenario_id, definition=scenario)
+    for mod in rule_set.setup_modifications():
+        if mod.get("ship_id"):
+            targets = [state.ships[mod["ship_id"]]] if mod.get("ship_id") in state.ships else []
+        else:
+            targets = [s for s in state.ships.values() if s.side.value in mod.get("sides", [])]
+        for ship in targets:
+            remove = mod.get("remove_mounts") or {}
+            for mount in ship.gun_mounts:
+                if (
+                    mount.kind == remove.get("kind")
+                    and (not remove.get("position") or mount.position == remove["position"])
+                ):
+                    mount.destroyed = True
+            if mod.get("hull_damage"):
+                damage = int(mod["hull_damage"])
+                ship.hull = max(1, ship.hull - damage)
+            if mod.get("speed_damage_track"):
+                ship.speed_damage_track = tuple(tuple(row) for row in mod["speed_damage_track"])
+            if mod.get("radar"):
+                ship.radar = True
+    for index, label in enumerate(rule_set.storm_hexes(), 1):
+        state.markers.append(
+            MarkerState(
+                id=f"STORM-{index}",
+                kind="storm",
+                position=HexCoord.from_label(label),
+            )
+        )
+    alert_rule = rule_set.alert_rule()
+    if alert_rule:
+        state.scenario_state["alerted"] = sorted(rule_set.initial_alerted(state.ships))
+    for side in Side:
+        value = rule_set.visibility_for_turn(side.value, state.turn)
+        if value is not None:
+            state.visibility[side.value] = value
+
+
 def build_initial_state(game_id: str, scenario_id: str, seed: int, options: GameOptions) -> GameState:
     from .ship_records import load_ship_records
 
@@ -220,6 +265,7 @@ def build_initial_state(game_id: str, scenario_id: str, seed: int, options: Game
         start, end = reinforcement["arrival"]["entry_hex_range"]
         state.reinforcement_entry_start = HexCoord.from_label(start)
         state.reinforcement_entry_end = HexCoord.from_label(end)
+    _apply_scenario_setup_rules(state, scenario)
     if options.optional_rules.hidden_contacts:
         state.resume_phase = state.phase
         state.phase = Phase.CONTACT_SETUP

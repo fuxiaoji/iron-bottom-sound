@@ -7,7 +7,7 @@ status: playable
 source: {document: scenario-book-zh.pdf, pdf_page: 5, printed_page: 6, status: verified_source}
 turns: 10
 visibility: {axis: 8, allies: 7}
-optional_rules: []
+optional_rules: [radar]
 available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
 setup:
   mode: scenario_positions
@@ -42,6 +42,18 @@ special_rules:
   - {id: IBS-S-05-R2, text: 美军只能在雷达接触的范围发射鱼雷和炮击。}
   - {id: IBS-S-05-R3, text: 双方都可以从地图北面离开，你也可以随时将它们从离开格正常移回地图，来保持彼此之间的关系。}
   - {id: IBS-S-05-R4, text: 日军的三艘增援单位在第二回合达到。它们从地图HH9至HH16（也包括这两格）之间以任意航速进入地图。增援编队的次序是天雾、夕雾、卯月。}
+special_rule_kinds:
+- id: IBS-S-05-R1
+  kind: turn_restriction
+  sides:
+  - axis
+  turns:
+  - 1
+  actions:
+  - gunnery
+  - torpedo
+  reason: 想定特例：日军在第一回合无法炮击和发射鱼雷
+
 ships:
   - {id: IBS-U-IJN-ONAMI, name: 大波, side: axis, template: dd-japanese-1942, position: X15, heading: 5, speed: 4, asset: 日本-DD-大波.png, flagship: true}
   - {id: IBS-U-IJN-MAKINAMI, name: 卷波, side: axis, template: dd-japanese-1942, position: Y16, heading: 5, speed: 4, asset: 日本-DD-卷波.png}

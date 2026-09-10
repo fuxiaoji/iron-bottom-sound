@@ -9,7 +9,7 @@ status: playable
 source: {document: scenario-book-zh.pdf, pdf_page: 14, printed_page: 15, status: verified_source}
 turns: 11
 visibility: {axis: 24, allies: 20}
-optional_rules: []
+optional_rules: [radar]
 available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
 setup:
   mode: scenario_positions
@@ -43,7 +43,7 @@ setup:
       note: 盟军驱逐单纵（赛尔弗里纪旗舰）
 
 victory:
-  kind: custom_score_thresholds
+  kind: dd_kill_comparison
 special_rules:
   # 能见度行附加条原文
   - {id: IBS-S-13-R1, text: 所有盟军单位拥有雷达。}
@@ -54,6 +54,13 @@ special_rules:
   # 胜利条件原文（非标准VP制）
   - {id: IBS-S-13-R4, text: 回合结束时，如果盟军击沉敌方3艘DD，己方只被击沉1艘DD或更少，则盟军战役级胜利。}
   - {id: IBS-S-13-R5, text: 如果日军击沉敌方3艘DD，己方无任何DD被击沉，则日军战役级胜利。除此之外的结果为平局。}
+special_rule_kinds:
+- id: IBS-S-13-R1
+  kind: setup_modification
+  sides:
+  - allies
+  radar: true
+
 ships:
   # 日本舰队 配置（旗舰：秋云 —— 伊集院松治大佐）
   - {id: IBS-U-IJN-AKIGUMO, name: 秋云, side: axis, template: dd-japanese-1942, position: L12, heading: 2, speed: 4, asset: 日本-DD-秋云.png, flagship: true}

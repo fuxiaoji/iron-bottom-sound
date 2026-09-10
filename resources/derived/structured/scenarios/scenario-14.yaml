@@ -9,7 +9,7 @@ status: playable
 source: {document: scenario-book-zh.pdf, pdf_page: 15, printed_page: 16, status: verified_source}
 turns: 12
 visibility: {axis: 27, allies: 25}
-optional_rules: []
+optional_rules: [radar]
 available_optional_rules: [hidden_contacts, radar, star_shells, searchlights, malfunction_66, squalls, smoke, silhouettes, hidden_damage, blind_torpedoes]
 setup:
   mode: scenario_positions
@@ -39,7 +39,9 @@ setup:
       note: 盟军驱逐纵队（尼古拉斯旗舰）
 
 victory:
-  kind: custom_score_thresholds
+  kind: margin_tiers
+  tactical_margin: 3
+  campaign_margin: 6
 special_rules:
   # 能见度行附加条原文
   - {id: IBS-S-14-R1, text: 所有盟军单位拥有雷达。南方为明亮的月光，所以任何向南方目标炮击的单位都可以获得火炮修正-2。}
@@ -51,6 +53,18 @@ special_rules:
   - {id: IBS-S-14-R6, text: 美军驱逐舰只能在6格或更近距离向驳船单位炮击，必须集中炮击，无法分别炮击多个单位。然后掷2枚骰子，只有点数和为12时，视为击沉驳船。每个击沉的驳船美军获得2分。}
   # 胜利条件原文（非标准VP制）
   - {id: IBS-S-14-R7, text: 任何一方领先3分即为战术胜利。如果领先6分，则为战役级胜利。其他情况为平局。}
+special_rule_kinds:
+- id: IBS-S-14-R1
+  kind: setup_modification
+  sides:
+  - allies
+  radar: true
+- id: IBS-S-14-R1B
+  kind: gunnery_direction_modifier
+  toward: south
+  modifier: -2
+  note: 南方月光明亮：向南方目标炮击的单位获得火炮修正 -2
+
 ships:
   # 日本舰队 配置（旗舰：涟 —— 伊集院松治大佐）
   - {id: IBS-U-IJN-SAZANAMI, name: 涟, side: axis, template: dd-japanese-1942, position: O11, heading: 5, speed: 4, asset: 日本-DD-涟.png, flagship: true}

@@ -761,7 +761,7 @@ def test_gunnery_rejects_destroyed_mount_and_scenario_one_axis_turn_one_fire() -
         ),
     )
     assert not result.valid
-    assert any("may not fire" in error for error in result.errors)
+    assert any("想定特例" in error for error in result.errors)
     assert any("unavailable gun mount" in error for error in result.errors)
 
 

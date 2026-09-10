@@ -611,11 +611,14 @@ class IronBottomEngine:
             if ship.side != side or ship.sunk or not ship.position:
                 continue
             blocked_reason: str | None = None
-            if state.scenario_id == "IBS-S-01" and state.turn == 1 and side == Side.AXIS:
-                blocked_reason = "想定特例：日军第 1 回合不得开火"
+            scenario_block = scenario_rules(state.scenario_id).turn_restriction_reason(
+                side.value, state.turn, "gunnery"
+            )
+            if scenario_block:
+                blocked_reason = scenario_block
             elif ship.guns_disabled_turns:
                 blocked_reason = "本回合全部火炮失效"
-            elif state.options.optional_rules.squalls and self._in_squall(state, ship.position):
+            elif self._weather_blocked(state, ship.position):
                 blocked_reason = "舰船位于飑区内"
             targets: list[dict[str, Any]] = []
             if not blocked_reason:
@@ -999,11 +1002,14 @@ class IronBottomEngine:
             if ship.side != side or ship.sunk or not ship.position or not ship.torpedo or ship.torpedo.destroyed:
                 continue
             blocked_reason: str | None = None
-            if state.scenario_id == "IBS-S-01" and state.turn < 4 and side == Side.AXIS:
-                blocked_reason = "想定特例：日军第 4 回合前不得发射鱼雷"
+            scenario_block = scenario_rules(state.scenario_id).turn_restriction_reason(
+                side.value, state.turn, "torpedo"
+            )
+            if scenario_block:
+                blocked_reason = scenario_block
             elif ship.ship_type in {"BB", "BC"} and ship.current_speed >= 4:
                 blocked_reason = "战列舰/战列巡洋舰以 4 MF 或更高速度航行"
-            elif state.options.optional_rules.squalls and self._in_squall(state, ship.position):
+            elif self._weather_blocked(state, ship.position):
                 blocked_reason = "舰船位于飑区内"
             movement = next(
                 (
@@ -1325,7 +1331,7 @@ class IronBottomEngine:
             source_bearing = ((torpedo_heading + 2) % 6) + 1
             relative = (source_bearing - target.heading) % 6
             aspect = "bow_stern" if relative in {0, 3} else "broadside"
-            modifier = self._torpedo_modifier(ship, target, distance)
+            modifier = self._torpedo_modifier(state, ship, target, distance)
             result["aspect"] = aspect
             result["modifier"] = modifier
             result["hit_probability"] = self.torpedo_hit_probability(aspect, modifier)
@@ -1486,6 +1492,11 @@ class IronBottomEngine:
                 )
                 if any(self._terrain_impassable(state, position) for position, _ in trajectory):
                     errors.append(f"{order.ship_id}: movement plan enters land")
+                scenario_violation = self._scenario_movement_violation(
+                    state, ship, commands, cost, trajectory[-1][0] if trajectory else ship.position
+                )
+                if scenario_violation:
+                    errors.append(f"{order.ship_id}: {scenario_violation}")
             except ValueError as error:
                 errors.append(f"{order.ship_id}: {error}")
                 continue
@@ -1553,11 +1564,14 @@ class IronBottomEngine:
             if not attacker:
                 errors.append(f"Gunnery references non-owned ship {order.ship_id}")
                 continue
-            if state.scenario_id == "IBS-S-01" and state.turn == 1 and batch.side == Side.AXIS:
-                errors.append("Japanese ships may not fire during scenario 1 turn 1")
+            scenario_block = scenario_rules(state.scenario_id).turn_restriction_reason(
+                batch.side.value, state.turn, "gunnery"
+            )
+            if scenario_block:
+                errors.append(scenario_block)
             if attacker.guns_disabled_turns:
                 errors.append(f"{order.ship_id}: all guns are disabled this turn")
-            if state.options.optional_rules.squalls and self._in_squall(state, attacker.position):
+            if self._weather_blocked(state, attacker.position):
                 errors.append(f"{order.ship_id}: ships in squalls may not fire")
             for target in (order.primary_target, order.secondary_target, order.searchlight_target):
                 if target and (target not in state.ships or state.ships[target].side == batch.side):
@@ -1613,11 +1627,14 @@ class IronBottomEngine:
             if state.options.realistic_command and ship.command_status != "attached":
                 errors.append(f"{order.ship_id}: detached ships may not receive torpedo orders")
                 continue
-            if state.scenario_id == "IBS-S-01" and state.turn < 4 and batch.side == Side.AXIS:
-                errors.append("Japanese ships may not launch torpedoes before scenario 1 turn 4")
+            scenario_block = scenario_rules(state.scenario_id).turn_restriction_reason(
+                batch.side.value, state.turn, "torpedo"
+            )
+            if scenario_block:
+                errors.append(scenario_block)
             if ship.ship_type in {"BB", "BC"} and ship.current_speed >= 4:
                 errors.append(f"{order.ship_id}: BB/BC moving at 4 MF or more may not launch torpedoes")
-            if state.options.optional_rules.squalls and self._in_squall(state, ship.position):
+            if self._weather_blocked(state, ship.position):
                 errors.append(f"{order.ship_id}: ships in squalls may not launch torpedoes")
             launcher = next((item for item in ship.torpedo_launchers if item.id == order.launcher_id), None)
             if not launcher or launcher.destroyed or launcher.reload_turns_remaining:
@@ -1792,6 +1809,7 @@ class IronBottomEngine:
             self._check_victory(state)
             if state.phase != Phase.COMPLETE:
                 state.turn += 1
+                self._apply_turn_start_scenario_rules(state)
                 state.phase = Phase.REINFORCEMENT
                 for ship in state.ships.values():
                     ship.fired = False
@@ -2852,7 +2870,7 @@ class IronBottomEngine:
                 rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
             )
             return None
-        if state.options.optional_rules.squalls and self._in_squall(state, ship.position):
+        if self._weather_blocked(state, ship.position):
             self._event(
                 state,
                 "torpedo_launch_cancelled",
@@ -2892,6 +2910,8 @@ class IronBottomEngine:
         )
         state.torpedo_tracks.append(track)
         launcher.loaded -= order.count
+        expended = state.scenario_state.setdefault("torpedo_expended", {})
+        expended[ship.side.value] = expended.get(ship.side.value, 0) + order.count
         if launcher.loaded == 0 and launcher.reloads_remaining:
             reload_duration = 3 if ship.ship_type in {"DD", "APD"} else 2
             launcher.reload_turns_remaining = reload_duration + 1
@@ -3414,8 +3434,15 @@ class IronBottomEngine:
                 len(targets_per_attacker[attacker.id]),
             )
             firepower = sum(mount.firepower for mount in mounts)
-            if state.scenario_id == "IBS-S-01" and attacker.side == Side.ALLIES:
-                firepower = (firepower + 1) // 2
+            multiplier = scenario_rules(state.scenario_id).firepower_multiplier(
+                attacker.side.value,
+                attacker.ship_type,
+                caliber,
+                "east" if (target.position and attacker.position and target.position.q > attacker.position.q) else "other",
+            )
+            if multiplier is not None:
+                factor, ceil_half = multiplier
+                firepower = math.ceil(firepower * factor) if ceil_half else int(firepower * factor)
             prepared.append((attacker, mounts, target, distance, modifiers, firepower, caliber))
         # The attack list and all modifiers are frozen before damage is applied: sunk ships still complete this phase's fire.
         for attacker, mounts, target, distance, modifiers, firepower, caliber in prepared:
@@ -3443,6 +3470,18 @@ class IronBottomEngine:
                 rule=self._rule("IBS-T-GHT", 2, "炮击命中表"),
                 dice=DiceRoll(dice=dice, notation="D66", raw=raw, adjusted=adjusted),
             )
+            self._mark_alerted(state, target.id, "被炮击")
+            if hits and scenario_rules(state.scenario_id).penetration_blocked(
+                attacker.side.value, state.turn, attacker.ship_type
+            ):
+                self._event(
+                    state,
+                    "penetration_blocked",
+                    f"{attacker.name} 的炮击命中但无法穿透 {target.name} 的装甲（想定特例：穿甲无效）",
+                    payload={"attacker": attacker.id, "target": target.id, "hits": hits},
+                    rule=self._scenario_rule(f"{state.scenario_id}-PENETRATION", 1, "想定特例：穿甲无效"),
+                )
+                hits = 0
             if state.options.optional_rules.malfunction_66 and raw == 66:
                 self._resolve_malfunction(state, attacker)
             for _ in range(hits):
@@ -3550,7 +3589,7 @@ class IronBottomEngine:
             for target_id in track.contact_ship_ids:
                 target = state.ships[target_id]
                 roll, dice = self._roll_2d6(state)
-                adjusted = roll + self._torpedo_modifier(attacker, target, distance)
+                adjusted = roll + self._torpedo_modifier(state, attacker, target, distance)
                 aspect = self._torpedo_track_aspect(track, target)
                 candidates.append((adjusted, target, roll, dice, aspect))
             adjusted, target, roll, dice, aspect = max(candidates, key=lambda item: item[0])
@@ -3572,6 +3611,8 @@ class IronBottomEngine:
                 rule=self._rule("IBS-R-08.2", 12, "8.2"),
                 dice=DiceRoll(dice=dice, notation="2D6", raw=roll, adjusted=adjusted),
             )
+            if hits:
+                self._mark_alerted(state, target.id, "被鱼雷命中")
             for _ in range(hits):
                 raw_damage_roll, damage_dice = self._roll_2d6(state)
                 damage_modifier = int(definition.get("damage_modifier", 0))
@@ -3729,6 +3770,11 @@ class IronBottomEngine:
             int(self.rules.modifiers["optional"]["through_smoke"])
             if state.options.optional_rules.smoke and (target.smoke or attacker.smoke) else 0
         )
+        scenario_modifier = scenario_rules(state.scenario_id).gunnery_situation_modifier(
+            attacker.position, target.position
+        )
+        if scenario_modifier:
+            values["scenario"] = scenario_modifier
         return values
 
     def _gunnery_modifier(
@@ -3750,9 +3796,10 @@ class IronBottomEngine:
                 return int(row[columns.index(target_group)])
         return 0
 
-    def _torpedo_modifier(self, attacker: ShipState, target: ShipState, distance: int) -> int:
+    def _torpedo_modifier(self, state: GameState, attacker: ShipState, target: ShipState, distance: int) -> int:
         modifier = self.rules.range_modifier("torpedo", distance, japanese=attacker.id.startswith("IBS-U-IJN-"))
         modifier += self.rules.target_speed_modifier("torpedo", target.current_speed)
+        modifier += scenario_rules(state.scenario_id).torpedo_roll_bonus(attacker.side.value, state.turn)
         return modifier
 
     @staticmethod
@@ -4250,7 +4297,7 @@ class IronBottomEngine:
     def _visible_to(self, state: GameState, target: ShipState, side: Side, own_positions: Iterable[HexCoord | None]) -> bool:
         if target.sunk or not target.position:
             return True
-        if state.options.optional_rules.squalls and self._in_squall(state, target.position):
+        if self._weather_blocked(state, target.position):
             return False
         if any(
             marker.kind == "searchlight" and marker.target_ship_id == target.id
@@ -4281,9 +4328,7 @@ class IronBottomEngine:
         return state.options.optional_rules.silhouettes and self._silhouetted(state, target)
 
     def _can_see(self, state: GameState, attacker: ShipState, target: ShipState) -> bool:
-        if state.options.optional_rules.squalls and (
-            self._in_squall(state, attacker.position) or self._in_squall(state, target.position)
-        ):
+        if self._weather_blocked(state, attacker.position) or self._weather_blocked(state, target.position):
             return False
         if not attacker.position or not target.position:
             return False
@@ -4391,6 +4436,106 @@ class IronBottomEngine:
     @staticmethod
     def _scenario_rule(rule_id: str, page: int, section: str) -> RuleReference:
         return RuleReference(rule_id=rule_id, document="scenario-book-zh.pdf", pdf_page=page, section=section)
+
+    def _weather_blocked(self, state: GameState, position: HexCoord | None) -> bool:
+        """想定暴雨标记始终生效；可选规则雨飑仍按 9.6 的开关判断。"""
+        if not position:
+            return False
+        for marker in state.markers:
+            if not marker.position or marker.position.distance(position) > 1:
+                continue
+            if marker.kind == "storm":
+                return True
+            if marker.kind == "squall" and state.options.optional_rules.squalls:
+                return True
+        return False
+
+    def _mark_alerted(self, state: GameState, ship_id: str, reason: str) -> None:
+        rule = scenario_rules(state.scenario_id).alert_rule()
+        if not rule or ship_id not in state.ships:
+            return
+        ship = state.ships[ship_id]
+        if ship.side.value not in rule.get("sides", []):
+            return
+        alerted = set(state.scenario_state.get("alerted", []))
+        if ship_id in alerted:
+            return
+        alerted.add(ship_id)
+        state.scenario_state["alerted"] = sorted(alerted)
+        self._event(
+            state,
+            "alert_state_changed",
+            f"{ship.name} 转入警戒状态（{reason}）",
+            payload={"ship_id": ship_id, "reason": reason},
+            rule=self._scenario_rule(f"{state.scenario_id}-ALERT", 1, "想定特例：警戒状态"),
+        )
+
+    def _apply_turn_start_scenario_rules(self, state: GameState) -> None:
+        """回合推进时的想定规则钩子：能见度日程、警戒自动升级与目视触发。"""
+        rule_set = scenario_rules(state.scenario_id)
+        for side in Side:
+            value = rule_set.visibility_for_turn(side.value, state.turn)
+            if value is not None:
+                state.visibility[side.value] = value
+        rule = rule_set.alert_rule()
+        if not rule:
+            return
+        sides = set(rule.get("sides", []))
+        auto_turn = int(rule.get("all_alerted_turn", 0))
+        if auto_turn and state.turn >= auto_turn:
+            for ship in list(state.ships.values()):
+                if ship.side.value in sides:
+                    self._mark_alerted(state, ship.id, f"第 {auto_turn} 回合自动警戒")
+        alerted = set(state.scenario_state.get("alerted", []))
+        for ship in state.ships.values():
+            if ship.side.value not in sides or ship.id in alerted or ship.sunk or not ship.position:
+                continue
+            visibility = int(state.visibility[ship.side.value])
+            enemy_visible = any(
+                enemy.position and not enemy.sunk and enemy.side != ship.side
+                and ship.position.distance(enemy.position) <= visibility
+                for enemy in state.ships.values()
+            )
+            if enemy_visible:
+                self._mark_alerted(state, ship.id, "敌舰进入可视范围")
+
+    def _scenario_movement_violation(
+        self, state: GameState, ship: ShipState, commands: list[str], cost: int, final_position: HexCoord | None
+    ) -> str | None:
+        rule_set = scenario_rules(state.scenario_id)
+        for constraint in rule_set.movement_constraints():
+            if constraint.get("constraint") != "stay_adjacent":
+                continue
+            subjects = constraint.get("subjects", {})
+            anchors = constraint.get("anchors", {})
+            if ship.side.value not in subjects.get("sides", []) or ship.ship_type not in subjects.get("ship_types", []):
+                continue
+            anchor_positions = [
+                other.position
+                for other in state.ships.values()
+                if other.id != ship.id
+                and other.side == ship.side
+                and other.ship_type in anchors.get("ship_types", [])
+                and not other.sunk
+                and other.position
+            ]
+            if not anchor_positions:
+                continue
+            max_distance = int(constraint.get("max_distance", 1))
+            if final_position is None or not any(final_position.distance(pos) <= max_distance for pos in anchor_positions):
+                anchor_names = "/".join(anchors.get("ship_types", []))
+                return f"想定特例 {constraint.get('id', '')}：必须始终与{anchor_names}保持{max_distance}格内邻接"
+        alert_rule = rule_set.alert_rule()
+        if alert_rule and ship.side.value in alert_rule.get("sides", []):
+            alerted = set(state.scenario_state.get("alerted", []))
+            if ship.id not in alerted:
+                if any(command != "advance" for command in commands):
+                    return "想定特例：未警戒单位只能保持原有方向直行"
+                if cost != ship.current_speed:
+                    return f"想定特例：未警戒单位只能以当前航速 {ship.current_speed} 直行"
+            if ship.id in rule_set.speed_capped_ships(state.ships) and cost > ship.current_speed + 1:
+                return f"想定特例：该舰每回合航速最多提升 1 MF（当前 {ship.current_speed}）"
+        return None
 
     @staticmethod
     def _event(

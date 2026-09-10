@@ -52,6 +52,24 @@ special_rules:
   - {id: IBS-S-02-R2, text: 岛屿放置：将萨沃岛小地图的X格对应放置在A-27格。}
   - {id: IBS-S-02-R3, text: 根据海军条令，美军DD必须始终维持与CL相邻。}
   - {id: IBS-S-02-R4, text: 日军可能受到增援。仅在第4回合开始时掷1枚骰子，如果掷到1或2，那么增援单位在移动阶段，以任意航速从G27至O27进入地图。“浜风”、“望月”、“三日月”按此顺序单纵队编队，划掉“浜风”的鱼雷再装填，因为它装载了额外的集装箱物资。}
+special_rule_kinds:
+- id: IBS-S-02-R3
+  kind: movement_constraint
+  constraint: stay_adjacent
+  max_distance: 2
+  note: 校准——本想定初始布阵中尼古拉斯(T6)距最近CL(火奴鲁鲁V7)恰为2格，故“相邻”按六边形距离≤2执行
+  subjects:
+    sides:
+    - allies
+    ship_types:
+    - DD
+  anchors:
+    sides:
+    - allies
+    ship_types:
+    - CL
+  note: 美军 DD 移动结束时必须与己方 CL 相邻（无存活 CL 时不适用）
+
 ships:
   - {id: IBS-U-IJN-NIIZUKI, name: 新月, side: axis, template: dd-japanese-1942, position: K14, heading: 6, speed: 5, asset: 日本-DD-新月.png, flagship: true}
   - {id: IBS-U-IJN-SUZUKAZE, name: 凉风, side: axis, template: dd-japanese-1942, position: K15, heading: 6, speed: 5, asset: 日本-DD-凉风.png}

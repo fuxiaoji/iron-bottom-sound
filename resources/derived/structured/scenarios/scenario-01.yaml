@@ -22,6 +22,35 @@ special_rules:
   - {id: IBS-S-01-R4, text: 美军火控不佳；所有阶段、所有攻击的 GF 减半并向上取整。}
   - {id: IBS-S-01-R5, text: 第三回合开始时掷一次 1D6；结果为 1 时，日军增援在第四回合开始、移动计划前从 E17 至 U27 间入场。}
   - {id: IBS-S-01-R6, text: 除朝云外，所有增援驱逐舰划去全部鱼雷备雷。}
+special_rule_kinds:
+- id: IBS-S-01-R2
+  kind: turn_restriction
+  sides:
+  - axis
+  turns:
+  - 1
+  actions:
+  - gunnery
+  reason: 想定特例：日军第 1 回合不得炮击
+- id: IBS-S-01-R3
+  kind: turn_restriction
+  sides:
+  - axis
+  turns:
+  - 1
+  - 2
+  - 3
+  actions:
+  - torpedo
+  reason: 想定特例：日军第 4 回合前不得发射鱼雷
+- id: IBS-S-01-R4
+  kind: firepower_multiplier
+  sides:
+  - allies
+  factor: 0.5
+  ceil: true
+  note: 美军火控不佳：所有阶段、所有攻击的 GF 减半并向上取整
+
 ships:
   - {id: IBS-U-IJN-AOBA, name: 青叶, side: axis, template: ca-japanese-1942, position: P10, heading: 2, speed: 5, asset: 日本-CA-青叶.png}
   - {id: IBS-U-IJN-FURUTAKA, name: 古鹰, side: axis, template: ca-japanese-1942, position: N9, heading: 2, speed: 5, asset: 日本-CA-古鹰.png}

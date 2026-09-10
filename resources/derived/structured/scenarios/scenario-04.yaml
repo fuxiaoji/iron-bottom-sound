@@ -63,6 +63,38 @@ special_rules:
   - {id: IBS-S-04-R4, text: 在第一到第三回合，日军鱼雷攻击判定掷骰点数+1。}
   - {id: IBS-S-04-R5, text: '区域存在的大片陆地影响美军重巡的8"火炮火控，它们炮火强度减半（向上取整），但向东侧目标炮击则不受影响。'}
   - {id: IBS-S-04-R6, text: 日军可能受到增援。仅在第4回合开始时掷1枚骰子，如果掷到1或2，那么增援单位在移动阶段，以任意航速从G27至O27进入地图。“浜风”、“望月”、“三日月”按此顺序单纵队编队，划掉“浜风”的鱼雷再装填，因为它装载了额外的集装箱物资。}
+special_rule_kinds:
+- id: IBS-S-04-R2
+  kind: turn_restriction
+  sides:
+  - allies
+  turns:
+  - 1
+  actions:
+  - torpedo
+  reason: 想定特例：美军在第一回合无法发射鱼雷
+- id: IBS-S-04-R4
+  kind: torpedo_roll_bonus
+  sides:
+  - axis
+  turns:
+  - 1
+  - 2
+  - 3
+  bonus: 1
+- id: IBS-S-04-R5
+  kind: firepower_multiplier
+  sides:
+  - allies
+  ship_types:
+  - CA
+  caliber_min: 7.5
+  caliber_max: 8.5
+  factor: 0.5
+  ceil: true
+  unless_direction: east
+  note: 陆地影响美军重巡 8 吋火控：炮火强度减半向上取整；向东侧目标炮击不受影响
+
 ships:
   - {id: IBS-U-IJN-TAKANAMI, name: 高波, side: axis, template: dd-japanese-1942, position: P16, heading: 2, speed: 3, asset: 日本-DD-高波.png}
   - {id: IBS-U-IJN-OYASHIO, name: 亲潮, side: axis, template: dd-japanese-1942, position: M19, heading: 2, speed: 3, asset: 日本-DD-亲潮.png}

@@ -63,6 +63,16 @@ special_rules:
   - {id: IBS-S-08-R2, text: 将暴风雨标记放置在L5、M4、M6和O5。这些格和其相邻格立刻被暴雨影响。}
   - {id: IBS-S-08-R3, text: 日军可能受到增援。仅在第4回合开始时掷1枚骰子，如果掷到1，那么增援单位在移动阶段开始前，以任意航速全部放置在E17至U27的格子。}
   - {id: IBS-S-08-R4, text: 划掉所有增援单位的鱼雷再装填，因为它装载了额外的地面部队和物资。}
+special_rule_kinds:
+- id: IBS-S-08-R2
+  kind: storm_markers
+  hexes:
+  - L5
+  - M4
+  - M6
+  - O5
+  note: 这些格与其相邻格立刻被暴雨影响（引擎按飑区规则判定）
+
 ships:
   # 日本舰队 配置（旗舰：神通——伊崎俊二少将）
   - {id: IBS-U-IJN-MIKAZUKI, name: 三日月, side: axis, template: dd-japanese-1942, position: F7, heading: 2, speed: 5, asset: 日本-APD-三日月.png}

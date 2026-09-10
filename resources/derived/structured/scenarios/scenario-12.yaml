@@ -57,7 +57,7 @@ setup:
       note: 第二警戒队
 
 victory:
-  kind: victory_points
+  kind: vp_with_bb_decisive_clause
   points_per_three_hull_lost: 1
   leader_margin: 4
   draw_if_margin_below: 4
@@ -66,6 +66,19 @@ special_rules:
   - {id: IBS-S-12-R1, text: 双方都对第一次接触很震惊，双方第一回合都无法炮击和发射鱼雷。}
   # 胜利条件附加条（schema 无战列舰损失判定字段）
   - {id: IBS-S-12-R2, text: 如果敌方损失1-2艘战列舰，而己方无战列舰损失，视为决定性胜利。}
+special_rule_kinds:
+- id: IBS-S-12-R1
+  kind: turn_restriction
+  sides:
+  - axis
+  - allies
+  turns:
+  - 1
+  actions:
+  - gunnery
+  - torpedo
+  reason: 想定特例：双方第一回合都无法炮击和发射鱼雷
+
 ships:
   # 日本舰队 配置（旗舰：长门 —— 德刚中将）
   # 页面计数器印“加古(1)”上标注记，按既有惯例写作 加古(I)

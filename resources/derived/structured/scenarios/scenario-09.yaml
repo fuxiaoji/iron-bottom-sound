@@ -83,6 +83,35 @@ special_rules:
   - {id: IBS-S-09-R2, text: 双方在第1回合都不能发射鱼雷。}
   - {id: IBS-S-09-R3, text: 日军战列舰BB在第1和第2回合时，任何炮击都无法穿透装甲。因为他们正准备向亨德森机场炮击高爆弹。}
   - {id: IBS-S-09-R4, text: 旧金山的舰尾主炮于当天早些时候被炸毁，需要先划掉。}
+special_rule_kinds:
+- id: IBS-S-09-R2
+  kind: turn_restriction
+  sides:
+  - axis
+  - allies
+  turns:
+  - 1
+  actions:
+  - torpedo
+  reason: 想定特例：双方在第 1 回合都不能发射鱼雷
+- id: IBS-S-09-R3
+  kind: penetration_block
+  sides:
+  - axis
+  turns:
+  - 1
+  - 2
+  ship_types:
+  - BB
+  note: 日军 BB 第 1-2 回合装高爆弹准备炮击机场，任何炮击都无法穿透装甲
+- id: IBS-S-09-R4
+  kind: setup_modification
+  ship_id: IBS-U-USN-SAN-FRANCISCO
+  remove_mounts:
+    kind: primary
+    position: stern
+  note: 旧金山的舰尾主炮于当天早些时候被炸毁
+
 ships:
   # 日本舰队 配置（旗舰：比睿——阿部弘毅中将）
   - {id: IBS-U-IJN-YUDACHI, name: 夕立, side: axis, template: dd-japanese-1942, position: S12, heading: 2, speed: 3, asset: 日本-DD-夕立.png}

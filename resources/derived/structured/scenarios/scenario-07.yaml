@@ -60,7 +60,7 @@ setup:
       note: 第二警戒队
 
 victory:
-  kind: victory_points
+  kind: bc_kill_comparison
   points_per_three_hull_lost: 1
   leader_margin: 5
   draw_if_margin_below: 5
@@ -68,6 +68,18 @@ victory:
 special_rules:
   - {id: IBS-S-07-R1, text: 第一回合双方都无法发射鱼雷。}
   - {id: IBS-S-07-R2, text: 游戏第7回合结束时统计胜利分。每造成3点“船体”损失，计入1分。领先5分和以上，并且同时击沉战巡BC比对方多的玩家为胜利者。其他结果为平局。}
+special_rule_kinds:
+- id: IBS-S-07-R1
+  kind: turn_restriction
+  sides:
+  - axis
+  - allies
+  turns:
+  - 1
+  actions:
+  - torpedo
+  reason: 想定特例：第一回合双方都无法发射鱼雷
+
 ships:
   # 日本舰队 配置（旗舰：尾张——长浜和也少将）
   - {id: IBS-U-IJN-OWARI, name: 尾张, side: axis, template: ca-american-1942, position: J9, heading: 2, speed: 4, asset: 日本-BC-尾张.png, flagship: true}

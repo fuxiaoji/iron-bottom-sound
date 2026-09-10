@@ -581,7 +581,7 @@ class WreckState(BaseModel):
 
 class MarkerState(BaseModel):
     id: str
-    kind: Literal["fire", "smoke", "star_shell", "searchlight", "squall", "contact", "torpedo_hit", "sunk"]
+    kind: Literal["fire", "smoke", "star_shell", "searchlight", "squall", "storm", "contact", "torpedo_hit", "sunk"]
     position: HexCoord | None = None
     ship_id: str | None = None
     target_ship_id: str | None = None
@@ -641,6 +641,9 @@ class GameState(BaseModel):
     hull_damage_taken: dict[str, int] = Field(
         default_factory=lambda: {Side.AXIS.value: 0, Side.ALLIES.value: 0}
     )
+    # 想定特例的运行期容器（警戒状态、鱼雷消耗计分等）；键结构由各想定的
+    # special_rule_kinds 定义，引擎不在此处复制规则常量。
+    scenario_state: dict[str, Any] = Field(default_factory=dict)
     winner: Side | None = None
     victory_reason: str | None = None
 

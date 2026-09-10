@@ -55,7 +55,9 @@ setup:
       note: 北方舰队
 
 victory:
-  kind: custom_score_thresholds
+  kind: score_threshold_tiers
+  tactical_margin: 16
+  decisive_margin: 50
 special_rules:
   # 配置框内注释原文
   - {id: IBS-S-10-R1, text: '“天龙”，“夕张” & “夕凪” 排成一列依次跟随“衣笠”（领头），这三艘舰船到达时每艘船占据一个格子。'}
@@ -84,6 +86,46 @@ special_rules:
   - {id: IBS-S-10-R20, text: 盟军玩家可能获得增援。第2回合开始，在日军移动阶段之前，掷2枚骰子，如果点数之和与下面表格对应的结果出现未上场的增援单位，将他们依次以警戒状态进入地图。盟军后续每回合都掷骰判定增援。骰点表：2=澳大利亚、东方部队、拉尔夫·托尔伯特；3=澳大利亚、东方部队、布鲁；4=澳大利亚、东方部队、布鲁；5-9=没有新部队转移或加入；10=澳大利亚；11=澳大利亚、拉尔夫·托尔伯特；12=拉尔夫·托尔伯特 & 布鲁。}
   - {id: IBS-S-10-R21, text: “澳大利亚”从地图HH22-HH27格进入地图（包含这两格），“拉尔夫·托尔伯特”从A1-A8进入地图（包含这两格），“布鲁”从A21-A27进入地图（包含这两格），东方编队从HH3-HH21进入地图（包含这两格）。上述单位可以以任何航速进入地图，东方编队以任意单位领头，单纵队进入地图。}
   - {id: IBS-S-10-R22, text: 如果日军单位离开地图，图拉吉护航编队可以进场。进场位置是离开地图的日军单位离开格的5格范围内，日军单位离开地图的2个回合后，图拉吉护航编队以任意航速进入。}
+special_rule_kinds:
+- id: IBS-S-10-R3
+  kind: visibility_schedule
+  side: allies
+  from_turn:
+    '1': 8
+    '2': 10
+    '3': 12
+- id: IBS-S-10-R5
+  kind: turn_restriction
+  sides:
+  - allies
+  turns:
+  - 1
+  actions:
+  - gunnery
+  reason: 想定特例：只有日军在第 1 回合可以炮击
+- id: IBS-S-10-R6
+  kind: alert_states
+  sides:
+  - allies
+  all_alerted_turn: 3
+  initial:
+    ships:
+    - IBS-U-RAN-CANBERRA
+    - IBS-U-USN-UNNAMED-T01-R12
+    - IBS-U-USN-PATTERSON
+    - IBS-U-USN-BAGLEY
+    - IBS-U-USN-JARVIS
+  speed_cap_ships:
+  - IBS-U-RAN-CANBERRA
+  - IBS-U-USN-UNNAMED-T01-R12
+  - IBS-U-USN-PATTERSON
+  - IBS-U-USN-BAGLEY
+  note: 南方编队初始警戒；未警戒单位只能原向原速直行（R7）；4 舰每回合最多提速 1MF（R8）；被炮击/被雷命中/敌舰可视转警戒（R9）；第 3 回合全体警戒（R10）
+- id: IBS-S-10-R13
+  kind: torpedo_expenditure_points
+  points_per_torpedo: 4
+  note: 每消耗 1 点鱼雷值日军得 4 分（R13）；离场计分/返回见 R12/R14 文本（离场机制引擎暂未实现）
+
 ships:
   # 日本舰队 配置（旗舰：鸟海——三川军一少将）
   - {id: IBS-U-IJN-CHOKAI, name: 鸟海, side: axis, template: ca-japanese-1942, position: H23, heading: 1, speed: 5, asset: 日本-CA-鸟海.png, flagship: true}
