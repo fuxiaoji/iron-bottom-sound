@@ -81,3 +81,14 @@ reinforcements:
     - {id: IBS-U-IJN-KIRISHIMA, name: 雾岛, side: axis, template: ca-american-1942, speed_track: [5, 5, 5], asset: 日本-BB-雾岛.png}
     - {id: IBS-U-IJN-ASAGUMO, name: 朝云, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], asset: 日本-DD-朝云.png}
     - {id: IBS-U-IJN-TERUZUKI, name: 照月, side: axis, template: dd-japanese-1942, speed_track: [6, 5, 5], asset: 日本-DD-照月.png}
+ai_stats:
+  games: 10
+  axis_wins: 3
+  allies_wins: 7
+  draws: 0
+  avg_turns: 10
+  avg_sunk:
+    axis: 1.3
+    allies: 2.0
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。

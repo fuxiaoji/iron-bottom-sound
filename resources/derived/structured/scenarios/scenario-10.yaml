@@ -156,3 +156,14 @@ ships:
 # UNVERIFIED-VICTORY: 胜利条件非标准VP制（按分差阈值与击沉日军重巡数判定，见 IBS-S-10-R15 至 R19），schema 无对应字段。
 # UNVERIFIED-TURNS: 页面为“无限回合，当所有日军单位从地图A27-HH27离开地图时游戏结束”，非数字回合格数；文件头 turns: 30 为引擎整回合并上界，非规则值。
 # UNVERIFIED-ALLY-OOB: 已解决——盟军舰队配置表位于手册下一页（PDF 第 11 页，印刷页码 12），盟军数据与增援规则已从该页逐字转录（R20-R22 与 ships 列表）。
+ai_stats:
+  games: 10
+  axis_wins: 4
+  allies_wins: 0
+  draws: 6
+  avg_turns: 14.7
+  avg_sunk:
+    axis: 0.5
+    allies: 2.4
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。

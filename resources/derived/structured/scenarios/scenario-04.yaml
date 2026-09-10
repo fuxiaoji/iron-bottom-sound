@@ -122,3 +122,14 @@ reinforcements:
     - {id: IBS-U-IJN-HAMAKAZE, name: 浜风, side: axis, template: dd-japanese-1942, torpedo_reloads: 0, asset: 日本-DD-浜风.png}
     - {id: IBS-U-IJN-MONCHIZUKI, name: 望月, side: axis, template: dd-japanese-1942, asset: 日本-APD-望月.png}
     - {id: IBS-U-IJN-MIKAZUKI, name: 三日月, side: axis, template: dd-japanese-1942, asset: 日本-APD-三日月.png}
+ai_stats:
+  games: 10
+  axis_wins: 2
+  allies_wins: 8
+  draws: 0
+  avg_turns: 6
+  avg_sunk:
+    axis: 1.6
+    allies: 0.8
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。

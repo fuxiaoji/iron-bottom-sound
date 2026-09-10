@@ -26,3 +26,14 @@ ships:
   - {id: IBS-U-RN-JERSEY, name: 泽西, side: allies, template: dd-british-1940, position: T15, heading: 5, speed: 5, asset: 英国-DD-泽西.png}
   - {id: IBS-U-RN-JACKAL, name: 豺, side: allies, template: dd-british-1940, position: U15, heading: 5, speed: 5, asset: 英国-DD-豺.png}
   - {id: IBS-U-RN-JUPITER, name: 朱庇特, side: allies, template: dd-british-1940, position: V14, heading: 5, speed: 5, asset: 英国-DD-朱庇特.png}
+ai_stats:
+  games: 10
+  axis_wins: 6
+  allies_wins: 4
+  draws: 0
+  avg_turns: 4
+  avg_sunk:
+    axis: 0.7
+    allies: 0.6
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。

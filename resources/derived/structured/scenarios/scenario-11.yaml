@@ -129,3 +129,14 @@ ships:
   - {id: IBS-U-USN-CONVERSE, name: 康弗斯, side: allies, template: dd-american-1942, position: GG21, heading: 4, speed: 4, asset: 美国-DD-康弗斯.png}
   - {id: IBS-U-USN-FOOTE, name: 福特, side: allies, template: dd-american-1942, position: GG22, heading: 4, speed: 4, asset: 美国-DD-福特.png}
 # UNVERIFIED-VICTORY: 胜利条件含“如果差值达到20分，视为决定性胜利”（IBS-S-11-R4），schema 的 victory 块无决定性胜利分差字段，仅保留标准VP四项。
+ai_stats:
+  games: 10
+  axis_wins: 1
+  allies_wins: 8
+  draws: 1
+  avg_turns: 9
+  avg_sunk:
+    axis: 2.7
+    allies: 2.2
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。

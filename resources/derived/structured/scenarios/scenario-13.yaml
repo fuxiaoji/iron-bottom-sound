@@ -89,3 +89,14 @@ reinforcements:
     - {id: IBS-U-USN-TAYLOR, name: 泰勒, side: allies, template: dd-american-1942, speed_track: [5, 5, 5], asset: 美国-DD-泰勒.png}
     - {id: IBS-U-USN-LA-VALLETTE, name: 拉瓦利特, side: allies, template: dd-american-1942, speed_track: [5, 5, 5], asset: 美国-DD-拉瓦利特.png}
 # UNVERIFIED-VICTORY: 胜利条件非标准VP制（按双方击沉DD数判定战役级胜利，见 IBS-S-13-R4/R5），schema 无对应字段，victory.kind 记为 custom_score_thresholds。
+ai_stats:
+  games: 10
+  axis_wins: 1
+  allies_wins: 1
+  draws: 8
+  avg_turns: 11
+  avg_sunk:
+    axis: 1.9
+    allies: 2.5
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。

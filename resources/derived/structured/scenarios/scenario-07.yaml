@@ -106,3 +106,14 @@ ships:
   - {id: IBS-U-USN-TRUXTON, name: 特鲁斯顿, side: allies, template: dd-american-1942, position: AA16, heading: 4, speed: 4, asset: 美国-DD-特鲁斯顿.png}
   - {id: IBS-U-USN-FOX, name: 福克斯, side: allies, template: dd-american-1942, position: BB16, heading: 4, speed: 4, asset: 美国-DD-福克斯.png}
 # UNVERIFIED-VICTORY: 胜利条件非标准VP制——“领先5分和以上”且“同时击沉战巡BC比对方多”才为胜利者，其他结果为平局；schema 无“击沉BC数”字段，原文完整见 IBS-S-07-R2。
+ai_stats:
+  games: 10
+  axis_wins: 0
+  allies_wins: 1
+  draws: 9
+  avg_turns: 7
+  avg_sunk:
+    axis: 2.0
+    allies: 3.2
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。

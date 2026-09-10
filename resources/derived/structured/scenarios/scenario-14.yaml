@@ -79,3 +79,14 @@ ships:
   - {id: IBS-U-USN-CHEVALIER, name: 谢伐利埃, side: allies, template: dd-american-1942, position: HH25, heading: 5, speed: 5, asset: 美国-DD-谢伐利埃.png}
 # UNVERIFIED-VICTORY: 胜利条件非标准VP制（领先3分战术胜利/领先6分战役级胜利，见 IBS-S-14-R7），schema 无对应字段，victory.kind 记为 custom_score_thresholds。
 # UNVERIFIED-DECOY: 两个假目标算子（驳船）放置于G17、H17、方向3、速度2（见 IBS-S-14-R4），为算子而非舰船，schema 无对应字段，未计入 ships。
+ai_stats:
+  games: 10
+  axis_wins: 3
+  allies_wins: 6
+  draws: 1
+  avg_turns: 12
+  avg_sunk:
+    axis: 1.7
+    allies: 1.1
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。

@@ -72,3 +72,14 @@ ships:
   - {id: IBS-U-USN-ERMA-ALLEN-M-SUMNER, name: 艾伦·M·萨姆纳, side: allies, position: S26, heading: 5, speed: 6, asset: 美国-DD-艾伦·M·萨姆纳.png}
   - {id: IBS-U-USN-ERMA-INGRAHAM, name: 英格拉罕, side: allies, position: T26, heading: 5, speed: 6, asset: 美国-DD-英格拉罕.png}
   - {id: IBS-U-USN-ERMA-COOPER, name: 库珀, side: allies, position: U27, heading: 5, speed: 6, asset: 美国-DD-库珀.png}
+ai_stats:
+  games: 10
+  axis_wins: 3
+  allies_wins: 0
+  draws: 7
+  avg_turns: 12
+  avg_sunk:
+    axis: 4.6
+    allies: 4.0
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。

@@ -143,3 +143,14 @@ ships:
   - {id: IBS-U-USN-BARTON, name: 巴顿, side: allies, template: dd-american-1942, position: Y25, heading: 5, speed: 4, asset: 美国-DD-巴顿.png}
   - {id: IBS-U-USN-MONSSEN, name: 蒙森, side: allies, template: dd-american-1942, position: Z25, heading: 5, speed: 4, asset: 美国-DD-蒙森.png}
   - {id: IBS-U-USN-FLETCHER, name: 弗莱彻, side: allies, template: dd-american-1942, position: AA26, heading: 5, speed: 4, asset: 美国-DD-弗莱彻.png}
+ai_stats:
+  games: 10
+  axis_wins: 0
+  allies_wins: 0
+  draws: 10
+  avg_turns: 1
+  avg_sunk:
+    axis: 0.0
+    allies: 0.0
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。

@@ -78,3 +78,14 @@ reinforcements:
     - {id: IBS-U-IJN-SHIRAYUKI, name: 白雪, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], torpedo_reloads: 0, asset: 日本-DD-白雪.png}
     - {id: IBS-U-IJN-MURAKUMO, name: 丛云, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], torpedo_reloads: 0, asset: 日本-DD-丛云.png}
     - {id: IBS-U-IJN-AKIZUKI, name: 秋月, side: axis, template: dd-japanese-1942, speed_track: [6, 5, 5], torpedo_reloads: 0, asset: 日本-DD-秋月.png}
+ai_stats:
+  games: 10
+  axis_wins: 0
+  allies_wins: 4
+  draws: 6
+  avg_turns: 7
+  avg_sunk:
+    axis: 2.9
+    allies: 1.3
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。

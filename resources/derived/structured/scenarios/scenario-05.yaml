@@ -69,3 +69,14 @@ reinforcements:
     - {id: IBS-U-IJN-AMAGIRI, name: 天雾, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], asset: 日本-DD-天雾.png}
     - {id: IBS-U-IJN-YUGIRI, name: 夕雾, side: axis, template: dd-japanese-1942, speed_track: [6, 6, 5], asset: 日本-DD-夕雾.png}
     - {id: IBS-U-IJN-UZUKI-2, name: 卯月(II), side: axis, template: dd-japanese-1942, speed_track: [6, 5, 5], asset: 日本-APD-卯月2.png}
+ai_stats:
+  games: 10
+  axis_wins: 1
+  allies_wins: 4
+  draws: 5
+  avg_turns: 10
+  avg_sunk:
+    axis: 0.4
+    allies: 0.0
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。

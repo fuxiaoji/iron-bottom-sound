@@ -495,3 +495,4 @@ button.editor-modal-close:hover{color:#ffe9b0}
 .paper-formation-side li{border:1px solid #8f7a4d;background:#efe6cb;padding:2px 8px;display:flex;gap:6px;align-items:center}
 .paper-formation-side li span{font-size:.66rem;color:#6d6350}
 .paper-footer{display:flex;justify-content:space-between;border-top:3px double #2c2416;margin-top:12px;padding-top:6px;font-size:.66rem;color:#6d6350}
+.paper-ai-stats{margin-top:8px}.paper-ai-stats h3{margin:10px 0 6px;font:1rem Georgia,serif;border-bottom:1px solid #b3a479;padding-bottom:3px}.paper-ai-stats p{font-size:.78rem;margin:.3rem 0}

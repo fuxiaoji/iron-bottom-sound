@@ -94,6 +94,15 @@ export function ScenarioBriefingModal({briefing,onClose,mySide}:Props){
      {briefing.special_rules.filter(r=>/胜利|平局|胜者/.test(r.text)).map(r=><li key={"v-"+r.id}>{r.text}</li>)}
     </ol>
    </section>
+   {briefing.ai_stats&&briefing.ai_stats.games>0&&<section className="paper-ai-stats">
+    <h3>AI 自战平衡参考</h3>
+    <p className="paper-fine">{briefing.ai_stats.note}</p>
+    <p>轴心 {briefing.ai_stats.axis_wins} 胜 · 盟军 {briefing.ai_stats.allies_wins} 胜 · 平局 {briefing.ai_stats.draws}
+     （共 {briefing.ai_stats.games} 局{briefing.ai_stats.failures?`，${briefing.ai_stats.failures} 局异常`:""}）
+     {briefing.ai_stats.avg_turns!=null&&<span> · 平均 {briefing.ai_stats.avg_turns} 回合</span>}
+     {briefing.ai_stats.avg_sunk&&<span> · 场均击沉 轴{briefing.ai_stats.avg_sunk.axis}/盟{briefing.ai_stats.avg_sunk.allies}</span>}
+    </p>
+   </section>}
    <FormationList briefing={briefing}/>
    <footer className="paper-footer"><span>想定手册 · 双方开局前共知信息</span><span>{briefing.id}</span></footer>
   </article>

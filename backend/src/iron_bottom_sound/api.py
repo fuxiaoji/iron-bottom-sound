@@ -281,6 +281,7 @@ def scenario_briefing(scenario_id: str):
         }
 
     reinforcements = definition.get("reinforcements")
+    ai_stats = definition.get("ai_stats")
     payload = {
         "id": definition.get("id", scenario_id),
         "number": definition.get("number"),
@@ -293,6 +294,7 @@ def scenario_briefing(scenario_id: str):
         "setup_note": definition.get("setup", {}).get("engine_default_note"),
         "formations": definition.get("setup", {}).get("engine_default_formations"),
         "ships": [ship_row(entry) for entry in definition.get("ships", [])],
+        "ai_stats": ai_stats,
         "reinforcements": None
         if not reinforcements
         else {

@@ -107,3 +107,14 @@ reinforcements:
     - {id: IBS-U-IJN-XIFENG, name: 夕风, side: axis, template: dd-japanese-1942, torpedo_reloads: 0, asset: 日本-APD-夕凪.png}  # 无“日本-APD-夕风.png”，取最接近的 日本-APD-夕凪.png
     - {id: IBS-U-IJN-MATSU-KAZE, name: 松风, side: axis, template: dd-japanese-1942, torpedo_reloads: 0, asset: 日本-APD-松风.png}
 # 注：页面“游戏回合：15个回合”，但胜利条件原文写“游戏第7回合结束时统计胜利分”（逐字照录，见 victory.evaluated_at）。
+ai_stats:
+  games: 10
+  axis_wins: 0
+  allies_wins: 0
+  draws: 10
+  avg_turns: 1
+  avg_sunk:
+    axis: 0.0
+    allies: 0.0
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。

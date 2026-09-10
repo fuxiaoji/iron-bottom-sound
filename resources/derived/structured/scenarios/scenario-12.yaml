@@ -100,3 +100,14 @@ ships:
   - {id: IBS-U-USN-BAINBRIDGE, name: 班布里奇, side: allies, template: dd-american-1942, position: BB17, heading: 5, speed: 3, asset: 美国-DD-班布里奇.png}
 # UNVERIFIED-VICTORY: 胜利条件含“如果敌方损失1-2艘战列舰，而己方无战列舰损失，视为决定性胜利”（IBS-S-12-R2），schema 的 victory 块无对应字段，仅保留标准VP四项。
 # UNVERIFIED-DATE: 页面日期“1928年3月3日”为架空想定日期（长门、陆奥对科罗拉多、西弗吉尼亚），非史实日期，逐字照录。
+ai_stats:
+  games: 10
+  axis_wins: 2
+  allies_wins: 4
+  draws: 4
+  avg_turns: 9
+  avg_sunk:
+    axis: 1.1
+    allies: 1.0
+  failures: 0
+  note: 双 tactical RealisticCommander 自战（balanced 风格，seeds 1..N）；仅供剧本平衡参考，非官方胜率。
