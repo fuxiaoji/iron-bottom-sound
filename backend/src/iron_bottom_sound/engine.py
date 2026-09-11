@@ -174,7 +174,7 @@ class RuleData:
         result = self.special_damage["results"][key]
         return {"effect": result[displacement_band], "additional": result.get("additional"), "armour_check": True}
 
-    def penetration(self, nation: str, caliber: float, distance: int) -> float:
+    def penetration(self, nation: str, caliber: float, distance: int, period: str = "post_1942") -> float:
         # 同格（碰撞检定失败，distance=0）按最近档处理。
         distance = max(1, distance)
         distance_column = next(
@@ -193,6 +193,15 @@ class RuleData:
                 candidates.append(row)
         if not candidates:
             return 0
+        # 年份规则：穿甲表 period 列区分 1928 / post_1942（脚注：美 16"/45* 仅
+        # 适用于 1942 年之后，1928 年用 16"('*28) 行）。年份匹配行优先，其次 all 期行。
+        period_rows = [item for item in candidates if item.get("period") == period]
+        if period_rows:
+            candidates = period_rows
+        else:
+            all_period_rows = [item for item in candidates if item.get("period") == "all"]
+            if all_period_rows:
+                candidates = all_period_rows
         row = next((item for item in candidates if nation in item["nation"].split("_")), candidates[0])
         value = row[distance_column]
         return 0 if value == "-" else float(value)
@@ -290,6 +299,10 @@ class IronBottomEngine:
                     min_legal_speed=self._legal_speed_range(ship, state.turn)[0] if reveal else None,
                     max_legal_speed=self._legal_speed_range(ship, state.turn)[1] if reveal else None,
                     torpedo_type=ship.torpedo_type if reveal else None,
+                    primary_armor=ship.primary_armor,
+                    secondary_armor=ship.secondary_armor,
+                    belt_armor=ship.belt_armor,
+                    bridge_armor=ship.bridge_armor,
                     gun_mounts=deepcopy(ship.gun_mounts) if reveal else [],
                     torpedo_launchers=deepcopy(ship.torpedo_launchers) if reveal else [],
                     turn_limit_degrees=ship.turn_limit_degrees if reveal else None,
@@ -3861,6 +3874,53 @@ class IronBottomEngine:
                     self._destroy_gun_mounts(
                         state, target, "primary", int(value), self._result_mount_position(key), "gunnery"
                     )
+            if result.get("fire_check_for_jp_de_4.7_or_5"):
+                self._extra_fire_determination(state, target, attacker, caliber)
+
+    def _extra_fire_determination(
+        self, state: GameState, target: ShipState, attacker: ShipState | None, caliber: float | None
+    ) -> None:
+        """炮击结果表 * 注：日/德 4.7" 或 5" 炮命中后额外检视火灾判定表并承受结果。"""
+        if attacker is None or not attacker.id.startswith("IBS-U-"):
+            return
+        nation = attacker.id.split("-")[2]
+        if nation not in {"IJN", "KM"} or caliber is None or not any(
+            abs(caliber - value) < 0.001 for value in (4.7, 5.0)
+        ):
+            return
+        raw, dice = self._roll_2d6(state)
+        did_not_fire = not target.fired
+        modifier = int(self.rules.fire_table["modifiers"]["ship_did_not_fire"]) if did_not_fire else 0
+        roll = min(12, raw + modifier)
+        ignored = did_not_fire and roll in self.rules.fire_table["modifiers"]["ignore_results_if_ship_did_not_fire"]
+        result = {"kind": "no_effect"} if ignored else self.rules.table_2d6(self.rules.fire_results, roll)
+        before = self._damage_snapshot(target)
+        if result.get("kind") == "special_damage":
+            self._resolve_special_damage(state, target, attacker, armour_already_penetrated=True, caliber=caliber)
+        self._damage_hull(state, target, int(result.get("hull", 0)), "fire", attacker)
+        self._lose_speed(target, int(result.get("speed_loss", 0)))
+        if result.get("secondary"):
+            self._destroy_gun_mounts(state, target, "secondary", int(result["secondary"]), None, "fire")
+        if result.get("primary"):
+            self._destroy_gun_mounts(state, target, "primary", int(result["primary"]), None, "fire")
+        if result.get("extinguish") and (result.get("applies_to") != "US_only" or target.id.startswith("IBS-U-USN-")):
+            target.fire_markers = max(0, target.fire_markers - 1)
+        self._event(
+            state,
+            "fire_check",
+            f"{target.name} 额外火灾检定（日/德4.7\"-5\"炮） {raw}{' +1' if modifier else ''} = {roll}",
+            payload={
+                "ship_id": target.id,
+                "target_name": target.name,
+                "attacker": attacker.id,
+                "modifier": modifier,
+                "result": result,
+                "ignored_for_no_fire": ignored,
+                "damage": self._damage_delta(before, self._damage_snapshot(target)),
+            },
+            rule=self._rule("IBS-T-GHRT", 1, "炮击结果表"),
+            dice=DiceRoll(dice=dice, notation="2D6", raw=raw, adjusted=roll),
+        )
 
     def _resolve_special_damage(
         self,
@@ -4014,10 +4074,13 @@ class IronBottomEngine:
                 "UK" if attacker.id.startswith("IBS-U-RN-") else "DE"
             )
         )
-        effective_caliber = scenario_rules(state.scenario_id).penetration_caliber(
-            attacker.id, caliber or attacker.primary.caliber
-        )
-        return self.rules.penetration(nation, effective_caliber, distance) >= armour
+        rules = scenario_rules(state.scenario_id)
+        effective_caliber = rules.penetration_caliber(attacker.id, caliber or attacker.primary.caliber)
+        # 穿甲表注释：穿甲值必须大于装甲才算击穿（美 8" 炮 12 格无法穿透 9" 装甲，
+        # 表中 11-13 档值恰为 9），平值不穿透。
+        return self.rules.penetration(
+            nation, effective_caliber, distance, period=rules.penetration_period()
+        ) > armour
 
     @staticmethod
     def _result_mount_position(label: str) -> MountPosition | None:

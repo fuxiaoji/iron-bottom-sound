@@ -322,6 +322,16 @@ class ScenarioRuleSet:
             return 3.0
         return caliber
 
+    def penetration_period(self) -> str:
+        """装甲穿透表的年份档：想定日期在 1942 年之前用 1928 行，否则用 post_1942 行。
+
+        穿甲表脚注：美 16"/45* 仅适用于 1942 年之后；1928 年使用 16"('*28) 一行。
+        想定缺日期时按 1942 后处理（与既有行为一致）。
+        """
+        date = str(self.definition.get("date") or "")
+        year = int(date[:4]) if date[:4].isdigit() else 1942
+        return "1928" if year < 1942 else "post_1942"
+
 
 @lru_cache(maxsize=32)
 def scenario_rules(scenario_id: str) -> ScenarioRuleSet:
