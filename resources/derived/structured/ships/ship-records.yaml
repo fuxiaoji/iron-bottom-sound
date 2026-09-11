@@ -8,16 +8,16 @@ families:
     hull_rows: [4, 4, 3]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 6, caliber: 8, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 5, caliber: 8, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: stern, firepower: 5, caliber: 8, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: port, firepower: 1, caliber: 4.7, arcs: [port]}
-      - {id: S2, kind: secondary, position: port, firepower: 1, caliber: 4.7, arcs: [port]}
-      - {id: S3, kind: secondary, position: starboard, firepower: 1, caliber: 4.7, arcs: [starboard]}
-      - {id: S4, kind: secondary, position: starboard, firepower: 1, caliber: 4.7, arcs: [starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 6, caliber: 8, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 5, caliber: 8, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: stern, firepower: 5, caliber: 8, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: port, firepower: 1, caliber: 4.7, arcs: [port]}
+    - {id: S2, kind: secondary, position: port, firepower: 1, caliber: 4.7, arcs: [port]}
+    - {id: S3, kind: secondary, position: starboard, firepower: 1, caliber: 4.7, arcs: [starboard]}
+    - {id: S4, kind: secondary, position: starboard, firepower: 1, caliber: 4.7, arcs: [starboard]}
     torpedo_launchers:
-      - {id: TT-P, position: port, arcs: [port], torpedoes: 2, reloads: 1}
-      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 2, reloads: 1}
+    - {id: TT-P, position: port, arcs: [port], torpedoes: 2, reloads: 1}
+    - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 2, reloads: 1}
     torpedo_type: jp-24-type93
     armour: {primary: 1, belt: 3}
     aircraft: true
@@ -27,12 +27,12 @@ families:
     hull_rows: [2, 2, 1]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 5, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: stern, firepower: 3, caliber: 5, arcs: [port, starboard, stern]}
-      - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 5, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 5, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: stern, firepower: 3, caliber: 5, arcs: [port, starboard, stern]}
+    - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 5, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 1}
-      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 1}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 1}
+    - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 1}
     torpedo_type: jp-24-type90
   ijn-akizuki-dd:
     ship_type: DD
@@ -40,12 +40,12 @@ families:
     hull_rows: [2, 3, 2]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 3.9, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 3.9, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: stern, firepower: 2, caliber: 3.9, arcs: [port, starboard, stern]}
-      - {id: P4, kind: primary, position: stern, firepower: 3, caliber: 3.9, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 3.9, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 3.9, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: stern, firepower: 2, caliber: 3.9, arcs: [port, starboard, stern]}
+    - {id: P4, kind: primary, position: stern, firepower: 3, caliber: 3.9, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: jp-24-type90
   ijn-chitose-av:
     ship_type: AV
@@ -53,8 +53,8 @@ families:
     hull_rows: [4, 3, 3]
     speed_damage_track: [[5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 5, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 3, caliber: 5, arcs: [bow, port, starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 5, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 3, caliber: 5, arcs: [bow, port, starboard]}
     aircraft: true
     special_rules: [primary_or_secondary_hit_becomes_1_hull]
   ijn-nisshin-av:
@@ -63,9 +63,9 @@ families:
     hull_rows: [4, 3, 3]
     speed_damage_track: [[5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 5, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 3, caliber: 5, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: midships, firepower: 3, caliber: 5, arcs: [port, starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 5, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 3, caliber: 5, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: midships, firepower: 3, caliber: 5, arcs: [port, starboard]}
     aircraft: true
     special_rules: [primary_or_secondary_hit_becomes_1_hull]
   usn-san-francisco-ca:
@@ -74,13 +74,13 @@ families:
     hull_rows: [4, 4, 4]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 7, caliber: 8, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 7, caliber: 8, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: stern, firepower: 8, caliber: 8, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port]}
-      - {id: S2, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
-      - {id: S3, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
-      - {id: S4, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 7, caliber: 8, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 7, caliber: 8, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: stern, firepower: 8, caliber: 8, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port]}
+    - {id: S2, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
+    - {id: S3, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
+    - {id: S4, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
     armour: {primary: 8, belt: 5, bridge: 3}
   usn-brooklyn-cl:
     ship_type: CL
@@ -88,15 +88,15 @@ families:
     hull_rows: [5, 4, 4]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 7, caliber: 6, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 6, caliber: 6, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: midships, firepower: 6, caliber: 6, arcs: [port, starboard]}
-      - {id: P4, kind: primary, position: stern, firepower: 6, caliber: 6, arcs: [port, starboard, stern]}
-      - {id: P5, kind: primary, position: stern, firepower: 7, caliber: 6, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port]}
-      - {id: S2, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
-      - {id: S3, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
-      - {id: S4, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 7, caliber: 6, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 6, caliber: 6, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: midships, firepower: 6, caliber: 6, arcs: [port, starboard]}
+    - {id: P4, kind: primary, position: stern, firepower: 6, caliber: 6, arcs: [port, starboard, stern]}
+    - {id: P5, kind: primary, position: stern, firepower: 7, caliber: 6, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port]}
+    - {id: S2, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
+    - {id: S3, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
+    - {id: S4, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
     radar: true
   usn-salt-lake-city-ca:
     ship_type: CA
@@ -104,14 +104,14 @@ families:
     hull_rows: [4, 4, 4]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 7, caliber: 8, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 5, caliber: 8, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: stern, firepower: 5, caliber: 8, arcs: [port, starboard, stern]}
-      - {id: P4, kind: primary, position: stern, firepower: 7, caliber: 8, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port]}
-      - {id: S2, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
-      - {id: S3, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
-      - {id: S4, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 7, caliber: 8, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 5, caliber: 8, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: stern, firepower: 5, caliber: 8, arcs: [port, starboard, stern]}
+    - {id: P4, kind: primary, position: stern, firepower: 7, caliber: 8, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port]}
+    - {id: S2, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
+    - {id: S3, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard]}
+    - {id: S4, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
     armour: {primary: 2, belt: 3, bridge: 1}
   usn-destroyer-5gun:
     ship_type: DD
@@ -119,14 +119,14 @@ families:
     hull_rows: [2, 2, 1]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 5, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 1, caliber: 5, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: midships, firepower: 2, caliber: 5, arcs: [port, starboard]}
-      - {id: P4, kind: primary, position: stern, firepower: 1, caliber: 5, arcs: [port, starboard, stern]}
-      - {id: P5, kind: primary, position: stern, firepower: 2, caliber: 5, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 5, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 1, caliber: 5, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: midships, firepower: 2, caliber: 5, arcs: [port, starboard]}
+    - {id: P4, kind: primary, position: stern, firepower: 1, caliber: 5, arcs: [port, starboard, stern]}
+    - {id: P5, kind: primary, position: stern, firepower: 2, caliber: 5, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
-      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 1, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 1, reloads: 0}
     torpedo_type: us-21-mk15-1942
   km-destroyer:
     ship_type: DD
@@ -134,14 +134,14 @@ families:
     hull_rows: [2, 2, 2]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 5, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 5, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: midships, firepower: 1, caliber: 5, arcs: [port, starboard]}
-      - {id: P4, kind: primary, position: stern, firepower: 2, caliber: 5, arcs: [port, starboard, stern]}
-      - {id: P5, kind: primary, position: stern, firepower: 2, caliber: 5, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 5, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 5, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: midships, firepower: 1, caliber: 5, arcs: [port, starboard]}
+    - {id: P4, kind: primary, position: stern, firepower: 2, caliber: 5, arcs: [port, starboard, stern]}
+    - {id: P5, kind: primary, position: stern, firepower: 2, caliber: 5, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
-      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: de-nl-21
   rn-j-class-dd:
     ship_type: DD
@@ -149,12 +149,12 @@ families:
     hull_rows: [2, 2, 1]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 4.7, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 4.7, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: stern, firepower: 2, caliber: 4.7, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 4.7, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 4.7, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: stern, firepower: 2, caliber: 4.7, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
-      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: uk-21-mk9
   ijn-kamikaze-dd:
     ship_type: DD
@@ -162,10 +162,10 @@ families:
     hull_rows: [2, 2, 1]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4.7, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 4.7, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4.7, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 4.7, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: jp-21
   ijn-mutsuki-dd:
     ship_type: DD
@@ -173,10 +173,10 @@ families:
     hull_rows: [2, 2, 1]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4.7, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 4.7, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4.7, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 4.7, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: jp-24-type90
   ijn-nagato-bb:
     ship_type: BB
@@ -184,15 +184,15 @@ families:
     hull_rows: [5, 5, 4]
     speed_damage_track: [[5, 4, 3, 2, 1], [4, 3, 2, 1], [4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
-      - {id: P4, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
-      - {id: P5, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
-      - {id: P6, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+    - {id: P4, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+    - {id: P5, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+    - {id: P6, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT-P, position: port, arcs: [port], torpedoes: 1, reloads: 1}
-      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 1, reloads: 1}
+    - {id: TT-P, position: port, arcs: [port], torpedoes: 1, reloads: 1}
+    - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 1, reloads: 1}
     torpedo_type: jp-24-type93
     armour: {primary: 11, belt: 11, bridge: 11}
     fire_control: true
@@ -203,11 +203,11 @@ families:
     hull_rows: [3, 3, 2]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 7.9, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: stern, firepower: 1, caliber: 7.9, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 7.9, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: stern, firepower: 1, caliber: 7.9, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT-P, position: port, arcs: [port], torpedoes: 1, reloads: 1}
-      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 1, reloads: 1}
+    - {id: TT-P, position: port, arcs: [port], torpedoes: 1, reloads: 1}
+    - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 1, reloads: 1}
     torpedo_type: jp-24-type93
     armour: {primary: 1, belt: 3, bridge: 0}
     fire_control: true
@@ -218,14 +218,14 @@ families:
     hull_rows: [4, 4, 4]
     speed_damage_track: [[4, 3, 2, 1], [3, 2, 1], [3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 16, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
-      - {id: P4, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
-      - {id: P5, kind: primary, position: stern, firepower: 2, caliber: 16, arcs: [port, starboard, stern]}
-      - {id: P6, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: port, firepower: 1, caliber: 5, arcs: [port]}
-      - {id: S2, kind: secondary, position: starboard, firepower: 1, caliber: 5, arcs: [starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 16, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+    - {id: P4, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+    - {id: P5, kind: primary, position: stern, firepower: 2, caliber: 16, arcs: [port, starboard, stern]}
+    - {id: P6, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: port, firepower: 1, caliber: 5, arcs: [port]}
+    - {id: S2, kind: secondary, position: starboard, firepower: 1, caliber: 5, arcs: [starboard]}
     armour: {primary: 18, belt: 13, bridge: 16}
     fire_control: true
   usn-omaha-cl:
@@ -234,13 +234,13 @@ families:
     hull_rows: [3, 3, 2]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 6, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: stern, firepower: 3, caliber: 6, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: port, firepower: 1, caliber: 3, arcs: [port]}
-      - {id: S2, kind: secondary, position: starboard, firepower: 1, caliber: 3, arcs: [starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 6, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: stern, firepower: 3, caliber: 6, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: port, firepower: 1, caliber: 3, arcs: [port]}
+    - {id: S2, kind: secondary, position: starboard, firepower: 1, caliber: 3, arcs: [starboard]}
     torpedo_launchers:
-      - {id: TT-P, position: port, arcs: [port], torpedoes: 1, reloads: 0}
-      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 1, reloads: 0}
+    - {id: TT-P, position: port, arcs: [port], torpedoes: 1, reloads: 0}
+    - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 1, reloads: 0}
     torpedo_type: us-21-mk15-1942
     armour: {primary: 2, belt: 3}
   ijn-jintsu-cl:
@@ -249,12 +249,12 @@ families:
     hull_rows: [2, 2, 2]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 5.5, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 5.5, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: bow, firepower: 1, caliber: 3, arcs: [bow, port, starboard]}
-      - {id: S2, kind: secondary, position: stern, firepower: 1, caliber: 3, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 5.5, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 5.5, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: bow, firepower: 1, caliber: 3, arcs: [bow, port, starboard]}
+    - {id: S2, kind: secondary, position: stern, firepower: 1, caliber: 3, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: jp-24-type90
     armour: {primary: 1, belt: 2, bridge: 2}
   ijn-tatsuta-cl:
@@ -263,11 +263,11 @@ families:
     hull_rows: [2, 2, 2]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 5.5, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 5.5, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: midships, firepower: 1, caliber: 3, arcs: [port, starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 5.5, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 5.5, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: midships, firepower: 1, caliber: 3, arcs: [port, starboard]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: jp-21
     armour: {belt: 2}
   usn-4in-dd:
@@ -276,11 +276,11 @@ families:
     hull_rows: [2, 2, 1]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: midships, firepower: 1, caliber: 4, arcs: [port, starboard]}
-      - {id: P3, kind: primary, position: stern, firepower: 1, caliber: 4, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: midships, firepower: 1, caliber: 4, arcs: [port, starboard]}
+    - {id: P3, kind: primary, position: stern, firepower: 1, caliber: 4, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: us-21-mk15-1942
   ijn-apd-mutsuki:
     ship_type: APD
@@ -288,9 +288,9 @@ families:
     hull_rows: [1, 1, 1]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4.7, arcs: [bow, port, starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4.7, arcs: [bow, port, starboard]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: jp-24-type8
   ijn-chokai-ca:
     ship_type: CA
@@ -298,14 +298,14 @@ families:
     hull_rows: [4, 4, 3]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 8, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 8, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 8, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
-      - {id: S2, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 8, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 8, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 8, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
+    - {id: S2, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
     torpedo_launchers:
-      - {id: TT-P, position: port, arcs: [port], torpedoes: 2, reloads: 1}
-      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 2, reloads: 1}
+    - {id: TT-P, position: port, arcs: [port], torpedoes: 2, reloads: 1}
+    - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 2, reloads: 1}
     torpedo_type: jp-24-type93
     armour: {primary: 1, belt: 4, bridge: 1}
   ijn-tenryu-cl:
@@ -314,12 +314,12 @@ families:
     hull_rows: [3, 3, 2]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 5.5, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: stern, firepower: 1, caliber: 5.5, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: bow, firepower: 1, caliber: 3, arcs: [bow, port, starboard]}
-      - {id: S2, kind: secondary, position: stern, firepower: 1, caliber: 3, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 5.5, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: stern, firepower: 1, caliber: 5.5, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: bow, firepower: 1, caliber: 3, arcs: [bow, port, starboard]}
+    - {id: S2, kind: secondary, position: stern, firepower: 1, caliber: 3, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: jp-21
     armour: {primary: 1, belt: 2, bridge: 2}
   ijn-yubari-cl:
@@ -328,11 +328,11 @@ families:
     hull_rows: [2, 2, 2]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 5.5, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 5.5, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: midships, firepower: 1, caliber: 3, arcs: [port, starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 5.5, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 5.5, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: midships, firepower: 1, caliber: 3, arcs: [port, starboard]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: jp-24-type90
     armour: {primary: 1, belt: 2}
   usn-ca-new-orleans:
@@ -341,12 +341,12 @@ families:
     hull_rows: [4, 4, 4]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 8, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 8, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 8, arcs: [port, starboard, stern]}
-      - {id: P4, kind: primary, position: stern, firepower: 2, caliber: 8, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
-      - {id: S2, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 8, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 8, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 8, arcs: [port, starboard, stern]}
+    - {id: P4, kind: primary, position: stern, firepower: 2, caliber: 8, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
+    - {id: S2, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
     armour: {primary: 8, belt: 5, bridge: 3}
   commonwealth-ca-kent:
     ship_type: CA
@@ -354,12 +354,12 @@ families:
     hull_rows: [4, 4, 4]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 8, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: stern, firepower: 3, caliber: 8, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: port, firepower: 2, caliber: 4, arcs: [port]}
-      - {id: S2, kind: secondary, position: starboard, firepower: 2, caliber: 4, arcs: [starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 8, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: stern, firepower: 3, caliber: 8, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: port, firepower: 2, caliber: 4, arcs: [port]}
+    - {id: S2, kind: secondary, position: starboard, firepower: 2, caliber: 4, arcs: [starboard]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: uk-21-mk7c
     armour: {primary: 1, belt: 4}
   ijn-myoko-ca:
@@ -368,15 +368,15 @@ families:
     hull_rows: [4, 4, 4]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 8, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 8, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 8, arcs: [port, starboard, stern]}
-      - {id: P4, kind: primary, position: stern, firepower: 2, caliber: 8, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
-      - {id: S2, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
+    - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 8, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 2, caliber: 8, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: stern, firepower: 3, caliber: 8, arcs: [port, starboard, stern]}
+    - {id: P4, kind: primary, position: stern, firepower: 2, caliber: 8, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: port, firepower: 2, caliber: 5, arcs: [port]}
+    - {id: S2, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
     torpedo_launchers:
-      - {id: TT-P, position: port, arcs: [port], torpedoes: 2, reloads: 1}
-      - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 2, reloads: 1}
+    - {id: TT-P, position: port, arcs: [port], torpedoes: 2, reloads: 1}
+    - {id: TT-S, position: starboard, arcs: [starboard], torpedoes: 2, reloads: 1}
     torpedo_type: jp-24-type93
     armour: {primary: 1, belt: 4}
   ijn-sendai-cl:
@@ -385,12 +385,12 @@ families:
     hull_rows: [3, 3, 2]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 5.5, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 5.5, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: bow, firepower: 1, caliber: 5, arcs: [bow, port, starboard]}
-      - {id: S2, kind: secondary, position: stern, firepower: 1, caliber: 5, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 2, caliber: 5.5, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: stern, firepower: 2, caliber: 5.5, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: bow, firepower: 1, caliber: 5, arcs: [bow, port, starboard]}
+    - {id: S2, kind: secondary, position: stern, firepower: 1, caliber: 5, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: jp-24-type90
     armour: {primary: 1, belt: 2, bridge: 2}
   ijn-agano-cl:
@@ -399,12 +399,12 @@ families:
     hull_rows: [3, 3, 2]
     speed_damage_track: [[6, 5, 4, 3, 2, 1], [6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 6, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: stern, firepower: 1, caliber: 6, arcs: [port, starboard, stern]}
-      - {id: S1, kind: secondary, position: bow, firepower: 1, caliber: 3, arcs: [bow, port, starboard]}
-      - {id: S2, kind: secondary, position: stern, firepower: 1, caliber: 3, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 6, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: stern, firepower: 1, caliber: 6, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: bow, firepower: 1, caliber: 3, arcs: [bow, port, starboard]}
+    - {id: S2, kind: secondary, position: stern, firepower: 1, caliber: 3, arcs: [port, starboard, stern]}
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 2, reloads: 0}
     torpedo_type: jp-24-type90
     armour: {primary: 1, belt: 2, bridge: 2}
   usn-washington-bb:
@@ -413,12 +413,12 @@ families:
     hull_rows: [6, 6, 6]
     speed_damage_track: [[5, 4, 3, 2, 1], [4, 3, 2, 1], [4, 3, 2, 1]]
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
-      - {id: P3, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
-      - {id: P4, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
-      - {id: P5, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
-      - {id: P6, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: bow, firepower: 3, caliber: 16, arcs: [bow, port, starboard]}
+    - {id: P4, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+    - {id: P5, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
+    - {id: P6, kind: primary, position: stern, firepower: 3, caliber: 16, arcs: [port, starboard, stern]}
     armour: {primary: 16, belt: 12, bridge: 15}
     fire_control: true
     radar: true
@@ -435,8 +435,8 @@ records:
   IBS-U-USN-NEW-ORLEANS: {family: usn-ca-new-orleans, name: 新奥尔良, vp: 10, source_page: 7, fire_control: true, radar: true, aircraft: true}
   IBS-U-USN-PENSACOLA: {family: usn-ca-new-orleans, name: 彭萨科拉, vp: 10, source_page: 7, fire_control: true, aircraft: true, armour: {primary: 2, belt: 2, bridge: 1}}
   IBS-U-USN-NORTHAMPTON: {family: usn-ca-new-orleans, name: 北安普敦, vp: 10, source_page: 7, fire_control: true, aircraft: true, armour: {primary: 2, belt: 4, bridge: 1}}
-  IBS-U-USN-WASHINGTON: {family: usn-washington-bb, name: 华盛顿, vp: 37, source_page: 9}
-  IBS-U-USN-SOUTH-DAKOTA: {family: usn-washington-bb, name: 南达科塔, vp: 36, source_page: 9, displacement_band: G, armour: {primary: 18, belt: 12, bridge: 16}}
+  IBS-U-USN-WASHINGTON: {family: usn-washington-bb, name: 华盛顿, vp: 37, source_page: 9, armour: {primary: 16, secondary: 2, belt: 12, bridge: 15}}
+  IBS-U-USN-SOUTH-DAKOTA: {family: usn-washington-bb, name: 南达科塔, vp: 36, source_page: 9, displacement_band: G, armour: {primary: 18, secondary: 2, belt: 12, bridge: 16}}
   IBS-U-IJN-FURUTAKA: {family: ijn-aoba-ca, name: 古鹰, vp: 11, source_page: 2}
   IBS-U-IJN-KINUGASA: {family: ijn-aoba-ca, name: 衣笠, vp: 11, source_page: 2}
   IBS-U-IJN-FUBUKI: {family: ijn-fubuki-dd, name: 吹雪, vp: 3, source_page: 2}
@@ -449,8 +449,8 @@ records:
     vp: 4
     source_page: 2
     torpedo_launchers:
-      - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 3, reloads: 1}
-      - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 3, reloads: 1}
+    - {id: TT1, position: midships, arcs: [port, starboard], torpedoes: 3, reloads: 1}
+    - {id: TT2, position: midships, arcs: [port, starboard], torpedoes: 3, reloads: 1}
   IBS-U-IJN-NATSUGUMO: {family: ijn-fubuki-dd, name: 夏云, vp: 4, source_page: 2}
   IBS-U-IJN-YAMAGUMO: {family: ijn-fubuki-dd, name: 山云, vp: 3, source_page: 2}
   IBS-U-IJN-MURAKUMO: {family: ijn-fubuki-dd, name: 丛云, vp: 3, source_page: 2}
@@ -483,8 +483,8 @@ records:
   IBS-U-IJN-URANAMI: {family: ijn-fubuki-dd, name: 浦波, vp: 3, source_page: 8}
   IBS-U-IJN-AYANAMI: {family: ijn-fubuki-dd, name: 绫波, vp: 3, source_page: 8}
   IBS-U-IJN-SHIKINAMI: {family: ijn-fubuki-dd, name: 敷波, vp: 3, source_page: 8}
-  IBS-U-USN-HONOLULU: {family: usn-brooklyn-cl, name: 火奴鲁鲁, vp: 12, source_page: 15}
-  IBS-U-USN-ST-LOUIS: {family: usn-brooklyn-cl, name: 圣路易斯, vp: 11, source_page: 15}
+  IBS-U-USN-HONOLULU: {family: usn-brooklyn-cl, name: 火奴鲁鲁, vp: 12, source_page: 15, armour: {primary: 6, secondary: 1, belt: 5, bridge: 6}}
+  IBS-U-USN-ST-LOUIS: {family: usn-brooklyn-cl, name: 圣路易斯, vp: 11, source_page: 15, armour: {primary: 6, secondary: 1, belt: 5, bridge: 6}}
   IBS-U-IJN-MIKAZUKI: {family: ijn-apd-mutsuki, name: 三日月, vp: 3, source_page: 12}
   IBS-U-IJN-KAKO-II: {family: ijn-aoba-ca, name: 加古(II), vp: 11, source_page: 16}
   IBS-U-IJN-CHOKAI: {family: ijn-chokai-ca, name: 鸟海, vp: 15, source_page: 16}
@@ -497,7 +497,7 @@ records:
   IBS-U-RAN-AUSTRALIA: {family: commonwealth-ca-kent, name: 澳大利亚, vp: 12, source_page: 17}
   IBS-U-IJN-MYOKO: {family: ijn-myoko-ca, name: 妙高, vp: 16, source_page: 18}
   IBS-U-IJN-HAGURO: {family: ijn-myoko-ca, name: 羽黑, vp: 15, source_page: 18}
-  IBS-U-IJN-SENDAI: {family: ijn-sendai-cl, name: 川内, vp: 7, source_page: 18}
+  IBS-U-IJN-SENDAI: {family: ijn-sendai-cl, name: 川内, vp: 7, source_page: 18, armour: {primary: 1, secondary: 0, belt: 2, bridge: 0}}
   IBS-U-IJN-SHIGURE: {family: ijn-fubuki-dd, name: 时雨, vp: 3, source_page: 18}
   IBS-U-IJN-HATSU-KAZE:
     family: ijn-fubuki-dd
@@ -554,9 +554,9 @@ records:
     vp: 2
     source_page: 11
     guns:
-      - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4, arcs: [bow, port, starboard]}
-      - {id: P2, kind: primary, position: midships, firepower: 2, caliber: 4, arcs: [port, starboard]}
-      - {id: P3, kind: primary, position: stern, firepower: 1, caliber: 4, arcs: [port, starboard, stern]}
+    - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 4, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: midships, firepower: 2, caliber: 4, arcs: [port, starboard]}
+    - {id: P3, kind: primary, position: stern, firepower: 1, caliber: 4, arcs: [port, starboard, stern]}
   IBS-U-USN-NICHOLAS: {family: usn-destroyer-5gun, name: 尼古拉斯, vp: 3, source_page: 13}
   IBS-U-USN-OBANNON: {family: usn-destroyer-5gun, name: 奥班农, vp: 3, source_page: 13}
   IBS-U-USN-TAYLOR: {family: usn-destroyer-5gun, name: 泰勒, vp: 3, source_page: 13}

@@ -1,4 +1,7 @@
+from typing import Any
+
 from iron_bottom_sound.engine import D66_VALUES, IronBottomEngine
+from iron_bottom_sound.scenario_rules import scenario_rules
 from iron_bottom_sound.models import (
     GameOptions,
     ContactSetupOrder,
@@ -1847,30 +1850,95 @@ def test_special_damage_deck_fire_is_ignored_for_ship_without_aircraft() -> None
     assert ship.mfc_destroyed
 
 
-def test_special_damage_belt_armour_exactly_equal_penetration_sinks_but_above_does_not() -> None:
-    exact_engine = IronBottomEngine()
-    exact = exact_engine.reset("IBS-S-01", seed=1)
-    attacker = exact.ships["IBS-U-IJN-AOBA"]
-    target = exact.ships["IBS-U-USN-HELENA"]
-    target.belt_armor = 7
-    exact_engine._roll_d66 = lambda _: (43, [4, 3])  # type: ignore[method-assign]
-    exact_engine._resolve_special_damage(exact, target, attacker, distance=21, caliber=8)
+def test_special_damage_belt_armour_penetration_requires_strictly_higher_value() -> None:
+    # 穿甲表注释：美 8" 炮 12 格无法穿透 9" 装甲（表中 11-13 档值恰为 9）——
+    # 穿甲值必须严格大于装甲才算击穿，平值不穿透。
+    # 青叶 8" 炮在 21 格的穿甲值为 7（日 7.9"/8" 行 21-25 档）。
+    below_engine = IronBottomEngine()
+    below = below_engine.reset("IBS-S-01", seed=1)
+    attacker = below.ships["IBS-U-IJN-AOBA"]
+    target = below.ships["IBS-U-USN-HELENA"]
+    target.belt_armor = 6.9
+    below_engine._roll_d66 = lambda _: (43, [4, 3])  # type: ignore[method-assign]
+    below_engine._resolve_special_damage(below, target, attacker, distance=21, caliber=8)
     assert target.sunk
-    event = next(event for event in exact.events if event.type == "special_damage")
+    event = next(event for event in below.events if event.type == "special_damage")
     assert event.payload["penetrated"] is True
 
-    blocked_engine = IronBottomEngine()
-    blocked = blocked_engine.reset("IBS-S-01", seed=1)
-    blocked_attacker = blocked.ships["IBS-U-IJN-AOBA"]
-    blocked_target = blocked.ships["IBS-U-USN-HELENA"]
-    blocked_target.belt_armor = 7.1
-    blocked_engine._roll_d66 = lambda _: (43, [4, 3])  # type: ignore[method-assign]
-    blocked_engine._resolve_special_damage(
-        blocked, blocked_target, blocked_attacker, distance=21, caliber=8
-    )
-    assert not blocked_target.sunk
+    def blocked_case(belt: float) -> tuple[IronBottomEngine, Any]:
+        engine = IronBottomEngine()
+        state = engine.reset("IBS-S-01", seed=1)
+        blocked_attacker = state.ships["IBS-U-IJN-AOBA"]
+        blocked_target = state.ships["IBS-U-USN-HELENA"]
+        blocked_target.belt_armor = belt
+        engine._roll_d66 = lambda _: (43, [4, 3])  # type: ignore[method-assign]
+        engine._resolve_special_damage(state, blocked_target, blocked_attacker, distance=21, caliber=8)
+        return engine, state
+
+    # 平值：不穿透（穿甲表注释的判例）
+    exact_engine, exact = blocked_case(7)
+    assert not exact.ships["IBS-U-USN-HELENA"].sunk
+    exact_event = next(event for event in exact.events if event.type == "special_damage")
+    assert exact_event.payload["penetrated"] is False
+
+    # 高于穿甲值：不穿透
+    blocked_engine, blocked = blocked_case(7.1)
+    assert not blocked.ships["IBS-U-USN-HELENA"].sunk
     blocked_event = next(event for event in blocked.events if event.type == "special_damage")
     assert blocked_event.payload["penetrated"] is False
+
+
+def test_penetration_period_uses_1928_row_for_pre_1942_scenarios() -> None:
+    # 穿甲表脚注：美 16"/45* 仅适用于 1942 年之后；1928 年用 16"('*28) 行。
+    engine = IronBottomEngine()
+    # S-12 为 1928 架空想定：美 16" 炮 1-2 格穿甲值应为 24（而非 post_1942 的 25）。
+    assert engine.rules.penetration("US", 16, 1, period="1928") == 24
+    assert engine.rules.penetration("US", 16, 1, period="post_1942") == 25
+    # 1942 后想定走 post_1942 行；英 4.7" 在 1928 用 4.7('*28) 行（GENERIC）。
+    assert engine.rules.penetration("UK", 4.7, 1, period="post_1942") == 6
+    assert engine.rules.penetration("UK", 4.7, 1, period="1928") == 5
+    rules_1928 = scenario_rules("IBS-S-12")
+    assert rules_1928.penetration_period() == "1928"
+    rules_1942 = scenario_rules("IBS-S-01")
+    assert rules_1942.penetration_period() == "post_1942"
+
+
+def test_special_damage_42_destroys_gun_mounts_without_armour_check() -> None:
+    # 特殊伤害表 42 行（船体2/主炮2/副炮1）原文无 @ 标记：不查穿甲，直接摧毁。
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-01", seed=1)
+    attacker = state.ships["IBS-U-IJN-AOBA"]
+    target = state.ships["IBS-U-USN-HELENA"]
+    target.belt_armor = 99
+    engine._roll_d66 = lambda _: (42, [4, 2])  # type: ignore[method-assign]
+    primary_total = sum(1 for mount in target.gun_mounts if mount.kind == "primary")
+    secondary_total = sum(1 for mount in target.gun_mounts if mount.kind == "secondary")
+    engine._resolve_special_damage(state, target, attacker, distance=5, caliber=8)
+    destroyed_primary = sum(1 for mount in target.gun_mounts if mount.kind == "primary" and mount.destroyed)
+    destroyed_secondary = sum(1 for mount in target.gun_mounts if mount.kind == "secondary" and mount.destroyed)
+    assert destroyed_primary == min(2, primary_total)
+    assert destroyed_secondary == min(1, secondary_total)
+
+
+def test_gunnery_result_33_jp_47_gun_triggers_extra_fire_determination() -> None:
+    # 炮击结果表 * 注：日/德 4.7" 或 5" 炮命中 33 行时额外检视火灾判定表。
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-01", seed=1)
+    attacker = state.ships["IBS-U-IJN-FUBUKI"]  # 日 5"（12.7cm）主炮驱逐舰
+    target = state.ships["IBS-U-USN-HELENA"]
+    engine._apply_gunnery_result(state, attacker, target, 33, {"primary_stern": 1, "fire_check_for_jp_de_4.7_or_5": True}, 5, 5)
+    fire_events = [event for event in state.events if event.type == "fire_check" and event.payload.get("attacker") == attacker.id]
+    assert fire_events, "日 5\" 炮命中 33 行应触发额外火灾检定"
+
+    # 对照：美 6" 炮（非日/德 4.7"/5"）不触发额外检定。
+    us_engine = IronBottomEngine()
+    us_state = us_engine.reset("IBS-S-01", seed=1)
+    us_attacker = us_state.ships["IBS-U-USN-BOISE"]
+    us_target = us_state.ships["IBS-U-IJN-FUBUKI"]
+    us_engine._apply_gunnery_result(us_state, us_attacker, us_target, 33, {"primary_stern": 1, "fire_check_for_jp_de_4.7_or_5": True}, 5, 6)
+    assert not [
+        event for event in us_state.events if event.type == "fire_check" and event.payload.get("attacker") == us_attacker.id
+    ]
 
 
 def test_special_damage_31_destroys_radar_even_when_bridge_armour_stops_bridge_effects() -> None:

@@ -669,6 +669,11 @@ class PublicShip(BaseModel):
     min_legal_speed: int | None = None
     max_legal_speed: int | None = None
     torpedo_type: str | None = None
+    # 装甲（英寸，静态舰级数据，双方可见；穿透判定用）
+    primary_armor: float = 0
+    secondary_armor: float = 0
+    belt_armor: float = 0
+    bridge_armor: float = 0
     gun_mounts: list[GunMountState] = Field(default_factory=list)
     torpedo_launchers: list[TorpedoLauncherState] = Field(default_factory=list)
     turn_limit_degrees: int | None = None

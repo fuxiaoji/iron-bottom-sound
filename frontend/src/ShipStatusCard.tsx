@@ -5,6 +5,7 @@ import type {Ship} from "./types";
 const arcNames:Record<string,string>={bow:"艏",stern:"艉",port:"左",starboard:"右"};
 const arcLabel=(arcs:string[])=>arcs.map(arc=>arcNames[arc]??arc).join("·");
 const phaseNames:Record<string,string>={gunnery:"炮击",torpedo_effects:"鱼雷",fire_end:"火灾/回合末",movement_resolution:"碰撞"};
+const armourLabel=(value:number|null|undefined)=>value!=null&&value>0?`${value}"`:"无";
 
 // 火控情况：只在本方可见字段（owner-only）出现时渲染；敌方/未公开舰的内部状态不可知。
 function FireControlStatus({ship}:{ship:Ship}){
@@ -40,7 +41,8 @@ export function ShipStatusCard({ship}:{ship:Ship|undefined}){
    <div className="condition-row"><span>上回合实际消耗 <b>{ship.current_speed} MF</b></span><span>本回合合法消耗 <b>{ship.min_legal_speed??"?"}–{ship.max_legal_speed??"?"} MF</b></span><span>火灾 <b>{ship.fire_markers}</b></span></div>
    {ship.max_legal_speed!=null&&<FireControlStatus ship={ship}/>}
   </div>
-  <div className="ship-diagram" aria-label="舰体炮位与鱼雷配置"><span className="bow-label">舰艏 ▶</span><div className="hull-silhouette"/><div className="mount-line">{ship.gun_mounts.map(mount=>{const kind={primary:"主炮",secondary:"副炮",tertiary:"高射炮"}[mount.kind];return <div className={`mount-token ${mount.destroyed?"destroyed":mount.fired_this_phase?"used":""}`} key={mount.id} title={`${mount.id} · ${mount.caliber}" ${kind} · 装甲 ${mount.armour!=null?`${mount.armour}"`:"无"} · ${arcLabel(mount.arcs)}`}><b>{mount.id}</b><span>{kind} · GF {mount.firepower}</span><small>{mount.caliber}&quot; · 装 {mount.armour!=null?`${mount.armour}"`:"无"} · {arcLabel(mount.arcs)}</small></div>})}</div>{ship.gun_mounts.length===0&&<p className="empty-plan">炮位记录未向本阵营公开。</p>}</div>
+  <div className="condition-row armour-row" aria-label="装甲分布"><span>装甲</span><span>主炮 <b>{armourLabel(ship.primary_armor)}</b></span><span>副炮 <b>{armourLabel(ship.secondary_armor)}</b></span><span>舷侧 <b>{armourLabel(ship.belt_armor)}</b></span><span>舰桥 <b>{armourLabel(ship.bridge_armor)}</b></span></div>
+  <div className="ship-diagram" aria-label="舰体炮位与鱼雷配置"><span className="bow-label">舰艏 ▶</span><div className="hull-silhouette"/><div className="mount-line">{ship.gun_mounts.map(mount=>{const kind={primary:"主炮",secondary:"副炮",tertiary:"高射炮"}[mount.kind];const mountArmour=mount.kind==="secondary"?ship.secondary_armor:ship.primary_armor;return <div className={`mount-token ${mount.destroyed?"destroyed":mount.fired_this_phase?"used":""}`} key={mount.id} title={`${mount.id} · ${mount.caliber}" ${kind} · 装甲 ${armourLabel(mountArmour)} · ${arcLabel(mount.arcs)}`}><b>{mount.id}</b><span>{kind} · GF {mount.firepower}</span><small>{mount.caliber}&quot; · 装 {armourLabel(mountArmour)} · {arcLabel(mount.arcs)}</small></div>})}</div>{ship.gun_mounts.length===0&&<p className="empty-plan">炮位记录未向本阵营公开。</p>}</div>
   <div className="record-legend"><span><i className="sample ready"/>可用</span><span><i className="sample used"/>已射击</span><span><i className="sample destroyed"/>摧毁</span></div>
   <h3 className="section-label">鱼雷 {ship.torpedo_type??""}</h3>
   <div className="launcher-strip">{ship.torpedo_launchers.map(launcher=><div className={`launcher-token ${launcher.destroyed?"destroyed":""}`} key={launcher.id}><b>{launcher.id}</b><span>{arcLabel(launcher.arcs)}</span><div className="torpedo-pips" aria-label={`已装填 ${launcher.loaded}`}>{Array.from({length:launcher.torpedoes},(_,index)=><i className={index<launcher.loaded?"loaded":"empty"} key={index}/>)}</div><small>备雷 {launcher.reloads_remaining}{launcher.reload_turns_remaining?` · 装填剩余 ${launcher.reload_turns_remaining} 回合`:""}</small></div>)}</div>
