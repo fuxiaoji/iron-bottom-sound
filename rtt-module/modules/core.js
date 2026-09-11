@@ -88,23 +88,37 @@ function nationOf(shipId) {
 		: shipId.indexOf("IBS-U-KM-") === 0 ? "DE"
 		: shipId.indexOf("IBS-U-NLD-") === 0 ? "NL" : "JP"
 }
-function penetration(nation, caliber, distance) {
+function penetration(nation, caliber, distance, period) {
 	const dist = Math.max(1, distance)
 	const column = ["1-2", "3-5", "6-7", "8-10", "11-13", "14-17", "18-20", "21-25"].find((label) => {
 		const [lo, hi] = label.split("-").map((n) => parseInt(n, 10))
 		return dist >= lo && dist <= hi
 	})
-	let best = 0
+	let candidates = []
 	for (const row of D.rules.armourPenetration) {
 		const calibers = String(row.caliber_in).split("|").map((v) => parseFloat(v))
 		const nations = String(row.nation).split("_")
-		if (!calibers.some((c) => Math.abs(c - caliber) < 0.26) || nations.indexOf(nation) < 0) continue
-		const value = row[column]
-		if (value === "-" || value === undefined) continue
-		const inches = parseFloat(value)
-		if (!isNaN(inches) && inches > best) best = inches
+		if (!calibers.some((c) => Math.abs(c - caliber) < 0.26)) continue
+		if (nations.indexOf(nation) < 0 && row.nation !== "GENERIC") continue
+		candidates.push(row)
 	}
-	return best
+	if (!candidates.length) return 0
+	const periodRows = candidates.filter((r) => String(r.period) === String(period || "post_1942"))
+	if (periodRows.length) candidates = periodRows
+	else {
+		const allRows = candidates.filter((r) => String(r.period) === "all")
+		if (allRows.length) candidates = allRows
+	}
+	const row = candidates.find((r) => String(r.nation).split("_").indexOf(nation) >= 0) || candidates[0]
+	const value = row[column]
+	if (value === "-" || value === undefined) return 0
+	const inches = parseFloat(value)
+	return isNaN(inches) ? 0 : inches
+}
+function penetrationPeriod(scenario) {
+	const date = String(scenario.date || "")
+	const year = parseInt(date.slice(0, 4), 10)
+	return isNaN(year) ? "post_1942" : (year < 1942 ? "1928" : "post_1942")
 }
 function specialDamageResult(roll, band) {
 	const direct = D.rules.specialDamage.direct_results
@@ -360,7 +374,7 @@ function trajectory(ship, plan) {
 const IBSApi = {
 	random, rollDie, roll2d6, rollD66, d66Adjust, hitCount, torpedoEffect, parseEffect,
 	rangeModifier, targetSpeedModifier, table2d6, gunneryResult, specialDamageResult,
-	nationOf, penetration, turnRestrictionReason, torpedoRollBonus, gunnerySituationModifier,
+	nationOf, penetration, penetrationPeriod, turnRestrictionReason, torpedoRollBonus, gunnerySituationModifier,
 	firepowerMultiplier, penetrationBlocked, visibilityForTurn, kinds,
 	createGame, makeShip, maxSpeedForTurn, legalSpeedRange, movementCommands, validateCommands,
 	movementCost, trajectory,

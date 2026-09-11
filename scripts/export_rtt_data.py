@@ -181,7 +181,10 @@ def build_rules() -> dict[str, Any]:
         "torpedoes": to_plain(torpedoes),
         "torpedoLaunchDirections": to_plain(torpedo_launch_directions),
         "modifiers": to_plain(modifiers),
-        "armourPenetration": _read_csv_rows(RULES / "armour-penetration-table.csv"),
+        "armourPenetration": [
+            {**row, "period": str(row.get("period", "all"))}
+            for row in _read_csv_rows(RULES / "armour-penetration-table.csv")
+        ],
         "d66Values": list(D66_VALUES),
     }
 

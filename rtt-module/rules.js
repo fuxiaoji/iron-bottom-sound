@@ -166,11 +166,12 @@ function resolveSubmitted(game) {
 			break
 		}
 	}
+	if (game.state === "game_over") game.undoBy = {} // 终局不可撤销，防快照随整局 JSON 落库膨胀
 }
 
 function autoSubmit(game) {
 	if (!game.ai_side || game.submitted[game.ai_side]) return
-	const ai = require("./modules/ai.js")
+	const ai = (typeof IBS !== "undefined" && IBS.ai) || require("./modules/ai.js")
 	const payload = ai.plan(game, game.ai_side)
 	game.undoBy[game.ai_side] = snapshot(game)
 	game.submitted[game.ai_side] = sanitize(game, game.ai_side, payload)
@@ -193,4 +194,6 @@ function doUndo(game, player) {
 	game.log = prevLog
 	game.log.push("** " + (player === "Axis" ? "轴心" : "同盟") + " 撤销了本阶段命令 **")
 }
+if (typeof module !== "undefined" && module.exports) module.exports = exports
+else (window.IBS = window.IBS || {}).rules = exports
 })();

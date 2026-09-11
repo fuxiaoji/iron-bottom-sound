@@ -101,20 +101,47 @@ function updateMap(viewObj) {
 	}).join("")
 }
 
+function counterAssetPath(ship) {
+	const entry = (data.scenarios[view.scenario.id].ships || []).find((e) => e.id === ship.id)
+	const asset = (entry && entry.asset) || counterAssetByName(ship)
+	return asset ? "assets/counters/" + encodeURIComponent(asset) : null
+}
+function counterAssetByName(ship) {
+	const nation = ship.side === "axis" ? (ship.id.indexOf("IBS-U-KM-") === 0 ? "德国" : "日本")
+		: ship.id.indexOf("IBS-U-RAN-") === 0 ? "澳大利亚" : ship.id.indexOf("IBS-U-RN-") === 0 ? "英国" : "美国"
+	return nation + "-" + ship.type + "-" + ship.name + ".png"
+}
 function buildShipEl(ship) {
 	const g = document.createElementNS("http://www.w3.org/2000/svg", "g")
-	g.innerHTML = `<polygon points="14,0 5,-8 -12,-8 -12,8 5,8" class="hull"></polygon>
-		<text class="type" y="-9"></text><text class="name" y="2"></text>
-		<text class="hullpips" y="12"></text>`
+	const src = counterAssetPath(ship)
+	if (src) {
+		g.innerHTML = `<image href="" x="-16" y="-14" width="32" height="28" preserveAspectRatio="xMidYMid meet" class="counterimg"></image>
+			<text class="name" y="20"></text><text class="hullpips" y="27"></text>`
+	} else {
+		g.innerHTML = `<polygon points="14,0 5,-8 -12,-8 -12,8 5,8" class="hull"></polygon>
+			<text class="type" y="-9"></text><text class="name" y="2"></text>
+			<text class="hullpips" y="12"></text>`
+	}
 	g.addEventListener("click", () => { selectedShipId = selectedShipId === ship.id ? null : ship.id; on_update() })
 	return g
 }
 
 function updateShipFace(el, ship) {
-	el.querySelector(".type").textContent = ship.type
-	el.querySelector(".name").textContent = ship.name.slice(0, 5)
-	const ratio = ship.maxHull ? ship.hull / ship.maxHull : 0
-	el.querySelector(".hullpips").textContent = ship.sunk ? "✕" : "▮".repeat(Math.max(0, Math.round(ratio * 4)))
+	const img = el.querySelector(".counterimg")
+	if (img && !img.getAttribute("href")) {
+		const src = counterAssetPath(ship)
+		if (src) img.setAttribute("href", src)
+	}
+	const name = el.querySelector(".name")
+	if (name) name.textContent = ship.name.slice(0, 6)
+	const pips = el.querySelector(".hullpips")
+	if (pips) {
+		const ratio = ship.maxHull ? ship.hull / ship.maxHull : 0
+		pips.textContent = ship.sunk ? "✕" : "▮".repeat(Math.max(0, Math.round(ratio * 4)))
+	}
+	// 旗向标：舰首指向（航向 1..6 → 屏幕角 330+(h-1)*60 度）
+	const angle = 330 + (ship.heading - 1) * 60
+	el.querySelector(".counterimg, .hull").style.transform = ship.sunk ? "" : `rotate(${angle - 90}deg)`
 	el.style.opacity = ship.sunk ? 0.35 : 1
 }
 

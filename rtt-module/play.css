@@ -1,5 +1,8 @@
 /* 铁底湾的回响 IV — RTT 前端样式（贴合原版深色主题） */
-body{background:#10191b;color:#e9e2d0;font-family:Inter,"Noto Sans SC",system-ui}
+body{background:#10191b;color:#e9e2d0;font-family:Inter,"Noto Sans SC",system-ui;display:grid;grid-template:"header header" 64px "aside main" 1fr / 300px 1fr;height:100vh;margin:0}
+body>header{grid-area:header}
+body>aside{grid-area:aside;overflow:auto}
+body>main{grid-area:main;position:relative;overflow:hidden}
 header{background:#0b1315;border-bottom:1px solid #465554}
 aside{background:#182426;border-right:1px solid #485554}
 main{background:radial-gradient(circle at 30% 10%,#3b5152,#10191b 70%)}
@@ -12,6 +15,8 @@ main{background:radial-gradient(circle at 30% 10%,#3b5152,#10191b 70%)}
 .ship.selected .hull{stroke:#e8d8ad;stroke-width:3}
 .ship .type,.ship .name,.ship .hullpips{text-anchor:middle;fill:#fff;paint-order:stroke;stroke:#112;stroke-width:3px;font-size:9px;font-weight:700}
 .ship .type{font-size:8px;fill:#ffe9b0}
+.ship .counterimg{filter:drop-shadow(0 1px 2px #000a)}
+.ship.sunk .counterimg{filter:grayscale(1) brightness(.6)}
 .ship .hullpips{fill:#d7ffd9}
 .torpedodot{fill:#9fe3ff;stroke:#123}
 .torpedodot.allies{fill:#b7f0c9}

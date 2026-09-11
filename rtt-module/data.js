@@ -3,7 +3,7 @@
 var data = {
   meta: {
     "generator": "scripts/export_rtt_data.py",
-    "generated_at": "2026-09-10T16:56:36+00:00",
+    "generated_at": "2026-09-11T18:51:40+00:00",
     "counts": {
       "ships": 214,
       "scenarios": 16,
@@ -1419,7 +1419,7 @@ var data = {
         "gun_id": "us-16-1928",
         "nation": "US",
         "caliber_in": 16,
-        "period": 1928,
+        "period": "1928",
         "1-2": 24,
         "3-5": 23,
         "6-7": 22,
@@ -1587,7 +1587,7 @@ var data = {
         "gun_id": "generic-4.7-1928",
         "nation": "GENERIC",
         "caliber_in": 4.7,
-        "period": 1928,
+        "period": "1928",
         "1-2": 5,
         "3-5": 5,
         "6-7": 4,
@@ -3007,7 +3007,7 @@ var data = {
       "torpedo_type": null,
       "armour": {
         "primary": 16.0,
-        "secondary": null,
+        "secondary": 2.0,
         "belt": 12.0,
         "bridge": 15.0
       },
@@ -3106,7 +3106,7 @@ var data = {
       "torpedo_type": null,
       "armour": {
         "primary": 18.0,
-        "secondary": null,
+        "secondary": 2.0,
         "belt": 12.0,
         "bridge": 16.0
       },
@@ -6538,10 +6538,10 @@ var data = {
       "torpedo_launchers": [],
       "torpedo_type": null,
       "armour": {
-        "primary": null,
-        "secondary": null,
-        "belt": null,
-        "bridge": null
+        "primary": 6.0,
+        "secondary": 1.0,
+        "belt": 5.0,
+        "bridge": 6.0
       },
       "fire_control": true,
       "radar": true,
@@ -6664,10 +6664,10 @@ var data = {
       "torpedo_launchers": [],
       "torpedo_type": null,
       "armour": {
-        "primary": null,
-        "secondary": null,
-        "belt": null,
-        "bridge": null
+        "primary": 6.0,
+        "secondary": 1.0,
+        "belt": 5.0,
+        "bridge": 6.0
       },
       "fire_control": true,
       "radar": true,
@@ -7861,9 +7861,9 @@ var data = {
       "torpedo_type": "jp-24-type90",
       "armour": {
         "primary": 1.0,
-        "secondary": null,
+        "secondary": 0.0,
         "belt": 2.0,
-        "bridge": 2.0
+        "bridge": 0.0
       },
       "fire_control": true,
       "radar": false,

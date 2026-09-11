@@ -363,6 +363,10 @@ function resolveGunnery(game, ordersBySide) {
 				const result = core.gunneryResult(resultRoll)
 				applyGunneryResult(game, attacker, target, result, distance, caliber)
 				log(game, "  ↳ " + target.name + " 命中结果 " + resultRoll)
+				// 炮击结果表 * 注：日/德 4.7"/5" 炮命中后额外检视火灾判定表
+				if (attacker.id.indexOf("IBS-U-IJN-") === 0 || attacker.id.indexOf("IBS-U-KM-") === 0) {
+					if (Math.abs(caliber - 4.7) < 0.05 || Math.abs(caliber - 5) < 0.05) extraFireDetermination(game, target, attacker, caliber)
+				}
 			}
 		}
 	}
@@ -413,9 +417,12 @@ function applyGunneryResult(game, attacker, target, result, distance, caliber) {
 }
 
 function penetrates(game, attacker, armour, distance, caliber) {
+	// 穿甲表注释：穿甲值必须大于装甲（平值不穿透）
 	if (!armour || armour <= 0) return true
-	return core.penetration(core.nationOf(attacker.id), caliber || 5, distance) >= armour
+	const period = core.penetrationPeriod(gameMod_scenario(game))
+	return core.penetration(core.nationOf(attacker.id), caliber || 5, distance, period) > armour
 }
+function gameMod_scenario(game) { return D.scenarios[game.scenario] }
 
 function destroyGuns(game, ship, kind, count, position) {
 	let destroyed = 0
@@ -424,6 +431,20 @@ function destroyGuns(game, ship, kind, count, position) {
 		if (g.kind === kind && !g.destroyed && (!position || g.position === position)) { g.destroyed = true; destroyed++ }
 	}
 	if (destroyed) log(game, "  ↳ " + ship.name + " 损失 " + destroyed + " 座" + (kind === "primary" ? "主炮" : "副炮"))
+}
+
+function extraFireDetermination(game, target, attacker, caliber) {
+	let roll = core.roll2d6(game)
+	if (!target.fired) roll = Math.min(12, roll + intOr0((D.rules.fireTable.modifiers || {}).ship_did_not_fire))
+	const ignore = D.rules.fireTable.modifiers && (D.rules.fireTable.modifiers.ignore_results_if_ship_did_not_fire || [])
+	if (!target.fired && ignore.indexOf(roll) >= 0) return
+	const result = core.table2d6(D.rules.fireTable.results, roll)
+	if (result.kind === "special_damage") resolveSpecialDamage(game, target, attacker, null, caliber)
+	if (result.hull) damageHull(game, target, intOr0(result.hull), "fire", attacker)
+	if (result.speed_loss) loseSpeed(target, intOr0(result.speed_loss))
+	if (result.secondary) destroyGuns(game, target, "secondary", intOr0(result.secondary), null)
+	if (result.primary) destroyGuns(game, target, "primary", intOr0(result.primary), null)
+	if (result.extinguish) target.fireMarkers = Math.max(0, target.fireMarkers - 1)
 }
 
 function resolveSpecialDamage(game, target, attacker, distance, caliber) {
