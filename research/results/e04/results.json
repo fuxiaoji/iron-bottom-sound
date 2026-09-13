@@ -1,0 +1,1248 @@
+{
+  "experiment": "E04 torpedo direct-kill vs maneuver-denial decomposition",
+  "protocol": "same-turn perfect-information response (turn-2 launch opportunities, turn-2 target plan space; see report for the protocol decision)",
+  "base_seed": 20260909,
+  "seeds_per_cell": 36,
+  "geometries": [
+    "chase",
+    "close",
+    "crossing",
+    "opposing"
+  ],
+  "fleets": [
+    "1v1",
+    "2v1"
+  ],
+  "direct_hit_threshold": 0.15,
+  "threat_only_hazard": 1.0,
+  "horizon_turns": 6,
+  "lane_model_verification": {
+    "scenario": "opposing/1v1 seed=424242 (turn-2 launch)",
+    "order": "IBS-U-IJN-FUBUKI TT1 mf=2 port/A setting=1",
+    "engine_traversed": [
+      "V18",
+      "V17",
+      "V16",
+      "V15",
+      "V14",
+      "V13"
+    ],
+    "analytic_path": [
+      "V18",
+      "V17",
+      "V16",
+      "V15",
+      "V14",
+      "V13",
+      "V12",
+      "V11",
+      "V10",
+      "V9",
+      "V8",
+      "V7",
+      "V6",
+      "V5",
+      "V4",
+      "V3",
+      "V2",
+      "V1"
+    ],
+    "match": true
+  },
+  "runtime_seconds": 17.36282181739807,
+  "acceptance": {
+    "criterion": "low-direct-hit subset V_denial 95% bootstrap CI > 0, repeated across >= 3 geometries",
+    "geometries_with_low_samples": [
+      "chase",
+      "crossing",
+      "opposing"
+    ],
+    "geometries_passing": [],
+    "pass": false,
+    "min_seeds_per_geometry": 72
+  },
+  "pooled_low": {
+    "n": 216,
+    "options_total_mean": 144.0,
+    "cross_total_mean": 7.333333333333333,
+    "cross_low_mean": 7.333333333333333,
+    "cross_high_mean": 0.0,
+    "j_ref_mean": 7.333333333333333,
+    "j_tied_top_mean": 25.5,
+    "j_tiers_mean": 8.0,
+    "threat_weight": 0.3425925925925926,
+    "v_denial_c": {
+      "n": 216,
+      "mean": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "std": 0.0
+    },
+    "v_denial_c_norm": {
+      "n": 216,
+      "mean": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "std": 0.0
+    },
+    "v_denial_c1_norm": {
+      "n": 216,
+      "mean": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "std": 0.0
+    },
+    "v_denial_d": {
+      "n": 216,
+      "mean": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "std": 0.0
+    },
+    "v_denial_d_norm": {
+      "n": 216,
+      "mean": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "std": 0.0
+    },
+    "v_direct_norm": {
+      "n": 216,
+      "mean": 0.028549382716049395,
+      "ci_low": 0.028549382716049395,
+      "ci_high": 0.028549382716049395,
+      "std": 1.043251821911258e-17
+    },
+    "v_direct_vp": {
+      "n": 216,
+      "mean": 0.8333333333333334,
+      "ci_low": 0.8333333333333334,
+      "ci_high": 0.8333333333333334,
+      "std": 1.1128019433720084e-16
+    },
+    "v_torpedo_norm": {
+      "n": 216,
+      "mean": 0.028549382716049395,
+      "ci_low": 0.028549382716049395,
+      "ci_high": 0.028549382716049395,
+      "std": 1.043251821911258e-17
+    },
+    "c_minus_d_denial": {
+      "n": 216,
+      "mean": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "std": 0.0
+    },
+    "route_changed_rate_c": 1.0,
+    "route_changed_rate_d": 1.0,
+    "route_changed_rate_c1": 1.0,
+    "heading_change_mean_c": 1.6666666666666667,
+    "speed_loss_mean_c": 0.0,
+    "deviation_mean_c": 0.0,
+    "e_hits_mean": 0.08333333333333333,
+    "e_hits_zero_share": 0.0,
+    "denial_significant": false,
+    "n_seeds_total": 216
+  },
+  "pooled_direct": {
+    "n": 72,
+    "options_total_mean": 144.0,
+    "cross_total_mean": 7.5,
+    "cross_low_mean": 0.0,
+    "cross_high_mean": 7.5,
+    "j_ref_mean": 25.999999999999996,
+    "j_tied_top_mean": 7.5,
+    "j_tiers_mean": 19.5,
+    "threat_weight": 0.3425925925925926,
+    "v_denial_c": {
+      "n": 72,
+      "mean": 0.9166666666666666,
+      "ci_low": 0.4166666666666667,
+      "ci_high": 1.4166666666666667,
+      "std": 2.173787504029788
+    },
+    "v_denial_c_norm": {
+      "n": 72,
+      "mean": 0.026442307692307696,
+      "ci_low": 0.012019230769230772,
+      "ci_high": 0.040865384615384616,
+      "std": 0.06270540877009005
+    },
+    "v_denial_c1_norm": {
+      "n": 72,
+      "mean": 0.21257345085470086,
+      "ci_low": 0.15781917735042736,
+      "ci_high": 0.26973157051282054,
+      "std": 0.24494782677535648
+    },
+    "v_denial_d": {
+      "n": 72,
+      "mean": 7.369212962962962,
+      "ci_low": 5.471064814814814,
+      "ci_high": 9.350694444444445,
+      "std": 8.491524661545691
+    },
+    "v_denial_d_norm": {
+      "n": 72,
+      "mean": 0.21257345085470086,
+      "ci_low": 0.15781917735042736,
+      "ci_high": 0.26973157051282054,
+      "std": 0.24494782677535648
+    },
+    "v_direct_norm": {
+      "n": 72,
+      "mean": 0.3248814014631916,
+      "ci_low": 0.30082590306355733,
+      "ci_high": 0.3489368998628258,
+      "std": 0.10981663412869491
+    },
+    "v_direct_vp": {
+      "n": 72,
+      "mean": 9.483024691358024,
+      "ci_low": 8.780864197530864,
+      "ci_high": 10.185185185185183,
+      "std": 3.2054585097024466
+    },
+    "v_torpedo_norm": {
+      "n": 72,
+      "mean": 0.35132370915549926,
+      "ci_low": 0.3193540941226127,
+      "ci_high": 0.3825907460166719,
+      "std": 0.1396184691563639
+    },
+    "c_minus_d_denial": {
+      "n": 72,
+      "mean": -6.452546296296296,
+      "ci_low": -8.51736111111111,
+      "ci_high": -4.387731481481481,
+      "std": 8.909372717540146
+    },
+    "route_changed_rate_c": 0.1527777777777778,
+    "route_changed_rate_d": 0.5,
+    "route_changed_rate_c1": 0.5,
+    "heading_change_mean_c": 0.1527777777777778,
+    "speed_loss_mean_c": 0.0,
+    "deviation_mean_c": 0.1527777777777778,
+    "e_hits_mean": 0.9483024691358026,
+    "e_hits_zero_share": 0.0,
+    "denial_significant": true,
+    "n_seeds_total": 72
+  },
+  "low_by_geometry": {
+    "chase": {
+      "n": 72,
+      "options_total_mean": 144.0,
+      "cross_total_mean": 11.0,
+      "cross_low_mean": 11.0,
+      "cross_high_mean": 0.0,
+      "j_ref_mean": 8.000000000000002,
+      "j_tied_top_mean": 31.5,
+      "j_tiers_mean": 7.0,
+      "threat_weight": 0.3425925925925926,
+      "v_denial_c": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c_norm": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c1_norm": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d_norm": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_direct_norm": {
+        "n": 72,
+        "mean": 0.02854938271604939,
+        "ci_low": 0.02854938271604939,
+        "ci_high": 0.02854938271604939,
+        "std": 6.98758849362898e-18
+      },
+      "v_direct_vp": {
+        "n": 72,
+        "mean": 0.8333333333333331,
+        "ci_low": 0.8333333333333331,
+        "ci_high": 0.8333333333333331,
+        "std": 1.118014158980637e-16
+      },
+      "v_torpedo_norm": {
+        "n": 72,
+        "mean": 0.02854938271604939,
+        "ci_low": 0.02854938271604939,
+        "ci_high": 0.02854938271604939,
+        "std": 6.98758849362898e-18
+      },
+      "c_minus_d_denial": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "route_changed_rate_c": 1.0,
+      "route_changed_rate_d": 1.0,
+      "route_changed_rate_c1": 1.0,
+      "heading_change_mean_c": 2.0,
+      "speed_loss_mean_c": 0.0,
+      "deviation_mean_c": 0.0,
+      "e_hits_mean": 0.08333333333333333,
+      "e_hits_zero_share": 0.0,
+      "denial_significant": false,
+      "n_seeds_total": 72
+    },
+    "crossing": {
+      "n": 72,
+      "options_total_mean": 144.0,
+      "cross_total_mean": 6.0,
+      "cross_low_mean": 6.0,
+      "cross_high_mean": 0.0,
+      "j_ref_mean": 8.000000000000002,
+      "j_tied_top_mean": 32.5,
+      "j_tiers_mean": 7.0,
+      "threat_weight": 0.3425925925925926,
+      "v_denial_c": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c_norm": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c1_norm": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d_norm": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_direct_norm": {
+        "n": 72,
+        "mean": 0.02854938271604939,
+        "ci_low": 0.02854938271604939,
+        "ci_high": 0.02854938271604939,
+        "std": 6.98758849362898e-18
+      },
+      "v_direct_vp": {
+        "n": 72,
+        "mean": 0.8333333333333331,
+        "ci_low": 0.8333333333333331,
+        "ci_high": 0.8333333333333331,
+        "std": 1.118014158980637e-16
+      },
+      "v_torpedo_norm": {
+        "n": 72,
+        "mean": 0.02854938271604939,
+        "ci_low": 0.02854938271604939,
+        "ci_high": 0.02854938271604939,
+        "std": 6.98758849362898e-18
+      },
+      "c_minus_d_denial": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "route_changed_rate_c": 1.0,
+      "route_changed_rate_d": 1.0,
+      "route_changed_rate_c1": 1.0,
+      "heading_change_mean_c": 2.0,
+      "speed_loss_mean_c": 0.0,
+      "deviation_mean_c": 0.0,
+      "e_hits_mean": 0.08333333333333333,
+      "e_hits_zero_share": 0.0,
+      "denial_significant": false,
+      "n_seeds_total": 72
+    },
+    "opposing": {
+      "n": 72,
+      "options_total_mean": 144.0,
+      "cross_total_mean": 5.0,
+      "cross_low_mean": 5.0,
+      "cross_high_mean": 0.0,
+      "j_ref_mean": 5.999999999999998,
+      "j_tied_top_mean": 12.5,
+      "j_tiers_mean": 10.0,
+      "threat_weight": 0.3425925925925926,
+      "v_denial_c": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c_norm": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c1_norm": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d_norm": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_direct_norm": {
+        "n": 72,
+        "mean": 0.02854938271604939,
+        "ci_low": 0.02854938271604939,
+        "ci_high": 0.02854938271604939,
+        "std": 6.98758849362898e-18
+      },
+      "v_direct_vp": {
+        "n": 72,
+        "mean": 0.8333333333333331,
+        "ci_low": 0.8333333333333331,
+        "ci_high": 0.8333333333333331,
+        "std": 1.118014158980637e-16
+      },
+      "v_torpedo_norm": {
+        "n": 72,
+        "mean": 0.02854938271604939,
+        "ci_low": 0.02854938271604939,
+        "ci_high": 0.02854938271604939,
+        "std": 6.98758849362898e-18
+      },
+      "c_minus_d_denial": {
+        "n": 72,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "route_changed_rate_c": 1.0,
+      "route_changed_rate_d": 1.0,
+      "route_changed_rate_c1": 1.0,
+      "heading_change_mean_c": 1.0,
+      "speed_loss_mean_c": 0.0,
+      "deviation_mean_c": 0.0,
+      "e_hits_mean": 0.08333333333333333,
+      "e_hits_zero_share": 0.0,
+      "denial_significant": false,
+      "n_seeds_total": 72
+    }
+  },
+  "low_by_cell": {
+    "chase:1v1": {
+      "n": 36,
+      "options_total_mean": 96.0,
+      "cross_total_mean": 9.0,
+      "cross_low_mean": 9.0,
+      "cross_high_mean": 0.0,
+      "j_ref_mean": 5.333333333333334,
+      "j_tied_top_mean": 32.0,
+      "j_tiers_mean": 4.0,
+      "threat_weight": 0.3425925925925927,
+      "v_denial_c": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c1_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_direct_norm": {
+        "n": 36,
+        "mean": 0.02854938271604938,
+        "ci_low": 0.02854938271604938,
+        "ci_high": 0.02854938271604938,
+        "std": 3.5186614235981765e-18
+      },
+      "v_direct_vp": {
+        "n": 36,
+        "mean": 0.8333333333333331,
+        "ci_low": 0.8333333333333331,
+        "ci_high": 0.8333333333333331,
+        "std": 1.1259716555514165e-16
+      },
+      "v_torpedo_norm": {
+        "n": 36,
+        "mean": 0.02854938271604938,
+        "ci_low": 0.02854938271604938,
+        "ci_high": 0.02854938271604938,
+        "std": 3.5186614235981765e-18
+      },
+      "c_minus_d_denial": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "route_changed_rate_c": 1.0,
+      "route_changed_rate_d": 1.0,
+      "route_changed_rate_c1": 1.0,
+      "heading_change_mean_c": 2.0,
+      "speed_loss_mean_c": 0.0,
+      "deviation_mean_c": 0.0,
+      "e_hits_mean": 0.08333333333333334,
+      "e_hits_zero_share": 0.0,
+      "denial_significant": false,
+      "n_seeds_total": 36
+    },
+    "chase:2v1": {
+      "n": 36,
+      "options_total_mean": 192.0,
+      "cross_total_mean": 13.0,
+      "cross_low_mean": 13.0,
+      "cross_high_mean": 0.0,
+      "j_ref_mean": 10.66666666666667,
+      "j_tied_top_mean": 31.0,
+      "j_tiers_mean": 10.0,
+      "threat_weight": 0.3425925925925927,
+      "v_denial_c": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c1_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_direct_norm": {
+        "n": 36,
+        "mean": 0.02854938271604938,
+        "ci_low": 0.02854938271604938,
+        "ci_high": 0.02854938271604938,
+        "std": 3.5186614235981765e-18
+      },
+      "v_direct_vp": {
+        "n": 36,
+        "mean": 0.8333333333333331,
+        "ci_low": 0.8333333333333331,
+        "ci_high": 0.8333333333333331,
+        "std": 1.1259716555514165e-16
+      },
+      "v_torpedo_norm": {
+        "n": 36,
+        "mean": 0.02854938271604938,
+        "ci_low": 0.02854938271604938,
+        "ci_high": 0.02854938271604938,
+        "std": 3.5186614235981765e-18
+      },
+      "c_minus_d_denial": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "route_changed_rate_c": 1.0,
+      "route_changed_rate_d": 1.0,
+      "route_changed_rate_c1": 1.0,
+      "heading_change_mean_c": 2.0,
+      "speed_loss_mean_c": 0.0,
+      "deviation_mean_c": 0.0,
+      "e_hits_mean": 0.08333333333333334,
+      "e_hits_zero_share": 0.0,
+      "denial_significant": false,
+      "n_seeds_total": 36
+    },
+    "crossing:1v1": {
+      "n": 36,
+      "options_total_mean": 96.0,
+      "cross_total_mean": 6.0,
+      "cross_low_mean": 6.0,
+      "cross_high_mean": 0.0,
+      "j_ref_mean": 5.333333333333334,
+      "j_tied_top_mean": 33.0,
+      "j_tiers_mean": 4.0,
+      "threat_weight": 0.3425925925925927,
+      "v_denial_c": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c1_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_direct_norm": {
+        "n": 36,
+        "mean": 0.02854938271604938,
+        "ci_low": 0.02854938271604938,
+        "ci_high": 0.02854938271604938,
+        "std": 3.5186614235981765e-18
+      },
+      "v_direct_vp": {
+        "n": 36,
+        "mean": 0.8333333333333331,
+        "ci_low": 0.8333333333333331,
+        "ci_high": 0.8333333333333331,
+        "std": 1.1259716555514165e-16
+      },
+      "v_torpedo_norm": {
+        "n": 36,
+        "mean": 0.02854938271604938,
+        "ci_low": 0.02854938271604938,
+        "ci_high": 0.02854938271604938,
+        "std": 3.5186614235981765e-18
+      },
+      "c_minus_d_denial": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "route_changed_rate_c": 1.0,
+      "route_changed_rate_d": 1.0,
+      "route_changed_rate_c1": 1.0,
+      "heading_change_mean_c": 2.0,
+      "speed_loss_mean_c": 0.0,
+      "deviation_mean_c": 0.0,
+      "e_hits_mean": 0.08333333333333334,
+      "e_hits_zero_share": 0.0,
+      "denial_significant": false,
+      "n_seeds_total": 36
+    },
+    "crossing:2v1": {
+      "n": 36,
+      "options_total_mean": 192.0,
+      "cross_total_mean": 6.0,
+      "cross_low_mean": 6.0,
+      "cross_high_mean": 0.0,
+      "j_ref_mean": 10.66666666666667,
+      "j_tied_top_mean": 32.0,
+      "j_tiers_mean": 10.0,
+      "threat_weight": 0.3425925925925927,
+      "v_denial_c": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c1_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_direct_norm": {
+        "n": 36,
+        "mean": 0.02854938271604938,
+        "ci_low": 0.02854938271604938,
+        "ci_high": 0.02854938271604938,
+        "std": 3.5186614235981765e-18
+      },
+      "v_direct_vp": {
+        "n": 36,
+        "mean": 0.8333333333333331,
+        "ci_low": 0.8333333333333331,
+        "ci_high": 0.8333333333333331,
+        "std": 1.1259716555514165e-16
+      },
+      "v_torpedo_norm": {
+        "n": 36,
+        "mean": 0.02854938271604938,
+        "ci_low": 0.02854938271604938,
+        "ci_high": 0.02854938271604938,
+        "std": 3.5186614235981765e-18
+      },
+      "c_minus_d_denial": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "route_changed_rate_c": 1.0,
+      "route_changed_rate_d": 1.0,
+      "route_changed_rate_c1": 1.0,
+      "heading_change_mean_c": 2.0,
+      "speed_loss_mean_c": 0.0,
+      "deviation_mean_c": 0.0,
+      "e_hits_mean": 0.08333333333333334,
+      "e_hits_zero_share": 0.0,
+      "denial_significant": false,
+      "n_seeds_total": 36
+    },
+    "opposing:1v1": {
+      "n": 36,
+      "options_total_mean": 96.0,
+      "cross_total_mean": 5.0,
+      "cross_low_mean": 5.0,
+      "cross_high_mean": 0.0,
+      "j_ref_mean": 5.333333333333334,
+      "j_tied_top_mean": 13.0,
+      "j_tiers_mean": 6.0,
+      "threat_weight": 0.3425925925925927,
+      "v_denial_c": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c1_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_direct_norm": {
+        "n": 36,
+        "mean": 0.02854938271604938,
+        "ci_low": 0.02854938271604938,
+        "ci_high": 0.02854938271604938,
+        "std": 3.5186614235981765e-18
+      },
+      "v_direct_vp": {
+        "n": 36,
+        "mean": 0.8333333333333331,
+        "ci_low": 0.8333333333333331,
+        "ci_high": 0.8333333333333331,
+        "std": 1.1259716555514165e-16
+      },
+      "v_torpedo_norm": {
+        "n": 36,
+        "mean": 0.02854938271604938,
+        "ci_low": 0.02854938271604938,
+        "ci_high": 0.02854938271604938,
+        "std": 3.5186614235981765e-18
+      },
+      "c_minus_d_denial": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "route_changed_rate_c": 1.0,
+      "route_changed_rate_d": 1.0,
+      "route_changed_rate_c1": 1.0,
+      "heading_change_mean_c": 1.0,
+      "speed_loss_mean_c": 0.0,
+      "deviation_mean_c": 0.0,
+      "e_hits_mean": 0.08333333333333334,
+      "e_hits_zero_share": 0.0,
+      "denial_significant": false,
+      "n_seeds_total": 36
+    },
+    "opposing:2v1": {
+      "n": 36,
+      "options_total_mean": 192.0,
+      "cross_total_mean": 5.0,
+      "cross_low_mean": 5.0,
+      "cross_high_mean": 0.0,
+      "j_ref_mean": 6.666666666666666,
+      "j_tied_top_mean": 12.0,
+      "j_tiers_mean": 14.0,
+      "threat_weight": 0.3425925925925927,
+      "v_denial_c": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c1_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d_norm": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_direct_norm": {
+        "n": 36,
+        "mean": 0.02854938271604938,
+        "ci_low": 0.02854938271604938,
+        "ci_high": 0.02854938271604938,
+        "std": 3.5186614235981765e-18
+      },
+      "v_direct_vp": {
+        "n": 36,
+        "mean": 0.8333333333333331,
+        "ci_low": 0.8333333333333331,
+        "ci_high": 0.8333333333333331,
+        "std": 1.1259716555514165e-16
+      },
+      "v_torpedo_norm": {
+        "n": 36,
+        "mean": 0.02854938271604938,
+        "ci_low": 0.02854938271604938,
+        "ci_high": 0.02854938271604938,
+        "std": 3.5186614235981765e-18
+      },
+      "c_minus_d_denial": {
+        "n": 36,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "route_changed_rate_c": 1.0,
+      "route_changed_rate_d": 1.0,
+      "route_changed_rate_c1": 1.0,
+      "heading_change_mean_c": 1.0,
+      "speed_loss_mean_c": 0.0,
+      "deviation_mean_c": 0.0,
+      "e_hits_mean": 0.08333333333333334,
+      "e_hits_zero_share": 0.0,
+      "denial_significant": false,
+      "n_seeds_total": 36
+    }
+  },
+  "low_by_fleet": {
+    "1v1": {
+      "n": 108,
+      "options_total_mean": 96.0,
+      "cross_total_mean": 6.666666666666667,
+      "cross_low_mean": 6.666666666666667,
+      "cross_high_mean": 0.0,
+      "j_ref_mean": 5.333333333333335,
+      "j_tied_top_mean": 26.0,
+      "j_tiers_mean": 4.666666666666667,
+      "threat_weight": 0.3425925925925927,
+      "v_denial_c": {
+        "n": 108,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c_norm": {
+        "n": 108,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c1_norm": {
+        "n": 108,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d": {
+        "n": 108,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d_norm": {
+        "n": 108,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_direct_norm": {
+        "n": 108,
+        "mean": 0.028549382716049395,
+        "ci_low": 0.028549382716049395,
+        "ci_high": 0.028549382716049395,
+        "std": 1.0456864852501486e-17
+      },
+      "v_direct_vp": {
+        "n": 108,
+        "mean": 0.8333333333333331,
+        "ci_low": 0.8333333333333331,
+        "ci_high": 0.8333333333333331,
+        "std": 1.1153989176001584e-16
+      },
+      "v_torpedo_norm": {
+        "n": 108,
+        "mean": 0.028549382716049395,
+        "ci_low": 0.028549382716049395,
+        "ci_high": 0.028549382716049395,
+        "std": 1.0456864852501486e-17
+      },
+      "c_minus_d_denial": {
+        "n": 108,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "route_changed_rate_c": 1.0,
+      "route_changed_rate_d": 1.0,
+      "route_changed_rate_c1": 1.0,
+      "heading_change_mean_c": 1.6666666666666667,
+      "speed_loss_mean_c": 0.0,
+      "deviation_mean_c": 0.0,
+      "e_hits_mean": 0.08333333333333336,
+      "e_hits_zero_share": 0.0,
+      "denial_significant": false,
+      "n_seeds_total": 108
+    },
+    "2v1": {
+      "n": 108,
+      "options_total_mean": 192.0,
+      "cross_total_mean": 8.0,
+      "cross_low_mean": 8.0,
+      "cross_high_mean": 0.0,
+      "j_ref_mean": 9.333333333333336,
+      "j_tied_top_mean": 25.0,
+      "j_tiers_mean": 11.333333333333334,
+      "threat_weight": 0.3425925925925927,
+      "v_denial_c": {
+        "n": 108,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c_norm": {
+        "n": 108,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_c1_norm": {
+        "n": 108,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d": {
+        "n": 108,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_denial_d_norm": {
+        "n": 108,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "v_direct_norm": {
+        "n": 108,
+        "mean": 0.028549382716049395,
+        "ci_low": 0.028549382716049395,
+        "ci_high": 0.028549382716049395,
+        "std": 1.0456864852501486e-17
+      },
+      "v_direct_vp": {
+        "n": 108,
+        "mean": 0.8333333333333331,
+        "ci_low": 0.8333333333333331,
+        "ci_high": 0.8333333333333331,
+        "std": 1.1153989176001584e-16
+      },
+      "v_torpedo_norm": {
+        "n": 108,
+        "mean": 0.028549382716049395,
+        "ci_low": 0.028549382716049395,
+        "ci_high": 0.028549382716049395,
+        "std": 1.0456864852501486e-17
+      },
+      "c_minus_d_denial": {
+        "n": 108,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "std": 0.0
+      },
+      "route_changed_rate_c": 1.0,
+      "route_changed_rate_d": 1.0,
+      "route_changed_rate_c1": 1.0,
+      "heading_change_mean_c": 1.6666666666666667,
+      "speed_loss_mean_c": 0.0,
+      "deviation_mean_c": 0.0,
+      "e_hits_mean": 0.08333333333333336,
+      "e_hits_zero_share": 0.0,
+      "denial_significant": false,
+      "n_seeds_total": 108
+    }
+  },
+  "direct_by_geometry": {
+    "close": {
+      "n": 72,
+      "options_total_mean": 144.0,
+      "cross_total_mean": 7.5,
+      "cross_low_mean": 0.0,
+      "cross_high_mean": 7.5,
+      "j_ref_mean": 25.999999999999996,
+      "j_tied_top_mean": 7.5,
+      "j_tiers_mean": 19.5,
+      "threat_weight": 0.3425925925925926,
+      "v_denial_c": {
+        "n": 72,
+        "mean": 0.9166666666666666,
+        "ci_low": 0.4166666666666667,
+        "ci_high": 1.4166666666666667,
+        "std": 2.173787504029788
+      },
+      "v_denial_c_norm": {
+        "n": 72,
+        "mean": 0.026442307692307696,
+        "ci_low": 0.012019230769230772,
+        "ci_high": 0.040865384615384616,
+        "std": 0.06270540877009005
+      },
+      "v_denial_c1_norm": {
+        "n": 72,
+        "mean": 0.21257345085470086,
+        "ci_low": 0.15781917735042736,
+        "ci_high": 0.26973157051282054,
+        "std": 0.24494782677535648
+      },
+      "v_denial_d": {
+        "n": 72,
+        "mean": 7.369212962962962,
+        "ci_low": 5.471064814814814,
+        "ci_high": 9.350694444444445,
+        "std": 8.491524661545691
+      },
+      "v_denial_d_norm": {
+        "n": 72,
+        "mean": 0.21257345085470086,
+        "ci_low": 0.15781917735042736,
+        "ci_high": 0.26973157051282054,
+        "std": 0.24494782677535648
+      },
+      "v_direct_norm": {
+        "n": 72,
+        "mean": 0.3248814014631916,
+        "ci_low": 0.30082590306355733,
+        "ci_high": 0.3489368998628258,
+        "std": 0.10981663412869491
+      },
+      "v_direct_vp": {
+        "n": 72,
+        "mean": 9.483024691358024,
+        "ci_low": 8.780864197530864,
+        "ci_high": 10.185185185185183,
+        "std": 3.2054585097024466
+      },
+      "v_torpedo_norm": {
+        "n": 72,
+        "mean": 0.35132370915549926,
+        "ci_low": 0.3193540941226127,
+        "ci_high": 0.3825907460166719,
+        "std": 0.1396184691563639
+      },
+      "c_minus_d_denial": {
+        "n": 72,
+        "mean": -6.452546296296296,
+        "ci_low": -8.51736111111111,
+        "ci_high": -4.387731481481481,
+        "std": 8.909372717540146
+      },
+      "route_changed_rate_c": 0.1527777777777778,
+      "route_changed_rate_d": 0.5,
+      "route_changed_rate_c1": 0.5,
+      "heading_change_mean_c": 0.1527777777777778,
+      "speed_loss_mean_c": 0.0,
+      "deviation_mean_c": 0.1527777777777778,
+      "e_hits_mean": 0.9483024691358026,
+      "e_hits_zero_share": 0.0,
+      "denial_significant": true,
+      "n_seeds_total": 72
+    }
+  }
+}

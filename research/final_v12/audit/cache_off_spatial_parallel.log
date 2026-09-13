@@ -1,0 +1,5 @@
+cache_off_spatial parallel h=1 1/8 policies=6 65.2s
+cache_off_spatial parallel h=2 1/8 policies=41 85.4s
+cache_off_spatial parallel h=3 1/8 policies=51 86.1s
+cache_off_spatial parallel h=6 1/8 policies=57 86.5s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'off', 'symmetry': True, 'cap': 200, 'tol': 0.005, 'n': 8, 'complete': True, 'C': 0.0, 'CI_lo': 0.0, 'CI_hi': 0.0, 'near_zero': True, 'CI_contains_zero': True}, {'geometry': 'parallel', 'h': 2, 'mode': 'off', 'symmetry': True, 'cap': 200, 'tol': 0.005, 'n': 8, 'complete': True, 'C': 1.022693787716199, 'CI_lo': -0.0825750241286175, 'CI_hi': 2.84384428232917, 'near_zero': False, 'CI_contains_zero': True}, {'geometry': 'parallel', 'h': 3, 'mode': 'off', 'symmetry': True, 'cap': 200, 'tol': 0.005, 'n': 8, 'complete': True, 'C': 0.8590208216690753, 'CI_lo': -1.1964147521195565, 'CI_hi': 3.8821512528663065, 'near_zero': False, 'CI_contains_zero': True}, {'geometry': 'parallel', 'h': 6, 'mode': 'off', 'symmetry': True, 'cap': 200, 'tol': 0.005, 'n': 8, 'complete': True, 'C': 0.12868239141654625, 'CI_lo': -3.124445961209217, 'CI_hi': 2.9785777538551246, 'near_zero': True, 'CI_contains_zero': True}]

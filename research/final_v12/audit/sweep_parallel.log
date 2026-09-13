@@ -1,0 +1,60 @@
+sweep_tol0.05_cap15 parallel h=1 1/8 policies=1 10.0s
+sweep_tol0.05_cap15 parallel h=6 1/8 policies=1 10.0s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.05_cap30 parallel h=1 1/8 policies=1 18.0s
+sweep_tol0.05_cap30 parallel h=6 1/8 policies=1 18.0s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.05_cap60 parallel h=1 1/8 policies=1 33.6s
+sweep_tol0.05_cap60 parallel h=6 1/8 policies=1 33.6s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.05_cap120 parallel h=1 1/8 policies=6 62.4s
+sweep_tol0.05_cap120 parallel h=6 1/8 policies=39 83.6s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.05, 'n': 8, 'complete': True, 'C': 0.0, 'CI_lo': 0.0, 'CI_hi': 0.0, 'near_zero': True, 'CI_contains_zero': True}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.05, 'n': 8, 'complete': True, 'C': 0.25215589873695143, 'CI_lo': -2.7704177053688843, 'CI_hi': 2.9932710423586846, 'near_zero': False, 'CI_contains_zero': True}]
+sweep_tol0.05_cap200 parallel h=1 1/8 policies=6 61.6s
+sweep_tol0.05_cap200 parallel h=6 1/8 policies=39 80.6s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.05, 'n': 8, 'complete': True, 'C': 0.0, 'CI_lo': 0.0, 'CI_hi': 0.0, 'near_zero': True, 'CI_contains_zero': True}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.05, 'n': 8, 'complete': True, 'C': 0.25215589873695143, 'CI_lo': -2.7704177053688843, 'CI_hi': 2.9932710423586846, 'near_zero': False, 'CI_contains_zero': True}]
+sweep_tol0.02_cap15 parallel h=1 1/8 policies=1 9.6s
+sweep_tol0.02_cap15 parallel h=6 1/8 policies=1 9.6s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.02_cap30 parallel h=1 1/8 policies=1 17.2s
+sweep_tol0.02_cap30 parallel h=6 1/8 policies=1 17.2s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.02_cap60 parallel h=1 1/8 policies=1 32.9s
+sweep_tol0.02_cap60 parallel h=6 1/8 policies=1 32.9s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.02_cap120 parallel h=1 1/8 policies=6 58.2s
+sweep_tol0.02_cap120 parallel h=6 1/8 policies=39 76.3s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.02, 'n': 8, 'complete': True, 'C': 0.0, 'CI_lo': 0.0, 'CI_hi': 0.0, 'near_zero': True, 'CI_contains_zero': True}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.02, 'n': 8, 'complete': True, 'C': 0.25215589873695143, 'CI_lo': -2.7704177053688843, 'CI_hi': 2.9932710423586846, 'near_zero': False, 'CI_contains_zero': True}]
+sweep_tol0.02_cap200 parallel h=1 1/8 policies=6 65.9s
+sweep_tol0.02_cap200 parallel h=6 1/8 policies=39 89.1s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.02, 'n': 8, 'complete': True, 'C': 0.0, 'CI_lo': 0.0, 'CI_hi': 0.0, 'near_zero': True, 'CI_contains_zero': True}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.02, 'n': 8, 'complete': True, 'C': 0.25215589873695143, 'CI_lo': -2.7704177053688843, 'CI_hi': 2.9932710423586846, 'near_zero': False, 'CI_contains_zero': True}]
+sweep_tol0.01_cap15 parallel h=1 1/8 policies=1 11.5s
+sweep_tol0.01_cap15 parallel h=6 1/8 policies=1 11.5s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.01_cap30 parallel h=1 1/8 policies=1 20.7s
+sweep_tol0.01_cap30 parallel h=6 1/8 policies=1 20.7s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.01_cap60 parallel h=1 1/8 policies=1 38.5s
+sweep_tol0.01_cap60 parallel h=6 1/8 policies=1 38.5s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.01_cap120 parallel h=1 1/8 policies=6 64.8s
+sweep_tol0.01_cap120 parallel h=6 1/8 policies=39 85.6s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.01, 'n': 8, 'complete': True, 'C': 0.0, 'CI_lo': 0.0, 'CI_hi': 0.0, 'near_zero': True, 'CI_contains_zero': True}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.01, 'n': 8, 'complete': True, 'C': 0.12868239141654625, 'CI_lo': -3.124445961209217, 'CI_hi': 2.9785777538551246, 'near_zero': True, 'CI_contains_zero': True}]
+sweep_tol0.01_cap200 parallel h=1 1/8 policies=6 59.9s
+sweep_tol0.01_cap200 parallel h=6 1/8 policies=39 78.3s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.01, 'n': 8, 'complete': True, 'C': 0.0, 'CI_lo': 0.0, 'CI_hi': 0.0, 'near_zero': True, 'CI_contains_zero': True}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.01, 'n': 8, 'complete': True, 'C': 0.12868239141654625, 'CI_lo': -3.124445961209217, 'CI_hi': 2.9785777538551246, 'near_zero': True, 'CI_contains_zero': True}]
+sweep_tol0.005_cap15 parallel h=1 1/8 policies=1 9.2s
+sweep_tol0.005_cap15 parallel h=6 1/8 policies=1 9.2s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.005_cap30 parallel h=1 1/8 policies=1 16.5s
+sweep_tol0.005_cap30 parallel h=6 1/8 policies=1 16.5s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.005_cap60 parallel h=1 1/8 policies=1 30.9s
+sweep_tol0.005_cap60 parallel h=6 1/8 policies=1 30.9s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.005_cap120 parallel h=1 1/8 policies=6 57.0s
+sweep_tol0.005_cap120 parallel h=6 1/8 policies=39 75.1s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.005, 'n': 8, 'complete': True, 'C': 0.0, 'CI_lo': 0.0, 'CI_hi': 0.0, 'near_zero': True, 'CI_contains_zero': True}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.005, 'n': 8, 'complete': True, 'C': 0.12868239141654625, 'CI_lo': -3.124445961209217, 'CI_hi': 2.9785777538551246, 'near_zero': True, 'CI_contains_zero': True}]
+sweep_tol0.005_cap200 parallel h=1 1/8 policies=6 56.1s
+sweep_tol0.005_cap200 parallel h=6 1/8 policies=39 74.5s
+[{'geometry': 'parallel', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.005, 'n': 8, 'complete': True, 'C': 0.0, 'CI_lo': 0.0, 'CI_hi': 0.0, 'near_zero': True, 'CI_contains_zero': True}, {'geometry': 'parallel', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.005, 'n': 8, 'complete': True, 'C': 0.12868239141654625, 'CI_lo': -3.124445961209217, 'CI_hi': 2.9785777538551246, 'near_zero': True, 'CI_contains_zero': True}]

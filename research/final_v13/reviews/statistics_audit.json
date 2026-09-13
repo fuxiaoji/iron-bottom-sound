@@ -1,0 +1,33 @@
+{
+  "checklist_id": "IBS-V13-EXPERIMENT",
+  "errors": [],
+  "gap_item_ids_by_category": {},
+  "item_count": 22,
+  "item_ids_missing_requested_action": [],
+  "notice": "This is a structured completeness and consistency audit, not a statistical reanalysis, reproducibility claim, quality score, or publication recommendation. A qualified specialist must evaluate methods outside the reviewer's competence.",
+  "schema_version": "2.0",
+  "specialist_review": {
+    "declared_areas": [
+      "mathematical_novelty",
+      "numerical_game_theory",
+      "journal_fit"
+    ],
+    "declared_needed": "yes",
+    "declared_requested": false,
+    "recheck_recommended": false,
+    "trigger_item_ids": []
+  },
+  "status": "VALID_NO_RECORDED_GAPS",
+  "status_counts": {
+    "not_applicable": 2,
+    "verified_present": 20
+  },
+  "study_design": "finite_computational_game",
+  "valid": true,
+  "warnings": [
+    {
+      "code": "SPECIALIST_REVIEW_NOT_REQUESTED",
+      "field": "specialist_review.requested"
+    }
+  ]
+}

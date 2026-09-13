@@ -1,0 +1,60 @@
+sweep_tol0.05_cap15 head_on h=1 1/8 policies=1 9.9s
+sweep_tol0.05_cap15 head_on h=6 1/8 policies=1 9.9s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.05_cap30 head_on h=1 1/8 policies=1 17.9s
+sweep_tol0.05_cap30 head_on h=6 1/8 policies=1 17.9s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.05_cap60 head_on h=1 1/8 policies=1 33.7s
+sweep_tol0.05_cap60 head_on h=6 1/8 policies=1 33.7s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.05_cap120 head_on h=1 1/8 policies=1 67.3s
+sweep_tol0.05_cap120 head_on h=6 1/8 policies=1 67.3s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.05, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.05_cap200 head_on h=1 1/8 policies=6 78.0s
+sweep_tol0.05_cap200 head_on h=6 1/8 policies=41 113.6s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.05, 'n': 8, 'complete': True, 'C': 0.0, 'CI_lo': 0.0, 'CI_hi': 0.0, 'near_zero': True, 'CI_contains_zero': True}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.05, 'n': 8, 'complete': True, 'C': -3.1477530288205755, 'CI_lo': -7.9545941011016135, 'CI_hi': 1.3631351946128163, 'near_zero': False, 'CI_contains_zero': True}]
+sweep_tol0.02_cap15 head_on h=1 1/8 policies=1 9.5s
+sweep_tol0.02_cap15 head_on h=6 1/8 policies=1 9.5s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.02_cap30 head_on h=1 1/8 policies=1 17.2s
+sweep_tol0.02_cap30 head_on h=6 1/8 policies=1 17.2s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.02_cap60 head_on h=1 1/8 policies=1 33.8s
+sweep_tol0.02_cap60 head_on h=6 1/8 policies=1 33.8s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.02_cap120 head_on h=1 1/8 policies=1 66.0s
+sweep_tol0.02_cap120 head_on h=6 1/8 policies=1 66.0s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.02, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.02_cap200 head_on h=1 1/8 policies=6 85.9s
+sweep_tol0.02_cap200 head_on h=6 1/8 policies=40 117.8s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.02, 'n': 8, 'complete': True, 'C': 0.0, 'CI_lo': 0.0, 'CI_hi': 0.0, 'near_zero': True, 'CI_contains_zero': True}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.02, 'n': 8, 'complete': True, 'C': -3.026494298736579, 'CI_lo': -7.547014091972899, 'CI_hi': 1.284095922823939, 'near_zero': False, 'CI_contains_zero': True}]
+sweep_tol0.01_cap15 head_on h=1 1/8 policies=1 10.4s
+sweep_tol0.01_cap15 head_on h=6 1/8 policies=1 10.4s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.01_cap30 head_on h=1 1/8 policies=1 18.8s
+sweep_tol0.01_cap30 head_on h=6 1/8 policies=1 18.8s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.01_cap60 head_on h=1 1/8 policies=1 35.6s
+sweep_tol0.01_cap60 head_on h=6 1/8 policies=1 35.6s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.01_cap120 head_on h=1 1/8 policies=1 69.2s
+sweep_tol0.01_cap120 head_on h=6 1/8 policies=1 69.2s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.01, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.01_cap200 head_on h=1 1/8 policies=6 82.1s
+sweep_tol0.01_cap200 head_on h=6 1/8 policies=40 111.4s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.01, 'n': 8, 'complete': True, 'C': 0.0, 'CI_lo': 0.0, 'CI_hi': 0.0, 'near_zero': True, 'CI_contains_zero': True}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.01, 'n': 8, 'complete': True, 'C': 0.1737133117762677, 'CI_lo': -5.473996775412182, 'CI_hi': 4.856485374280876, 'near_zero': True, 'CI_contains_zero': True}]
+sweep_tol0.005_cap15 head_on h=1 1/8 policies=1 9.6s
+sweep_tol0.005_cap15 head_on h=6 1/8 policies=1 9.6s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 15, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.005_cap30 head_on h=1 1/8 policies=1 17.3s
+sweep_tol0.005_cap30 head_on h=6 1/8 policies=1 17.3s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 30, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.005_cap60 head_on h=1 1/8 policies=1 33.0s
+sweep_tol0.005_cap60 head_on h=6 1/8 policies=1 33.0s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 60, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.005_cap120 head_on h=1 1/8 policies=1 63.8s
+sweep_tol0.005_cap120 head_on h=6 1/8 policies=1 63.9s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 120, 'tol': 0.005, 'n': 8, 'complete': False, 'C': None, 'CI_lo': None, 'CI_hi': None, 'near_zero': False, 'CI_contains_zero': False}]
+sweep_tol0.005_cap200 head_on h=1 1/8 policies=6 81.4s
+sweep_tol0.005_cap200 head_on h=6 1/8 policies=40 111.6s
+[{'geometry': 'head_on', 'h': 1, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.005, 'n': 8, 'complete': True, 'C': 0.0, 'CI_lo': 0.0, 'CI_hi': 0.0, 'near_zero': True, 'CI_contains_zero': True}, {'geometry': 'head_on', 'h': 6, 'mode': 'exact_history', 'symmetry': True, 'cap': 200, 'tol': 0.005, 'n': 8, 'complete': True, 'C': 0.1737133117762677, 'CI_lo': -5.473996775412182, 'CI_hi': 4.856485374280876, 'near_zero': True, 'CI_contains_zero': True}]

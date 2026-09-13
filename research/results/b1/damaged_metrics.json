@@ -1,0 +1,13 @@
+{
+  "damaged_mount": "P3 (stern primary, firepower 8) destroyed",
+  "held_out": {
+    "spearman": 0.9951050566961015,
+    "nmae": 0.05470010709790843,
+    "n": 1523
+  },
+  "gate": "PASS",
+  "structure": {
+    "stern_mean_hits": 0.0,
+    "bow_mean_hits": 1.407
+  }
+}

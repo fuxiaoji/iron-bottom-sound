@@ -1,0 +1,9 @@
+claim_id,location,claim_type,claim_summary,evidence_ids,support_level,alignment_issue,limitation,requested_action
+C01,Gate,primary_outcome,Primary positive support 5/12 under amended frozen design,E_CONFIRM;E_GATE,supported,none,Finite forced-speed Grid3 T6 only,
+C02,Theory,generalization,Mobility capability always increases adaptation value,E_CAPABILITY;E_THEORY,unsupported,scope,Nested-menu and algebraic counterexamples retained,Do not assert general complementarity.
+C03,Mechanism,causal,Higher speed improves tracking and thereby adaptation,E_MECHANISM,unsupported,causal_language,Standardized probes and failed directional chain,Do not claim causal mediation or a positive chain.
+C04,Capability,secondary_outcome,Separate T4 capability diagnostic 5/6 positive,E_CAPABILITY,supported,none,Not primary confirmation or horizon robustness,
+C05,Theory,other,Reduced quadratic tracking theorem under fixed disturbance and ball/reset assumptions,E_THEORY,supported,none,Proof scope explicit; novelty and specialist endorsement unverified,
+C06,Numerics,methods,Final complete mirrors and nonnegative adaptation verified in tested cells,E_AUDIT;E_TESTS,supported,none,Finite floating-point calculation; not universal solver correctness,
+C07,Readiness,generalization,Current experiment establishes CAS Q1 or Q2 manuscript readiness,E_GATE;E_FALLBACK,unsupported,scope,No current new manuscript or independent review; fallback known defects,Do not certify journal rank or readiness.
+C08,Protocol,methods,Design stayed fixed but payoff implementation was amended after a mirror failure,E_AMENDMENT;E_FREEZE,supported,none,Original incomplete run archived; all affected scientific data rerun,

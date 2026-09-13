@@ -1,0 +1,16 @@
+{
+  "utc": "2026-09-13T02:42:42.172617+00:00",
+  "git_head": "fc77a65e970e92cca429e6c87498b0c68a70bf1e",
+  "design_sha256": "bafcf76ec7a7cc8d01b99f726433d61c673a092af73a0d17d978790fd7cd8603",
+  "source_hashes": {
+    "research/final_v13/confirmatory_design/CONFIRMATORY_DESIGN.md": "bafcf76ec7a7cc8d01b99f726433d61c673a092af73a0d17d978790fd7cd8603",
+    "research/final_v13/discovery/all_results.json": "b31005fec5d86926e4c837ab6123f5b0666a4bbad245b3b0409c802b020d00c3",
+    "research/final_v13/mechanism/discovery/all_results.json": "e346560323f493273b4869be0221292d949020cecaf8ab9bbfbbf7589f77f9b2",
+    "research/final_v13/DISCOVERY_PROTOCOL.md": "3137b570cd621f160700bfb91e831071ff731e23c3bed573daf6314d9157f968",
+    "research/final_v13/MECHANISM_PROTOCOL.md": "f1c5fe560a7ff625c476c1cd5ad561bc25a76470a9262fa5887a6e8a53918af6",
+    "research/experiments/v13_exact.py": "0d338cb08b5eed8d7000e8ddacb11bdf4e630e89061343abca315dc94dacb588",
+    "research/experiments/v13_mechanism.py": "00e08d360d79296659598e5cca948675180aa9b6cfd3538ac0de2095491949f0",
+    "research/formation/tracking_v13.py": "64b28a767b24e9aeb583158a5e8f6248761d549dc541b38a566ad0eaa3156a37"
+  },
+  "no_heldout_outcomes_evaluated": true
+}

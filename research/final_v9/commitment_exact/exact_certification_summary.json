@@ -1,0 +1,32 @@
+{
+  "grid5_cells": 18,
+  "grid5_sign_certified": 18,
+  "grid5_certified_reversals": 0,
+  "grid7_cells": 18,
+  "grid7_certified_reversals": 0,
+  "geometry_support": {
+    "head_on": {
+      "pos": 3,
+      "neg": 3,
+      "n": 6
+    },
+    "parallel": {
+      "pos": 3,
+      "neg": 3,
+      "n": 6
+    },
+    "crossing": {
+      "pos": 3,
+      "neg": 3,
+      "n": 6
+    }
+  },
+  "symmetric_sanity_ok": true,
+  "h1_exact_all": true,
+  "verdict": "CORE-STRONG (Grid-7 full)",
+  "grids_run": [
+    "5",
+    "7"
+  ],
+  "wall_time_s": 706.4
+}

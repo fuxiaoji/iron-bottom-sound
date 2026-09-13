@@ -1,0 +1,69 @@
+{
+  "degeneracy": {
+    "grid_16x12": {
+      "max_abs_V_minus_L": 0.0,
+      "sweeps": 2
+    },
+    "grid_30x24": {
+      "max_abs_V_minus_L": 0.0,
+      "sweeps": 2
+    },
+    "interpretation": "With simultaneous moves, identical instantaneous capabilities and full observability, the successor-payoff matrix is exactly skew-symmetric in (u_B, u_R); the stationary value equals the instantaneous fire differential and positional maneuvering has zero equilibrium value. Tactical geometry therefore acquires game value only under order commitment (open loop), which is what the engine's sealed-order discipline \u2014 and naval doctrine \u2014 provides."
+  },
+  "symmetry_swap_error": 0.0,
+  "sensitivity_eta_g": [
+    {
+      "eta_g": 0.8,
+      "game_value": -3.0869303615265777,
+      "maximin_plan_B": "turn-30"
+    },
+    {
+      "eta_g": 1.0,
+      "game_value": -1.0394990434041251,
+      "maximin_plan_B": "turn-30"
+    },
+    {
+      "eta_g": 1.25,
+      "game_value": 1.3933008218105085,
+      "maximin_plan_B": "turn-30"
+    }
+  ],
+  "fresh_grid": [
+    {
+      "eta_v": 0.95,
+      "eta_r": 0.85,
+      "regime": "cross_or_beam",
+      "value": 0.4374819815148223
+    },
+    {
+      "eta_v": 0.95,
+      "eta_r": 1.15,
+      "regime": "cross_or_beam",
+      "value": 2.1291348239558032
+    },
+    {
+      "eta_v": 1.05,
+      "eta_r": 0.85,
+      "regime": "oblique_duel",
+      "value": -1.8053533767507366
+    },
+    {
+      "eta_v": 1.05,
+      "eta_r": 1.15,
+      "regime": "oblique_duel",
+      "value": -0.4561464777885143
+    },
+    {
+      "eta_v": 1.2,
+      "eta_r": 0.85,
+      "regime": "oblique_duel",
+      "value": -1.7901393377937216
+    },
+    {
+      "eta_v": 1.2,
+      "eta_r": 1.15,
+      "regime": "oblique_duel",
+      "value": -0.52864389730931
+    }
+  ]
+}

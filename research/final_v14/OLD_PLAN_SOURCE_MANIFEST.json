@@ -1,0 +1,21 @@
+{
+  "sources": {
+    "iron_bottom_sound_commitment_revival_q1_v12.md": {
+      "original": "/Users/Zhuanz1/Downloads/iron_bottom_sound_commitment_revival_q1_v12.md",
+      "copy": "research/final_v14/old_plans/iron_bottom_sound_commitment_revival_q1_v12.md",
+      "sha256": "97d5f844eade1f475cc2e26f3fb1b7ead9f0b1e3072742c020cc7b684de6f642"
+    },
+    "iron_bottom_sound_v13_1_mobility_flexibility_q1_plan.md": {
+      "original": "/Users/Zhuanz1/Downloads/iron_bottom_sound_v13_1_mobility_flexibility_q1_plan.md",
+      "copy": "research/final_v14/old_plans/iron_bottom_sound_v13_1_mobility_flexibility_q1_plan.md",
+      "sha256": "560147aed0eadd1bf1aa7dfd5ba9880131e6e39b6a3bddc056b3ba6ee53087ca"
+    },
+    "iron_bottom_sound_v13_1_master_prompt.md": {
+      "original": "/Users/Zhuanz1/Downloads/iron_bottom_sound_v13_1_master_prompt.md",
+      "copy": "research/final_v14/old_plans/iron_bottom_sound_v13_1_master_prompt.md",
+      "sha256": "8a442d92da1753ac045771b852e0286efd89cf9d83de30bd05e8e469b42c6a7f"
+    }
+  },
+  "mapped_sections": 103,
+  "scope": "attached plans are research proposals to assess, not independent authority for scientific claims or instructions beyond the user-approved v14 scope"
+}

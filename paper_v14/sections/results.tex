@@ -1,0 +1,49 @@
+\section{Results}\label{sec:results}
+
+All numbers below are read from the frozen solver outputs: 452 certified value files, of which 452 carry status \texttt{certified\_numeric} and 0 are unresolved. The largest certified interval width over the whole set is $4.3e-06$.
+
+\subsection{The budget frontier}
+On the development slice (three geometries, three focal operating speeds, $T=6$, Grid-3, committed opponent), the full flexibility value ranges from $+2.20$ to $+7.02$, while the zero-revision value ranges from $-0.67$ to $+1.63$: the budget itself moves the value by up to $7.69$ payoff units in this design. The frontier does \emph{not} saturate early: the smallest budget attaining the full value is $5$ in the cell where it is largest, and only $2$ of $6$ cells reach the full value with fewer than $5.0$ revisions (median $K^{\star}=5$). Under this design the binding constraint is the budget itself, which is why the retention targets below are reported as certified budgets rather than as slack.
+
+\begin{table}[!htb]\centering\small
+\caption{Development slice, focal player against a committed opponent: the value without revisions, the full-flexibility value, and the smallest budget attaining it.}
+\label{tab:devfrontier}
+\begin{tabular}{llrrr}
+\toprule
+Geometry & focal speed & $W_0$ & $W_{\max}$ & $K^\star$ \\
+\midrule
+head-on & 0.85 & $+0.235$ & $+6.816$ & $5$ \\
+head-on & 1.00 & $+0.000$ & $+5.348$ & $5$ \\
+head-on & 1.15 & $+1.625$ & $+7.015$ & $4$ \\
+parallel & 0.85 & $-0.674$ & $+2.200$ & $4$ \\
+parallel & 1.00 & $+0.000$ & $+3.407$ & $5$ \\
+parallel & 1.15 & $+1.065$ & $+5.276$ & $5$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Which revisions pay}
+For every budget the maximizing calendars concentrate on the early engaged epochs. Table~\ref{tab:results} lists the selected calendar per cell; across the development slice the median first selected epoch is $1$ and the median last selected epoch is $4$. Because the calendar objective is not submodular (Proposition~\ref{prop:counterexample}), this front-loading is an empirical property of the frozen instances, not a consequence of a greedy argument.
+
+\subsection{Loss certificates}
+The certificate experiment is reported once the frozen runs for this phase complete; the constructions themselves are Theorems~\ref{thm:deletion} and~\ref{thm:interval}, and a cell with an unresolved value is reported as an interval, not a ratio.
+
+\subsection{Minimum certified budget for a retention target}
+\begin{table}[!htb]\centering\small
+\caption{Smallest certified budget retaining a fraction of the full-flexibility value, over the cells where the target is attainable with a certified value.}
+\label{tab:retention}
+\begin{tabular}{lrr}
+\toprule
+Retention & cells & median $K$ \\
+\midrule
+90\% & 9 & $3$ \\
+95\% & 9 & $3$ \\
+99\% & 9 & $4$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In 5 condition(s) the full-flexibility value is indistinguishable from zero at the certified tolerance, so a \emph{ratio} retention target is undefined. Those cells are reported as absolute losses, not as a minimum budget; this is the disclosure rule fixed before the runs.
+
+\subsection{Robustness and ablations}
+Section~\ref{sec:methods} fixes the horizon, action-grid and ablation protocols before their outputs. The corresponding summaries are reported in Figures~\ref{fig:robust} and~\ref{fig:retention} and in the supplement, with unresolved cells marked. We do not convert a change of sign under an ablation into a new positive claim; if an ablation overturns a pattern, that is reported as a boundary of the result.

@@ -1,0 +1,22 @@
+{
+  "created_utc": "2026-09-13T05:51:55.747421+00:00",
+  "design_sha256": "fb92864810ea05f3aac9542297f702109793bd4623433d32d9ab49dff06ff4dc",
+  "source_hashes": {
+    "research/formation/frontier_v14.py": "502cfd90267368cb5e21b840b485ec860cbdcaaff0300dc10a95eb4074676c9c",
+    "research/formation/policy_v14.py": "d24d4afc8522a9ace650567bc0b0e61a05ffcb20ec068e55deda5dc93b0ef9b2",
+    "research/formation/recovery_v14.py": "4f32ae7ee2910d91c681eecb608d6b93de9774217cd3d194439d0fca08043ab1",
+    "research/experiments/v14_resources.py": "d6d60f20bf0c8822b6f8c26c782dd58b756c5ccbd98b20b186b989ab16601ccc",
+    "research/experiments/v14_resume.py": "6b2e6d90d2fc11948c6b71bdab7f8e48bfa692af83ac9e2dd5b4b1c48c577000",
+    "research/experiments/v14_benchmark.py": "1d350cc2cf33c1e1cf44c7ef294ae88832a63baa43bf8bea44293ed1c4fccce9",
+    "research/experiments/v14_inner_benchmark.py": "e9869a9f0380f7dc0d0e46875ef55fae52f90e15ff35ec2c12b1d0acf2c63f20",
+    "research/experiments/v14_certificates.py": "3c43cc4318a3f81b3a111c7c310d7cd068e2aca40e9bf226bd41c0d87d27553e",
+    "research/experiments/v14_aux_freeze.py": "81fb6568584b18a564a59c7d876f6649cf8b0c38b9e7dd5efc7afdd8d8f3c664",
+    "research/final_v14/BENCHMARK_PROTOCOL.md": "98b42f83c78c4ae732bbf1e9bef09281024b333b058b199db14e5e0bcc5f63b3",
+    "tests/test_frontier_v14.py": "8a19160fa0bcb46a157e306deff2d9689589f6fbc17ebb9b9df93ef4375c76d5",
+    "tests/test_policy_v14.py": "7a85d634fadfe486e7540e1718e59d7389e2b785c13b6b2b1f728c41608b9541",
+    "tests/test_recovery_v14.py": "3e809094bc136fc09e26189100633f4be13cc6c23d31e56275fbe8c462ca4da2",
+    "tests/test_workflow_v14.py": "7b59b212b5f26a5e32473fe260216f20a06b6f514369aaa6e202d886b330eac6"
+  },
+  "test_outputs_present": [],
+  "scope": "auxiliary method and construction freeze; primary value solver separately frozen in RUN_FREEZE.json"
+}

@@ -1,0 +1,134 @@
+[
+  {
+    "geometry": "parallel",
+    "range": 12,
+    "axis_hex": "K10",
+    "axis_heading": 2,
+    "ally_hex": "V16",
+    "ally_heading": 2,
+    "true_range": 12,
+    "V_surrogate": 0.45912596179302445,
+    "plan": "turn+180"
+  },
+  {
+    "geometry": "parallel",
+    "range": 16,
+    "axis_hex": "K10",
+    "axis_heading": 2,
+    "ally_hex": "Z18",
+    "ally_heading": 2,
+    "true_range": 16,
+    "V_surrogate": 0.35805448007321783,
+    "plan": "turn-120"
+  },
+  {
+    "geometry": "parallel",
+    "range": 20,
+    "axis_hex": "K10",
+    "axis_heading": 2,
+    "ally_hex": "DD20",
+    "ally_heading": 2,
+    "true_range": 20,
+    "V_surrogate": 0.36849835212287585,
+    "plan": "turn-60"
+  },
+  {
+    "geometry": "parallel",
+    "range": 24,
+    "axis_hex": "K10",
+    "axis_heading": 2,
+    "ally_hex": "HH22",
+    "ally_heading": 2,
+    "true_range": 24,
+    "V_surrogate": 0.27442121571105343,
+    "plan": "turn+90"
+  },
+  {
+    "geometry": "head_on",
+    "range": 12,
+    "axis_hex": "K10",
+    "axis_heading": 2,
+    "ally_hex": "R18",
+    "ally_heading": 5,
+    "true_range": 12,
+    "V_surrogate": -0.0,
+    "plan": "turn+30"
+  },
+  {
+    "geometry": "head_on",
+    "range": 16,
+    "axis_hex": "K10",
+    "axis_heading": 2,
+    "ally_hex": "U21",
+    "ally_heading": 5,
+    "true_range": 16,
+    "V_surrogate": -0.0,
+    "plan": "turn+30"
+  },
+  {
+    "geometry": "head_on",
+    "range": 20,
+    "axis_hex": "K10",
+    "axis_heading": 2,
+    "ally_hex": "W24",
+    "ally_heading": 5,
+    "true_range": 20,
+    "V_surrogate": -0.0,
+    "plan": "turn-180"
+  },
+  {
+    "geometry": "head_on",
+    "range": 24,
+    "axis_hex": "K10",
+    "axis_heading": 2,
+    "ally_hex": "Z26",
+    "ally_heading": 5,
+    "true_range": 24,
+    "V_surrogate": -0.0,
+    "plan": "turn+30"
+  },
+  {
+    "geometry": "crossing",
+    "range": 12,
+    "axis_hex": "K10",
+    "axis_heading": 2,
+    "ally_hex": "W12",
+    "ally_heading": 5,
+    "true_range": 12,
+    "V_surrogate": -0.0,
+    "plan": "turn-90"
+  },
+  {
+    "geometry": "crossing",
+    "range": 16,
+    "axis_hex": "K10",
+    "axis_heading": 2,
+    "ally_hex": "AA13",
+    "ally_heading": 5,
+    "true_range": 16,
+    "V_surrogate": -0.0,
+    "plan": "turn-30"
+  },
+  {
+    "geometry": "crossing",
+    "range": 20,
+    "axis_hex": "K10",
+    "axis_heading": 2,
+    "ally_hex": "EE14",
+    "ally_heading": 5,
+    "true_range": 20,
+    "V_surrogate": -0.0,
+    "plan": "turn+90"
+  },
+  {
+    "geometry": "crossing",
+    "range": 24,
+    "axis_hex": "K10",
+    "axis_heading": 2,
+    "ally_hex": "II15",
+    "ally_heading": 5,
+    "true_range": 24,
+    "V_surrogate": -0.0,
+    "plan": "turn-30"
+  }
+]

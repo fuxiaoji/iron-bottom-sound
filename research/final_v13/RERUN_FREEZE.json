@@ -1,0 +1,38 @@
+{
+  "utc": "2026-09-13T03:11:05.586206+00:00",
+  "git_head": "fc77a65e970e92cca429e6c87498b0c68a70bf1e",
+  "status": "post-freeze implementation amendment; no amended scientific outputs read",
+  "regressions": "30 passed, exit code 0",
+  "original_design_unchanged": true,
+  "source_hashes": {
+    "research/experiments/v13_analysis.py": "d4a5b0fbb3396cabe7575b7fa234d31499770b0ade7142ce62e4cea420407bd8",
+    "research/experiments/v13_exact.py": "76913982029ca7236723601ac380d16a23f744275153afcd81eec7f32f43f346",
+    "research/experiments/v13_mechanism.py": "3036e55d2faa3dcaf402038db9aba11c812b90537db96105f85f3c913f1d532c",
+    "research/experiments/v13_capability.py": "ec6b0f49d5111ec86ad09fd7889e244811ce4e66238508578b6c41aba48cef9e",
+    "research/experiments/v13_figures.py": "e40d1aa499ffb7afa9112b8209a45c40054d8715eb2344502b6d0ba7ede7d6e0",
+    "research/formation/payoff_v13.py": "7ba3ad97900fe9d1af1d3eda6fd8d9346ec97880098d775c77c9c4a149308aa0",
+    "research/formation/capability_v13.py": "73d367d07a4162a1583b3f0712a33532a0493357bfe25333891179d8561cf427",
+    "research/formation/tracking_v13.py": "db7960a08f523ca7a79b6ffe3dc3d88ed2af01646629121e898abcb49368572a",
+    "research/final_v13/IMPLEMENTATION_AMENDMENT_01.md": "769f3092f3e7d9e1e166cd8cbc5b646b9c825b9269e3543368f80c0840b5172a",
+    "research/final_v13/REGRESSION_FINAL.log": "a2a3c4b68aa70416fb312e4aaae8e14c352c367fc692b27c4622eb9644d825cf",
+    "research/final_v13/DISCOVERY_PROTOCOL.md": "3137b570cd621f160700bfb91e831071ff731e23c3bed573daf6314d9157f968",
+    "research/final_v13/MECHANISM_PROTOCOL.md": "f1c5fe560a7ff625c476c1cd5ad561bc25a76470a9262fa5887a6e8a53918af6",
+    "research/final_v13/DISCOVERY_FREEZE.json": "fee16bcefa1b2770422ece8725de268b27fb396a0f457bec7a0e814398125a1c",
+    "research/final_v13/MECHANISM_FREEZE.json": "e146fdcb07a742674620a141ec8d82fed6a867a6b780e71e45c822cfe580a026",
+    "research/final_v13/confirmatory_design/CONFIRMATORY_DESIGN.md": "bafcf76ec7a7cc8d01b99f726433d61c673a092af73a0d17d978790fd7cd8603",
+    "research/final_v13/confirmatory_design/FREEZE.json": "8cef380dd21646e6e4fdc3b1124b5e403e3ec17624540a4f4bd9a32d1b66027e",
+    "research/final_v13/pre_boundary_amendment/ARCHIVE_MANIFEST.json": "e8768157ab922bbcb302535549f6f90d291114c61b38586ed4a00ebc39de149c",
+    "tests/test_payoff_boundary_v13.py": "ef6385ba82098bcfb52bb60416dd4c39fa1c58e9c8963791b751ef738375ebd6",
+    "tests/test_tracking_v13.py": "33860356a761b12467c02633303eaeb6179212a867e5ce7ae842a5d1960891e6",
+    "tests/test_capability_v13.py": "270620f551a2e63c3639b2ec7b2ce9526b2f3a290bba9bea03d3465a7dd365fd",
+    "tests/test_v13_regression.py": "2087d0014b20d777fdeea753229b80ff88b9a754e098eaee460ad5b8e8de3322"
+  },
+  "archive_mapping": "original numerical paths now under research/final_v13/pre_boundary_amendment/; original FREEZE.json stays immutable",
+  "rerun_scope": [
+    "discovery",
+    "confirmatory",
+    "mechanism discovery",
+    "mechanism confirmatory",
+    "capability"
+  ]
+}

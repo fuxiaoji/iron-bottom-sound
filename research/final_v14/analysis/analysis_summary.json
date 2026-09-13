@@ -1,0 +1,16 @@
+{
+  "n_value_files": 452,
+  "cells": [
+    "head_on_v0.85_d16_T6_G3_none",
+    "head_on_v1.15_d16_T6_G3_none",
+    "head_on_v1_d16_T6_G3_none",
+    "parallel_v0.85_d16_T6_G3_none",
+    "parallel_v1.15_d16_T6_G3_none",
+    "parallel_v1_d16_T6_G3_none"
+  ],
+  "n_frontier_rows": 90,
+  "status_counts": {
+    "certified_numeric": 452
+  },
+  "max_gap": 4.305933146212336e-06
+}

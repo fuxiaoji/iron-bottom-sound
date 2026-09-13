@@ -1,0 +1,24 @@
+{
+  "V": 7.260134444801886,
+  "numeric_error_budget": 2.4931168240982515e-12,
+  "LB": 7.260134444799393,
+  "UB": 7.260134444804379,
+  "trace": [
+    {
+      "t_start": 0,
+      "t_end": 6,
+      "nodes": 1,
+      "matrix_order": 729,
+      "max_local_duality_gap": 2.4931168240982515e-12,
+      "lp_calls": 1,
+      "seconds": 0.36946308400001726
+    }
+  ],
+  "algorithm": "complete backward induction",
+  "T": 6,
+  "h": 6,
+  "base": 3,
+  "leaves": 531441,
+  "certification_scope": "finite game, floating-point payoff evaluation and LP precision",
+  "seconds": 0.3695969581604004
+}

@@ -1,0 +1,56 @@
+{
+  "frozen": "2026-09-12 19:50:20",
+  "hashes": {
+    "manuscript_tex": {
+      "path": "paper_v10/main.tex",
+      "sha256_16": "56e14493fb1d7a28"
+    },
+    "manuscript_pdf": {
+      "path": "paper_v10/main.pdf",
+      "sha256_16": "259cfec6ee8f85f8"
+    },
+    "claim_registry": {
+      "path": "research/final_v10/claim_registry_v10.csv",
+      "sha256_16": "964f4a62fc564f4f"
+    },
+    "lf_grid5": {
+      "path": "research/final_v10/commitment_lf_exact/lf_grid5_results.csv",
+      "sha256_16": "56035877f90cc89a"
+    },
+    "lf_grid7": {
+      "path": "research/final_v10/commitment_lf_exact/lf_grid7_results.csv",
+      "sha256_16": "9b972cbbd197aa71"
+    },
+    "rigid_vs_lf": {
+      "path": "research/final_v10/commitment_lf_exact/rigid_vs_lf_exact.csv",
+      "sha256_16": "26fa88571b19fb9c"
+    },
+    "bridge": {
+      "path": "research/final_v10/bridge/bridge_cells.csv",
+      "sha256_16": "3c300be3a3cc55dd"
+    },
+    "torpedo": {
+      "path": "research/final_v10/torpedo_sensitivity/threat_contraction.csv",
+      "sha256_16": "46704b9f753fcf7b"
+    },
+    "reposition": {
+      "path": "research/final_v10/reposition_sensitivity/reposition_cells.csv",
+      "sha256_16": "038c04fa3b0d98af"
+    },
+    "unit_tests": {
+      "path": "research/final_v10/formation_tests/unit_test_results.json",
+      "sha256_16": "665fd7d6dfcf5330"
+    },
+    "advisor_report": {
+      "path": "research/final_v10/FINAL_V10_ADVISOR_REPORT.md",
+      "sha256_16": "fd5ca4a7b8d7cd9b"
+    },
+    "lf_module": {
+      "path": "research/formation/path_following.py",
+      "sha256_16": "5a7491150662c71c"
+    }
+  },
+  "v10_commitment_definition": "P_6 = V_6 - V_1 (varying BOTH plan length and evaluation horizon)",
+  "v10_known_problem": "P_6 conflates plan length with evaluation horizon; it may only be cited as an open-loop engagement-horizon effect, never as a commitment value",
+  "v10_LF_result": "LF-CORE-STRONG: 18/18 sign-certified, rigid-vs-LF sign 18/18 (open-loop horizon metric)"
+}

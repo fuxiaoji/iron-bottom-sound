@@ -1,0 +1,8 @@
+cell,eta_v,eta_r,geometry,V_coarse,V_medium,V_fine,delta_V,pass
+symmetric_head_on,1.0,1.0,head_on,-0.000000,-0.000000,0.014146,0.014146,True
+symmetric_parallel,1.0,1.0,parallel,-0.000000,-0.000000,0.014146,0.014146,True
+range_adv_head_on,1.0,1.33,head_on,7.662302,7.899718,7.926172,0.003338,True
+range_disadv_head_on,1.0,0.75,head_on,-7.956913,-8.359835,-8.509221,0.017556,True
+crossing_sym,1.0,1.0,crossing,-0.000000,-0.000000,0.014146,0.014146,True
+speed_adv_parallel,1.25,1.0,parallel,-0.000000,-0.000000,0.014146,0.014146,True
+range_adv_crossing,1.0,1.33,crossing,7.662302,7.899718,7.926172,0.003338,True

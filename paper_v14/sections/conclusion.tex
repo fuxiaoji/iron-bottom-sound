@@ -1,0 +1,36 @@
+\section{Conclusion}\label{sec:conclusion}
+
+We asked a budgeting question about adversarial trajectory planning: with
+revisions rationed to a public calendar, how much budget is needed, where
+should it be spent, and can a computation certify the answer? The paper's
+answer has three parts.
+
+The frontier is computable. For a history-dependent sealed-block game, the
+value attainable with at most $K$ revisions can be computed exactly up to a
+certified interval, and the frontier is monotone by policy inclusion. On the
+frozen design the budget is not slack: the smallest budget attaining the
+full-flexibility value is the full budget in most cells, so the binding
+constraint is the number of revisions rather than the particular schedule.
+Where the budget does bite less, the maximizing calendars concentrate on the
+early engaged epochs --- an empirical property, not a consequence of a greedy
+argument, because the calendar objective is not submodular.
+
+The certificates are valid and their sharpness is reported. A constructive
+deletion certificate produces a feasible coarse policy together with an upper
+bound on its loss, and an interval-loss bound certifies a budget under a fully
+flexible opponent by a shortest path over public intervals. Both are bounds,
+not optimality claims: the interval bound maximises over histories and the
+deletion bound concerns one constructed policy, so we report where each is
+loose instead of presenting a bound as a tightness result.
+
+The scope is bounded on purpose. The physical model is a leader--follower
+line-ahead formation with a frozen directional kernel; the design is a fixed
+computational benchmark rather than a statistical sample; and an earlier
+hypothesis that the range-advantaged side values revisions differently was
+falsified at this fidelity and is kept as a negative result. The contribution
+is the certified frontier and the structure that supports it, not a new
+general equilibrium-computation method.
+
+The natural next questions are the ones the certificates cannot yet answer:
+tight rather than merely valid bounds, a game in which both sides select
+calendars, and a formation model that deforms.

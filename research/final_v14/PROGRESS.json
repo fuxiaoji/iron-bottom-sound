@@ -1,0 +1,10 @@
+{
+  "updated_utc": "2026-09-13T06:33:02.591646+00:00",
+  "phase": "development",
+  "cell": "crossing_v0.85_d16_T6_G3_none",
+  "side": "blue",
+  "opponent": "C",
+  "mask": 16,
+  "latest_status": "certified_numeric",
+  "complete_value_files": 575
+}

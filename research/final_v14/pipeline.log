@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v14_pipeline.py", line 38, in main
+    try:os.kill(a.wait_development_pid,0)
+        ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+ProcessLookupError: [Errno 3] No such process
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v14_pipeline.py", line 70, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v14_pipeline.py", line 39, in main
+    except ProcessLookupError:raise RuntimeError('existing development runner stopped without completion marker')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: existing development runner stopped without completion marker

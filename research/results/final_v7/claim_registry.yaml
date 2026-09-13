@@ -1,0 +1,91 @@
+# claim_registry.yaml (v7) — evidence-tracked claims of the paper
+# status: KEEP | KEEP+NARROW | PROVISIONAL | REMOVE
+# numerical_method / convergence_status / limitations are mandatory per claim.
+
+- claim: path-integrated exposure objective is load-bearing
+  evidence: B2 (1089 rollouts, 9 cells; Kendall tau snapshot-vs-integral 0.14-0.62;
+    constructed peak-vs-integral reversal 2.88 vs 5.02)
+  assumptions: identical candidate plan sets across objectives; E01-calibrated kernel
+  numerical_method: open-loop maximin LP over plan library, paired rollouts
+  convergence_status: exact LP per cell (no stochastic solver)
+  limitations: plan library finite; single-formation-type (line-ahead)
+  status: KEEP
+
+- claim: closed-loop degeneracy V=L under symmetric conditions
+  evidence: B3 assumption-breaking matrix; P1 finite-horizon DP (machine-precision
+    collapse in 2 sweeps); e02 degeneracy_check
+  assumptions: simultaneous moves, common action set, identical kernels,
+    skew-symmetric successor matrices
+  numerical_method: finite-horizon value iteration on reduced state (r, alpha_B, alpha_R)
+  convergence_status: converged (exact collapse, all sweeps)
+  limitations: symmetry conditions only; tested on reduced state space
+  status: KEEP+NARROW (under the tested symmetric closed-loop conditions)
+
+- claim: speed-capability monotonicity V(v2)>=V(v1) for nested control sets
+  evidence: B4 (8/8 cells monotone under capability semantics)
+  assumptions: nested reachable-set nesting; capability (not operating-speed) semantics
+  numerical_method: open-loop maximin LP sweep over speed capability
+  convergence_status: exact per cell
+  limitations: proposition-level; operating-speed effect is a distinct phenomenon
+  status: KEEP
+
+- claim: commitment-range comparative statics (sign(P_H)=sign(eta_r-1))
+  evidence: B7 library-based (78% of asymmetric cells, sign match);
+    MUST-1 formation-level double oracle re-test (results final_v7/must1_*)
+  assumptions: open-loop committed plans; formation reference-state game;
+    approximate BR gap gate g/max(1,|V|)<5% or 3-round value stagnation
+  numerical_method: Double Oracle, K-segment piecewise-constant turn schedules,
+    multi-start continuous best response, restricted-game LP
+  convergence_status: reported per cell (gap-gate vs stagnation distinguished)
+  limitations: local (approximate) BR; K in {2,3,4,6} refinement check; H in {1..6}
+  status: PROVISIONAL -> resolved by MUST-1 (v7 4.9 frozen decision rule)
+
+- claim: delayed torpedo threat acts via response-set contraction
+  evidence: B10 (time-dependent threat field, 40-42% threat mass in future turns);
+    B11 (C_resp monotone 0.19->0.25 in thickness); B12 matched-lethality;
+    E04 (low-hit denial == 0; direct-hit control 0.92 [0.42,1.42])
+  assumptions: torpedo field state z_t=(s_t,q_t); near-optimal response set at eps
+  numerical_method: engine rollouts + response-set enumeration
+  convergence_status: 216 samples (denial), 72 (control), 8/8 cells
+  limitations: coverage alone insufficient; mechanism requires
+    coverage + local threat intensity + response landscape
+  status: KEEP+NARROW
+
+- claim: engine validation supports sign/ranking of the model
+  evidence: B13 (100 paired seeds x 3 geometries; rho=1.00 ordering; PARTIAL
+    strict-sign 2/3); MUST-2 matched 2x2 formation validation (12 cells x 4 arms
+    x 100 CRN seeds; gates sign>=80%, rho>=0.60, ordering>=75%)
+  assumptions: matched policy class (same model/objective/horizon/actions);
+    formation-level scenarios; CRN paired seeds
+  numerical_method: rules-engine rollouts, paired bootstrap CIs
+  convergence_status: pre-specified gates, verdict PASS/PARTIAL/FAIL
+  limitations: external validity check only (10-15% of paper); not an AI benchmark
+  status: PROVISIONAL -> resolved by MUST-2 (v7 5.6 frozen gate)
+
+- claim: +5.14 head-on gap is a feedback advantage
+  evidence: B13 table (cross-policy comparison)
+  assumptions: NONE justifying premium interpretation — model class and action
+    set differ between compared policies
+  numerical_method: n/a (interpretation corrected)
+  convergence_status: n/a
+  limitations: relabeled as policy-class gap; matched premium measured only by
+    MUST-2 R-F vs F-F within the same policy family
+  status: REMOVE (as "feedback advantage"); replaced by "policy-class gap"
+
+- claim: coverage beats damage (torpedo thickness mechanism)
+  evidence: B12 matched-lethality negative result — thickness alone does not
+    explain denial
+  assumptions: n/a
+  numerical_method: n/a
+  convergence_status: n/a
+  limitations: superseded by coverage + intensity + response-landscape mechanism
+  status: REMOVE
+
+- claim: formation-level wording consistency
+  evidence: v7 mandate — every reduced model interpreted as formation reference
+    state; payoff aggregated over formation vessels (F_i = sum_k K_ik)
+  assumptions: rigid/quasi-rigid line-ahead formations; no formation deformation
+  numerical_method: formation DO (MUST-1) and 3v3 engine scenarios (MUST-2)
+  convergence_status: paper-wide sweep (paper_v7/main.tex)
+  limitations: no formation deformation dynamics modelled
+  status: KEEP

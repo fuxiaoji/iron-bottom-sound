@@ -1,0 +1,82 @@
+[
+  {
+    "file": "research/final_v13/figures/Fig_A_favorable_set.png",
+    "check": "skill metadata PNG minimum 300 dpi",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_B_factorial.png",
+    "check": "skill metadata PNG minimum 300 dpi",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_C_discovery_curves.png",
+    "check": "skill metadata PNG minimum 300 dpi",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_D_mechanism.png",
+    "check": "skill metadata PNG minimum 300 dpi",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_E_confirmatory_forest.png",
+    "check": "skill metadata PNG minimum 300 dpi",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_F_capability.png",
+    "check": "skill metadata PNG minimum 300 dpi",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_G_tracking_diagnostics.png",
+    "check": "skill metadata PNG minimum 300 dpi",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_H_numerical_separation.png",
+    "check": "skill metadata PNG minimum 300 dpi",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_A_favorable_set.pdf",
+    "check": "Poppler pdfinfo",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_B_factorial.pdf",
+    "check": "Poppler pdfinfo",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_C_discovery_curves.pdf",
+    "check": "Poppler pdfinfo",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_D_mechanism.pdf",
+    "check": "Poppler pdfinfo",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_E_confirmatory_forest.pdf",
+    "check": "Poppler pdfinfo",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_F_capability.pdf",
+    "check": "Poppler pdfinfo",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_G_tracking_diagnostics.pdf",
+    "check": "Poppler pdfinfo",
+    "returncode": 0
+  },
+  {
+    "file": "research/final_v13/figures/Fig_H_numerical_separation.pdf",
+    "check": "Poppler pdfinfo",
+    "returncode": 0
+  }
+]

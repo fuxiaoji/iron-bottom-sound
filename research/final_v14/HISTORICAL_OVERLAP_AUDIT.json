@@ -1,0 +1,666 @@
+{
+  "design_sha256": "fb92864810ea05f3aac9542297f702109793bd4623433d32d9ab49dff06ff4dc",
+  "cells": [
+    {
+      "cell": "head_on_v0.85_d16_T6_G3_none",
+      "phases": [
+        "development"
+      ],
+      "known_v13_physical_overlap": [
+        "research/final_v13/discovery/head_on_0.85_blue.json"
+      ],
+      "result_exposure": "already inspected historical endpoint values"
+    },
+    {
+      "cell": "head_on_v1_d16_T6_G3_none",
+      "phases": [
+        "development",
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [
+        "research/final_v13/discovery/head_on_1_blue.json"
+      ],
+      "result_exposure": "already inspected historical endpoint values"
+    },
+    {
+      "cell": "head_on_v1.15_d16_T6_G3_none",
+      "phases": [
+        "development"
+      ],
+      "known_v13_physical_overlap": [
+        "research/final_v13/discovery/head_on_1.15_blue.json"
+      ],
+      "result_exposure": "already inspected historical endpoint values"
+    },
+    {
+      "cell": "head_on_v0.8_d13.5_T6_G3_none",
+      "phases": [
+        "test"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "head_on_v0.95_d15_T6_G3_none",
+      "phases": [
+        "test"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "head_on_v1.05_d17_T6_G3_none",
+      "phases": [
+        "test"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "head_on_v1.2_d18.5_T6_G3_none",
+      "phases": [
+        "test"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "head_on_v1_d16_T4_G3_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "head_on_v1_d16_T5_G3_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "head_on_v1_d16_T7_G3_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "head_on_v1_d16_T4_G5_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "head_on_v1_d16_T4_G7_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "head_on_v1_d16_T4_G3_isotropic",
+      "phases": [
+        "ablation"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "head_on_v1_d16_T4_G3_terminal",
+      "phases": [
+        "ablation"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "head_on_v1_d16_T4_G3_rigid",
+      "phases": [
+        "ablation"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "parallel_v0.85_d16_T6_G3_none",
+      "phases": [
+        "development"
+      ],
+      "known_v13_physical_overlap": [
+        "research/final_v13/discovery/parallel_0.85_blue.json"
+      ],
+      "result_exposure": "already inspected historical endpoint values"
+    },
+    {
+      "cell": "parallel_v1_d16_T6_G3_none",
+      "phases": [
+        "development",
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [
+        "research/final_v13/discovery/parallel_1_blue.json"
+      ],
+      "result_exposure": "already inspected historical endpoint values"
+    },
+    {
+      "cell": "parallel_v1.15_d16_T6_G3_none",
+      "phases": [
+        "development"
+      ],
+      "known_v13_physical_overlap": [
+        "research/final_v13/discovery/parallel_1.15_blue.json"
+      ],
+      "result_exposure": "already inspected historical endpoint values"
+    },
+    {
+      "cell": "parallel_v0.8_d13.5_T6_G3_none",
+      "phases": [
+        "test"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "parallel_v0.95_d15_T6_G3_none",
+      "phases": [
+        "test"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "parallel_v1.05_d17_T6_G3_none",
+      "phases": [
+        "test"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "parallel_v1.2_d18.5_T6_G3_none",
+      "phases": [
+        "test"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "parallel_v1_d16_T4_G3_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "parallel_v1_d16_T5_G3_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "parallel_v1_d16_T7_G3_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "parallel_v1_d16_T4_G5_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "parallel_v1_d16_T4_G7_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "parallel_v1_d16_T4_G3_isotropic",
+      "phases": [
+        "ablation"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "parallel_v1_d16_T4_G3_terminal",
+      "phases": [
+        "ablation"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "parallel_v1_d16_T4_G3_rigid",
+      "phases": [
+        "ablation"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "crossing_v0.85_d16_T6_G3_none",
+      "phases": [
+        "development"
+      ],
+      "known_v13_physical_overlap": [
+        "research/final_v13/discovery/crossing_0.85_blue.json"
+      ],
+      "result_exposure": "already inspected historical endpoint values"
+    },
+    {
+      "cell": "crossing_v1_d16_T6_G3_none",
+      "phases": [
+        "development",
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [
+        "research/final_v13/discovery/crossing_1_blue.json"
+      ],
+      "result_exposure": "already inspected historical endpoint values"
+    },
+    {
+      "cell": "crossing_v1.15_d16_T6_G3_none",
+      "phases": [
+        "development"
+      ],
+      "known_v13_physical_overlap": [
+        "research/final_v13/discovery/crossing_1.15_blue.json"
+      ],
+      "result_exposure": "already inspected historical endpoint values"
+    },
+    {
+      "cell": "crossing_v0.8_d13.5_T6_G3_none",
+      "phases": [
+        "test"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "crossing_v0.95_d15_T6_G3_none",
+      "phases": [
+        "test"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "crossing_v1.05_d17_T6_G3_none",
+      "phases": [
+        "test"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "crossing_v1.2_d18.5_T6_G3_none",
+      "phases": [
+        "test"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "crossing_v1_d16_T4_G3_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "crossing_v1_d16_T5_G3_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "crossing_v1_d16_T7_G3_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "crossing_v1_d16_T4_G5_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "crossing_v1_d16_T4_G7_none",
+      "phases": [
+        "robustness"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "crossing_v1_d16_T4_G3_isotropic",
+      "phases": [
+        "ablation"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "crossing_v1_d16_T4_G3_terminal",
+      "phases": [
+        "ablation"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    },
+    {
+      "cell": "crossing_v1_d16_T4_G3_rigid",
+      "phases": [
+        "ablation"
+      ],
+      "known_v13_physical_overlap": [],
+      "result_exposure": "no matching v13 physical configuration found"
+    }
+  ],
+  "historical_metadata": [
+    {
+      "geometry": "crossing",
+      "speed": 0.7,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/crossing_0.7_blue.json",
+      "sha256": "a2540834b95a66544e2f1bdb9a139d9c57a14e936844cbd48828af96094be46c",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "crossing",
+      "speed": 0.85,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/crossing_0.85_blue.json",
+      "sha256": "b5fdf7685f7f0d193656b51fd1c7f1f2424065ba5b6b8354b52651f87e8b420c",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "crossing",
+      "speed": 1.15,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/crossing_1.15_blue.json",
+      "sha256": "160324ea41c27bcb98eddb82b6822868c8a67d26a5ed5eed37e669bbb5680ad9",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "crossing",
+      "speed": 1.3,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/crossing_1.3_blue.json",
+      "sha256": "f1a778d59174f5746b345720884491b8dd8435ef5f3fb311c897c0baa4f728cc",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "crossing",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/crossing_1_blue.json",
+      "sha256": "748779ac29d5dd9478cac49ba37498a96b256a26500d665244d353b56fe7d763",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "head_on",
+      "speed": 0.7,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/head_on_0.7_blue.json",
+      "sha256": "960b7779b53f7feddcf2af1a52f84a02f245bd064216079ef36a95f539bdf942",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "head_on",
+      "speed": 0.85,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/head_on_0.85_blue.json",
+      "sha256": "e5cc313fdbfb1f212a5c096f8ce7a0066a4b732f65103c3e37b53c4229b78db7",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "head_on",
+      "speed": 1.15,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/head_on_1.15_blue.json",
+      "sha256": "f3c96045e62761a861e1b6b6ba0de311c9e1c6d48866416651e008f22c84036f",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "head_on",
+      "speed": 1.3,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/head_on_1.3_blue.json",
+      "sha256": "3899974695a99a4a05e47dda6ad7f521c00d08918f75021b61947976e1cee5cb",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "head_on",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/head_on_1_blue.json",
+      "sha256": "cb82bcdd002eb6dcf455e2c8f05b48a00f2ea848edf4d93bed62ad924cc793e3",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "parallel",
+      "speed": 0.7,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/parallel_0.7_blue.json",
+      "sha256": "a21ab55537c83ac06ad4b1b9a1dd34815968a9c9717b8c8b79d9586c3ff03a5e",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "parallel",
+      "speed": 0.85,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/parallel_0.85_blue.json",
+      "sha256": "b907bf6d1b2978cdded4f8cc030cdd8df442ddcc886f533b1bbdcca7571544cc",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "parallel",
+      "speed": 1.15,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/parallel_1.15_blue.json",
+      "sha256": "b6f96547ec888d4e41eedad93bf8df5175bb95ab27f968dd322f3f68f2bc069a",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "parallel",
+      "speed": 1.3,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/parallel_1.3_blue.json",
+      "sha256": "742e2494dbf3208a18f1ea72cca9d3cd49f69d919db2754b5910af716058b3a4",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "parallel",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/discovery/parallel_1_blue.json",
+      "sha256": "77ce248ccb04856911e11f165b91586471b56cc8a3401e542201f12c0d4b639c",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "crossing",
+      "speed": 0.75,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/confirmatory/crossing_0.75_blue.json",
+      "sha256": "0a94eaee90a91bc0bdd53687aef55bff6676c0b6f880cc964e99c90924159d29",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "crossing",
+      "speed": 0.9,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/confirmatory/crossing_0.9_blue.json",
+      "sha256": "a9ab04178bbf978af99df168d1f899756dfb51bd58099a232d81d14eac82e38e",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "crossing",
+      "speed": 1.1,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/confirmatory/crossing_1.1_blue.json",
+      "sha256": "59547dac4e4862471c478277b6cf9742a74eac89510ac3de4ed2e1ab4985ff90",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "crossing",
+      "speed": 1.25,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/confirmatory/crossing_1.25_blue.json",
+      "sha256": "790b1cba623bded496ab0b20d697e793ea03994174ddf4d46daf96b524511b88",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "head_on",
+      "speed": 0.75,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/confirmatory/head_on_0.75_blue.json",
+      "sha256": "02f9e8e8acd24cb19e4b6cce5a29e48b2cf1235b5b4b7ad6ff2aba647e4c9505",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "head_on",
+      "speed": 0.9,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/confirmatory/head_on_0.9_blue.json",
+      "sha256": "5fc5b487baea793faaed5ca8b0b12510657f4ffa5f9e756447d875efc5e4cfc3",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "head_on",
+      "speed": 1.1,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/confirmatory/head_on_1.1_blue.json",
+      "sha256": "54b2ac4cd2d3e81fb8482982707017e24f4dbebab8f1d24458ea779525350c16",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "head_on",
+      "speed": 1.25,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/confirmatory/head_on_1.25_blue.json",
+      "sha256": "c323e81a95f7092bd177e10bb67aa8bbe73cffe349be442229d0f7f705405d22",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "parallel",
+      "speed": 0.75,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/confirmatory/parallel_0.75_blue.json",
+      "sha256": "e2b88da5de38da80180e8e2b72094c6c13d424cd7ee53f985e0833fd7a861ec5",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "parallel",
+      "speed": 0.9,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/confirmatory/parallel_0.9_blue.json",
+      "sha256": "30c91669cce4d26563980d6017af134aaf3c263cfda904a2768af510d3ea23f6",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "parallel",
+      "speed": 1.1,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/confirmatory/parallel_1.1_blue.json",
+      "sha256": "e19cf282de46c10ec03131e3ec90f748a58104358b20726395073dda702a09f6",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    },
+    {
+      "geometry": "parallel",
+      "speed": 1.25,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "source": "research/final_v13/confirmatory/parallel_1.25_blue.json",
+      "sha256": "1c89b31e1ee4c382687a7b2583eb3999faa1583daff3e1402c2aeb33402fd642",
+      "distance_provenance": "v13_exact.game -> make_lf_game; explicit fixed r0=16 in frozen factory"
+    }
+  ],
+  "v12_boundary": "v12 complete formation-game factory also fixes r0=16; its range_ratio changes the kernel range, not separation. Frozen-test distances13.5,15,17,18.5 differ.",
+  "earlier_boundary": "searched experiment and formation Python sources for r0 assignments; standalone kernel grids are not complete trajectory games. Engine snapshot experiments have different action/horizon/model semantics.",
+  "limitation": "local source/metadata audit, not a claim that all prior human exposure or undocumented external experiments are known; no prospective external validation claim",
+  "timing": "audit written before any v14 test-phase result; development outputs have been viewed",
+  "source_hashes": {
+    "research/experiments/v13_exact.py": "76913982029ca7236723601ac380d16a23f744275153afcd81eec7f32f43f346",
+    "research/formation/path_following.py": "1faa140c3eb3fa417bea3dac54b4ce63d4048047a6150ef2e302456289fe601b"
+  }
+}

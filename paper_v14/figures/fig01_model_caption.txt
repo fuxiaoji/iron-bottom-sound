@@ -1,0 +1,3 @@
+Model and information structure. (a) A specified illustrative Grid-3 trajectory, with three vessels per side and snapshots at epochs 0, 2, 4 and 6; labels mark leaders. It is not an optimized policy or an equilibrium replay. (b) The model-to-decision chain. (c) Own calendar S={2,4}, compared with fixed opponent F and C update rights. Only initial planning is free. Dots identify decisions; unexecuted commands remain private.
+
+Alt text: Formation paths and three calendar timelines showing the distinction between public executed history and sealed future actions.

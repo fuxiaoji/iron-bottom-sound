@@ -1,0 +1,75 @@
+{
+  "discovery": {
+    "physical_cells": 15,
+    "independent_mirror_cells": 15,
+    "max_payoff_mirror_error": 3.410605131648481e-13,
+    "max_value_mirror_error": 1.127986593019159e-13,
+    "max_flexibility_mirror_error": 1.127986593019159e-13
+  },
+  "confirmatory": {
+    "physical_cells": 12,
+    "independent_mirror_cells": 12,
+    "max_payoff_mirror_error": 4.689582056016661e-13,
+    "max_value_mirror_error": 2.5757174171303632e-14,
+    "max_flexibility_mirror_error": 2.2648549702353193e-14
+  },
+  "all_main_values": {
+    "count": 216,
+    "max_interval_width": 3.051909835960487e-10,
+    "max_flow_residual": 5.758620298434585e-14,
+    "max_inequality_violation": 4.032738772534241e-13,
+    "min_flexibility": 0.888763374525501
+  },
+  "mechanism": {
+    "discovery": {
+      "cells": 15,
+      "probe_episodes": 480,
+      "epoch_alpha_rows": 5760,
+      "defined_epoch_alpha_rows": 5760,
+      "min_negative_correction_fraction": 0.328125,
+      "max_negative_correction_fraction": 0.6354166666666666,
+      "min_outside_domain_fraction": 0.21354166666666666,
+      "max_outside_domain_fraction": 0.375,
+      "min_zero_drift_fraction": 0.13541666666666666,
+      "max_zero_drift_fraction": 0.13541666666666666
+    },
+    "confirmatory": {
+      "cells": 12,
+      "probe_episodes": 384,
+      "epoch_alpha_rows": 4608,
+      "defined_epoch_alpha_rows": 4608,
+      "min_negative_correction_fraction": 0.34375,
+      "max_negative_correction_fraction": 0.6302083333333334,
+      "min_outside_domain_fraction": 0.22395833333333334,
+      "max_outside_domain_fraction": 0.359375,
+      "min_zero_drift_fraction": 0.13541666666666666,
+      "max_zero_drift_fraction": 0.13541666666666666
+    }
+  },
+  "capability": {
+    "n": 6,
+    "positive": 5,
+    "reversal": 1,
+    "max_nested_payoff_error": 0.0,
+    "max_mirror_payoff_error": 1.6697754290362354e-13,
+    "max_interval_width": 7.622786846184226e-10
+  },
+  "freezes": {
+    "research/final_v13/v12_freeze/FREEZE_MANIFEST.json": {
+      "n": 429,
+      "mismatches": []
+    },
+    "research/final_v13/pre_boundary_amendment/ARCHIVE_MANIFEST.json": {
+      "n": 209,
+      "mismatches": []
+    },
+    "research/final_v13/RERUN_FREEZE.json": {
+      "n": 21,
+      "mismatches": []
+    }
+  },
+  "protected_live_v12_and_manuscript_files": {
+    "n": 78,
+    "mismatches": []
+  }
+}

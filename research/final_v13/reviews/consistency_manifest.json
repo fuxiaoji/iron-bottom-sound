@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "numeric_facts": [
+    {
+      "fact_id": "N001",
+      "section": "Gate",
+      "concept": "primary_positive_support",
+      "analysis_set": "amended_frozen_primary",
+      "value": 5,
+      "unit": "count",
+      "numerator": 5,
+      "denominator": 12,
+      "sample_size": null,
+      "evidence_ids": [
+        "E001"
+      ]
+    },
+    {
+      "fact_id": "N002",
+      "section": "Advisor",
+      "concept": "primary_positive_support",
+      "analysis_set": "amended_frozen_primary",
+      "value": 5,
+      "unit": "count",
+      "numerator": 5,
+      "denominator": 12,
+      "sample_size": null,
+      "evidence_ids": [
+        "E001"
+      ]
+    }
+  ],
+  "methods": [
+    {
+      "method_id": "M001",
+      "name": "final rerun analysis: implementation amended after original held-out failure and before rerun; design unchanged",
+      "analysis_intent": "confirmatory",
+      "protocol_status": "amended_before_analysis",
+      "outcome_ids": [
+        "O001"
+      ]
+    }
+  ],
+  "results": [
+    {
+      "result_id": "R001",
+      "method_id": "M001",
+      "outcome_id": "O001",
+      "analysis_intent": "confirmatory",
+      "reported_sections": [
+        "Gate",
+        "Advisor"
+      ],
+      "sample_size": 12,
+      "evidence_ids": [
+        "E001"
+      ]
+    }
+  ]
+}

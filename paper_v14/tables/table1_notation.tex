@@ -1,0 +1,24 @@
+\begin{table}[!htb]
+\centering\small
+\caption{Notation and the assumptions each symbol carries.  Every
+comparison in this paper fixes the opponent speed, opponent range, opponent
+class, geometry, horizon, formation model and payoff; only the own calendar
+and the own speed capability vary within a comparison.}
+\label{tab:notation}
+\begin{tabular}{p{2.5cm}p{4.4cm}p{6.6cm}}
+\toprule
+Symbol & Meaning & Assumption or scope \\
+\midrule
+$S\subseteq\{1,\dots,T-1\}$ & public revision calendar; $|S|\le K$ & frozen and announced before play; initial epoch $t=0$ is not a revision \\
+$K$ & revision budget & $W_K=\max_{|S|\le K}V(S,R)$ is nondecreasing (Prop.~1) \\
+$\kappa\in\{F,C\}$ & opponent class & $F$ fully flexible, $C$ committed; classes are not mixed in a comparison \\
+$\Pi_S$ & own policy set under calendar $S$ & sealed blocks between consecutive updates; current block and unexecuted suffix are private \\
+$V(S,R)$ & game value with own calendar $S$ and opponent calendar $R$ & mixed minimax; finite horizon, $\gamma=1$ \\
+$C_q(j\mid i)$ & counterfactual conditional law of opponent path $j$ given own path $i$ & does not assume opponent commitment; reduces to $q_j$ for committed $q$ \\
+$\mathrm{BR}_S(q)$ & exact best response of own calendar $S$ against $q$ & complete permitted policy class (Thm.~3) \\
+$d(t,e)$ & interval loss for committing over $[t,e)$ against $F$ & $\ge0$, $d(t,t+1)=0$; used in the interval certificate \\
+$x_{ik},\psi_{ik}$ & vessel position and heading & $=\gamma_i(s_i-\ell_k)$ and the local tangent; history matters \\
+$L(h_t)$ & formation interaction differential & sum over vessel pairs of the directional kernel difference \\
+\bottomrule
+\end{tabular}
+\end{table}

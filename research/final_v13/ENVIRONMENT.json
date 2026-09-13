@@ -1,0 +1,13 @@
+{
+  "python": "3.14.6 (main, Jun 10 2026, 10:03:53) [Clang 21.0.0 (clang-2100.0.123.102)]",
+  "platform": "macOS-26.3-arm64-arm-64bit-Mach-O",
+  "packages": {
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.1",
+    "pytest": "9.1.1",
+    "pillow": "12.3.0",
+    "pypdf": null
+  },
+  "PDF_metadata_validation": "Poppler pdfinfo; pypdf not installed in scientific venv"
+}

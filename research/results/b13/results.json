@@ -1,0 +1,64 @@
+{
+  "cells": [
+    {
+      "geometry": "head_on",
+      "n": 100,
+      "engine_mean_diff": 5.14,
+      "engine_ci95": [
+        4.0,
+        6.24
+      ],
+      "engine_positive_frac": 0.79,
+      "model_value_vs_straight": -1.5165,
+      "sign_agree": 0,
+      "model_class": "advantage",
+      "engine_class": "advantage"
+    },
+    {
+      "geometry": "parallel",
+      "n": 100,
+      "engine_mean_diff": 7.59,
+      "engine_ci95": [
+        6.54,
+        8.66
+      ],
+      "engine_positive_frac": 0.92,
+      "model_value_vs_straight": 0.1223,
+      "sign_agree": 1,
+      "model_class": "neutral",
+      "engine_class": "advantage"
+    },
+    {
+      "geometry": "crossing",
+      "n": 100,
+      "engine_mean_diff": 8.64,
+      "engine_ci95": [
+        7.57,
+        9.71
+      ],
+      "engine_positive_frac": 0.94,
+      "model_value_vs_straight": 0.1464,
+      "sign_agree": 1,
+      "model_class": "neutral",
+      "engine_class": "advantage"
+    }
+  ],
+  "gates": {
+    "sign_agreement": {
+      "value_pct": 66,
+      "gate": 80,
+      "pass": false
+    },
+    "rank_correlation": {
+      "value": -0.5,
+      "gate": 0.6,
+      "pass": false
+    },
+    "regime_agreement": {
+      "value_pct": 33,
+      "gate": 75,
+      "pass": false
+    }
+  },
+  "overall": "FAIL"
+}

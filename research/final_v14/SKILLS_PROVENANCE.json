@@ -1,0 +1,30 @@
+{
+  "repository": "https://github.com/K-Dense-AI/scientific-agent-skills",
+  "head_observed": "c1ed16d97dd61ff50a3bd46dd353e4a55fd77f34",
+  "stars_displayed": "44.6k",
+  "verified_date": "2026-09-13",
+  "install_method": "official skill-installer --method auto",
+  "skills": [
+    {
+      "name": "scientific-critical-thinking",
+      "path": "/Users/Zhuanz1/.codex/skills/scientific-critical-thinking/SKILL.md",
+      "sha256": "b77ba9ed1872d85d804125a339e2038984052e7aaf3616813ab79f5ad91c0558"
+    },
+    {
+      "name": "peer-review",
+      "path": "/Users/Zhuanz1/.codex/skills/peer-review/SKILL.md",
+      "sha256": "3422beafc240aa7d2703e71fe16e3400269a5ea17045d8b390a30efe58c3de67"
+    },
+    {
+      "name": "scientific-visualization",
+      "path": "/Users/Zhuanz1/.codex/skills/scientific-visualization/SKILL.md",
+      "sha256": "f7c7f9a2350ea02db2db55cd28921a54c74b089f6762f1b0b63a13b8f6eeec33"
+    },
+    {
+      "name": "scientific-writing",
+      "path": "/Users/Zhuanz1/.codex/skills/scientific-writing/SKILL.md",
+      "sha256": "f6026e7d79cd3133e9343a7d6e6c5e06f4ad061888efb6a73fcb95e073eebf67"
+    }
+  ],
+  "citation": "Kassis T, Agarwal V, He Y, Patel D, Brueckner AM (2026). Scientific Agent Skills: A Library of Procedural Knowledge for Research Agents. arXiv:2609.00065. DOI 10.48550/arXiv.2609.00065. Latest record inspected: v2, 2026-09-02."
+}

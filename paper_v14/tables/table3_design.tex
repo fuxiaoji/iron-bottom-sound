@@ -1,0 +1,20 @@
+\begin{table}[!htb]
+\centering\small
+\caption{Frozen experimental design (declared before any output of the
+corresponding phase was produced; see the design freeze hash in the
+reproducibility package).  ``Conditions'' counts solver runs: two opponent
+classes per cell, times two sides where the mirror is solved.  Speeds are the
+focal player's forced operating speeds relative to the opponent's; all other
+model parameters are frozen.}
+\label{tab:design}
+\begin{tabular}{lccccccc}
+\toprule
+Phase & Cells & Geometries & Focal speed & $T$ & Action grid & Conditions & Ablation \\
+\midrule
+Development & 9 & crossing, head_on, parallel & 0.85--1.15 & 6 & Grid-3 & 24 & none \\
+Frozen test & 12 & crossing, head_on, parallel & 0.80--1.20 & 6 & Grid-3 & 30 & none \\
+Robustness & 18 & crossing, head_on, parallel & 1.00--1.00 & 4, 5, 6, 7 & Grid-3, Grid-5, Grid-7 & 42 & none \\
+Ablation & 9 & crossing, head_on, parallel & 1.00--1.00 & 4 & Grid-3 & 18 & isotropic, rigid, terminal \\
+\bottomrule
+\end{tabular}
+\end{table}

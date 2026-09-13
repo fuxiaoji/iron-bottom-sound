@@ -1,0 +1,192 @@
+{
+  "generated": "2026-09-12 11:34:16",
+  "paper_source": "paper_v7/main.tex",
+  "repo_commit_note": "engine frozen at fc77a65 (paper preamble)",
+  "claims": [
+    {
+      "claim_id": "C1-kernel",
+      "source_script": "research/experiments/e01_fire_kernel.py",
+      "result_file": "research/results/e01/kernel_fits.json",
+      "figures": [
+        "paper_v7/figures/fig_e01_calibration.png"
+      ],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "8ec3e881e5ec2629",
+      "generation_time": "2026-09-10 03:11",
+      "figure_files": [
+        "paper_v7/figures/fig_e01_calibration.png"
+      ]
+    },
+    {
+      "claim_id": "C2-path-integrated",
+      "source_script": "research/experiments/b2_path_integral.py",
+      "result_file": "research/results/b2/report.md",
+      "figures": [],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "631129e87ba134d0",
+      "generation_time": "2026-09-10 23:49",
+      "figure_files": []
+    },
+    {
+      "claim_id": "C3-degeneracy",
+      "source_script": "research/geometry/differential_game.py",
+      "result_file": "research/results/e02/degeneracy_check.json",
+      "figures": [],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "36444d1caf51828e",
+      "generation_time": "2026-09-10 01:06",
+      "figure_files": []
+    },
+    {
+      "claim_id": "C3b-assumption-matrix",
+      "source_script": "research/experiments/b3_symmetry_break.py",
+      "result_file": "research/results/b3/report.md",
+      "figures": [],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "e13a9d22ebb0f85a",
+      "generation_time": "2026-09-10 23:33",
+      "figure_files": []
+    },
+    {
+      "claim_id": "C4-speed-monotonicity",
+      "source_script": "research/experiments/b4_capability_monotonicity.py",
+      "result_file": "research/results/b4/report.md",
+      "figures": [
+        "paper_v7/figures/fig_b4_monotonicity.png"
+      ],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "ab5f117f81546edf",
+      "generation_time": "2026-09-10 23:50",
+      "figure_files": [
+        "paper_v7/figures/fig_b4_monotonicity.png"
+      ]
+    },
+    {
+      "claim_id": "C5-reposition-cost",
+      "source_script": "research/experiments/b5_reposition_cost.py",
+      "result_file": "research/results/b5/report.md",
+      "figures": [
+        "paper_v7/figures/fig_b5_cost.png"
+      ],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "20288f0695ab7864",
+      "generation_time": "2026-09-12 00:27",
+      "figure_files": [
+        "paper_v7/figures/fig_b5_cost.png"
+      ]
+    },
+    {
+      "claim_id": "C6-no-guarantee",
+      "source_script": "research/experiments/b6_reach_viability.py",
+      "result_file": "research/results/b6/report.md",
+      "figures": [
+        "paper_v7/figures/fig_b6_thresholds.png"
+      ],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "d95cd855406f7885",
+      "generation_time": "2026-09-10 23:52",
+      "figure_files": [
+        "paper_v7/figures/fig_b6_thresholds.png"
+      ]
+    },
+    {
+      "claim_id": "C7-commitment-library",
+      "source_script": "research/experiments/b7_commitment_horizon.py",
+      "result_file": "research/results/b7/report.md",
+      "figures": [],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "77aa863c17a18e29",
+      "generation_time": "2026-09-10 23:37",
+      "figure_files": []
+    },
+    {
+      "claim_id": "C8-library-nonconvergence",
+      "source_script": "research/experiments/b8_library_convergence.py",
+      "result_file": "research/results/b8/report.md",
+      "figures": [],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "5088aad74ee77a23",
+      "generation_time": "2026-09-10 23:57",
+      "figure_files": []
+    },
+    {
+      "claim_id": "C9-delayed-threat",
+      "source_script": "research/experiments/b10_torpedo_field.py",
+      "result_file": "research/results/b10/report.md",
+      "figures": [],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "9a52f202c4ea3c2d",
+      "generation_time": "2026-09-11 01:24",
+      "figure_files": []
+    },
+    {
+      "claim_id": "C10-response-contraction",
+      "source_script": "research/experiments/b11_response_contraction.py",
+      "result_file": "research/results/b11/report.md",
+      "figures": [],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "fc244c836e1227b3",
+      "generation_time": "2026-09-11 01:08",
+      "figure_files": []
+    },
+    {
+      "claim_id": "C11-matched-lethality",
+      "source_script": "research/experiments/b12_matched_lethality.py",
+      "result_file": "research/results/b12/report.md",
+      "figures": [],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "a6057653edce57ed",
+      "generation_time": "2026-09-11 01:23",
+      "figure_files": []
+    },
+    {
+      "claim_id": "C12-engine-crosspolicy",
+      "source_script": "research/experiments/e06_engine_validation.py",
+      "result_file": "research/results/b13/games.csv",
+      "figures": [
+        "paper_v7/figures/fig_e06_forest.png"
+      ],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "15bd5dba3b27b6ee",
+      "generation_time": "2026-09-11 00:52",
+      "figure_files": [
+        "paper_v7/figures/fig_e06_forest.png"
+      ]
+    },
+    {
+      "claim_id": "C13-commitment-formation",
+      "source_script": "research/experiments/must1_formation_do.py",
+      "result_file": "research/results/final_v7/must1_aggregate.json",
+      "figures": [],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "1024bec540db352b",
+      "generation_time": "2026-09-12 08:25",
+      "figure_files": []
+    },
+    {
+      "claim_id": "C14-engine-matched",
+      "source_script": "research/experiments/must2_matched_engine.py",
+      "result_file": "research/results/final_v7/must2_results.json",
+      "figures": [],
+      "status": "verified",
+      "input_commit": "fc77a65",
+      "result_sha256_16": "a3d9a4639b5bbe76",
+      "generation_time": "2026-09-12 06:35",
+      "figure_files": []
+    }
+  ]
+}

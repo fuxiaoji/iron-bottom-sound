@@ -33,3 +33,13 @@ resources/derived/rag/*.sqlite3-shm
 resources/derived/rag/*.sqlite3-wal
 .pt-run-*/
 .pt-run-*
+.venv-ibsglm/
+.DS_Store
+**/.DS_Store
+texput.log
+*.aux
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+research/**/runs/**/*.npz
+research/final_v13/**/cache/

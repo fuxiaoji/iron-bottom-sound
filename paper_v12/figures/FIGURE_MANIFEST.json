@@ -1,0 +1,630 @@
+[
+  {
+    "figure": "fig01_information",
+    "sources": [
+      {
+        "path": "research/final_v12/THEORY_AUDIT.md",
+        "sha256": "94bb4204efddffdee4745c707d9fc20040abbfa6e4d4869f1b8f01d503ab23b2"
+      }
+    ],
+    "alt_text": "Four information structures; adding Blue flexibility raises value and adding Red flexibility lowers it. Bilateral effect is a difference of nonnegative path-specific benefits.",
+    "format": "vector PDF; 320 dpi PNG",
+    "generated_by": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v12_figures.py"
+  },
+  {
+    "figure": "fig02_geometry",
+    "sources": [
+      {
+        "path": "research/formation/path_following.py",
+        "sha256": "1faa140c3eb3fa417bea3dac54b4ce63d4048047a6150ef2e302456289fe601b"
+      },
+      {
+        "path": "research/formation/commitment_v12.py",
+        "sha256": "b4645f1abb6afd778687c5f8c40b6dfb5354384305533ccb00bbf7663689583e"
+      }
+    ],
+    "alt_text": "Three prescribed initial geometries with complete straight prehistories. Half-turn exchange applies to head-on and crossing; reflection applies to parallel.",
+    "format": "vector PDF; 320 dpi PNG",
+    "generated_by": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v12_figures.py"
+  },
+  {
+    "figure": "fig03_audit",
+    "sources": [
+      {
+        "path": "research/final_v12/audit/history_tests.json",
+        "sha256": "6fefc3ca6f7a76e77df4d0dc75a5c0cd474121945c9c480d46b86f4a5d220ed7"
+      },
+      {
+        "path": "research/final_v12/audit/initial_grid5_controls.json",
+        "sha256": "c14471aac526637279b3f3ddb92ec88b83e1834b59f17485d0a09209e0a395e9"
+      }
+    ],
+    "alt_text": "Legacy errors exceed numerical tolerance in every sampled history. Corrected errors approach floating-point precision. Initial Grid-5 games require 80 to 144 oracle iterations to meet strict gap tolerance.",
+    "format": "vector PDF; 320 dpi PNG",
+    "generated_by": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v12_figures.py"
+  },
+  {
+    "figure": "fig04_exact_cadence",
+    "sources": [
+      {
+        "path": "research/final_v12/exact_grid3/discovery_summary.json",
+        "sha256": "066b08d87861028f42c767287ce7a3f4f0d8b3f3500cc2003212a5027a2030c2"
+      }
+    ],
+    "alt_text": "All six exact discovery cadence curves are retained. Head-on has the hypothesized bilateral sign; parallel and crossing reverse it. Cadences two and three are not nested decision schedules.",
+    "format": "vector PDF; 320 dpi PNG",
+    "generated_by": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v12_figures.py"
+  },
+  {
+    "figure": "figS01_mc_controls",
+    "sources": [
+      {
+        "path": "research/final_v12/audit/ordinary_head_on_summary.json",
+        "sha256": "e4dd4f08ebce0d3e63d97378e9127046ae9594934031faf23f3eab55a805ed86"
+      },
+      {
+        "path": "research/final_v12/audit/spatial_head_on_summary.json",
+        "sha256": "e8d5f49917852a1fc73dcb21358c6d899cace3b9a2c0fa7d3a11c80caa23634f"
+      },
+      {
+        "path": "research/final_v12/audit/ordinary_parallel_summary.json",
+        "sha256": "77f85d8027a7d339e4d61593f40c0345261438d24d194ba364a6b589c2f8ea16"
+      },
+      {
+        "path": "research/final_v12/audit/spatial_parallel_summary.json",
+        "sha256": "f00850660c328a876c756068f28a84f5594326a135b5f9ee5e8c7e0579a9f1be"
+      },
+      {
+        "path": "research/final_v12/audit/ordinary_crossing_summary.json",
+        "sha256": "0f1fdc255d0e1d4717692bdd51dd6d82983e2eb1ccc4bcbb574bc5de8aa729ea"
+      },
+      {
+        "path": "research/final_v12/audit/spatial_crossing_summary.json",
+        "sha256": "ab8b633e485565e8bb0febc028e973d1cafcd045b96a6ea4e4c279b36c9190a5"
+      }
+    ],
+    "alt_text": "Paired 200-seed Monte Carlo receding-policy contrasts; original threshold gate fails. These are planner outcomes, not exact feedback equilibrium values; intervals are pointwise, unadjusted.",
+    "format": "vector PDF; 320 dpi PNG",
+    "generated_by": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v12_figures.py"
+  },
+  {
+    "figure": "figS02_sweep",
+    "sources": [
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap15_head_on_summary.json",
+        "sha256": "787ad6623d6aab4ad8c68583c89cfb13aac5e162af8e3690bec5fd29431b2b2e"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap15_head_on.json",
+        "sha256": "95a7128feecf71604186717a06635d31c6ccd7485db42543a318c18f06c5801b"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap30_head_on_summary.json",
+        "sha256": "f04e334c12280e533e5760e5a5555df5422c6d67aabe2cbbc243fcf18e51bbe3"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap30_head_on.json",
+        "sha256": "aba3ad095c210cab560e9dbdcf096ed349e0a69d916a5afb0d429dbb7d9551da"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap60_head_on_summary.json",
+        "sha256": "21f5cbcc46906027207f6ae3a4301a0b684799b2ca57acba606a32a29dc2bfa5"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap60_head_on.json",
+        "sha256": "fab262441a56d7ee35e7c94fe776ac401652a35c124f2cce00e73b77c7ef77d1"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap120_head_on_summary.json",
+        "sha256": "b645241d9191c35acbf0e042bd32b0c0e32c8a9df9ba290e9022fdd4a5b12da9"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap120_head_on.json",
+        "sha256": "af61bdd1bc97883a56f1ee5b6546a9335c0d7f728348d523d9cf56778709514f"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap200_head_on_summary.json",
+        "sha256": "96dab69bd51b2b2f6bcd897d61b4c5cc050bd0300ec48184dbbfb820d7db6d38"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap200_head_on.json",
+        "sha256": "d4adb7bd4a69b8ea73fc0c780fd6fb3ab0af00cafbf7477106b03d05e0d5afab"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap15_head_on_summary.json",
+        "sha256": "d6ba15de0821256bbdaaa36d4e42d774ffe0910fae701f268256023acc5e1054"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap15_head_on.json",
+        "sha256": "1f3f98e94c713d10018f17aa03624878495ad10ec35d66507d640448a0ee6690"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap30_head_on_summary.json",
+        "sha256": "1684f52e42e0d4280a69788ffac1ca9821f5544c6bd6623225c42daf075c262e"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap30_head_on.json",
+        "sha256": "eed30e13e247894238cb117657410319eca549e8fb17d8adeadcabaac310dc26"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap60_head_on_summary.json",
+        "sha256": "111d3de984c32a9a1eaa804879519b9508332bf01122482092441085c9634633"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap60_head_on.json",
+        "sha256": "855a3086d68871a9c555be424149b28f9ca406946492ff71ddd4c23128d2e19b"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap120_head_on_summary.json",
+        "sha256": "bd22497146c336cc537dd7a8ad2f08a26f9059a46148de5feeea6cbb935d0cf8"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap120_head_on.json",
+        "sha256": "d19b229b59180884d813d5baca4e33cd69c71f0cb36e948f66746564695b7c42"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap200_head_on_summary.json",
+        "sha256": "793fff2df8981abea1ea975b2e309907cf26128c5752ff0db60de1241b5f5d0d"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap200_head_on.json",
+        "sha256": "537a99028f33a7c1352389517130ef2d7e63813b2e0edd2e52bf9fcc11ff25a9"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap15_head_on_summary.json",
+        "sha256": "0c41137e1ee9fb5dfe789603b36be2fb06e30481fb13c4802365d23765f8e6f6"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap15_head_on.json",
+        "sha256": "039a6f3663a3cd443e1b053b39f775c9ae8d4617bb979b5aa152f0aebecfdf4a"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap30_head_on_summary.json",
+        "sha256": "c3f477c0955fa07fec8c69b8c303205fdbce600019047b64155b4e5d5ef67194"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap30_head_on.json",
+        "sha256": "b7bf7e89c15f8b11e545c195a2961adc5aa715ceeb4d35689a67bad3bef19121"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap60_head_on_summary.json",
+        "sha256": "2c88bcbc6a3e7190e1028b790d663ae4e19ba32bf71ab9aa1c7213b22ad9e3df"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap60_head_on.json",
+        "sha256": "cd6afef1256f26f2cf1cca07239f504c0d6d254b26f1fea039ecf41908f4ffb4"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap120_head_on_summary.json",
+        "sha256": "acd6784787b7155853091c9110efb67c594ba25a843d521fa6ba9ef8e4c2de07"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap120_head_on.json",
+        "sha256": "ff63c098b2a47043e28e097fd6373e1c6022132155ade4ad0e0502218d1b01c6"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap200_head_on_summary.json",
+        "sha256": "bd522a711b3f69522b6d3318dc88a83295608ef1b5de246e0d47a7759564ae55"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap200_head_on.json",
+        "sha256": "a64c0ffeb8c75017475fe3e8018f8f1eabf70218d3dc2942279a6cfb0327c74c"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap15_head_on_summary.json",
+        "sha256": "8fc3c06186de34bae4916ebf03dd308b3a8d0597e826299c43aa3e47be7c690a"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap15_head_on.json",
+        "sha256": "4090b43d5b21770809e5cdc01083e556ee49975d9d7ef2e934a1d62aaf027c32"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap30_head_on_summary.json",
+        "sha256": "022dc1346ebdfd8179cc534a62242619f34d45d0bf0b2f6a4892d3790d09ea4d"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap30_head_on.json",
+        "sha256": "2a5a30c5201728b1d774ac8672207f34bbb037fe18526db6365c3a9a62ccc776"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap60_head_on_summary.json",
+        "sha256": "f4b6a7580cf24f5b4e80e3c11f89229de4734ce898b99136a52bfef75e6c8f3f"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap60_head_on.json",
+        "sha256": "dd97672e96d12cc75b23908c42d2c7370eb4120f119b0ae1f55ecb1a0fbb2aaa"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap120_head_on_summary.json",
+        "sha256": "df48e5d21e458bdfdb8b98dc8fe35d2876660d7472d75fd5c8879dcfb1e20693"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap120_head_on.json",
+        "sha256": "58f2ce8047a0d7098596c1826fe4391138fe5377d3129303066b6e8b816ed2d1"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap200_head_on_summary.json",
+        "sha256": "2343c9ccb89b2ac7b3a1a3babe7522bc62775cc46be927cda839c86f0672a216"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap200_head_on.json",
+        "sha256": "6b26750eec9af9288b20cca5e9823e8a01c3ea5f47ad9542423abd0ae457acbc"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap15_parallel_summary.json",
+        "sha256": "3e64866bdaf82d3eb006059eaee735476bfc3ad158f054ce10ba53d3874b1d4b"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap15_parallel.json",
+        "sha256": "407f7de8f87f222b38d1c62e192cccb90e53871d3316767b9ce0595202423920"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap30_parallel_summary.json",
+        "sha256": "470aa74d337e534cf2bcfd527b2c02b7e5b1665b72f0040ce0983d9182b4c15c"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap30_parallel.json",
+        "sha256": "6f7c4abb2896e3c8d9898f66944241d080323a41cedd2d6c45f12b78128f61c8"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap60_parallel_summary.json",
+        "sha256": "26eeb77ff58f045c56054f028d0e320c14645048637c1b11bc2dd6409124db9c"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap60_parallel.json",
+        "sha256": "4f620012eaa1bcc9e4a6b0e963e31b56a5cacbc4cf9c10fa7f1279f0d61a9d39"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap120_parallel_summary.json",
+        "sha256": "b9956d2337a4c7956e1b6b398bb718fd326cd5e2ff03ded864556406eab444a0"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap120_parallel.json",
+        "sha256": "278cbce7a8e4dd1179ccc6010d77f88522a3d341b8b4cfd257f025d96d5b323a"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap200_parallel_summary.json",
+        "sha256": "4b189b40638fd31503d5e46bc174f70a5131d632ebb415a4ac2417c615502ad7"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap200_parallel.json",
+        "sha256": "13cac30e866f01822af79236f1bb2d0a8e810fbfd4343446dfe3ba3dd6e46883"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap15_parallel_summary.json",
+        "sha256": "e8d2cb87b994efd20dbe66a19ab4aa8deee076ee268074316b1f846bac54a0ee"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap15_parallel.json",
+        "sha256": "d13a0484ac9f246d11ae894dcb87c1db42f51e18f0796a92f4c963f6a54959fc"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap30_parallel_summary.json",
+        "sha256": "efd4888fddf4f41ba36e49589203cd1959cfce2c4aa4535bee10032827a34ee6"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap30_parallel.json",
+        "sha256": "d843a5036720aa5cdbfb28bb96d16405032d368a05bf53626db4a62bf6888eb2"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap60_parallel_summary.json",
+        "sha256": "111fd8e26021e54d0443c55acf0d7ca473166a75a49fe26d10755a6350150624"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap60_parallel.json",
+        "sha256": "a5d6cb6b05e2386403c62ed7cdd53bbae795b5bf77a1d8813e2d9b791efb5156"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap120_parallel_summary.json",
+        "sha256": "c022c1c16328bc4b0c8b63bcb6b3c654f4dbdfc056cbc2cac90f8a7d2a283294"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap120_parallel.json",
+        "sha256": "a225d6ec433dbd9bf33ad37e29aa3376c5bd4bde38d323c2113e46d049a8ced2"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap200_parallel_summary.json",
+        "sha256": "e7fc73813ffd976dcce0be7c74057df72c81fb3ed7280a8dc6e2056ea9190ae6"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap200_parallel.json",
+        "sha256": "f3967f764e1ff8d6491bc6a0c48d4640077c61f4b6870dc3ec89deb10b54c113"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap15_parallel_summary.json",
+        "sha256": "d7bb58e16c50394ae8d67fcce71665f2af271fcde2ef0a225684168bdcc2dd66"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap15_parallel.json",
+        "sha256": "f1baf05b0ce8437d7156cf9edc39517907177aff7b8d6f825e0b5ba615336674"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap30_parallel_summary.json",
+        "sha256": "3100e9c5c8ceeaf317e05ea617b83c1eb9daa4f3feb7a06db148a2cf27dd4ae1"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap30_parallel.json",
+        "sha256": "a7042ebbfd3fad2dd1077dc7130745edaee93daf6012cb7b26a50bb33b73b7ed"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap60_parallel_summary.json",
+        "sha256": "17f1d43e4ec39bed538d2e226f91a15087d737e4e53bff286a123bd39bed8f5d"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap60_parallel.json",
+        "sha256": "e26675f30c1526a6423c3391e5feb9fa9ae371f50dba2edab46dfed144d99d51"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap120_parallel_summary.json",
+        "sha256": "18048eeceae680486ff0c53d356ee78597ad1b28772007471c7426f121d0c233"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap120_parallel.json",
+        "sha256": "10c9c91e61045511d23a18b1517a51351c9beaa7bd5f7a277189eb8b5a38a359"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap200_parallel_summary.json",
+        "sha256": "d10a99b31c75195755e2c36a952fa8609eceb7eee08d5798622604f5fad2f780"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap200_parallel.json",
+        "sha256": "1d27cd55cee7f09a545ea80a2debdf66c8794fd6adb61b046ce137784f61df10"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap15_parallel_summary.json",
+        "sha256": "0335e082ac356e2d5b7c643d9b74f3160dd7da9ac11a4f93c6b7a161fb665f3e"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap15_parallel.json",
+        "sha256": "2abea752bc3eed30a9e4212b3611bcc661757f41c13cfd1b77606a133201c3c7"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap30_parallel_summary.json",
+        "sha256": "75021dcea4ee466c0ff587e9ef3d2c4bb5ef0730c685a4ed567ad0accc320bed"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap30_parallel.json",
+        "sha256": "09a75c755a87d11c82c9fb4886c2617868176e299b7840b3b283382a3a5cbd17"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap60_parallel_summary.json",
+        "sha256": "b4f8bd089f327ad75d236036583bb1556438164dd41ad82595d15e45daf6192f"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap60_parallel.json",
+        "sha256": "c6f82b3c93d2682f1e885b52d9d6cdcbd7da52e652bb06c4c44c430186fd60f8"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap120_parallel_summary.json",
+        "sha256": "c19faddb9119eff517b1b467ae14641663f6e8dfcb6f5b09fbebd2065e78ff4c"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap120_parallel.json",
+        "sha256": "e227c161261272b3b64da5ab713c1788696dd4cd04a2c94e9745c302c261b319"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap200_parallel_summary.json",
+        "sha256": "7ddae43fad34d59c42ef229bf9c5fe0c67a836a904c2b681206573b9e9e89bf0"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap200_parallel.json",
+        "sha256": "f1b9af375627e891a68d43c44f3b7f7f19f1c578b35928692d322f4fec998716"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap15_crossing_summary.json",
+        "sha256": "9211c7eef934dd4f61a23bf49a0d5026436bb033ab03a20a781ee8280445d0d2"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap15_crossing.json",
+        "sha256": "894d05f6d92b6254d1ba43ad312586f29b8f7351a8736ae73e2639da99d6a135"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap30_crossing_summary.json",
+        "sha256": "87e37c15507e9aca5165a6bf2583f90ef9a01a2aab1208195cdc27fce721c6ef"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap30_crossing.json",
+        "sha256": "0635e217c0fccf25f732db2ac7f241b180e1e9dd0c28b35adbcb2e0e16c481b4"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap60_crossing_summary.json",
+        "sha256": "745feab01a906d4f285ef57327f1124d92afdbab8d78ff1d310ba08efe6d2c68"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap60_crossing.json",
+        "sha256": "8b48cdb13d84bfeb6a16b91fbcb7ff276ce49a11deb88f88a75a94f12bdf73a6"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap120_crossing_summary.json",
+        "sha256": "db438bf599fb16af8122047a57fdd0a1037e7468a3191f6f128bc26a1cdb22be"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap120_crossing.json",
+        "sha256": "6d90c1fcee008cf1591aa737dc43adc9c6de2d159a20cdc1a423e9d81430c207"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap200_crossing_summary.json",
+        "sha256": "62aa75d07f1110140d14b14b76d38eca6226de86c1e7ff148f8a0c33333a291e"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.05_cap200_crossing.json",
+        "sha256": "1363e9c4125b4577e39dd9c8b81ab888c90a94a0e58ee63ad54f0e98cd9b88a1"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap15_crossing_summary.json",
+        "sha256": "349ff13ee15e1431328cec004b3cea2bc3b05e28689b40de2f1a327fa5038a66"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap15_crossing.json",
+        "sha256": "c85040e8be3b8288531926424db362f2ecfd2995814d8ec8639f19e4576fc487"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap30_crossing_summary.json",
+        "sha256": "bb8d9392e49d1864d99e587b96e52c29869a4648c0b68aa7720233691d4ecda9"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap30_crossing.json",
+        "sha256": "1973af31f8cc396f49e51ec10fa95765326f52054c110b4567eddf8d95d03691"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap60_crossing_summary.json",
+        "sha256": "140987e60f7e11791d48d1e4149ba1dd78dc87e6e42c12bec3ce63f2bcab3648"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap60_crossing.json",
+        "sha256": "98e9361ab7dade485b0fc1262fa80278b578b5885f905f68dd15c45466512288"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap120_crossing_summary.json",
+        "sha256": "eb6df5fde3dd36712a6280957c368daf854bf5911f9228f1b8a0cecabbb00e33"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap120_crossing.json",
+        "sha256": "84e13114cddb99072f77c49e2d9a28aeb857ed17ca71a4498c0990b3c1b7f474"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap200_crossing_summary.json",
+        "sha256": "6b6c54818dc0eabc1024d6f7f2ad15c784b0f6d254395884794bceaa8d99d2b3"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.02_cap200_crossing.json",
+        "sha256": "2f1ca91149a400479e48d1619de2d57a201004a08da5d1c093671ad5df30e79b"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap15_crossing_summary.json",
+        "sha256": "7a468c68d662a306ba1b40c03bbdb6c951a70d5872b4da8d4f8cdb29b44d2483"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap15_crossing.json",
+        "sha256": "1caf244fb703d4e53ab275e2897cce06090e125e7dc64b43f1bcb815be222b82"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap30_crossing_summary.json",
+        "sha256": "254cea83312f0221d1f24ecbf975051c07ac858b0daddfa88e654d4f82b8ca16"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap30_crossing.json",
+        "sha256": "ccda5653ffe21dc833a61f3fb07cf9e556e25121c52c69daa9f2cf61f04432e3"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap60_crossing_summary.json",
+        "sha256": "7cdcc990788bd7ffecae97fa1947910bcbe354e3b309bf250085c70e117e2557"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap60_crossing.json",
+        "sha256": "44a83231dc3c42bb1ba9ae2a11eedfd1d5b7e8475c46e2d730805308092015a4"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap120_crossing_summary.json",
+        "sha256": "aa8a2dac2ad2875db1d8c9e7fb3efc57422d5863b700f0c2e6aa9c8fd0f68ab7"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap120_crossing.json",
+        "sha256": "6f1ef1366929aa61feaf466e87995d3f92725de4dbf91c53c98c2fdbabb79a0f"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap200_crossing_summary.json",
+        "sha256": "4f02c6716198f6a72e5c1fc07b0f3585623db8a41726d32becca99ab179abe45"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.01_cap200_crossing.json",
+        "sha256": "6fd02e1e42bb758f0cec187031983f79c46b30ddf2f211ded54a64e095546a73"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap15_crossing_summary.json",
+        "sha256": "c0ebe7ce018fc8626446ea82f2c591876eb2bb393bb3febad3d326d833c7ee3d"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap15_crossing.json",
+        "sha256": "2c0da7a58bba11f9fb1f542d198902c0dbde8fb0c99dfbe48fef1cc8439a3cf3"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap30_crossing_summary.json",
+        "sha256": "2e3ab2689b1bd9ecbd5a497465096153effb127e2d457e6a193d58cf399037df"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap30_crossing.json",
+        "sha256": "bafddeea874da7363a6182a282ea2afb7f5f8671a297e5243c55a2177da8eca8"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap60_crossing_summary.json",
+        "sha256": "8b9253d71ce20ecba7f8dc2896bd7e12c8b5011df1785ed5e7a04f8efa832bce"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap60_crossing.json",
+        "sha256": "a5a4e006c16d649b5f644e0d91edeb54b72ffef3a07c013fc4881dcb8d3eb981"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap120_crossing_summary.json",
+        "sha256": "d4cb695d5aaa9b41484b565bbc153c2819fb186e0dc8a16e7316b258b21ba8be"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap120_crossing.json",
+        "sha256": "8ee3785f2b91b85254b9b11c29f6db99b8397277695eb039cc2a8a7ecb98cb69"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap200_crossing_summary.json",
+        "sha256": "8dd8ef05acb1bb601fa4b08ab9692b434b8838e86c18df937f5020cb2af34dab"
+      },
+      {
+        "path": "research/final_v12/audit/sweep_tol0.005_cap200_crossing.json",
+        "sha256": "80d9267e0aa7faa5a3d27721c2b54ce3ca3a93afd74a9c71bb74f540d458f1dd"
+      }
+    ],
+    "alt_text": "Sixty tolerance-cap settings. Failed episodes invalidate cell means. Valid cells retain Monte Carlo uncertainty; reducing local open-loop gap does not prove convergence to a feedback equilibrium.",
+    "format": "vector PDF; 320 dpi PNG",
+    "generated_by": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v12_figures.py"
+  },
+  {
+    "figure": "figS03_kernel",
+    "sources": [
+      {
+        "path": "research/results/e01/baselines.json",
+        "sha256": "9bf6aba5469399bcadbc8efefe1a00cbc87beb0f65e7a55d90fbd7105435720f"
+      }
+    ],
+    "alt_text": "Archived E01 directional and isotropic kernel held-out comparison across four classes, 1523 test points per class. Data are carried forward, not new v12 calibration.",
+    "format": "vector PDF; 320 dpi PNG",
+    "generated_by": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v12_figures.py"
+  },
+  {
+    "figure": "figS04_objectives",
+    "sources": [
+      {
+        "path": "research/results/b2/snapshot_vs_integral.csv",
+        "sha256": "0a884ee35a6f7eb705eaa0073401dde79d974c0d2ab06208b8510d33123d91cd"
+      },
+      {
+        "path": "research/results/b2/example_AB.json",
+        "sha256": "ebfd9686752d2fdeeb71c9b7e55455737f1a3784265b26b2c13c2c9f5ed392d0"
+      }
+    ],
+    "alt_text": "Archived snapshot and path-integral rankings differ. The illustrative A and B joint trajectories use different plans for both players and do not isolate a unilateral causal effect.",
+    "format": "vector PDF; 320 dpi PNG",
+    "generated_by": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v12_figures.py"
+  },
+  {
+    "figure": "figS05_capability",
+    "sources": [
+      {
+        "path": "research/results/b4/b41_monotonicity.csv",
+        "sha256": "003ae0aede69c3b12a0cfd83db900909a8ac79181d6296c6840c18c4e7a4593b"
+      }
+    ],
+    "alt_text": "Archived nested selectable speed sets have nondecreasing values. This is distinct from forcing a larger operating speed and is not a new flexibility result.",
+    "format": "vector PDF; 320 dpi PNG",
+    "generated_by": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v12_figures.py"
+  },
+  {
+    "figure": "figS06_archived_threat",
+    "sources": [
+      {
+        "path": "research/final_v10/torpedo_sensitivity/threat_contraction.csv",
+        "sha256": "46704b9f753fcf7b9496f1a023f04d184f7585c8f356eabb37fabe57e67b8365"
+      }
+    ],
+    "alt_text": "Archived head-on threat sensitivity for LF and rigid models under legacy path semantics. These exploratory diagnostics do not establish v12 formation robustness.",
+    "format": "vector PDF; 320 dpi PNG",
+    "generated_by": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v12_figures.py"
+  }
+]

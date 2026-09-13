@@ -1,0 +1,4 @@
+geometry,eta_r,eta_v,grid,H,V_restricted,lower_bound,upper_bound,bound_width,relative_gap,LB_1,UB_1,P_lower,P_upper,point_estimate,sign_certified,certified_sign,expected_sign,solver_status,n_full_strategies,DO_iterations,restricted_rows,restricted_cols,num_payoff_evals,runtime_sec
+head_on,1.0,1.0,7,6,-0.0,-0.0,0.0,0.0,0.0,0.0,0.0,-0.0,0.0,0.0,0,0,0,tight,117649,40,74,74,0,135.4
+parallel,1.0,1.0,7,6,1.4708,0.676,2.7428,2.0668,1.4052,0.0,0.0,0.676,2.7428,1.7094,1,1,0,SIGN-CERTIFIED/VALUE-LOOSE,117649,40,75,75,0,140.5
+crossing,1.0,1.0,7,6,-0.0,-0.2718,0.2718,0.5435,0.5435,0.0,0.0,-0.2718,0.2718,-0.0,0,0,0,UNCERTIFIED,117649,40,75,75,0,133.5

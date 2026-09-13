@@ -1,0 +1,77 @@
+\section{Discussion and limitations}\label{sec:discussion}
+
+\subsection{What the frontier does and does not settle}
+
+A certified frontier answers a budgeting question, not a doctrine question. It
+says which revision calendars are compatible with a tolerated loss under the
+frozen model, and it carries the residual of the computation that produced it.
+It does not say that a particular calendar is optimal in the real world, and
+it does not identify the mechanism by which revisions pay. Two readings of the
+same frontier should be resisted.
+
+First, monotonicity in $K$ is a correctness property, not a finding: it follows
+from policy inclusion (Proposition~\ref{prop:inclusion}) and would hold for any
+model in this class. The informative content is the \emph{shape}: where the
+frontier saturates, and which epochs the maximizing calendar selects.
+
+Second, a budget that suffices is not a budget that is necessary. The
+deletion certificate bounds the loss of a specified coarse calendar from
+above; the interval certificate bounds a budget by a shortest path over
+interval losses. Neither claims minimality for a true performance target, and
+neither should be read as an optimality certificate for the calendar itself.
+
+\subsection{Where the certificates can be loose}
+
+Both certificates can be conservative, and we say where. The interval bound
+takes a maximum over all histories at a boundary
+(\eqref{eq:intervalcost}), so one unfavourable history sets the cost of an
+interval for every path through it. The deletion certificate multiplies source
+transition kernels along hypothetical completions of the opponent's future,
+which is exact for the constructed policy but says nothing about the best
+coarse policy. When either bound is far above the realised loss, the honest
+report is that the certificate is weak in that cell, not that the budget is
+tight. The certificates are also asymmetric in the opponent class: the
+interval construction needs public boundaries, which an unexecuted committed
+opponent suffix destroys, so it applies to the fully flexible opponent only.
+
+\subsection{Model scope}
+
+The numerical instantiation is a leader--follower line-ahead formation with
+fixed arc-length spacing, a frozen directional kernel calibrated against an
+auditable rules engine, and a fixed horizon with unit discount. Four
+restrictions bound the conclusions. (i)~Formations are rigid in shape: no
+formation breaking, no independent vessel autonomy, and no command delay.
+(ii)~Information is perfect within the model's observation structure; the
+budget restricts \emph{when} a player may act, not what it can see, so this
+paper is not about costly observation. (iii)~The payoff is a reduced
+interaction kernel, not a physical ballistic or hydrodynamic model; it is a
+surrogate whose fidelity was measured separately and whose transfer to the
+rules engine is partial. (iv)~The design is a fixed computational benchmark:
+conditions were declared before their outputs, the solver is deterministic,
+and no statistical sampling claim is attached to its output. Where a value is
+unresolved, we report the interval and the termination reason rather than a
+point estimate.
+
+\subsection{Falsified predecessor and its role}
+
+An earlier iteration of this project asked whether the side with the range
+advantage values revision rights differently from the side without it. Tested
+at this fidelity with exact anchors and frozen held-out configurations, that
+claim failed: most configurations pointed the other way, and neither the sign
+nor the ranking was stable. We keep the negative result in the record, do not
+re-tune the design to revive it, and do not restate it under a new name. The
+counterexample of Proposition~\ref{prop:counterexample} explains why the
+underlying intuition --- that more revision opportunities must have
+diminishing value --- cannot be assumed: revision opportunities can be
+complementary, so their value is a property of the instance.
+
+\subsection{What would move this to a stronger claim}
+
+Three things would strengthen the paper beyond its present scope, and we list
+them as open rather than claim them. A certificate that is tight rather than
+merely valid, for instance by computing interval losses on the realised
+history class instead of the worst history. A budgeted equilibrium notion in
+which both players choose calendars, since the present design fixes one
+calendar as public and optimises the other. And a formation model with
+deformation, which would test whether the frontier shape survives the
+representation change that the ablation probes only at $T=4$.

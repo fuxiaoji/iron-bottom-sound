@@ -1,0 +1,12 @@
+{
+  "created_utc": "2026-09-13T06:02:38.970750+00:00",
+  "source_hashes": {
+    "research/formation/interval_bound_v14.py": "2cc6643cbb21b4b80533d86dc8ef8196b14bfd19b460dd6a57aceaf49b831663",
+    "research/experiments/v14_interval_experiment.py": "4e3c73252c6176b93fae0a449b4c11997795fc5135779d59cb53c17129257bac",
+    "tests/test_interval_bound_v14.py": "70c6925ac232e1f3458603d8854a6fa99a239cf5f40586caa4ab829b2e5ba513",
+    "research/final_v14/INTERVAL_BOUND_PROTOCOL.md": "51890a2788c2b5b36f99379b3bf4eabc55f4dce4b33018ce35ab4cfdd0af7fa0"
+  },
+  "design_sha256": "fb92864810ea05f3aac9542297f702109793bd4623433d32d9ab49dff06ff4dc",
+  "development_outcomes_already_viewed": true,
+  "test_outcomes_present": false
+}

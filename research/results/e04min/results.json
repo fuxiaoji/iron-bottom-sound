@@ -1,0 +1,90 @@
+{
+  "per_geometry": {
+    "close_high_hit": {
+      "all": {
+        "n": 30,
+        "mean_v_denial": 6.000000000000002,
+        "ci95": [
+          6.000000000000002,
+          6.000000000000002
+        ],
+        "route_changed_rate": 1.0,
+        "route_changed_ci95": [
+          0.8864829086095221,
+          1.0
+        ],
+        "mean_v_direct": 38.5
+      }
+    },
+    "mid_low_hit": {
+      "all": {
+        "n": 30,
+        "mean_v_denial": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "route_changed_rate": 0.0,
+        "route_changed_ci95": [
+          -1.3877787807814457e-17,
+          0.113517091390478
+        ],
+        "mean_v_direct": 3.6666666666666674
+      },
+      "low_hit": {
+        "n": 30,
+        "mean_v_denial": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "route_changed_rate": 0.0,
+        "route_changed_ci95": [
+          -1.3877787807814457e-17,
+          0.113517091390478
+        ],
+        "mean_v_direct": 3.6666666666666674
+      }
+    },
+    "long_low_hit": {
+      "all": {
+        "n": 30,
+        "mean_v_denial": 4.000000000000001,
+        "ci95": [
+          4.000000000000001,
+          4.000000000000001
+        ],
+        "route_changed_rate": 1.0,
+        "route_changed_ci95": [
+          0.8864829086095221,
+          1.0
+        ],
+        "mean_v_direct": 1.8333333333333337
+      },
+      "low_hit": {
+        "n": 30,
+        "mean_v_denial": 4.000000000000001,
+        "ci95": [
+          4.000000000000001,
+          4.000000000000001
+        ],
+        "route_changed_rate": 1.0,
+        "route_changed_ci95": [
+          0.8864829086095221,
+          1.0
+        ],
+        "mean_v_direct": 1.8333333333333337
+      }
+    }
+  },
+  "low_hit_overall": {
+    "n": 60,
+    "mean_v_denial": 2.0000000000000004,
+    "ci95": [
+      1.5333333333333339,
+      2.5333333333333337
+    ],
+    "positive_fraction": 0.5
+  },
+  "n_samples": 90
+}

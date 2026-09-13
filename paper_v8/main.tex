@@ -1,0 +1,1143 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black,urlcolor=blue!60!black]{hyperref}
+\usepackage[numbers]{natbib}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+\emergencystretch=2.5em
+
+\newtheorem{proposition}{Proposition}
+\newcommand{\etav}{\eta_v}
+\newcommand{\etar}{\eta_r}
+\newcommand{\etag}{\eta_g}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+\title{Maneuvering Against a Directional Field:\\
+Path-Integrated Exposure, Commitment, and Delayed Threats\\
+in Nonholonomic Adversarial Games}
+
+\author{Research Layer of the \emph{Iron Bottom Sound} project\thanks{All
+experiments are reproducible from repository scripts against a frozen
+deterministic rules engine (commit \texttt{fc77a65}).  The WWII surface-combat
+wargame serves only as an interpretable validation environment; this paper's
+claims are about the general model class.}}
+
+\date{September 11, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We study adversarial trajectory optimization between two moving
+\emph{formations} that interact through a directional field under
+nonholonomic motion constraints.  The decision variable is not a position
+but a trajectory, and the objective is the path-integrated net exposure
+$J=\int_0^T[P_{B\to R}(t)-\lambda P_{R\to B}(t)]\,dt$ built from a
+calibrated anisotropic interaction kernel; we characterize the resulting
+closed-loop dynamic game and certify its comparative statics numerically.
+Three structural results are proved and measured.  First, the
+path-integrated objective is load-bearing: snapshot and peak objectives
+reorder committed plans (Kendall $\tau$ as low as $0.14$) and prefer the
+opposite trajectory in a constructed reversal.  Second, a symmetric
+closed-loop degeneracy: when the successor-payoff matrix is skew-symmetric
+the value collapses exactly to the instantaneous payoff --- the collapse is
+an interaction-symmetry phenomenon, destroyed by range or firepower
+asymmetry but untouched by speed or action-set asymmetry --- and by
+nesting of admissible policy sets, speed \emph{capability} is monotone
+while fixed operating speed is not.  Third, within a pre-specified discretized
+open-loop game --- frozen action grids, exhaustive full-space best
+responses against the complete equilibrium mixtures --- genuine
+equilibrium bounds certify that the sign of the value of a longer
+commitment equals the sign of the range advantage in all eighteen tested
+asymmetric cells, with no certified reversal, both range directions
+supported in every geometry, and the sign unchanged under action-grid
+refinement.  Fourth, against best-response resistance, no favorable
+positional state is guaranteed reachable or viable in open water: the
+worst-case advantage-retention ratio never exceeds $0.07$ with median
+retention $0$--$3\%$.  Delayed torpedo threats act through response-set
+contraction --- thin low-lethality threats produce zero contraction of the
+near-optimal set, and thickness increases contraction in the tested range,
+so the mechanism is threshold- and landscape-dependent rather than purely
+coverage-driven.  Finally, a matched external test isolates decision
+structure in an auditable rules engine (same policy class on both sides;
+formation scenarios, $100$ paired seeds, common random numbers): transfer
+of the reduced model's point values is partial and non-monotonic, which
+locates the boundary of the reduced model and makes the engine an external
+case study rather than a validation claim.
+\end{abstract}
+
+\section{Introduction}\label{sec:intro}
+
+How should an adversarial formation maneuver when the interaction strength
+is directional, the motion is nonholonomic, and some controls have delayed
+effects?  The classical naval answer --- cross the enemy's line to concentrate
+broadside fire while presenting only bow or stern arcs --- is a doctrine about
+\emph{positions}.  This paper argues that positions are the wrong primitive.
+What matters is the \emph{cumulative interaction along trajectories}: the
+path-integrated net exposure an opponent suffers versus the exposure one must
+sustain in return.  From this vantage, crossing the T is merely one geometric
+state that may or may not raise the integral --- never an objective in itself.
+
+We develop this view on a complete, auditable wargame engine (deterministic conditional on sealed orders and random seed)
+(\emph{Iron Bottom Sound}, IBS): a hexagonal WWII surface-combat simulation
+whose adjudication is a pure function of state, sealed orders, and seed, with
+every die roll audited against its rule reference.  The engine provides the
+calibration target for our interaction field and the case-study environment for
+our policies; the mathematical claims are about the model class, not the
+wargame.  The resulting pipeline is:
+\begin{enumerate}
+\item calibrate a smooth anisotropic interaction kernel against the engine's
+exact adjudication (retained fidelity $\rho=0.991$);
+\item embed the kernel in a committed-maneuver dynamic game over
+path-integrated exposure;
+\item characterize structural properties (degeneracy boundary, commitment
+value, speed-capability monotonicity);
+\item translate model policies back into legal engine orders and validate
+against doctrine baselines with paired seeds.
+\end{enumerate}
+Each step is gated by pre-specified acceptance criteria and every number in
+this paper traces to a script in the repository.
+
+\subsection{Contributions}
+\begin{enumerate}
+\item \textbf{A path-integrated anisotropic exposure formulation for moving
+formations}: each player is a rigid/quasi-rigid formation
+(\eqref{eq:formation}--\eqref{eq:ffield}) with a calibrated directional
+kernel (fidelity $\rho=0.991$, nMAE $5.7\%$ across four ship classes), an
+an isotropic-kernel ablation (removing directionality reduces the
+held-out Spearman rank correlation from $0.991$ to $0.952$), and
+cross-ship-pair transfer ($\rho=0.982$--$0.992$).
+\item \textbf{The path-integrated objective is load-bearing}: snapshot and
+integral objectives reorder committed plans (Kendall $\tau$ $0.14$--$0.62$);
+a constructed engagement reverses preferences entirely (peak $2.88$ vs
+integral $5.02$).
+\item \textbf{A degeneracy proposition with an assumption-breaking matrix}:
+the symmetric closed loop collapses to the instantaneous payoff; the matrix
+localizes the collapse to interaction-strength symmetry --- kinematic
+asymmetries (speed, action sets) leave it exactly intact --- together with
+speed-capability monotonicity.
+\item \textbf{Commitment comparative statics, certified} (Contribution 3,
+conditional on the certification): inside a frozen discretized open-loop
+game with exhaustive best responses, valid equilibrium bounds certify
+sign($P_6$)=sign($\etar-1$) in $18/18$ tested asymmetric cells with no
+certified reversal, stable across a $5^6\to7^6$ action-grid refinement;
+the certified intervals are reported per cell and flagged tight or loose.
+\item \textbf{Delayed spatiotemporal threat and response-set effects}: a
+launched weapon is a stateful hazard field whose mass lies in future turns;
+contraction of the near-optimal response set depends jointly on coverage,
+local threat intensity, and the value landscape of the alternatives, and the
+matched-lethality comparison shows that coverage alone does not determine
+denial.
+\item \textbf{An external rules-engine case study}: a matched $2\times2$
+design (same policy class on both sides) isolates decision structure in
+formation-level engine scenarios; the reduced model's point values and its
+exact-zero degeneracy predictions do not transfer to the hex-quantised
+engine, which is therefore reported as an external case study that locates
+the boundary of the reduced model.
+\end{enumerate}
+
+\section{Related Work}\label{sec:related}
+
+\subsection{Dynamic and differential games}
+Zero-sum differential games originate with Isaacs' method of characteristics
+\cite{isaacs1965}; the theory of feedback (closed-loop) versus open-loop
+information structures and their associated Nash values is developed in
+\cite{basar1999}.  Classical pursuit--evasion and combat models optimize
+terminal capture, separation, or energy-style objectives; Lanchester-type
+attrition and its optimal-control treatment \cite{taylor1974} and
+PDE combat models \cite{protopopescu1989} aggregate force levels rather
+than adjudicate anisotropic single-weapon interactions.  Our point of
+departure is the objective: a \emph{path-integrated anisotropic
+interaction} --- the cumulative net exposure along whole trajectories ---
+for which instantaneous geometry is only an ingredient, not the prize.
+
+\subsection{Reachability and viability}
+Reachable-set and viability-kernel methods characterise states a system
+can maintain under constraints \cite{aubin1991}, with Hamilton--Jacobi
+reachability providing adversarial variants for continuous dynamic games
+\cite{mitchell2005}.  In that literature the target set is given ex
+ante.  Here the ``favorable region'' is itself defined by the directional
+interaction value ($L\ge\alpha$), and reachability questions are coupled
+to a path-integrated payoff: we ask not only whether a state is reachable
+or invariant, but what sustaining it is worth along the trajectory.
+
+\subsection{Commitment and information structure}
+The strategic value of binding oneself --- committing to a plan the
+opponent can observe --- is classical \cite{schelling1960}; in dynamic
+games it separates open-loop from feedback equilibria \cite{basar1999},
+and receding-horizon control makes the replanning cadence a design
+variable \cite{mayne2000}.  Algorithmically, our open-loop solver is a
+double-oracle scheme in the spirit of \cite{mcmahan2003}.  The
+comparative static studied here --- how the \emph{sign} of the value of
+commitment horizons tracks a capability asymmetry (range) while pure
+kinematic asymmetry prices commitment with the opposite sign --- is, to
+our knowledge, not part of the standard repertoire.
+
+\subsection{Interdiction and spatiotemporal hazards}
+Time-dependent shortest paths \cite{orda1990} and network interdiction
+\cite{israeli2002} study adversaries who add costs to arcs or destroy
+links.  Robust path planning around dynamic obstacles treats hazards as
+spatial fields to avoid.  The delayed threat studied here differs
+mechanically: a launched weapon is a \emph{stateful spacetime field} that
+does not merely add path cost but reshapes the opponent's set of
+near-optimal future responses --- a response-set contraction measured
+against the near-optimal landscape, not against feasibility.
+
+\section{General Formation Game}\label{sec:model}
+
+\noindent\textbf{Players are formations.}  Throughout, each player
+$i\in\{B,R\}$ is a moving \emph{formation} --- a rigid or quasi-rigid
+line-ahead column of vessels --- not an individual vessel.  The formation's
+reference state is $s_i=(c_i,\psi_i,v_i,\chi_i)$: reference point
+$c_i=(x_i,y_i)$, formation heading $\psi_i$, speed $v_i$, and capability
+state $\chi_i$ (weapon availability).  Vessel $k$ of formation $i$ occupies
+\begin{equation}
+x_{ik}(t) \;=\; c_i(t) \;+\; R(\psi_i(t))\, p_{ik},
+\label{eq:formation}
+\end{equation}
+where $p_{ik}$ is vessel $k$'s offset in the formation frame ($p_{ik}=(0,
+-\ell k)$ for a line-ahead column with astern spacing $\ell$) and
+$R(\cdot)$ is the rotation matrix.  The reference point obeys nonholonomic
+kinematics, $\dot x_i=v_i\cos\psi_i$, $\dot y_i=v_i\sin\psi_i$,
+$\dot\psi_i=\omega_i$, with $v\le\bar v_i$ and $|\omega_i|\le\bar\omega$ (a
+minimum turn radius $R_{\min}(v)=v/\bar\omega$ couples speed and turning in
+the engine-faithful variant).  Lateral displacement therefore requires first
+rotating the velocity vector --- the defining nonholonomic cost.  Reduced
+implementations that track a single reference state are read as
+\emph{formation reference states} under this definition; no experiment in
+this paper supports a claim about isolated single vessels.
+
+\noindent\textbf{Anisotropic formation field.}  Each vessel projects an
+interaction kernel $K_{ik}(x,t)=K(r,\theta,\psi_i,\psi_j,\chi_i)$ depending
+on range, relative bearing, both headings, and capability state; the
+formation field aggregates over its vessels,
+\begin{equation}
+F_i(x,t) \;=\; \sum_{k\in i} K_{ik}(x,t),
+\label{eq:ffield}
+\end{equation}
+and formation-vs-formation interaction sums over vessel pairs.  In the
+naval instantiation $K$ is the calibrated kernel of
+Section~\ref{sec:kernel} and each formation is a line-ahead column.
+
+\begin{proposition}[Formation aggregation]\label{prop:agg}
+For rigid formations, formation-to-formation exposure is exactly additive
+over vessel pairs:
+\[
+E_{i\to j}\;=\;\int_0^T F_i\bigl(x_j(t),t\bigr)\,dt
+\;=\;\sum_{k\in i}\sum_{m\in j}\;
+\int_0^T K\bigl(x_{jm}(t);\,x_{ik}(t),t\bigr)\,dt .
+\]
+\end{proposition}
+\begin{proof}
+By \eqref{eq:ffield} the formation field is a sum of per-vessel kernels,
+and the integral is linear.  Hence the exposure of vessel $m$ of
+formation $j$ equals the sum, over the vessels $k$ of formation $i$, of
+the pairwise terms; summing over $m\in j$ gives the stated identity.
+\end{proof}
+
+\noindent This elementary identity pins down what ``formation payoff''
+means operationally: the double sum over vessel pairs that all solvers in
+this paper evaluate.
+
+\noindent\textbf{Path-integrated objective.}  Against trajectory $x_j(t)$,
+the cumulative exposure is $E_{B\to j}=\int_0^T F_B(x_j(t),t)\,dt$, and the
+net path value is
+\begin{equation}
+J_{\text{gun}} \;=\; E_{B\to R} \;-\; \lambda\, E_{R\to B},
+\qquad \lambda = 1.
+\label{eq:J}
+\end{equation}
+The object of optimisation is not a position but a trajectory: the integral
+is the primitive.  Discretely, $J=\sum_t \Delta t\,[P_{B\to R}(t)-\lambda
+P_{R\to B}(t)]$ with formation-aggregate $P$ from \eqref{eq:ffield}.
+
+\noindent\textbf{Delayed threat state.}  Torpedoes are not damage terms but a
+delayed stateful field: the state extends to $z_t=(s_t,q_t)$, where $q_t$
+records every launched weapon's position, heading, speed, remaining range,
+and threat probability.  The spatiotemporal hazard $H(x,t;q_t)$ is generated
+by past launches and constrains future responses (Section~\ref{sec:threat}).
+
+\noindent\textbf{Information and commitment.}  In the closed loop both sides
+re-optimize every step against current state.  In the committed (open loop)
+game both sides seal formation heading plans of horizon $H$ before execution
+--- mirroring the engine's sealed-order discipline.
+
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/fig1_schematic.png}
+\caption{Two line-ahead formations compete over future trajectories inside a
+directional fire field (background, computed from the calibrated kernel) and a
+delayed torpedo hazard corridor.  Solid, dashed, and dotted arcs are candidate
+open-loop trajectories; the payoff of a plan is the exposure integrated along
+the whole path, not the value at its best instant.}
+\label{fig:schematic}
+\end{figure}
+
+\section{Structural Properties of the Closed-Loop Game}\label{sec:structural}
+
+\subsection{Closed-loop degeneracy and its boundary}\label{sec:degeneracy}
+
+\begin{proposition}[Symmetric closed-loop degeneracy]\label{prop:deg}
+Consider a two-player zero-sum dynamic game with simultaneous moves, a
+common finite action set $U$ with mixed play on the simplex $\Delta(U)$, a
+stage payoff that depends on the state only, $g(s,u_B,u_R)=\ell(s)$, and a
+deterministic successor map $F$.  Write
+$\mathcal S$ for the \emph{player-exchange map} on states (the relabelling
+that swaps which formation is B and which is R).  Assume:
+\begin{enumerate}
+\item[(A1)] \emph{odd stage payoff under exchange}: $\ell(\mathcal S s)
+      = -\ell(s)$;
+\item[(A2)] \emph{equivariant dynamics}: $\mathcal S F(s,u_B,u_R)
+      = F(\mathcal S s, u_R, u_B)$.
+\end{enumerate}
+Then at every state $s$ the one-step successor-payoff matrix
+$A(s)=\bigl[\ell(F(s,u,v))\bigr]_{u,v\in U}$ is skew-symmetric, and:
+\begin{itemize}
+\item[(i)] \emph{finite horizon $H$ with any $\gamma\le1$}: the value
+      function obtained by backward induction from any terminal value
+      satisfying $V_{H+1}(\mathcal S s)=-V_{H+1}(s)$ equals the
+      instantaneous payoff, $V_h\equiv L\equiv\ell$;
+\item[(ii)] \emph{infinite horizon with $0<\gamma<1$}: the Bellman
+      operator $T$ is a $\gamma$-contraction on bounded functions, $L$ is
+      its fixed point, and $V^\star\equiv L$ by the contraction mapping
+      theorem.
+\end{itemize}
+\end{proposition}
+
+\begin{proof}
+\emph{Skew-symmetry.}  Take $s$, $u,v\in U$.  By (A2),
+$F(s,u,v)$ and $\mathcal S F(s,v,u)$ denote the same state, so
+$A_{uv}(s)=\ell(F(s,u,v))=\ell(\mathcal S F(s,v,u))=-A_{vu}(s)$ by (A1).
+Hence $A(s)^\top=-A(s)$.
+
+\emph{Stage value.}  For skew $A$ and any $x\in\Delta(U)$,
+$x^\top A x=\sum_{u,v}x_ux_vA_{uv}=0$: diagonal terms vanish
+($A_{uu}=0$) and off-diagonal terms cancel in pairs.  Thus
+$\min_y x^\top Ay\le0$ for all $x$, so
+$\max_x\min_y x^\top Ay\le0$; and $y^\top Ay=0$ gives
+$\max_x x^\top Ay\ge0$ for all $y$, so
+$\min_y\max_x x^\top Ay\ge0$.  By the minimax theorem both equal the same
+value, hence $\operatorname{val}A(s)=0$ for every $s$.
+
+\emph{(i) Backward induction, $\gamma\le1$.}  Suppose
+$V_{h+1}(\mathcal S s)=-V_{h+1}(s)$.  The continuation matrix at $s$ is
+$A^{(h+1)}(s)=\bigl[\gamma V_{h+1}(F(s,u,v))\bigr]_{u,v}$.  By (A2) and the
+induction hypothesis it is again skew-symmetric, so its minimax value is
+$0$ and $V_h(s)=\ell(s)+\operatorname{val}A^{(h+1)}(s)=\ell(s)=L(s)$,
+restoring the hypothesis one step earlier.  Induction down to $h=0$ gives
+$V_h\equiv L$ for every horizon.
+
+\emph{(ii) Infinite horizon, $0<\gamma<1$.}  For bounded $V,V'$,
+$|\max_x\min_y\,x^\top A[V]y-\max_x\min_y\,x^\top A[V']y|
+\le\max_{u,v}|V(F(s,u,v))-V'(F(s,u,v))|\le\|V-V'\|_\infty$ because
+$\max_x\min_y$ is $1$-Lipschitz in the matrix entries under the sup-norm;
+hence $T$ is a $\gamma$-contraction.  Since $(TL)(s)=\ell(s)+\gamma\cdot0
+=L(s)$, $L$ is a fixed point, and uniqueness of the fixed point gives
+$V^\star=L$.  \qed
+\end{proof}
+
+\begin{remark}[Scope of the skew-symmetry condition]\label{rem:skew}
+\textup{(A1)} is \emph{not} implied by identical hardware alone; it is a
+statement about the exchange symmetry of the closed loop in the relative
+state.  It holds exactly at player-exchange-symmetric configurations when
+the stage payoff is odd under the exchange and the successor map is
+equivariant, and in the calibrated symmetric model it holds at machine
+precision across the full state grid ($\max|V-L|=0$ on two grid sizes,
+two value-iteration sweeps; exchange-symmetry error $0$).  Our solver uses
+the pure-strategy Bellman recursion; it shares the fixed point because the
+pure max--min of $A(s)$ is also $0$ on the entire symmetric grid.  The
+boundary of the proposition is measured in Table~\ref{tab:b3}.
+\end{remark}
+The interesting science is the \emph{boundary} of the proposition.  We
+break each assumption and re-solve (Table~\ref{tab:b3}):
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.58\textwidth]{figures/fig3_degeneracy_boundary.pdf}
+\caption{Where the degeneracy breaks.  Colour is $\max_s|V(s)-L(s)|$, the
+closed-loop excess value over the instantaneous payoff, on the
+$(\etav,\etar)$ grid: the \emph{horizontal} axis is the speed ratio
+(speed asymmetry) and the \emph{vertical} axis is the range ratio
+(range / interaction-envelope asymmetry).  In the tested perturbations the
+range asymmetry breaks the collapse whereas the tested speed asymmetry
+leaves it essentially intact.}
+\label{fig:degeneracy}
+\end{figure}
+
+\begin{table}[!htb]
+\centering\small
+\caption{Assumption-breaking matrix: $\max|V-L|$ after re-solving the
+closed loop with one assumption violated at a time.}
+\label{tab:b3}
+\begin{tabular}{lcc}
+\toprule
+Violated assumption & $\max|V-L|$ & degeneracy \\
+\midrule
+(none --- symmetric base) & $0.0$ & held \\
+speed asymmetry ($\etav=1.25$ / $0.80$) & $0.0$ / $0.0$ & held \\
+action asymmetry (5 turn levels vs 3) & $0.0$ & held \\
+symmetry-preserving terminal payoff & $0.0$ & held \\
+\textbf{range asymmetry} ($\etar=1.25$ vs $0.80$) & $\mathbf{13.99}$ & broken \\
+\textbf{firepower asymmetry} ($\etag=1.25$) & $\mathbf{20.09}$ & broken \\
+all combined & $9.75$ & broken \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The pattern is sharp in the tested perturbations: \emph{kinematic}
+asymmetries (speed, action sets) and the tested
+\emph{symmetry-preserving} terminal-payoff perturbation leave the
+degeneracy exactly intact, while \emph{interaction-strength} asymmetries
+(range, firepower) destroy it.  The
+degeneracy is an interaction-symmetry phenomenon: kinematic asymmetries alone did not unlock
+positional value in the tested conditions; only interaction-strength
+asymmetries did.  This
+localized prediction --- and its contrast with the committed game below ---
+is the paper's central structural finding.
+
+
+\subsection{Finite-horizon DP refinement}\label{sec:regimes}
+
+The plan-library approach of Section~\ref{sec:commitment} suffers from a
+first-order limitation: the committed-maneuver values depend on the
+discretisation of the plan library.  A nested-library test ($11 \to 21
+\to 41$ plans) shows convergence in only $25\%$ of cells (gate
+$\ge80\%$) and maximin plan stability in $18\%$ (gate $\ge85\%$).  We
+therefore replace the plan library with a \emph{finite-horizon backward
+induction} solver on the reduced-state grid:
+
+\begin{equation}
+V_T(s) = 0, \qquad
+V_t(s) = \max_{u_B} \min_{u_R}
+\bigl[L(s)\,\Delta t + V_{t+1}(F(s,u_B,u_R))\bigr],
+\end{equation}
+
+with three grid refinements (coarse $16{\times}12$, medium
+$30{\times}24$, fine $48{\times}36$).  Across seven representative test
+cells (symmetric head-on/parallel, range advantage/disadvantage,
+crossing, speed advantage), \textbf{all cells converge} ($\delta_V < 5\%$;
+most $< 2\%$).  The solver confirms:
+(i)~symmetric configurations yield $V \approx 0$ (the degeneracy
+prediction of Proposition~\ref{prop:deg});
+(ii)~range asymmetry produces strongly signed values ($\pm 8$);
+(iii)~speed asymmetry alone does not break the degeneracy (consistent
+with the interaction-symmetry boundary).
+The plan-library approach is retained only for the \emph{committed
+policy} translation layer (Section~\ref{sec:validation}), where its
+$60$-seed engine validation provides independent confirmation.
+
+Plan-library convergence is a first-order concern for committed-maneuver
+studies, and our nested-library test returns an honest failure: enlarging
+the library from $11$ to $21$ to $41$ plans changes the maximin value by
+more than the $5\%$ convergence gate in $75\%$ of cells (gate: $\ge80\%$
+converged), and the maximin plan identity is stable in only $18\%$.
+Per the plan's decision tree, we therefore (i)~do \emph{not} describe the
+phase diagrams as converged equilibrium regimes but as
+\emph{library-approximate} regime maps; (ii)~report all values as the
+interval $[V_{21},V_{41}]$; and (iii)~verify that the robust conclusions
+(the sign structure from range asymmetry, the swap symmetry, the
+degeneracy boundary of Table~\ref{tab:b3}) are library-independent ---
+they are propositions about the model, not outputs of the library.  The
+library-approximate maps over $(\etav,\etar)$ and their regime labels are
+given in the repository; the regime \emph{ordering} (which asymmetry
+dominates) is stable even where exact values are not.  The lesson for the
+method class: committed-maneuver equilibrium values are
+\emph{library-sensitive} in a way that the structural propositions are
+not, and any committed-game paper should publish its library-sensitivity
+audit alongside its values.
+
+\subsection{Speed-capability monotonicity}
+\begin{proposition}[Capability monotonicity]\label{prop:mono}
+Let $V(\bar v)$ denote the game value when player $B$'s admissible
+closed-loop policy set is $\mathcal P(\bar v)$ --- the policies whose
+action at every information state lies in the capability set $[0,\bar v]$
+(with a common turn-rate bound).  If $\mathcal P(\bar v_1)\subseteq
+\mathcal P(\bar v_2)$, then $V(\bar v_2)\ge V(\bar v_1)$.
+\end{proposition}
+\begin{proof}
+$V(\bar v)=\max_{\pi\in\mathcal P(\bar v)}\ \min_{\pi_R}J(\pi,\pi_R)$.
+Taking the maximum over a superset cannot decrease it.  \qed
+\end{proof}
+
+\noindent\emph{Capability vs.\ operating speed.}  The premise requires
+\emph{nested capability} semantics --- a vessel's cap $\bar v\in\{2,4,6\}$
+admits speed tiers $\{v\le\bar v\}$, giving $U(2)\subset U(4)\subset
+U(6)$.  A \emph{fixed operating speed} $v=\bar v$ changes the dynamics
+non-nestedly and the proposition makes no claim about it; conflating the
+two produced what earlier drafts called a ``speed paradox,'' a term we
+retire.  Measured over two geometries
+$\times$ three range ratios: the open-loop maximin value is non-decreasing
+in $\bar v$ in every cell (e.g., parallel geometry at $\etar=1$:
+$V=-0.571\to-0.135\to+0.000$; at $\etar=1.33$:
+$+2.66\to+2.69\to+2.77$); the largest single-step ``drop'' across all
+cells is $-2.2\times10^{-15}$ (LP noise).  \textbf{Speed-capability
+monotonicity holds.}  The contrast with the fixed-operating-speed sweep
+--- where the value \emph{decreases} with speed in most geometries ---
+confirms that the earlier ``speed paradox'' is purely an artifact of the
+operating-speed semantics: given the \emph{capability} to choose, more
+speed never hurts; forced to \emph{operate} at higher speed without a
+positional objective, it hurts (supplement).
+
+
+
+\section{Path-integrated Formation Maneuver}\label{sec:pathint}
+
+\subsection{The path-integrated objective is load-bearing}\label{sec:b2}
+
+For identical candidate-trajectory sets we compare three objectives:
+the terminal snapshot $L(s_T)$, the peak $\max_t L(t)$, and the integral
+$J$.  Across nine parameter cells ($\etav\in\{0.8,1.0,1.25\}\times$ three
+geometries; $1{,}089$ rollouts):
+
+\begin{itemize}
+\item Kendall $\tau$ between integral and snapshot rankings: mean $0.476$
+for $L(s_T)$ ($95\%$ CI $[0.404,0.548]$) and $0.365$ for $\max_t L$ ---
+far from the $\tau\ge0.95$ equivalence band; \textbf{no cell is
+rank-equivalent}.
+\item The peak objective's worst-case vector degenerates completely in
+$9/9$ cells (a best-responding defender holds $L(t)\le0$ at every $t$): under
+maximin, the peak objective has \emph{no discriminating power}.
+\item Constructed reversal (real rollouts): trajectory $A$ (turn $+180^\circ$
+into a crossing shot) reaches a peak $L=2.88$ at $t=2$ but integrates to
+$J=1.32$; trajectory $B$ (turn $+30^\circ$, sustained oblique) peaks at $0.29$
+but integrates to $J=5.02$.  The peak criterion and the integral criterion
+prefer opposite trajectories.
+\end{itemize}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\textwidth]{figures/fig2_peak_vs_integral.png}
+\caption{Snapshot versus integrated objectives on two real committed
+trajectories.  (a)~The plans and their paths.  (b)~Instantaneous advantage:
+trajectory A reaches a much higher peak.  (c)~Cumulative exposure: the
+integral prefers the sustained moderate posture.}
+\label{fig:peak-vs-integral}
+\end{figure}
+
+A fire-timing audit (fire-before-move vs the engine's move-then-fire
+ordering) shifts integrals by a mean of $0.08$ with \emph{zero} sign changes
+across $1{,}089$ plan pairs: the ordering offset is second-order.
+Fleet-level exposure maps show the column's mid-flank sustained
+$+18.8\%$ higher directional density than the van flank --- a structural
+field property that only appears once the field, not the position, is the
+object.
+
+\subsection{Lateral reposition cost}
+A finer $d_\perp \in \{0,\ldots,10\}$ sweep reveals the cost's structure:
+$C_{\text{reposition}}$ starts at $+2.9$ for $d_\perp \approx 0$ (where
+the fire is most concentrated), decays to $+0.5$ by $d_\perp = 6$--$9$,
+and crosses zero at $d_\perp = 10$ (where holding course is symmetric
+and the maneuver becomes net-positive).  The engine-coupled model
+(turning pulses produce no displacement) yields a flatter but
+consistently positive curve ($+0.55$ to $+0.69$ within range).
+The nonholonomic tax is a real, range-dependent levy on turning, and
+it is precisely the cost that the commitment comparative statics of
+Section~\ref{sec:commitment-section} price in; the representative curve
+is given in the supplement.
+
+
+
+
+
+\section{Open-Loop Commitment}\label{sec:commitment-section}
+
+\subsection{The library-based commitment result}\label{sec:commitment}
+
+In the committed (open-loop) game both sides seal heading plans of horizon
+$H$.  Define $P_H=V_H-V_1$ (the value of committing for $H$ turns relative
+to one-turn commitments).  In the symmetric base cell $P_H\approx0$ at
+every $H$ --- the degeneracy again.  Across the asymmetric grid
+($\etav\in[0.8,1.33]\times\etar\in\{0.75,1.33\}$), however,
+$|P_6|>0.05$ in $78\%$ of cells, and the \emph{sign of $P_6$ equals the
+sign of the range advantage}: with $\etar=0.75$ (out-ranged), longer
+commitments cost $0.8$--$1.4$ value points (the out-ranged side wants the
+freedom to refuse each turn); with $\etar=1.33$ (longer-ranged), they earn
+$+0.8$--$+1.3$ (commitment forces the engagement to persist inside the
+favorable envelope).  Commitment horizon is a multiplier on the range
+advantage --- choosing it is itself a strategic act.
+
+\noindent\emph{Formation-level re-tests.}  The library-based result rests on
+a finite hand-built plan library whose plan identity does not converge
+(Section~\ref{sec:negative}), so we re-test the comparative static twice at
+the formation level: first with an enhanced continuous-control Double
+Oracle whose best responses are multi-start trajectory optimisations on
+$K$-segment turn schedules ($K\in\{3,4,6\}$), which removes the library
+artifact but whose bounds remain oracle-dependent; then, decisively, with
+an \emph{exact} enumeration over a frozen discretized action space that
+yields genuine lower and upper equilibrium bounds.  The pre-specified
+classification rule is: CORE-STRONG if the sign is certified in $\ge15/18$
+asymmetric cells with no certified reversal and stable under
+action-grid refinement; CORE-CONDITIONAL for $10$--$14$ or
+geometry-dependent effects; REMOVE-CORE on certified reversals.  Both
+outcomes are reported in Section~\ref{sec:commitment-result}.
+
+\subsection{Certification of the commitment comparative statics}\label{sec:commitment-result}
+
+\noindent\textbf{Why exact, and why discrete.}  A restricted-game value is
+not a valid bound on the full game: restricting the maximiser lowers the
+value and restricting the minimiser raises it, so with both sides
+restricted the restricted value carries no one-sided meaning.  We therefore
+certify the sign \emph{exactly within a pre-specified discretized
+open-loop game} and test its stability under action-grid refinement ---
+not as an exact statement about the continuous game.  The action grids are
+frozen before any run: normalised turn rates
+$\mathcal A_5=\{-1,-\tfrac12,0,\tfrac12,1\}$ and
+$\mathcal A_7=\{-1,-\tfrac23,-\tfrac13,0,\tfrac13,\tfrac23,1\}$, mapped to
+$\omega = a\,\bar\omega$ with $\bar\omega=60^\circ$ per turn (the engine's
+turn granularity).  At $H=6$ a pure strategy is a full turn-rate sequence,
+so $|\Omega_5|=5^6=15\,625$ and $|\Omega_7|=7^6=117\,649$.
+
+\noindent\textbf{Valid bounds.}  With Blue the maximiser, write $x_R$,
+$y_R$ for the equilibrium mixtures of the current restricted game and let
+$\Omega_m$ be the \emph{complete} finite strategy space.  Then
+\[
+\underline{V}=\min_{\tau_R\in\Omega_m}\mathbb E_{\tau_B\sim x_R}J,
+\qquad
+\overline{V}=\max_{\tau_B\in\Omega_m}\mathbb E_{\tau_R\sim y_R}J,
+\qquad
+\underline{V}\le V^\star_m\le\overline{V},
+\]
+because $x_R$ (resp.\ $y_R$) is a legitimate full-game strategy.  Both
+extrema are computed by \emph{exhaustive} enumeration of $\Omega_m$
+(no sampling, no surrogate search) against the \emph{complete} restricted
+mixture --- no truncation, top-$k$ pruning, or renormalisation is used
+anywhere in the certification path.  A Double Oracle loop adds the exact
+argmin/argmax sequences until
+$(\overline{V}-\underline{V})/\max(1,|V_R|)<5\%$, or reports the residual
+width.  Because $H=1$ admits a complete $|\mathcal A_m|\times|\mathcal
+A_m|$ payoff matrix, its value is solved exactly and
+$\underline{V}_1=\overline{V}_1=V_1^\star$ to LP tolerance (verified for
+every cell); the commitment interval is then
+\begin{equation}
+P_6 \;\in\; [\,\underline{V}_6-\overline{V}_1,\;
+\overline{V}_6-\underline{V}_1\,],
+\label{eq:cert}
+\end{equation}
+positive-certified when $\underline{V}_6-\overline{V}_1>0$,
+negative-certified when $\overline{V}_6-\underline{V}_1<0$, and
+UNCERTIFIED otherwise.
+
+\noindent\textbf{Result.}  On Grid-5 the sign is certified in
+$\mathbf{18/18}$ asymmetric cells with \textbf{zero certified reversals},
+and $12$ of the $18$ intervals reach the tight gate
+$(\overline V-\underline V)/\max(1,|V_R|)<5\%$; the remaining six are
+sign-certified with loosely bounded magnitude (Figure~\ref{fig:commitment},
+Table~\ref{tab:cert}).  Every geometry contributes
+both directions ($3$ positive and $3$ negative certified cells each).  The
+magnitudes order as the mechanism predicts: the out-ranged side
+($\etar=0.8$) loses value by committing longer, with certified intervals
+between $[-10.8,-10.2]$ and $[-5.7,-5.4]$, while the longer-ranged side
+($\etar=1.2$) gains, with intervals between $[+5.0,+5.2]$ and
+$[+8.7,+9.3]$.
+
+\noindent\textbf{Grid refinement.}  Repeating the certification on
+Grid-7 ($117\,649$ strategies) reproduces the sign in all $18$ asymmetric
+cells: sign agreement across grids is $18/18$ with no certified reversal,
+and the interval midpoints shift only modestly (e.g.\ $-10.4\to-11.1$,
+$+10.2\to+10.2$).  Grid-5 and Grid-7 therefore agree on the comparative
+static, and within each grid the double-oracle loop converges with exact
+best responses rather than surrogate search.
+
+\noindent\textbf{Symmetric controls.}  At $\etar=\etav=1$ the exact bounds
+collapse to zero at machine precision in the head-on and crossing
+configurations ($\underline V=\overline V=-0.008$ and $-0.000$
+respectively), reproducing the degeneracy of Proposition~\ref{prop:deg} in
+the discretized game.  The parallel configuration is \emph{not}
+exchange-symmetric --- both columns extend astern on the same course, so
+the player-exchange map does not return the configuration to itself --- and
+consequently no zero prediction applies there; its certified interval is
+$[+0.06,+1.29]$.  We report this rather than treating the third sanity cell
+as a failure of the degeneracy.
+
+\noindent\textbf{Relation to the continuous-control study.}  The
+enhanced-oracle continuous experiment of the previous section produced
+point estimates with the same sign in every asymmetric cell.  The exact
+discrete computation agrees with those signs in $18/18$ cells, so the
+continuous study is best read as a robustness experiment: it motivated the
+pattern, and the exact finite-game bounds certify it.  Its values are not
+bounds and are not used as such anywhere.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\textwidth]{figures/fig4_commitment_certification.pdf}
+\caption{Exact finite-game certification of the value of a six-turn
+commitment.  Each tile is one $(\etav,\etar)$ cell and the printed number is
+the midpoint of the certified interval
+$[\underline V_6-\overline V_1,\ \overline V_6-\underline V_1]$.
+Certification is encoded separately from magnitude: solid blue (red) borders
+are exact sign-certified positive (negative), grey hatching marks an interval
+crossing zero, a black cross marks a Grid-5/Grid-7 sign disagreement, and a
+small open circle marks a Grid-7 cell not run.}
+\label{fig:commitment}
+\end{figure}
+
+\begin{table}[!htb]
+\centering\small
+\caption{Exact finite-game commitment certification summarised by geometry
+and range direction; the full per-cell table is in the supplement.  Intervals
+are $[\underline V_6-\overline V_1,\ \overline V_6-\underline V_1]$, and a cell
+is \emph{tight} when $(\overline V-\underline V)/\max(1,|V_R|)<5\%$.}
+\label{tab:cert}
+\begin{tabular}{lcccc}
+\toprule
+Geometry & certified $+$ & certified $-$ & uncertified & tight \\
+\midrule
+head-on  & $3$ & $3$ & $0$ & $5/6$ \\
+parallel & $3$ & $3$ & $0$ & $2/6$ \\
+crossing & $3$ & $3$ & $0$ & $5/6$ \\
+\midrule
+total (Grid-5) & $9$ & $9$ & $0$ & $12/18$ \\
+Grid-7 refinement & \multicolumn{3}{c}{$18/18$ signs reproduced, $0$ reversals} & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Classification.}  Under the pre-specified rule ---
+Grid-5 at least $15/18$ sign-certified, no certified reversal, no
+Grid-7 reversal, and both range directions supported in every geometry ---
+the commitment comparative static is classified \textbf{CORE-STRONG}
+\emph{within the discretized formation game}:
+longer commitment is consistently favorable to the range-advantaged side
+and unfavorable to the range-disadvantaged side, and the sign is stable
+under action-grid refinement.
+
+\section{Reachability and Viability}\label{sec:reachability}
+
+\subsection{No guaranteed favorable state in open water}
+With the favorable set $G_\alpha=\{s: L(s)\ge\alpha\}$ defined relative to
+each configuration's cooperative peak ($\alpha=\tau=0.5$), we ask whether
+the committed maximin plan guarantees reachability (worst-case peak
+$\ge\alpha$) or viability (worst-case holding share $\ge\tau$) against
+\emph{all} eleven defender plans, over $144$ cells (three geometries
+$\times$ sixteen speed ratios $\times$ three turn scalings).
+\textbf{No cell admits a guarantee.}  The mechanism is the defender's
+standing \emph{decline-battle option}: in open water a best-responding opponent
+can disengage at will, so the worst-case advantage-retention ratio never
+reaches $\alpha$ and the per-plan retention landscape collapses to a
+median of $0$--$3\%$ of steps.  Per the plan's decision tree we therefore
+pivot from threshold-hunting to the viability landscape (reported as
+per-plan quantiles in the repository).  This negative result sharpens the
+commitment finding: positional guarantees are purchasable only through
+range/firepower asymmetry (which shifts $L$ itself) or through the
+opponent's own commitments.
+
+\section{Delayed Threats and Response-Space Contraction}
+\label{sec:threat}
+
+\subsection{The delayed threat state}
+Torpedoes extend the state to $z=(s,q)$.  Each launched weapon carries its
+analytic $(\text{hex},\text{impulse})$ timeline --- verified cell-by-cell
+against a real engine adjudication --- so the hazard
+$H(x,t;q)$ genuinely depends on time: the same hex is threatened at one
+impulse and safe at another quantified in Figure~\ref{fig:delayed}(a,b).
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\textwidth]{figures/fig5_delayed_threat.pdf}
+\caption{The delayed threat is stateful and time-dependent.  (a)~Share of the field's threat mass acting in turns \emph{after} the launch turn, per tested engagement cell.  (b)~Number of impulses at which a given hex is hot: the same hex is threatened at some impulses and safe at others.  (c)~Thickness sweep under \emph{unmatched} lethality: contraction rises over the tested range (points: mean; bars: interquartile range).  (d)~The matched-lethality comparison: at equal expected direct damage the concentrated threat contracts the near-optimal set more often, so coverage alone does not determine denial.}
+\label{fig:delayed}
+\end{figure}
+
+\subsection{Response-set contraction}
+Let $\mathcal B_\epsilon=\{\tau: J(\tau)\ge J^\ast-\epsilon\}$ be the
+$\epsilon$-near-optimal response set over the target's $340$--$600$ legal
+plans, and
+$C_{\text{resp}}=1-|\mathcal B_\epsilon^{H}|/|\mathcal B_\epsilon|$
+its contraction under the threat.  The response-set experiment measures $C_{\text{resp}}$ over the defender's
+complete plan space ($340$--$600$ plans) as a function of threat
+thickness $k$.  At the $5\%$ response-set threshold, the mean
+contraction increases with thickness across the tested range: $C_{\text{resp}} =
+0.20 \to 0.31$ from $k=1$ to $k=6$, with individual cells reaching
+full contraction ($C_{\text{resp}} = 1.0$) when the threat saturates
+the top tier.  In the low-hit regime (k=1), the contraction is exactly
+zero in $7$ of $8$ cells --- reproducing the structural finding of the
+low-hit regime --- while
+thicker salvoes progressively remove tied top-tier routes.  The single
+exception (a close-range pair with a two-plan top tier) has the entire top tier
+covered by one track, yielding $C_{\text{resp}} = 0.173$ even at
+$k=1$: \emph{the mechanism prediction (coverage of the top tier
+determines contraction) is confirmed in 8/8 cells}.  The threat-field
+experiment confirms the spatiotemporal hazard's time dependence: hot
+hexes are dangerous on only $6$--$11\%$ of pulses (mean $8.4\%$),
+and $40.8$--$42.5\%$ of the threat mass lies in future turns ---
+impossible for an instantaneous weapon, establishing the
+delayed-persistence property that distinguishes torpedoes from
+gunfire.  Same-hex time dependence is concrete: hex W18 has
+$H=1.000$ at impulse 3 but $H=0.000$ at impulse 0.
+
+\subsection{Matched-lethality thickness experiment}
+The matched-lethality experiment --- thin concentrated versus
+thick dispersed at equal expected direct damage --- returns an honest
+negative with mechanism: at the $5\%$ threshold, thin concentrated
+dominates in $21/28$ matched pairs (the engine's coarse hit table
+places dispersed-track probabilities below the per-plan contraction
+threshold), while at the $10\%$ threshold dispersed wins $10/0$ on
+edge plans.  The result refutes a purely coverage-driven account at the engine's
+granularity: coverage and per-plan lethality interact with the
+value-landscape tier structure, and neither alone determines
+contraction.  A richer threat model
+(continuous damage, finer-grained tiers) is required for a definitive
+test.  In the $\varepsilon=20\%$ regime, neither pattern produces
+contraction (all $C_{\text{resp}}=0$), confirming that the tier
+gap --- not the threat pattern --- is the binding constraint at wide
+response thresholds.
+
+\section{Naval Combat Instantiation}\label{sec:naval}
+
+The general model is instantiated as WWII surface combat: hex-grid motion
+with three-pulse turns, directional gun mounts with bow/starboard/stern/port
+arcs, D66 hit adjudication with range/target-speed/longitudinal modifiers,
+armor penetration, and impulse-resolved torpedo tracks.  The instantiation
+is complete (all adjudication tables structured) and auditable (every die
+roll logged with its rule reference).
+
+\subsection{Kernel calibration}\label{sec:kernel}
+The kernel $K$ of Eq.~\eqref{eq:J} is calibrated against the engine's exact
+expected-hit response (inversion + interval-censored least squares over a
+$24\times6\times6\times6$ grid per ship pair).  Pooled held-out Spearman
+$\rho=0.9912$ (nMAE $5.7\%$; gate $\ge0.90$/$\le15\%$); per-class
+$\rho\ge0.9907$.  Controls: an isotropic kernel drops pooled $\rho$ to
+$0.952$ (removing directionality reduces held-out Spearman rank
+correlation from $0.991$ to $0.952$);
+modifier curves transfer across ship pairs at $\rho=0.982$--$0.992$;
+per-class bootstrap CIs are $\pm0.002$.
+
+\subsection{Prior engine validation}
+A $60$-seed-per-cell paired validation of the translation layer (SYN
+duel) showed large significant advantages over a non-maneuvering baseline
+and parity with doctrine commanders except head-on against the
+line-ahead specialist; a $20$-seed historical-scenario check (Cape
+Esperance, Japanese side) reproduced the pattern ($+12.2$ [$+6.5,+17.9$]
+vs straight).
+
+\section{External Engine Case Study}\label{sec:validation}
+
+The translation layer (receding-horizon, three-turn commitment) converts
+model policies into legal engine orders.  We validate on the near-symmetric
+cruiser duel under three initial geometries, $100$ paired seeds per cell:
+
+\begin{table}[!htb]
+\centering\small
+\caption{Cross-policy engine comparison.  Engine paired damage differentials
+(positive favors the geometry policy) against model predictions (best
+fixed plan's payoff vs straight sailing).}
+\label{tab:b13}
+\begin{tabular}{lccccc}
+\toprule
+Geometry & engine diff & $95\%$ CI & pos.\ pairs & model best plan & model class \\
+\midrule
+parallel & $+7.59$ & $[+6.54,+8.66]$ & $92\%$ & $+5.28$ & advantage \\
+crossing & $+8.64$ & $[+7.57,+9.71]$ & $94\%$ & $+5.91$ & advantage \\
+head-on & $+5.14$ & $[+4.00,+6.24]$ & $79\%$ & $0.00$ & neutral \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Rank ordering (crossing $>$ parallel $>$ head-on) is preserved across the
+three reported geometries at $100$ paired seeds ($\rho=1.00$), while strict
+sign agreement holds in two of the three.  The one apparent discrepancy is itself
+informative: in head-on geometry the model's best \emph{fixed} plan
+achieves $0.0$ (the degeneracy prediction --- no committed plan guarantees
+an advantage in symmetric head-on), while the engine's receding-horizon
+policy achieves $+5.14$.  This $+5.14$ gap is a \emph{cross-policy
+comparison} (policy-class gap), \emph{not} a feedback premium: the two
+sides differ in model class and action set as well as in replanning, so
+the comparison cannot isolate the value of replanning.  A matched
+same-model measurement (identical model, objective, horizon, and action
+parameterisation; the only difference is replanning) is reported in
+Section~\ref{sec:matched}.
+Strict sign agreement $2/3$ ($67\%$; head-on model correctly predicts
+degenerate $0.0$ but the engine's receding-horizon policy exceeds it);
+lower-bound sign agreement $3/3$ ($100\%$); rank correlation $\rho=1.00$;
+regime agreement $67\%$.  Overall: \textbf{PARTIAL} (per-cell detail in
+the supplement).
+
+\subsection{Matched external validity test}\label{sec:matched}
+
+The cross-policy comparison of Table~\ref{tab:b13} pits the geometry
+policy against \emph{doctrine} baselines --- a comparison in which model
+class and action set vary together with decision structure.  This section removes the confound: a matched
+$2\times2$ design in which both sides run the \emph{same} policy class
+(same model, same objective, same horizon, same action parameterisation)
+and the only manipulated variable is replanning versus commitment
+protocol).  Scenarios are $3$-vessel line-ahead \emph{formations}
+(matched class on both sides), so paired damage differentials isolate
+decision structure, not force composition.  Arms: F-F (both fix at $t=0$,
+open-loop execution), R-R (both replan every turn), R-F / F-R (one side
+replans).  The pre-specified gates are sign agreement $\ge80\%$, Spearman
+$\rho\ge0.60$ (surrogate formation-game value vs engine margin across the
+$12$ cells), and pairwise ordering $\ge75\%$; the true feedback premium is
+$\Delta_{FB}=J_{\text{receding}}-J_{\text{fixed}}$ measured within this
+matched family.
+
+$4{,}800$ games ($12$ cells $\times$ $4$ arms $\times$ $100$ paired CRN
+seeds; zero aborted games) yield a \textbf{FAIL} on the pre-specified
+gates: sign agreement $75\%$ ($3/4$ cells with a signed model prediction;
+gate $\ge80\%$), Spearman $\rho=-0.08$ across the $12$ cells (gate
+$\ge0.60$), pairwise ordering $63\%$ of $38$ pairs (gate $\ge75\%$).
+
+The failure mode is structural and informative.  In the two
+mirror-symmetric geometries (head-on, crossing) the formation surrogate
+predicts \emph{exactly zero} advantage --- the degeneracy --- while the
+hex-quantized engine produces margins of several damage points from
+discretization asymmetries the continuum model cannot see
+(e.g., $+6.3$ $[+5.6,+7.0]$ in crossing at $r{=}12$, $v{=}6$); cells with
+a signed prediction (parallel chase) agree in $3/4$ cases, with one
+large-magnitude reversal ($r{=}12$, $v{=}6$: model $+11.4$, engine
+$-5.5$).  The matched \emph{feedback premium} is unreliable: replanning
+gains a significant advantage in only $5/12$ (axis) and $1/12$ (allies)
+cells --- confirming that the earlier $+5.1$ cross-policy gap must not be
+read as a value of replanning.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.72\textwidth]{figures/fig6_engine_transfer.pdf}
+\caption{Transfer of reduced-model comparative statics to the rules engine:
+model surrogate value vs.\ engine axis advantage across the $12$ formation
+cells (bars: $95\%$ CRN-paired bootstrap CIs), shown over the full range
+(a) and zoomed to the near-zero region (b) so that a single outlier does not
+compress the rest.  Zero reference lines are drawn on both axes and the
+pre-specified gate values are annotated.}
+\label{fig:transfer}
+\end{figure}
+
+Per the pre-specified decision tree, the wargame is therefore positioned
+as an \emph{external case study} rather than a validation claim: the cross-policy
+comparison of Section~\ref{sec:validation} (ordering transfer,
+$\rho=1.00$) stands as a weaker external check, while the matched design
+shows that the reduced model's \emph{point values} --- and its
+exact-zero degeneracy predictions --- do not survive the engine's hex
+discretization.  No engine rule was modified to fit the model.
+
+\section{Robustness and Negative Results}\label{sec:negative}
+
+We report negatives with the same fidelity as positives:
+\begin{itemize}
+\item \emph{Isotropic ablation}: removing directionality drops
+pooled $\rho$ to $0.952$ and triples nMAE --- directionality carries one
+third of the rank information.
+\item \emph{Snapshot objectives}: terminal-snapshot and peak
+objectives reorder plans (Kendall $\tau$ $0.14$--$0.62$) and the peak
+objective degenerates under maximin (no discriminating power in $9/9$
+cells).
+\item \emph{No guaranteed favorable state}: worst-case
+advantage-retention never exceeds $0.07$; median retention $0$--$3\%$.
+In the tested regimes open water voids positional guarantees: the
+decline-battle option remains available at every cell.
+\item \emph{Library non-convergence}: $25\%$ convergence and $18\%$
+plan stability against $80\%$/$85\%$ gates; committed-maneuver values are
+reported as intervals $[V_{21},V_{41}]$.
+\item \emph{Engagement-network specification analysis} (prior work): graph
+shape features add $+0.033$ [$+0.007,+0.056$] beyond totals (strict
+reading, below the $+0.05$ gate); the plan-literal reading that charges
+the directional in-degree to the graph passes ($+0.108$).  Both reported.
+\item \emph{Operating-speed effect vs speed-capability effect}: the
+non-monotone value of speed reported earlier arises under a
+\emph{fixed operating speed} (constant-cruise) semantics and is renamed
+accordingly; capability-monotonicity under nested speed sets is treated
+in Section~\ref{sec:structural}.
+\end{itemize}
+
+\section{Discussion}\label{sec:discussion}
+
+\paragraph{Why doctrine exists, precisely.}  The degeneracy proposition and
+its breaking matrix give a two-line answer: closed-loop, symmetric,
+fully-informed positional play is worthless ( Proposition~1); commitment
+breaks the degeneracy, and interaction-strength asymmetry decides the
+sign.  The result offers one possible interpretation of why precommitted
+manoeuvre rules can matter when actions are sealed before execution; it is
+not an explanation of any historical doctrine's formation.
+
+\paragraph{WWII as a case study.}  The wargame is an interpretable
+validation environment, not a physics model: conclusions target the rule
+system's decision structure, with Bernotti-era doctrine as a qualitative
+anchor.  The specific ship classes (San Francisco, New Orleans, Laffey,
+Helena, Yamato, Iowa) were chosen for calibration diversity (four tonnage
+classes spanning the displacement spectrum) and historical plausibility
+(iron-bottom-sound-era surface combatants); the structural propositions
+(Proposition~\ref{prop:deg} and the commitment findings) are about the
+model class and would hold for any directional-field system with the same
+symmetry structure.
+
+\paragraph{Limitations.}  (i)~The kernel excludes terrain, smoke, and
+formation effects.  (ii)~The plan library is not converged; values are
+intervals.  (iii)~The constant-cruise approximation excludes
+speed-throttle tactics.  (iv)~the direct-hit contrast comes from one
+geometry with zero-variance low-hit expectancy ($1/12$).  (v)~the
+no-guarantee landscape is computed over an $11$-plan defender library.  (vi)~The
+engine is a rules system; historical doctrine is a qualitative anchor.
+(vii)~commitment-certification values are solver-relative ($67\%$ approximate-BR-gap
+convergence; values rise with turn-schedule refinement while signs are
+invariant).  (viii)~The matched engine validation fails point-value
+transfer (hex discretization asymmetries dominate small model-level
+edges), which is why the wargame is an external case-study environment.
+
+\section{Reproducibility}\label{sec:repro}
+Every experiment is a script under \texttt{research/experiments/}
+writing raw CSV/JSON and figures under \texttt{research/results/}, with
+per-experiment reports (hypothesis, design, gates, results, failures,
+decisions).  \texttt{python reproduce\_paper.py} regenerates the main
+figures, the certification and transfer summaries, and the final PDF;
+\texttt{--full} additionally re-runs the two core solvers.  Frozen engine commit \texttt{fc77a65}; seeds and paired
+common random numbers throughout; definitions audited in
+\texttt{research/audit\_v4/}.
+
+\section{Conclusion}\label{sec:conclusion}
+
+For formation adversaries interacting through a directional field under
+nonholonomic motion, the object of optimisation is the path integral of net
+exposure, not a position.  We proved and measured three structural facts.
+The closed loop is exactly degenerate while interaction strengths remain
+symmetric --- a skew-symmetric successor structure collapses the value onto
+the instantaneous payoff --- and the collapse is an
+\emph{interaction-symmetry} phenomenon, untouched by kinematic asymmetry;
+speed \emph{capability} is monotone by nesting while fixed operating speed is
+not.  Commitment is the complement.  Within a pre-specified discretized
+open-loop game --- frozen action grids, exhaustive full-space best
+responses against the complete equilibrium mixtures, so that the reported
+lower and upper values are genuine equilibrium bounds --- the sign of the
+value of committing six turns is certified in all $18$ tested asymmetric
+cells, with no certified reversal, both range directions supported in every
+geometry, and the sign unchanged when the action grid is refined from
+$5^6$ to $7^6$ strategies.  The result is a sign result inside the
+discretized game: the intervals are tight in $12$ of $18$ cells and loosely
+bounded in the rest, and we report which is which.  Delayed weapons act not
+as added path cost but as a stateful spacetime field that contracts the
+near-optimal response set, with the mechanism depending on coverage, local
+intensity, and the response landscape jointly rather than on any single
+variable.  Finally, a matched external test in an auditable rules engine
+isolates decision structure and shows that transfer of the reduced model's
+point values is partial and non-monotonic --- the boundary of the reduced
+model, reported as an honest negative rather than smoothed into a validation
+claim.  The durable contributions are the formulation, the structural
+results with their boundary conditions, and the audited experimental
+pipeline that makes both the positives and the negatives reproducible.
+
+\bibliographystyle{unsrtnat}
+\begin{thebibliography}{25}
+
+\bibitem{isaacs1965}
+R.~Isaacs, \emph{Differential Games}, Wiley, New York, 1965.
+
+\bibitem{basar1999}
+T.~Ba{\c s}ar and G.~J. Olsder, \emph{Dynamic Noncooperative Game
+Theory}, 2nd ed., SIAM, Philadelphia, 1999.
+
+\bibitem{aubin1991}
+J.-P. Aubin, \emph{Viability Theory}, Birkh\"auser, Boston, 1991.
+
+\bibitem{mitchell2005}
+I.~M. Mitchell, A.~M. Bayen, and C.~J. Tomlin, ``A time-dependent
+Hamilton--Jacobi formulation of reachable sets for continuous dynamic
+games,'' \emph{IEEE Transactions on Automatic Control}, vol.~50, no.~7,
+pp.~947--957, 2005.
+
+\bibitem{schelling1960}
+T.~C. Schelling, \emph{The Strategy of Conflict}, Harvard University
+Press, Cambridge, MA, 1960.
+
+\bibitem{mayne2000}
+D.~Q. Mayne, J.~B. Rawlings, C.~V. Rao, and P.~O.~M. Scokaert,
+``Constrained model predictive control: Stability and optimality,''
+\emph{Automatica}, vol.~36, no.~6, pp.~789--814, 2000.
+
+\bibitem{mcmahan2003}
+H.~B. McMahan, G.~J. Gordon, and A.~Blum, ``Planning in the presence of
+cost functions controlled by an adversary,'' \emph{Proceedings of the
+20th International Conference on Machine Learning (ICML)}, 2003.
+
+\bibitem{orda1990}
+A.~Orda and R.~Rom, ``Shortest-path and minimum-delay algorithms in
+networks with time-dependent edge-length,'' \emph{Journal of the ACM},
+vol.~37, no.~3, pp.~607--625, 1990.
+
+\bibitem{israeli2002}
+E.~Israeli and A.~Wood, ``Shortest-path network interdiction,''
+\emph{Networks}, vol.~40, no.~2, pp.~97--111, 2002.
+
+\bibitem{bernotti1911}
+R.~Bernotti, ``The fundamentals of naval tactics,'' \emph{U.S. Naval
+Institute Proceedings}, vol.~37, 1911.
+
+\bibitem{bernotti1912}
+R.~Bernotti, ``The fundamentals of naval tactics (continued),'' \emph{U.S.
+Naval Institute Proceedings}, vol.~38, 1912.
+
+\bibitem{taylor1974}
+J.~G. Taylor, ``Lanchester-type models of warfare and optimal control,''
+\emph{Naval Research Logistics Quarterly}, vol.~21, no.~1, pp.~79--106,
+1974.
+
+\bibitem{protopopescu1989}
+V.~Protopopescu, R.~T. Santoro, and J.~Dockery, ``Combat modeling with
+partial differential equations,'' \emph{European Journal of Operational
+Research}, vol.~38, no.~2, pp.~178--183, 1989.
+
+\bibitem{gonzalez2011}
+E.~Gonz{\'a}lez and M.~Villena, ``Spatial Lanchester models,'' \emph{European
+Journal of Operational Research}, vol.~210, no.~3, pp.~706--715, 2011.
+
+\bibitem{networked2020}
+A.~C. Kalloniatis, K.~Hoek, M.~Zuparic, and M.~Brede, ``Optimising
+structure in a networked Lanchester model for fires and man{\oe}uvre in
+warfare,'' \emph{Journal of the Operational Research Society}, vol.~72,
+no.~8, pp.~1863--1878, 2021.
+
+\bibitem{solis2020}
+C.~U. Solis and J.~B. Clempner, ``Ship differential game approach for
+multiple players: Stackelberg security games,'' \emph{Optimal Control
+Applications and Methods}, vol.~41, no.~1, pp.~312--326, 2020.
+
+\bibitem{weintraub2020}
+I.~E. Weintraub, M.~Pachter, and E.~Garcia, ``An introduction to
+pursuit--evasion differential games,'' in \emph{Proc. American Control
+Conference (ACC)}, pp.~1049--1066, 2020.
+
+\bibitem{cubic1993}
+E.~A. Galperin, ``The cubic algorithm for global games with application to
+pursuit-evasion games,'' \emph{Computers \& Mathematics with Applications},
+vol.~26, no.~6, pp.~13--31, 1993.
+
+\bibitem{bansal2021}
+S.~Bansal and C.~J. Tomlin, ``DeepReach: A deep learning approach to
+high-dimensional reachability,'' in \emph{Proc. IEEE ICRA}, pp.~1817--1824,
+2021.
+
+\bibitem{lanctot2017}
+M.~Lanctot et~al., ``A unified game-theoretic approach to multiagent
+reinforcement learning,'' in \emph{Advances in Neural Information
+Processing Systems (NeurIPS)}, 2017.
+
+\bibitem{bighashdel2024}
+A.~Bighashdel, Y.~Wang, S.~McAleer, R.~Savani, and F.~A. Oliehoek,
+``Policy space response oracles: A survey,'' in \emph{Proc. IJCAI},
+pp.~7951--7961, 2024.
+
+\bibitem{wellman2024}
+M.~P. Wellman, K.~Tuyls, and A.~Greenwald, ``Empirical game-theoretic
+analysis: A survey,'' \emph{arXiv:2403.04018}, 2024.
+
+\bibitem{omidshafiei2019}
+S.~Omidshafiei et~al., ``$\alpha$-Rank: Multi-agent evaluation by
+evolution,'' \emph{Scientific Reports}, vol.~9, p.~9937, 2019.
+
+\bibitem{adam2021}
+L.~Adam, R.~Hor{\v{c}}{\'i}k, T.~Kasl, and T.~Kroupa, ``Double oracle
+algorithm for computing equilibria in continuous games,'' in \emph{Proc.
+AAAI}, vol.~35, no.~6, pp.~5070--5077, 2021.
+
+\bibitem{wez2022}
+W.~Wu, J.~Shi, Y.~Wu, Y.~Wang, and Y.~Lyu, ``A multi-UCAV cooperative
+occupation method based on weapon engagement zones for beyond-visual-range
+air combat,'' \emph{Defence Technology}, vol.~18, no.~6, pp.~1006--1022,
+2022.
+
+\end{thebibliography}
+
+\end{document}

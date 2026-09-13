@@ -1,0 +1,25 @@
+{
+  "method": "repository modules actually imported by physical_v14.make_game, supplemented by explicit RUN_FREEZE",
+  "files": {
+    "research/__init__.py": "b092e63b890664ceb2c53ffcbe73bfb84b54c1a8cbbd26fc1041ff04066e305f",
+    "research/experiments/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/geometry/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/geometry/committed_game.py": "c8990468163fee710e13cb7045f750068020fcdfb32e9f5c61a9c8dd4dc67627",
+    "research/formation/path_following.py": "1faa140c3eb3fa417bea3dac54b4ce63d4048047a6150ef2e302456289fe601b",
+    "backend/src/iron_bottom_sound/models.py": "abdaca540f6e4578c4fd3bfb96caa9a6026811e935b55d3e85845072e6b6a27f",
+    "backend/src/iron_bottom_sound/data.py": "6ccff38d5e072c8ff4cce51713ced167e6e9fd30f864c3c441cccbdd96239d41",
+    "backend/src/iron_bottom_sound/scenario_rules.py": "57d8499a38558076d3cbfade6312808d512b5b5f5fb16226c8594921bd64f43d",
+    "backend/src/iron_bottom_sound/engine.py": "0cbcc6bfc7d0f97e0b24fbff8cd372ffcb9beb0c5ba5e5757a9d16a3e38d446b",
+    "backend/src/iron_bottom_sound/__init__.py": "3f1f6b1ec2c71f3a1d1e6b7384bce2e1f0cf2b7779bb22c7e6dd15696568bf5a",
+    "research/geometry/firepower_kernel.py": "85bfc7d1ad55c27dac5226491df40968386a48fe08950f06a05dc3d333bfef17",
+    "research/experiments/must1_formation_do.py": "d6497364c686cfd7f9b73501d92d9a519194bdb81effef86d062488e0317d4b4",
+    "research/experiments/t1_exact_discrete_certification.py": "ebd112249f0058a2654c18447ef4494122b1226c7009298cc428a4d7935145da",
+    "research/formation/matched_horizon.py": "d9f394abd082f392b41ea5194a98a32b72c9b64f9bb43f5017f21fc4c5456f02",
+    "research/formation/commitment_v12.py": "b4645f1abb6afd778687c5f8c40b6dfb5354384305533ccb00bbf7663689583e",
+    "research/formation/exact_v12.py": "bc4893cf4c85ae52e2ffb0189698bb44f15dc974e1453a86fdf1acb661e5cba3",
+    "research/formation/payoff_v13.py": "7ba3ad97900fe9d1af1d3eda6fd8d9346ec97880098d775c77c9c4a149308aa0",
+    "research/formation/sequence_v12.py": "de4aa85c0cb574ea1caa0632f66aae9cd43a4e35f5c6f11f676c69fa99020297",
+    "research/experiments/v13_exact.py": "76913982029ca7236723601ac380d16a23f744275153afcd81eec7f32f43f346",
+    "research/formation/physical_v14.py": "1bb7e8761ec05395d5279368c28618a9e58aee1ba02cc24922e437d3c4c5d248"
+  }
+}

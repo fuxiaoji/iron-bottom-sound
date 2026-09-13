@@ -1,0 +1,5 @@
+{'n': 100, 'max_scalar_batch_error': 8.171241461241152e-14, 'max_swap_error': 3.552713678800501e-15, 'max_prefix_error': 0.0, 'old_max_scalar_batch_error': 18.606688914996376, 'old_failures_1e8': 100, 'pass': True}
+{'old_key_equal': True, 'exact_key_equal': False, 'payoff_difference': 33.12069538284198, 'old_key': (-14.0, 0.0, 0.0, 25.31, 11.31, 180.0, 6)}
+{'geometry': 'head_on', 'V': -6.170933909731097e-16, 'gap': 2.3485696720726423e-10, 'iteration': 144, 'status': 'CONVERGED', 'seconds': 73.80451241699848}
+{'geometry': 'parallel', 'V': 8.433922711888056e-16, 'gap': 2.8265584317566095e-14, 'iteration': 109, 'status': 'CONVERGED', 'seconds': 56.380723000002035}
+{'geometry': 'crossing', 'V': -9.887564093106888e-16, 'gap': 4.535954944984155e-14, 'iteration': 80, 'status': 'CONVERGED', 'seconds': 41.74248195900145}

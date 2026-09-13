@@ -1,0 +1,12 @@
+{
+  "E_CONFIRM": "analysis/confirmatory_interactions.csv",
+  "E_GATE": "analysis/GATE_DATA.json",
+  "E_CAPABILITY": "capability/all_results.json",
+  "E_THEORY": "THEOREM_SCRATCHPAD.md",
+  "E_MECHANISM": "analysis/confirmatory_mechanism.json",
+  "E_AUDIT": "analysis/NUMERICAL_AUDIT.json",
+  "E_TESTS": "REGRESSION_FINAL.log",
+  "E_AMENDMENT": "analysis/AMENDMENT_AUDIT.json",
+  "E_FREEZE": "RERUN_FREEZE.json",
+  "E_FALLBACK": "../../manuscript_q2_frozen/README.md"
+}

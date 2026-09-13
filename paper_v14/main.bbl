@@ -1,0 +1,48 @@
+\begin{thebibliography}{7}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bo{\v s}ansk{\'y} et~al.(2014)Bo{\v s}ansk{\'y}, Kiekintveld, Lis{\'y}, and P{\v e}chou{\v c}ek]{bosansky2014}
+Branislav Bo{\v s}ansk{\'y}, Christopher Kiekintveld, Viliam Lis{\'y}, and Michal P{\v e}chou{\v c}ek.
+\newblock An exact double-oracle algorithm for zero-sum extensive-form games with imperfect information.
+\newblock \emph{Journal of Artificial Intelligence Research}, 51:\penalty0 829--866, 2014.
+\newblock URL \url{https://www.cs.utep.edu/kiekintveld/papers/2014/bklp_double_oracle.pdf}.
+
+\bibitem[Chen and Waggoner(2017)]{chen2017}
+Yiling Chen and Bo~Waggoner.
+\newblock Informational substitutes, 2017.
+\newblock URL \url{https://arxiv.org/abs/1703.08636}.
+\newblock Full version of the FOCS 2016 paper.
+
+\bibitem[Hogeboom-Burr and Y{\"u}ksel(2020)]{hogeboom2020}
+Ian Hogeboom-Burr and Serdar Y{\"u}ksel.
+\newblock Comparison of information structures for zero-sum games and a partial converse to blackwell ordering in standard borel spaces, 2020.
+\newblock URL \url{https://arxiv.org/abs/2005.06673}.
+
+\bibitem[Kroer and Sandholm(2018)]{kroer2018}
+Christian Kroer and Tuomas Sandholm.
+\newblock A unified framework for extensive-form game abstraction with bounds.
+\newblock In \emph{Advances in Neural Information Processing Systems}, volume~31, 2018.
+\newblock URL \url{https://proceedings.neurips.cc/paper/2018/file/aa942ab2bfa6ebda4840e7360ce6e7ef-Paper.pdf}.
+
+\bibitem[McAleer et~al.(2021)McAleer, Lanier, Wang, Baldi, and Fox]{mcaleer2021}
+Stephen McAleer, John Lanier, Kevin Wang, Pierre Baldi, and Roy Fox.
+\newblock {XDO}: A double oracle algorithm for extensive-form games, 2021.
+\newblock URL \url{https://arxiv.org/abs/2103.06426}.
+
+\bibitem[McMahan et~al.(2003)McMahan, Gordon, and Blum]{mcmahan2003}
+H.~Brendan McMahan, Geoffrey~J. Gordon, and Avrim Blum.
+\newblock Planning in the presence of cost functions controlled by an adversary.
+\newblock In \emph{Proceedings of the International Conference on Machine Learning}, 2003.
+\newblock URL \url{https://cdn.aaai.org/ICML/2003/ICML03-071.pdf}.
+
+\bibitem[von Stengel(1996)]{stengel1996}
+Bernhard von Stengel.
+\newblock Efficient computation of behavior strategies.
+\newblock \emph{Games and Economic Behavior}, 14\penalty0 (2):\penalty0 220--246, 1996.
+\newblock \doi{10.1006/game.1996.0050}.
+
+\end{thebibliography}

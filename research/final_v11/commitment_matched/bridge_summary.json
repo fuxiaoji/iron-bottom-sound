@@ -1,0 +1,113 @@
+{
+  "sign_agreement": "6/6",
+  "rows": [
+    {
+      "geometry": "head_on",
+      "eta_r": 0.8,
+      "model": "leader_follower",
+      "C6": -1.1215,
+      "C6_lo": -3.0886,
+      "C6_hi": 0.808,
+      "significant": 0
+    },
+    {
+      "geometry": "head_on",
+      "eta_r": 0.8,
+      "model": "rigid_line_ahead",
+      "C6": -1.1215,
+      "C6_lo": -3.0886,
+      "C6_hi": 0.808,
+      "significant": 0
+    },
+    {
+      "geometry": "head_on",
+      "eta_r": 1.2,
+      "model": "leader_follower",
+      "C6": -1.7921,
+      "C6_lo": -5.0604,
+      "C6_hi": 1.4293,
+      "significant": 0
+    },
+    {
+      "geometry": "head_on",
+      "eta_r": 1.2,
+      "model": "rigid_line_ahead",
+      "C6": -1.7921,
+      "C6_lo": -5.0604,
+      "C6_hi": 1.4293,
+      "significant": 0
+    },
+    {
+      "geometry": "parallel",
+      "eta_r": 0.8,
+      "model": "leader_follower",
+      "C6": 1.7774,
+      "C6_lo": 0.1849,
+      "C6_hi": 3.3181,
+      "significant": 1
+    },
+    {
+      "geometry": "parallel",
+      "eta_r": 0.8,
+      "model": "rigid_line_ahead",
+      "C6": 1.7774,
+      "C6_lo": 0.1849,
+      "C6_hi": 3.3181,
+      "significant": 1
+    },
+    {
+      "geometry": "parallel",
+      "eta_r": 1.2,
+      "model": "leader_follower",
+      "C6": -2.3046,
+      "C6_lo": -4.7793,
+      "C6_hi": 0.1555,
+      "significant": 0
+    },
+    {
+      "geometry": "parallel",
+      "eta_r": 1.2,
+      "model": "rigid_line_ahead",
+      "C6": -2.3046,
+      "C6_lo": -4.7793,
+      "C6_hi": 0.1555,
+      "significant": 0
+    },
+    {
+      "geometry": "crossing",
+      "eta_r": 0.8,
+      "model": "leader_follower",
+      "C6": 4.1758,
+      "C6_lo": 2.1377,
+      "C6_hi": 6.3482,
+      "significant": 1
+    },
+    {
+      "geometry": "crossing",
+      "eta_r": 0.8,
+      "model": "rigid_line_ahead",
+      "C6": 4.1758,
+      "C6_lo": 2.1377,
+      "C6_hi": 6.3482,
+      "significant": 1
+    },
+    {
+      "geometry": "crossing",
+      "eta_r": 1.2,
+      "model": "leader_follower",
+      "C6": 6.2011,
+      "C6_lo": 4.3247,
+      "C6_hi": 7.967,
+      "significant": 1
+    },
+    {
+      "geometry": "crossing",
+      "eta_r": 1.2,
+      "model": "rigid_line_ahead",
+      "C6": 6.2011,
+      "C6_lo": 4.3247,
+      "C6_hi": 7.967,
+      "significant": 1
+    }
+  ]
+}

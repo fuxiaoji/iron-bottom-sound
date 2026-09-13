@@ -1,0 +1,13 @@
+legacy_id,legacy_claim,v4_semantics_audit,action,v4_home
+E00,引擎审计 PASS（确定性/零泄漏/零变异）,无语义问题,KEEP,v4 §8 + Gate F
+E01,火力核 ρ=0.9912/nMAE 0.0571（四舰种，留出30%）,瞬时 expected firepower 语义正确,KEEP,v4 §7 Table 2 + B1 补 mount-damage
+E01b,各向同性 0.952；跨舰对迁移 0.982-0.992,robustness 语义,KEEP,v4 §9 Negative/Robustness
+E02-闭环,简并命题 V≡L（机器精度，两网格）,前提 A1-A7 成立；纯策略现象=经验事实,KEEP,v4 §3.3 + B3.3 假设破坏
+E02-开环,承诺机动相图 54 格；swap 误差 0.0,路径积分语义成立；速度语义=operating,KEEP,v4 §5 + B8/B9 收敛与重分类
+E02-速度,速度悖论（等射程快者更差）,FIXED OPERATING SPEED 语义,RENAME,v4 B4.2 operating-speed effect；B4.1 另测 capability
+E04-主,低命中剥夺恒 0（阶梯机制）；直击 0.92 显著,时空语义正确；V_direct 为 pre-response 变体,KEEP,v4 §6 + B10 补 post-response 变体
+E04-min,决策级交叉验证,部分时空（粗），仅旁证,KEEP(附录),v4 附录
+E04c,剥夺随齐射厚度单调凸增 2.0→5.0,同上,KEEP,v4 §6
+E05,交战图规范敏感（+0.108/+0.033 双口径）,非 v4 主线核心；robustness/阴性素材,KEEP(降级),v4 §9
+E06,翻译层 vs straight 全显著；vs doctrine 持平,60 seeds 配对,KEEP,v4 §8（B13 按 100 seeds 门限扩展）
+E07,历史想定 vs straight +12.2 显著,20 seeds 定性,KEEP,v4 §8

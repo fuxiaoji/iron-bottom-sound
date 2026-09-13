@@ -1,0 +1,485 @@
+{
+  "geometry": "head_on",
+  "four_values": {
+    "low": {
+      "blue": {
+        "config": {
+          "geometry": "head_on",
+          "T": 4,
+          "speed_menu_B": [
+            0.75,
+            1.0
+          ],
+          "speed_menu_R": [
+            1.0
+          ],
+          "initial_history_speed_ratio": 1.0,
+          "range_ratio": 1.0,
+          "turn_bound_deg": 60.0,
+          "formation": "leader_follower",
+          "protocol_sha256": "f1c5fe560a7ff625c476c1cd5ad561bc25a76470a9262fa5887a6e8a53918af6",
+          "core_sha256": "7e040ebe2aa8dddf731a9cfad36ee0810ae6c7e00c97917e0301d8a301d0264b",
+          "scope": "limited-horizon genuine nested per-turn speed capability"
+        },
+        "values": {
+          "FF": {
+            "V": 3.851572759169193,
+            "LB": 3.851572759107597,
+            "UB": 3.8515727592307885,
+            "numeric_error_budget": 6.159583954001846e-11,
+            "T": 4,
+            "trace": [
+              {
+                "t": 3,
+                "nodes": 5832,
+                "mixed_lp_nodes": 494,
+                "max_gap": 6.156497533993388e-11
+              },
+              {
+                "t": 2,
+                "nodes": 324,
+                "mixed_lp_nodes": 57,
+                "max_gap": 2.708944180085382e-14
+              },
+              {
+                "t": 1,
+                "nodes": 18,
+                "mixed_lp_nodes": 8,
+                "max_gap": 1.1102230246251565e-15
+              },
+              {
+                "t": 0,
+                "nodes": 1,
+                "mixed_lp_nodes": 1,
+                "max_gap": 2.6645352591003757e-15
+              }
+            ],
+            "algorithm": "complete rectangular backward induction",
+            "seconds": 0.791820764541626
+          },
+          "CC": {
+            "V": 1.1682721575517903,
+            "LB": 1.1682721575517307,
+            "UB": 1.1682721575517947,
+            "gap": 6.394884621840902e-14,
+            "algorithm": "complete matrix LP",
+            "seconds": 0.08822798728942871
+          },
+          "FC": {
+            "V": 6.952513488889494,
+            "LB": 6.952513488889494,
+            "UB": 6.952513488889493,
+            "gap": 0.0,
+            "flow_inequality_residual": 8.881784197001252e-16,
+            "base_B": 6,
+            "base_R": 3,
+            "T": 4,
+            "structure": "FC",
+            "sequences_B": 37051,
+            "sequences_R": 82,
+            "infosets_B": 6175,
+            "infosets_R": 1,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 0.8933308124542236
+          },
+          "CF": {
+            "V": -2.5336780933174183,
+            "LB": -2.533678093317419,
+            "UB": -2.533678093317419,
+            "gap": 0.0,
+            "flow_inequality_residual": 1.1102230246251565e-15,
+            "base_B": 6,
+            "base_R": 3,
+            "T": 4,
+            "structure": "CF",
+            "sequences_B": 1297,
+            "sequences_R": 18526,
+            "infosets_B": 1,
+            "infosets_R": 6175,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 0.7629811763763428
+          }
+        },
+        "complete": true,
+        "conditional_flexibility": {
+          "F": {
+            "F": 6.385250852486611,
+            "LB": 6.385250852425016,
+            "UB": 6.385250852548207
+          },
+          "C": {
+            "F": 5.784241331337704,
+            "LB": 5.784241331337699,
+            "UB": 5.784241331337762
+          }
+        }
+      },
+      "red": {
+        "config": {
+          "geometry": "head_on",
+          "T": 4,
+          "speed_menu_B": [
+            1.0
+          ],
+          "speed_menu_R": [
+            0.75,
+            1.0
+          ],
+          "initial_history_speed_ratio": 1.0,
+          "range_ratio": 1.0,
+          "turn_bound_deg": 60.0,
+          "formation": "leader_follower",
+          "protocol_sha256": "f1c5fe560a7ff625c476c1cd5ad561bc25a76470a9262fa5887a6e8a53918af6",
+          "core_sha256": "7e040ebe2aa8dddf731a9cfad36ee0810ae6c7e00c97917e0301d8a301d0264b",
+          "scope": "limited-horizon genuine nested per-turn speed capability"
+        },
+        "values": {
+          "FF": {
+            "V": -3.851572759169191,
+            "LB": -3.8515727592446956,
+            "UB": -3.8515727590936866,
+            "numeric_error_budget": 7.55044915479175e-11,
+            "T": 4,
+            "trace": [
+              {
+                "t": 3,
+                "nodes": 5832,
+                "mixed_lp_nodes": 494,
+                "max_gap": 7.549250113925154e-11
+              },
+              {
+                "t": 2,
+                "nodes": 324,
+                "mixed_lp_nodes": 57,
+                "max_gap": 7.549516567451064e-15
+              },
+              {
+                "t": 1,
+                "nodes": 18,
+                "mixed_lp_nodes": 8,
+                "max_gap": 1.3322676295501878e-15
+              },
+              {
+                "t": 0,
+                "nodes": 1,
+                "mixed_lp_nodes": 1,
+                "max_gap": 3.1086244689504383e-15
+              }
+            ],
+            "algorithm": "complete rectangular backward induction",
+            "seconds": 0.794395923614502
+          },
+          "CC": {
+            "V": -1.1682721575517911,
+            "LB": -1.1682721575517956,
+            "UB": -1.1682721575515918,
+            "gap": 2.0383694732117874e-13,
+            "algorithm": "complete matrix LP",
+            "seconds": 0.08989620208740234
+          },
+          "FC": {
+            "V": 2.533678093317418,
+            "LB": 2.5336780933174183,
+            "UB": 2.533678093317418,
+            "gap": 0.0,
+            "flow_inequality_residual": 5.329070518200751e-15,
+            "base_B": 3,
+            "base_R": 6,
+            "T": 4,
+            "structure": "FC",
+            "sequences_B": 18526,
+            "sequences_R": 1297,
+            "infosets_B": 6175,
+            "infosets_R": 1,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 0.6093559265136719
+          },
+          "CF": {
+            "V": -6.952513488889491,
+            "LB": -6.952513488889491,
+            "UB": -6.952513488889489,
+            "gap": 2.6645352591003757e-15,
+            "flow_inequality_residual": 1.3553218922235737e-14,
+            "base_B": 3,
+            "base_R": 6,
+            "T": 4,
+            "structure": "CF",
+            "sequences_B": 82,
+            "sequences_R": 37051,
+            "infosets_B": 1,
+            "infosets_R": 6175,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 2.7503790855407715
+          }
+        },
+        "complete": true,
+        "conditional_flexibility": {
+          "F": {
+            "F": 6.3852508524866085,
+            "LB": 6.3852508524111045,
+            "UB": 6.385250852562113
+          },
+          "C": {
+            "F": 5.7842413313377,
+            "LB": 5.784241331337693,
+            "UB": 5.784241331337899
+          }
+        }
+      },
+      "mirror_payoff_error": 7.460698725481052e-14
+    },
+    "high": {
+      "blue": {
+        "config": {
+          "geometry": "head_on",
+          "T": 4,
+          "speed_menu_B": [
+            0.75,
+            1.0,
+            1.3
+          ],
+          "speed_menu_R": [
+            1.0
+          ],
+          "initial_history_speed_ratio": 1.0,
+          "range_ratio": 1.0,
+          "turn_bound_deg": 60.0,
+          "formation": "leader_follower",
+          "protocol_sha256": "f1c5fe560a7ff625c476c1cd5ad561bc25a76470a9262fa5887a6e8a53918af6",
+          "core_sha256": "7e040ebe2aa8dddf731a9cfad36ee0810ae6c7e00c97917e0301d8a301d0264b",
+          "scope": "limited-horizon genuine nested per-turn speed capability"
+        },
+        "values": {
+          "FF": {
+            "V": 5.656331213744325,
+            "LB": 5.656331213738657,
+            "UB": 5.6563312137499935,
+            "numeric_error_budget": 5.668354674526199e-12,
+            "T": 4,
+            "trace": [
+              {
+                "t": 3,
+                "nodes": 19683,
+                "mixed_lp_nodes": 1853,
+                "max_gap": 5.650591106132197e-12
+              },
+              {
+                "t": 2,
+                "nodes": 729,
+                "mixed_lp_nodes": 147,
+                "max_gap": 1.509903313490213e-14
+              },
+              {
+                "t": 1,
+                "nodes": 27,
+                "mixed_lp_nodes": 8,
+                "max_gap": 8.881784197001252e-16
+              },
+              {
+                "t": 0,
+                "nodes": 1,
+                "mixed_lp_nodes": 1,
+                "max_gap": 1.7763568394002505e-15
+              }
+            ],
+            "algorithm": "complete rectangular backward induction",
+            "seconds": 2.932699203491211
+          },
+          "CC": {
+            "V": 2.7663674680948143,
+            "LB": 2.7663674680945913,
+            "UB": 2.766367468094848,
+            "gap": 2.566835632933362e-13,
+            "algorithm": "complete matrix LP",
+            "seconds": 0.7759408950805664
+          },
+          "FC": {
+            "V": 8.830412318038462,
+            "LB": 8.830412318038462,
+            "UB": 8.83041231803846,
+            "gap": 0.0,
+            "flow_inequality_residual": 3.552713678800501e-15,
+            "base_B": 9,
+            "base_R": 3,
+            "T": 4,
+            "structure": "FC",
+            "sequences_B": 183961,
+            "sequences_R": 82,
+            "infosets_B": 20440,
+            "infosets_R": 1,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 27.794079065322876
+          },
+          "CF": {
+            "V": -0.19402910801001327,
+            "LB": -0.19402910801001316,
+            "UB": -0.19402910801001302,
+            "gap": 1.3877787807814457e-16,
+            "flow_inequality_residual": 1.1796119636642288e-15,
+            "base_B": 9,
+            "base_R": 3,
+            "T": 4,
+            "structure": "CF",
+            "sequences_B": 6562,
+            "sequences_R": 61321,
+            "infosets_B": 1,
+            "infosets_R": 20440,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 4.218673229217529
+          }
+        },
+        "complete": true,
+        "conditional_flexibility": {
+          "F": {
+            "F": 5.850360321754338,
+            "LB": 5.85036032174867,
+            "UB": 5.850360321760006
+          },
+          "C": {
+            "F": 6.064044849943648,
+            "LB": 6.064044849943614,
+            "UB": 6.064044849943869
+          }
+        }
+      },
+      "red": {
+        "config": {
+          "geometry": "head_on",
+          "T": 4,
+          "speed_menu_B": [
+            1.0
+          ],
+          "speed_menu_R": [
+            0.75,
+            1.0,
+            1.3
+          ],
+          "initial_history_speed_ratio": 1.0,
+          "range_ratio": 1.0,
+          "turn_bound_deg": 60.0,
+          "formation": "leader_follower",
+          "protocol_sha256": "f1c5fe560a7ff625c476c1cd5ad561bc25a76470a9262fa5887a6e8a53918af6",
+          "core_sha256": "7e040ebe2aa8dddf731a9cfad36ee0810ae6c7e00c97917e0301d8a301d0264b",
+          "scope": "limited-horizon genuine nested per-turn speed capability"
+        },
+        "values": {
+          "FF": {
+            "V": -5.656331213744323,
+            "LB": -5.656331213745622,
+            "UB": -5.656331213743025,
+            "numeric_error_budget": 1.298516849601583e-12,
+            "T": 4,
+            "trace": [
+              {
+                "t": 3,
+                "nodes": 19683,
+                "mixed_lp_nodes": 1853,
+                "max_gap": 1.270095140171179e-12
+              },
+              {
+                "t": 2,
+                "nodes": 729,
+                "mixed_lp_nodes": 147,
+                "max_gap": 2.1316282072803006e-14
+              },
+              {
+                "t": 1,
+                "nodes": 27,
+                "mixed_lp_nodes": 8,
+                "max_gap": 1.7763568394002505e-15
+              },
+              {
+                "t": 0,
+                "nodes": 1,
+                "mixed_lp_nodes": 1,
+                "max_gap": 5.329070518200751e-15
+              }
+            ],
+            "algorithm": "complete rectangular backward induction",
+            "seconds": 2.9155220985412598
+          },
+          "CC": {
+            "V": -2.7663674680948165,
+            "LB": -2.766367468094887,
+            "UB": -2.7663674680944776,
+            "gap": 4.0945025148175773e-13,
+            "algorithm": "complete matrix LP",
+            "seconds": 0.7900547981262207
+          },
+          "FC": {
+            "V": 0.1940291080100114,
+            "LB": 0.19402910801001133,
+            "UB": 0.19402910801001144,
+            "gap": 1.1102230246251565e-16,
+            "flow_inequality_residual": 3.58046925441613e-15,
+            "base_B": 3,
+            "base_R": 9,
+            "T": 4,
+            "structure": "FC",
+            "sequences_B": 61321,
+            "sequences_R": 6562,
+            "infosets_B": 20440,
+            "infosets_R": 1,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 3.8876612186431885
+          },
+          "CF": {
+            "V": -8.83041231803846,
+            "LB": -8.830412318038459,
+            "UB": -8.830412318038462,
+            "gap": 0.0,
+            "flow_inequality_residual": 6.087171322555207e-10,
+            "base_B": 3,
+            "base_R": 9,
+            "T": 4,
+            "structure": "CF",
+            "sequences_B": 82,
+            "sequences_R": 183961,
+            "infosets_B": 1,
+            "infosets_R": 20440,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 19.35525393486023
+          }
+        },
+        "complete": true,
+        "conditional_flexibility": {
+          "F": {
+            "F": 5.8503603217543345,
+            "LB": 5.850360321753036,
+            "UB": 5.850360321755633
+          },
+          "C": {
+            "F": 6.0640448499436435,
+            "LB": 6.064044849943575,
+            "UB": 6.064044849943981
+          }
+        }
+      },
+      "mirror_payoff_error": 1.1368683772161603e-13
+    }
+  },
+  "interactions": [
+    {
+      "geometry": "head_on",
+      "opponent_policy": "F",
+      "M": -0.5348905307322731,
+      "LB": -0.5348905307995375,
+      "UB": -0.5348905306650096,
+      "F_low": 6.385250852486611,
+      "F_high": 5.850360321754338,
+      "T": 4,
+      "nested_payoff_error": 0.0
+    },
+    {
+      "geometry": "head_on",
+      "opponent_policy": "C",
+      "M": 0.2798035186059442,
+      "LB": 0.27980351860585184,
+      "UB": 0.2798035186061698,
+      "F_low": 5.784241331337704,
+      "F_high": 6.064044849943648,
+      "T": 4,
+      "nested_payoff_error": 0.0
+    }
+  ]
+}

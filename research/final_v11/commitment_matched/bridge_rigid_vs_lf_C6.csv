@@ -1,0 +1,13 @@
+geometry,eta_r,model,C6,C6_lo,C6_hi,significant
+head_on,0.8,leader_follower,-1.1215,-3.0886,0.808,0
+head_on,0.8,rigid_line_ahead,-1.1215,-3.0886,0.808,0
+head_on,1.2,leader_follower,-1.7921,-5.0604,1.4293,0
+head_on,1.2,rigid_line_ahead,-1.7921,-5.0604,1.4293,0
+parallel,0.8,leader_follower,1.7774,0.1849,3.3181,1
+parallel,0.8,rigid_line_ahead,1.7774,0.1849,3.3181,1
+parallel,1.2,leader_follower,-2.3046,-4.7793,0.1555,0
+parallel,1.2,rigid_line_ahead,-2.3046,-4.7793,0.1555,0
+crossing,0.8,leader_follower,4.1758,2.1377,6.3482,1
+crossing,0.8,rigid_line_ahead,4.1758,2.1377,6.3482,1
+crossing,1.2,leader_follower,6.2011,4.3247,7.967,1
+crossing,1.2,rigid_line_ahead,6.2011,4.3247,7.967,1

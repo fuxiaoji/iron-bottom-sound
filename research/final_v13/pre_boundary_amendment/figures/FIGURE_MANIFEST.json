@@ -1,0 +1,70 @@
+[
+  {
+    "figure": "Fig_A_favorable_set",
+    "status": "DRAFT",
+    "alt_text": "Preselected head-on probe zero, epoch zero. Favorable three-dimensional states are projected onto position; heading is not discarded in distance calculations. Three discrete reachable endpoints per speed are shown, not a continuous reachable region. Frames translate with the opponent, retaining world orientation.",
+    "formats": "vector PDF and 320 dpi PNG",
+    "sources": [
+      {
+        "path": "research/final_v13/mechanism/discovery/illustration_head_on_0.7.npz",
+        "sha256": "40bd6e73f0f191c80d8c755aca1f899f9ccdd1f447305acb0a9b329485f2ace9"
+      },
+      {
+        "path": "research/final_v13/mechanism/discovery/illustration_head_on_1.3.npz",
+        "sha256": "41ca87036b510ecaef899143ca0549c96dd2ef90bcc1d9f3b8b90aa1d47dd62b"
+      },
+      {
+        "path": "research/final_v13/MECHANISM_PROTOCOL.md",
+        "sha256": "f1c5fe560a7ff625c476c1cd5ad561bc25a76470a9262fa5887a6e8a53918af6"
+      }
+    ]
+  },
+  {
+    "figure": "Fig_B_factorial",
+    "status": "DRAFT",
+    "alt_text": "The own-speed by own-adaptation factorial holds the opponent speed and strategy class fixed. Its interaction is distinct from the bilateral commitment difference.",
+    "formats": "vector PDF and 320 dpi PNG",
+    "sources": [
+      {
+        "path": "research/final_v13/DISCOVERY_PROTOCOL.md",
+        "sha256": "3137b570cd621f160700bfb91e831071ff731e23c3bed573daf6314d9157f968"
+      }
+    ]
+  },
+  {
+    "figure": "Fig_C_discovery_curves",
+    "status": "DRAFT",
+    "alt_text": "All five speed values and both fixed opponent classes, for all three geometries. Curves are exploratory and nonmonotone; nonnegative flexibility does not imply positive speed interaction.",
+    "formats": "vector PDF and 320 dpi PNG",
+    "sources": [
+      {
+        "path": "research/final_v13/discovery/all_results.json",
+        "sha256": "b31005fec5d86926e4c837ab6123f5b0666a4bbad245b3b0409c802b020d00c3"
+      }
+    ]
+  },
+  {
+    "figure": "Fig_F_capability",
+    "status": "DRAFT",
+    "alt_text": "Six interactions from genuinely nested per-turn speed menus, low .75/1.0 and high .75/1.0/1.3. Five support complementarity; head-on against a flexible opponent reverses. This limited-horizon check is separate from the forced-speed primary experiment.",
+    "formats": "vector PDF and 320 dpi PNG",
+    "sources": [
+      {
+        "path": "research/final_v13/capability/all_results.json",
+        "sha256": "7fdf726c404de6b8ddd6a8854b59b002e02f127eeb0845446d049e80ac62572f"
+      }
+    ]
+  },
+  {
+    "figure": "Fig_G_tracking_diagnostics",
+    "status": "DRAFT",
+    "alt_text": "Frozen primary and alpha=.8 tracking curves plus negative raw-correction frequencies. Signed corrections remain in data; only the declared bounded score uses their positive part. The tracking axis displays the observed lower half of its theoretical zero-to-one range.",
+    "formats": "vector PDF and 320 dpi PNG",
+    "sources": [
+      {
+        "path": "research/final_v13/mechanism/discovery/all_results.json",
+        "sha256": "e346560323f493273b4869be0221292d949020cecaf8ab9bbfbbf7589f77f9b2"
+      }
+    ]
+  }
+]

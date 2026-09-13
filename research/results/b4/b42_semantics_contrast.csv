@@ -1,0 +1,7 @@
+geometry,eta_v_operating,"V_operating (E02, speed forced)",note_operating,V_capability vbar=2 (B4.1),V_capability vbar=4 (B4.1),V_capability vbar=6 (B4.1),note_capability
+head_on,0.8,1.025218753913637,"speed = constant parameter, no speed action",-0.0,-0.0,-0.0,"speed = plan-chosen tier, U(vbar) nested"
+head_on,1.0,-0.0,"speed = constant parameter, no speed action",-0.0,-0.0,-0.0,"speed = plan-chosen tier, U(vbar) nested"
+head_on,1.25,-1.3878383010845758,"speed = constant parameter, no speed action",-0.0,-0.0,-0.0,"speed = plan-chosen tier, U(vbar) nested"
+parallel,0.8,1.0987443659952163,"speed = constant parameter, no speed action",-0.5711892386842397,-0.13461091497081207,0.0003769545917107234,"speed = plan-chosen tier, U(vbar) nested"
+parallel,1.0,0.017268107811821212,"speed = constant parameter, no speed action",-0.5711892386842397,-0.13461091497081207,0.0003769545917107234,"speed = plan-chosen tier, U(vbar) nested"
+parallel,1.25,-1.4899059169445816,"speed = constant parameter, no speed action",-0.5711892386842397,-0.13461091497081207,0.0003769545917107234,"speed = plan-chosen tier, U(vbar) nested"

@@ -1,0 +1,24 @@
+{
+  "mode": "grid7_anchors",
+  "n_cells": 6,
+  "n_asymmetric": 6,
+  "n_significant": 2,
+  "n_sign_correct": 0,
+  "n_significant_wrong_sign": 2,
+  "geometry_support": {
+    "head_on": {
+      "pos": 0,
+      "neg": 0
+    },
+    "parallel": {
+      "pos": 0,
+      "neg": 0
+    },
+    "crossing": {
+      "pos": 0,
+      "neg": 0
+    }
+  },
+  "verdict": "REMOVE-CORE",
+  "wall_time_s": 929.8
+}

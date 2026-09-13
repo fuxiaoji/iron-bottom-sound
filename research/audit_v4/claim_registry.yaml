@@ -1,0 +1,83 @@
+# B0 审计 5/6：主张登记表（claim_registry.yaml）
+
+v3 论文全部核心主张的 v4 语义审计与处置。状态：
+KEEP（保留）/ NARROW（收窄）/ RENAME（改语义名）/ REMOVE（删除）。
+
+```yaml
+- id: C-kernel
+  claim: 方向性火力核可校准至 Spearman 0.991（四舰种，留出 30%）
+  evidence: research/results/e01/{metrics.json, baselines.json}
+  semantics_issues: []
+  action: KEEP
+  v4_note: B1 补 mount-damage 扫描（v4 新增维度）
+
+- id: C-isotropic
+  claim: 各向同性基线 ρ=0.952，nMAE 恶化 3.2×——方向性承载约 1/3 秩信息
+  evidence: research/results/e01/baselines.json
+  action: KEEP
+
+- id: C-transfer
+  claim: 修正曲线跨舰对迁移 ρ 0.982–0.992（6 方向）
+  evidence: research/results/e01/baselines.json
+  semantics_issues: ["论文曾写 eleven directions，已改 six"]
+  action: KEEP
+
+- id: C-degeneracy
+  claim: 对称闭环简并，V≡L 精确；混合策略值 0 由极小极大定理保证
+  evidence: research/results/e02/{degeneracy_check.json, boundary_stability.json}
+  semantics_issues: []
+  action: KEEP
+  v4_note: B3.3 逐项打破假设（速度/射程/动作对称、观测延迟、承诺、终端收益）
+           并测量 V−L 偏离——升级为"假设边界图"
+
+- id: C-commitment
+  claim: 承诺打破闭环简并；开环 maximin 产生非零位置价值
+  evidence: committed_game + E02 相图
+  semantics_issues: ["P_H = V_H − V_1 的系统扫描未做（v4 B7 新实验）"]
+  action: KEEP + EXTEND (B7)
+
+- id: C-speed-paradox
+  claim: "速度悖论：等射程下更快承诺方更差"
+  evidence: e02 phase_diagram.csv（方向已复核）
+  semantics_issues:
+    - "FIXED OPERATING SPEED 语义，非 capability（B4.2）"
+    - "转向-速度解耦（无引擎的转向耗推进语义）"
+  action: RENAME → operating-speed effect；B4.1 用嵌套能力集另测
+          speed-capability monotonicity
+
+- id: C-regime-map
+  claim: (ηv, ηr) 相图区间稳定（新鲜网格 + 重采样复现）
+  evidence: phase_diagram.csv + boundary_stability.json
+  semantics_issues: ["方案库收敛性未系统验证（v4 B8：L11⊂L21⊂L41 门限）"]
+  action: KEEP + EXTEND (B8 收敛验证，否则去掉 'equilibrium' 术语)
+
+- id: C-torpedo-null
+  claim: 低命中鱼雷剥夺价值结构性为 0；机制=价值阶梯 8 档/顶档 25.5 并列
+  evidence: research/results/e04/*
+  semantics_issues:
+    - "V_direct 在 τ0* 航路计算（pre-response）；v4 需补 τT* 变体"
+  action: KEEP + EXTEND (B10/B11)
+
+- id: C-thickness
+  claim: 剥夺对齐射厚度单调凸增（k=6 阈值跳变）
+  evidence: research/results/e04salvo/
+  semantics_issues: ["单发射击者协议；E[hits] 分布覆盖有限"]
+  action: KEEP（B12 匹配致命性扩展）
+
+- id: C-engine-validation
+  claim: 翻译层有效（vs straight 全显著）、与教义持平、head-on 让分 line
+  evidence: research/results/e06 (60 seeds/cell), e07 (20 seeds)
+  semantics_issues:
+    - "v4 B13 要求 100 paired seeds/critical comparison、符号一致≥80%、
+       秩 ρ≥0.60、区间一致≥75% —— 需按 v4 门限补齐"
+  action: KEEP + EXTEND (B13)
+
+- id: C-engagement-network
+  claim: 交战图规范敏感（plan-literal +0.108 PASS / strict +0.033 未达）
+  evidence: research/results/e05/spec_analysis.json（脚本已存档）
+  action: KEEP（v4 论文中降级为Robustness/Negative Results 章节素材）
+```
+
+## 汇总
+KEEP: 9 | RENAME: 1（速度悖论→运行速度效应）| REMOVE: 0
+需扩展实验：B3.3、B4、B7、B8、B10-11、B13。

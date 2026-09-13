@@ -1,0 +1,69 @@
+{
+  "V": 8.817235643876664,
+  "numeric_error_budget": 2.6645352591003757e-14,
+  "LB": 8.817235643876637,
+  "UB": 8.81723564387669,
+  "trace": [
+    {
+      "t_start": 5,
+      "t_end": 6,
+      "nodes": 59049,
+      "matrix_order": 3,
+      "max_local_duality_gap": 1.0658141036401503e-14,
+      "lp_calls": 0,
+      "seconds": 0.045316791998629924
+    },
+    {
+      "t_start": 4,
+      "t_end": 5,
+      "nodes": 6561,
+      "matrix_order": 3,
+      "max_local_duality_gap": 7.105427357601002e-15,
+      "lp_calls": 0,
+      "seconds": 0.0060967080025875475
+    },
+    {
+      "t_start": 3,
+      "t_end": 4,
+      "nodes": 729,
+      "matrix_order": 3,
+      "max_local_duality_gap": 3.552713678800501e-15,
+      "lp_calls": 0,
+      "seconds": 0.0011053749985876493
+    },
+    {
+      "t_start": 2,
+      "t_end": 3,
+      "nodes": 81,
+      "matrix_order": 3,
+      "max_local_duality_gap": 3.552713678800501e-15,
+      "lp_calls": 0,
+      "seconds": 0.0004982919999747537
+    },
+    {
+      "t_start": 1,
+      "t_end": 2,
+      "nodes": 9,
+      "matrix_order": 3,
+      "max_local_duality_gap": 0.0,
+      "lp_calls": 0,
+      "seconds": 0.00037841700032004155
+    },
+    {
+      "t_start": 0,
+      "t_end": 1,
+      "nodes": 1,
+      "matrix_order": 3,
+      "max_local_duality_gap": 1.7763568394002505e-15,
+      "lp_calls": 0,
+      "seconds": 0.0002365000000281725
+    }
+  ],
+  "algorithm": "complete backward induction",
+  "T": 6,
+  "h": 1,
+  "base": 3,
+  "leaves": 531441,
+  "certification_scope": "finite game, floating-point payoff evaluation and LP precision",
+  "seconds": 0.05468916893005371
+}

@@ -1,0 +1,271 @@
+{
+  "V": -0.6742303384252264,
+  "LB": -0.6742307321610291,
+  "UB": -0.6742299446893874,
+  "gap": 7.874716417754857e-07,
+  "S": [],
+  "S_R": [],
+  "opponent": "C",
+  "T": 6,
+  "base": 3,
+  "status": "certified_numeric",
+  "seconds": 0.5275296250038082,
+  "iterations": 32,
+  "policy_count": 32,
+  "trace": [
+    {
+      "iteration": 1,
+      "policies": 1,
+      "LB": -22.495240671590565,
+      "UB": 21.011612615334478,
+      "elapsed": 0.007637417002115399
+    },
+    {
+      "iteration": 2,
+      "policies": 2,
+      "LB": -8.917122028709917,
+      "UB": 15.723627166057051,
+      "elapsed": 0.014149084003292955
+    },
+    {
+      "iteration": 3,
+      "policies": 3,
+      "LB": -7.977974247038764,
+      "UB": 15.145586524101697,
+      "elapsed": 0.021100458994624205
+    },
+    {
+      "iteration": 4,
+      "policies": 4,
+      "LB": -6.2053226373469315,
+      "UB": 6.930867507164818,
+      "elapsed": 0.02793891700275708
+    },
+    {
+      "iteration": 5,
+      "policies": 5,
+      "LB": -4.626363617165463,
+      "UB": 4.192969499608604,
+      "elapsed": 0.03639258400653489
+    },
+    {
+      "iteration": 6,
+      "policies": 6,
+      "LB": -4.244182720087793,
+      "UB": 3.789997452415028,
+      "elapsed": 0.04571212499286048
+    },
+    {
+      "iteration": 7,
+      "policies": 7,
+      "LB": -3.1529870477857003,
+      "UB": 3.8545580976977853,
+      "elapsed": 0.055758917005732656
+    },
+    {
+      "iteration": 8,
+      "policies": 8,
+      "LB": -2.206793395665295,
+      "UB": 5.242039165992534,
+      "elapsed": 0.06569183399551548
+    },
+    {
+      "iteration": 9,
+      "policies": 9,
+      "LB": -2.168806678372104,
+      "UB": 3.050744886713262,
+      "elapsed": 0.07552470899827313
+    },
+    {
+      "iteration": 10,
+      "policies": 10,
+      "LB": -2.045300934024079,
+      "UB": 2.557420789216659,
+      "elapsed": 0.08651812499738298
+    },
+    {
+      "iteration": 11,
+      "policies": 11,
+      "LB": -1.8684517179858728,
+      "UB": 1.7574935023686644,
+      "elapsed": 0.09984504200110678
+    },
+    {
+      "iteration": 12,
+      "policies": 12,
+      "LB": -1.6932201034277048,
+      "UB": 2.1069129777009836,
+      "elapsed": 0.11367137500201352
+    },
+    {
+      "iteration": 13,
+      "policies": 13,
+      "LB": -1.6451142109157018,
+      "UB": 2.772028223197321,
+      "elapsed": 0.1279483749967767
+    },
+    {
+      "iteration": 14,
+      "policies": 14,
+      "LB": -1.5608839556817686,
+      "UB": 2.1062925577183096,
+      "elapsed": 0.14406458400480915
+    },
+    {
+      "iteration": 15,
+      "policies": 15,
+      "LB": -1.3105831658197096,
+      "UB": 0.8647053502723197,
+      "elapsed": 0.16090608399827033
+    },
+    {
+      "iteration": 16,
+      "policies": 16,
+      "LB": -1.280166510499797,
+      "UB": 1.438790354870972,
+      "elapsed": 0.17862329199851956
+    },
+    {
+      "iteration": 17,
+      "policies": 17,
+      "LB": -1.2077294881732774,
+      "UB": 0.9841361412999623,
+      "elapsed": 0.19727604200306814
+    },
+    {
+      "iteration": 18,
+      "policies": 18,
+      "LB": -1.1944967281860612,
+      "UB": 1.1623934246880523,
+      "elapsed": 0.21655416699650232
+    },
+    {
+      "iteration": 19,
+      "policies": 19,
+      "LB": -1.0954503375754407,
+      "UB": 1.0325227616349604,
+      "elapsed": 0.2362600000051316
+    },
+    {
+      "iteration": 20,
+      "policies": 20,
+      "LB": -0.976133049013988,
+      "UB": 0.641213388767951,
+      "elapsed": 0.2559382089966675
+    },
+    {
+      "iteration": 21,
+      "policies": 21,
+      "LB": -0.8169182535362567,
+      "UB": 0.27577035070982725,
+      "elapsed": 0.2764103340014117
+    },
+    {
+      "iteration": 22,
+      "policies": 22,
+      "LB": -0.8013523260105296,
+      "UB": 0.11957536719980388,
+      "elapsed": 0.299746792006772
+    },
+    {
+      "iteration": 23,
+      "policies": 23,
+      "LB": -0.7717748902623621,
+      "UB": 0.28003921713967084,
+      "elapsed": 0.3227652500063414
+    },
+    {
+      "iteration": 24,
+      "policies": 24,
+      "LB": -0.7578867875058592,
+      "UB": 0.04282682074933141,
+      "elapsed": 0.3442895839980338
+    },
+    {
+      "iteration": 25,
+      "policies": 25,
+      "LB": -0.7470397101909241,
+      "UB": 0.06075023949793578,
+      "elapsed": 0.3669607920019189
+    },
+    {
+      "iteration": 26,
+      "policies": 26,
+      "LB": -0.7103220002200131,
+      "UB": -0.16998882793674563,
+      "elapsed": 0.39145337500667665
+    },
+    {
+      "iteration": 27,
+      "policies": 27,
+      "LB": -0.7031800398738389,
+      "UB": -0.22079523007673096,
+      "elapsed": 0.4154873340012273
+    },
+    {
+      "iteration": 28,
+      "policies": 28,
+      "LB": -0.6908591987194924,
+      "UB": -0.4477487797699337,
+      "elapsed": 0.4410069589939667
+    },
+    {
+      "iteration": 29,
+      "policies": 29,
+      "LB": -0.6838588257339707,
+      "UB": -0.5400049790943566,
+      "elapsed": 0.4612897089973558
+    },
+    {
+      "iteration": 30,
+      "policies": 30,
+      "LB": -0.6794745238483089,
+      "UB": -0.43572982350508493,
+      "elapsed": 0.4829685000004247
+    },
+    {
+      "iteration": 31,
+      "policies": 31,
+      "LB": -0.6787698606107683,
+      "UB": -0.5812213094410347,
+      "elapsed": 0.5057117499964079
+    },
+    {
+      "iteration": 32,
+      "policies": 32,
+      "LB": -0.6742307321610291,
+      "UB": -0.6742299446893874,
+      "elapsed": 0.5275251249986468
+    }
+  ],
+  "numerical_padding": 3.9373578197442583e-07,
+  "pricing": "exact full-history dynamic program",
+  "algorithm": "one-sided contingent-policy generation; full committed opponent space",
+  "certification_scope": "finite game; full-space floating-point response bounds",
+  "config_id": "parallel_v0.85_d16_T6_G3_none",
+  "side": "blue",
+  "mask": 0,
+  "seconds_total": 0.5295858750032494,
+  "peak_rss_bytes": 120733696,
+  "created_utc": "2026-09-13T05:49:49.953013+00:00",
+  "core_hashes": {
+    "research/formation/schedule_v14.py": "cb9150dd827acdbe48191704f4b68d00a76090729b9bb7c0654b6a5918a195a9",
+    "research/formation/pricing_v14.py": "6845651480958860de0855284b0290c9c0aef55f33aca124d28efe78152a7ab8",
+    "research/formation/physical_v14.py": "1bb7e8761ec05395d5279368c28618a9e58aee1ba02cc24922e437d3c4c5d248",
+    "research/experiments/v14_run.py": "a9f4bef051a58a66318b0fa769501eac011ac7d550b8f39efe45a37e10184f2b",
+    "research/formation/commitment_v12.py": "b4645f1abb6afd778687c5f8c40b6dfb5354384305533ccb00bbf7663689583e",
+    "research/formation/payoff_v13.py": "7ba3ad97900fe9d1af1d3eda6fd8d9346ec97880098d775c77c9c4a149308aa0",
+    "research/formation/path_following.py": "1faa140c3eb3fa417bea3dac54b4ce63d4048047a6150ef2e302456289fe601b",
+    "research/formation/matched_horizon.py": "d9f394abd082f392b41ea5194a98a32b72c9b64f9bb43f5017f21fc4c5456f02",
+    "research/formation/exact_v12.py": "bc4893cf4c85ae52e2ffb0189698bb44f15dc974e1453a86fdf1acb661e5cba3",
+    "research/experiments/v13_exact.py": "76913982029ca7236723601ac380d16a23f744275153afcd81eec7f32f43f346",
+    "research/results/e01/kernel_fits.json": "8ec3e881e5ec262983bcd249abddecd0a75d9e550e631c5eedebeca061436384"
+  },
+  "design_sha256": "fb92864810ea05f3aac9542297f702109793bd4623433d32d9ab49dff06ff4dc",
+  "execution": {
+    "reason": "completed",
+    "returncode": 0,
+    "wall_seconds": 2.0477356249903096,
+    "tree_peak_rss_bytes": 118751232
+  }
+}

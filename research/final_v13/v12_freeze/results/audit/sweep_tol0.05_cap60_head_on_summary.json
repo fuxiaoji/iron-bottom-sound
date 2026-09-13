@@ -1,0 +1,32 @@
+[
+  {
+    "geometry": "head_on",
+    "h": 1,
+    "mode": "exact_history",
+    "symmetry": true,
+    "cap": 60,
+    "tol": 0.05,
+    "n": 8,
+    "complete": false,
+    "C": null,
+    "CI_lo": null,
+    "CI_hi": null,
+    "near_zero": false,
+    "CI_contains_zero": false
+  },
+  {
+    "geometry": "head_on",
+    "h": 6,
+    "mode": "exact_history",
+    "symmetry": true,
+    "cap": 60,
+    "tol": 0.05,
+    "n": 8,
+    "complete": false,
+    "C": null,
+    "CI_lo": null,
+    "CI_hi": null,
+    "near_zero": false,
+    "CI_contains_zero": false
+  }
+]

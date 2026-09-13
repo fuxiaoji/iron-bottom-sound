@@ -1,0 +1,185 @@
+{
+  "reason": "CF was solved through negative-transpose FC; only information-set COUNT LABELS needed exchanging to match already-correct player sequence counts. No payoff, value, bound, policy, or conclusion changed. In-flight runner had imported code before this metadata fix.",
+  "files": [
+    {
+      "file": "research/final_v12/flexibility/heldout_head_on_1.15_0.9.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_head_on_0.85_0.9.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_parallel_1.15_1.1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_crossing_1.15_0.9_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_head_on_1.15_1.1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_head_on_0.85_1.1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/control_parallel_1_1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/discovery_head_on_0.8_1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_head_on_0.85_1.1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/discovery_head_on_0.8_1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/discovery_summary.json",
+      "corrected_records": 6
+    },
+    {
+      "file": "research/final_v12/flexibility/discovery_crossing_1.2_1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_head_on_0.85_0.9_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/control_crossing_1_1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/control_head_on_1_1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/discovery_parallel_0.8_1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/control_crossing_1_1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/control_parallel_1_1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/discovery_head_on_1.2_1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_parallel_1.15_0.9.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_crossing_1.15_1.1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_parallel_1.15_0.9_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_parallel_0.85_0.9.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_parallel_1.15_1.1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/control_head_on_1_1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_parallel_0.85_1.1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_parallel_0.85_1.1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_crossing_0.85_0.9_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/discovery_crossing_0.8_1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/discovery_parallel_1.2_1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_head_on_1.15_1.1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/discovery_parallel_0.8_1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_crossing_1.15_1.1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_crossing_0.85_1.1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/discovery_crossing_1.2_1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_crossing_1.15_0.9.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_crossing_0.85_0.9.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_head_on_1.15_0.9_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/controls_summary.json",
+      "corrected_records": 3
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_crossing_0.85_1.1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_parallel_0.85_0.9_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/discovery_crossing_0.8_1.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/heldout_summary.json",
+      "corrected_records": 12
+    },
+    {
+      "file": "research/final_v12/flexibility/discovery_head_on_1.2_1_CF.json",
+      "corrected_records": 1
+    },
+    {
+      "file": "research/final_v12/flexibility/discovery_parallel_1.2_1.json",
+      "corrected_records": 1
+    }
+  ]
+}

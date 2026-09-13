@@ -1,0 +1,17 @@
+{
+ "head_on": {
+  "model_best_vs_straight": 0.0,
+  "model_sign": 0,
+  "model_class": "neutral"
+ },
+ "parallel": {
+  "model_best_vs_straight": 5.282,
+  "model_sign": 1,
+  "model_class": "advantage"
+ },
+ "crossing": {
+  "model_best_vs_straight": 5.909,
+  "model_sign": 1,
+  "model_class": "advantage"
+ }
+}

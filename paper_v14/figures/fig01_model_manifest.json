@@ -1,0 +1,20 @@
+{
+  "figure": "fig01_model",
+  "caption": "Model and information structure. (a) A specified illustrative Grid-3 trajectory, with three vessels per side and snapshots at epochs 0, 2, 4 and 6; labels mark leaders. It is not an optimized policy or an equilibrium replay. (b) The model-to-decision chain. (c) Own calendar S={2,4}, compared with fixed opponent F and C update rights. Only initial planning is free. Dots identify decisions; unexecuted commands remain private.",
+  "alt_text": "Formation paths and three calendar timelines showing the distinction between public executed history and sealed future actions.",
+  "scope": "specified explanatory trajectory",
+  "source_sha256": {
+    "research/final_v14/DESIGN.json": "fb92864810ea05f3aac9542297f702109793bd4623433d32d9ab49dff06ff4dc",
+    "research/formation/physical_v14.py": "1bb7e8761ec05395d5279368c28618a9e58aee1ba02cc24922e437d3c4c5d248",
+    "research/formation/commitment_v12.py": "b4645f1abb6afd778687c5f8c40b6dfb5354384305533ccb00bbf7663689583e"
+  },
+  "generator_sha256": "273d6838495fb20debf461f9eb47fc03411d00002a29f8ab043792cfd065b3f5",
+  "exports": {
+    "pdf": "48023cc7b821bf760d9187839d5936b934526baf93bcb3503650b3bf4d0256ac",
+    "png": "66c80fdb1eb2c609635d7838ad9ef7842db9881af4c418cb4c3c649f72ab7153"
+  },
+  "plotting_data": "paper_v14/figures/fig01_model_data.json",
+  "style": "general two-column-width scientific layout; not journal acceptance or template compliance",
+  "uncertainty": "numerical intervals where shown; no population confidence intervals",
+  "missing": "no missing scientific values are replaced by zero"
+}

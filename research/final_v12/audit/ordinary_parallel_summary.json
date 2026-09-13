@@ -1,0 +1,62 @@
+[
+  {
+    "geometry": "parallel",
+    "h": 1,
+    "mode": "exact_history",
+    "symmetry": false,
+    "cap": 200,
+    "tol": 0.005,
+    "n": 200,
+    "complete": true,
+    "C": 0.0,
+    "CI_lo": 0.0,
+    "CI_hi": 0.0,
+    "near_zero": true,
+    "CI_contains_zero": true
+  },
+  {
+    "geometry": "parallel",
+    "h": 2,
+    "mode": "exact_history",
+    "symmetry": false,
+    "cap": 200,
+    "tol": 0.005,
+    "n": 200,
+    "complete": true,
+    "C": 0.34386407292853777,
+    "CI_lo": 0.07594144077229942,
+    "CI_hi": 0.6184429194705355,
+    "near_zero": false,
+    "CI_contains_zero": false
+  },
+  {
+    "geometry": "parallel",
+    "h": 3,
+    "mode": "exact_history",
+    "symmetry": false,
+    "cap": 200,
+    "tol": 0.005,
+    "n": 200,
+    "complete": true,
+    "C": 0.2855845706818222,
+    "CI_lo": -0.22364205868308273,
+    "CI_hi": 0.801904576400464,
+    "near_zero": false,
+    "CI_contains_zero": true
+  },
+  {
+    "geometry": "parallel",
+    "h": 6,
+    "mode": "exact_history",
+    "symmetry": false,
+    "cap": 200,
+    "tol": 0.005,
+    "n": 200,
+    "complete": true,
+    "C": 0.19527040480316052,
+    "CI_lo": -0.48989836022588684,
+    "CI_hi": 0.8743952163661544,
+    "near_zero": true,
+    "CI_contains_zero": true
+  }
+]

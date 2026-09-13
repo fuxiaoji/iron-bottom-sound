@@ -1,0 +1,79 @@
+{
+  "alpha": 0.5,
+  "tau": 0.5,
+  "thresholds": {
+    "head_on|0.7|reachability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "head_on|0.7|viability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "parallel|0.7|reachability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "parallel|0.7|viability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "crossing|0.7|reachability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "crossing|0.7|viability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "head_on|1.0|reachability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "head_on|1.0|viability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "parallel|1.0|reachability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "parallel|1.0|viability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "crossing|1.0|reachability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "crossing|1.0|viability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "head_on|1.3|reachability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "head_on|1.3|viability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "parallel|1.3|reachability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "parallel|1.3|viability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "crossing|1.3|reachability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    },
+    "crossing|1.3|viability": {
+      "eta_v_star": null,
+      "n_grid": 16
+    }
+  },
+  "n_cells": 144
+}

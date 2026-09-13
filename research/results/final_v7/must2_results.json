@@ -1,0 +1,643 @@
+{
+  "n_games": 4800,
+  "n_errors": 0,
+  "error_examples": [],
+  "per_cell": [
+    {
+      "geometry": "parallel",
+      "range": 12,
+      "speed": 4,
+      "V_surrogate": 0.23980932093608054,
+      "F-F": {
+        "n": 100,
+        "axis_adv": 3.23,
+        "ci": [
+          2.78,
+          3.7
+        ]
+      },
+      "R-R": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "R-F": {
+        "n": 100,
+        "axis_adv": 3.23,
+        "ci": [
+          2.78,
+          3.7
+        ]
+      },
+      "F-R": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "premium_axis_RF": {
+        "mean": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "premium_allies_FR": {
+        "mean": -3.23,
+        "ci": [
+          -3.7,
+          -2.78
+        ]
+      }
+    },
+    {
+      "geometry": "parallel",
+      "range": 12,
+      "speed": 6,
+      "V_surrogate": 11.406900137922758,
+      "F-F": {
+        "n": 100,
+        "axis_adv": -5.49,
+        "ci": [
+          -6.11,
+          -4.87
+        ]
+      },
+      "R-R": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "R-F": {
+        "n": 100,
+        "axis_adv": -1.74,
+        "ci": [
+          -2.33025,
+          -1.2
+        ]
+      },
+      "F-R": {
+        "n": 100,
+        "axis_adv": -5.49,
+        "ci": [
+          -6.11,
+          -4.87
+        ]
+      },
+      "premium_axis_RF": {
+        "mean": 3.75,
+        "ci": [
+          2.94,
+          4.58
+        ]
+      },
+      "premium_allies_FR": {
+        "mean": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "geometry": "parallel",
+      "range": 20,
+      "speed": 4,
+      "V_surrogate": -1.5346869165878503,
+      "F-F": {
+        "n": 100,
+        "axis_adv": -2.52,
+        "ci": [
+          -3.44,
+          -1.68
+        ]
+      },
+      "R-R": {
+        "n": 100,
+        "axis_adv": -2.52,
+        "ci": [
+          -3.44,
+          -1.68
+        ]
+      },
+      "R-F": {
+        "n": 100,
+        "axis_adv": -2.52,
+        "ci": [
+          -3.44,
+          -1.68
+        ]
+      },
+      "F-R": {
+        "n": 100,
+        "axis_adv": -2.52,
+        "ci": [
+          -3.44,
+          -1.68
+        ]
+      },
+      "premium_axis_RF": {
+        "mean": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "premium_allies_FR": {
+        "mean": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "geometry": "parallel",
+      "range": 20,
+      "speed": 6,
+      "V_surrogate": -0.06775726808172755,
+      "F-F": {
+        "n": 100,
+        "axis_adv": -1.53,
+        "ci": [
+          -3.05,
+          -0.09
+        ]
+      },
+      "R-R": {
+        "n": 100,
+        "axis_adv": -1.67,
+        "ci": [
+          -3.23,
+          -0.19
+        ]
+      },
+      "R-F": {
+        "n": 100,
+        "axis_adv": -6.9,
+        "ci": [
+          -8.11,
+          -5.72
+        ]
+      },
+      "F-R": {
+        "n": 100,
+        "axis_adv": -1.67,
+        "ci": [
+          -3.23,
+          -0.19
+        ]
+      },
+      "premium_axis_RF": {
+        "mean": -5.37,
+        "ci": [
+          -6.84,
+          -3.94
+        ]
+      },
+      "premium_allies_FR": {
+        "mean": -0.14,
+        "ci": [
+          -0.66,
+          0.31
+        ]
+      }
+    },
+    {
+      "geometry": "head_on",
+      "range": 12,
+      "speed": 4,
+      "V_surrogate": -0.0,
+      "F-F": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "R-R": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "R-F": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "F-R": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "premium_axis_RF": {
+        "mean": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "premium_allies_FR": {
+        "mean": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "geometry": "head_on",
+      "range": 12,
+      "speed": 6,
+      "V_surrogate": -0.0,
+      "F-F": {
+        "n": 100,
+        "axis_adv": -0.86,
+        "ci": [
+          -1.75,
+          0.03
+        ]
+      },
+      "R-R": {
+        "n": 100,
+        "axis_adv": 6.33,
+        "ci": [
+          4.79,
+          7.9
+        ]
+      },
+      "R-F": {
+        "n": 100,
+        "axis_adv": 6.47,
+        "ci": [
+          5.1,
+          7.85
+        ]
+      },
+      "F-R": {
+        "n": 100,
+        "axis_adv": 1.3,
+        "ci": [
+          0.2,
+          2.4
+        ]
+      },
+      "premium_axis_RF": {
+        "mean": 7.33,
+        "ci": [
+          5.5,
+          9.2
+        ]
+      },
+      "premium_allies_FR": {
+        "mean": 2.16,
+        "ci": [
+          1.52,
+          2.82
+        ]
+      }
+    },
+    {
+      "geometry": "head_on",
+      "range": 20,
+      "speed": 4,
+      "V_surrogate": -0.0,
+      "F-F": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "R-R": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "R-F": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "F-R": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "premium_axis_RF": {
+        "mean": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "premium_allies_FR": {
+        "mean": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "geometry": "head_on",
+      "range": 20,
+      "speed": 6,
+      "V_surrogate": -0.0,
+      "F-F": {
+        "n": 100,
+        "axis_adv": 1.26,
+        "ci": [
+          0.24,
+          2.27
+        ]
+      },
+      "R-R": {
+        "n": 100,
+        "axis_adv": 0.29,
+        "ci": [
+          -1.43,
+          1.98
+        ]
+      },
+      "R-F": {
+        "n": 100,
+        "axis_adv": 6.76,
+        "ci": [
+          5.98,
+          7.54
+        ]
+      },
+      "F-R": {
+        "n": 100,
+        "axis_adv": -5.49,
+        "ci": [
+          -6.11,
+          -4.87
+        ]
+      },
+      "premium_axis_RF": {
+        "mean": 5.5,
+        "ci": [
+          4.3,
+          6.73
+        ]
+      },
+      "premium_allies_FR": {
+        "mean": -6.75,
+        "ci": [
+          -8.14,
+          -5.36
+        ]
+      }
+    },
+    {
+      "geometry": "crossing",
+      "range": 12,
+      "speed": 4,
+      "V_surrogate": -0.0,
+      "F-F": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "R-R": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "R-F": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "F-R": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "premium_axis_RF": {
+        "mean": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "premium_allies_FR": {
+        "mean": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "geometry": "crossing",
+      "range": 12,
+      "speed": 6,
+      "V_surrogate": -0.0,
+      "F-F": {
+        "n": 100,
+        "axis_adv": 6.29,
+        "ci": [
+          5.59,
+          7.0
+        ]
+      },
+      "R-R": {
+        "n": 100,
+        "axis_adv": 6.36,
+        "ci": [
+          5.46,
+          7.26
+        ]
+      },
+      "R-F": {
+        "n": 100,
+        "axis_adv": 0.98,
+        "ci": [
+          0.0,
+          1.95
+        ]
+      },
+      "F-R": {
+        "n": 100,
+        "axis_adv": 2.43,
+        "ci": [
+          1.61,
+          3.32
+        ]
+      },
+      "premium_axis_RF": {
+        "mean": -5.31,
+        "ci": [
+          -6.47,
+          -4.19
+        ]
+      },
+      "premium_allies_FR": {
+        "mean": -3.86,
+        "ci": [
+          -5.12,
+          -2.5697500000000035
+        ]
+      }
+    },
+    {
+      "geometry": "crossing",
+      "range": 20,
+      "speed": 4,
+      "V_surrogate": 1.7860496663141543e-15,
+      "F-F": {
+        "n": 100,
+        "axis_adv": -1.11,
+        "ci": [
+          -1.51,
+          -0.75
+        ]
+      },
+      "R-R": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "R-F": {
+        "n": 100,
+        "axis_adv": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "F-R": {
+        "n": 100,
+        "axis_adv": -1.11,
+        "ci": [
+          -1.51,
+          -0.75
+        ]
+      },
+      "premium_axis_RF": {
+        "mean": 1.11,
+        "ci": [
+          0.75,
+          1.51
+        ]
+      },
+      "premium_allies_FR": {
+        "mean": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "geometry": "crossing",
+      "range": 20,
+      "speed": 6,
+      "V_surrogate": 2.5982982436437067e-15,
+      "F-F": {
+        "n": 100,
+        "axis_adv": -5.49,
+        "ci": [
+          -6.11,
+          -4.87
+        ]
+      },
+      "R-R": {
+        "n": 100,
+        "axis_adv": -7.99,
+        "ci": [
+          -9.26,
+          -6.75
+        ]
+      },
+      "R-F": {
+        "n": 100,
+        "axis_adv": -1.36,
+        "ci": [
+          -2.13,
+          -0.6
+        ]
+      },
+      "F-R": {
+        "n": 100,
+        "axis_adv": -5.49,
+        "ci": [
+          -6.11,
+          -4.87
+        ]
+      },
+      "premium_axis_RF": {
+        "mean": 4.13,
+        "ci": [
+          3.32,
+          4.93
+        ]
+      },
+      "premium_allies_FR": {
+        "mean": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      }
+    }
+  ],
+  "gates": {
+    "sign_agreement": 0.75,
+    "spearman_rho": -0.08283858275063591,
+    "pairwise_ordering": 0.631578947368421,
+    "n_sign_comparable": 4,
+    "n_pairs": 38
+  },
+  "feedback_premium_cells": {
+    "axis_RF": "5/12",
+    "allies_FR": "1/12"
+  },
+  "verdict": "FAIL"
+}

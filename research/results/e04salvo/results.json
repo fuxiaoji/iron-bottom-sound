@@ -1,0 +1,37 @@
+{
+  "aggregate_by_k": {
+    "1": {
+      "n": 90,
+      "mean_v_denial": 2.0000000000000004,
+      "mean_v_direct": 2.546296296296297,
+      "route_changed": 0.6666666666666666,
+      "low_hit_mean_v_denial": 0.0,
+      "low_hit_n": 60
+    },
+    "2": {
+      "n": 90,
+      "mean_v_denial": 2.0000000000000004,
+      "mean_v_direct": 5.092592592592594,
+      "route_changed": 0.6666666666666666,
+      "low_hit_mean_v_denial": 0.0,
+      "low_hit_n": 60
+    },
+    "4": {
+      "n": 90,
+      "mean_v_denial": 3.333333333333334,
+      "mean_v_direct": 10.185185185185189,
+      "route_changed": 0.6666666666666666,
+      "low_hit_mean_v_denial": 2.0000000000000004,
+      "low_hit_n": 60
+    },
+    "6": {
+      "n": 60,
+      "mean_v_denial": 5.000000000000001,
+      "mean_v_direct": 20.166666666666668,
+      "route_changed": 1.0,
+      "low_hit_mean_v_denial": 4.000000000000001,
+      "low_hit_n": 30
+    }
+  },
+  "n_rows": 330
+}

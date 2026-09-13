@@ -694,3 +694,37 @@
 - **入口**：项目根目录新增 `start-game.bat`；双击即可自动切换到项目目录，并用放宽当前进程执行策略的 PowerShell 调用既有 `scripts/start-game.ps1`。
 - **失败反馈**：保留 PowerShell 原始退出码；失败时窗口暂停并提示查看 `tmp/runtime/backend-error.log` 与 `frontend-error.log`，避免双击后错误窗口瞬间消失。
 - **验证**：从项目上级目录实际冷启动成功；`http://127.0.0.1:5173` 与 `http://127.0.0.1:8000/scenarios` 均返回 HTTP 200，PID 文件对应 Python/Node 进程存活，`git diff --check` 通过。
+
+## 2026-09-13 v12 论文修复：第一批确定性审计（进行中）
+
+- 基线提交：`fc77a65`（完整哈希见 research/final_v12/freeze/INPUT_MANIFEST.json）；本批新增研究文件尚未提交，既有未提交文件保留。
+- 已冻结 v11 源码、稿件、结果摘要哈希和用户 v12 计划；在任何新 discovery/held-out 运行前冻结研究协议与 12-cell 验证集。
+- 新增独立 causal LF scalar/vector 收益、完整 history cache fingerprint、gap 驱动 DO、失败阻断、交换耦合与几何规范化；未改动游戏裁决引擎。
+- 100 个 reachable-history payoff 测试全部通过：scalar/vector 最大误差 8.17e-14、玩家交换 3.55e-15、未来 suffix 前缀不变性 0；旧代码 100/100 不一致。旧 cache 等键状态的 payoff 差 33.12。
+- 初态 Grid-5 三对称控制 DO 收敛分别需要 144/109/80 次迭代；新数据在 research/final_v12/audit。200-seed Monte Carlo 和消融仍运行中，不能据此宣称 Phase A 完成。
+- 新增 full-tree backward induction 与 sparse sequence form；15 项初始研究回归测试通过（包含 T=1/2/3 normal-form/DP/sequence-form 等价与单边 flexibility 单调）。更完整空间等变回归继续补充。
+- 论文证明审计发现 v11 全状态 V=L 推论不成立；已给出满足其假设的反例与正确交换奇对称证明。另记录闭环旧代码 radians/degrees 缺陷，不将未证实的因果解释写成结论。
+- 已通过官方 skill-installer 安装并使用 K-Dense 四项科研技能，仓库显示约 44.6k stars；具体源码哈希、版本与使用边界见 research/final_v12/skills/PROVENANCE.json。
+
+
+## 2026-09-13 — v13.1 mobility/flexibility 实验停止分支完成
+
+- 用户最新范围为读取两份 v13.1 文件、完成新实验、直到开写论文前。实验分支 codex/v13-1-mobility-flexibility；基线提交 fc77a65e970e92cca429e6c87498b0c68a70bf1e；本批次未提交、未投稿，未重写主标题/摘要/贡献/正文。
+- 冻结并核验 429 个 v12/fallback 文件；原 range 假设失败标签不变，fallback 不视作二区认证稿件。未重跑完整 v12 Monte Carlo。
+- 固定对手速度与策略类，完成 15 discovery +12 confirmatory 物理单元及其全部独立镜像、每单元四价值，共 216 个主价值。全部 finite matrix/DP/sequence-form，禁止旧 pose-only cache 和 receding DO 值替代。
+- 首轮 parallel/.75 镜像支付失败定位到非零近接触下 ±150 度浮点射界分类。归档 209 个初次文件；原设计 hash 不改；独立实现修订 01 固定 1e-8 度边界归并并先冻结新源码，再重算所有 v13。60 个可比矩阵中 2 个改变，只有一个可用旧价值改变超过 1e-8，幅度 .0046974265。无数值对称化。
+- 修订后 held-out 5/12 正、7/12 强反向，无未分辨；对手 F 的 6 个全反向。机制 0/6 物理对提高 Theta，Spearman .1696208383。按冻结 Gate 判 FAIL，停止 Grid5/7、转向率、horizon 和 rigid 扩展；未触发项不报为通过。
+- 真正嵌套的 T4 绝对速度菜单能力对照 5/6 正，head-on/对手 F 为 -.5348905307；共同子矩阵误差 0、完整镜像通过；不替代主分母。27 机制单元×32 探针×6 epochs×2 alpha，共 10368 行 epoch/alpha 数据；保留负 correction、域外状态及零漂移。
+- 验证：30 项目标 pytest 回归通过；主 payoff 镜像最大差 4.69e-13、主价值最大差 1.13e-13，主 M 区间最大宽度 9.08e-11，最小 |M| .348056。全部冻结 hash 及受保护 live v12/稿件匹配。git diff --check 通过。
+- 交付 research/final_v13/ 中的 FINAL_V13_ADVISOR_REPORT.md、V13_Q1_GATE.md、PLAN_EXECUTION_LEDGER.md、3 轮16项记录、THEOREM_SCRATCHPAD.md、LITERATURE_NOTES.md、审稿草稿和证据表、8 组 DRAFT PNG/vector PDF 与完整数据/QA、环境/复现文档；根目录 reproduce_v13.py 提供校验和重算冻结分析入口。
+- 使用已核验 GitHub K-Dense 科研批判、peer-review、scientific-visualization、scientific-writing 技能。审稿 intake、证据结构、统计披露、一致性及review lint已运行；三项一般互补/因果机制/投稿成熟度主张仍标为 unsupported，未伪报独立同行评审或一区标准认证。PNG 8 项和 PDF 8 项元数据检查通过，全部 PNG 与 PDF 渲染页已目视核验；只调整 C/D 图例布局。
+- 科学结论与停止证据：research/final_v13/analysis/GATE_DATA.json、NUMERICAL_AUDIT.json、AMENDMENT_AUDIT.json；最终校验清单 FINAL_MANIFEST.json 与复现日志 VERIFICATION_FINAL.log。
+
+
+## 2026-09-13 — v14 第一批：协议与核心方法实现（整体仍进行中）
+
+- 用户批准从实验到完整稿件的v14计划；已保存MASTER_PLAN、45物理配置DESIGN、1371历史文件保护清单、技能来源和环境。分支codex/v14-budgeted-replanning；基线fc77a65，新增内容尚未提交。
+- 任意固定公开日程采用完美回忆密封行动块，已实现完整序列形式、共同更新时间分解、精确历史响应定价、策略迁移/可行删点证书和预算分支定界。对称性等旧错误推论在THEORY中纠正。
+- 新增核心检查：26项日程/定价/分支定界测试通过（REGRESSION_AMENDMENT_01.log），另2项行为策略重建/删点完整响应对照通过；不是一般定理的数值替代。
+- 已观察v13迎头速度1实例的六项工程试运行与四个端点吻合；它不是未见验证。首开发非对称实例策略生成较慢，归档第一次执行代码/日志，固定64次定价后完整序列形式回退。物理模型/实验设计/精度未改，DEVELOPMENT_AMENDMENT_01记录。
+- 已启动串行开发实验，单独进程监控8GB内存与20分钟普通任务限制；冻结测试、稳健性、消融、完整稿件和最终审阅尚未完成，不能宣称一区标准通过。

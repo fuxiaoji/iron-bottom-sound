@@ -1,0 +1,23 @@
+{
+  "timestamp_utc": "2026-09-12T16:31:50.071551+00:00",
+  "git_head": "fc77a65e970e92cca429e6c87498b0c68a70bf1e",
+  "sha256": {
+    "research/formation/matched_horizon.py": "d9f394abd082f392b41ea5194a98a32b72c9b64f9bb43f5017f21fc4c5456f02",
+    "research/formation/path_following.py": "1faa140c3eb3fa417bea3dac54b4ce63d4048047a6150ef2e302456289fe601b",
+    "paper_v11/main.tex": "37d830700ecc8aee77128b325a5e04ea3bdc7dc3ddc3c89c06576b45f8b208de",
+    "research/final_v12/freeze/REQUESTED_PLAN.md": "97d5f844eade1f475cc2e26f3fb1b7ead9f0b1e3072742c020cc7b684de6f642",
+    "research/final_v11/claim_mapping_v10_to_v11.csv": "054ce7dd6e26d3d4d10d7dc03a92e316c49ec5cf3fa63ceffa2937c4f3a780eb",
+    "research/final_v11/claim_registry_v11.csv": "bbb4dd3746e2bd28f5e25adffe6ebdbd1eff7e36ee837735ba4cb895588077dc",
+    "research/final_v11/v10_freeze/lf_grid5_results.csv": "56035877f90cc89a15a0ae8bba068032e524e86d6344cf5b4ca9ebc743d74c5c",
+    "research/final_v11/v10_freeze/bridge_cells.csv": "3c300be3a3cc55dd35f4a51851ee3ec8e650c8bc5c2484a175522f1764c8b70b",
+    "research/final_v11/v10_freeze/reposition_cells.csv": "038c04fa3b0d98afead942878e3b0bdcab95954f8bbc9ebe4d85f5167c08d29f",
+    "research/final_v11/v10_freeze/lf_grid7_results.csv": "9b972cbbd197aa71b50a0ea6750f917a4f43fa2781c3b5db71cca676047da524",
+    "research/final_v11/v10_freeze/threat_contraction.csv": "46704b9f753fcf7b9496f1a023f04d184f7585c8f356eabb37fabe57e67b8365",
+    "research/final_v11/v10_freeze/claim_registry_v10.csv": "964f4a62fc564f4f2bcd2cdd1af155c84e75d42f03b5eb49c5c13319402d6cad",
+    "research/final_v11/v10_freeze/rigid_vs_lf_exact.csv": "26fa88571b19fb9c471c9a5db01e68c327112fb416e47a613c61a74b12fab530",
+    "research/final_v11/commitment_matched/horizon_anchors.csv": "e7d424ce2383e90939d700754f33e023c822d3302c3609760df03360e644719b",
+    "research/final_v11/commitment_matched/bridge_rigid_vs_lf_C6.csv": "042f5ee552cc9e5c52a341dca78cadf99c7e4d4fc3da238200ad222230ad466f",
+    "research/final_v11/commitment_matched/grid7_anchors.csv": "cc8b0a0ebcba8d3ede3af3e2eee16b3e4195007e323c45248ba2ccd8165a8814",
+    "research/final_v11/commitment_matched/main_18cells.csv": "2b2f8ce4e611c5efe1c484b1f0f3689365d3a674ed9ccb648ca29690e168a4d0"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "per_class": {
+    "DD": {
+      "train": {
+        "spearman": 0.9918626649544378,
+        "nmae": 0.05974620680285771,
+        "n": 3553
+      },
+      "test": {
+        "spearman": 0.9913123354728295,
+        "nmae": 0.061649541693477604,
+        "n": 1523
+      }
+    },
+    "CL": {
+      "train": {
+        "spearman": 0.9916684417565691,
+        "nmae": 0.0535592590428075,
+        "n": 3553
+      },
+      "test": {
+        "spearman": 0.9917178630610106,
+        "nmae": 0.054968829760994306,
+        "n": 1523
+      }
+    },
+    "CA": {
+      "train": {
+        "spearman": 0.9914497402475002,
+        "nmae": 0.055967082924869946,
+        "n": 3553
+      },
+      "test": {
+        "spearman": 0.990839354294363,
+        "nmae": 0.05768123802755606,
+        "n": 1523
+      }
+    },
+    "BB": {
+      "train": {
+        "spearman": 0.9913539986918936,
+        "nmae": 0.05245533038864086,
+        "n": 3553
+      },
+      "test": {
+        "spearman": 0.9907327438558726,
+        "nmae": 0.05429762753008782,
+        "n": 1523
+      }
+    }
+  },
+  "all_rows": 20304,
+  "arithmetic_mean_class_test_spearman": 0.9911505741710189,
+  "actual_concatenated_test_spearman": 0.9935522738279258,
+  "class_reconstruction": "contiguous DD,CL,CA,BB blocks from archived exporter ATTACKERS order and recorded n_train+n_test; class absent in source CSV",
+  "scope": "arithmetic replay of archived fit and rule-grid table, without refitting or engine regeneration; not real engagement data",
+  "correction": "legacy pooled_spearman and pooled_nmae are arithmetic means of per-class metrics, not pooled estimates",
+  "source_hashes": {
+    "research/results/e01/truth.csv": "103972826563c6ce84299ca421244117328086e52a1ef061375638b9dd6d2e01",
+    "research/results/e01/kernel_fits.json": "8ec3e881e5ec262983bcd249abddecd0a75d9e550e631c5eedebeca061436384",
+    "research/results/e01/metrics.json": "ffa8a16a39d5ae288210f5eeba1a8cc857be939b2094ad34ec0ce6f33c2b81b8",
+    "research/experiments/e01_fire_kernel.py": "d496fdb4ec0107553c7a31f69324bfef309838ef863cadeca72dee10efbf01ad",
+    "research/geometry/firepower_kernel.py": "85bfc7d1ad55c27dac5226491df40968386a48fe08950f06a05dc3d333bfef17"
+  }
+}

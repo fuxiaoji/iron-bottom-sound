@@ -1,0 +1,161 @@
+{
+  "geometry": "head_on",
+  "eta_r": 0.85,
+  "eta_v": 1.1,
+  "T": 6,
+  "grid": 3,
+  "formation": "leader_follower",
+  "phase": "heldout",
+  "values": {
+    "FF": {
+      "V": -10.629019164250018,
+      "numeric_error_budget": 8.348877145181177e-14,
+      "LB": -10.629019164250101,
+      "UB": -10.629019164249934,
+      "trace": [
+        {
+          "t_start": 5,
+          "t_end": 6,
+          "nodes": 59049,
+          "matrix_order": 3,
+          "max_local_duality_gap": 1.4210854715202004e-14,
+          "lp_calls": 0,
+          "seconds": 0.03402620799897704
+        },
+        {
+          "t_start": 4,
+          "t_end": 5,
+          "nodes": 6561,
+          "matrix_order": 3,
+          "max_local_duality_gap": 7.105427357601002e-15,
+          "lp_calls": 0,
+          "seconds": 0.004262750000634696
+        },
+        {
+          "t_start": 3,
+          "t_end": 4,
+          "nodes": 729,
+          "matrix_order": 3,
+          "max_local_duality_gap": 7.105427357601002e-15,
+          "lp_calls": 0,
+          "seconds": 0.0012582500021380838
+        },
+        {
+          "t_start": 2,
+          "t_end": 3,
+          "nodes": 81,
+          "matrix_order": 3,
+          "max_local_duality_gap": 7.105427357601002e-15,
+          "lp_calls": 0,
+          "seconds": 0.00032954100242932327
+        },
+        {
+          "t_start": 1,
+          "t_end": 2,
+          "nodes": 9,
+          "matrix_order": 3,
+          "max_local_duality_gap": 4.796163466380676e-14,
+          "lp_calls": 0,
+          "seconds": 0.00011024999912478961
+        },
+        {
+          "t_start": 0,
+          "t_end": 1,
+          "nodes": 1,
+          "matrix_order": 3,
+          "max_local_duality_gap": 0.0,
+          "lp_calls": 0,
+          "seconds": 1.237499964190647e-05
+        }
+      ],
+      "algorithm": "complete backward induction",
+      "T": 6,
+      "h": 1,
+      "base": 3,
+      "leaves": 531441,
+      "certification_scope": "finite game, floating-point payoff evaluation and LP precision",
+      "seconds": 0.04123187065124512
+    },
+    "CC": {
+      "V": -7.385571968804097,
+      "numeric_error_budget": 3.765876499528531e-13,
+      "LB": -7.385571968804474,
+      "UB": -7.3855719688037205,
+      "trace": [
+        {
+          "t_start": 0,
+          "t_end": 6,
+          "nodes": 1,
+          "matrix_order": 729,
+          "max_local_duality_gap": 3.765876499528531e-13,
+          "lp_calls": 1,
+          "seconds": 0.4522417089974624
+        }
+      ],
+      "algorithm": "complete backward induction",
+      "T": 6,
+      "h": 6,
+      "base": 3,
+      "leaves": 531441,
+      "certification_scope": "finite game, floating-point payoff evaluation and LP precision",
+      "seconds": 0.45239901542663574
+    },
+    "FC": {
+      "V": -2.6641965297922745,
+      "LB": -2.664196529792273,
+      "UB": -2.664196529792273,
+      "gap": 0.0,
+      "flow_residual_B": 4.829470157119431e-15,
+      "flow_residual_R": 4.440892098500626e-16,
+      "inequality_violation": 4.440892098500626e-15,
+      "structure": "FC",
+      "base": 3,
+      "T": 6,
+      "sequences_B": 199291,
+      "sequences_R": 730,
+      "infosets_B": 66430,
+      "infosets_R": 1,
+      "payoff_nonzeros": 531441,
+      "lp_iterations": 33274,
+      "algorithm": "sparse perfect-recall sequence-form LP with full realization best responses",
+      "seconds": 31.63776397705078
+    },
+    "CF": {
+      "V": -13.466632295773453,
+      "LB": -13.466632295773454,
+      "UB": -13.466632295773449,
+      "gap": 5.329070518200751e-15,
+      "flow_residual_B": 1.1102230246251565e-16,
+      "flow_residual_R": 1.9984014443252818e-15,
+      "inequality_violation": 4.085620730620576e-14,
+      "structure": "CF",
+      "base": 3,
+      "T": 6,
+      "sequences_B": 730,
+      "sequences_R": 199291,
+      "infosets_B": 1,
+      "infosets_R": 66430,
+      "payoff_nonzeros": 531441,
+      "lp_iterations": 75422,
+      "algorithm": "sparse perfect-recall sequence-form LP with full realization best responses",
+      "seconds": 39.458730936050415,
+      "solved_via": "negative-transpose FC"
+    }
+  },
+  "F_B": 4.7213754390118226,
+  "F_R": 7.964822634457743,
+  "F_B_alt": 2.837613131523435,
+  "F_R_alt": 6.0810603269693555,
+  "interaction": 1.8837623074883858,
+  "C": 3.2434471954459205,
+  "C_LB": 3.2434471954454605,
+  "C_UB": 3.2434471954463806,
+  "Delta_F": -3.2434471954459205,
+  "Delta_LB": -3.2434471954463806,
+  "Delta_UB": -3.2434471954454605,
+  "correct_resolved": false,
+  "reverse_resolved": true,
+  "monotonicity_pass": true,
+  "identity_error": 0.0,
+  "seconds": 80.22522711753845
+}

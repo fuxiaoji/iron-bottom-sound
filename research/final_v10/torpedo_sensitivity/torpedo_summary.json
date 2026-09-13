@@ -1,0 +1,42 @@
+{
+  "by_model": {
+    "rigid_line_ahead": {
+      "coverage_effect": 0.0,
+      "intensity_effect": 0.0,
+      "cells": {
+        "narrow_weak": 0.0,
+        "narrow_strong": 0.0,
+        "broad_weak": 0.0,
+        "broad_strong": 0.0,
+        "wide_weak": 0.0,
+        "wide_strong": 0.0
+      }
+    },
+    "leader_follower": {
+      "coverage_effect": 0.25,
+      "intensity_effect": 0.6667,
+      "cells": {
+        "narrow_weak": 0.0,
+        "narrow_strong": 0.0,
+        "broad_weak": 0.0,
+        "broad_strong": 1.0,
+        "wide_weak": 0.0,
+        "wide_strong": 1.0
+      }
+    }
+  },
+  "mechanism_agrees": false,
+  "mechanism_properties": {
+    "rigid_line_ahead": {
+      "responds_to_intensity": false,
+      "coverage_alone_insufficient": true,
+      "thin_threat_gives_zero": true
+    },
+    "leader_follower": {
+      "responds_to_intensity": true,
+      "coverage_alone_insufficient": true,
+      "thin_threat_gives_zero": true
+    }
+  },
+  "narrow_corridor_weak_intensity_is_zero": true
+}

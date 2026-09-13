@@ -1,0 +1,311 @@
+{
+  "V": 0.14635842914906222,
+  "LB": 0.14635801339584426,
+  "UB": 0.1463588449023269,
+  "gap": 8.315064826146063e-07,
+  "S": [
+    1,
+    4,
+    5
+  ],
+  "S_R": [],
+  "opponent": "C",
+  "T": 6,
+  "base": 3,
+  "status": "certified_numeric",
+  "seconds": 1.0015527079958702,
+  "iterations": 38,
+  "policy_count": 38,
+  "trace": [
+    {
+      "iteration": 1,
+      "policies": 1,
+      "LB": -10.958831781527172,
+      "UB": 40.4853575193408,
+      "elapsed": 0.014607290999265388
+    },
+    {
+      "iteration": 2,
+      "policies": 2,
+      "LB": -2.6338284319175984,
+      "UB": 15.219500621983087,
+      "elapsed": 0.026782874992932193
+    },
+    {
+      "iteration": 3,
+      "policies": 3,
+      "LB": -1.7742957761783233,
+      "UB": 7.987790816985437,
+      "elapsed": 0.041720332999830134
+    },
+    {
+      "iteration": 4,
+      "policies": 4,
+      "LB": -1.5396609371577763,
+      "UB": 13.563527363203562,
+      "elapsed": 0.06032266600232106
+    },
+    {
+      "iteration": 5,
+      "policies": 5,
+      "LB": -1.0809593836854705,
+      "UB": 4.513858696453471,
+      "elapsed": 0.0815968749957392
+    },
+    {
+      "iteration": 6,
+      "policies": 6,
+      "LB": -0.6084169863171374,
+      "UB": 5.986315033351279,
+      "elapsed": 0.09310729100252502
+    },
+    {
+      "iteration": 7,
+      "policies": 7,
+      "LB": -0.5983993288434929,
+      "UB": 3.475480820139009,
+      "elapsed": 0.11351966600341257
+    },
+    {
+      "iteration": 8,
+      "policies": 8,
+      "LB": -0.5658118288127678,
+      "UB": 4.2116856765929445,
+      "elapsed": 0.1324892499978887
+    },
+    {
+      "iteration": 9,
+      "policies": 9,
+      "LB": -0.3931273305253044,
+      "UB": 3.537020591165016,
+      "elapsed": 0.1473474999947939
+    },
+    {
+      "iteration": 10,
+      "policies": 10,
+      "LB": -0.37953426271870166,
+      "UB": 2.9957554976568597,
+      "elapsed": 0.16362504099379294
+    },
+    {
+      "iteration": 11,
+      "policies": 11,
+      "LB": -0.23165828408764638,
+      "UB": 1.6060171639823961,
+      "elapsed": 0.18606154099688865
+    },
+    {
+      "iteration": 12,
+      "policies": 12,
+      "LB": -0.11736150813531585,
+      "UB": 3.4953600770089497,
+      "elapsed": 0.20003283300320618
+    },
+    {
+      "iteration": 13,
+      "policies": 13,
+      "LB": -0.0816277369854742,
+      "UB": 2.082897519900497,
+      "elapsed": 0.22375166599522345
+    },
+    {
+      "iteration": 14,
+      "policies": 14,
+      "LB": -0.020541116875180773,
+      "UB": 2.7441636136288112,
+      "elapsed": 0.23771558300359175
+    },
+    {
+      "iteration": 15,
+      "policies": 15,
+      "LB": 0.00033626289458475625,
+      "UB": 1.4003917262464134,
+      "elapsed": 0.27135029100463726
+    },
+    {
+      "iteration": 16,
+      "policies": 16,
+      "LB": 0.05843910059659803,
+      "UB": 1.475239122606013,
+      "elapsed": 0.29733970799134113
+    },
+    {
+      "iteration": 17,
+      "policies": 17,
+      "LB": 0.08608867721560415,
+      "UB": 0.6419004952146198,
+      "elapsed": 0.3243245829944499
+    },
+    {
+      "iteration": 18,
+      "policies": 18,
+      "LB": 0.09325374452902918,
+      "UB": 0.4342281953480653,
+      "elapsed": 0.34977962500124704
+    },
+    {
+      "iteration": 19,
+      "policies": 19,
+      "LB": 0.10798556169398021,
+      "UB": 0.5093307728366842,
+      "elapsed": 0.38722220799536444
+    },
+    {
+      "iteration": 20,
+      "policies": 20,
+      "LB": 0.11413484480756131,
+      "UB": 0.37154468701620513,
+      "elapsed": 0.40722208299848717
+    },
+    {
+      "iteration": 21,
+      "policies": 21,
+      "LB": 0.11506649773860583,
+      "UB": 0.3434858623900123,
+      "elapsed": 0.43115975000546314
+    },
+    {
+      "iteration": 22,
+      "policies": 22,
+      "LB": 0.12539287603240512,
+      "UB": 0.4870024278372409,
+      "elapsed": 0.4584261659911135
+    },
+    {
+      "iteration": 23,
+      "policies": 23,
+      "LB": 0.13124140929245143,
+      "UB": 0.30402303865469466,
+      "elapsed": 0.4853387500043027
+    },
+    {
+      "iteration": 24,
+      "policies": 24,
+      "LB": 0.1313821246629877,
+      "UB": 0.23481367282084592,
+      "elapsed": 0.5127331249968847
+    },
+    {
+      "iteration": 25,
+      "policies": 25,
+      "LB": 0.13580725036657784,
+      "UB": 0.7587664398073928,
+      "elapsed": 0.5488130409939913
+    },
+    {
+      "iteration": 26,
+      "policies": 26,
+      "LB": 0.14177223034785427,
+      "UB": 0.21171981606373727,
+      "elapsed": 0.5768668329983484
+    },
+    {
+      "iteration": 27,
+      "policies": 27,
+      "LB": 0.143586698617779,
+      "UB": 0.1807872469706609,
+      "elapsed": 0.6060394160012947
+    },
+    {
+      "iteration": 28,
+      "policies": 28,
+      "LB": 0.14374190489754315,
+      "UB": 0.16558500644112104,
+      "elapsed": 0.6341369580040919
+    },
+    {
+      "iteration": 29,
+      "policies": 29,
+      "LB": 0.14438546238973823,
+      "UB": 0.1624943821205046,
+      "elapsed": 0.6657534999976633
+    },
+    {
+      "iteration": 30,
+      "policies": 30,
+      "LB": 0.1448604763433799,
+      "UB": 0.16257167520680865,
+      "elapsed": 0.6959642080037156
+    },
+    {
+      "iteration": 31,
+      "policies": 31,
+      "LB": 0.14590580022323588,
+      "UB": 0.16059925350636936,
+      "elapsed": 0.7324260829918785
+    },
+    {
+      "iteration": 32,
+      "policies": 32,
+      "LB": 0.1460173020655693,
+      "UB": 0.15362424325486018,
+      "elapsed": 0.7694156659999862
+    },
+    {
+      "iteration": 33,
+      "policies": 33,
+      "LB": 0.14608125908182007,
+      "UB": 0.15158371854196362,
+      "elapsed": 0.800545374993817
+    },
+    {
+      "iteration": 34,
+      "policies": 34,
+      "LB": 0.14624700907934066,
+      "UB": 0.1478574980359454,
+      "elapsed": 0.8472410829999717
+    },
+    {
+      "iteration": 35,
+      "policies": 35,
+      "LB": 0.1463019718032729,
+      "UB": 0.14753793230085557,
+      "elapsed": 0.8801385410042712
+    },
+    {
+      "iteration": 36,
+      "policies": 36,
+      "LB": 0.14633217658955883,
+      "UB": 0.1470988330401831,
+      "elapsed": 0.9184921660053078
+    },
+    {
+      "iteration": 37,
+      "policies": 37,
+      "LB": 0.1463573131735299,
+      "UB": 0.14728351172725404,
+      "elapsed": 0.9612652499927208
+    },
+    {
+      "iteration": 38,
+      "policies": 38,
+      "LB": 0.14635801339584426,
+      "UB": 0.1463588449023269,
+      "elapsed": 1.0015466250042664
+    }
+  ],
+  "numerical_padding": 4.1575321728485244e-07,
+  "pricing": "exact full-history dynamic program",
+  "algorithm": "one-sided contingent-policy generation; full committed opponent space",
+  "certification_scope": "finite game; full-space floating-point response bounds",
+  "config_id": "crossing_v0.85_d16_T6_G3_none",
+  "side": "blue",
+  "mask": 25,
+  "seconds_total": 1.004927875008434,
+  "peak_rss_bytes": 127057920,
+  "created_utc": "2026-09-13T06:32:50.395304+00:00",
+  "core_hashes": {
+    "research/formation/schedule_v14.py": "cb9150dd827acdbe48191704f4b68d00a76090729b9bb7c0654b6a5918a195a9",
+    "research/formation/pricing_v14.py": "6845651480958860de0855284b0290c9c0aef55f33aca124d28efe78152a7ab8",
+    "research/formation/physical_v14.py": "1bb7e8761ec05395d5279368c28618a9e58aee1ba02cc24922e437d3c4c5d248",
+    "research/experiments/v14_run.py": "a9f4bef051a58a66318b0fa769501eac011ac7d550b8f39efe45a37e10184f2b",
+    "research/formation/commitment_v12.py": "b4645f1abb6afd778687c5f8c40b6dfb5354384305533ccb00bbf7663689583e",
+    "research/formation/payoff_v13.py": "7ba3ad97900fe9d1af1d3eda6fd8d9346ec97880098d775c77c9c4a149308aa0",
+    "research/formation/path_following.py": "1faa140c3eb3fa417bea3dac54b4ce63d4048047a6150ef2e302456289fe601b",
+    "research/formation/matched_horizon.py": "d9f394abd082f392b41ea5194a98a32b72c9b64f9bb43f5017f21fc4c5456f02",
+    "research/formation/exact_v12.py": "bc4893cf4c85ae52e2ffb0189698bb44f15dc974e1453a86fdf1acb661e5cba3",
+    "research/experiments/v13_exact.py": "76913982029ca7236723601ac380d16a23f744275153afcd81eec7f32f43f346",
+    "research/results/e01/kernel_fits.json": "8ec3e881e5ec262983bcd249abddecd0a75d9e550e631c5eedebeca061436384"
+  },
+  "design_sha256": "fb92864810ea05f3aac9542297f702109793bd4623433d32d9ab49dff06ff4dc"
+}

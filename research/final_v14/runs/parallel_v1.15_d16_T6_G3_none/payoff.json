@@ -1,0 +1,32 @@
+{
+  "config": {
+    "id": "parallel_v1.15_d16_T6_G3_none",
+    "geometry": "parallel",
+    "speed": 1.15,
+    "distance": 16.0,
+    "T": 6,
+    "grid": 3,
+    "ablation": "none",
+    "phases": [
+      "development"
+    ],
+    "mirror_solve_all": false,
+    "opponents": [
+      "F",
+      "C"
+    ]
+  },
+  "seconds": 18.854703916993458,
+  "mirror_error": 2.255973186038318e-13,
+  "blue_sha256": "de35c63a6291782a114abcb7a938ce15c7b588fea277e26372a1bbfcc56a543b",
+  "red_sha256": "236d6c7705bf735903838aee8ad6e4d6f99ce88719a4801bb4555480a434413a",
+  "shape": [
+    729,
+    729
+  ],
+  "scale": 36.987434030391924,
+  "minimum": -36.987434030391924,
+  "maximum": 35.55055038619779,
+  "created_utc": "2026-09-13T06:23:10.422099+00:00",
+  "peak_rss_bytes": 177946624
+}

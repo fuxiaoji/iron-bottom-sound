@@ -1,0 +1,806 @@
+{
+  "experiment": "B10 time dependence of H(x,t): same hex, different impulse",
+  "definition": "hot pulse = a (turn,impulse) at which the hex carries H>0",
+  "cells": {
+    "chase:1v1": {
+      "n_pulses": 33,
+      "time_dependence": {
+        "n_hot_hexes": 399,
+        "hot_pulse_count_distribution": {
+          "1": 43,
+          "2": 113,
+          "3": 79,
+          "4": 149,
+          "5": 14,
+          "6": 1
+        },
+        "mean_hot_pulses_per_hot_hex": 2.9523809523809526,
+        "single_pulse_hot_share": 0.10776942355889724,
+        "example_hex": {
+          "hex": "T19",
+          "hot_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_hot_pulse": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            2
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "T10",
+          "tau0_contact_pulse": [
+            3,
+            2
+          ],
+          "tau0_contact_hazard_field": 0.15972222222222232,
+          "tau0_contact_hazard_route": 0.08333333333333333,
+          "other_plan": "1PP1P1P1P",
+          "other_plan_signature": [
+            "O13",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": true,
+          "other_plan_j_over_jref": 1.0,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "example_hexes": [
+        {
+          "hex": "T19",
+          "hot_pulse": [
+            2,
+            0
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            2
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "U19",
+          "hot_pulse": [
+            2,
+            1
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            3
+          ],
+          "hazard_cold": 0.0
+        }
+      ]
+    },
+    "chase:2v1": {
+      "n_pulses": 33,
+      "time_dependence": {
+        "n_hot_hexes": 481,
+        "hot_pulse_count_distribution": {
+          "1": 29,
+          "2": 80,
+          "3": 69,
+          "4": 118,
+          "5": 51,
+          "6": 87,
+          "7": 34,
+          "8": 11,
+          "9": 2
+        },
+        "mean_hot_pulses_per_hot_hex": 4.135135135135135,
+        "single_pulse_hot_share": 0.060291060291060294,
+        "example_hex": {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_at_hot_pulse": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "T10",
+          "tau0_contact_pulse": [
+            3,
+            2
+          ],
+          "tau0_contact_hazard_field": 0.22974537037037046,
+          "tau0_contact_hazard_route": 0.08333333333333333,
+          "other_plan": "1PP1P1P1P",
+          "other_plan_signature": [
+            "O13",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": true,
+          "other_plan_j_over_jref": 1.0,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "example_hexes": [
+        {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_hot": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "V18",
+          "hot_pulse": [
+            2,
+            2
+          ],
+          "hazard_hot": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "W17",
+          "hot_pulse": [
+            2,
+            4
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        }
+      ]
+    },
+    "close:1v1": {
+      "n_pulses": 33,
+      "time_dependence": {
+        "n_hot_hexes": 399,
+        "hot_pulse_count_distribution": {
+          "1": 43,
+          "2": 113,
+          "3": 79,
+          "4": 149,
+          "5": 14,
+          "6": 1
+        },
+        "mean_hot_pulses_per_hot_hex": 2.9523809523809526,
+        "single_pulse_hot_share": 0.10776942355889724,
+        "example_hex": {
+          "hex": "T19",
+          "hot_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_hot_pulse": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            2
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "T18",
+          "tau0_contact_pulse": [
+            2,
+            2
+          ],
+          "tau0_contact_hazard_field": 0.9995406063420023,
+          "tau0_contact_hazard_route": 0.7222222222222222,
+          "other_plan": "1P1PP2",
+          "other_plan_signature": [
+            "V17",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": true,
+          "other_plan_j_over_jref": 1.0,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              2,
+              3
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.0
+          ]
+        }
+      },
+      "example_hexes": [
+        {
+          "hex": "T19",
+          "hot_pulse": [
+            2,
+            0
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            2
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "U19",
+          "hot_pulse": [
+            2,
+            1
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            3
+          ],
+          "hazard_cold": 0.0
+        }
+      ]
+    },
+    "close:2v1": {
+      "n_pulses": 33,
+      "time_dependence": {
+        "n_hot_hexes": 481,
+        "hot_pulse_count_distribution": {
+          "1": 29,
+          "2": 80,
+          "3": 69,
+          "4": 118,
+          "5": 51,
+          "6": 87,
+          "7": 34,
+          "8": 11,
+          "9": 2
+        },
+        "mean_hot_pulses_per_hot_hex": 4.135135135135135,
+        "single_pulse_hot_share": 0.060291060291060294,
+        "example_hex": {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_at_hot_pulse": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "T17",
+          "tau0_contact_pulse": [
+            2,
+            2
+          ],
+          "tau0_contact_hazard_field": 0.9785665294924554,
+          "tau0_contact_hazard_route": 0.7222222222222222,
+          "other_plan": "1",
+          "other_plan_signature": [
+            "T17",
+            4,
+            1
+          ],
+          "other_plan_is_tied_top": false,
+          "other_plan_j_over_jref": 0.3822115384615385,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              2,
+              1
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.9995406063420023
+          ]
+        }
+      },
+      "example_hexes": [
+        {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_hot": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "V18",
+          "hot_pulse": [
+            2,
+            2
+          ],
+          "hazard_hot": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "W17",
+          "hot_pulse": [
+            2,
+            4
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        }
+      ]
+    },
+    "crossing:1v1": {
+      "n_pulses": 33,
+      "time_dependence": {
+        "n_hot_hexes": 399,
+        "hot_pulse_count_distribution": {
+          "1": 43,
+          "2": 113,
+          "3": 79,
+          "4": 149,
+          "5": 14,
+          "6": 1
+        },
+        "mean_hot_pulses_per_hot_hex": 2.9523809523809526,
+        "single_pulse_hot_share": 0.10776942355889724,
+        "example_hex": {
+          "hex": "T19",
+          "hot_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_hot_pulse": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            2
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "T10",
+          "tau0_contact_pulse": [
+            3,
+            3
+          ],
+          "tau0_contact_hazard_field": 0.15972222222222232,
+          "tau0_contact_hazard_route": 0.08333333333333333,
+          "other_plan": "1P2P1P1P",
+          "other_plan_signature": [
+            "O13",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": true,
+          "other_plan_j_over_jref": 1.0,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "example_hexes": [
+        {
+          "hex": "T19",
+          "hot_pulse": [
+            2,
+            0
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            2
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "U19",
+          "hot_pulse": [
+            2,
+            1
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            3
+          ],
+          "hazard_cold": 0.0
+        }
+      ]
+    },
+    "crossing:2v1": {
+      "n_pulses": 33,
+      "time_dependence": {
+        "n_hot_hexes": 481,
+        "hot_pulse_count_distribution": {
+          "1": 29,
+          "2": 80,
+          "3": 69,
+          "4": 118,
+          "5": 51,
+          "6": 87,
+          "7": 34,
+          "8": 11,
+          "9": 2
+        },
+        "mean_hot_pulses_per_hot_hex": 4.135135135135135,
+        "single_pulse_hot_share": 0.060291060291060294,
+        "example_hex": {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_at_hot_pulse": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "T10",
+          "tau0_contact_pulse": [
+            3,
+            3
+          ],
+          "tau0_contact_hazard_field": 0.15972222222222232,
+          "tau0_contact_hazard_route": 0.08333333333333333,
+          "other_plan": "1P2P1P1P",
+          "other_plan_signature": [
+            "O13",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": true,
+          "other_plan_j_over_jref": 1.0,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "example_hexes": [
+        {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_hot": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "V18",
+          "hot_pulse": [
+            2,
+            2
+          ],
+          "hazard_hot": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "W17",
+          "hot_pulse": [
+            2,
+            4
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        }
+      ]
+    },
+    "opposing:1v1": {
+      "n_pulses": 33,
+      "time_dependence": {
+        "n_hot_hexes": 399,
+        "hot_pulse_count_distribution": {
+          "1": 43,
+          "2": 113,
+          "3": 79,
+          "4": 149,
+          "5": 14,
+          "6": 1
+        },
+        "mean_hot_pulses_per_hot_hex": 2.9523809523809526,
+        "single_pulse_hot_share": 0.10776942355889724,
+        "example_hex": {
+          "hex": "T19",
+          "hot_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_hot_pulse": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            2
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "V25",
+          "tau0_contact_pulse": [
+            3,
+            1
+          ],
+          "tau0_contact_hazard_field": 0.15972222222222232,
+          "tau0_contact_hazard_route": 0.08333333333333333,
+          "other_plan": "2S2S1P",
+          "other_plan_signature": [
+            "T26",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": false,
+          "other_plan_j_over_jref": 0.25000000000000006,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              3,
+              2
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.15972222222222232
+          ]
+        }
+      },
+      "example_hexes": [
+        {
+          "hex": "T19",
+          "hot_pulse": [
+            2,
+            0
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            2
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "U19",
+          "hot_pulse": [
+            2,
+            1
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            3
+          ],
+          "hazard_cold": 0.0
+        }
+      ]
+    },
+    "opposing:2v1": {
+      "n_pulses": 33,
+      "time_dependence": {
+        "n_hot_hexes": 481,
+        "hot_pulse_count_distribution": {
+          "1": 29,
+          "2": 80,
+          "3": 69,
+          "4": 118,
+          "5": 51,
+          "6": 87,
+          "7": 34,
+          "8": 11,
+          "9": 2
+        },
+        "mean_hot_pulses_per_hot_hex": 4.135135135135135,
+        "single_pulse_hot_share": 0.060291060291060294,
+        "example_hex": {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_at_hot_pulse": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "V25",
+          "tau0_contact_pulse": [
+            3,
+            1
+          ],
+          "tau0_contact_hazard_field": 0.15972222222222232,
+          "tau0_contact_hazard_route": 0.08333333333333333,
+          "other_plan": "2S2S1P",
+          "other_plan_signature": [
+            "T26",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": false,
+          "other_plan_j_over_jref": 0.3999999999999999,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              3,
+              2
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.22974537037037046
+          ]
+        }
+      },
+      "example_hexes": [
+        {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_hot": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "V18",
+          "hot_pulse": [
+            2,
+            2
+          ],
+          "hazard_hot": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        },
+        {
+          "hex": "W17",
+          "hot_pulse": [
+            2,
+            4
+          ],
+          "hazard_hot": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_cold": 0.0
+        }
+      ]
+    }
+  }
+}

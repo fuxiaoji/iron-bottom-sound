@@ -1,0 +1,17 @@
+{
+  "catalog_reviewed_on": "2026-07-23",
+  "coverage": null,
+  "errors": [],
+  "notice": "Guideline selection and checklist coverage concern reporting completeness only. They are not scores and do not establish study quality, validity, conduct, or manuscript merit. Check the official guideline, applicable extensions, and target venue policy.",
+  "profile_id": "V14-FINITE-GAME-OPTIMIZATION",
+  "schema_version": "2.0",
+  "selected_guidelines": [],
+  "status": "VALID",
+  "valid": true,
+  "warnings": [
+    {
+      "code": "NO_BUNDLED_GUIDELINE_MATCH",
+      "field": "profile.study_types"
+    }
+  ]
+}

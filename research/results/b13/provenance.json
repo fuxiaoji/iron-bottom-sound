@@ -1,0 +1,23 @@
+{
+  "conflict_root_cause": "results.json used MEAN of all 11 plan payoffs vs straight (including deliberately bad plans) as model prediction; report.md used BEST plan payoff.  Both written by different code paths: results.json by b13_engine_validation_v4.py::main() (which averaged), report.md manually using model_predictions.json (which took max).",
+  "resolution": "Best-plan payoff adopted as canonical (it represents the maximin policy's guaranteed open-loop value).  Mean is not meaningful.",
+  "files": {
+    "games.csv": {
+      "source": "b13_engine_validation_v4.py::engine_run",
+      "n": 600
+    },
+    "model_predictions.json": {
+      "source": "AD-HOC inline script",
+      "formula": "max(plan payoffs)"
+    },
+    "results.json": {
+      "source": "b13_engine_validation_v4.py::main()",
+      "formula": "mean(plan payoffs)",
+      "status": "SUPERSEDED"
+    },
+    "report.md": {
+      "source": "manually written",
+      "status": "SUPERSEDED -> regenerated from canonical"
+    }
+  }
+}

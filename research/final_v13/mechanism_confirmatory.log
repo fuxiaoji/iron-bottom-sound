@@ -1,0 +1,12 @@
+mechanism confirmatory head_on 0.75 0.06442169499583122 14.4 s
+mechanism confirmatory head_on 0.9 0.03926001191961085 14.4 s
+mechanism confirmatory head_on 1.1 0.0 15.5 s
+mechanism confirmatory head_on 1.25 0.0 15.7 s
+mechanism confirmatory parallel 0.75 0.1275833315744066 19.3 s
+mechanism confirmatory parallel 0.9 0.1105748622816338 19.4 s
+mechanism confirmatory parallel 1.1 0.10816713582708555 14.5 s
+mechanism confirmatory parallel 1.25 0.09394030404304883 14.4 s
+mechanism confirmatory crossing 0.75 0.11767129008904732 16.4 s
+mechanism confirmatory crossing 0.9 0.10563240436181345 16.4 s
+mechanism confirmatory crossing 1.25 0.03324507232800461 15.0 s
+mechanism confirmatory crossing 1.1 0.06707704409755083 17.3 s

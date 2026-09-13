@@ -1,0 +1,11 @@
+{
+  "physical_configs": 45,
+  "complete_conditions": 8,
+  "expected_conditions": 90,
+  "partial_conditions": 2,
+  "unresolved_values": 0,
+  "complete_test_conditions": 0,
+  "conditions_with_submodularity_violation": 8,
+  "mirror_values_checked": 64,
+  "final": false
+}

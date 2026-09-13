@@ -1,0 +1,5 @@
+# Author-requested experimental review — DRAFT
+
+Authorization is the author/user request for scientific, reviewer, visualization and writing skills, limited by the latest instruction to stop before manuscript writing. This is an open developmental review within the author’s workspace, not a delegated journal review. The intake's checked policy refers to this author-controlled review scope; no journal confidentiality or AI policy is represented as checked. The user remains accountable for any later submission; no final human review or approval is inferred.
+
+The four skills were used for experimental validity, proof and claim boundaries, local audit structure and DRAFT scientific figures. Unpublished project content was not uploaded to an external research service. Public literature lookups used topic/paper metadata only. Local project artifacts are retained as authorized experimental deliverables. No editorial decision, independent reviewer status, CAS tier or publication-quality score is claimed.

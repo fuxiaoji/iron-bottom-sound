@@ -1,0 +1,105 @@
+{
+ "params": {
+  "heading_deg": 0.0,
+  "ship_len_cells": 3.0,
+  "segments_per_ship": 4,
+  "n_ships": 2,
+  "spacing_cells": 6.0,
+  "speed_cells_per_step": 1.0,
+  "frames_t": [
+   0,
+   6,
+   12
+  ],
+  "target": "speed-4 broadside stationary point target",
+  "kernel_class": "CA",
+  "grid_step": 0.5,
+  "source_positions_t0": [
+   [
+    -1.125,
+    0.0,
+    0.0
+   ],
+   [
+    -0.375,
+    0.0,
+    0.0
+   ],
+   [
+    0.375,
+    0.0,
+    0.0
+   ],
+   [
+    1.125,
+    0.0,
+    0.0
+   ],
+   [
+    -7.125,
+    0.0,
+    0.0
+   ],
+   [
+    -6.375,
+    0.0,
+    0.0
+   ],
+   [
+    -5.625,
+    0.0,
+    0.0
+   ],
+   [
+    -4.875,
+    0.0,
+    0.0
+   ]
+  ],
+  "smoothing": "centred moving average, k=5"
+ },
+ "comoving_stability": {
+  "0": {
+   "max_abs_dev": 0.0,
+   "mean_abs_dev": 0.0,
+   "rel_mean_dev": 0.0,
+   "pearson": 0.9999999999999999
+  },
+  "6": {
+   "max_abs_dev": 0.0,
+   "mean_abs_dev": 0.0,
+   "rel_mean_dev": 0.0,
+   "pearson": 1.0
+  },
+  "12": {
+   "max_abs_dev": 0.0,
+   "mean_abs_dev": 0.0,
+   "rel_mean_dev": 0.0,
+   "pearson": 0.9999999999999999
+  }
+ },
+ "center_vs_flank_ridge_y6": {
+  "0": {
+   "F_center(x=-3)": 9.175055504609688,
+   "F_flank_aft(x=-7.5)": 7.724595287005343,
+   "F_flank_fwd(x=+1.5)": 7.724595287005342,
+   "argmax_x": -3.0,
+   "center_gt_both_flanks": true
+  },
+  "6": {
+   "F_center(x=-3)": 9.175055504609688,
+   "F_flank_aft(x=-7.5)": 7.724595287005343,
+   "F_flank_fwd(x=+1.5)": 7.724595287005342,
+   "argmax_x": -3.0,
+   "center_gt_both_flanks": true
+  },
+  "12": {
+   "F_center(x=-3)": 9.175055504609688,
+   "F_flank_aft(x=-7.5)": 7.724595287005343,
+   "F_flank_fwd(x=+1.5)": 7.724595287005342,
+   "argmax_x": -3.0,
+   "center_gt_both_flanks": true
+  }
+ },
+ "interpretation_pending": "see report.md"
+}

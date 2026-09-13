@@ -1,0 +1,28 @@
+{
+  "grid5_lf_cells": 18,
+  "grid5_lf_sign_certified": 18,
+  "grid5_lf_reversals": 0,
+  "grid7_lf_cells": 18,
+  "grid7_lf_reversals": 0,
+  "geometry_support": {
+    "head_on": {
+      "pos": 3,
+      "neg": 3,
+      "n": 6
+    },
+    "parallel": {
+      "pos": 3,
+      "neg": 3,
+      "n": 6
+    },
+    "crossing": {
+      "pos": 3,
+      "neg": 3,
+      "n": 6
+    }
+  },
+  "rigid_vs_lf_sign_match": "18/18",
+  "h1_exact_all": true,
+  "verdict": "LF-CORE-STRONG",
+  "wall_time_s": 1792.7
+}

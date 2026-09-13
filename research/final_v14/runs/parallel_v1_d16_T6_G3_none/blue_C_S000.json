@@ -1,0 +1,327 @@
+{
+  "V": 1.0094014339743877e-15,
+  "LB": -4.03427593718484e-07,
+  "UB": 4.034275911720374e-07,
+  "gap": 8.068551848905214e-07,
+  "S": [],
+  "S_R": [],
+  "opponent": "C",
+  "T": 6,
+  "base": 3,
+  "status": "certified_numeric",
+  "seconds": 0.6964533340069465,
+  "iterations": 40,
+  "policy_count": 40,
+  "trace": [
+    {
+      "iteration": 1,
+      "policies": 1,
+      "LB": -15.507851405646335,
+      "UB": 17.039293866755024,
+      "elapsed": 0.0071047090023057535
+    },
+    {
+      "iteration": 2,
+      "policies": 2,
+      "LB": -11.627374419207454,
+      "UB": 8.19686699581798,
+      "elapsed": 0.013793459002044983
+    },
+    {
+      "iteration": 3,
+      "policies": 3,
+      "LB": -10.796413828342368,
+      "UB": 10.030450011381223,
+      "elapsed": 0.021078542005852796
+    },
+    {
+      "iteration": 4,
+      "policies": 4,
+      "LB": -5.868586432262798,
+      "UB": 7.391703835243965,
+      "elapsed": 0.029107374997693114
+    },
+    {
+      "iteration": 5,
+      "policies": 5,
+      "LB": -4.55612574246762,
+      "UB": 12.541951564967166,
+      "elapsed": 0.03838441699917894
+    },
+    {
+      "iteration": 6,
+      "policies": 6,
+      "LB": -3.9451458808341506,
+      "UB": 7.422805235871677,
+      "elapsed": 0.04746549999981653
+    },
+    {
+      "iteration": 7,
+      "policies": 7,
+      "LB": -2.7486889653986255,
+      "UB": 7.756088343664337,
+      "elapsed": 0.0576522500050487
+    },
+    {
+      "iteration": 8,
+      "policies": 8,
+      "LB": -2.4400154106611955,
+      "UB": 6.109529563722057,
+      "elapsed": 0.06790945900138468
+    },
+    {
+      "iteration": 9,
+      "policies": 9,
+      "LB": -1.8824858375152453,
+      "UB": 7.430906619948144,
+      "elapsed": 0.07757870900968555
+    },
+    {
+      "iteration": 10,
+      "policies": 10,
+      "LB": -1.8237889639757645,
+      "UB": 3.6079716037043026,
+      "elapsed": 0.08774637500755489
+    },
+    {
+      "iteration": 11,
+      "policies": 11,
+      "LB": -1.3800120127709108,
+      "UB": 5.645838129011053,
+      "elapsed": 0.09870666700589936
+    },
+    {
+      "iteration": 12,
+      "policies": 12,
+      "LB": -1.0665900423230807,
+      "UB": 3.7686135833883436,
+      "elapsed": 0.10987258399836719
+    },
+    {
+      "iteration": 13,
+      "policies": 13,
+      "LB": -1.0375826132575727,
+      "UB": 3.82405968738323,
+      "elapsed": 0.12094112500199117
+    },
+    {
+      "iteration": 14,
+      "policies": 14,
+      "LB": -0.8276136236348669,
+      "UB": 5.553732347729607,
+      "elapsed": 0.13267962500685826
+    },
+    {
+      "iteration": 15,
+      "policies": 15,
+      "LB": -0.5182151295723912,
+      "UB": 4.984208214465968,
+      "elapsed": 0.14614562501083128
+    },
+    {
+      "iteration": 16,
+      "policies": 16,
+      "LB": -0.42619294700851523,
+      "UB": 3.058853657969705,
+      "elapsed": 0.15961458400124684
+    },
+    {
+      "iteration": 17,
+      "policies": 17,
+      "LB": -0.3851492496124075,
+      "UB": 2.637534122653105,
+      "elapsed": 0.17335687500599306
+    },
+    {
+      "iteration": 18,
+      "policies": 18,
+      "LB": -0.295403834440067,
+      "UB": 1.6071604817533305,
+      "elapsed": 0.1879630420007743
+    },
+    {
+      "iteration": 19,
+      "policies": 19,
+      "LB": -0.23528637105500372,
+      "UB": 1.9344666292981345,
+      "elapsed": 0.2029787089995807
+    },
+    {
+      "iteration": 20,
+      "policies": 20,
+      "LB": -0.21406002017944448,
+      "UB": 1.2588618407798418,
+      "elapsed": 0.21899412501079496
+    },
+    {
+      "iteration": 21,
+      "policies": 21,
+      "LB": -0.16416240271967428,
+      "UB": 0.9887869251358572,
+      "elapsed": 0.23625741701107472
+    },
+    {
+      "iteration": 22,
+      "policies": 22,
+      "LB": -0.13852514862473242,
+      "UB": 0.6188417436663661,
+      "elapsed": 0.2539107089978643
+    },
+    {
+      "iteration": 23,
+      "policies": 23,
+      "LB": -0.10729079089307901,
+      "UB": 0.7713227383519169,
+      "elapsed": 0.2727657089999411
+    },
+    {
+      "iteration": 24,
+      "policies": 24,
+      "LB": -0.0689488151591226,
+      "UB": 0.6003381428028912,
+      "elapsed": 0.29066374999820255
+    },
+    {
+      "iteration": 25,
+      "policies": 25,
+      "LB": -0.05874335544381043,
+      "UB": 0.5638558440666308,
+      "elapsed": 0.30811716700554825
+    },
+    {
+      "iteration": 26,
+      "policies": 26,
+      "LB": -0.051443518359097815,
+      "UB": 0.7278654275263566,
+      "elapsed": 0.32757579200551845
+    },
+    {
+      "iteration": 27,
+      "policies": 27,
+      "LB": -0.050938628927859,
+      "UB": 0.5214993981334611,
+      "elapsed": 0.34740520900231786
+    },
+    {
+      "iteration": 28,
+      "policies": 28,
+      "LB": -0.035281121197236816,
+      "UB": 0.26633009128785395,
+      "elapsed": 0.36748437500500586
+    },
+    {
+      "iteration": 29,
+      "policies": 29,
+      "LB": -0.030448563174138573,
+      "UB": 0.39847734728969986,
+      "elapsed": 0.3886215840029763
+    },
+    {
+      "iteration": 30,
+      "policies": 30,
+      "LB": -0.029534546993293075,
+      "UB": 0.2969045685461282,
+      "elapsed": 0.4120074590027798
+    },
+    {
+      "iteration": 31,
+      "policies": 31,
+      "LB": -0.024656133066640717,
+      "UB": 0.2658533172475342,
+      "elapsed": 0.4365774590114597
+    },
+    {
+      "iteration": 32,
+      "policies": 32,
+      "LB": -0.024626266219493497,
+      "UB": 0.1588782452256187,
+      "elapsed": 0.46000370899855625
+    },
+    {
+      "iteration": 33,
+      "policies": 33,
+      "LB": -0.020816349579548893,
+      "UB": 0.16174482276006602,
+      "elapsed": 0.48325037500762846
+    },
+    {
+      "iteration": 34,
+      "policies": 34,
+      "LB": -0.009530554205654804,
+      "UB": 0.23555925679108353,
+      "elapsed": 0.5079215840087272
+    },
+    {
+      "iteration": 35,
+      "policies": 35,
+      "LB": -0.008254838358148468,
+      "UB": 0.20014116201447757,
+      "elapsed": 0.5334061670000665
+    },
+    {
+      "iteration": 36,
+      "policies": 36,
+      "LB": -0.004131732639828658,
+      "UB": 0.12987400392082443,
+      "elapsed": 0.5583814170095138
+    },
+    {
+      "iteration": 37,
+      "policies": 37,
+      "LB": -0.0030637522332440602,
+      "UB": 0.11512223008396655,
+      "elapsed": 0.615935542009538
+    },
+    {
+      "iteration": 38,
+      "policies": 38,
+      "LB": -0.0005073005107412342,
+      "UB": 0.06109625316667173,
+      "elapsed": 0.6422680420073448
+    },
+    {
+      "iteration": 39,
+      "policies": 39,
+      "LB": -7.515357652988729e-06,
+      "UB": 0.05310049467517137,
+      "elapsed": 0.6694429170020157
+    },
+    {
+      "iteration": 40,
+      "policies": 40,
+      "LB": -4.03427593718484e-07,
+      "UB": 4.034275911720374e-07,
+      "elapsed": 0.6964484170021024
+    }
+  ],
+  "numerical_padding": 4.0342758739727914e-07,
+  "pricing": "exact full-history dynamic program",
+  "algorithm": "one-sided contingent-policy generation; full committed opponent space",
+  "certification_scope": "finite game; full-space floating-point response bounds",
+  "config_id": "parallel_v1_d16_T6_G3_none",
+  "side": "blue",
+  "mask": 0,
+  "seconds_total": 0.6977269999915734,
+  "peak_rss_bytes": 123125760,
+  "created_utc": "2026-09-13T06:00:02.755373+00:00",
+  "core_hashes": {
+    "research/formation/schedule_v14.py": "cb9150dd827acdbe48191704f4b68d00a76090729b9bb7c0654b6a5918a195a9",
+    "research/formation/pricing_v14.py": "6845651480958860de0855284b0290c9c0aef55f33aca124d28efe78152a7ab8",
+    "research/formation/physical_v14.py": "1bb7e8761ec05395d5279368c28618a9e58aee1ba02cc24922e437d3c4c5d248",
+    "research/experiments/v14_run.py": "a9f4bef051a58a66318b0fa769501eac011ac7d550b8f39efe45a37e10184f2b",
+    "research/formation/commitment_v12.py": "b4645f1abb6afd778687c5f8c40b6dfb5354384305533ccb00bbf7663689583e",
+    "research/formation/payoff_v13.py": "7ba3ad97900fe9d1af1d3eda6fd8d9346ec97880098d775c77c9c4a149308aa0",
+    "research/formation/path_following.py": "1faa140c3eb3fa417bea3dac54b4ce63d4048047a6150ef2e302456289fe601b",
+    "research/formation/matched_horizon.py": "d9f394abd082f392b41ea5194a98a32b72c9b64f9bb43f5017f21fc4c5456f02",
+    "research/formation/exact_v12.py": "bc4893cf4c85ae52e2ffb0189698bb44f15dc974e1453a86fdf1acb661e5cba3",
+    "research/experiments/v13_exact.py": "76913982029ca7236723601ac380d16a23f744275153afcd81eec7f32f43f346",
+    "research/results/e01/kernel_fits.json": "8ec3e881e5ec262983bcd249abddecd0a75d9e550e631c5eedebeca061436384"
+  },
+  "design_sha256": "fb92864810ea05f3aac9542297f702109793bd4623433d32d9ab49dff06ff4dc",
+  "execution": {
+    "reason": "completed",
+    "returncode": 0,
+    "wall_seconds": 2.0459934169921326,
+    "tree_peak_rss_bytes": 117489664
+  }
+}

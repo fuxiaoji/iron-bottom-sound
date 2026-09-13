@@ -1,0 +1,8 @@
+{
+  "schema_version": "2.0",
+  "profile_id": "V14-FINITE-GAME-OPTIMIZATION",
+  "study_types": ["computational_mathematics"],
+  "report_kind": "results",
+  "features": [],
+  "domains": ["operations_research"]
+}

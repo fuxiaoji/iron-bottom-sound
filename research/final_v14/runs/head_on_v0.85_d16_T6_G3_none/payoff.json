@@ -1,0 +1,32 @@
+{
+  "config": {
+    "id": "head_on_v0.85_d16_T6_G3_none",
+    "geometry": "head_on",
+    "speed": 0.85,
+    "distance": 16.0,
+    "T": 6,
+    "grid": 3,
+    "ablation": "none",
+    "phases": [
+      "development"
+    ],
+    "mirror_solve_all": false,
+    "opponents": [
+      "F",
+      "C"
+    ]
+  },
+  "seconds": 19.853956874998403,
+  "mirror_error": 2.4158453015843406e-13,
+  "blue_sha256": "3fd193107ed7d675b741f9c190e4a0f251a3725ecf105dcc90c1705b206a53eb",
+  "red_sha256": "b9c688f4396fbd919b92532b0d06d7405afa689e379719cef89f9f94e2c4bab4",
+  "shape": [
+    729,
+    729
+  ],
+  "scale": 49.375276689423764,
+  "minimum": -49.375276689423764,
+  "maximum": 32.174126681421626,
+  "created_utc": "2026-09-13T04:52:17.254011+00:00",
+  "peak_rss_bytes": 182697984
+}

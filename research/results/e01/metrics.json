@@ -1,0 +1,75 @@
+{
+  "per_class": {
+    "DD": {
+      "train": {
+        "spearman": 0.9918626649544378,
+        "p_value": 0.0,
+        "nmae": 0.05974620680285771,
+        "n": 3553
+      },
+      "test": {
+        "spearman": 0.9913123354728295,
+        "p_value": 0.0,
+        "nmae": 0.061649541693477604,
+        "n": 1523
+      },
+      "attacker": "IBS-U-USN-LAFFEY",
+      "target": "IBS-U-IJN-FUBUKI"
+    },
+    "CL": {
+      "train": {
+        "spearman": 0.9916684417565691,
+        "p_value": 0.0,
+        "nmae": 0.0535592590428075,
+        "n": 3553
+      },
+      "test": {
+        "spearman": 0.9917178630610106,
+        "p_value": 0.0,
+        "nmae": 0.054968829760994306,
+        "n": 1523
+      },
+      "attacker": "IBS-U-USN-HELENA",
+      "target": "IBS-U-USN-ST-LOUIS"
+    },
+    "CA": {
+      "train": {
+        "spearman": 0.9914497402475002,
+        "p_value": 0.0,
+        "nmae": 0.055967082924869946,
+        "n": 3553
+      },
+      "test": {
+        "spearman": 0.990839354294363,
+        "p_value": 0.0,
+        "nmae": 0.05768123802755606,
+        "n": 1523
+      },
+      "attacker": "IBS-U-USN-SAN-FRANCISCO",
+      "target": "IBS-U-IJN-AOBA"
+    },
+    "BB": {
+      "train": {
+        "spearman": 0.9913539986918936,
+        "p_value": 0.0,
+        "nmae": 0.05245533038864086,
+        "n": 3553
+      },
+      "test": {
+        "spearman": 0.9907327438558726,
+        "p_value": 0.0,
+        "nmae": 0.05429762753008782,
+        "n": 1523
+      },
+      "attacker": "IBS-U-IJN-ERMA-YAMATO",
+      "target": "IBS-U-USN-ERMA-IOWA"
+    }
+  },
+  "pooled_spearman": 0.9911505741710189,
+  "pooled_nmae": 0.05714930925302895,
+  "acceptance": "PASS",
+  "criteria": {
+    "spearman_min": 0.9,
+    "nmae_max": 0.15
+  }
+}

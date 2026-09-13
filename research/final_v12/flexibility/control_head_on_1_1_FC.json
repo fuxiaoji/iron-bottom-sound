@@ -1,0 +1,20 @@
+{
+  "V": 5.348411684396352,
+  "LB": 5.34841168439635,
+  "UB": 5.348411684396351,
+  "gap": 8.881784197001252e-16,
+  "flow_residual_B": 3.858025010572419e-15,
+  "flow_residual_R": 2.3040651418032576e-16,
+  "inequality_violation": 1.9539925233402755e-14,
+  "structure": "FC",
+  "base": 3,
+  "T": 6,
+  "sequences_B": 199291,
+  "sequences_R": 730,
+  "infosets_B": 66430,
+  "infosets_R": 1,
+  "payoff_nonzeros": 531441,
+  "lp_iterations": 49791,
+  "algorithm": "sparse perfect-recall sequence-form LP with full realization best responses",
+  "seconds": 32.80343794822693
+}

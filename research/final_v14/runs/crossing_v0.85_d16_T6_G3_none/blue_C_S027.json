@@ -1,0 +1,389 @@
+{
+  "V": 0.14635842914906239,
+  "LB": 0.14635801339580434,
+  "UB": 0.14635884490229895,
+  "gap": 8.315064945772594e-07,
+  "S": [
+    1,
+    2,
+    4,
+    5
+  ],
+  "S_R": [],
+  "opponent": "C",
+  "T": 6,
+  "base": 3,
+  "status": "certified_numeric",
+  "seconds": 1.6596226249967003,
+  "iterations": 49,
+  "policy_count": 49,
+  "trace": [
+    {
+      "iteration": 1,
+      "policies": 1,
+      "LB": -1.1206235208653186,
+      "UB": 3.654378890879592,
+      "elapsed": 0.025602458001230843
+    },
+    {
+      "iteration": 2,
+      "policies": 2,
+      "LB": -1.1206235208653186,
+      "UB": 2.0087488364368618,
+      "elapsed": 0.03918166599760298
+    },
+    {
+      "iteration": 3,
+      "policies": 3,
+      "LB": -1.1083303587980746,
+      "UB": 1.7497934308762375,
+      "elapsed": 0.05461091600591317
+    },
+    {
+      "iteration": 4,
+      "policies": 4,
+      "LB": -1.0523480434770829,
+      "UB": 4.028224809281786,
+      "elapsed": 0.06654987500223797
+    },
+    {
+      "iteration": 5,
+      "policies": 5,
+      "LB": -0.7093560802699096,
+      "UB": 1.4773032365809093,
+      "elapsed": 0.08086429099785164
+    },
+    {
+      "iteration": 6,
+      "policies": 6,
+      "LB": -0.6859442921898556,
+      "UB": 4.136820826461899,
+      "elapsed": 0.09791450000193436
+    },
+    {
+      "iteration": 7,
+      "policies": 7,
+      "LB": -0.648191409408411,
+      "UB": 2.371499429104284,
+      "elapsed": 0.11255562500446104
+    },
+    {
+      "iteration": 8,
+      "policies": 8,
+      "LB": -0.5216230118283227,
+      "UB": 0.459829168040254,
+      "elapsed": 0.1309376660065027
+    },
+    {
+      "iteration": 9,
+      "policies": 9,
+      "LB": -0.4395866057793109,
+      "UB": 1.2768470041361462,
+      "elapsed": 0.14831304100516718
+    },
+    {
+      "iteration": 10,
+      "policies": 10,
+      "LB": -0.4101904396348414,
+      "UB": 1.517275142988634,
+      "elapsed": 0.16316241600725334
+    },
+    {
+      "iteration": 11,
+      "policies": 11,
+      "LB": -0.38321640836263854,
+      "UB": 0.6610317196364491,
+      "elapsed": 0.18235920800361782
+    },
+    {
+      "iteration": 12,
+      "policies": 12,
+      "LB": -0.32449364811453163,
+      "UB": 1.122487082306071,
+      "elapsed": 0.19939816600526683
+    },
+    {
+      "iteration": 13,
+      "policies": 13,
+      "LB": -0.3195355569081058,
+      "UB": 1.345481732255721,
+      "elapsed": 0.22087770799407735
+    },
+    {
+      "iteration": 14,
+      "policies": 14,
+      "LB": -0.2583708928212395,
+      "UB": 1.3636224415688711,
+      "elapsed": 0.23762466599873733
+    },
+    {
+      "iteration": 15,
+      "policies": 15,
+      "LB": -0.21063990783204525,
+      "UB": 1.7925050274178385,
+      "elapsed": 0.26164349999453407
+    },
+    {
+      "iteration": 16,
+      "policies": 16,
+      "LB": -0.19110359098317964,
+      "UB": 0.9279404722178982,
+      "elapsed": 0.2906781250057975
+    },
+    {
+      "iteration": 17,
+      "policies": 17,
+      "LB": -0.14408265558706065,
+      "UB": 1.445737962796042,
+      "elapsed": 0.31116700000711717
+    },
+    {
+      "iteration": 18,
+      "policies": 18,
+      "LB": -0.10133846677124494,
+      "UB": 1.3561874077365288,
+      "elapsed": 0.3453819580026902
+    },
+    {
+      "iteration": 19,
+      "policies": 19,
+      "LB": -0.05762022302010981,
+      "UB": 2.166475776884819,
+      "elapsed": 0.38303904100030195
+    },
+    {
+      "iteration": 20,
+      "policies": 20,
+      "LB": -0.028778258150370998,
+      "UB": 1.6148860251917618,
+      "elapsed": 0.454229833005229
+    },
+    {
+      "iteration": 21,
+      "policies": 21,
+      "LB": 0.021378401653775355,
+      "UB": 0.9960974855852959,
+      "elapsed": 0.5117682499985676
+    },
+    {
+      "iteration": 22,
+      "policies": 22,
+      "LB": 0.03281077321215246,
+      "UB": 1.564993621669346,
+      "elapsed": 0.5401800830004504
+    },
+    {
+      "iteration": 23,
+      "policies": 23,
+      "LB": 0.03658563452517959,
+      "UB": 0.37604511802902907,
+      "elapsed": 0.5785038330068346
+    },
+    {
+      "iteration": 24,
+      "policies": 24,
+      "LB": 0.04194861798537018,
+      "UB": 0.5100776776496598,
+      "elapsed": 0.6032359160017222
+    },
+    {
+      "iteration": 25,
+      "policies": 25,
+      "LB": 0.04349220302735031,
+      "UB": 0.5738309192421693,
+      "elapsed": 0.6336604160023853
+    },
+    {
+      "iteration": 26,
+      "policies": 26,
+      "LB": 0.04472283157679389,
+      "UB": 0.37135531205521916,
+      "elapsed": 0.6635690410039388
+    },
+    {
+      "iteration": 27,
+      "policies": 27,
+      "LB": 0.04698925454396806,
+      "UB": 0.4463786237640359,
+      "elapsed": 0.7005013330053771
+    },
+    {
+      "iteration": 28,
+      "policies": 28,
+      "LB": 0.06063125635710393,
+      "UB": 0.7733219687531074,
+      "elapsed": 0.7305984580016229
+    },
+    {
+      "iteration": 29,
+      "policies": 29,
+      "LB": 0.07676658360024767,
+      "UB": 0.6335898190614139,
+      "elapsed": 0.7569087080046302
+    },
+    {
+      "iteration": 30,
+      "policies": 30,
+      "LB": 0.1006791848564076,
+      "UB": 0.4042698607839479,
+      "elapsed": 0.7928513749939157
+    },
+    {
+      "iteration": 31,
+      "policies": 31,
+      "LB": 0.10725713051620675,
+      "UB": 0.49696778874887293,
+      "elapsed": 0.8265127500053495
+    },
+    {
+      "iteration": 32,
+      "policies": 32,
+      "LB": 0.12470102064316732,
+      "UB": 0.32408613574558237,
+      "elapsed": 0.8647938329959288
+    },
+    {
+      "iteration": 33,
+      "policies": 33,
+      "LB": 0.12716847269765585,
+      "UB": 0.2573087703768823,
+      "elapsed": 0.9044253330066567
+    },
+    {
+      "iteration": 34,
+      "policies": 34,
+      "LB": 0.13202370361666366,
+      "UB": 0.3382257559363377,
+      "elapsed": 0.9494378329982283
+    },
+    {
+      "iteration": 35,
+      "policies": 35,
+      "LB": 0.1362091488702497,
+      "UB": 0.2996728908616234,
+      "elapsed": 0.9934817909961566
+    },
+    {
+      "iteration": 36,
+      "policies": 36,
+      "LB": 0.13818362215754845,
+      "UB": 0.2143138244446594,
+      "elapsed": 1.0361874579975847
+    },
+    {
+      "iteration": 37,
+      "policies": 37,
+      "LB": 0.14122592317984922,
+      "UB": 0.19699493450602856,
+      "elapsed": 1.0799419160030084
+    },
+    {
+      "iteration": 38,
+      "policies": 38,
+      "LB": 0.14427775272142332,
+      "UB": 0.19371199344590567,
+      "elapsed": 1.1288789160025772
+    },
+    {
+      "iteration": 39,
+      "policies": 39,
+      "LB": 0.14589679273581332,
+      "UB": 0.1502100654883305,
+      "elapsed": 1.177174708005623
+    },
+    {
+      "iteration": 40,
+      "policies": 40,
+      "LB": 0.14603131402350364,
+      "UB": 0.15111024226374478,
+      "elapsed": 1.2311034159938572
+    },
+    {
+      "iteration": 41,
+      "policies": 41,
+      "LB": 0.14607893312601045,
+      "UB": 0.14863721467298366,
+      "elapsed": 1.2782806659961352
+    },
+    {
+      "iteration": 42,
+      "policies": 42,
+      "LB": 0.14608989911163237,
+      "UB": 0.1486349227529344,
+      "elapsed": 1.32075425000221
+    },
+    {
+      "iteration": 43,
+      "policies": 43,
+      "LB": 0.14625460235291535,
+      "UB": 0.14741186032427286,
+      "elapsed": 1.3638486249983544
+    },
+    {
+      "iteration": 44,
+      "policies": 44,
+      "LB": 0.14627105544146865,
+      "UB": 0.14801154770201275,
+      "elapsed": 1.406977332997485
+    },
+    {
+      "iteration": 45,
+      "policies": 45,
+      "LB": 0.14627769845956098,
+      "UB": 0.14774927212243757,
+      "elapsed": 1.4505204580054851
+    },
+    {
+      "iteration": 46,
+      "policies": 46,
+      "LB": 0.14627798556862756,
+      "UB": 0.14774632212770258,
+      "elapsed": 1.5025915000005625
+    },
+    {
+      "iteration": 47,
+      "policies": 47,
+      "LB": 0.14633585533836038,
+      "UB": 0.14758293048835044,
+      "elapsed": 1.5557367910078028
+    },
+    {
+      "iteration": 48,
+      "policies": 48,
+      "LB": 0.1463499216812045,
+      "UB": 0.1482126638233739,
+      "elapsed": 1.6108535829989705
+    },
+    {
+      "iteration": 49,
+      "policies": 49,
+      "LB": 0.14635801339580434,
+      "UB": 0.14635884490229895,
+      "elapsed": 1.6596028329950059
+    }
+  ],
+  "numerical_padding": 4.1575321728485244e-07,
+  "pricing": "exact full-history dynamic program",
+  "algorithm": "one-sided contingent-policy generation; full committed opponent space",
+  "certification_scope": "finite game; full-space floating-point response bounds",
+  "config_id": "crossing_v0.85_d16_T6_G3_none",
+  "side": "blue",
+  "mask": 27,
+  "seconds_total": 1.6632080420095008,
+  "peak_rss_bytes": 136871936,
+  "created_utc": "2026-09-13T06:32:55.077215+00:00",
+  "core_hashes": {
+    "research/formation/schedule_v14.py": "cb9150dd827acdbe48191704f4b68d00a76090729b9bb7c0654b6a5918a195a9",
+    "research/formation/pricing_v14.py": "6845651480958860de0855284b0290c9c0aef55f33aca124d28efe78152a7ab8",
+    "research/formation/physical_v14.py": "1bb7e8761ec05395d5279368c28618a9e58aee1ba02cc24922e437d3c4c5d248",
+    "research/experiments/v14_run.py": "a9f4bef051a58a66318b0fa769501eac011ac7d550b8f39efe45a37e10184f2b",
+    "research/formation/commitment_v12.py": "b4645f1abb6afd778687c5f8c40b6dfb5354384305533ccb00bbf7663689583e",
+    "research/formation/payoff_v13.py": "7ba3ad97900fe9d1af1d3eda6fd8d9346ec97880098d775c77c9c4a149308aa0",
+    "research/formation/path_following.py": "1faa140c3eb3fa417bea3dac54b4ce63d4048047a6150ef2e302456289fe601b",
+    "research/formation/matched_horizon.py": "d9f394abd082f392b41ea5194a98a32b72c9b64f9bb43f5017f21fc4c5456f02",
+    "research/formation/exact_v12.py": "bc4893cf4c85ae52e2ffb0189698bb44f15dc974e1453a86fdf1acb661e5cba3",
+    "research/experiments/v13_exact.py": "76913982029ca7236723601ac380d16a23f744275153afcd81eec7f32f43f346",
+    "research/results/e01/kernel_fits.json": "8ec3e881e5ec262983bcd249abddecd0a75d9e550e631c5eedebeca061436384"
+  },
+  "design_sha256": "fb92864810ea05f3aac9542297f702109793bd4623433d32d9ab49dff06ff4dc"
+}

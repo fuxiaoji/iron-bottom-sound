@@ -1,0 +1,22 @@
+{
+  "n_asymmetric_K6": 18,
+  "n_sign_certified": 18,
+  "certified_reversals": 0,
+  "geometry_certification": {
+    "head_on": {
+      "pos_certified": 3,
+      "neg_certified": 3
+    },
+    "parallel": {
+      "pos_certified": 3,
+      "neg_certified": 3
+    },
+    "crossing": {
+      "pos_certified": 3,
+      "neg_certified": 3
+    }
+  },
+  "k_refinement_sign_stable": true,
+  "tight_cells": 0,
+  "verdict": "KEEP CORE (STRONG)"
+}

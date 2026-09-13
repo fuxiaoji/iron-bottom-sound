@@ -1,0 +1,104 @@
+plan,section,source_line,title,disposition,v14_tasks,evidence,note
+v12,0,23,为什么 v11 还不能被解释成“Commitment 已被证伪”,已有证据完成,P02/P03,research/final_v13/v12_freeze/V12_FROZEN_CONCLUSIONS.md,保留已执行的模型审计/数学基础；纠正无条件对称性及闭环退化推论。
+v12,1,90,目前代码中必须先修的两个具体问题,已有证据完成,P02/P03,research/final_v12/audit/PHASE_A_GATE.json; research/final_v12/freeze/AMENDMENT_03_CONTROL_PRECISION.md,原 Monte Carlo Gate 仍失败；确定性精确路线按事前修订执行，不能改称原 Gate 通过。
+v12,2,267,Double Oracle 必须从“固定迭代数”改成“收敛驱动”,已有证据完成,P02/P03,research/final_v12/audit/PHASE_A_GATE.json; research/final_v12/freeze/AMENDMENT_03_CONTROL_PRECISION.md,原 Monte Carlo Gate 仍失败；确定性精确路线按事前修订执行，不能改称原 Gate 通过。
+v12,3,336,将“统计误差”和“求解器误差”分开,已有证据完成,P02/P03,research/final_v12/audit/PHASE_A_GATE.json; research/final_v12/freeze/AMENDMENT_03_CONTROL_PRECISION.md,原 Monte Carlo Gate 仍失败；确定性精确路线按事前修订执行，不能改称原 Gate 通过。
+v12,4,383,Phase A — Commitment Solver Audit,已有证据完成,P02/P03,research/final_v12/audit/PHASE_A_GATE.json; research/final_v12/freeze/AMENDMENT_03_CONTROL_PRECISION.md,原 Monte Carlo Gate 仍失败；确定性精确路线按事前修订执行，不能改称原 Gate 通过。
+v12,5,547,Solver Audit Stop Gate,已有证据完成,P02/P03,research/final_v12/audit/PHASE_A_GATE.json; research/final_v12/freeze/AMENDMENT_03_CONTROL_PRECISION.md,原 Monte Carlo Gate 仍失败；确定性精确路线按事前修订执行，不能改称原 Gate 通过。
+v12,6,578,Phase B — Exact Grid-3 Gold Standard,已有证据完成,P02/P03,research/final_v12/exact_grid3; research/final_v12/freeze/SCIENTIFIC_STOP.md,完整精确控制和六锚点已执行；进入 B2/D 分支，未复活 range 符号规律。
+v12,7,609,Same-cadence exact block game,已有证据完成,P02/P03,research/final_v12/exact_grid3; research/final_v12/freeze/SCIENTIFIC_STOP.md,完整精确控制和六锚点已执行；进入 B2/D 分支，未复活 range 符号规律。
+v12,8,668,Exact Grid-3 首先做 3 个 symmetric controls,已有证据完成,P02/P03,research/final_v12/exact_grid3; research/final_v12/freeze/SCIENTIFIC_STOP.md,完整精确控制和六锚点已执行；进入 B2/D 分支，未复活 range 符号规律。
+v12,9,688,然后做 6 个 asymmetric anchors,已有证据完成,P02/P03,research/final_v12/exact_grid3; research/final_v12/freeze/SCIENTIFIC_STOP.md,完整精确控制和六锚点已执行；进入 B2/D 分支，未复活 range 符号规律。
+v12,10,708,这里有两条分支,已有证据完成,P02/P03,research/final_v12/exact_grid3; research/final_v12/freeze/SCIENTIFIC_STOP.md,完整精确控制和六锚点已执行；进入 B2/D 分支，未复活 range 符号规律。
+v12,11,750,为什么“双方同时 commitment”本来就可能没有单调符号,已有证据完成,P02/P03,research/final_v13/v12_freeze/V12_FROZEN_CONCLUSIONS.md,保留已执行的模型审计/数学基础；纠正无条件对称性及闭环退化推论。
+v12,12,783,Phase D — 把 Commitment 重构成“Value of Flexibility”,已有证据完成,P02/P03,research/final_v13/v12_freeze/V12_FROZEN_CONCLUSIONS.md,保留已执行的模型审计/数学基础；纠正无条件对称性及闭环退化推论。
+v12,13,824,Proposition A — Own flexibility cannot hurt,已有证据完成,P02/P03,research/final_v13/v12_freeze/V12_FROZEN_CONCLUSIONS.md,保留已执行的模型审计/数学基础；纠正无条件对称性及闭环退化推论。
+v12,14,851,Proposition B — Opponent flexibility cannot help Blue,已有证据完成,P02/P03,research/final_v13/v12_freeze/V12_FROZEN_CONCLUSIONS.md,保留已执行的模型审计/数学基础；纠正无条件对称性及闭环退化推论。
+v12,15,878,Proposition C — Bilateral commitment decomposition,已有证据完成,P02/P03,research/final_v13/v12_freeze/V12_FROZEN_CONCLUSIONS.md,保留已执行的模型审计/数学基础；纠正无条件对称性及闭环退化推论。
+v12,16,944,Proposition D — Symmetric game cancellation,已有证据完成,P02/P03,research/final_v13/v12_freeze/V12_FROZEN_CONCLUSIONS.md,保留已执行的模型审计/数学基础；纠正无条件对称性及闭环退化推论。
+v12,17,964,新的真正研究问题,已有证据完成,P02/P03,research/final_v12/flexibility; research/final_v12/freeze/SCIENTIFIC_STOP.md,检验完成且失败：开发2/6支持、冻结1/12支持；相关非负性和代数分解保留。
+v12,18,990,新的主 comparative static,已有证据完成,P02/P03,research/final_v12/flexibility; research/final_v12/freeze/SCIENTIFIC_STOP.md,检验完成且失败：开发2/6支持、冻结1/12支持；相关非负性和代数分解保留。
+v12,19,1024,为什么需要 asymmetric information-structure game,已有证据完成,P02/P03,research/formation/sequence_v12.py; research/final_v13/v12_freeze/V12_FROZEN_CONCLUSIONS.md,旧端点求解与目标回归已完成；任意日程扩展由 v14 P04 承接。
+v12,20,1049,Phase E — Exact Extensive-Form Solver,已有证据完成,P02/P03,research/formation/sequence_v12.py; research/final_v13/v12_freeze/V12_FROZEN_CONCLUSIONS.md,旧端点求解与目标回归已完成；任意日程扩展由 v14 P04 承接。
+v12,21,1081,Sequence-form 实现要点,已有证据完成,P02/P03,research/formation/sequence_v12.py; research/final_v13/v12_freeze/V12_FROZEN_CONCLUSIONS.md,旧端点求解与目标回归已完成；任意日程扩展由 v14 P04 承接。
+v12,22,1103,Sequence-form Unit Tests,已有证据完成,P02/P03,research/formation/sequence_v12.py; research/final_v13/v12_freeze/V12_FROZEN_CONCLUSIONS.md,旧端点求解与目标回归已完成；任意日程扩展由 v14 P04 承接。
+v12,23,1159,Exact flexibility experiment — Discovery set,已有证据完成,P02/P03,research/final_v12/flexibility; research/final_v12/freeze/SCIENTIFIC_STOP.md,检验完成且失败：开发2/6支持、冻结1/12支持；相关非负性和代数分解保留。
+v12,24,1186,Confirmatory held-out grid,已有证据完成,P02/P03,research/final_v12/flexibility; research/final_v12/freeze/SCIENTIFIC_STOP.md,检验完成且失败：开发2/6支持、冻结1/12支持；相关非负性和代数分解保留。
+v12,25,1219,新主 hypothesis 的判定,已有证据完成,P02/P03,research/final_v12/flexibility; research/final_v12/freeze/SCIENTIFIC_STOP.md,检验完成且失败：开发2/6支持、冻结1/12支持；相关非负性和代数分解保留。
+v12,26,1257,Grid-5 / Grid-7 如何扩展,原失败分支未触发,P09/P10/P12,research/final_v12/freeze/SCIENTIFIC_STOP.md,旧 Grid5/7、可选策略评价/前沿和复活分支未运行；v14 新预算设计另行执行，不是追认旧成功分支。
+v12,27,1289,可选 Phase F — Exact expected receding-policy evaluation,原失败分支未触发,P09/P10/P12,research/final_v12/freeze/SCIENTIFIC_STOP.md,旧 Grid5/7、可选策略评价/前沿和复活分支未运行；v14 新预算设计另行执行，不是追认旧成功分支。
+v12,28,1325,可选 Phase G — “Commitment frontier” 而不是单个 \(h=1\) vs \(h=6\),原失败分支未触发,P09/P10/P12,research/final_v12/freeze/SCIENTIFIC_STOP.md,旧 Grid5/7、可选策略评价/前沿和复活分支未运行；v14 新预算设计另行执行，不是追认旧成功分支。
+v12,29,1359,对当前 v11 sign reversals 的诊断表,已有证据完成,P02/P03,research/final_v12/flexibility; research/final_v12/freeze/SCIENTIFIC_STOP.md,检验完成且失败：开发2/6支持、冻结1/12支持；相关非负性和代数分解保留。
+v12,30,1387,为什么这个方向比“继续调 v11”更强,由新任务承接,P02/P07/P14/P15/P16/P17/P18,research/final_v14/MASTER_PLAN.md; research/final_v14/HISTORICAL_V12_ANSWERS.md,新用户授权完整 v14 论文、图表、文献和导师说明；旧 v12 写稿未完成，不标为历史交付。
+v12,31,1426,论文重构方案（如果 Commitment 成功复活）,由新任务承接,P02/P07/P14/P15/P16/P17/P18,research/final_v14/MASTER_PLAN.md; research/final_v14/HISTORICAL_V12_ANSWERS.md,新用户授权完整 v14 论文、图表、文献和导师说明；旧 v12 写稿未完成，不标为历史交付。
+v12,32,1443,新 Contributions,由新任务承接,P02/P07/P14/P15/P16/P17/P18,research/final_v14/MASTER_PLAN.md; research/final_v14/HISTORICAL_V12_ANSWERS.md,新用户授权完整 v14 论文、图表、文献和导师说明；旧 v12 写稿未完成，不标为历史交付。
+v12,33,1460,Commitment 章节新的结构,由新任务承接,P02/P07/P14/P15/P16/P17/P18,research/final_v14/MASTER_PLAN.md; research/final_v14/HISTORICAL_V12_ANSWERS.md,新用户授权完整 v14 论文、图表、文献和导师说明；旧 v12 写稿未完成，不标为历史交付。
+v12,34,1498,可视化,由新任务承接,P02/P07/P14/P15/P16/P17/P18,research/final_v14/MASTER_PLAN.md; research/final_v14/HISTORICAL_V12_ANSWERS.md,新用户授权完整 v14 论文、图表、文献和导师说明；旧 v12 写稿未完成，不标为历史交付。
+v12,35,1555,和现有论文其它模块的关系,由新任务承接,P02/P07/P14/P15/P16/P17/P18,research/final_v14/MASTER_PLAN.md; research/final_v14/HISTORICAL_V12_ANSWERS.md,新用户授权完整 v14 论文、图表、文献和导师说明；旧 v12 写稿未完成，不标为历史交付。
+v12,36,1578,Related Work 必须新增,由新任务承接,P02/P07/P14/P15/P16/P17/P18,research/final_v14/MASTER_PLAN.md; research/final_v14/HISTORICAL_V12_ANSWERS.md,新用户授权完整 v14 论文、图表、文献和导师说明；旧 v12 写稿未完成，不标为历史交付。
+v12,37,1603,为什么这才有“冲 Q1”的可能,由新任务承接,P02/P07/P14/P15/P16/P17/P18,research/final_v14/MASTER_PLAN.md; research/final_v14/HISTORICAL_V12_ANSWERS.md,新用户授权完整 v14 论文、图表、文献和导师说明；旧 v12 写稿未完成，不标为历史交付。
+v12,38,1655,最终决策树,已有证据完成,P02/P03,research/final_v12/flexibility; research/final_v12/freeze/SCIENTIFIC_STOP.md,检验完成且失败：开发2/6支持、冻结1/12支持；相关非负性和代数分解保留。
+v12,39,1685,Branch C — 如果原简单 Commitment 真被 solver 修复救回来,原失败分支未触发,P09/P10/P12,research/final_v12/freeze/SCIENTIFIC_STOP.md,旧 Grid5/7、可选策略评价/前沿和复活分支未运行；v14 新预算设计另行执行，不是追认旧成功分支。
+v12,40,1722,什么时候停止救,已有证据完成,P02/P03,research/final_v12/flexibility; research/final_v12/freeze/SCIENTIFIC_STOP.md,检验完成且失败：开发2/6支持、冻结1/12支持；相关非负性和代数分解保留。
+v12,41,1743,建议执行顺序,由新任务承接,P02/P07/P14/P15/P16/P17/P18,research/final_v14/MASTER_PLAN.md; research/final_v14/HISTORICAL_V12_ANSWERS.md,新用户授权完整 v14 论文、图表、文献和导师说明；旧 v12 写稿未完成，不标为历史交付。
+v12,42,1772,本地 AI 每轮报告格式,由新任务承接,P02/P07/P14/P15/P16/P17/P18,research/final_v14/MASTER_PLAN.md; research/final_v14/HISTORICAL_V12_ANSWERS.md,新用户授权完整 v14 论文、图表、文献和导师说明；旧 v12 写稿未完成，不标为历史交付。
+v12,43,1796,最终导师报告必须回答,由新任务承接,P02/P07/P14/P15/P16/P17/P18,research/final_v14/MASTER_PLAN.md; research/final_v14/HISTORICAL_V12_ANSWERS.md,新用户授权完整 v14 论文、图表、文献和导师说明；旧 v12 写稿未完成，不标为历史交付。
+v12,44,1825,最终科学纪律,已有证据完成,P02/P03,research/final_v13/v12_freeze/V12_FROZEN_CONCLUSIONS.md,保留已执行的模型审计/数学基础；纠正无条件对称性及闭环退化推论。
+v13.1,0,43,v13.1 最大修改：不要再用“不同对手 policy class”比较快慢双方的 flexibility,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；DISCOVERY_PROTOCOL.md、confirmatory_design/CONFIRMATORY_DESIGN.md；v14 不改变旧 Gate。
+v13.1,1,81,正确的新主量：Conditional Own-Flexibility Value,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；四价值表及 conditional_flexibility 字段；v14 不改变旧 Gate。
+v13.1,2,115,两种条件化 flexibility value,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；F^F=FF−CF，F^C=FC−CC；v14 不改变旧 Gate。
+v13.1,3,145,新核心假设 H1：Own Mobility–Flexibility Complementarity,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成检验；失败，不将假设改成事实；v14 不改变旧 Gate。
+v13.1,4,220,Player-swap 镜像,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；所有主物理单元独立重建，NUMERICAL_AUDIT.json；v14 不改变旧 Gate。
+v13.1,5,250,Secondary hypothesis H2：Mutual Commitment Compresses Mobility Premium,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；THEOREM_SCRATCHPAD.md 证明 S_F−S_C=M；不增加独立端点；v14 不改变旧 Gate。
+v13.1,6,294,v13.1 不再重复 v12 Solver Audit,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；REGRESSION_FINAL.log，30 项；未重跑 v12 完整 Monte Carlo；v14 不改变旧 Gate。
+v13.1,7,319,Freeze v12,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；v12_freeze/、V12_FROZEN_CONCLUSIONS.md、429 文件原冻结清单；v14 不改变旧 Gate。
+v13.1,8,356,Phase A — Exact Grid-3 Mobility Discovery,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；15 焦点物理单元及 15 镜像，discovery/；v14 不改变旧 Gate。
+v13.1,9,402,Discovery 要完整计算 2×2 policy factorial,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；每单元 FF/FC/CF/CC，全部源数据保留；v14 不改变旧 Gate。
+v13.1,10,442,镜像运行,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；独立物理交换与 parallel 转向反射映射；v14 不改变旧 Gate。
+v13.1,11,464,Discovery 参数只用于机制探索,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；探索结果独立标记，原验证设计不可变；实现修订单独披露；v14 不改变旧 Gate。
+v13.1,12,491,速度应该作为 capability expansion，而不是 forced operating speed,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；主模型是 forced speed，不误称 capability；v14 不改变旧 Gate。
+v13.1,13,521,如果当前模型只有固定速度,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；T=4 绝对速度菜单严格嵌套，6 个单独 interaction；不加入主分母；v14 不改变旧 Gate。
+v13.1,14,571,Phase B — Moving Favorable Geometry Mechanism,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；冻结核导出集合，未硬编码 Crossing-T reward；v14 不改变旧 Gate。
+v13.1,15,581,不以单个 argmax 作为主机制指标,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；使用超水平集合，插图探针与时点事前固定；v14 不改变旧 Gate。
+v13.1,16,607,Favorable set 定义,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；相对位置/航向离散域、alpha=.9/.8、不正最大值规则预设；v14 不改变旧 Gate。
+v13.1,17,637,Drift 指标,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；directed median nearest-set、embedded centroid、symmetric Hausdorff、对手转向；v14 不改变旧 Gate。
+v13.1,18,671,Reachable correction 的正确指标,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；逐个合法单步终态比较，保留 signed R_raw 和负值标记；v14 不改变旧 Gate。
+v13.1,19,726,Tracking Ability 指标,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,"完成且纠正原公式；R_plus/(R_plus+D+epsilon)，明确原 signed 形式不保证 [0,1]；v14 不改变旧 Gate。"
+v13.1,20,763,Mechanism outcome,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；F 与 Theta 按对手类报告，27 单元完整探针与源数据；v14 不改变旧 Gate。
+v13.1,21,801,Mechanism 的更强检验：Mediation-style ordering,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成诊断；DeltaTheta/M 相关、分层图、geometry/class/contrast FE；不主张因果中介；v14 不改变旧 Gate。
+v13.1,22,857,Phase C — Freeze Confirmatory Design,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；原 FREEZE.json/设计 hash 不改，修订另存 IMPLEMENTATION_AMENDMENT_01.md 与 RERUN_FREEZE.json；v14 不改变旧 Gate。
+v13.1,23,883,Confirmatory 参数,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；.75/.90/1.10/1.25，各三几何、固定对手 1.0、固定 range；v14 不改变旧 Gate。
+v13.1,24,925,Primary confirmatory endpoint,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；outer/inner ×三几何×两固定类；镜像不增加数量；v14 不改变旧 Gate。
+v13.1,25,957,Success classification,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；FAIL，见 V13_Q1_GATE.md；不是期刊质量评分；v14 不改变旧 Gate。
+v13.1,26,1009,Phase D — Grid-5 refinement,原失败分支未触发,P10/P11,research/final_v13/PLAN_EXECUTION_LEDGER.md,未触发；基础 Gate 失败，停止扩展；v14 不改变旧 Gate。
+v13.1,27,1032,Phase E — Grid-7 anchors,原失败分支未触发,P10/P11,research/final_v13/PLAN_EXECUTION_LEDGER.md,未触发；不伪报稳定性；v14 不改变旧 Gate。
+v13.1,28,1049,Phase F — Turn-rate / maneuverability robustness,原失败分支未触发,P10/P11,research/final_v13/PLAN_EXECUTION_LEDGER.md,未触发；不宣称一般 maneuverability 规律；v14 不改变旧 Gate。
+v13.1,29,1091,Phase G — Horizon robustness,原失败分支未触发,P10/P11,research/final_v13/PLAN_EXECUTION_LEDGER.md,未触发；独立 T=4 capability 不是同模型 horizon 验证；v14 不改变旧 Gate。
+v13.1,30,1113,Phase H — Leader–Follower vs Rigid,原失败分支未触发,P10/P11,research/final_v13/PLAN_EXECUTION_LEDGER.md,未触发；不作跨编队模型稳健性结论；v14 不改变旧 Gate。
+v13.1,31,1145,理论模块 1：Policy-set monotonicity,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；有限 minimax 嵌入论证与小规模数值检验；v14 不改变旧 Gate。
+v13.1,32,1165,理论模块 2：Bilateral decomposition,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；纯代数恒等式与非负项之差的无固定符号解释；v14 不改变旧 Gate。
+v13.1,33,1185,理论模块 3：Increasing Differences / Complementarity,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成 reduced theorem 与嵌套能力反例；完整模型的一般命题不成立/未获支持；v14 不改变旧 Gate。
+v13.1,34,1211,不要企图直接证明完整 naval model 的全局 theorem,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；固定扰动、球约束、平方损失/reset 条件逐项写清；不用结论作假设；v14 不改变旧 Gate。
+v13.1,35,1261,Q1 方法学故事,由新任务承接,P07/P15/P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,成功前提未满足；范围外，不改写成一区主贡献；v14 不改变旧 Gate。
+v13.1,36,1291,论文重写必须延后,由新任务承接,P07/P15/P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,已遵守；本次未写主标题、摘要、贡献列表或正文；v14 不改变旧 Gate。
+v13.1,37,1332,Q2 fallback branch,由新任务承接,P07/P15/P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,冻结完成；未获二区认证，有已知证明/叙事缺陷，不自动投稿；v14 不改变旧 Gate。
+v13.1,38,1353,成功后论文结构,由新任务承接,P07/P15/P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,未触发且范围外；只保留附件方案，无新主论文；v14 不改变旧 Gate。
+v13.1,39,1372,新核心图,已有证据完成,P14/P07/P15,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；外加 F 能力对照、G 指标诊断、H 数值分离，共八组 DRAFT PNG/PDF；v14 不改变旧 Gate。
+v13.1,40,1438,Related Work 重点更新,已有证据完成,P14/P07/P15,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成定向文献笔记；主原始来源与访问边界记录，新颖性不作认证；v14 不改变旧 Gate。
+v13.1,41,1454,最终 V13 Advisor Report 必须回答,已有证据完成,P14/P07/P15,research/final_v13/PLAN_EXECUTION_LEDGER.md,完成；FINAL_V13_ADVISOR_REPORT.md；v14 不改变旧 Gate。
+v13.1,42,1479,最后原则,已有证据完成,P02/P03,research/final_v13/PLAN_EXECUTION_LEDGER.md,已执行；不改符号、不换分母、不补选参数，不写稿，不投稿；v14 不改变旧 Gate。
+v13.1-master,1,37,首先冻结 v12,已有证据完成,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第7节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,2,85,不要重复 v12 solver audit,已有证据完成,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第6节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,3,100,绝对禁止现在重写主论文,由新任务承接,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第36节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,4,134,Phase A：Exact Grid-3 Discovery,已有证据完成,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第8节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,5,187,Operating speed 与 capability 必须区分,已有证据完成,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第12节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,6,227,Phase B：Moving Favorable Geometry,已有证据完成,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第14节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,7,260,Reachable Correction 与 Tracking Ability,已有证据完成,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第18节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,8,299,机制假设,已有证据完成,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第20节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,9,324,Discovery 完成后必须冻结 Confirmatory Design,已有证据完成,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第22节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,10,373,Q1 Gate,已有证据完成,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第25节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,11,408,Refinement,原失败分支未触发,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第26节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,12,432,理论任务,已有证据完成,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第31节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,13,471,每轮报告,由新任务承接,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第41节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,14,498,最终报告,由新任务承接,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第41节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。
+v13.1-master,15,526,最重要的科学纪律,已有证据完成,P02/P03/P08-P18,research/final_v13/PLAN_EXECUTION_LEDGER.md,旧详细计划第42节及其关联节；新完整论文范围由当前用户授权覆盖旧暂缓写稿限制。

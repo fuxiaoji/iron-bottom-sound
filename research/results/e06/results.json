@@ -1,0 +1,97 @@
+{
+  "paired_comparisons": {
+    "parallel": {
+      "n": 60,
+      "line": {
+        "mean_diff_edge": -0.55,
+        "ci95": [
+          -2.2,
+          1.05
+        ],
+        "positive_fraction": 0.36666666666666664
+      },
+      "balanced": {
+        "mean_diff_edge": -0.9166666666666666,
+        "ci95": [
+          -2.466666666666667,
+          0.6
+        ],
+        "positive_fraction": 0.43333333333333335
+      },
+      "straight": {
+        "mean_diff_edge": 7.683333333333334,
+        "ci95": [
+          6.432916666666667,
+          9.033333333333333
+        ],
+        "positive_fraction": 0.9333333333333333
+      }
+    },
+    "head_on": {
+      "n": 60,
+      "line": {
+        "mean_diff_edge": -1.7333333333333334,
+        "ci95": [
+          -3.23375,
+          -0.2833333333333333
+        ],
+        "positive_fraction": 0.3333333333333333
+      },
+      "balanced": {
+        "mean_diff_edge": -0.43333333333333335,
+        "ci95": [
+          -1.6333333333333333,
+          0.8504166666666682
+        ],
+        "positive_fraction": 0.35
+      },
+      "straight": {
+        "mean_diff_edge": 5.166666666666667,
+        "ci95": [
+          3.6,
+          6.8
+        ],
+        "positive_fraction": 0.7833333333333333
+      }
+    },
+    "crossing": {
+      "n": 60,
+      "line": {
+        "mean_diff_edge": -0.2,
+        "ci95": [
+          -1.6833333333333333,
+          1.3333333333333333
+        ],
+        "positive_fraction": 0.4166666666666667
+      },
+      "balanced": {
+        "mean_diff_edge": 1.4666666666666666,
+        "ci95": [
+          -0.03333333333333333,
+          3.0170833333333347
+        ],
+        "positive_fraction": 0.48333333333333334
+      },
+      "straight": {
+        "mean_diff_edge": 9.583333333333334,
+        "ci95": [
+          8.1,
+          11.033750000000001
+        ],
+        "positive_fraction": 0.9333333333333333
+      }
+    }
+  },
+  "n_seeds": 60,
+  "policies": [
+    "geometry",
+    "line",
+    "balanced",
+    "straight"
+  ],
+  "geometries": [
+    "parallel",
+    "head_on",
+    "crossing"
+  ]
+}

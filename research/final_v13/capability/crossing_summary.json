@@ -1,0 +1,493 @@
+{
+  "geometry": "crossing",
+  "four_values": {
+    "low": {
+      "blue": {
+        "config": {
+          "geometry": "crossing",
+          "T": 4,
+          "speed_menu_B": [
+            0.75,
+            1.0
+          ],
+          "speed_menu_R": [
+            1.0
+          ],
+          "initial_history_speed_ratio": 1.0,
+          "range_ratio": 1.0,
+          "turn_bound_deg": 60.0,
+          "formation": "leader_follower",
+          "protocol_sha256": "f1c5fe560a7ff625c476c1cd5ad561bc25a76470a9262fa5887a6e8a53918af6",
+          "core_sha256": "73d367d07a4162a1583b3f0712a33532a0493357bfe25333891179d8561cf427",
+          "payoff_sha256": "7ba3ad97900fe9d1af1d3eda6fd8d9346ec97880098d775c77c9c4a149308aa0",
+          "implementation_amendment_sha256": "769f3092f3e7d9e1e166cd8cbc5b646b9c825b9269e3543368f80c0840b5172a",
+          "scope": "limited-horizon genuine nested per-turn speed capability"
+        },
+        "values": {
+          "FF": {
+            "V": 0.0,
+            "LB": -3.8102465627076754e-10,
+            "UB": 3.8102465627076754e-10,
+            "numeric_error_budget": 3.8102465627076754e-10,
+            "T": 4,
+            "trace": [
+              {
+                "t": 3,
+                "nodes": 5832,
+                "mixed_lp_nodes": 327,
+                "max_gap": 2.6612045900265e-13
+              },
+              {
+                "t": 2,
+                "nodes": 324,
+                "mixed_lp_nodes": 44,
+                "max_gap": 3.807576476333452e-10
+              },
+              {
+                "t": 1,
+                "nodes": 18,
+                "mixed_lp_nodes": 3,
+                "max_gap": 8.881784197001252e-16
+              },
+              {
+                "t": 0,
+                "nodes": 1,
+                "mixed_lp_nodes": 0,
+                "max_gap": 0.0
+              }
+            ],
+            "algorithm": "complete rectangular backward induction",
+            "seconds": 0.609886884689331
+          },
+          "CC": {
+            "V": 0.2497873459237893,
+            "LB": 0.24978734592351337,
+            "UB": 0.24978734592379026,
+            "gap": 2.7688962234151404e-13,
+            "algorithm": "complete matrix LP",
+            "seconds": 0.07275986671447754
+          },
+          "FC": {
+            "V": 0.5704680003672623,
+            "LB": 0.5704680003672624,
+            "UB": 0.5704680003672624,
+            "gap": 0.0,
+            "flow_inequality_residual": 5.551115123125783e-16,
+            "base_B": 6,
+            "base_R": 3,
+            "T": 4,
+            "structure": "FC",
+            "sequences_B": 37051,
+            "sequences_R": 82,
+            "infosets_B": 6175,
+            "infosets_R": 1,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 0.5136299133300781
+          },
+          "CF": {
+            "V": -0.305984225257541,
+            "LB": -0.3059842252575409,
+            "UB": -0.3059842252575409,
+            "gap": 0.0,
+            "flow_inequality_residual": 3.3306690738754696e-16,
+            "base_B": 6,
+            "base_R": 3,
+            "T": 4,
+            "structure": "CF",
+            "sequences_B": 1297,
+            "sequences_R": 18526,
+            "infosets_B": 1,
+            "infosets_R": 6175,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 1.020176887512207
+          }
+        },
+        "complete": true,
+        "conditional_flexibility": {
+          "F": {
+            "F": 0.305984225257541,
+            "LB": 0.3059842248765162,
+            "UB": 0.30598422563856553
+          },
+          "C": {
+            "F": 0.32068065444347305,
+            "LB": 0.32068065444347216,
+            "UB": 0.32068065444374905
+          }
+        }
+      },
+      "red": {
+        "config": {
+          "geometry": "crossing",
+          "T": 4,
+          "speed_menu_B": [
+            1.0
+          ],
+          "speed_menu_R": [
+            0.75,
+            1.0
+          ],
+          "initial_history_speed_ratio": 1.0,
+          "range_ratio": 1.0,
+          "turn_bound_deg": 60.0,
+          "formation": "leader_follower",
+          "protocol_sha256": "f1c5fe560a7ff625c476c1cd5ad561bc25a76470a9262fa5887a6e8a53918af6",
+          "core_sha256": "73d367d07a4162a1583b3f0712a33532a0493357bfe25333891179d8561cf427",
+          "payoff_sha256": "7ba3ad97900fe9d1af1d3eda6fd8d9346ec97880098d775c77c9c4a149308aa0",
+          "implementation_amendment_sha256": "769f3092f3e7d9e1e166cd8cbc5b646b9c825b9269e3543368f80c0840b5172a",
+          "scope": "limited-horizon genuine nested per-turn speed capability"
+        },
+        "values": {
+          "FF": {
+            "V": 0.0,
+            "LB": -3.810232129808355e-10,
+            "UB": 3.810232129808355e-10,
+            "numeric_error_budget": 3.810232129808355e-10,
+            "T": 4,
+            "trace": [
+              {
+                "t": 3,
+                "nodes": 5832,
+                "mixed_lp_nodes": 327,
+                "max_gap": 2.5845992013273644e-13
+              },
+              {
+                "t": 2,
+                "nodes": 324,
+                "mixed_lp_nodes": 44,
+                "max_gap": 3.807576476333452e-10
+              },
+              {
+                "t": 1,
+                "nodes": 18,
+                "mixed_lp_nodes": 3,
+                "max_gap": 7.105427357601002e-15
+              },
+              {
+                "t": 0,
+                "nodes": 1,
+                "mixed_lp_nodes": 0,
+                "max_gap": 0.0
+              }
+            ],
+            "algorithm": "complete rectangular backward induction",
+            "seconds": 0.6417679786682129
+          },
+          "CC": {
+            "V": -0.249787345923789,
+            "LB": -0.2497873459237895,
+            "UB": -0.24978734592355012,
+            "gap": 2.393918396847994e-13,
+            "algorithm": "complete matrix LP",
+            "seconds": 0.08465790748596191
+          },
+          "FC": {
+            "V": 0.3059842252575407,
+            "LB": 0.3059842252575409,
+            "UB": 0.30598422525754077,
+            "gap": 0.0,
+            "flow_inequality_residual": 4.718447854656915e-15,
+            "base_B": 3,
+            "base_R": 6,
+            "T": 4,
+            "structure": "FC",
+            "sequences_B": 18526,
+            "sequences_R": 1297,
+            "infosets_B": 6175,
+            "infosets_R": 1,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 0.3773782253265381
+          },
+          "CF": {
+            "V": -0.5704680003672622,
+            "LB": -0.5704680003672622,
+            "UB": -0.570468000367262,
+            "gap": 2.220446049250313e-16,
+            "flow_inequality_residual": 1.7763568394002505e-15,
+            "base_B": 3,
+            "base_R": 6,
+            "T": 4,
+            "structure": "CF",
+            "sequences_B": 82,
+            "sequences_R": 37051,
+            "infosets_B": 1,
+            "infosets_R": 6175,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 1.6564111709594727
+          }
+        },
+        "complete": true,
+        "conditional_flexibility": {
+          "F": {
+            "F": 0.3059842252575407,
+            "LB": 0.30598422487651766,
+            "UB": 0.305984225638564
+          },
+          "C": {
+            "F": 0.32068065444347316,
+            "LB": 0.3206806544434725,
+            "UB": 0.3206806544437121
+          }
+        }
+      },
+      "mirror_payoff_error": 1.2079226507921703e-13
+    },
+    "high": {
+      "blue": {
+        "config": {
+          "geometry": "crossing",
+          "T": 4,
+          "speed_menu_B": [
+            0.75,
+            1.0,
+            1.3
+          ],
+          "speed_menu_R": [
+            1.0
+          ],
+          "initial_history_speed_ratio": 1.0,
+          "range_ratio": 1.0,
+          "turn_bound_deg": 60.0,
+          "formation": "leader_follower",
+          "protocol_sha256": "f1c5fe560a7ff625c476c1cd5ad561bc25a76470a9262fa5887a6e8a53918af6",
+          "core_sha256": "73d367d07a4162a1583b3f0712a33532a0493357bfe25333891179d8561cf427",
+          "payoff_sha256": "7ba3ad97900fe9d1af1d3eda6fd8d9346ec97880098d775c77c9c4a149308aa0",
+          "implementation_amendment_sha256": "769f3092f3e7d9e1e166cd8cbc5b646b9c825b9269e3543368f80c0840b5172a",
+          "scope": "limited-horizon genuine nested per-turn speed capability"
+        },
+        "values": {
+          "FF": {
+            "V": 3.570349967800029,
+            "LB": 3.570349967799914,
+            "UB": 3.5703499678001434,
+            "numeric_error_budget": 1.1457501614131615e-13,
+            "T": 4,
+            "trace": [
+              {
+                "t": 3,
+                "nodes": 19683,
+                "mixed_lp_nodes": 1414,
+                "max_gap": 9.50350909079134e-14
+              },
+              {
+                "t": 2,
+                "nodes": 729,
+                "mixed_lp_nodes": 92,
+                "max_gap": 1.509903313490213e-14
+              },
+              {
+                "t": 1,
+                "nodes": 27,
+                "mixed_lp_nodes": 5,
+                "max_gap": 4.440892098500626e-15
+              },
+              {
+                "t": 0,
+                "nodes": 1,
+                "mixed_lp_nodes": 0,
+                "max_gap": 0.0
+              }
+            ],
+            "algorithm": "complete rectangular backward induction",
+            "seconds": 3.3343238830566406
+          },
+          "CC": {
+            "V": 1.5120919735266989,
+            "LB": 1.5120919735266978,
+            "UB": 1.5120919735266996,
+            "gap": 1.7763568394002505e-15,
+            "algorithm": "complete matrix LP",
+            "seconds": 0.6019740104675293
+          },
+          "FC": {
+            "V": 4.454866687358322,
+            "LB": 4.454866687358324,
+            "UB": 4.454866687358323,
+            "gap": 0.0,
+            "flow_inequality_residual": 2.6645352591003757e-15,
+            "base_B": 9,
+            "base_R": 3,
+            "T": 4,
+            "structure": "FC",
+            "sequences_B": 183961,
+            "sequences_R": 82,
+            "infosets_B": 20440,
+            "infosets_R": 1,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 11.68673300743103
+          },
+          "CF": {
+            "V": 0.18711727206979156,
+            "LB": 0.18711727206979162,
+            "UB": 0.1871172720697916,
+            "gap": 0.0,
+            "flow_inequality_residual": 3.608224830031759e-16,
+            "base_B": 9,
+            "base_R": 3,
+            "T": 4,
+            "structure": "CF",
+            "sequences_B": 6562,
+            "sequences_R": 61321,
+            "infosets_B": 1,
+            "infosets_R": 20440,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 6.078761100769043
+          }
+        },
+        "complete": true,
+        "conditional_flexibility": {
+          "F": {
+            "F": 3.3832326957302374,
+            "LB": 3.3832326957301224,
+            "UB": 3.3832326957303516
+          },
+          "C": {
+            "F": 2.942774713831623,
+            "LB": 2.9427747138316245,
+            "UB": 2.9427747138316254
+          }
+        }
+      },
+      "red": {
+        "config": {
+          "geometry": "crossing",
+          "T": 4,
+          "speed_menu_B": [
+            1.0
+          ],
+          "speed_menu_R": [
+            0.75,
+            1.0,
+            1.3
+          ],
+          "initial_history_speed_ratio": 1.0,
+          "range_ratio": 1.0,
+          "turn_bound_deg": 60.0,
+          "formation": "leader_follower",
+          "protocol_sha256": "f1c5fe560a7ff625c476c1cd5ad561bc25a76470a9262fa5887a6e8a53918af6",
+          "core_sha256": "73d367d07a4162a1583b3f0712a33532a0493357bfe25333891179d8561cf427",
+          "payoff_sha256": "7ba3ad97900fe9d1af1d3eda6fd8d9346ec97880098d775c77c9c4a149308aa0",
+          "implementation_amendment_sha256": "769f3092f3e7d9e1e166cd8cbc5b646b9c825b9269e3543368f80c0840b5172a",
+          "scope": "limited-horizon genuine nested per-turn speed capability"
+        },
+        "values": {
+          "FF": {
+            "V": -3.570349967800019,
+            "LB": -3.570349967804785,
+            "UB": -3.570349967795253,
+            "numeric_error_budget": 4.765965400110872e-12,
+            "T": 4,
+            "trace": [
+              {
+                "t": 3,
+                "nodes": 19683,
+                "mixed_lp_nodes": 1414,
+                "max_gap": 4.75441908065477e-12
+              },
+              {
+                "t": 2,
+                "nodes": 729,
+                "mixed_lp_nodes": 92,
+                "max_gap": 9.325873406851315e-15
+              },
+              {
+                "t": 1,
+                "nodes": 27,
+                "mixed_lp_nodes": 5,
+                "max_gap": 2.220446049250313e-15
+              },
+              {
+                "t": 0,
+                "nodes": 1,
+                "mixed_lp_nodes": 0,
+                "max_gap": 0.0
+              }
+            ],
+            "algorithm": "complete rectangular backward induction",
+            "seconds": 3.562082052230835
+          },
+          "CC": {
+            "V": -1.5120919735267004,
+            "LB": -1.5120919735267022,
+            "UB": -1.5120919735266996,
+            "gap": 2.6645352591003757e-15,
+            "algorithm": "complete matrix LP",
+            "seconds": 0.7567670345306396
+          },
+          "FC": {
+            "V": -0.1871172720697914,
+            "LB": -0.18711727206979145,
+            "UB": -0.18711727206979178,
+            "gap": 0.0,
+            "flow_inequality_residual": 9.43689570931383e-16,
+            "base_B": 3,
+            "base_R": 9,
+            "T": 4,
+            "structure": "FC",
+            "sequences_B": 61321,
+            "sequences_R": 6562,
+            "infosets_B": 20440,
+            "infosets_R": 1,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 5.050155162811279
+          },
+          "CF": {
+            "V": -4.454866687358315,
+            "LB": -4.454866687358314,
+            "UB": -4.454866687358312,
+            "gap": 2.6645352591003757e-15,
+            "flow_inequality_residual": 1.3322676295501878e-15,
+            "base_B": 3,
+            "base_R": 9,
+            "T": 4,
+            "structure": "CF",
+            "sequences_B": 82,
+            "sequences_R": 183961,
+            "infosets_B": 1,
+            "infosets_R": 20440,
+            "algorithm": "complete rectangular sequence-form LP and full best responses",
+            "seconds": 26.53168272972107
+          }
+        },
+        "complete": true,
+        "conditional_flexibility": {
+          "F": {
+            "F": 3.3832326957302277,
+            "LB": 3.3832326957254617,
+            "UB": 3.383232695734993
+          },
+          "C": {
+            "F": 2.9427747138316147,
+            "LB": 2.9427747138316094,
+            "UB": 2.9427747138316147
+          }
+        }
+      },
+      "mirror_payoff_error": 1.6697754290362354e-13
+    }
+  },
+  "interactions": [
+    {
+      "geometry": "crossing",
+      "opponent_policy": "F",
+      "M": 3.0772484704726963,
+      "LB": 3.0772484700915568,
+      "UB": 3.0772484708538355,
+      "F_low": 0.305984225257541,
+      "F_high": 3.3832326957302374,
+      "T": 4,
+      "nested_payoff_error": 0.0
+    },
+    {
+      "geometry": "crossing",
+      "opponent_policy": "C",
+      "M": 2.62209405938815,
+      "LB": 2.6220940593878757,
+      "UB": 2.622094059388153,
+      "F_low": 0.32068065444347305,
+      "F_high": 2.942774713831623,
+      "T": 4,
+      "nested_payoff_error": 0.0
+    }
+  ]
+}

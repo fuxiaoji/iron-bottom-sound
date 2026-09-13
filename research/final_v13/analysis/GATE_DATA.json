@@ -1,0 +1,123 @@
+{
+  "n_primary": 12,
+  "n_positive": 5,
+  "n_reversal": 7,
+  "n_strong_reversal": 7,
+  "n_unresolved": 0,
+  "per_opponent_class": {
+    "F": {
+      "positive": 0,
+      "reversal": 6
+    },
+    "C": {
+      "positive": 5,
+      "reversal": 1
+    }
+  },
+  "per_geometry_positive": {
+    "head_on": 1,
+    "parallel": 2,
+    "crossing": 2
+  },
+  "mechanism": {
+    "primary_spearman": 0.16962083825765267,
+    "per_opponent_class_spearman": {
+      "F": 0.4285714285714286,
+      "C": 0.2571428571428572
+    },
+    "F_vs_Theta_spearman": {
+      "F": 0.0770579115172181,
+      "C": -0.6760080419465042
+    },
+    "robustness_correlations": {
+      "delta_Theta_0.9": 0.16962083825765267,
+      "delta_Theta_centroid_0.9": 0.16962083825765267,
+      "delta_Theta_hausdorff_0.9": 0.12721562869323952,
+      "delta_raw_ratio_0.9": 0.21202604782206586,
+      "delta_nonnegative_ratio_0.9": 0.16962083825765267,
+      "delta_R_raw_0.9": 0.21202604782206586,
+      "delta_directed_drift_0.9": -0.15284960135940137,
+      "delta_centroid_drift_0.9": -0.09160572248286888,
+      "delta_hausdorff_0.9": -0.14484136487558028,
+      "delta_Theta_0.8": 0.08481041912882634,
+      "delta_Theta_centroid_0.8": 0.08481041912882634,
+      "delta_Theta_hausdorff_0.8": 0.04240520956441317,
+      "delta_raw_ratio_0.8": 0.16962083825765267,
+      "delta_nonnegative_ratio_0.8": -0.04240520956441317,
+      "delta_R_raw_0.8": 0.16962083825765267,
+      "delta_directed_drift_0.8": -0.14484136487558028,
+      "delta_centroid_drift_0.8": -0.14484136487558028,
+      "delta_hausdorff_0.8": -0.11450715310358613
+    },
+    "n_endpoints": 12,
+    "n_unique_physical_contrasts": 6,
+    "n_positive_DeltaTheta": 0,
+    "defined_epoch_fraction": 1.0,
+    "regression": {
+      "columns": [
+        "intercept",
+        "DeltaTheta",
+        "geometry_parallel",
+        "geometry_crossing",
+        "opponent_C",
+        "contrast_inner"
+      ],
+      "coefficients": {
+        "intercept": -5.860318962287594,
+        "DeltaTheta": -41.66021596791941,
+        "geometry_parallel": 2.2983238575736253,
+        "geometry_crossing": 0.05439280869919927,
+        "opponent_C": 3.07801908741513,
+        "contrast_inner": 1.6984942014062676
+      },
+      "rank": 6,
+      "n_columns": 6,
+      "n_rows": 12,
+      "condition_number": 311.3571811131019,
+      "R_squared": 0.894048417335981,
+      "fitted": [
+        -3.1764972357418317,
+        -0.09847814832670165,
+        -2.526244185407248,
+        0.5517749020078822,
+        -2.1604193119429453,
+        0.9175997754721847,
+        -1.7631944992195483,
+        1.3148245881955818,
+        -2.2887116883087617,
+        0.7893073991063684,
+        -2.5012073168520077,
+        0.5768117705631224
+      ],
+      "residuals": [
+        0.5844952076987608,
+        -0.5631450642762785,
+        0.04174287212618211,
+        -0.06309301554840063,
+        -0.807993536107916,
+        0.7777832843518557,
+        0.6193665629254395,
+        -0.5891563111694529,
+        -0.657506633719477,
+        0.6663667420531454,
+        0.21989552707710924,
+        -0.22875563541088773
+      ],
+      "scope": "descriptive fixed-design least squares; shared mechanism probes; no population p-values or causal mediation"
+    },
+    "scope": "standardized kinematic probes, not equilibrium-policy paths; no independent-count inflation from policy classes"
+  },
+  "failure_reasons": [
+    "primary support <=7/12",
+    "multiple strong reversals",
+    "tracking mechanism or directional chain unsupported",
+    "systematic reversal in a fixed opponent class"
+  ],
+  "pre_refinement_verdict": "FAIL",
+  "max_mirror_interaction_error": 2.842170943040401e-14,
+  "max_interaction_interval_width": 9.0794927132265e-11,
+  "min_abs_interaction": 0.34805613515223466,
+  "manuscript_writing_in_current_scope": false,
+  "refinement_allowed": false,
+  "note": "Project gate is not journal rank or acceptance certification."
+}

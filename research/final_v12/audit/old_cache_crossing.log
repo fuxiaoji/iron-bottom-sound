@@ -1,0 +1,14 @@
+old_cache crossing h=1 1/8 policies=6 44.8s
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v12_controls.py", line 64, in <module>
+    control(a.geometry,a.n,a.mode,not a.ordinary,a.cap,a.tol,a.tag)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/experiments/v12_controls.py", line 28, in control
+    sol=rg.solve();policies[sk]=(sol,rg.seqs)
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/formation/commitment_v12.py", line 246, in solve
+    sol=matrix_lp(pay,coupled=mirror is not None)
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/formation/commitment_v12.py", line 172, in matrix_lp
+    raise ValueError('not a skew-symmetric restricted game; projection forbidden')
+ValueError: not a skew-symmetric restricted game; projection forbidden

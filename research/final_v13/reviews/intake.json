@@ -1,0 +1,66 @@
+{
+  "schema_version": "2.0",
+  "review_id": "IBS-V13-AUTHOR-EXPERIMENT-REVIEW",
+  "material": {
+    "status": "unpublished_confidential",
+    "contains_personal_or_sensitive_data": false
+  },
+  "authorization": {
+    "basis": "author_request",
+    "documented": true,
+    "local_processing_authorized": true,
+    "external_processing_authorized": false
+  },
+  "reviewer": {
+    "capacity": "author_requested_reader",
+    "human_accountable": true,
+    "competence_areas": [
+      "mathematical_model",
+      "numerical_optimization",
+      "reproducibility"
+    ],
+    "competence_limits": [
+      "AI-assisted developmental review is not independent journal peer review. Human mathematical and novelty review remains necessary.",
+      "Developmental self-audit by the implementing assistant; no independent specialist has certified novelty or mathematical merit."
+    ],
+    "conflict_status": "none_identified",
+    "conflicts": []
+  },
+  "venue_policy": {
+    "checked": true,
+    "peer_review_model": "open",
+    "confidential_editor_notes_supported": false
+  },
+  "ai_use": {
+    "policy": "permitted_with_disclosure",
+    "planned": "approved_ai_assistance",
+    "permission_confirmed": true,
+    "disclosure_planned": true
+  },
+  "handling": {
+    "local_only": true,
+    "external_service_use": false,
+    "data_reuse_permitted": false,
+    "retention_rule": "retain_per_venue_policy",
+    "deletion_or_retention_record_planned": true
+  },
+  "scope": {
+    "manuscript_type": "computational_mathematics_experimental_packet",
+    "requested_focus": [
+      "proofs",
+      "experiments",
+      "reproducibility",
+      "figures",
+      "claim_evidence"
+    ],
+    "out_of_scope": [
+      "editorial_decision",
+      "submission",
+      "manuscript_writing"
+    ],
+    "specialist_review_needed": [
+      "mathematical_novelty",
+      "target_journal_fit"
+    ]
+  }
+}

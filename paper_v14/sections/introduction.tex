@@ -1,0 +1,118 @@
+\section{Introduction}\label{sec:intro}
+
+\subsection{The problem}
+
+Decision makers rarely receive unlimited opportunities to revise a plan.
+A commander who can re-issue manoeuvre orders at every moment is not the same
+agent as one who may re-issue them twice in an engagement, even when both
+retain the same ships, the same sensors and the same doctrine. What differs is
+the \emph{revision calendar}: the set of epochs at which the agent may look at
+what has actually happened and choose again. Replanning is not free, it cannot
+be scheduled after the fact, and the value of a revision depends on what the
+opponent has already done.
+
+This paper studies the resulting optimisation problem in a class of
+adversarial trajectory games. Two formations move under nonholonomic
+constraints inside a directional interaction field, and each earns a payoff
+that integrates the field along the whole trajectory rather than at a terminal
+instant. The state that matters is a history: trailing vessels follow the
+leader's executed track, so the current leader pose does not determine the
+formation's shape \citep{stengel1996}. Each player is allowed a bounded number
+of revisions, arranged on a calendar that is fixed and public in advance.
+Within each interval between consecutive revisions the player seals a block of
+commands; the opponent sees the block only as it is executed.
+
+The question is deliberately budget-shaped. Given a tolerated loss of
+performance, how many revisions are needed, when should they occur, and can a
+computation certify that the chosen calendar is good enough? Three things make
+this non-trivial. First, the feasible policy set depends on the calendar, so
+calendars cannot be compared by evaluating a single pre-computed policy.
+Second, more revisions need not have diminishing returns: the natural greedy
+argument fails, because revision opportunities can be complementary. Third,
+the opponent may itself be revising, and a strategy that is optimal against a
+committed opponent is not admissible against a flexible one.
+
+\subsection{Approach}
+
+We treat the calendar as an explicit decision variable and build an exact
+finite-game formulation around it. Section~\ref{sec:model} fixes the
+history-dependent interaction game, the sealed-block information structure and
+the budgeted value $W_K$. Section~\ref{sec:theory} develops four structural
+results and the certificates the computation relies on:
+policy inclusion gives monotonicity in the budget and identifies the endpoints;
+a counterexample shows that the calendar objective is not submodular, so
+selection needs more than a greedy argument; a common-update decomposition
+localises the game at public boundaries; and two certificate constructions
+bound the loss of a coarsened calendar from above, one by an explicit feasible
+policy and one by summing losses over public intervals. Section
+\ref{sec:algorithm} turns these into a solver: exact pricing of revisions
+against a fixed causal opponent, calendar branch and bound with certified
+intervals, and reuse of opponent responses across calendars.
+Section~\ref{sec:methods} freezes the experimental design, and
+Section~\ref{sec:results} reports it.
+
+\subsection{Contributions and scope}
+
+\begin{enumerate}
+\item \textbf{A certified budget frontier for history-dependent sealed-block
+games.} For a fixed opponent class we compute, exactly up to a certified
+interval, the value attainable with at most $K$ revisions, $W_K$, over a
+frozen finite design. The frontier identifies which revisions actually pay and
+where the budget stops binding.
+\item \textbf{Structure that survives contact with counterexamples.} We prove
+budget monotonicity and endpoint equivalence, exhibit a binary-action
+counterexample showing the calendar objective is not submodular, and prove a
+common-update decomposition whose scope is stated exactly: a revision by one
+player alone is not a public boundary while the opponent still holds an
+unexecuted block.
+\item \textbf{Two computable loss certificates and an exact pricing
+recurrence.} A constructive deletion certificate gives a feasible coarse
+policy and an upper bound on the loss it incurs; an interval-loss bound gives
+a shortest-path certificate for a budget under a fully flexible opponent. Both
+are reported with the residual of the computation that produced them.
+\end{enumerate}
+
+The scope is bounded and we state it where it binds. The physical design is a
+\emph{fixed computational benchmark} over three geometries, four
+speed/distance configurations, two opponent classes and three one-factor
+ablations; it is not a statistical sample and we do not attach $p$-values to
+deterministic solver output. The opponent classes are a committed class and a
+fully flexible class, and the second certificate applies only to the latter,
+where public boundaries exist. A previously investigated claim --- that the
+range-advantaged side values revision rights differently from the
+range-disadvantaged side --- was tested at this fidelity and \emph{falsified};
+those results stay archived and are disclosed as a negative finding rather
+than repaired. Our claim is about the frontier and the certificates, not about
+a new general equilibrium-computation method: the pricing recurrence
+specialises established extensive-form best-response ideas
+\citep{mcmahan2003,bosansky2014,kroer2018}, and completeness of the reported
+frontier is relative to the frozen design and the certified tolerances.
+
+\subsection{Related work}
+
+Our setting sits between three literatures. In \emph{dynamic games with
+information}, an informed player's value is monotone in the information
+structure \citep{hogeboom2020}; revisions are not free observations but
+binding command blocks, so the inclusion argument applies to policy sets
+rather than to signal structures. Huang and Zhu study a pursuit--evasion
+differential game in which observation opportunities are purchased
+strategically \citep{huang2021}; there the cost is paid for information about
+the state, whereas here the budget limits when the agent may \emph{act on}
+information it already has. Chen and Waggoner show that whether additional
+signals are substitutes or complements depends on the decision problem
+\citep{chen2017}; our counterexample extends that caution to revision
+calendars.
+
+In \emph{zero-sum game solving}, double-oracle and column-generation methods
+converge finitely with response oracles \citep{mcmahan2003,bosansky2014}, and
+extensive-form abstractions admit bounds on equilibrium error
+\citep{kroer2018}. We use those tools rather than reinvent them. The
+distinction is the object being optimised: not a strategy within a fixed
+information structure, but the information structure itself, subject to an
+explicit revision budget and with per-calendar certificates.
+
+In \emph{formation control and pursuit--evasion}, leader--follower
+path-following formations and speed asymmetry under turn constraints are
+classical. We use a leader--follower line-ahead formation as the numerical
+instantiation and treat a rigid column as an ablation, so that conclusions are
+not an artefact of one formation representation.

@@ -1,0 +1,10 @@
+cell_id,geometry,eta_r,eta_v,P6_rigid,P6_leader_follower,sign_match,kappa_L_F
+crossing|0.8|1.0,crossing,0.8,1.0,-7.422,-7.0498,1,0.6981
+head_on|0.8|1.0,head_on,0.8,1.0,-9.4471,-9.5317,1,0.6981
+parallel|1.2|1.0,parallel,1.2,1.0,4.8826,7.4536,1,0.6981
+parallel|0.8|1.0,parallel,0.8,1.0,-6.0179,-6.5067,1,0.6981
+head_on|1.2|1.0,head_on,1.2,1.0,7.3043,9.6734,1,0.6981
+crossing|1.2|1.2,crossing,1.2,1.2,8.9399,9.825,1,0.5818
+crossing|1.0|1.2,crossing,1.0,1.2,2.0857,1.2345,1,0.5818
+crossing|1.2|1.0,crossing,1.2,1.0,6.4247,6.2919,1,0.6981
+crossing|0.8|0.8,crossing,0.8,0.8,-8.6591,-8.8118,1,0.8727

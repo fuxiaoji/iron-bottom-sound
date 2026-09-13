@@ -1,0 +1,33 @@
+{
+  "config": {
+    "id": "crossing_v1_d16_T6_G3_none",
+    "geometry": "crossing",
+    "speed": 1.0,
+    "distance": 16.0,
+    "T": 6,
+    "grid": 3,
+    "ablation": "none",
+    "phases": [
+      "development",
+      "robustness"
+    ],
+    "mirror_solve_all": true,
+    "opponents": [
+      "F",
+      "C"
+    ]
+  },
+  "seconds": 19.10677037500136,
+  "mirror_error": 2.984279490192421e-13,
+  "blue_sha256": "4e72eece67f1f920ffacdd1778331120884b54e5593d72e12f03ffd5f436df4c",
+  "red_sha256": "4e72eece67f1f920ffacdd1778331120884b54e5593d72e12f03ffd5f436df4c",
+  "shape": [
+    729,
+    729
+  ],
+  "scale": 29.093880581555158,
+  "minimum": -29.093880581555158,
+  "maximum": 29.093880581555137,
+  "created_utc": "2026-09-13T06:29:50.622327+00:00",
+  "peak_rss_bytes": 184270848
+}

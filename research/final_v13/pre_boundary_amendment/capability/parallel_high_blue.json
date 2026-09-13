@@ -1,0 +1,113 @@
+{
+  "config": {
+    "geometry": "parallel",
+    "T": 4,
+    "speed_menu_B": [
+      0.75,
+      1.0,
+      1.3
+    ],
+    "speed_menu_R": [
+      1.0
+    ],
+    "initial_history_speed_ratio": 1.0,
+    "range_ratio": 1.0,
+    "turn_bound_deg": 60.0,
+    "formation": "leader_follower",
+    "protocol_sha256": "f1c5fe560a7ff625c476c1cd5ad561bc25a76470a9262fa5887a6e8a53918af6",
+    "core_sha256": "7e040ebe2aa8dddf731a9cfad36ee0810ae6c7e00c97917e0301d8a301d0264b",
+    "scope": "limited-horizon genuine nested per-turn speed capability"
+  },
+  "values": {
+    "FF": {
+      "V": 0.8628678550771256,
+      "LB": 0.8628678550735924,
+      "UB": 0.8628678550806588,
+      "numeric_error_budget": 3.533173753567098e-12,
+      "T": 4,
+      "trace": [
+        {
+          "t": 3,
+          "nodes": 19683,
+          "mixed_lp_nodes": 1860,
+          "max_gap": 3.5198510772715963e-12
+        },
+        {
+          "t": 2,
+          "nodes": 729,
+          "mixed_lp_nodes": 130,
+          "max_gap": 1.0658141036401503e-14
+        },
+        {
+          "t": 1,
+          "nodes": 27,
+          "mixed_lp_nodes": 8,
+          "max_gap": 2.6645352591003757e-15
+        },
+        {
+          "t": 0,
+          "nodes": 1,
+          "mixed_lp_nodes": 1,
+          "max_gap": 0.0
+        }
+      ],
+      "algorithm": "complete rectangular backward induction",
+      "seconds": 2.9324309825897217
+    },
+    "CC": {
+      "V": 2.0051194934717524,
+      "LB": 2.005119493471751,
+      "UB": 2.0051194934717533,
+      "gap": 2.220446049250313e-15,
+      "algorithm": "complete matrix LP",
+      "seconds": 0.6985459327697754
+    },
+    "FC": {
+      "V": 4.43756736526625,
+      "LB": 4.437567365266249,
+      "UB": 4.43756736526625,
+      "gap": 8.881784197001252e-16,
+      "flow_inequality_residual": 1.7763568394002505e-15,
+      "base_B": 9,
+      "base_R": 3,
+      "T": 4,
+      "structure": "FC",
+      "sequences_B": 183961,
+      "sequences_R": 82,
+      "infosets_B": 20440,
+      "infosets_R": 1,
+      "algorithm": "complete rectangular sequence-form LP and full best responses",
+      "seconds": 15.30353307723999
+    },
+    "CF": {
+      "V": 0.008524779553473536,
+      "LB": 0.008524779553473194,
+      "UB": 0.00852477955347361,
+      "gap": 4.163336342344337e-16,
+      "flow_inequality_residual": 3.885780586188048e-16,
+      "base_B": 9,
+      "base_R": 3,
+      "T": 4,
+      "structure": "CF",
+      "sequences_B": 6562,
+      "sequences_R": 61321,
+      "infosets_B": 1,
+      "infosets_R": 20440,
+      "algorithm": "complete rectangular sequence-form LP and full best responses",
+      "seconds": 6.778438091278076
+    }
+  },
+  "complete": true,
+  "conditional_flexibility": {
+    "F": {
+      "F": 0.8543430755236521,
+      "LB": 0.8543430755201188,
+      "UB": 0.8543430755271856
+    },
+    "C": {
+      "F": 2.4324478717944973,
+      "LB": 2.4324478717944955,
+      "UB": 2.4324478717944986
+    }
+  }
+}

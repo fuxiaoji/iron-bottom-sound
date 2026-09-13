@@ -1,0 +1,60 @@
+{
+  "frozen": "2026-09-12 17:56:10",
+  "hashes": {
+    "manuscript_pdf": {
+      "path": "paper_v8/main.pdf",
+      "sha256_16": "e9ec71600df2e031"
+    },
+    "manuscript_tex": {
+      "path": "paper_v8/main.tex",
+      "sha256_16": "98e37e7de6d5aba5"
+    },
+    "exact_grid5": {
+      "path": "research/final_v9/commitment_exact/exact_grid5_results.csv",
+      "sha256_16": "852ec31ee860cfdd"
+    },
+    "exact_grid7": {
+      "path": "research/final_v9/commitment_exact/exact_grid7_results.csv",
+      "sha256_16": "9613b40553b9ef02"
+    },
+    "summary": {
+      "path": "research/final_v9/commitment_exact/exact_certification_summary.json",
+      "sha256_16": "426f7f80f30fb892"
+    },
+    "h1_baselines": {
+      "path": "research/final_v9/commitment_exact/exact_h1_baselines.json",
+      "sha256_16": "bdf6366d636f6957"
+    },
+    "claim_registry": {
+      "path": "research/final_v9/paper_claim_registry_v9.csv",
+      "sha256_16": "ce31e438638ddbad"
+    },
+    "advisor_report": {
+      "path": "research/final_v9/FINAL_V9_ADVISOR_REPORT.md",
+      "sha256_16": "9b3c6a28d5d04c25"
+    },
+    "iteration": {
+      "path": "research/final_v9/ITERATION_1.md",
+      "sha256_16": "a0dc52fadf3468b2"
+    }
+  },
+  "commitment_final_status": "CORE-STRONG (Grid-7 full)",
+  "exact_grid5": "18/18 sign-certified, 0 reversals",
+  "exact_grid7": "18 cells, 0 reversals",
+  "retained_claims": {
+    "C1": "KEEP",
+    "C2": "KEEP",
+    "C3": "KEEP",
+    "C4": "KEEP",
+    "C5": "CORE-STRONG",
+    "C5b": "KEEP",
+    "C6": "KEEP",
+    "C7": "KEEP",
+    "C8": "NARROW",
+    "C9": "REMOVE",
+    "C10": "REMOVE",
+    "C11": "REMOVE",
+    "C12": "KEEP",
+    "C13": "KEEP"
+  }
+}

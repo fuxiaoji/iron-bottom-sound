@@ -1,0 +1,114 @@
+{
+  "results": [
+    {
+      "case": "base_symmetric",
+      "max_abs_V_minus_L": 0.0,
+      "relative": 0.0,
+      "sweeps": 2
+    },
+    {
+      "case": "speed_asymmetry_vB125",
+      "max_abs_V_minus_L": 0.0,
+      "relative": 0.0,
+      "sweeps": 2
+    },
+    {
+      "case": "speed_asymmetry_vB080",
+      "max_abs_V_minus_L": 0.0,
+      "relative": 0.0,
+      "sweeps": 2
+    },
+    {
+      "case": "range_asymmetry_B125_R080",
+      "max_abs_V_minus_L": 13.990749661530668,
+      "relative": 4.7696,
+      "sweeps": 322
+    },
+    {
+      "case": "action_asymmetry_B5_R3",
+      "max_abs_V_minus_L": 0.0,
+      "relative": 0.0,
+      "sweeps": 2
+    },
+    {
+      "case": "firepower_asymmetry_B125",
+      "max_abs_V_minus_L": 20.08597468123309,
+      "relative": 4.8931,
+      "sweeps": 326
+    },
+    {
+      "case": "full_asymmetry",
+      "max_abs_V_minus_L": 9.75459340177655,
+      "relative": 3.5301,
+      "sweeps": 314
+    },
+    {
+      "case": "terminal_payoff_finite_horizon_T30",
+      "max_abs_V_minus_L": 0.0,
+      "relative": 0.0,
+      "sweeps": 30
+    },
+    {
+      "case": "commitment_reference_open_loop",
+      "max_abs_V_minus_L": null,
+      "note": "open-loop committed game: LP values are generically nonzero; see e02 payoff_matrices.json (e.g., parallel eta_r=1 values +0.02..+2.97 across cells)"
+    }
+  ],
+  "cases": [
+    {
+      "case": "base_symmetric",
+      "max_abs_V_minus_L": 0.0,
+      "relative": 0.0,
+      "sweeps": 2
+    },
+    {
+      "case": "speed_asymmetry_vB125",
+      "max_abs_V_minus_L": 0.0,
+      "relative": 0.0,
+      "sweeps": 2
+    },
+    {
+      "case": "speed_asymmetry_vB080",
+      "max_abs_V_minus_L": 0.0,
+      "relative": 0.0,
+      "sweeps": 2
+    },
+    {
+      "case": "range_asymmetry_B125_R080",
+      "max_abs_V_minus_L": 13.990749661530668,
+      "relative": 4.7696,
+      "sweeps": 322
+    },
+    {
+      "case": "action_asymmetry_B5_R3",
+      "max_abs_V_minus_L": 0.0,
+      "relative": 0.0,
+      "sweeps": 2
+    },
+    {
+      "case": "firepower_asymmetry_B125",
+      "max_abs_V_minus_L": 20.08597468123309,
+      "relative": 4.8931,
+      "sweeps": 326
+    },
+    {
+      "case": "full_asymmetry",
+      "max_abs_V_minus_L": 9.75459340177655,
+      "relative": 3.5301,
+      "sweeps": 314
+    },
+    {
+      "case": "terminal_payoff_finite_horizon_T30",
+      "max_abs_V_minus_L": 0.0,
+      "relative": 0.0,
+      "sweeps": 30
+    },
+    {
+      "case": "commitment_reference_open_loop",
+      "max_abs_V_minus_L": null,
+      "note": "open-loop committed game: LP values are generically nonzero; see e02 payoff_matrices.json (e.g., parallel eta_r=1 values +0.02..+2.97 across cells)"
+    }
+  ],
+  "base_expectation": "max|V-L|=0 under full symmetry",
+  "conclusion": "Assumption-breaking matrix (7 cases + commitment reference): the closed-loop degeneracy V=L is EXACTLY preserved under speed asymmetry (vB 4.8 or 7.5 vs 6.0), action-set asymmetry (5 vs 3 turn levels), and finite-horizon terminal payoff; it is broken ONLY by interaction-strength asymmetry -- gun range (eta_r 1.25 vs 0.8: deviation 14.0) and firepower (eta_g 1.25: deviation 20.1).  The degeneracy is therefore an interaction-symmetry phenomenon, not a kinematic one: kinematic asymmetries leave it intact, asymmetries in the field strength itself destroy it.  This sharpens Proposition 1's scope and explains why the operating-speed effect (B4.2) lives in the committed/open-loop game rather than in the closed loop."
+}

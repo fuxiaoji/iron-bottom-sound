@@ -1,0 +1,230 @@
+\section{Structure and certificates}\label{sec:theory}
+
+\subsection{Policy inclusion does not imply diminishing returns}
+\begin{proposition}[Calendar inclusion]\label{prop:inclusion}
+For fixed $A$ and $R$, $S\subseteq U$ implies $V(S,R)\le V(U,R)$.
+Consequently $W_K(R)$ is nondecreasing, with $W_0=V_0$ and $W_{T-1}=V_F$.
+\end{proposition}
+\begin{proof}
+An $S$-policy can be implemented under $U$ by choosing the corresponding
+parts of each original block and ignoring observations at additional update
+epochs. The player remembers the original block or the privately sampled
+pure policy. This embedding is outcome-equivalent against every policy in
+the same $\QQ_R$. Extending the embedding to mixtures and maximizing over
+the enlarged feasible set proves the value inequality. The budget and
+endpoint statements follow immediately.
+\end{proof}
+This is a finite policy-inclusion argument, consistent with established
+zero-sum information-value results \citep{hogeboom2020}. We use it as a
+correctness condition, not as an independent novelty claim. It does not
+compare different physical speeds or different opponent classes.
+
+\begin{proposition}[Complementary update opportunities]\label{prop:counterexample}
+Even with binary actions, a committed opponent and a nonnegative bounded
+payoff, $S\mapsto V(S,C)$ need not be submodular.
+\end{proposition}
+\begin{proof}
+Take $T=3$ and payoff
+$A=\mathbf1\{b_1=r_0\}\mathbf1\{b_2=r_1\}$.
+The values for $S=\varnothing,\{1\},\{2\},\{1,2\}$ are
+$1/4,1/2,1/2,1$, respectively. Without updates, independent uniform Blue
+guesses guarantee $1/4$, and independent uniform Red bits bound the value
+by $1/4$. With only update 1, Blue matches the observed first bit and guesses
+the second; with only update 2 it guesses the first and matches the second.
+Uniform unknown bits bound both values by $1/2$. Both updates permit both
+matches. Thus the marginal value of update 2 rises from $1/4$ to $1/2$
+when update 1 is already present, violating submodularity.
+\end{proof}
+This example concerns the general finite history-payoff class, not every
+formation instance. It rules out a generic diminishing-returns justification
+for greedy calendar selection. The informational-substitutes literature
+likewise requires substantive conditions on the decision problem
+\citep{chen2017}. A sufficient special case is a sum of independent reset
+games with product feasible sets, independent information and no shared
+opponent resource: product equilibrium strategies give matching lower and
+upper guarantees for the sum, so each selected update contributes a fixed
+premium. That special case is modular. The formation history in
+\eqref{eq:formation} generally prevents such a reset decomposition.
+
+\subsection{Where the game can be decomposed}
+\begin{theorem}[Common-update decomposition]\label{thm:decomposition}
+At a common update $c\in S\cap R$, each complete executed prefix defines a
+proper subgame. Backward replacement of these subgames by their minimax
+values preserves the root value. No identification of distinct physical
+histories is needed.
+\end{theorem}
+\begin{proof}
+At $c$ both previously selected command blocks have finished. Their executed
+contents are public, and no private unexecuted command crosses the cut.
+All histories belonging to either player's information set at or after this
+prefix remain inside the corresponding subtree. The subtree is therefore a
+proper subgame. Within it, the maximizing player can guarantee its value
+and the minimizing player can enforce the same upper bound. Replacing its
+continuation by that scalar gives matching guarantees in the preceding
+game. Induction over common boundaries, in reverse chronological order,
+proves equality at the root.
+\end{proof}
+An update of Blue alone is not such a boundary while Red still has an
+unfinished command block. This restriction separates the result from an
+incorrect full-information Bellman recursion at every physical epoch.
+
+\begin{corollary}[Propagation of subgame error]\label{cor:error}
+If the uniform value error at replacement level $l$ is at most $e_l$, the
+root error is at most $\sum_l e_l$.
+\end{corollary}
+\begin{proof}
+A uniform perturbation of at most $e$ changes the expected payoff of every
+fixed strategy pair by at most $e$. Taking the minimum and maximum preserves
+the bound. Induct over the successive replacements.
+\end{proof}
+
+\subsection{Exact pricing against a fixed causal opponent}
+For a fixed opponent policy $q$, define $C_q(j\mid i)$ as its realization
+probability of path $j$ when the own path $i$ is externally fixed. This is a
+counterfactual conditional law; it does not assume that the opponent
+commits. For committed $q$, it reduces to $q_j$. For a mixture of causal
+pure opponent maps $r_m(i)$ with weights $w_m$,
+\begin{equation}
+ C_q(j\mid i)=\sum_m w_m\mathbf1\{r_m(i)=j\}.
+ \label{eq:counterfactual}
+\end{equation}
+Every positive mixture weight is retained. Initialize
+$H_T(i,j)=A(i,j)C_q(j\mid i)$. At consecutive own block boundaries $t<e$,
+apply the recurrence
+\begin{equation}
+ H_t(i_t,j_t)=\max_a\sum_z H_e(i_t a,j_t z),
+ \label{eq:pricing}
+\end{equation}
+where $a$ is the complete own block and $z$ ranges over the opponent's
+executed actions during that block. The sum precedes the maximum.
+
+\begin{theorem}[Response over the complete permitted policy class]\label{thm:pricing}
+Recurrence \eqref{eq:pricing} returns the maximum payoff against $q$ over
+all policies permitted by the own calendar. Its stored maximizing blocks
+define a feasible pure best response.
+\end{theorem}
+\begin{proof}
+Causality implies that the counterfactual opponent probability up to time
+$t$ depends only on the executed prefix, hence is independent of the
+yet-unchosen own block. For each block, all unobserved opponent continuations
+must first be summed. At the next own update the continuation can be chosen
+separately for each newly observed prefix; its optimum has already been
+computed by the induction hypothesis. The resulting sum followed by a
+maximum is precisely the feasible decision at $t$. Backward induction proves
+root optimality. Prefix probabilities remain unnormalized, so no division
+by zero is required. The recorded block at each information set uses only
+its observed prefixes, which proves feasibility, including arbitrary legal
+choices at zero-weight histories.
+\end{proof}
+The recurrence takes $O(b^{2T})$ arithmetic and memory for $b\ge2$, up to
+a geometric-series factor. Constructing the physical matrix and generating
+multiple response policies are additional costs. The result specializes
+established extensive-form best-response ideas; we do not claim a new
+general equilibrium-computation framework \citep{bosansky2014,mcaleer2021}.
+
+\subsection{Transferable upper bounds and feasible deletion policies}
+\begin{proposition}[Opponent-policy reuse]\label{prop:reuse}
+For fixed opponent calendar $R$, a causal opponent policy remains feasible
+when only the own calendar changes. For any finite pool $Q_0\subseteq\QQ_R$,
+\begin{equation}
+ V(S,R)\le\min_{q\in Q_0}\BR_S(q).
+ \label{eq:poolbound}
+\end{equation}
+\end{proposition}
+\begin{proof}
+The opponent's update times, observed executed prefixes and legal action
+menu remain unchanged. Its old policy can ignore the new public calendar
+and use the same map of observations to commands. Its feasibility never
+depends on observing an unexecuted suffix. Fixing any such policy in the
+minimax expression gives an upper bound, and the minimum of valid upper
+bounds is valid.
+\end{proof}
+
+To remove updates, we construct a legal coarse policy rather than treating
+an infeasible fine-calendar strategy as if it remained admissible. Express
+a full-update source strategy as conditional action kernels. At a coarse
+update, retain the actual own and opponent prefixes, complete the opponent
+future by a fixed straight-action suffix, and multiply the source kernels
+along every possible own block. These products define its block distribution.
+When a source information set has zero incoming probability, use the uniform
+legal action distribution. This is an explicit new behavioral policy; no
+claim is made that it preserves the source's outcome distribution after
+updates are deleted.
+
+\begin{theorem}[Constructive deletion certificate]\label{thm:deletion}
+Under state-independent legal action menus, the construction gives a feasible
+policy $\tilde p$ for any coarse calendar $S'\subseteq\NN$. If $U_F$ bounds
+$V_F$ from above and
+$L'=\min_{q\in\QQ_R}\EE_{\tilde p,q}A$, then
+\begin{equation}
+ 0\le V_F-V(S',R)\le U_F-L'.
+ \label{eq:loss}
+\end{equation}
+\end{theorem}
+\begin{proof}
+Each source kernel is normalized. Summing the products over all own blocks
+therefore gives one by iterated normalization. The construction uses only
+information observed at the coarse update and a fixed hypothetical suffix.
+Every block is legal because action menus do not depend on the shadow
+trajectory. Thus $\tilde p\in\PP_{S'}$ and $L'\le V(S',R)$. Combine this
+inequality with $V_F\le U_F$ and Proposition~\ref{prop:inclusion}.
+\end{proof}
+The certificate can be loose; its usefulness must be measured. It is a
+full-response bound on an explicit policy, not a generic smoothness bound
+on the directional field. Existing abstraction theory also distinguishes
+solution error from the size of an abstraction \citep{kroer2018}.
+
+\subsection{A calendar bound from interval losses}
+The fully replanning opponent admits an additional public-boundary construction.
+Let $v_t(h)$ be the full-update continuation value at executed prefix $h$.
+For $t<e$, let $b_{t,e}(h)$ be the value when Blue commits over $[t,e)$,
+Red remains fully flexible, and the terminal payoff at $e$ is $v_e$.
+Define
+\begin{equation}
+ d(t,e)=\max_{h\text{ at }t}\{v_t(h)-b_{t,e}(h)\}.
+ \label{eq:intervalcost}
+\end{equation}
+Policy inclusion gives $d(t,e)\ge0$, and $d(t,t+1)=0$.
+
+\begin{theorem}[Calendar loss from public intervals]\label{thm:interval}
+For opponent $F$ and boundaries $0=t_0<t_1<\cdots<t_m=T$,
+\begin{equation}
+ 0\le V(F,F)-V(\{t_1,\ldots,t_{m-1}\},F)
+ \le\sum_{j=0}^{m-1}d(t_j,t_{j+1}).
+ \label{eq:intervalloss}
+\end{equation}
+Minimizing the right side over paths with at most $K+1$ edges from $0$ to $T$
+gives a computable upper bound on the loss of its selected calendar.
+\end{theorem}
+\begin{proof}
+At each selected boundary use a maximizing block policy of the game defining
+$b_{t,e}(h)$. Suppose the remaining stitched policy guarantees at least
+$v_e(h')-D$ at every successor prefix $h'$. Replacing $v_e$ by that
+continuation lowers the guarantee by at most $D$. The selected block thus
+guarantees $b_{t,e}(h)-D\ge v_t(h)-d(t,e)-D$. Backward induction from zero
+terminal loss proves the sum. Every stitched decision uses an observed
+public prefix; Red has no private unexecuted block across these cuts.
+Finally each forward path is exactly one feasible public calendar, so
+shortest-path minimization preserves the bound.
+\end{proof}
+With edge costs available, all budget bounds take $O(T^3)$ dynamic-programming
+work. Computing the full value tree and local interval games is preprocessing
+and can be expensive. Maxima over all histories can be conservative.
+The bound certifies sufficiency of a budget, not minimality for the true
+performance target. The construction is restricted to opponent $F$;
+an unexecuted committed opponent suffix prevents the same public-boundary
+argument for $C$. The result specializes a minimax perturbation argument
+to calendar selection rather than claiming a new general abstraction theorem.
+
+\subsection{Correct use of symmetry}
+Exchange-equivariant dynamics and antisymmetric payoff imply
+$V(\mathsf E s)=-V(s)$ after exchanging policy classes. At states fixed by
+the exchange, possibly combined with a verified spatial isometry, this
+implies zero value when policy classes are also exchanged into themselves.
+It does not imply that the finite-horizon value equals one-stage payoff at
+every state. For example, absorbing states $s=\pm1$ with stage payoff $s$
+have two-stage value $2s$ while satisfying exchange oddness. Mixed minimax,
+rather than pure max-min, is also essential for the zero value of a
+skew-symmetric matrix. These distinctions govern the numerical symmetry
+checks and prevent an invalid degeneracy argument from entering the main
+line of reasoning.

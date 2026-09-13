@@ -1,0 +1,62 @@
+[
+  {
+    "geometry": "crossing",
+    "h": 1,
+    "mode": "off",
+    "symmetry": true,
+    "cap": 200,
+    "tol": 0.005,
+    "n": 8,
+    "complete": true,
+    "C": 0.0,
+    "CI_lo": 0.0,
+    "CI_hi": 0.0,
+    "near_zero": true,
+    "CI_contains_zero": true
+  },
+  {
+    "geometry": "crossing",
+    "h": 2,
+    "mode": "off",
+    "symmetry": true,
+    "cap": 200,
+    "tol": 0.005,
+    "n": 8,
+    "complete": true,
+    "C": 0.31497384372252246,
+    "CI_lo": -0.3178605742953724,
+    "CI_hi": 0.9680488918285824,
+    "near_zero": false,
+    "CI_contains_zero": true
+  },
+  {
+    "geometry": "crossing",
+    "h": 3,
+    "mode": "off",
+    "symmetry": true,
+    "cap": 200,
+    "tol": 0.005,
+    "n": 8,
+    "complete": true,
+    "C": 1.1035857581667294,
+    "CI_lo": -1.4829108106578608,
+    "CI_hi": 4.650499848263556,
+    "near_zero": false,
+    "CI_contains_zero": true
+  },
+  {
+    "geometry": "crossing",
+    "h": 6,
+    "mode": "off",
+    "symmetry": true,
+    "cap": 200,
+    "tol": 0.005,
+    "n": 8,
+    "complete": true,
+    "C": 1.3137120289660478,
+    "CI_lo": -0.5938309210095163,
+    "CI_hi": 4.399493700384317,
+    "near_zero": false,
+    "CI_contains_zero": true
+  }
+]

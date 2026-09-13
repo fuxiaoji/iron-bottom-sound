@@ -1,0 +1,99 @@
+\section{Certified calendar optimization}\label{sec:algorithm}
+
+\subsection{An independent equilibrium reference}
+At own update $t$ with next update $e$, the information set is indexed by
+$(t,i_t,j_t)$ and has $b^{e-t}$ block actions. The sum of their realization
+weights equals that of the parent block sequence. The parent is identified
+by the previous own update, its observed prefixes and the entire block
+that has now been executed. A unit root weight completes the flow equations.
+Terminal path pairs contribute their payoff to the corresponding pair of
+last block sequences. These realization constraints yield the standard
+perfect-recall sequence-form LP \citep{stengel1996}.
+
+The implementation repairs proposed realization vectors top-down to
+nonnegative feasible behavioral distributions and reports the repair size.
+It then solves independent full best responses for both players. If $p,q$
+are the repaired strategies, the numerical certificate is based on
+\begin{equation}
+ L=\min_{q'\in\QQ_R}\EE_{p,q'}A,
+ \qquad U=\max_{p'\in\PP_S}\EE_{p',q}A.
+ \label{eq:responses}
+\end{equation}
+Residuals and numerical padding are recorded. These floating-point
+intervals do not include continuous-control discretization or physical
+model error and are not interval-arithmetic proofs.
+
+\subsection{Policy generation and common-boundary evaluation}
+Against a committed opponent, retain all $b^T$ Red plans and a restricted
+set of Blue contingent policies. Solve the rectangular matrix game; its
+Blue mixture gives a valid full-opponent lower bound. Price a full Blue
+best response using Theorem~\ref{thm:pricing} to obtain an upper bound and
+a new policy when needed. This follows the established response-oracle
+framework \citep{mcmahan2003,bosansky2014}.
+
+In exact arithmetic a policy attaining a strictly positive response gap
+cannot already belong to the restricted set. Since the pure-policy space
+is finite, repeated addition terminates finitely. No polynomial iteration
+guarantee is asserted. A development pilot demonstrated that iteration
+counts vary substantially between physical instances, so the numerical
+portfolio fixes a 64-iteration generation budget and then falls back to
+the full sequence-form LP when necessary. Initial generation time is
+charged to the total cost. This rule was set before the frozen tests.
+
+Against a fully flexible opponent, use the common updates of
+Theorem~\ref{thm:decomposition}. Each local interval has committed Blue
+against flexible Red; exchanging the algebraic subgame's roles applies
+the same one-sided solver. Distinct executed prefixes retain separate
+subgames. The intervals are propagated using Corollary~\ref{cor:error}.
+
+\subsection{Search on the calendar lattice}
+A branch-and-bound node specifies included updates $I$, excluded updates
+$E$ and undecided updates. Every descendant is contained in
+$U=\NN\setminus E$. Therefore an upper bound on $V(U,R)$ bounds the
+whole node, even when $|U|>K$. A feasible calendar supplies an incumbent
+lower bound $L^*$. A node is pruned only if its upper bound is at most
+$L^*+\eps$. If $|I|>K$ it is infeasible. If $|I|=K$, only $I$ remains
+admissible. If $|U|\le K$, calendar $U$ dominates its descendants by
+inclusion. Otherwise split on the smallest undecided update.
+
+The basic method solves the relaxed calendar $U$. The enhanced method
+first tries the cheaper upper bound \eqref{eq:poolbound}, using only
+opponent policies obtained from calendar queries already made by that
+method. A bound on $U$ also bounds all its subsets. Neither variant assumes
+submodularity. Calendar solutions are reused across budgets within a method,
+and the complete budget-frontier cost is recorded.
+
+\begin{theorem}[Search certificate]\label{thm:search}
+When every calendar node has been evaluated or safely pruned, the incumbent
+calendar has value at least $L^*$, and $W_K$ is at most the largest final-node
+upper bound $U^*$. If $U^*-L^*\le\eps$, the returned calendar is
+$\eps$-optimal.
+\end{theorem}
+\begin{proof}
+Binary inclusion/exclusion partitions all calendar subsets. Infeasible nodes
+contain no admissible solution. Both terminal reductions preserve an
+admissible dominating calendar by inclusion. Every remaining candidate
+therefore belongs to an evaluated or bounded terminal node. Their largest
+upper bound bounds every feasible value, while the incumbent lower bound
+is attained as a guarantee by a feasible strategy. Subtraction proves the
+claim.
+\end{proof}
+This guarantee does not establish a universal speedup. A relaxation may
+be expensive, a transferred response bound may be loose, and an incumbent
+may coincide with a simple uniform calendar. These outcomes are retained
+in the computational comparisons.
+
+\subsection{Certifying the smallest useful budget}
+Given intervals $[L_K,U_K]$, $[L_0,U_0]$ and $[L_F,U_F]$, condition
+\eqref{eq:retention} is guaranteed when
+\begin{equation}
+ L_K-\rho U_F-(1-\rho)U_0\ge0,
+ \label{eq:pass}
+\end{equation}
+and ruled out when
+\begin{equation}
+ U_K-\rho L_F-(1-\rho)L_0<0.
+ \label{eq:fail}
+\end{equation}
+When the possible and guaranteed smallest budgets differ, both are reported.
+The numerical precision is never silently relaxed to force a unique budget.

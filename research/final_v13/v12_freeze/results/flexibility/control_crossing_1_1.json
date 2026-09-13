@@ -1,0 +1,162 @@
+{
+  "geometry": "crossing",
+  "eta_r": 1.0,
+  "eta_v": 1.0,
+  "T": 6,
+  "grid": 3,
+  "formation": "leader_follower",
+  "phase": "control",
+  "values": {
+    "FF": {
+      "V": 0.0,
+      "numeric_error_budget": 1.4210854715202004e-14,
+      "LB": -1.4210854715202004e-14,
+      "UB": 1.4210854715202004e-14,
+      "trace": [
+        {
+          "t_start": 5,
+          "t_end": 6,
+          "nodes": 59049,
+          "matrix_order": 3,
+          "max_local_duality_gap": 5.329070518200751e-15,
+          "lp_calls": 0,
+          "seconds": 0.013857834001100855
+        },
+        {
+          "t_start": 4,
+          "t_end": 5,
+          "nodes": 6561,
+          "matrix_order": 3,
+          "max_local_duality_gap": 3.552713678800501e-15,
+          "lp_calls": 0,
+          "seconds": 0.001940583999385126
+        },
+        {
+          "t_start": 3,
+          "t_end": 4,
+          "nodes": 729,
+          "matrix_order": 3,
+          "max_local_duality_gap": 3.552713678800501e-15,
+          "lp_calls": 0,
+          "seconds": 0.0005665000026056077
+        },
+        {
+          "t_start": 2,
+          "t_end": 3,
+          "nodes": 81,
+          "matrix_order": 3,
+          "max_local_duality_gap": 1.7763568394002505e-15,
+          "lp_calls": 0,
+          "seconds": 0.00032191599893849343
+        },
+        {
+          "t_start": 1,
+          "t_end": 2,
+          "nodes": 9,
+          "matrix_order": 3,
+          "max_local_duality_gap": 0.0,
+          "lp_calls": 0,
+          "seconds": 1.270800203201361e-05
+        },
+        {
+          "t_start": 0,
+          "t_end": 1,
+          "nodes": 1,
+          "matrix_order": 3,
+          "max_local_duality_gap": 0.0,
+          "lp_calls": 0,
+          "seconds": 1.2042000889778137e-05
+        }
+      ],
+      "algorithm": "complete backward induction",
+      "T": 6,
+      "h": 1,
+      "base": 3,
+      "leaves": 531441,
+      "certification_scope": "finite game, floating-point payoff evaluation and LP precision",
+      "seconds": 0.017833948135375977
+    },
+    "CC": {
+      "V": -4.301377034918266e-16,
+      "numeric_error_budget": 7.675421715013341e-15,
+      "LB": -8.105559418505168e-15,
+      "UB": 7.245284011521515e-15,
+      "trace": [
+        {
+          "t_start": 0,
+          "t_end": 6,
+          "nodes": 1,
+          "matrix_order": 729,
+          "max_local_duality_gap": 7.675421715013341e-15,
+          "lp_calls": 1,
+          "seconds": 0.362218791997293
+        }
+      ],
+      "algorithm": "complete backward induction",
+      "T": 6,
+      "h": 6,
+      "base": 3,
+      "leaves": 531441,
+      "certification_scope": "finite game, floating-point payoff evaluation and LP precision",
+      "seconds": 0.36234498023986816
+    },
+    "FC": {
+      "V": 2.525756156854352,
+      "LB": 2.525756156854351,
+      "UB": 2.525756156854351,
+      "gap": 0.0,
+      "flow_residual_B": 1.3322676295501878e-15,
+      "flow_residual_R": 1.942890293094024e-16,
+      "inequality_violation": 1.7763568394002505e-15,
+      "structure": "FC",
+      "base": 3,
+      "T": 6,
+      "sequences_B": 199291,
+      "sequences_R": 730,
+      "infosets_B": 66430,
+      "infosets_R": 1,
+      "payoff_nonzeros": 531441,
+      "lp_iterations": 27475,
+      "algorithm": "sparse perfect-recall sequence-form LP with full realization best responses",
+      "seconds": 13.89674711227417
+    },
+    "CF": {
+      "V": -2.5257561568543467,
+      "LB": -2.525756156854347,
+      "UB": -2.525756156854347,
+      "gap": 0.0,
+      "flow_residual_B": 5.898059818321144e-17,
+      "flow_residual_R": 2.220446049250313e-16,
+      "inequality_violation": 1.7763568394002505e-15,
+      "structure": "CF",
+      "base": 3,
+      "T": 6,
+      "sequences_B": 730,
+      "sequences_R": 199291,
+      "infosets_B": 1,
+      "infosets_R": 66430,
+      "payoff_nonzeros": 531441,
+      "lp_iterations": 25552,
+      "algorithm": "sparse perfect-recall sequence-form LP with full realization best responses",
+      "seconds": 12.345031023025513,
+      "solved_via": "negative-transpose FC"
+    }
+  },
+  "F_B": 2.5257561568543525,
+  "F_R": 2.525756156854352,
+  "F_B_alt": 2.5257561568543467,
+  "F_R_alt": 2.5257561568543463,
+  "interaction": 5.759208221692578e-15,
+  "C": -4.301377034918266e-16,
+  "C_LB": -2.2316414133707173e-14,
+  "C_UB": 2.1456138726723517e-14,
+  "Delta_F": -0.0,
+  "Delta_LB": 0.0,
+  "Delta_UB": 0.0,
+  "correct_resolved": false,
+  "reverse_resolved": false,
+  "monotonicity_pass": true,
+  "identity_error": 1.395150635823604e-17,
+  "seconds": 35.360716104507446,
+  "exchange_pass": true
+}

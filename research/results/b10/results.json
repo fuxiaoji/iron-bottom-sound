@@ -1,0 +1,821 @@
+{
+  "experiment": "B10 delayed torpedo state model: z_t=(s_t,q_t) and H(x,t)",
+  "protocol": "E04 same-turn perfect-information protocol (all legal launches of the sealed turn-2 attacker plans become track states; no adjudication, no dice)",
+  "base_seed": 20260910,
+  "field_definition": {
+    "z_t": "(s_t world snapshot at decision time t, q_t = set of live tracks each with launch turn/impulse/hex, torpedo heading, speed cycle, range, salvo count, position-by-pulse map, removed_at expiration)",
+    "H(x,t)": "1 - prod_k (1 - p_k(x,t)) over tracks k occupying hex x at pulse t; p_k = engine.torpedo_hit_probability('broadside', modifier) at the track's transit geometry",
+    "reference_target_convention": "broadside aspect (worst case for the target) and reference target nominal speed, so H is a property of the threat state alone; route-level hazards in B11/B12 use exact per-plan aspect"
+  },
+  "provenance": {
+    "engine_py_sha256_16": "6488d72983e38b44",
+    "structured_tree_n_files": 40,
+    "structured_tree_hash_16": "d7c7b308c4cf8525",
+    "lane_eval_compat": "evaluate_contact accepts both current _torpedo_modifier(state, attacker, target, distance) and legacy API"
+  },
+  "runtime_seconds": 3.373868227005005,
+  "cells": {
+    "chase:1v1": {
+      "field_summary": {
+        "n_tracks": 96,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 399,
+        "n_hot_cells": 1178,
+        "threat_mass_total": 206.3777025368261,
+        "threat_mass_by_turn": {
+          "2": 122.08217784546805,
+          "3": 56.666666666666686,
+          "4": 22.665895061728406,
+          "5": 3.9660493827160517,
+          "6": 0.9969135802469142
+        },
+        "mean_track_lifetime_pulses": 18.364583333333332,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 96
+      },
+      "time_dependence": {
+        "n_hot_hexes": 399,
+        "hot_pulse_count_distribution": {
+          "1": 43,
+          "2": 113,
+          "3": 79,
+          "4": 149,
+          "5": 14,
+          "6": 1
+        },
+        "mean_hot_pulses_per_hot_hex": 2.9523809523809526,
+        "single_pulse_hot_share": 0.10776942355889724,
+        "example_hex": {
+          "hex": "T19",
+          "hot_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_hot_pulse": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            2
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "T10",
+          "tau0_contact_pulse": [
+            3,
+            2
+          ],
+          "tau0_contact_hazard_field": 0.15972222222222232,
+          "tau0_contact_hazard_route": 0.08333333333333333,
+          "other_plan": "1PP1P1P1P",
+          "other_plan_signature": [
+            "O13",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": true,
+          "other_plan_j_over_jref": 1.0,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "delayed_metrics": {
+        "n_tracks": 96,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 399,
+        "n_hot_cells": 1178,
+        "threat_mass_total": 206.3777025368261,
+        "threat_mass_by_turn": {
+          "2": 122.08217784546805,
+          "3": 56.666666666666686,
+          "4": 22.665895061728406,
+          "5": 3.9660493827160517,
+          "6": 0.9969135802469142
+        },
+        "mean_track_lifetime_pulses": 18.364583333333332,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 96,
+        "launch_turn": 2,
+        "future_turn_threat_mass_fraction": 0.40845267514457545,
+        "n_tracks_alive_one_turn_later": 96,
+        "share_tracks_alive_one_turn_later": 1.0,
+        "instantaneous_weapon_counterfactual": "a gun salvo's threat exists only at the firing pulse; here 0.408 of the field's threat mass lies in turns AFTER the launch turn, fully determined at launch (no further attacker decision required)"
+      }
+    },
+    "chase:2v1": {
+      "field_summary": {
+        "n_tracks": 192,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 481,
+        "n_hot_cells": 1989,
+        "threat_mass_total": 389.04241749936784,
+        "threat_mass_by_turn": {
+          "2": 223.79632434474198,
+          "3": 110.5453317901235,
+          "4": 44.67054076646093,
+          "5": 7.801697530864203,
+          "6": 2.2285230671772616
+        },
+        "mean_track_lifetime_pulses": 18.3125,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 192
+      },
+      "time_dependence": {
+        "n_hot_hexes": 481,
+        "hot_pulse_count_distribution": {
+          "1": 29,
+          "2": 80,
+          "3": 69,
+          "4": 118,
+          "5": 51,
+          "6": 87,
+          "7": 34,
+          "8": 11,
+          "9": 2
+        },
+        "mean_hot_pulses_per_hot_hex": 4.135135135135135,
+        "single_pulse_hot_share": 0.060291060291060294,
+        "example_hex": {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_at_hot_pulse": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "T10",
+          "tau0_contact_pulse": [
+            3,
+            2
+          ],
+          "tau0_contact_hazard_field": 0.22974537037037046,
+          "tau0_contact_hazard_route": 0.08333333333333333,
+          "other_plan": "1PP1P1P1P",
+          "other_plan_signature": [
+            "O13",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": true,
+          "other_plan_j_over_jref": 1.0,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "delayed_metrics": {
+        "n_tracks": 192,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 481,
+        "n_hot_cells": 1989,
+        "threat_mass_total": 389.04241749936784,
+        "threat_mass_by_turn": {
+          "2": 223.79632434474198,
+          "3": 110.5453317901235,
+          "4": 44.67054076646093,
+          "5": 7.801697530864203,
+          "6": 2.2285230671772616
+        },
+        "mean_track_lifetime_pulses": 18.3125,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 192,
+        "launch_turn": 2,
+        "future_turn_threat_mass_fraction": 0.4247508387819804,
+        "n_tracks_alive_one_turn_later": 192,
+        "share_tracks_alive_one_turn_later": 1.0,
+        "instantaneous_weapon_counterfactual": "a gun salvo's threat exists only at the firing pulse; here 0.425 of the field's threat mass lies in turns AFTER the launch turn, fully determined at launch (no further attacker decision required)"
+      }
+    },
+    "close:1v1": {
+      "field_summary": {
+        "n_tracks": 96,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 399,
+        "n_hot_cells": 1178,
+        "threat_mass_total": 206.3777025368261,
+        "threat_mass_by_turn": {
+          "2": 122.08217784546805,
+          "3": 56.666666666666686,
+          "4": 22.665895061728406,
+          "5": 3.9660493827160517,
+          "6": 0.9969135802469142
+        },
+        "mean_track_lifetime_pulses": 18.364583333333332,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 96
+      },
+      "time_dependence": {
+        "n_hot_hexes": 399,
+        "hot_pulse_count_distribution": {
+          "1": 43,
+          "2": 113,
+          "3": 79,
+          "4": 149,
+          "5": 14,
+          "6": 1
+        },
+        "mean_hot_pulses_per_hot_hex": 2.9523809523809526,
+        "single_pulse_hot_share": 0.10776942355889724,
+        "example_hex": {
+          "hex": "T19",
+          "hot_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_hot_pulse": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            2
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "T18",
+          "tau0_contact_pulse": [
+            2,
+            2
+          ],
+          "tau0_contact_hazard_field": 0.9995406063420023,
+          "tau0_contact_hazard_route": 0.7222222222222222,
+          "other_plan": "1P1PP2",
+          "other_plan_signature": [
+            "V17",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": true,
+          "other_plan_j_over_jref": 1.0,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              2,
+              3
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.0
+          ]
+        }
+      },
+      "delayed_metrics": {
+        "n_tracks": 96,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 399,
+        "n_hot_cells": 1178,
+        "threat_mass_total": 206.3777025368261,
+        "threat_mass_by_turn": {
+          "2": 122.08217784546805,
+          "3": 56.666666666666686,
+          "4": 22.665895061728406,
+          "5": 3.9660493827160517,
+          "6": 0.9969135802469142
+        },
+        "mean_track_lifetime_pulses": 18.364583333333332,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 96,
+        "launch_turn": 2,
+        "future_turn_threat_mass_fraction": 0.40845267514457545,
+        "n_tracks_alive_one_turn_later": 96,
+        "share_tracks_alive_one_turn_later": 1.0,
+        "instantaneous_weapon_counterfactual": "a gun salvo's threat exists only at the firing pulse; here 0.408 of the field's threat mass lies in turns AFTER the launch turn, fully determined at launch (no further attacker decision required)"
+      }
+    },
+    "close:2v1": {
+      "field_summary": {
+        "n_tracks": 192,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 481,
+        "n_hot_cells": 1989,
+        "threat_mass_total": 389.04241749936784,
+        "threat_mass_by_turn": {
+          "2": 223.79632434474198,
+          "3": 110.5453317901235,
+          "4": 44.67054076646093,
+          "5": 7.801697530864203,
+          "6": 2.2285230671772616
+        },
+        "mean_track_lifetime_pulses": 18.3125,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 192
+      },
+      "time_dependence": {
+        "n_hot_hexes": 481,
+        "hot_pulse_count_distribution": {
+          "1": 29,
+          "2": 80,
+          "3": 69,
+          "4": 118,
+          "5": 51,
+          "6": 87,
+          "7": 34,
+          "8": 11,
+          "9": 2
+        },
+        "mean_hot_pulses_per_hot_hex": 4.135135135135135,
+        "single_pulse_hot_share": 0.060291060291060294,
+        "example_hex": {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_at_hot_pulse": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "T17",
+          "tau0_contact_pulse": [
+            2,
+            2
+          ],
+          "tau0_contact_hazard_field": 0.9785665294924554,
+          "tau0_contact_hazard_route": 0.7222222222222222,
+          "other_plan": "1",
+          "other_plan_signature": [
+            "T17",
+            4,
+            1
+          ],
+          "other_plan_is_tied_top": false,
+          "other_plan_j_over_jref": 0.3822115384615385,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              2,
+              1
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.9995406063420023
+          ]
+        }
+      },
+      "delayed_metrics": {
+        "n_tracks": 192,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 481,
+        "n_hot_cells": 1989,
+        "threat_mass_total": 389.04241749936784,
+        "threat_mass_by_turn": {
+          "2": 223.79632434474198,
+          "3": 110.5453317901235,
+          "4": 44.67054076646093,
+          "5": 7.801697530864203,
+          "6": 2.2285230671772616
+        },
+        "mean_track_lifetime_pulses": 18.3125,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 192,
+        "launch_turn": 2,
+        "future_turn_threat_mass_fraction": 0.4247508387819804,
+        "n_tracks_alive_one_turn_later": 192,
+        "share_tracks_alive_one_turn_later": 1.0,
+        "instantaneous_weapon_counterfactual": "a gun salvo's threat exists only at the firing pulse; here 0.425 of the field's threat mass lies in turns AFTER the launch turn, fully determined at launch (no further attacker decision required)"
+      }
+    },
+    "crossing:1v1": {
+      "field_summary": {
+        "n_tracks": 96,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 399,
+        "n_hot_cells": 1178,
+        "threat_mass_total": 206.3777025368261,
+        "threat_mass_by_turn": {
+          "2": 122.08217784546805,
+          "3": 56.666666666666686,
+          "4": 22.665895061728406,
+          "5": 3.9660493827160517,
+          "6": 0.9969135802469142
+        },
+        "mean_track_lifetime_pulses": 18.364583333333332,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 96
+      },
+      "time_dependence": {
+        "n_hot_hexes": 399,
+        "hot_pulse_count_distribution": {
+          "1": 43,
+          "2": 113,
+          "3": 79,
+          "4": 149,
+          "5": 14,
+          "6": 1
+        },
+        "mean_hot_pulses_per_hot_hex": 2.9523809523809526,
+        "single_pulse_hot_share": 0.10776942355889724,
+        "example_hex": {
+          "hex": "T19",
+          "hot_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_hot_pulse": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            2
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "T10",
+          "tau0_contact_pulse": [
+            3,
+            3
+          ],
+          "tau0_contact_hazard_field": 0.15972222222222232,
+          "tau0_contact_hazard_route": 0.08333333333333333,
+          "other_plan": "1P2P1P1P",
+          "other_plan_signature": [
+            "O13",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": true,
+          "other_plan_j_over_jref": 1.0,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "delayed_metrics": {
+        "n_tracks": 96,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 399,
+        "n_hot_cells": 1178,
+        "threat_mass_total": 206.3777025368261,
+        "threat_mass_by_turn": {
+          "2": 122.08217784546805,
+          "3": 56.666666666666686,
+          "4": 22.665895061728406,
+          "5": 3.9660493827160517,
+          "6": 0.9969135802469142
+        },
+        "mean_track_lifetime_pulses": 18.364583333333332,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 96,
+        "launch_turn": 2,
+        "future_turn_threat_mass_fraction": 0.40845267514457545,
+        "n_tracks_alive_one_turn_later": 96,
+        "share_tracks_alive_one_turn_later": 1.0,
+        "instantaneous_weapon_counterfactual": "a gun salvo's threat exists only at the firing pulse; here 0.408 of the field's threat mass lies in turns AFTER the launch turn, fully determined at launch (no further attacker decision required)"
+      }
+    },
+    "crossing:2v1": {
+      "field_summary": {
+        "n_tracks": 192,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 481,
+        "n_hot_cells": 1989,
+        "threat_mass_total": 389.04241749936784,
+        "threat_mass_by_turn": {
+          "2": 223.79632434474198,
+          "3": 110.5453317901235,
+          "4": 44.67054076646093,
+          "5": 7.801697530864203,
+          "6": 2.2285230671772616
+        },
+        "mean_track_lifetime_pulses": 18.3125,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 192
+      },
+      "time_dependence": {
+        "n_hot_hexes": 481,
+        "hot_pulse_count_distribution": {
+          "1": 29,
+          "2": 80,
+          "3": 69,
+          "4": 118,
+          "5": 51,
+          "6": 87,
+          "7": 34,
+          "8": 11,
+          "9": 2
+        },
+        "mean_hot_pulses_per_hot_hex": 4.135135135135135,
+        "single_pulse_hot_share": 0.060291060291060294,
+        "example_hex": {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_at_hot_pulse": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "T10",
+          "tau0_contact_pulse": [
+            3,
+            3
+          ],
+          "tau0_contact_hazard_field": 0.15972222222222232,
+          "tau0_contact_hazard_route": 0.08333333333333333,
+          "other_plan": "1P2P1P1P",
+          "other_plan_signature": [
+            "O13",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": true,
+          "other_plan_j_over_jref": 1.0,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "delayed_metrics": {
+        "n_tracks": 192,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 481,
+        "n_hot_cells": 1989,
+        "threat_mass_total": 389.04241749936784,
+        "threat_mass_by_turn": {
+          "2": 223.79632434474198,
+          "3": 110.5453317901235,
+          "4": 44.67054076646093,
+          "5": 7.801697530864203,
+          "6": 2.2285230671772616
+        },
+        "mean_track_lifetime_pulses": 18.3125,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 192,
+        "launch_turn": 2,
+        "future_turn_threat_mass_fraction": 0.4247508387819804,
+        "n_tracks_alive_one_turn_later": 192,
+        "share_tracks_alive_one_turn_later": 1.0,
+        "instantaneous_weapon_counterfactual": "a gun salvo's threat exists only at the firing pulse; here 0.425 of the field's threat mass lies in turns AFTER the launch turn, fully determined at launch (no further attacker decision required)"
+      }
+    },
+    "opposing:1v1": {
+      "field_summary": {
+        "n_tracks": 96,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 399,
+        "n_hot_cells": 1178,
+        "threat_mass_total": 206.3777025368261,
+        "threat_mass_by_turn": {
+          "2": 122.08217784546805,
+          "3": 56.666666666666686,
+          "4": 22.665895061728406,
+          "5": 3.9660493827160517,
+          "6": 0.9969135802469142
+        },
+        "mean_track_lifetime_pulses": 18.364583333333332,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 96
+      },
+      "time_dependence": {
+        "n_hot_hexes": 399,
+        "hot_pulse_count_distribution": {
+          "1": 43,
+          "2": 113,
+          "3": 79,
+          "4": 149,
+          "5": 14,
+          "6": 1
+        },
+        "mean_hot_pulses_per_hot_hex": 2.9523809523809526,
+        "single_pulse_hot_share": 0.10776942355889724,
+        "example_hex": {
+          "hex": "T19",
+          "hot_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_hot_pulse": 0.999999788957467,
+          "cold_pulse": [
+            2,
+            2
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "V25",
+          "tau0_contact_pulse": [
+            3,
+            1
+          ],
+          "tau0_contact_hazard_field": 0.15972222222222232,
+          "tau0_contact_hazard_route": 0.08333333333333333,
+          "other_plan": "2S2S1P",
+          "other_plan_signature": [
+            "T26",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": false,
+          "other_plan_j_over_jref": 0.25000000000000006,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              3,
+              2
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.15972222222222232
+          ]
+        }
+      },
+      "delayed_metrics": {
+        "n_tracks": 96,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 399,
+        "n_hot_cells": 1178,
+        "threat_mass_total": 206.3777025368261,
+        "threat_mass_by_turn": {
+          "2": 122.08217784546805,
+          "3": 56.666666666666686,
+          "4": 22.665895061728406,
+          "5": 3.9660493827160517,
+          "6": 0.9969135802469142
+        },
+        "mean_track_lifetime_pulses": 18.364583333333332,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 96,
+        "launch_turn": 2,
+        "future_turn_threat_mass_fraction": 0.40845267514457545,
+        "n_tracks_alive_one_turn_later": 96,
+        "share_tracks_alive_one_turn_later": 1.0,
+        "instantaneous_weapon_counterfactual": "a gun salvo's threat exists only at the firing pulse; here 0.408 of the field's threat mass lies in turns AFTER the launch turn, fully determined at launch (no further attacker decision required)"
+      }
+    },
+    "opposing:2v1": {
+      "field_summary": {
+        "n_tracks": 192,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 481,
+        "n_hot_cells": 1989,
+        "threat_mass_total": 389.04241749936784,
+        "threat_mass_by_turn": {
+          "2": 223.79632434474198,
+          "3": 110.5453317901235,
+          "4": 44.67054076646093,
+          "5": 7.801697530864203,
+          "6": 2.2285230671772616
+        },
+        "mean_track_lifetime_pulses": 18.3125,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 192
+      },
+      "time_dependence": {
+        "n_hot_hexes": 481,
+        "hot_pulse_count_distribution": {
+          "1": 29,
+          "2": 80,
+          "3": 69,
+          "4": 118,
+          "5": 51,
+          "6": 87,
+          "7": 34,
+          "8": 11,
+          "9": 2
+        },
+        "mean_hot_pulses_per_hot_hex": 4.135135135135135,
+        "single_pulse_hot_share": 0.060291060291060294,
+        "example_hex": {
+          "hex": "W18",
+          "hot_pulse": [
+            2,
+            3
+          ],
+          "hazard_at_hot_pulse": 0.9999999954766261,
+          "cold_pulse": [
+            2,
+            0
+          ],
+          "hazard_at_cold_pulse": 0.0
+        },
+        "route_example": {
+          "contact_hex": "V25",
+          "tau0_contact_pulse": [
+            3,
+            1
+          ],
+          "tau0_contact_hazard_field": 0.15972222222222232,
+          "tau0_contact_hazard_route": 0.08333333333333333,
+          "other_plan": "2S2S1P",
+          "other_plan_signature": [
+            "T26",
+            1,
+            5
+          ],
+          "other_plan_is_tied_top": false,
+          "other_plan_j_over_jref": 0.3999999999999999,
+          "other_plan_visits_same_hex_at_pulses": [
+            [
+              3,
+              2
+            ]
+          ],
+          "other_plan_hazard_there": [
+            0.22974537037037046
+          ]
+        }
+      },
+      "delayed_metrics": {
+        "n_tracks": 192,
+        "n_pulses": 33,
+        "n_hot_hexes_total": 481,
+        "n_hot_cells": 1989,
+        "threat_mass_total": 389.04241749936784,
+        "threat_mass_by_turn": {
+          "2": 223.79632434474198,
+          "3": 110.5453317901235,
+          "4": 44.67054076646093,
+          "5": 7.801697530864203,
+          "6": 2.2285230671772616
+        },
+        "mean_track_lifetime_pulses": 18.3125,
+        "max_track_lifetime_pulses": 28,
+        "tracks_outliving_launch_turn": 192,
+        "launch_turn": 2,
+        "future_turn_threat_mass_fraction": 0.4247508387819804,
+        "n_tracks_alive_one_turn_later": 192,
+        "share_tracks_alive_one_turn_later": 1.0,
+        "instantaneous_weapon_counterfactual": "a gun salvo's threat exists only at the firing pulse; here 0.425 of the field's threat mass lies in turns AFTER the launch turn, fully determined at launch (no further attacker decision required)"
+      }
+    }
+  },
+  "acceptance": {
+    "criterion": "B10 PASS if (a) every cell's H(x,t) shows same-hex time dependence (hot hexes hot on <30% of all pulses on average), (b) a route-based example exists where the same hex is threatened at one pulse and clear at another, (c) future-turn threat-mass fraction > 0 in all cells (delayed persistence, impossible for instantaneous weapons)",
+    "hot_pulse_share_mean": 0.08403024192497877,
+    "single_pulse_hot_share_by_cell": {
+      "chase:1v1": 0.10776942355889724,
+      "chase:2v1": 0.060291060291060294,
+      "close:1v1": 0.10776942355889724,
+      "close:2v1": 0.060291060291060294,
+      "crossing:1v1": 0.10776942355889724,
+      "crossing:2v1": 0.060291060291060294,
+      "opposing:1v1": 0.10776942355889724,
+      "opposing:2v1": 0.060291060291060294
+    },
+    "future_mass_fractions": [
+      0.40845267514457545,
+      0.4247508387819804,
+      0.40845267514457545,
+      0.4247508387819804,
+      0.40845267514457545,
+      0.4247508387819804,
+      0.40845267514457545,
+      0.4247508387819804
+    ],
+    "route_examples_found": 8,
+    "n_cells": 8
+  }
+}

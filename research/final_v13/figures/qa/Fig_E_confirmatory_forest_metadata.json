@@ -1,0 +1,61 @@
+{
+  "checks": [
+    {
+      "actual": "PNG",
+      "detail": "File format is compared with the explicit allow-list.",
+      "expected": [
+        "PNG"
+      ],
+      "name": "format",
+      "status": "pass"
+    },
+    {
+      "actual": 319.9892,
+      "detail": "DPI basis: embedded metadata. Metadata DPI is not a quality measure; effective DPI depends on final physical size.",
+      "expected": {
+        "max": null,
+        "min": 300.0
+      },
+      "name": "dpi",
+      "status": "pass"
+    }
+  ],
+  "input": {
+    "name": "Fig_E_confirmatory_forest.png",
+    "path": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/final_v13/figures/Fig_E_confirmatory_forest.png",
+    "size_bytes": 129299,
+    "suffix": ".png"
+  },
+  "metadata": {
+    "bands": [
+      "R",
+      "G",
+      "B",
+      "A"
+    ],
+    "compression": null,
+    "dpi_x": 319.9892,
+    "dpi_y": 319.9892,
+    "exif_present": false,
+    "format": "PNG",
+    "frames": 1,
+    "has_alpha": true,
+    "height_mm_from_metadata": 117.24083187807588,
+    "height_px": 1477,
+    "icc_profile_bytes": 0,
+    "icc_profile_present": false,
+    "kind": "raster",
+    "mode": "RGBA",
+    "pixel_count": 3410393,
+    "width_mm_from_metadata": 183.28306080330213,
+    "width_px": 2309
+  },
+  "notice": "This deterministic metadata screen checks only the supplied constraints. It does not verify visual quality, scientific integrity, accessibility, embedded-raster resolution in vector files, or journal compliance.",
+  "schema_version": "1.0",
+  "screening_summary": {
+    "fail": 0,
+    "pass": 2,
+    "unknown": 0,
+    "warning": 0
+  }
+}

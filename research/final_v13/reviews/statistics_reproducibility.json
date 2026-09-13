@@ -1,0 +1,258 @@
+{
+  "schema_version": "2.0",
+  "checklist_id": "IBS-V13-EXPERIMENT",
+  "study_design": "finite_computational_game",
+  "specialist_review": {
+    "needed": "yes",
+    "areas": [
+      "mathematical_novelty",
+      "numerical_game_theory",
+      "journal_fit"
+    ],
+    "requested": false
+  },
+  "items": [
+    {
+      "id": "question.estimand_alignment",
+      "category": "question",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "confirmatory_design/CONFIRMATORY_DESIGN.md"
+      ],
+      "note": "Fixed opponent speed and class; H2 is algebraically the same factorial, no new endpoint.",
+      "requested_action": ""
+    },
+    {
+      "id": "design.unit_and_independence",
+      "category": "design",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "confirmatory_design/CONFIRMATORY_DESIGN.md"
+      ],
+      "note": "Twelve fixed endpoints, six physical speed contrasts; mirrors and policy classes are not extra independent replicates.",
+      "requested_action": ""
+    },
+    {
+      "id": "design.sample_size_precision",
+      "category": "design",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "DISCOVERY_PROTOCOL.md"
+      ],
+      "note": "Grid fixed for finite exhaustive computation; no population power claim or binomial inference.",
+      "requested_action": ""
+    },
+    {
+      "id": "design.allocation_randomization",
+      "category": "design",
+      "applicability": "not_applicable",
+      "status": "not_applicable",
+      "evidence_locations": [
+        "MECHANISM_PROTOCOL.md"
+      ],
+      "note": "No participant allocation or blinded clinical assessment. Deterministic exact model; probe PCG64 seed and paired actions are fixed. Analysts saw discovery and the implementation failure.",
+      "requested_action": ""
+    },
+    {
+      "id": "design.blinding",
+      "category": "design",
+      "applicability": "not_applicable",
+      "status": "not_applicable",
+      "evidence_locations": [
+        "MECHANISM_PROTOCOL.md"
+      ],
+      "note": "No participant allocation or blinded clinical assessment. Deterministic exact model; probe PCG64 seed and paired actions are fixed. Analysts saw discovery and the implementation failure.",
+      "requested_action": ""
+    },
+    {
+      "id": "data.inclusion_exclusion",
+      "category": "data",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "analysis/confirmatory_interactions.csv"
+      ],
+      "note": "All frozen endpoints retained; original failure archived rather than excluded.",
+      "requested_action": ""
+    },
+    {
+      "id": "data.missing_data",
+      "category": "data",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "analysis/NUMERICAL_AUDIT.json"
+      ],
+      "note": "No missing final primary value or favorable set; domain-exceeding states and zero drift separately flagged.",
+      "requested_action": ""
+    },
+    {
+      "id": "data.outliers_transformations",
+      "category": "data",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "MECHANISM_PROTOCOL.md"
+      ],
+      "note": "Signed raw correction preserved; declared positive-part bounded diagnostic and fixed medians, no outlier deletion.",
+      "requested_action": ""
+    },
+    {
+      "id": "analysis.prespecification",
+      "category": "analysis",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "IMPLEMENTATION_AMENDMENT_01.md"
+      ],
+      "note": "Post-freeze implementation correction disclosed; design unchanged, entire dataset recomputed.",
+      "requested_action": ""
+    },
+    {
+      "id": "analysis.method_design_alignment",
+      "category": "analysis",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "analysis/confirmatory_mechanism.json"
+      ],
+      "note": "Full finite game values; descriptive fixed-design association, no sampling p-values.",
+      "requested_action": ""
+    },
+    {
+      "id": "analysis.assumptions_diagnostics",
+      "category": "analysis",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "THEOREM_SCRATCHPAD.md"
+      ],
+      "note": "Reduced theorem assumptions do not establish full naval mechanism; no finer-grid or domain sensitivity after failed gate.",
+      "requested_action": ""
+    },
+    {
+      "id": "analysis.multiplicity",
+      "category": "analysis",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "confirmatory_design/CONFIRMATORY_DESIGN.md"
+      ],
+      "note": "Primary hierarchy fixed; capability and alternative metric correlations not added to primary success count.",
+      "requested_action": ""
+    },
+    {
+      "id": "analysis.clustering_repeated_measures",
+      "category": "analysis",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "MECHANISM_PROTOCOL.md"
+      ],
+      "note": "Paired seeded probes shared across speeds, classes and geometries; no independent N inflation.",
+      "requested_action": ""
+    },
+    {
+      "id": "results.effect_sizes_uncertainty",
+      "category": "results",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "analysis/confirmatory_interactions.csv"
+      ],
+      "note": "Full floating-point value bounds propagated by interval subtraction; not confidence intervals; probe IQR separate.",
+      "requested_action": ""
+    },
+    {
+      "id": "results.denominators_flow",
+      "category": "results",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "analysis/NUMERICAL_AUDIT.json"
+      ],
+      "note": "27 focal and 27 mirror games, four values each; 12 endpoints; 6 separate capability interactions.",
+      "requested_action": ""
+    },
+    {
+      "id": "results.complete_outcomes_harms",
+      "category": "results",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "PLAN_EXECUTION_LEDGER.md"
+      ],
+      "note": "Nulls, reversals, missing original computations, amendment and conditional non-execution all reported.",
+      "requested_action": ""
+    },
+    {
+      "id": "reproducibility.data_materials_access",
+      "category": "reproducibility",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "REPRODUCIBILITY.md"
+      ],
+      "note": "Local code, complete matrices, protocols, raw probe records, figures and original failure preserved.",
+      "requested_action": ""
+    },
+    {
+      "id": "reproducibility.code_environment_parameters",
+      "category": "reproducibility",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "ENVIRONMENT.json"
+      ],
+      "note": "Versioned Python environment, seed, grid and rerun instructions recorded.",
+      "requested_action": ""
+    },
+    {
+      "id": "reproducibility.provenance_versions",
+      "category": "reproducibility",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "RERUN_FREEZE.json"
+      ],
+      "note": "Original and amended freezes, independent archive, final checksums and comparison table.",
+      "requested_action": ""
+    },
+    {
+      "id": "ethics.approval_consent_governance",
+      "category": "ethics",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "reviews/SCOPE.md"
+      ],
+      "note": "Author-requested local developmental review; no humans/animals enrolled or external manuscript upload.",
+      "requested_action": ""
+    },
+    {
+      "id": "interpretation.claim_evidence_causality",
+      "category": "interpretation",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "V13_Q1_GATE.md"
+      ],
+      "note": "Explicit failed chain, reduced theorem scope, no generality or publication certification.",
+      "requested_action": ""
+    },
+    {
+      "id": "integrity.deviations_selective_reporting",
+      "category": "integrity",
+      "applicability": "applicable",
+      "status": "verified_present",
+      "evidence_locations": [
+        "analysis/AMENDMENT_AUDIT.json"
+      ],
+      "note": "Every available original value compared; no old values imputed or design thresholds adjusted.",
+      "requested_action": ""
+    }
+  ]
+}

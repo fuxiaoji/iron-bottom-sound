@@ -1,0 +1,23 @@
+{
+  "main": {
+    "count": 216,
+    "max_interval_width": 3.051909835960487e-10,
+    "max_flow_residual": 5.758620298434585e-14,
+    "max_inequality_violation": 4.032738772534241e-13,
+    "min_flexibility": 0.888763374525501
+  },
+  "capability": {
+    "n": 6,
+    "positive": 5,
+    "reversal": 1,
+    "max_nested_payoff_error": 0.0,
+    "max_mirror_payoff_error": 1.6697754290362354e-13,
+    "max_interval_width": 7.622786846184226e-10
+  },
+  "amendment": {
+    "max_payoff_change": 2.49980968689558,
+    "max_value_change": 0.004697426521250492,
+    "max_Theta_change": 0.0,
+    "changed_matrices": 2
+  }
+}

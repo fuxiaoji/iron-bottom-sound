@@ -1,0 +1,55 @@
+{
+  "n_tests": 8,
+  "n_pass": 8,
+  "all_pass": true,
+  "results": [
+    {
+      "test": "1 straight-line equivalence",
+      "pass": true,
+      "metric": "max|LF - rigid_line_ahead| = 0.00e+00 (positions and headings)",
+      "detail": ""
+    },
+    {
+      "test": "2 arc-length spacing",
+      "pass": true,
+      "metric": "max |chord - d| = 0.0034 hex (d = 2.0)",
+      "detail": ""
+    },
+    {
+      "test": "3 constant-curvature arc",
+      "pass": true,
+      "metric": "chord 1.9966 vs 1.9955 hex (R = 8.59); heading spread 26.7 vs 26.7 deg, monotone = True",
+      "detail": ""
+    },
+    {
+      "test": "4 no lateral teleportation",
+      "pass": true,
+      "metric": "max per-turn step = 7.200 hex <= v = 7.20 hex",
+      "detail": ""
+    },
+    {
+      "test": "5 heading-tangent consistency",
+      "pass": true,
+      "metric": "max heading error = 0.00e+00 deg",
+      "detail": ""
+    },
+    {
+      "test": "6 rotation / translation equivariance",
+      "pass": true,
+      "metric": "|dJ| rotation = 8.88e-16, translation-invariance = 0.00e+00",
+      "detail": "J = 7.1070"
+    },
+    {
+      "test": "7 formation order preserved",
+      "pass": true,
+      "metric": "min arc-length gap = 2.000 hex > 0",
+      "detail": ""
+    },
+    {
+      "test": "8 sub-step refinement",
+      "pass": true,
+      "metric": "|dJ|/max(1,|J|) = 1.5% between n_sub = 6 and 12 (J = 21.591 vs 21.918)",
+      "detail": ""
+    }
+  ]
+}

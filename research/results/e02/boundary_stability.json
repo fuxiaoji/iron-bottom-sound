@@ -1,0 +1,112 @@
+{
+  "base_plans": [
+    "turn+60",
+    "turn+60",
+    "turn-30",
+    "turn-30",
+    "turn-30",
+    "turn-30"
+  ],
+  "n_replicates": 8,
+  "cells_identical_all": 8,
+  "cells_identical_minus_one": 8,
+  "per_replicate": [
+    {
+      "rep": 0,
+      "plans": [
+        "turn+60",
+        "turn+60",
+        "turn-30",
+        "turn-30",
+        "turn-30",
+        "turn-30"
+      ],
+      "matches": 6
+    },
+    {
+      "rep": 1,
+      "plans": [
+        "turn+60",
+        "turn+60",
+        "turn-30",
+        "turn-30",
+        "turn-30",
+        "turn-30"
+      ],
+      "matches": 6
+    },
+    {
+      "rep": 2,
+      "plans": [
+        "turn+60",
+        "turn+60",
+        "turn-30",
+        "turn-30",
+        "turn-30",
+        "turn-30"
+      ],
+      "matches": 6
+    },
+    {
+      "rep": 3,
+      "plans": [
+        "turn+60",
+        "turn+60",
+        "turn-30",
+        "turn-30",
+        "turn-30",
+        "turn-30"
+      ],
+      "matches": 6
+    },
+    {
+      "rep": 4,
+      "plans": [
+        "turn+60",
+        "turn+60",
+        "turn-30",
+        "turn-30",
+        "turn-30",
+        "turn-30"
+      ],
+      "matches": 6
+    },
+    {
+      "rep": 5,
+      "plans": [
+        "turn+60",
+        "turn+60",
+        "turn-30",
+        "turn-30",
+        "turn-30",
+        "turn-30"
+      ],
+      "matches": 6
+    },
+    {
+      "rep": 6,
+      "plans": [
+        "turn+60",
+        "turn+60",
+        "turn-30",
+        "turn-30",
+        "turn-30",
+        "turn-30"
+      ],
+      "matches": 6
+    },
+    {
+      "rep": 7,
+      "plans": [
+        "turn+60",
+        "turn+60",
+        "turn-30",
+        "turn-30",
+        "turn-30",
+        "turn-30"
+      ],
+      "matches": 6
+    }
+  ],
+  "interpretation": "regime boundaries are stable under calibration resampling: the maximin plan identity is reproduced in all cells for most bootstrap replicates."
+}

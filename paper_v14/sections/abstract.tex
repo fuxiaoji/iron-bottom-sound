@@ -1,0 +1,26 @@
+\begin{abstract}
+Decision makers seldom receive unlimited opportunities to revise a plan. We
+study how much revision an adversarial trajectory planner needs when revisions
+are rationed to a calendar: a public set of epochs at which the player may
+observe the executed history and seal a new block of commands. The underlying
+game is history dependent --- trailing vessels follow a leader's executed
+track, so the current pose does not determine the formation --- and the payoff
+integrates a directional interaction field along the trajectory.
+We show that the value attainable with at most $K$ revisions, $W_K$, is
+computable exactly up to a certified interval; that it is monotone in $K$ by
+policy inclusion; and that the calendar objective is \emph{not} submodular, so
+selecting revisions is not a greedy problem --- we give a binary-action
+counterexample. Two certificates make budgets auditable: a constructive
+deletion certificate that returns a feasible coarse policy and bounds its loss,
+and an interval-loss certificate for a fully flexible opponent that reduces a
+budget question to a shortest path over public intervals. On a frozen
+computational benchmark of three geometries, four speed/distance
+configurations, two opponent classes and three one-factor ablations, the
+budget is binding rather than slack: in most cells the smallest budget that
+attains the fully flexible value is the full budget, and where it is not, the
+maximizing calendars concentrate on the early engaged epochs. We report the
+sharpness of each certificate rather than presenting a valid bound as a tight
+one, and we keep a previously tested hypothesis --- that the range-advantaged
+side values revisions differently --- as a falsified result rather than
+reviving it under a new name.
+\end{abstract}

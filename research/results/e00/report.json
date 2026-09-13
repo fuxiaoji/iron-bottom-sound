@@ -1,0 +1,24 @@
+{
+  "determinism": {
+    "same_seed_identical_events": true,
+    "different_seed_diverges": true,
+    "fingerprint_seed7": "fcf122727e327c34",
+    "fingerprint_seed8": "8c7d870cbab62de2"
+  },
+  "replay": {
+    "replay_state_identical": true
+  },
+  "no_leakage": {
+    "hidden_info_leaks": [],
+    "own_info_complete": true,
+    "leak_count": 0
+  },
+  "no_mutation": {
+    "snapshot_mutation_free": true
+  },
+  "engine_pytest": {
+    "suite": "463 passed, 1 failed (test_api_llm_storage tutorial API test,",
+    "note": "pre-existing failure unrelated to research layer; all engine/adjudication/AI tests pass"
+  },
+  "acceptance": "PASS"
+}

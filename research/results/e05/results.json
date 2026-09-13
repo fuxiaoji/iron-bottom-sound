@@ -1,0 +1,229 @@
+{
+  "experiment": "E05 dynamic engagement graph vs aggregate-force damage prediction",
+  "config": {
+    "base_seed": 20260909,
+    "matches_s03": 80,
+    "matches_s01": 40,
+    "profile_pairs": [
+      [
+        "balanced",
+        "balanced"
+      ],
+      [
+        "line",
+        "brawl"
+      ],
+      [
+        "cautious",
+        "balanced"
+      ]
+    ],
+    "bootstrap_reps": 1000,
+    "workers": 4,
+    "smoke": false
+  },
+  "data_summary": {
+    "n_samples": 5862,
+    "n_matches_ok": 120,
+    "n_matches_failed": 0,
+    "failures": [],
+    "n_snapshots": 600,
+    "damage_mean": 0.43244626407369496,
+    "damage_share_positive": 0.17007847151142955,
+    "damage_max": 13.0,
+    "crosscheck": {
+      "n_windows": 600,
+      "windows_fully_matched_by_events": 600,
+      "event_total_hull_lost": 2535,
+      "hull_diff_total": 2535
+    }
+  },
+  "split": {
+    "method": "grouped by match, stratified per scenario, 80/20",
+    "n_train_samples": 4674,
+    "n_test_samples": 1188,
+    "train_matches": 96,
+    "test_matches": 24
+  },
+  "baseline_features": [
+    "hull_frac",
+    "force_ratio",
+    "avg_enemy_dist"
+  ],
+  "full_features": [
+    "hull_frac",
+    "force_ratio",
+    "avg_enemy_dist",
+    "lfr",
+    "herfindahl",
+    "lambda2_own",
+    "attacker_count",
+    "p_reply"
+  ],
+  "main": {
+    "baseline": {
+      "oos_r2": 0.08910303073292092,
+      "oos_mae": 0.6379820467981094,
+      "auc_damaged": 0.8508194741291939,
+      "n_train": 4674,
+      "n_test": 1188
+    },
+    "full": {
+      "oos_r2": 0.12209474717382163,
+      "oos_mae": 0.6452374701286092,
+      "auc_damaged": 0.8793894773325212,
+      "n_train": 4674,
+      "n_test": 1188
+    },
+    "delta": {
+      "r2_full_minus_baseline": 0.03299171644090071,
+      "mae_relative_reduction": -0.011372456900492952,
+      "auc_full_minus_baseline": 0.028570003203327254,
+      "r2_ci95": [
+        0.00688887087187809,
+        0.05609716120690638
+      ],
+      "mae_relative_reduction_ci95": [
+        -0.036544059618246964,
+        0.014484863200467437
+      ],
+      "auc_ci95": [
+        0.011949257044954604,
+        0.045913482878488586
+      ],
+      "bootstrap_reps": 1000
+    },
+    "coefficients_standardized": {
+      "baseline": {
+        "intercept": 0.43688489516474094,
+        "hull_frac": -0.11810009297848166,
+        "force_ratio": 0.1800859483322954,
+        "avg_enemy_dist": -0.30080215124306164
+      },
+      "full": {
+        "intercept": 0.4368848951647409,
+        "hull_frac": -0.08815538670395079,
+        "force_ratio": 0.0882319669843198,
+        "avg_enemy_dist": -0.17908636409511774,
+        "lfr": 0.15030097888326224,
+        "herfindahl": 0.0399877391450057,
+        "lambda2_own": -0.060893171853013704,
+        "attacker_count": 0.17455855543973123,
+        "p_reply": 0.09472315726512802
+      }
+    }
+  },
+  "acceptance": {
+    "criteria": "delta_oos_r2 >= +0.05 OR mae_relative_reduction >= 10%",
+    "verdict": "FAIL"
+  },
+  "ood": {
+    "train_s01_test_s03": {
+      "baseline": {
+        "oos_r2": 0.03028731225129555,
+        "oos_mae": 0.6315987990738264,
+        "auc_damaged": 0.8644647606013063,
+        "n_train": 3448,
+        "n_test": 2414
+      },
+      "full": {
+        "oos_r2": -0.2163139315716205,
+        "oos_mae": 0.4984044163894364,
+        "auc_damaged": 0.879919551356945,
+        "n_train": 3448,
+        "n_test": 2414
+      },
+      "delta": {
+        "r2_full_minus_baseline": -0.24660124382291604,
+        "mae_relative_reduction": 0.21088447742412694,
+        "auc_full_minus_baseline": 0.015454790755638714
+      },
+      "coefficients_standardized": {
+        "baseline": {
+          "intercept": 0.5229118329466356,
+          "hull_frac": -0.14119239946527207,
+          "force_ratio": 0.20988383207689068,
+          "avg_enemy_dist": -0.3402768192968667
+        },
+        "full": {
+          "intercept": 0.5229118329466355,
+          "hull_frac": -0.12440606555279808,
+          "force_ratio": 0.06185892835303582,
+          "avg_enemy_dist": -0.1319584209515217,
+          "lfr": 0.16893898150968795,
+          "herfindahl": -0.02936179025217743,
+          "lambda2_own": -0.18651139353567572,
+          "attacker_count": 0.2455942448460463,
+          "p_reply": 0.13982319330531578
+        }
+      }
+    },
+    "train_s03_test_s01": {
+      "baseline": {
+        "oos_r2": 0.06124537775018568,
+        "oos_mae": 0.6928973309874447,
+        "auc_damaged": 0.8210234669987245,
+        "n_train": 2414,
+        "n_test": 3448
+      },
+      "full": {
+        "oos_r2": -1.114525922809221,
+        "oos_mae": 1.6644686420699757,
+        "auc_damaged": 0.8085195516118182,
+        "n_train": 2414,
+        "n_test": 3448
+      },
+      "delta": {
+        "r2_full_minus_baseline": -1.1757713005594068,
+        "mae_relative_reduction": -1.4021865399567197,
+        "auc_full_minus_baseline": -0.012503915386906317
+      },
+      "coefficients_standardized": {
+        "baseline": {
+          "intercept": 0.30323115161557584,
+          "hull_frac": -0.0514713014147056,
+          "force_ratio": 0.04601939418297973,
+          "avg_enemy_dist": -0.28463111970417
+        },
+        "full": {
+          "intercept": 0.30323115161557584,
+          "hull_frac": -0.04023609958645375,
+          "force_ratio": -0.00023803743807282796,
+          "avg_enemy_dist": -0.029626950472057195,
+          "lfr": 0.03884521049223493,
+          "herfindahl": 0.05396069729553522,
+          "lambda2_own": -0.0074443735966292736,
+          "attacker_count": 0.36053536621119076,
+          "p_reply": 0.010402972597009006
+        }
+      }
+    }
+  },
+  "decisions": [
+    "D1 graph edges are gated by engine._can_see: gunnery validation rejects orders at unseen targets (night-battle visibility), so ungated expected fire could never convert into adjudicated shots.",
+    "D2 per-kind firepower aggregation mirrors research/geometry/firepower_kernel.expected_hits_exact: sum can-bear, non-destroyed mount firepower per kind, then one engine.expected_gunnery_hits lookup per (kind, distance, target_speed).",
+    "D3 baseline force_ratio = enemy-side remaining total hull points / own-side remaining total hull points (aggregate 'total strength'); avg_enemy_dist = mean distance to alive enemies.",
+    "D4 Herfindahl H_j = sum_i (w_ij / P_attack)^2 with H=0 when P_attack=0 and H=1 with a single attacker (degenerate maximum concentration); 'at least 2 attackers' structure is carried by attacker_count.",
+    "D5 lambda2 = second-smallest eigenvalue of the side's formation-graph Laplacian (adjacency: distance <= 3 AND circular heading difference <= 1 on the 6-direction compass); 0.0 for sides with fewer than 2 alive ships or a disconnected graph.",
+    "D6 outcome window = hull points lost between the GUNNERY snapshot and the entry to FIRE_END (i.e. _resolve_gunnery + _resolve_torpedoes only); movement-phase damage (collision / torpedo contact) precedes the snapshot and is excluded by design.",
+    "D7 P_attack is excluded from the full regression (collinear with LFR = P_attack / P_reply); it is kept in dataset.csv for reference.",
+    "D8 statsmodels/sklearn are not installed: OLS uses numpy lstsq, logistic uses ridge IRLS (lambda=1e-6, 50 Newton steps), AUC uses the Mann-Whitney rank statistic.",
+    "D9 train/test split is grouped by match (no samples of the same match on both sides), stratified per scenario at 80/20.",
+    "D10 S-01 special rules (allies firepower halved, axis turn-1 gunnery ban) act through adjudication only; w_ij uses the raw engine hit-table function per plan, so S-01 realised damage is systematically scaled relative to its graph weights \u2014 a known, documented mismatch that also affects the OOD transfer numbers.",
+    "D11 reinforcement / contact-setup phases are answered by TacticalCommander.choose_plan itself (inherits DeterministicCommander._reinforcements); no special-casing needed. S-03 has no reinforcement group; S-01 turn-4 axis reinforcements enter through the same legal path when the turn-3 roll triggers.",
+    "D12 LFR smoothing constant eps = 0.05 (scale of a fraction of one expected hit) and LFR clipped to [0, 50]: ships whose side has no can-bear gun on any visible enemy give P_reply = 0 and an unclipped ratio would explode (observed max > 3e5 with eps = 1e-6 in S-01) and destabilise OLS standardisation. Clip affects 8.4% of smoke samples."
+  ],
+  "elapsed_s": 128.9,
+  "game_level_bootstrap": {
+    "delta_r2_ci95": [
+      0.08161423553223439,
+      0.15767055928705248
+    ],
+    "mae_diff_ci95": [
+      0.07113757915573037,
+      0.15170631654394967
+    ],
+    "n_resamples": 500,
+    "unit": "game"
+  }
+}

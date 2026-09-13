@@ -1,0 +1,11 @@
+{
+  "n_cells": 9,
+  "sign_match": 9,
+  "sign_match_fraction": 1.0,
+  "kendall_tau": 0.9444444444444445,
+  "spearman_rho": 0.9833333333333333,
+  "median_magnitude_distortion": 0.08122434736369835,
+  "kappa_LF_vs_absdeltaJ_spearman": 0.48805168214487743,
+  "verdict": "ROBUST",
+  "wall_time_s": 55.3
+}

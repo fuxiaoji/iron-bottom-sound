@@ -1,0 +1,4 @@
+geometry,n,engine_mean_diff,engine_ci95,engine_positive_frac,model_value_vs_straight,sign_agree,model_class,engine_class
+head_on,100,5.14,"[4.0, 6.24]",0.79,0.0,0,neutral,advantage
+parallel,100,7.59,"[6.54, 8.66]",0.92,5.282,1,advantage,advantage
+crossing,100,8.64,"[7.57, 9.71]",0.94,5.909,1,advantage,advantage

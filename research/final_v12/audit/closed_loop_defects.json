@@ -1,0 +1,70 @@
+{
+  "scope": "targeted 4x12x12 finite-two-stage regression; not a replacement of the legacy B3 experiment",
+  "aspect_at_pi_over_2_old": "bow_stern",
+  "aspect_at_pi_over_2_corrected": "broadside",
+  "max_stage_change": 0.8970652893202122,
+  "rows": [
+    {
+      "model": "legacy_aspect",
+      "n_states": 576,
+      "max_mixed_V2_minus_L": 0.0,
+      "max_pure_vs_mixed": 0.0,
+      "max_lp_gap": 0.0,
+      "witness_state_index": [
+        0,
+        0,
+        0
+      ],
+      "witness_L": -0.9722222222222223,
+      "witness_V2": -0.9722222222222223,
+      "witness_continuation_matrix": [
+        [
+          -0.9722222222222223,
+          0.7048965331816299,
+          -0.9722222222222215
+        ],
+        [
+          -3.582674310959408,
+          -1.9055555555555557,
+          -3.582674310959407
+        ],
+        [
+          -0.9722222222222223,
+          0.7048965331816299,
+          -0.9722222222222215
+        ]
+      ]
+    },
+    {
+      "model": "correct_aspect",
+      "n_states": 576,
+      "max_mixed_V2_minus_L": 0.0,
+      "max_pure_vs_mixed": 0.0,
+      "max_lp_gap": 0.0,
+      "witness_state_index": [
+        0,
+        0,
+        0
+      ],
+      "witness_L": -0.9722222222222223,
+      "witness_V2": -0.9722222222222223,
+      "witness_continuation_matrix": [
+        [
+          -0.9722222222222223,
+          0.8585966829095444,
+          -0.9722222222222215
+        ],
+        [
+          -3.736374460687322,
+          -1.9055555555555557,
+          -3.7363744606873213
+        ],
+        [
+          -0.9722222222222224,
+          0.8585966829095442,
+          -0.9722222222222217
+        ]
+      ]
+    }
+  ]
+}

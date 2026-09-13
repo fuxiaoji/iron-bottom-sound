@@ -1,0 +1,86 @@
+[
+  {
+    "geometry": "parallel",
+    "range": 12,
+    "speed": 4,
+    "true_range": 12,
+    "V_surrogate": 0.23980932093608054
+  },
+  {
+    "geometry": "parallel",
+    "range": 12,
+    "speed": 6,
+    "true_range": 12,
+    "V_surrogate": 11.406900137922758
+  },
+  {
+    "geometry": "parallel",
+    "range": 20,
+    "speed": 4,
+    "true_range": 20,
+    "V_surrogate": -1.5346869165878503
+  },
+  {
+    "geometry": "parallel",
+    "range": 20,
+    "speed": 6,
+    "true_range": 20,
+    "V_surrogate": -0.06775726808172755
+  },
+  {
+    "geometry": "head_on",
+    "range": 12,
+    "speed": 4,
+    "true_range": 12,
+    "V_surrogate": -0.0
+  },
+  {
+    "geometry": "head_on",
+    "range": 12,
+    "speed": 6,
+    "true_range": 12,
+    "V_surrogate": -0.0
+  },
+  {
+    "geometry": "head_on",
+    "range": 20,
+    "speed": 4,
+    "true_range": 20,
+    "V_surrogate": -0.0
+  },
+  {
+    "geometry": "head_on",
+    "range": 20,
+    "speed": 6,
+    "true_range": 20,
+    "V_surrogate": -0.0
+  },
+  {
+    "geometry": "crossing",
+    "range": 12,
+    "speed": 4,
+    "true_range": 12,
+    "V_surrogate": -0.0
+  },
+  {
+    "geometry": "crossing",
+    "range": 12,
+    "speed": 6,
+    "true_range": 12,
+    "V_surrogate": -0.0
+  },
+  {
+    "geometry": "crossing",
+    "range": 20,
+    "speed": 4,
+    "true_range": 20,
+    "V_surrogate": 1.7860496663141543e-15
+  },
+  {
+    "geometry": "crossing",
+    "range": 20,
+    "speed": 6,
+    "true_range": 20,
+    "V_surrogate": 2.5982982436437067e-15
+  }
+]

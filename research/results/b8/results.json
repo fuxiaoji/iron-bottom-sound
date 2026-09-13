@@ -1,0 +1,16 @@
+{
+  "n_cells": 27,
+  "conv_pass_fraction": 0.25,
+  "plan_stable_fraction": 0.18,
+  "gate": "FAIL",
+  "gate_detail": {
+    "convergence>=80%": false,
+    "plan stability>=85%": false
+  },
+  "libraries": {
+    "L11": 11,
+    "L21": 21,
+    "L41": 41
+  },
+  "horizon": 40
+}

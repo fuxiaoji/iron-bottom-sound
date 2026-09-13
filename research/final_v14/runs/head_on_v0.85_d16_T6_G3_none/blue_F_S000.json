@@ -1,0 +1,58 @@
+{
+  "V": -6.381095911095752,
+  "LB": -6.381096404848519,
+  "UB": -6.381095417342985,
+  "gap": 9.875055333452565e-07,
+  "S": [],
+  "S_R": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "T": 6,
+  "base": 3,
+  "seconds": 46.703780541000015,
+  "trace": [
+    {
+      "t": 0,
+      "end": 6,
+      "subgames": 1,
+      "block_leaves": 531441,
+      "max_local_error": 4.937527666726282e-07,
+      "LP_subgames": 1,
+      "seconds": 46.701736709001125
+    }
+  ],
+  "status": "certified_numeric",
+  "algorithm": "common-update decomposition with full-history subgames",
+  "certification_scope": "finite game; accumulated floating-point subgame intervals",
+  "config_id": "head_on_v0.85_d16_T6_G3_none",
+  "side": "blue",
+  "opponent": "F",
+  "mask": 0,
+  "seconds_total": 46.704000499994436,
+  "peak_rss_bytes": 474923008,
+  "created_utc": "2026-09-13T05:09:53.109126+00:00",
+  "core_hashes": {
+    "research/formation/schedule_v14.py": "cb9150dd827acdbe48191704f4b68d00a76090729b9bb7c0654b6a5918a195a9",
+    "research/formation/pricing_v14.py": "6845651480958860de0855284b0290c9c0aef55f33aca124d28efe78152a7ab8",
+    "research/formation/physical_v14.py": "1bb7e8761ec05395d5279368c28618a9e58aee1ba02cc24922e437d3c4c5d248",
+    "research/experiments/v14_run.py": "a9f4bef051a58a66318b0fa769501eac011ac7d550b8f39efe45a37e10184f2b",
+    "research/formation/commitment_v12.py": "b4645f1abb6afd778687c5f8c40b6dfb5354384305533ccb00bbf7663689583e",
+    "research/formation/payoff_v13.py": "7ba3ad97900fe9d1af1d3eda6fd8d9346ec97880098d775c77c9c4a149308aa0",
+    "research/formation/path_following.py": "1faa140c3eb3fa417bea3dac54b4ce63d4048047a6150ef2e302456289fe601b",
+    "research/formation/matched_horizon.py": "d9f394abd082f392b41ea5194a98a32b72c9b64f9bb43f5017f21fc4c5456f02",
+    "research/formation/exact_v12.py": "bc4893cf4c85ae52e2ffb0189698bb44f15dc974e1453a86fdf1acb661e5cba3",
+    "research/experiments/v13_exact.py": "76913982029ca7236723601ac380d16a23f744275153afcd81eec7f32f43f346",
+    "research/results/e01/kernel_fits.json": "8ec3e881e5ec262983bcd249abddecd0a75d9e550e631c5eedebeca061436384"
+  },
+  "design_sha256": "fb92864810ea05f3aac9542297f702109793bd4623433d32d9ab49dff06ff4dc",
+  "execution": {
+    "reason": "completed",
+    "returncode": 0,
+    "wall_seconds": 48.26277833399945,
+    "tree_peak_rss_bytes": 459849728
+  }
+}

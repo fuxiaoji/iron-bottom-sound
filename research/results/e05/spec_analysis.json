@@ -1,0 +1,74 @@
+{
+  "n_samples": 5862,
+  "n_games": 120,
+  "split": "80/20 by game, seed 42",
+  "strict": {
+    "baseline_features": [
+      "hull_frac",
+      "force_ratio",
+      "avg_enemy_dist"
+    ],
+    "graph_features": [
+      "p_attack",
+      "lfr",
+      "herfindahl",
+      "attacker_count",
+      "p_reply",
+      "lambda2_own"
+    ],
+    "oos_r2_baseline": 0.11037338429887988,
+    "oos_r2_full": 0.2187513082398016,
+    "delta_r2": 0.10837792394092172,
+    "delta_r2_sample_boot_ci": [
+      0.04891183269362309,
+      0.1635738560227004
+    ],
+    "delta_r2_game_boot_ci": [
+      0.0690123307662322,
+      0.15970310157790166
+    ],
+    "mae_baseline": 0.6260927343222633,
+    "mae_full": 0.5162922020398482,
+    "relative_mae_reduction": 0.17537423174423628,
+    "relative_mae_reduction_game_boot_ci": [
+      0.09717575034804642,
+      0.2672134662193477
+    ],
+    "gate": "PASS"
+  },
+  "plan_literal": {
+    "baseline_features": [
+      "hull_frac",
+      "speed",
+      "avg_enemy_dist",
+      "force_ratio"
+    ],
+    "graph_features": [
+      "p_attack",
+      "lfr",
+      "herfindahl",
+      "attacker_count",
+      "p_reply",
+      "lambda2_own"
+    ],
+    "oos_r2_baseline": 0.1094719391067992,
+    "oos_r2_full": 0.22584554546448488,
+    "delta_r2": 0.11637360635768568,
+    "delta_r2_sample_boot_ci": [
+      0.051233204882218775,
+      0.17655532424712045
+    ],
+    "delta_r2_game_boot_ci": [
+      0.0842158988547114,
+      0.16151896508902544
+    ],
+    "mae_baseline": 0.6243245900441837,
+    "mae_full": 0.5196625548808883,
+    "relative_mae_reduction": 0.1676404178728383,
+    "relative_mae_reduction_game_boot_ci": [
+      0.11262087707359657,
+      0.25240688528691146
+    ],
+    "gate": "PASS"
+  }
+}

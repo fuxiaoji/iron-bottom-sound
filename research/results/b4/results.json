@@ -1,0 +1,741 @@
+{
+  "batch": "B4 (v4.0): speed-capability monotonicity + operating-speed reclassification",
+  "protocol": {
+    "speed_tiers": [
+      2.0,
+      4.0,
+      6.0
+    ],
+    "nested_sets": {
+      "vbar2": [
+        2
+      ],
+      "vbar4": [
+        2,
+        4
+      ],
+      "vbar6": [
+        2,
+        4,
+        6
+      ]
+    },
+    "opponent_capability_vbar_R": 6,
+    "geometries": {
+      "head_on": [
+        0.0,
+        0.0,
+        180.0
+      ],
+      "parallel": [
+        90.0,
+        0.0,
+        0.0
+      ]
+    },
+    "r0": 16.0,
+    "steps": 40,
+    "gamma": 0.96,
+    "heading_library": "make_maneuver_library() (11 committed heading plans, unchanged)",
+    "firing_channel": "E02 proxy convention: kernel target-speed arg = constant 6 (engine-neutral for v>=4); capability acts via kinematics only",
+    "lp_tolerance": 1e-08
+  },
+  "b41_cells": {
+    "head_on_etar0.75": {
+      "vbars": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "cells": [
+        {
+          "vbar": 2.0,
+          "n_plans": 11,
+          "V_lp": -3.164703273577759,
+          "V_dual": -3.1647032735777603,
+          "duality_gap": 1.3322676295501878e-15,
+          "min_eq_slack": -8.881784197001252e-16,
+          "support_size": 4,
+          "support_speed_tiers": [
+            2.0
+          ],
+          "V_pure_maximin": -3.353459779119957,
+          "V_pure_minimax": -2.7730398495979647,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 4.0,
+          "n_plans": 22,
+          "V_lp": -3.094500957594284,
+          "V_dual": -3.094500957594279,
+          "duality_gap": 4.884981308350689e-15,
+          "min_eq_slack": 1.3322676295501878e-15,
+          "support_size": 5,
+          "support_speed_tiers": [
+            2.0,
+            4.0
+          ],
+          "V_pure_maximin": -3.353459779119957,
+          "V_pure_minimax": -1.6528727909376313,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 6.0,
+          "n_plans": 33,
+          "V_lp": -3.062152076161459,
+          "V_dual": -3.0621520761614622,
+          "duality_gap": 3.1086244689504383e-15,
+          "min_eq_slack": -1.865174681370263e-14,
+          "support_size": 5,
+          "support_speed_tiers": [
+            2.0,
+            6.0
+          ],
+          "V_pure_maximin": -3.353459779119957,
+          "V_pure_minimax": -1.6528727909376313,
+          "nesting_bitexact": true
+        }
+      ],
+      "increments": [
+        0.07020231598347504,
+        0.03234888143282477
+      ],
+      "max_decrease": 0.03234888143282477,
+      "monotone_within_tol": true
+    },
+    "head_on_etar1.0": {
+      "vbars": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "cells": [
+        {
+          "vbar": 2.0,
+          "n_plans": 11,
+          "V_lp": -0.0,
+          "V_dual": -0.0,
+          "duality_gap": 0.0,
+          "min_eq_slack": 0.0,
+          "support_size": 1,
+          "support_speed_tiers": [
+            2.0
+          ],
+          "V_pure_maximin": 0.0,
+          "V_pure_minimax": 0.0,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 4.0,
+          "n_plans": 22,
+          "V_lp": -0.0,
+          "V_dual": -0.0,
+          "duality_gap": 0.0,
+          "min_eq_slack": 0.0,
+          "support_size": 2,
+          "support_speed_tiers": [
+            2.0,
+            4.0
+          ],
+          "V_pure_maximin": 0.0,
+          "V_pure_minimax": 0.0,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 6.0,
+          "n_plans": 33,
+          "V_lp": -0.0,
+          "V_dual": -0.0,
+          "duality_gap": 0.0,
+          "min_eq_slack": 0.0,
+          "support_size": 2,
+          "support_speed_tiers": [
+            2.0,
+            4.0
+          ],
+          "V_pure_maximin": 0.0,
+          "V_pure_minimax": 0.0,
+          "nesting_bitexact": true
+        }
+      ],
+      "increments": [
+        0.0,
+        0.0
+      ],
+      "max_decrease": 0.0,
+      "monotone_within_tol": true
+    },
+    "head_on_etar1.33": {
+      "vbars": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "cells": [
+        {
+          "vbar": 2.0,
+          "n_plans": 11,
+          "V_lp": 2.996535895241544,
+          "V_dual": 2.996535895241553,
+          "duality_gap": 8.881784197001252e-15,
+          "min_eq_slack": -8.881784197001252e-16,
+          "support_size": 4,
+          "support_speed_tiers": [
+            2.0
+          ],
+          "V_pure_maximin": 1.0583637037469136,
+          "V_pure_minimax": 3.8843251743075724,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 4.0,
+          "n_plans": 22,
+          "V_lp": 2.996535895241542,
+          "V_dual": 2.9965358952415433,
+          "duality_gap": 1.3322676295501878e-15,
+          "min_eq_slack": -4.440892098500626e-16,
+          "support_size": 4,
+          "support_speed_tiers": [
+            2.0
+          ],
+          "V_pure_maximin": 1.0583637037469136,
+          "V_pure_minimax": 3.8843251743075724,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 6.0,
+          "n_plans": 33,
+          "V_lp": 2.9965358952415815,
+          "V_dual": 2.9965358952415357,
+          "duality_gap": 4.574118861455645e-14,
+          "min_eq_slack": -5.0182080713057076e-14,
+          "support_size": 4,
+          "support_speed_tiers": [
+            2.0
+          ],
+          "V_pure_maximin": 1.0583637037469136,
+          "V_pure_minimax": 3.8843251743075724,
+          "nesting_bitexact": true
+        }
+      ],
+      "increments": [
+        -2.220446049250313e-15,
+        3.952393967665557e-14
+      ],
+      "max_decrease": -2.220446049250313e-15,
+      "monotone_within_tol": true
+    },
+    "parallel_etar0.75": {
+      "vbars": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "cells": [
+        {
+          "vbar": 2.0,
+          "n_plans": 11,
+          "V_lp": -2.8522774389246957,
+          "V_dual": -2.8522774389246957,
+          "duality_gap": 0.0,
+          "min_eq_slack": 0.0,
+          "support_size": 4,
+          "support_speed_tiers": [
+            2.0
+          ],
+          "V_pure_maximin": -3.6854437022251467,
+          "V_pure_minimax": -2.270079188636176,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 4.0,
+          "n_plans": 22,
+          "V_lp": -2.839413123624186,
+          "V_dual": -2.839413123624187,
+          "duality_gap": 8.881784197001252e-16,
+          "min_eq_slack": -4.440892098500626e-15,
+          "support_size": 4,
+          "support_speed_tiers": [
+            2.0,
+            4.0
+          ],
+          "V_pure_maximin": -3.6854437022251467,
+          "V_pure_minimax": -2.270079188636176,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 6.0,
+          "n_plans": 33,
+          "V_lp": -2.3905444815594468,
+          "V_dual": -2.3905444815594485,
+          "duality_gap": 1.7763568394002505e-15,
+          "min_eq_slack": 8.881784197001252e-16,
+          "support_size": 5,
+          "support_speed_tiers": [
+            2.0,
+            6.0
+          ],
+          "V_pure_maximin": -3.6854437022251467,
+          "V_pure_minimax": -0.3626526094777677,
+          "nesting_bitexact": true
+        }
+      ],
+      "increments": [
+        0.012864315300509688,
+        0.4488686420647392
+      ],
+      "max_decrease": 0.012864315300509688,
+      "monotone_within_tol": true
+    },
+    "parallel_etar1.0": {
+      "vbars": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "cells": [
+        {
+          "vbar": 2.0,
+          "n_plans": 11,
+          "V_lp": -0.5711892386842397,
+          "V_dual": -0.5711892386842397,
+          "duality_gap": 0.0,
+          "min_eq_slack": -4.440892098500626e-16,
+          "support_size": 3,
+          "support_speed_tiers": [
+            2.0
+          ],
+          "V_pure_maximin": -1.6330735808879675,
+          "V_pure_minimax": 0.0,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 4.0,
+          "n_plans": 22,
+          "V_lp": -0.13461091497081207,
+          "V_dual": -0.1346109149708136,
+          "duality_gap": 1.5265566588595902e-15,
+          "min_eq_slack": -9.159339953157541e-16,
+          "support_size": 5,
+          "support_speed_tiers": [
+            2.0,
+            4.0
+          ],
+          "V_pure_maximin": -1.6330735808879675,
+          "V_pure_minimax": 1.1730761460789263,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 6.0,
+          "n_plans": 33,
+          "V_lp": 0.0003769545917107234,
+          "V_dual": 0.00037695459171415834,
+          "duality_gap": 3.434915112759951e-15,
+          "min_eq_slack": 1.1631863007510734e-15,
+          "support_size": 7,
+          "support_speed_tiers": [
+            2.0,
+            4.0,
+            6.0
+          ],
+          "V_pure_maximin": -1.6330735808879675,
+          "V_pure_minimax": 1.6330735808879675,
+          "nesting_bitexact": true
+        }
+      ],
+      "increments": [
+        0.4365783237134276,
+        0.1349878695625228
+      ],
+      "max_decrease": 0.1349878695625228,
+      "monotone_within_tol": true
+    },
+    "parallel_etar1.33": {
+      "vbars": [
+        2.0,
+        4.0,
+        6.0
+      ],
+      "cells": [
+        {
+          "vbar": 2.0,
+          "n_plans": 11,
+          "V_lp": 2.662844944545918,
+          "V_dual": 2.662844944545918,
+          "duality_gap": 0.0,
+          "min_eq_slack": -8.881784197001252e-16,
+          "support_size": 4,
+          "support_speed_tiers": [
+            2.0
+          ],
+          "V_pure_maximin": 0.43089243830820584,
+          "V_pure_minimax": 3.165584332089642,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 4.0,
+          "n_plans": 22,
+          "V_lp": 2.685292351383479,
+          "V_dual": 2.6852923513834797,
+          "duality_gap": 4.440892098500626e-16,
+          "min_eq_slack": -4.440892098500626e-16,
+          "support_size": 5,
+          "support_speed_tiers": [
+            2.0,
+            4.0
+          ],
+          "V_pure_maximin": 0.43089243830820584,
+          "V_pure_minimax": 3.165584332089642,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 6.0,
+          "n_plans": 33,
+          "V_lp": 2.7654001027983375,
+          "V_dual": 2.7654001027983375,
+          "duality_gap": 0.0,
+          "min_eq_slack": -3.1086244689504383e-15,
+          "support_size": 6,
+          "support_speed_tiers": [
+            2.0,
+            4.0,
+            6.0
+          ],
+          "V_pure_maximin": 0.43089243830820584,
+          "V_pure_minimax": 4.589097278776254,
+          "nesting_bitexact": true
+        }
+      ],
+      "increments": [
+        0.02244740683756108,
+        0.08010775141485826
+      ],
+      "max_decrease": 0.02244740683756108,
+      "monotone_within_tol": true
+    }
+  },
+  "b41_sensitivity_actual_speed": [
+    {
+      "geometry": "head_on",
+      "channel": "actual_target_speed",
+      "cells": [
+        {
+          "vbar": 2.0,
+          "n_plans": 11,
+          "V_lp": -7.103979020613634,
+          "V_dual": -7.103979020613634,
+          "duality_gap": 0.0,
+          "min_eq_slack": -8.881784197001252e-16,
+          "support_size": 3,
+          "support_speed_tiers": [
+            2.0
+          ],
+          "V_pure_maximin": -7.536155723465556,
+          "V_pure_minimax": -6.488508899420975,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 4.0,
+          "n_plans": 22,
+          "V_lp": -0.0,
+          "V_dual": -0.0,
+          "duality_gap": 0.0,
+          "min_eq_slack": 0.0,
+          "support_size": 2,
+          "support_speed_tiers": [
+            4.0
+          ],
+          "V_pure_maximin": 0.0,
+          "V_pure_minimax": 0.0,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 6.0,
+          "n_plans": 33,
+          "V_lp": -0.0,
+          "V_dual": 7.105427357601002e-15,
+          "duality_gap": 7.105427357601002e-15,
+          "min_eq_slack": 0.0,
+          "support_size": 1,
+          "support_speed_tiers": [
+            4.0
+          ],
+          "V_pure_maximin": 0.0,
+          "V_pure_minimax": 0.0,
+          "nesting_bitexact": true
+        }
+      ],
+      "monotone_within_tol": true,
+      "max_decrease": 0.0
+    },
+    {
+      "geometry": "parallel",
+      "channel": "actual_target_speed",
+      "cells": [
+        {
+          "vbar": 2.0,
+          "n_plans": 11,
+          "V_lp": -6.33708568226122,
+          "V_dual": -6.33708568226122,
+          "duality_gap": 0.0,
+          "min_eq_slack": 0.0,
+          "support_size": 2,
+          "support_speed_tiers": [
+            2.0
+          ],
+          "V_pure_maximin": -6.905153225126381,
+          "V_pure_minimax": -5.888954094017875,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 4.0,
+          "n_plans": 22,
+          "V_lp": -0.1401720999355732,
+          "V_dual": -0.14017209993557414,
+          "duality_gap": 9.43689570931383e-16,
+          "min_eq_slack": -1.27675647831893e-15,
+          "support_size": 2,
+          "support_speed_tiers": [
+            4.0
+          ],
+          "V_pure_maximin": -0.33511776097145496,
+          "V_pure_minimax": 0.3351177609714544,
+          "nesting_bitexact": true
+        },
+        {
+          "vbar": 6.0,
+          "n_plans": 33,
+          "V_lp": -0.1401720999355807,
+          "V_dual": -0.14017209993556998,
+          "duality_gap": 1.071365218763276e-14,
+          "min_eq_slack": 6.217248937900877e-15,
+          "support_size": 2,
+          "support_speed_tiers": [
+            4.0
+          ],
+          "V_pure_maximin": -0.33511776097145496,
+          "V_pure_minimax": 0.3351177609714544,
+          "nesting_bitexact": true
+        }
+      ],
+      "monotone_within_tol": true,
+      "max_decrease": -7.494005416219807e-15
+    }
+  ],
+  "b42_operating_speed_rows": [
+    {
+      "protocol": "fixed_operating_speed (E02)",
+      "geometry": "crossing",
+      "eta_v": 0.8,
+      "eta_r": 1.0,
+      "game_value": -0.0,
+      "pure_value": 0.0,
+      "maximin_plan_B": "turn+90",
+      "minimax_plan_R": "turn+90",
+      "regime": "cross_or_beam"
+    },
+    {
+      "protocol": "fixed_operating_speed (E02)",
+      "geometry": "crossing",
+      "eta_v": 1.0,
+      "eta_r": 1.0,
+      "game_value": -0.0,
+      "pure_value": 0.0,
+      "maximin_plan_B": "turn+90",
+      "minimax_plan_R": "turn+90",
+      "regime": "cross_or_beam"
+    },
+    {
+      "protocol": "fixed_operating_speed (E02)",
+      "geometry": "crossing",
+      "eta_v": 1.25,
+      "eta_r": 1.0,
+      "game_value": -0.22085092483278876,
+      "pure_value": -0.7124598557342788,
+      "maximin_plan_B": "turn+90",
+      "minimax_plan_R": "turn+120",
+      "regime": "cross_or_beam"
+    },
+    {
+      "protocol": "fixed_operating_speed (E02)",
+      "geometry": "head_on",
+      "eta_v": 0.8,
+      "eta_r": 1.0,
+      "game_value": 1.025218753913637,
+      "pure_value": 0.0,
+      "maximin_plan_B": "straight",
+      "minimax_plan_R": "straight",
+      "regime": "closure_advantage"
+    },
+    {
+      "protocol": "fixed_operating_speed (E02)",
+      "geometry": "head_on",
+      "eta_v": 1.0,
+      "eta_r": 1.0,
+      "game_value": -0.0,
+      "pure_value": 0.0,
+      "maximin_plan_B": "straight",
+      "minimax_plan_R": "straight",
+      "regime": "even_closure"
+    },
+    {
+      "protocol": "fixed_operating_speed (E02)",
+      "geometry": "head_on",
+      "eta_v": 1.25,
+      "eta_r": 1.0,
+      "game_value": -1.3878383010845758,
+      "pure_value": -3.7923461352579415,
+      "maximin_plan_B": "turn+180",
+      "minimax_plan_R": "turn+60",
+      "regime": "disengage"
+    },
+    {
+      "protocol": "fixed_operating_speed (E02)",
+      "geometry": "parallel",
+      "eta_v": 0.8,
+      "eta_r": 1.0,
+      "game_value": 1.0987443659952163,
+      "pure_value": 0.0,
+      "maximin_plan_B": "turn+60",
+      "minimax_plan_R": "turn+30",
+      "regime": "cross_or_beam"
+    },
+    {
+      "protocol": "fixed_operating_speed (E02)",
+      "geometry": "parallel",
+      "eta_v": 1.0,
+      "eta_r": 1.0,
+      "game_value": 0.017268107811821212,
+      "pure_value": -1.9979748540479068,
+      "maximin_plan_B": "turn-30",
+      "minimax_plan_R": "turn+30",
+      "regime": "oblique_duel"
+    },
+    {
+      "protocol": "fixed_operating_speed (E02)",
+      "geometry": "parallel",
+      "eta_v": 1.25,
+      "eta_r": 1.0,
+      "game_value": -1.4899059169445816,
+      "pure_value": -2.16234829305928,
+      "maximin_plan_B": "turn-30",
+      "minimax_plan_R": "turn-90",
+      "regime": "oblique_duel"
+    }
+  ],
+  "b42_contrast_table": [
+    {
+      "geometry": "head_on",
+      "eta_v_operating": 0.8,
+      "V_operating (E02, speed forced)": 1.025218753913637,
+      "note_operating": "speed = constant parameter, no speed action",
+      "V_capability vbar=2 (B4.1)": -0.0,
+      "V_capability vbar=4 (B4.1)": -0.0,
+      "V_capability vbar=6 (B4.1)": -0.0,
+      "note_capability": "speed = plan-chosen tier, U(vbar) nested"
+    },
+    {
+      "geometry": "head_on",
+      "eta_v_operating": 1.0,
+      "V_operating (E02, speed forced)": -0.0,
+      "note_operating": "speed = constant parameter, no speed action",
+      "V_capability vbar=2 (B4.1)": -0.0,
+      "V_capability vbar=4 (B4.1)": -0.0,
+      "V_capability vbar=6 (B4.1)": -0.0,
+      "note_capability": "speed = plan-chosen tier, U(vbar) nested"
+    },
+    {
+      "geometry": "head_on",
+      "eta_v_operating": 1.25,
+      "V_operating (E02, speed forced)": -1.3878383010845758,
+      "note_operating": "speed = constant parameter, no speed action",
+      "V_capability vbar=2 (B4.1)": -0.0,
+      "V_capability vbar=4 (B4.1)": -0.0,
+      "V_capability vbar=6 (B4.1)": -0.0,
+      "note_capability": "speed = plan-chosen tier, U(vbar) nested"
+    },
+    {
+      "geometry": "parallel",
+      "eta_v_operating": 0.8,
+      "V_operating (E02, speed forced)": 1.0987443659952163,
+      "note_operating": "speed = constant parameter, no speed action",
+      "V_capability vbar=2 (B4.1)": -0.5711892386842397,
+      "V_capability vbar=4 (B4.1)": -0.13461091497081207,
+      "V_capability vbar=6 (B4.1)": 0.0003769545917107234,
+      "note_capability": "speed = plan-chosen tier, U(vbar) nested"
+    },
+    {
+      "geometry": "parallel",
+      "eta_v_operating": 1.0,
+      "V_operating (E02, speed forced)": 0.017268107811821212,
+      "note_operating": "speed = constant parameter, no speed action",
+      "V_capability vbar=2 (B4.1)": -0.5711892386842397,
+      "V_capability vbar=4 (B4.1)": -0.13461091497081207,
+      "V_capability vbar=6 (B4.1)": 0.0003769545917107234,
+      "note_capability": "speed = plan-chosen tier, U(vbar) nested"
+    },
+    {
+      "geometry": "parallel",
+      "eta_v_operating": 1.25,
+      "V_operating (E02, speed forced)": -1.4899059169445816,
+      "note_operating": "speed = constant parameter, no speed action",
+      "V_capability vbar=2 (B4.1)": -0.5711892386842397,
+      "V_capability vbar=4 (B4.1)": -0.13461091497081207,
+      "V_capability vbar=6 (B4.1)": 0.0003769545917107234,
+      "note_capability": "speed = plan-chosen tier, U(vbar) nested"
+    }
+  ],
+  "gate": {
+    "per_cell": [
+      {
+        "cell": "head_on_etar0.75",
+        "monotone_within_tol": true,
+        "max_decrease": 0.03234888143282477,
+        "nesting_bitexact": true
+      },
+      {
+        "cell": "head_on_etar1.0",
+        "monotone_within_tol": true,
+        "max_decrease": 0.0,
+        "nesting_bitexact": true
+      },
+      {
+        "cell": "head_on_etar1.33",
+        "monotone_within_tol": true,
+        "max_decrease": -2.220446049250313e-15,
+        "nesting_bitexact": true
+      },
+      {
+        "cell": "parallel_etar0.75",
+        "monotone_within_tol": true,
+        "max_decrease": 0.012864315300509688,
+        "nesting_bitexact": true
+      },
+      {
+        "cell": "parallel_etar1.0",
+        "monotone_within_tol": true,
+        "max_decrease": 0.1349878695625228,
+        "nesting_bitexact": true
+      },
+      {
+        "cell": "parallel_etar1.33",
+        "monotone_within_tol": true,
+        "max_decrease": 0.02244740683756108,
+        "nesting_bitexact": true
+      },
+      {
+        "cell": "head_on (actual-speed)",
+        "monotone_within_tol": true,
+        "max_decrease": 0.0,
+        "nesting_bitexact": true
+      },
+      {
+        "cell": "parallel (actual-speed)",
+        "monotone_within_tol": true,
+        "max_decrease": -7.494005416219807e-15,
+        "nesting_bitexact": true
+      }
+    ],
+    "pass": true
+  }
+}

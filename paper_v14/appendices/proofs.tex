@@ -1,0 +1,306 @@
+\section{Finite game and realization-plan formulation}
+Write a complete own path as $i=(i_0,\ldots,i_{T-1})$ and the opponent path
+as $j=(j_0,\ldots,j_{T-1})$. Both use a state-independent menu of size $b$.
+At an own update $t$, the information available for a new choice is exactly
+$(i_{<t},j_{<t})$. All previously selected own commands have then executed;
+their contents are already in $i_{<t}$. The choice is an element of
+$\{0,\ldots,b-1\}^{e-t}$, where $e$ is the next own update or the horizon.
+The opponent's currently outstanding suffix is excluded. These information
+sets have perfect recall: every earlier own choice and every earlier
+observation is recoverable from the present prefix.
+
+For each own information set $I$, let $\sigma(I)$ be its incoming own
+sequence and let $\sigma(I)a$ denote each block-extended sequence. Include
+an empty sequence with realization weight one. A realization plan satisfies
+\[
+ x_{\emptyset}=1,\qquad x\ge0,\qquad
+ \sum_{a\in A(I)}x_{\sigma(I)a}=x_{\sigma(I)}.
+\]
+Collect these equations as $Ex=e$; write the opponent equations as $Fy=f$.
+For every terminal pair $(i,j)$ put its full trajectory payoff into the
+matrix entry indexed by its final own and opponent sequences. If more than
+one terminal node shares an index, add its chance-weighted contribution.
+There are no exogenous chance moves in the formation benchmark. The expected
+payoff is $x^\top Py$ and the value is
+\[
+ \max_{x\ge0,Ex=e}\min_{y\ge0,Fy=f}x^\top Py.
+\]
+The inner problem has dual $\max_v f^\top v$ subject to $F^\top v\le P^\top x$.
+Consequently the maximizer solves
+\begin{equation}
+ \max_{x,v}f^\top v\quad\text{s.t.}\quad
+ Ex=e,\ x\ge0,\ F^\top v\le P^\top x,
+ \label{eq:sf}
+\end{equation}
+with unrestricted $v$. Finite game duality and perfect-recall realization
+equivalence justify this standard formulation \citep{stengel1996}.
+Its size is linear in the represented game tree, which can itself grow
+exponentially in $T$.
+
+For a numerical candidate $(x,y)$, nonnegative conditional child weights
+are normalized at every information set and multiplied by repaired parent
+reach. If proposed child mass is zero, use a uniform conditional distribution.
+This constructs feasible realization plans in exact arithmetic. Report the
+actual flow residual and the maximum repair magnitude. Two unrestricted
+responses then give
+\[
+ \min_{Fy'=f,y'\ge0}x^\top Py'\ \le V\ \le
+ \max_{Ex'=e,x'\ge0}{x'}^\top Py.
+\]
+Feasibility repair does not correct a wrongly specified information set.
+The independent tiny-game normal-form enumeration is therefore a separate
+test of model representation.
+
+\section{Exact counterfactual pricing}
+Fix a causal opponent policy $q$. For each externally specified own path
+$i$, let $C_q(j\mid i)$ be the probability of opponent path $j$. Causality
+means that for any $t$ and opponent prefix $j_{<t}$,
+\begin{equation}
+ \sum_{j_{\ge t}}C_q(j\mid i)
+\end{equation}
+depends on $i_{<t}$ and not on any later own action. This follows by multiplying
+the opponent's conditional decision probabilities, or by averaging causal
+pure policies. An opponent may retain a private command suffix inside a
+block; the marginalization integrates over that suffix rather than revealing it.
+
+Initialize $H_T(i,j)=A(i,j)C_q(j\mid i)$. If $t<e$ are successive own
+boundaries, recursively define
+\begin{equation}
+ H_t(i_{<t},j_{<t})=max_{a\in\{0,\ldots,b-1\}^{e-t}}
+ \sum_{z\in\{0,\ldots,b-1\}^{e-t}}
+ H_e(i_{<t}a,j_{<t}z).
+ \label{eq:price}
+\end{equation}
+The terminal entries are weighted by opponent realization probabilities,
+not by an own policy. Suppose all decisions from $e$ onward have been optimized.
+At time $t$, the own block $a$ must be fixed before $z$ is observed. Thus $z$
+is summed for each candidate $a$; the maximizing block is then selected.
+The probability of the already executed opponent prefix is independent of
+this candidate. It can remain as an unnormalized common factor throughout
+the recurrence. The induction hypothesis permits different optimal
+continuations at distinct newly observed prefixes at $e$. This proves
+\eqref{eq:price} and the root best-response value. Any stored maximizing
+choice at a zero-weight prefix is admissible.
+
+For $b\ge2$, the number of weighted entries processed is at most
+\[
+ b^{2T}+b^{2(T-1)}+\cdots+1\le\frac{b^{2T}}{1-b^{-2}}.
+\]
+The payoff matrix and response arrays therefore take $O(b^{2T})$ arithmetic
+and memory. Constructing the physical payoff and repeating this procedure
+inside an equilibrium solver remain additional costs. This is a specialized
+history-indexed response calculation, not a polynomial algorithm in the
+compact physical-state description.
+
+\section{Restricted policy generation and stopping}
+Against a committed opponent, a feasible pure own policy $p_m$ induces one
+own path $i_m(j)$ for each complete opponent path $j$. Form a restricted
+matrix with entries $B_{mj}=A(i_m(j),j)$, retaining every opponent column.
+Let $w$ and $q$ be restricted equilibrium distributions. The mixed own policy
+has full-game lower guarantee
+\[
+ L=\min_j\sum_m w_mB_{mj},
+\]
+and exact pricing against $q$ gives $U=\BR_S(q)\ge V(S,C)$. Hence $[L,U]$
+is valid. If $U=L$ in exact arithmetic, the restricted mixture and $q$ are
+an equilibrium of the complete game. If $U>L$, a maximizing response cannot
+be a previously available row, since all old rows have payoff at most the
+restricted value against $q$. Adding that response strictly enlarges the
+finite set of available policies. The exact procedure terminates after
+finitely many additions, but this worst-case count can be exponential.
+This is the standard response-oracle argument
+\citep{mcmahan2003,bosansky2014}.
+
+The implementation attempts at most 64 policy additions before switching to
+the complete realization-plan LP for the same game. The first attempt's
+time is included. A duplicate response with a numerical gap is reported as
+a stall, not used as a proof of convergence. All positive mixture weights
+enter full-response evaluation; pruning tiny positive weights would require
+an additional error budget.
+
+\section{Coarsening a full-update behavioral strategy}
+Let $\pi_u(a\mid i_{<u},j_{<u})$ be a full-update source strategy, completed
+by uniform distributions at its zero-reach histories. Fix one legal reference
+opponent action $r_\star$, the straight action in the experiment. For a target
+block $[t,e)$ and actual observed prefixes $(i_{<t},j_{<t})$, define
+\begin{equation}
+ \widetilde\pi_{t:e}(a_t,\ldots,a_{e-1}\mid i_{<t},j_{<t})
+ =\prod_{u=t}^{e-1}
+ \pi_u\left(a_u\mid i_{<t}a_{t:u},j_{<t}r_\star^{u-t}\right).
+ \label{eq:coarse}
+\end{equation}
+For each fixed earlier own block prefix, the last factor sums to one over
+$a_{e-1}$. Repeating this argument backward proves normalization of
+\eqref{eq:coarse}. Its factors use only observed prefixes, private sampled
+own commands and a deterministic hypothetical continuation. No actual future
+opponent command is supplied. State-independent menus make all resulting
+blocks legal. Thus the construction is a feasible target-calendar policy.
+
+The source need not be optimal for this feasibility result. If it is obtained
+as a root mixture, first convert its realization distribution to behavioral
+kernels using perfect recall. Deleting updates after this conversion defines
+a new behavioral strategy; it need not preserve the source's mixture over
+latent pure plans or its outcome distribution. This distinction matters at
+histories that become newly reachable after coarsening.
+
+Let $U_F$ be any valid upper bound on the full-update value for the same
+opponent class. A full response to $\widetilde\pi$ gives $L'$. Policy inclusion
+and feasibility imply
+\[
+ 0\le V(F,R)-V(S',R)\le U_F-L'.
+\]
+To evaluate the minimizing response, apply \eqref{eq:price} to the inverted
+matrix $-A^\top$ weighted by the counterfactual realization law of
+$\widetilde\pi$, using the opponent calendar $R$. This directly quantifies
+the actual projected policy. It avoids unproved smoothness assumptions but
+can yield a loose bound. It does not strengthen the general abstraction
+decomposition of \citet{kroer2018}.
+
+\section{Calendar search and transferable opponents}
+A search node consists of included epochs $I$ and undecided epochs $D$.
+Excluded epochs are the complement of $I\cup D$. Its remaining family is
+\[
+ \mathcal C(I,D)=\{S:I\subseteq S\subseteq I\cup D,\ |S|\le K\}.
+\]
+For any $S$ in this family, $V(S,R)\le V(I\cup D,R)$ by policy inclusion.
+The latter game is a valid relaxation even if $|I\cup D|>K$. Its numerical
+upper bound is therefore a node upper bound. A fixed opponent strategy
+remains feasible at every node because its own calendar, available history
+and action menu are unchanged. Thus $\BR_{I\cup D}(q)$ is another valid upper
+bound, and a minimum over such bounds is safe.
+
+If an upper bound is at most the incumbent feasible lower bound plus
+$\varepsilon$, prune the node while retaining that bound in the terminal
+bound list. Otherwise split on one undecided epoch, producing the included
+and excluded child. These children partition the remaining family. When
+$|I|=K$, only $I$ remains. When $|I\cup D|\le K$, inclusion implies that
+$I\cup D$ dominates all calendars within the node, so solve only that calendar.
+After finite exhaustion, every feasible calendar has either been evaluated
+or belongs to a represented pruned node. The largest retained upper bound,
+together with the best feasible lower bound, encloses $W_K$. If unresolved
+inner solves leave a gap above $\varepsilon$, the search result is unresolved.
+Finite termination alone does not establish numerical optimality.
+
+\section{Interval losses and the shortest-path construction}
+For opponent $F$, every physical epoch is a potential common boundary. The
+fully replanning continuation tree supplies values $v_t(h)$ at every public
+history. Let $b_{t,e}(h)$ denote the value of a block game with Blue committed,
+Red fully replanning and terminal continuation $v_e$. Define
+$\delta_{t,e}(h)=v_t(h)-b_{t,e}(h)$ and
+$d(t,e)=\max_h\delta_{t,e}(h)$. These deficits are nonnegative because the
+block restriction only removes own decisions. Adjacent boundaries give the
+identical one-stage simultaneous game, hence $d(t,t+1)=0$.
+
+Fix a calendar and stitch the maximizing block policies for its successive
+intervals. Write $G_t(h)$ for the lower guarantee of this stitched policy
+from $t$. If $G_e(h')\ge v_e(h')-D_e$ for every possible successor history,
+the same block policy guarantees
+\[
+ G_t(h)\ge b_{t,e}(h)-D_e
+       =v_t(h)-\delta_{t,e}(h)-D_e
+       \ge v_t(h)-d(t,e)-D_e.
+\]
+The first inequality holds against every within-block Red policy, including
+one chosen with full knowledge of the public calendar. Future Red choices
+are covered by the uniform continuation guarantee. Because Red updates at
+every epoch and Blue's block ends at $e$, no private command crosses this
+boundary. Starting with $D_T=0$ and inducting backward proves the main
+interval-loss theorem. This also constructs a feasible policy attaining
+the bound in exact arithmetic.
+
+For nonnegative certified edge bounds $\bar d(t,e)\ge d(t,e)$, set
+$D(0,0)=0$ and all other $D(0,e)=+\infty$. The recurrence
+\[
+ D(j,e)=\min_{0\le t<e}\{D(j-1,t)+\bar d(t,e)\}
+\]
+uses exactly $j$ intervals. Its budget answer is
+$\min_{1\le j\le K+1}D(j,T)$. The minimum over all smaller $j$ is essential:
+the edge upper bounds need not satisfy a triangle inequality. Storing each
+minimizing predecessor recovers a calendar. The resulting value lower bound
+is $L_F-\min_{j\le K+1}D(j,T)$ when $L_F\le V(F,F)$. It need not be the
+optimal calendar value, and a sufficient retention budget from this bound
+need not be the true minimum budget.
+
+For numerical edge construction, suppose the full tree uses approximations
+$\widehat v_t$ with uniform errors $\epsilon_t$. A lower bound
+$\widehat L_{t,e}(h)$ for the block game with terminal reward
+$\widehat v_e$ gives
+\[
+ d(t,e)\le\max_h\{
+ \widehat v_t(h)+\epsilon_t-\widehat L_{t,e}(h)+\epsilon_e\}.
+\]
+The implemented upper bound also takes its maximum with zero. Adjacent
+edges use their exact identity $d=0$. Every local game and the full tree
+are charged as preprocessing; the cheap graph search must not be reported
+as the total method cost. The finite-history maximum is deliberately
+conservative and requires no global smoothness of the directional kernel.
+
+\section{A sufficient modular special case}
+Suppose there are independent component games indexed by potential update
+epochs $m$. Component $m$ has maximizing pure-policy set $P_m^0$ without its
+update and $P_m^1\supseteq P_m^0$ with its update, a fixed minimizing set $Q_m$,
+and payoff $a_m(p_m,q_m)$. Assume the whole game's pure-policy sets are exactly
+the Cartesian products of the component sets and its payoff is the sum of
+the component payoffs. These are structural assumptions: there are no shared
+opponent resources, inter-component physical state constraints or additional
+cross-component observations that enlarge these sets.
+
+Let $v_m^d$ be the minimax value of component $m$ under $d\in\{0,1\}$. The
+product of component maximizing equilibrium policies guarantees
+$\sum_m v_m^{\mathbf1\{m\in S\}}$ against every joint minimizing policy,
+because each of its component marginals is feasible. The product of component
+minimizing equilibria gives the matching upper bound against every joint
+maximizing policy. Therefore
+\[
+ V(S)=\sum_m v_m^0+\sum_{m\in S}(v_m^1-v_m^0),
+\]
+which is modular. The assumptions define a checkable special class and are
+not claimed for the formation benchmark. The shared trajectory and target
+history prevent this product factorization in general.
+
+\section{Boundary conditions and historical counterexamples}
+The angular kernel changes firing sector at specified bearings. A nonzero
+one-sided jump is incompatible with a finite global Lipschitz constant:
+the ratio of the jump to an arbitrarily small bearing separation is unbounded.
+All current certificates operate on the explicitly evaluated finite payoff
+matrix, including its boundary convention. They do not certify angular-grid
+refinement, continuous-control limits or the physical accuracy of the kernel.
+The archived floating-boundary amendment groups values within $10^{-8}$
+degrees at the designated $\pm30$ and $\pm150$ degree boundaries. No payment
+matrix is projected onto an antisymmetric matrix to pass a mirror test.
+
+Exchange oddness is not a Bellman collapse. Take absorbing states $s=\pm1$
+with no actions and stage reward $s$. Exchanging players sends $s$ to $-s$,
+but the two-step value is $2s$, not the one-stage reward. A separate issue is
+pure versus mixed play: the rock--paper--scissors antisymmetric matrix has
+pure max--min value $-1$ and mixed minimax value zero. Zero-value claims must
+identify the correct exchange-fixed state and the matching policy classes.
+
+Changing a forced operating speed changes the feasible trajectories and is
+not a nested enlargement of the action menu. Even an actually nested ability
+set guarantees only that each value with fixed opposing class cannot decrease;
+it does not make the difference of two such values monotone. Archived v12
+range and v13 mobility contrasts therefore remain separate negative evidence,
+not premises of the present budget theorem.
+
+\section{Numerical intervals and decision logic}
+The scientific objective is the finite deterministic game. Declared numerical
+intervals come from feasible strategies, complete responses, local error
+propagation and explicit floating-point padding. They are not interval-arithmetic
+proofs: arithmetic and physical-payoff rounding are not enclosed with directed
+rounding. The implementation reports this scope with every solver result.
+
+For adaptation retention $\rho$, define
+$M_K=W_K-\rho V_F-(1-\rho)V_0$. Given value intervals, the lower and upper
+margins are
+\[
+ M_K^- = L_K-\rho U_F-(1-\rho)U_0,\qquad
+ M_K^+ = U_K-\rho L_F-(1-\rho)L_0.
+\]
+A nonnegative lower margin proves sufficiency, and a negative upper margin
+proves insufficiency. The smallest possibly sufficient budget and the smallest
+certified sufficient budget are reported separately. Equality of these budgets
+certifies minimality. When the adaptation interval is too close to zero, the
+reported quantity is absolute loss; no unstable retention percentage is formed.
+These are optimization intervals on a deterministic finite design, not sampling
+confidence intervals.

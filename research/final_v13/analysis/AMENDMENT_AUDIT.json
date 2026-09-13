@@ -1,0 +1,19 @@
+{
+  "comparison_rows": 564,
+  "payoff_matrices_compared": 60,
+  "changed_matrices": 2,
+  "max_payoff_change": 2.49980968689558,
+  "max_value_change": 0.004697426521250492,
+  "max_Theta_change": 0.0,
+  "changed_value_rows_above_1e_8": [
+    {
+      "phase": "confirmatory",
+      "cell": "parallel_0.75_blue",
+      "metric": "CF",
+      "old": -5.31186011178621,
+      "amended": -5.31655753830746,
+      "difference": -0.004697426521250492
+    }
+  ],
+  "scope": "Compare all available pre-amendment outputs, including failed original confirmation. Original parallel speeds .90/1.10/1.25 were never computed; no old result is imputed."
+}

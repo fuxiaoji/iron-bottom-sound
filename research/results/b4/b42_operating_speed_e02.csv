@@ -1,0 +1,10 @@
+protocol,geometry,eta_v,eta_r,game_value,pure_value,maximin_plan_B,minimax_plan_R,regime
+fixed_operating_speed (E02),crossing,0.8,1.0,-0.0,0.0,turn+90,turn+90,cross_or_beam
+fixed_operating_speed (E02),crossing,1.0,1.0,-0.0,0.0,turn+90,turn+90,cross_or_beam
+fixed_operating_speed (E02),crossing,1.25,1.0,-0.22085092483278876,-0.7124598557342788,turn+90,turn+120,cross_or_beam
+fixed_operating_speed (E02),head_on,0.8,1.0,1.025218753913637,0.0,straight,straight,closure_advantage
+fixed_operating_speed (E02),head_on,1.0,1.0,-0.0,0.0,straight,straight,even_closure
+fixed_operating_speed (E02),head_on,1.25,1.0,-1.3878383010845758,-3.7923461352579415,turn+180,turn+60,disengage
+fixed_operating_speed (E02),parallel,0.8,1.0,1.0987443659952163,0.0,turn+60,turn+30,cross_or_beam
+fixed_operating_speed (E02),parallel,1.0,1.0,0.017268107811821212,-1.9979748540479068,turn-30,turn+30,oblique_duel
+fixed_operating_speed (E02),parallel,1.25,1.0,-1.4899059169445816,-2.16234829305928,turn-30,turn-90,oblique_duel

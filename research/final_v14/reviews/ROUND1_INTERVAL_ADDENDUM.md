@@ -1,0 +1,11 @@
+# Round1 addendum: public interval loss bound
+
+The supplemental theorem was formulated after development outcomes had been viewed and before any frozen-test result. Its separate protocol and code freeze preserve that timing. The original primary solver and auxiliary algorithm freeze are unchanged.
+
+Mathematical checks: the local block value uses the fully replanning continuation value at its right endpoint; the deficit compares identical histories and total-payoff units. A block's minimizing strategy ranges over the full flexible opponent policy class within that block. The stitched maximizing policy gives a lower guarantee uniformly at all next histories, so backward minimax perturbation yields the additive deficit bound. The maximization over all histories makes the bound conservative but valid. No posterior or hidden suffix is supplied. The argument is limited to opponent F because a C opponent has an unfinished private plan at a focal boundary.
+
+Algorithm checks: a path with j edges represents j−1 updates; the initial plan is free. The implementation takes the minimum over at most K+1 edges rather than assuming a triangle inequality. Independent binary three-epoch full sequence-form values satisfy every calendar bound; direct path enumeration agrees with the dynamic program. The test with deliberately non-triangular edge costs confirms the at-most-budget rule. Adjacent edges are zero by equality of their decision games. Other edges include upper full-tree errors and lower block-game errors with the correct signs.
+
+Requested limitation retained: this produces a sufficient conservative budget and calendar, not the minimum budget for actual performance. Every preprocessing solve must be included in timing. The general proof tools are minimax perturbation and shortest paths; novelty and useful tightness remain to be evaluated. The claimed scope does not extend to C or continuous-control limits.
+
+Evidence: paper_v14/sections/theory.tex, paper_v14/appendices/proofs.tex, interval_bound_v14.py, tests/test_interval_bound_v14.py, REGRESSION_INTERVAL.log, INTERVAL_BOUND_FREEZE.json. This remains the implementing assistant's developmental self-audit, not independent specialist review.

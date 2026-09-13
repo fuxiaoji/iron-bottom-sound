@@ -1,0 +1,176 @@
+{
+  "config": {
+    "phase": "discovery",
+    "geometry": "parallel",
+    "focal_player": "Red",
+    "focal_speed_ratio": 1.0,
+    "opponent_speed_ratio": 1.0,
+    "range_ratio": 1.0,
+    "T": 6,
+    "grid": 3,
+    "turn_bound_deg": 60.0,
+    "speed_semantics": "forced operating speed",
+    "formation": "leader_follower",
+    "scientific_cache": "complete_configuration_terminal_matrix",
+    "source_hashes": {
+      "research/formation/commitment_v12.py": "b4645f1abb6afd778687c5f8c40b6dfb5354384305533ccb00bbf7663689583e",
+      "research/formation/exact_v12.py": "bc4893cf4c85ae52e2ffb0189698bb44f15dc974e1453a86fdf1acb661e5cba3",
+      "research/formation/sequence_v12.py": "de4aa85c0cb574ea1caa0632f66aae9cd43a4e35f5c6f11f676c69fa99020297",
+      "research/formation/matched_horizon.py": "d9f394abd082f392b41ea5194a98a32b72c9b64f9bb43f5017f21fc4c5456f02",
+      "research/formation/path_following.py": "1faa140c3eb3fa417bea3dac54b4ce63d4048047a6150ef2e302456289fe601b",
+      "research/results/e01/kernel_fits.json": "8ec3e881e5ec262983bcd249abddecd0a75d9e550e631c5eedebeca061436384"
+    },
+    "discovery_protocol_sha256": "3137b570cd621f160700bfb91e831071ff731e23c3bed573daf6314d9157f968"
+  },
+  "values": {
+    "FF": {
+      "V": 0.0,
+      "numeric_error_budget": 9.658940314238862e-15,
+      "LB": -9.658940314238862e-15,
+      "UB": 9.658940314238862e-15,
+      "trace": [
+        {
+          "t_start": 5,
+          "t_end": 6,
+          "nodes": 59049,
+          "matrix_order": 3,
+          "max_local_duality_gap": 3.552713678800501e-15,
+          "lp_calls": 0,
+          "seconds": 0.014579292001144495
+        },
+        {
+          "t_start": 4,
+          "t_end": 5,
+          "nodes": 6561,
+          "matrix_order": 3,
+          "max_local_duality_gap": 3.552713678800501e-15,
+          "lp_calls": 0,
+          "seconds": 0.00259845800610492
+        },
+        {
+          "t_start": 3,
+          "t_end": 4,
+          "nodes": 729,
+          "matrix_order": 3,
+          "max_local_duality_gap": 1.7763568394002505e-15,
+          "lp_calls": 0,
+          "seconds": 0.0008417919962084852
+        },
+        {
+          "t_start": 2,
+          "t_end": 3,
+          "nodes": 81,
+          "matrix_order": 3,
+          "max_local_duality_gap": 7.771561172376096e-16,
+          "lp_calls": 0,
+          "seconds": 0.0004938749989378266
+        },
+        {
+          "t_start": 1,
+          "t_end": 2,
+          "nodes": 9,
+          "matrix_order": 3,
+          "max_local_duality_gap": 0.0,
+          "lp_calls": 0,
+          "seconds": 1.3500000932253897e-05
+        },
+        {
+          "t_start": 0,
+          "t_end": 1,
+          "nodes": 1,
+          "matrix_order": 3,
+          "max_local_duality_gap": 0.0,
+          "lp_calls": 0,
+          "seconds": 1.158300437964499e-05
+        }
+      ],
+      "algorithm": "complete backward induction",
+      "T": 6,
+      "h": 1,
+      "base": 3,
+      "leaves": 531441,
+      "certification_scope": "finite game, floating-point payoff evaluation and LP precision",
+      "seconds": 0.01965785026550293
+    },
+    "CC": {
+      "V": 9.624524988801733e-16,
+      "numeric_error_budget": 7.783615294657791e-14,
+      "LB": -7.687370044769774e-14,
+      "UB": 7.879860544545809e-14,
+      "trace": [
+        {
+          "t_start": 0,
+          "t_end": 6,
+          "nodes": 1,
+          "matrix_order": 729,
+          "max_local_duality_gap": 7.783615294657791e-14,
+          "lp_calls": 1,
+          "seconds": 0.45031833400571486
+        }
+      ],
+      "algorithm": "complete backward induction",
+      "T": 6,
+      "h": 6,
+      "base": 3,
+      "leaves": 531441,
+      "certification_scope": "finite game, floating-point payoff evaluation and LP precision",
+      "seconds": 0.45044612884521484
+    },
+    "FC": {
+      "V": 3.406573724064333,
+      "LB": 3.406573724064334,
+      "UB": 3.406573724064332,
+      "gap": 0.0,
+      "flow_residual_B": 1.27675647831893e-15,
+      "flow_residual_R": 5.238051745820593e-17,
+      "inequality_violation": 8.43769498715119e-15,
+      "structure": "FC",
+      "base": 3,
+      "T": 6,
+      "sequences_B": 199291,
+      "sequences_R": 730,
+      "infosets_B": 66430,
+      "infosets_R": 1,
+      "payoff_nonzeros": 531441,
+      "lp_iterations": 47953,
+      "algorithm": "sparse perfect-recall sequence-form LP with full realization best responses",
+      "seconds": 26.143107175827026
+    },
+    "CF": {
+      "V": -3.406573724064325,
+      "LB": -3.4065737240643297,
+      "UB": -3.4065737240643252,
+      "gap": 4.440892098500626e-15,
+      "flow_residual_B": 6.245004513516506e-17,
+      "flow_residual_R": 1.2212453270876722e-15,
+      "inequality_violation": 4.6629367034256575e-14,
+      "structure": "CF",
+      "base": 3,
+      "T": 6,
+      "sequences_B": 730,
+      "sequences_R": 199291,
+      "infosets_B": 1,
+      "infosets_R": 66430,
+      "payoff_nonzeros": 531441,
+      "lp_iterations": 49043,
+      "algorithm": "sparse perfect-recall sequence-form LP with full realization best responses",
+      "solved_via": "negative-transpose FC",
+      "seconds": 35.32930374145508
+    }
+  },
+  "complete": true,
+  "payoff_sha256": "3fc664f9bb4b89e2a960d1fd51790c88e71b76c52f22f9bf502519d48c5ef89e",
+  "conditional_flexibility": {
+    "F": {
+      "F": 3.406573724064333,
+      "LB": 3.4065737240643243,
+      "UB": 3.4065737240643417
+    },
+    "C": {
+      "F": 3.4065737240643257,
+      "LB": 3.4065737240642484,
+      "UB": 3.4065737240644083
+    }
+  },
+  "additional_seconds": 70.9512288570404
+}

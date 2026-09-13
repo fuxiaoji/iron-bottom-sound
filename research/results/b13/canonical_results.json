@@ -1,0 +1,109 @@
+{
+  "_meta": {
+    "generated": "2026-09-11T23:09:48.454929",
+    "commit": "fc77a65 + research/ untracked",
+    "engine": "IBS deterministic, zero-dice protocol",
+    "ship_pair": "San Francisco (axis, geometry policy) vs New Orleans (allies, balanced)",
+    "seeds_per_cell": 100,
+    "total_games": 600,
+    "model_prediction_method": "best fixed plan payoff vs straight sailing (open-loop upper bound; the receding-horizon engine policy can only exceed this)",
+    "engine_metric": "paired hull damage differential (allies - axis)",
+    "conflict_note": "Previous results.json used MEAN over all 11 plans (including deliberately bad ones) as model prediction; report.md used BEST plan.  Both files written by different scripts at different times.  Resolved: best plan is the correct model-side quantity."
+  },
+  "model_predictions": {
+    "head_on": {
+      "model_best_vs_straight": 0.0,
+      "model_sign": 0,
+      "model_class": "neutral"
+    },
+    "parallel": {
+      "model_best_vs_straight": 5.282,
+      "model_sign": 1,
+      "model_class": "advantage"
+    },
+    "crossing": {
+      "model_best_vs_straight": 5.909,
+      "model_sign": 1,
+      "model_class": "advantage"
+    }
+  },
+  "engine_results": {
+    "head_on": {
+      "n": 100,
+      "mean_diff": 5.14,
+      "positive_frac": 0.79,
+      "engine_class": "advantage"
+    },
+    "parallel": {
+      "n": 100,
+      "mean_diff": 7.59,
+      "positive_frac": 0.92,
+      "engine_class": "advantage"
+    },
+    "crossing": {
+      "n": 100,
+      "mean_diff": 8.64,
+      "positive_frac": 0.94,
+      "engine_class": "advantage"
+    }
+  },
+  "cells": [
+    {
+      "geometry": "head_on",
+      "model_best_payoff": 0.0,
+      "model_class": "neutral",
+      "engine_n": 100,
+      "engine_mean_diff": 5.14,
+      "engine_positive_frac": 0.79,
+      "engine_class": "advantage",
+      "sign_agree_strict": 0,
+      "sign_agree_lower_bound": 1
+    },
+    {
+      "geometry": "parallel",
+      "model_best_payoff": 5.282,
+      "model_class": "advantage",
+      "engine_n": 100,
+      "engine_mean_diff": 7.59,
+      "engine_positive_frac": 0.92,
+      "engine_class": "advantage",
+      "sign_agree_strict": 1,
+      "sign_agree_lower_bound": 1
+    },
+    {
+      "geometry": "crossing",
+      "model_best_payoff": 5.909,
+      "model_class": "advantage",
+      "engine_n": 100,
+      "engine_mean_diff": 8.64,
+      "engine_positive_frac": 0.94,
+      "engine_class": "advantage",
+      "sign_agree_strict": 1,
+      "sign_agree_lower_bound": 1
+    }
+  ],
+  "gates": {
+    "sign_agreement_strict": {
+      "pct": 66,
+      "gate": 80,
+      "pass": false
+    },
+    "sign_agreement_lower_bound": {
+      "pct": 100,
+      "gate": 80,
+      "pass": true,
+      "note": "head-on model=0.0 is degeneracy lower bound"
+    },
+    "rank_correlation": {
+      "rho": 1.0,
+      "gate": 0.6,
+      "pass": true
+    },
+    "regime_agreement": {
+      "pct": 66,
+      "gate": 75,
+      "pass": false
+    }
+  },
+  "overall": "PARTIAL"
+}

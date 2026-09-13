@@ -1,0 +1,282 @@
+{
+  "definition": "P_H = V_H - V_1 (V_H: maximin LP value with H-turn committed plans)",
+  "horizon_sweep": [
+    {
+      "geometry": "head_on",
+      "H": 1,
+      "V_H": -0.0,
+      "maximin_plan_B": "straight",
+      "minimax_plan_R": "straight"
+    },
+    {
+      "geometry": "head_on",
+      "H": 2,
+      "V_H": -0.0,
+      "maximin_plan_B": "turn+120",
+      "minimax_plan_R": "turn+120"
+    },
+    {
+      "geometry": "head_on",
+      "H": 3,
+      "V_H": -0.0,
+      "maximin_plan_B": "turn+30",
+      "minimax_plan_R": "turn+30"
+    },
+    {
+      "geometry": "head_on",
+      "H": 4,
+      "V_H": -0.0,
+      "maximin_plan_B": "straight",
+      "minimax_plan_R": "straight"
+    },
+    {
+      "geometry": "head_on",
+      "H": 6,
+      "V_H": -0.0,
+      "maximin_plan_B": "straight",
+      "minimax_plan_R": "straight"
+    },
+    {
+      "geometry": "head_on",
+      "H": 12,
+      "V_H": -0.0,
+      "maximin_plan_B": "straight",
+      "minimax_plan_R": "straight"
+    },
+    {
+      "geometry": "head_on",
+      "H": 40,
+      "V_H": -0.0,
+      "maximin_plan_B": "straight",
+      "minimax_plan_R": "straight"
+    },
+    {
+      "geometry": "parallel",
+      "H": 1,
+      "V_H": -0.0,
+      "maximin_plan_B": "straight",
+      "minimax_plan_R": "straight"
+    },
+    {
+      "geometry": "parallel",
+      "H": 2,
+      "V_H": -0.0,
+      "maximin_plan_B": "straight",
+      "minimax_plan_R": "straight"
+    },
+    {
+      "geometry": "parallel",
+      "H": 3,
+      "V_H": -0.0,
+      "maximin_plan_B": "turn+30",
+      "minimax_plan_R": "turn-30"
+    },
+    {
+      "geometry": "parallel",
+      "H": 4,
+      "V_H": 0.00781660766510723,
+      "maximin_plan_B": "turn+120",
+      "minimax_plan_R": "turn-120"
+    },
+    {
+      "geometry": "parallel",
+      "H": 6,
+      "V_H": -0.0,
+      "maximin_plan_B": "turn+120",
+      "minimax_plan_R": "turn-120"
+    },
+    {
+      "geometry": "parallel",
+      "H": 12,
+      "V_H": -0.0,
+      "maximin_plan_B": "turn+120",
+      "minimax_plan_R": "turn-120"
+    },
+    {
+      "geometry": "parallel",
+      "H": 40,
+      "V_H": 0.017268107811821212,
+      "maximin_plan_B": "turn-30",
+      "minimax_plan_R": "turn+30"
+    },
+    {
+      "geometry": "crossing",
+      "H": 1,
+      "V_H": -0.0,
+      "maximin_plan_B": "straight",
+      "minimax_plan_R": "straight"
+    },
+    {
+      "geometry": "crossing",
+      "H": 2,
+      "V_H": -0.0,
+      "maximin_plan_B": "straight",
+      "minimax_plan_R": "straight"
+    },
+    {
+      "geometry": "crossing",
+      "H": 3,
+      "V_H": -0.0,
+      "maximin_plan_B": "turn+90",
+      "minimax_plan_R": "turn+90"
+    },
+    {
+      "geometry": "crossing",
+      "H": 4,
+      "V_H": -0.0,
+      "maximin_plan_B": "turn+90",
+      "minimax_plan_R": "turn+90"
+    },
+    {
+      "geometry": "crossing",
+      "H": 6,
+      "V_H": -0.0,
+      "maximin_plan_B": "turn+90",
+      "minimax_plan_R": "turn+90"
+    },
+    {
+      "geometry": "crossing",
+      "H": 12,
+      "V_H": -0.0,
+      "maximin_plan_B": "turn+90",
+      "minimax_plan_R": "turn+90"
+    },
+    {
+      "geometry": "crossing",
+      "H": 40,
+      "V_H": -0.0,
+      "maximin_plan_B": "turn+90",
+      "minimax_plan_R": "turn+90"
+    }
+  ],
+  "grid_P6": [
+    {
+      "eta_v": 0.8,
+      "eta_r": 0.75,
+      "V_1": -0.1787711881358059,
+      "V_6": -1.0091979413403276,
+      "P_6": -0.8304267532045218
+    },
+    {
+      "eta_v": 0.8,
+      "eta_r": 1.0,
+      "V_1": -0.0,
+      "V_6": -0.0,
+      "P_6": 0.0
+    },
+    {
+      "eta_v": 0.8,
+      "eta_r": 1.33,
+      "V_1": 0.2688025038458618,
+      "V_6": 1.4592021990189465,
+      "P_6": 1.1903996951730846
+    },
+    {
+      "eta_v": 0.89,
+      "eta_r": 0.75,
+      "V_1": -0.1787711881358059,
+      "V_6": -1.1234220627179539,
+      "P_6": -0.944650874582148
+    },
+    {
+      "eta_v": 0.89,
+      "eta_r": 1.0,
+      "V_1": -0.0,
+      "V_6": 0.014767320738343808,
+      "P_6": 0.014767320738343808
+    },
+    {
+      "eta_v": 0.89,
+      "eta_r": 1.33,
+      "V_1": 0.2688025038458618,
+      "V_6": 1.4468072094999609,
+      "P_6": 1.1780047056540992
+    },
+    {
+      "eta_v": 1.0,
+      "eta_r": 0.75,
+      "V_1": -0.1787711881358059,
+      "V_6": -1.3779914346986877,
+      "P_6": -1.1992202465628818
+    },
+    {
+      "eta_v": 1.0,
+      "eta_r": 1.0,
+      "V_1": -0.0,
+      "V_6": -0.0,
+      "P_6": 0.0
+    },
+    {
+      "eta_v": 1.0,
+      "eta_r": 1.33,
+      "V_1": 0.2688025038458618,
+      "V_6": 1.5589943203417267,
+      "P_6": 1.2901918164958648
+    },
+    {
+      "eta_v": 1.13,
+      "eta_r": 0.75,
+      "V_1": -0.1787711881358059,
+      "V_6": -1.2231935900390003,
+      "P_6": -1.0444224019031945
+    },
+    {
+      "eta_v": 1.13,
+      "eta_r": 1.0,
+      "V_1": -0.0,
+      "V_6": -0.04502650356416105,
+      "P_6": -0.04502650356416105
+    },
+    {
+      "eta_v": 1.13,
+      "eta_r": 1.33,
+      "V_1": 0.2688025038458618,
+      "V_6": 1.4128543563821439,
+      "P_6": 1.1440518525362822
+    },
+    {
+      "eta_v": 1.25,
+      "eta_r": 0.75,
+      "V_1": -0.1787711881358059,
+      "V_6": -1.2142242706862245,
+      "P_6": -1.0354530825504187
+    },
+    {
+      "eta_v": 1.25,
+      "eta_r": 1.0,
+      "V_1": -0.0,
+      "V_6": -0.18647189346438758,
+      "P_6": -0.18647189346438758
+    },
+    {
+      "eta_v": 1.25,
+      "eta_r": 1.33,
+      "V_1": 0.2688025038458618,
+      "V_6": 1.051252673281787,
+      "P_6": 0.7824501694359253
+    },
+    {
+      "eta_v": 1.33,
+      "eta_r": 0.75,
+      "V_1": -0.1787711881358059,
+      "V_6": -1.1081672712678896,
+      "P_6": -0.9293960831320838
+    },
+    {
+      "eta_v": 1.33,
+      "eta_r": 1.0,
+      "V_1": -0.0,
+      "V_6": -0.22514899759825366,
+      "P_6": -0.22514899759825366
+    },
+    {
+      "eta_v": 1.33,
+      "eta_r": 1.33,
+      "V_1": 0.2688025038458618,
+      "V_6": 1.1485456865874266,
+      "P_6": 0.8797431827415648
+    }
+  ],
+  "P6_nonzero_fraction": 0.7777777777777778,
+  "interpretation": "P_H != 0 for most cells means commitment length changes the positional value; P_H ~ 0 everywhere would demote commitment to a structural side-note."
+}

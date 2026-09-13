@@ -1,0 +1,66 @@
+{
+  "channel_separation": {
+    "author_before_editor": true,
+    "author_heading_count": 1,
+    "editor_heading_count": 1
+  },
+  "comments": [
+    {
+      "comment_id": "M1",
+      "empty_fields": [],
+      "heading_line": 5,
+      "kind": "major",
+      "missing_fields": []
+    },
+    {
+      "comment_id": "M2",
+      "empty_fields": [],
+      "heading_line": 17,
+      "kind": "major",
+      "missing_fields": []
+    },
+    {
+      "comment_id": "M3",
+      "empty_fields": [],
+      "heading_line": 29,
+      "kind": "major",
+      "missing_fields": []
+    },
+    {
+      "comment_id": "M4",
+      "empty_fields": [],
+      "heading_line": 41,
+      "kind": "major",
+      "missing_fields": []
+    },
+    {
+      "comment_id": "M5",
+      "empty_fields": [],
+      "heading_line": 53,
+      "kind": "major",
+      "missing_fields": []
+    },
+    {
+      "comment_id": "m1",
+      "empty_fields": [],
+      "heading_line": 65,
+      "kind": "minor",
+      "missing_fields": []
+    },
+    {
+      "comment_id": "m2",
+      "empty_fields": [],
+      "heading_line": 77,
+      "kind": "minor",
+      "missing_fields": []
+    }
+  ],
+  "errors": [],
+  "line_count": 91,
+  "notice": "This deterministic lint uses structural and lexical rules. It does not judge scientific validity, verify whether statements are true, or replace accountable human review. Findings contain line numbers and rule IDs, not review or manuscript text.",
+  "schema_version": "2.0",
+  "status": "READY_FOR_HUMAN_REVIEW",
+  "structured_comment_count": 7,
+  "valid": true,
+  "warnings": []
+}

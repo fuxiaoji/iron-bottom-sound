@@ -1,0 +1,115 @@
+{
+  "config": {
+    "geometry": "crossing",
+    "T": 4,
+    "speed_menu_B": [
+      0.75,
+      1.0,
+      1.3
+    ],
+    "speed_menu_R": [
+      1.0
+    ],
+    "initial_history_speed_ratio": 1.0,
+    "range_ratio": 1.0,
+    "turn_bound_deg": 60.0,
+    "formation": "leader_follower",
+    "protocol_sha256": "f1c5fe560a7ff625c476c1cd5ad561bc25a76470a9262fa5887a6e8a53918af6",
+    "core_sha256": "73d367d07a4162a1583b3f0712a33532a0493357bfe25333891179d8561cf427",
+    "payoff_sha256": "7ba3ad97900fe9d1af1d3eda6fd8d9346ec97880098d775c77c9c4a149308aa0",
+    "implementation_amendment_sha256": "769f3092f3e7d9e1e166cd8cbc5b646b9c825b9269e3543368f80c0840b5172a",
+    "scope": "limited-horizon genuine nested per-turn speed capability"
+  },
+  "values": {
+    "FF": {
+      "V": 3.570349967800029,
+      "LB": 3.570349967799914,
+      "UB": 3.5703499678001434,
+      "numeric_error_budget": 1.1457501614131615e-13,
+      "T": 4,
+      "trace": [
+        {
+          "t": 3,
+          "nodes": 19683,
+          "mixed_lp_nodes": 1414,
+          "max_gap": 9.50350909079134e-14
+        },
+        {
+          "t": 2,
+          "nodes": 729,
+          "mixed_lp_nodes": 92,
+          "max_gap": 1.509903313490213e-14
+        },
+        {
+          "t": 1,
+          "nodes": 27,
+          "mixed_lp_nodes": 5,
+          "max_gap": 4.440892098500626e-15
+        },
+        {
+          "t": 0,
+          "nodes": 1,
+          "mixed_lp_nodes": 0,
+          "max_gap": 0.0
+        }
+      ],
+      "algorithm": "complete rectangular backward induction",
+      "seconds": 3.3343238830566406
+    },
+    "CC": {
+      "V": 1.5120919735266989,
+      "LB": 1.5120919735266978,
+      "UB": 1.5120919735266996,
+      "gap": 1.7763568394002505e-15,
+      "algorithm": "complete matrix LP",
+      "seconds": 0.6019740104675293
+    },
+    "FC": {
+      "V": 4.454866687358322,
+      "LB": 4.454866687358324,
+      "UB": 4.454866687358323,
+      "gap": 0.0,
+      "flow_inequality_residual": 2.6645352591003757e-15,
+      "base_B": 9,
+      "base_R": 3,
+      "T": 4,
+      "structure": "FC",
+      "sequences_B": 183961,
+      "sequences_R": 82,
+      "infosets_B": 20440,
+      "infosets_R": 1,
+      "algorithm": "complete rectangular sequence-form LP and full best responses",
+      "seconds": 11.68673300743103
+    },
+    "CF": {
+      "V": 0.18711727206979156,
+      "LB": 0.18711727206979162,
+      "UB": 0.1871172720697916,
+      "gap": 0.0,
+      "flow_inequality_residual": 3.608224830031759e-16,
+      "base_B": 9,
+      "base_R": 3,
+      "T": 4,
+      "structure": "CF",
+      "sequences_B": 6562,
+      "sequences_R": 61321,
+      "infosets_B": 1,
+      "infosets_R": 20440,
+      "algorithm": "complete rectangular sequence-form LP and full best responses",
+      "seconds": 6.078761100769043
+    }
+  },
+  "complete": true,
+  "conditional_flexibility": {
+    "F": {
+      "F": 3.3832326957302374,
+      "LB": 3.3832326957301224,
+      "UB": 3.3832326957303516
+    },
+    "C": {
+      "F": 2.942774713831623,
+      "LB": 2.9427747138316245,
+      "UB": 2.9427747138316254
+    }
+  }
+}

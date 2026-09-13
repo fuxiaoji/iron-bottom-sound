@@ -1,0 +1,62 @@
+[
+  {
+    "geometry": "crossing",
+    "h": 1,
+    "mode": "exact_history",
+    "symmetry": true,
+    "cap": 200,
+    "tol": 0.005,
+    "n": 200,
+    "complete": true,
+    "C": 0.0,
+    "CI_lo": 0.0,
+    "CI_hi": 0.0,
+    "near_zero": true,
+    "CI_contains_zero": true
+  },
+  {
+    "geometry": "crossing",
+    "h": 2,
+    "mode": "exact_history",
+    "symmetry": true,
+    "cap": 200,
+    "tol": 0.005,
+    "n": 200,
+    "complete": true,
+    "C": 0.04631011455336911,
+    "CI_lo": -0.2744850927567064,
+    "CI_hi": 0.37979952674870837,
+    "near_zero": true,
+    "CI_contains_zero": true
+  },
+  {
+    "geometry": "crossing",
+    "h": 3,
+    "mode": "exact_history",
+    "symmetry": true,
+    "cap": 200,
+    "tol": 0.005,
+    "n": 200,
+    "complete": true,
+    "C": 0.057595721083041646,
+    "CI_lo": -0.5108634907992152,
+    "CI_hi": 0.6129921189586737,
+    "near_zero": true,
+    "CI_contains_zero": true
+  },
+  {
+    "geometry": "crossing",
+    "h": 6,
+    "mode": "exact_history",
+    "symmetry": true,
+    "cap": 200,
+    "tol": 0.005,
+    "n": 200,
+    "complete": true,
+    "C": -0.2000561935250666,
+    "CI_lo": -0.7754094136779983,
+    "CI_hi": 0.3757313766719978,
+    "near_zero": true,
+    "CI_contains_zero": true
+  }
+]

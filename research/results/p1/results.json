@@ -1,0 +1,283 @@
+{
+  "solver": "finite-horizon backward induction (reduced-state grid)",
+  "horizon_T": 40,
+  "gamma": 0.96,
+  "grid_levels": {
+    "coarse": [
+      16,
+      12
+    ],
+    "medium": [
+      30,
+      24
+    ],
+    "fine": [
+      48,
+      36
+    ]
+  },
+  "cells": [
+    {
+      "cell": "symmetric_head_on",
+      "eta_v": 1.0,
+      "eta_r": 1.0,
+      "geometry": "head_on",
+      "levels": {
+        "coarse": {
+          "mean": -1.4456028966473392e-19,
+          "std": 0.619378911121536,
+          "min": -2.719220925767902,
+          "max": 2.719220925767902,
+          "value_at_r12_headon": 0.0,
+          "value_at_r12_parallel": 0.0,
+          "value_at_r12_crossing": 0.0
+        },
+        "medium": {
+          "mean": -1.3363795666784292e-18,
+          "std": 0.6740089354042376,
+          "min": -2.719220925767902,
+          "max": 2.719220925767902,
+          "value_at_r12_headon": 0.0,
+          "value_at_r12_parallel": 0.0,
+          "value_at_r12_crossing": 0.28747527737938916
+        },
+        "fine": {
+          "mean": 0.014146241116028541,
+          "std": 0.7043702268088259,
+          "min": -2.719220925767902,
+          "max": 2.719220925767902,
+          "value_at_r12_headon": 0.0,
+          "value_at_r12_parallel": 0.0,
+          "value_at_r12_crossing": 0.27299851220212745
+        },
+        "convergence_delta": 0.014146,
+        "convergence_pass": true
+      }
+    },
+    {
+      "cell": "symmetric_parallel",
+      "eta_v": 1.0,
+      "eta_r": 1.0,
+      "geometry": "parallel",
+      "levels": {
+        "coarse": {
+          "mean": -1.4456028966473392e-19,
+          "std": 0.619378911121536,
+          "min": -2.719220925767902,
+          "max": 2.719220925767902,
+          "value_at_r12_headon": 0.0,
+          "value_at_r12_parallel": 0.0,
+          "value_at_r12_crossing": 0.0
+        },
+        "medium": {
+          "mean": -1.3363795666784292e-18,
+          "std": 0.6740089354042376,
+          "min": -2.719220925767902,
+          "max": 2.719220925767902,
+          "value_at_r12_headon": 0.0,
+          "value_at_r12_parallel": 0.0,
+          "value_at_r12_crossing": 0.28747527737938916
+        },
+        "fine": {
+          "mean": 0.014146241116028541,
+          "std": 0.7043702268088259,
+          "min": -2.719220925767902,
+          "max": 2.719220925767902,
+          "value_at_r12_headon": 0.0,
+          "value_at_r12_parallel": 0.0,
+          "value_at_r12_crossing": 0.27299851220212745
+        },
+        "convergence_delta": 0.014146,
+        "convergence_pass": true
+      }
+    },
+    {
+      "cell": "range_adv_head_on",
+      "eta_v": 1.0,
+      "eta_r": 1.33,
+      "geometry": "head_on",
+      "levels": {
+        "coarse": {
+          "mean": 7.662302301282015,
+          "std": 2.2071224894871992,
+          "min": -1.1367815935948031,
+          "max": 12.261250071935695,
+          "value_at_r12_headon": 0.8195618948204934,
+          "value_at_r12_parallel": 10.362661071117437,
+          "value_at_r12_crossing": 3.911936161203678
+        },
+        "medium": {
+          "mean": 7.899717660716119,
+          "std": 1.792280895929239,
+          "min": -1.1486908828252582,
+          "max": 12.418504731052595,
+          "value_at_r12_headon": 0.8257823375460921,
+          "value_at_r12_parallel": 10.394712818310882,
+          "value_at_r12_crossing": 6.094122351071197
+        },
+        "fine": {
+          "mean": 7.9261717940833,
+          "std": 1.8373380224501776,
+          "min": -1.3641759250524688,
+          "max": 12.814997131608946,
+          "value_at_r12_headon": 0.8334751722999465,
+          "value_at_r12_parallel": 10.44333011211658,
+          "value_at_r12_crossing": 6.710527089195637
+        },
+        "convergence_delta": 0.003338,
+        "convergence_pass": true
+      }
+    },
+    {
+      "cell": "range_disadv_head_on",
+      "eta_v": 1.0,
+      "eta_r": 0.75,
+      "geometry": "head_on",
+      "levels": {
+        "coarse": {
+          "mean": -7.956912562921531,
+          "std": 1.1149872106665755,
+          "min": -14.382337771981273,
+          "max": -4.478483772165458,
+          "value_at_r12_headon": -6.992755633463551,
+          "value_at_r12_parallel": -7.1854867571369105,
+          "value_at_r12_crossing": -7.106346837222825
+        },
+        "medium": {
+          "mean": -8.35983486840601,
+          "std": 1.11537886853316,
+          "min": -14.145306683373573,
+          "max": -4.775901355947786,
+          "value_at_r12_headon": -7.700289903469409,
+          "value_at_r12_parallel": -7.435778500218781,
+          "value_at_r12_crossing": -7.899361504646631
+        },
+        "fine": {
+          "mean": -8.509220858967053,
+          "std": 1.1568907720989103,
+          "min": -14.472724386049027,
+          "max": -4.3131770272282015,
+          "value_at_r12_headon": -8.15532002409554,
+          "value_at_r12_parallel": -7.911800069367734,
+          "value_at_r12_crossing": -8.606850985098797
+        },
+        "convergence_delta": 0.017556,
+        "convergence_pass": true
+      }
+    },
+    {
+      "cell": "crossing_sym",
+      "eta_v": 1.0,
+      "eta_r": 1.0,
+      "geometry": "crossing",
+      "levels": {
+        "coarse": {
+          "mean": -1.4456028966473392e-19,
+          "std": 0.619378911121536,
+          "min": -2.719220925767902,
+          "max": 2.719220925767902,
+          "value_at_r12_headon": 0.0,
+          "value_at_r12_parallel": 0.0,
+          "value_at_r12_crossing": 0.0
+        },
+        "medium": {
+          "mean": -1.3363795666784292e-18,
+          "std": 0.6740089354042376,
+          "min": -2.719220925767902,
+          "max": 2.719220925767902,
+          "value_at_r12_headon": 0.0,
+          "value_at_r12_parallel": 0.0,
+          "value_at_r12_crossing": 0.28747527737938916
+        },
+        "fine": {
+          "mean": 0.014146241116028541,
+          "std": 0.7043702268088259,
+          "min": -2.719220925767902,
+          "max": 2.719220925767902,
+          "value_at_r12_headon": 0.0,
+          "value_at_r12_parallel": 0.0,
+          "value_at_r12_crossing": 0.27299851220212745
+        },
+        "convergence_delta": 0.014146,
+        "convergence_pass": true
+      }
+    },
+    {
+      "cell": "speed_adv_parallel",
+      "eta_v": 1.25,
+      "eta_r": 1.0,
+      "geometry": "parallel",
+      "levels": {
+        "coarse": {
+          "mean": -1.4456028966473392e-19,
+          "std": 0.619378911121536,
+          "min": -2.719220925767902,
+          "max": 2.719220925767902,
+          "value_at_r12_headon": 0.0,
+          "value_at_r12_parallel": 0.0,
+          "value_at_r12_crossing": 0.0
+        },
+        "medium": {
+          "mean": -1.3363795666784292e-18,
+          "std": 0.6740089354042376,
+          "min": -2.719220925767902,
+          "max": 2.719220925767902,
+          "value_at_r12_headon": 0.0,
+          "value_at_r12_parallel": 0.0,
+          "value_at_r12_crossing": 0.28747527737938916
+        },
+        "fine": {
+          "mean": 0.014146241116028541,
+          "std": 0.7043702268088259,
+          "min": -2.719220925767902,
+          "max": 2.719220925767902,
+          "value_at_r12_headon": 0.0,
+          "value_at_r12_parallel": 0.0,
+          "value_at_r12_crossing": 0.27299851220212745
+        },
+        "convergence_delta": 0.014146,
+        "convergence_pass": true
+      }
+    },
+    {
+      "cell": "range_adv_crossing",
+      "eta_v": 1.0,
+      "eta_r": 1.33,
+      "geometry": "crossing",
+      "levels": {
+        "coarse": {
+          "mean": 7.662302301282015,
+          "std": 2.2071224894871992,
+          "min": -1.1367815935948031,
+          "max": 12.261250071935695,
+          "value_at_r12_headon": 0.8195618948204934,
+          "value_at_r12_parallel": 10.362661071117437,
+          "value_at_r12_crossing": 3.911936161203678
+        },
+        "medium": {
+          "mean": 7.899717660716119,
+          "std": 1.792280895929239,
+          "min": -1.1486908828252582,
+          "max": 12.418504731052595,
+          "value_at_r12_headon": 0.8257823375460921,
+          "value_at_r12_parallel": 10.394712818310882,
+          "value_at_r12_crossing": 6.094122351071197
+        },
+        "fine": {
+          "mean": 7.9261717940833,
+          "std": 1.8373380224501776,
+          "min": -1.3641759250524688,
+          "max": 12.814997131608946,
+          "value_at_r12_headon": 0.8334751722999465,
+          "value_at_r12_parallel": 10.44333011211658,
+          "value_at_r12_crossing": 6.710527089195637
+        },
+        "convergence_delta": 0.003338,
+        "convergence_pass": true
+      }
+    }
+  ],
+  "convergence_fraction_pct": 100,
+  "gate_80pct": true,
+  "overall": "PASS"
+}

@@ -1,0 +1,799 @@
+{
+  "created_utc": "2026-09-13T04:42:11.592339+00:00",
+  "cells": [
+    {
+      "id": "head_on_v0.85_d16_T6_G3_none",
+      "geometry": "head_on",
+      "speed": 0.85,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "development"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v1_d16_T6_G3_none",
+      "geometry": "head_on",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "development",
+        "robustness"
+      ],
+      "mirror_solve_all": true,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v1.15_d16_T6_G3_none",
+      "geometry": "head_on",
+      "speed": 1.15,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "development"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v0.8_d13.5_T6_G3_none",
+      "geometry": "head_on",
+      "speed": 0.8,
+      "distance": 13.5,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "test"
+      ],
+      "mirror_solve_all": true,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v0.95_d15_T6_G3_none",
+      "geometry": "head_on",
+      "speed": 0.95,
+      "distance": 15.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "test"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v1.05_d17_T6_G3_none",
+      "geometry": "head_on",
+      "speed": 1.05,
+      "distance": 17.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "test"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v1.2_d18.5_T6_G3_none",
+      "geometry": "head_on",
+      "speed": 1.2,
+      "distance": 18.5,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "test"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v1_d16_T4_G3_none",
+      "geometry": "head_on",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v1_d16_T5_G3_none",
+      "geometry": "head_on",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 5,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v1_d16_T7_G3_none",
+      "geometry": "head_on",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 7,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v1_d16_T4_G5_none",
+      "geometry": "head_on",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 5,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v1_d16_T4_G7_none",
+      "geometry": "head_on",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 7,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v1_d16_T4_G3_isotropic",
+      "geometry": "head_on",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 3,
+      "ablation": "isotropic",
+      "phases": [
+        "ablation"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v1_d16_T4_G3_terminal",
+      "geometry": "head_on",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 3,
+      "ablation": "terminal",
+      "phases": [
+        "ablation"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "head_on_v1_d16_T4_G3_rigid",
+      "geometry": "head_on",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 3,
+      "ablation": "rigid",
+      "phases": [
+        "ablation"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v0.85_d16_T6_G3_none",
+      "geometry": "parallel",
+      "speed": 0.85,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "development"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v1_d16_T6_G3_none",
+      "geometry": "parallel",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "development",
+        "robustness"
+      ],
+      "mirror_solve_all": true,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v1.15_d16_T6_G3_none",
+      "geometry": "parallel",
+      "speed": 1.15,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "development"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v0.8_d13.5_T6_G3_none",
+      "geometry": "parallel",
+      "speed": 0.8,
+      "distance": 13.5,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "test"
+      ],
+      "mirror_solve_all": true,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v0.95_d15_T6_G3_none",
+      "geometry": "parallel",
+      "speed": 0.95,
+      "distance": 15.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "test"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v1.05_d17_T6_G3_none",
+      "geometry": "parallel",
+      "speed": 1.05,
+      "distance": 17.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "test"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v1.2_d18.5_T6_G3_none",
+      "geometry": "parallel",
+      "speed": 1.2,
+      "distance": 18.5,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "test"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v1_d16_T4_G3_none",
+      "geometry": "parallel",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v1_d16_T5_G3_none",
+      "geometry": "parallel",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 5,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v1_d16_T7_G3_none",
+      "geometry": "parallel",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 7,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v1_d16_T4_G5_none",
+      "geometry": "parallel",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 5,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v1_d16_T4_G7_none",
+      "geometry": "parallel",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 7,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v1_d16_T4_G3_isotropic",
+      "geometry": "parallel",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 3,
+      "ablation": "isotropic",
+      "phases": [
+        "ablation"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v1_d16_T4_G3_terminal",
+      "geometry": "parallel",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 3,
+      "ablation": "terminal",
+      "phases": [
+        "ablation"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "parallel_v1_d16_T4_G3_rigid",
+      "geometry": "parallel",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 3,
+      "ablation": "rigid",
+      "phases": [
+        "ablation"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v0.85_d16_T6_G3_none",
+      "geometry": "crossing",
+      "speed": 0.85,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "development"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v1_d16_T6_G3_none",
+      "geometry": "crossing",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "development",
+        "robustness"
+      ],
+      "mirror_solve_all": true,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v1.15_d16_T6_G3_none",
+      "geometry": "crossing",
+      "speed": 1.15,
+      "distance": 16.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "development"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v0.8_d13.5_T6_G3_none",
+      "geometry": "crossing",
+      "speed": 0.8,
+      "distance": 13.5,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "test"
+      ],
+      "mirror_solve_all": true,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v0.95_d15_T6_G3_none",
+      "geometry": "crossing",
+      "speed": 0.95,
+      "distance": 15.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "test"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v1.05_d17_T6_G3_none",
+      "geometry": "crossing",
+      "speed": 1.05,
+      "distance": 17.0,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "test"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v1.2_d18.5_T6_G3_none",
+      "geometry": "crossing",
+      "speed": 1.2,
+      "distance": 18.5,
+      "T": 6,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "test"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v1_d16_T4_G3_none",
+      "geometry": "crossing",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v1_d16_T5_G3_none",
+      "geometry": "crossing",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 5,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v1_d16_T7_G3_none",
+      "geometry": "crossing",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 7,
+      "grid": 3,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v1_d16_T4_G5_none",
+      "geometry": "crossing",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 5,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v1_d16_T4_G7_none",
+      "geometry": "crossing",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 7,
+      "ablation": "none",
+      "phases": [
+        "robustness"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v1_d16_T4_G3_isotropic",
+      "geometry": "crossing",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 3,
+      "ablation": "isotropic",
+      "phases": [
+        "ablation"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v1_d16_T4_G3_terminal",
+      "geometry": "crossing",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 3,
+      "ablation": "terminal",
+      "phases": [
+        "ablation"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    },
+    {
+      "id": "crossing_v1_d16_T4_G3_rigid",
+      "geometry": "crossing",
+      "speed": 1.0,
+      "distance": 16.0,
+      "T": 4,
+      "grid": 3,
+      "ablation": "rigid",
+      "phases": [
+        "ablation"
+      ],
+      "mirror_solve_all": false,
+      "opponents": [
+        "F",
+        "C"
+      ]
+    }
+  ],
+  "main_plan_sha256": "299ff7a66919f13b65a10f2eee377f9daae3d0d9cc43a13991f61448143f7b01",
+  "main_opponents": [
+    "F",
+    "C"
+  ],
+  "value_tolerance_scale": 1e-06,
+  "numeric_padding_scale": 1e-08,
+  "ordinary_wall_seconds": 1200,
+  "instance_wall_seconds": 21600,
+  "process_tree_memory_bytes": 8589934592,
+  "heavy_workers": 1,
+  "default_model": {
+    "opponent_speed": 6,
+    "range_B": 1,
+    "range_R": 1,
+    "gamma": 1,
+    "formation": "leader_follower",
+    "ships": 3,
+    "spacing": 2,
+    "n_sub": 6,
+    "turn_bound_deg": 60,
+    "payoff": "causal endpoint trapezoid; frozen v13 boundary completion",
+    "kernel_target_speed": "fixed input 6 clipped by wrapper to 5"
+  },
+  "ablation_scope": "T4 Grid3; one factor at a time",
+  "test_interpretation": "fixed computational benchmark, not speed causal identification"
+}

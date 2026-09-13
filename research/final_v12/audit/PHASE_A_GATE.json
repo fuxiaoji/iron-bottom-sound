@@ -1,0 +1,25 @@
+{
+  "date_utc": "2026-09-12T17:05:55.041049+00:00",
+  "original_MC_gate_pass": false,
+  "amended_deterministic_gate_pass": true,
+  "checks": {
+    "history_scalar_vector_swap": true,
+    "cache_off_vs_exact": true,
+    "all_200_seed_epochs_converged": true,
+    "spatial_policy_equivariance": true,
+    "all_12_exact_symmetric_values_zero": true
+  },
+  "cache_errors": {
+    "head_on": 0.0,
+    "parallel": 0.0,
+    "crossing": 0.0
+  },
+  "exact_max_abs_value": 2.3866236815706645e-15,
+  "n_certified_sampled_epochs": 7200,
+  "amendments": [
+    "AMENDMENT_01.md",
+    "AMENDMENT_02.md",
+    "AMENDMENT_03_CONTROL_PRECISION.md"
+  ],
+  "interpretation": "Exact finite-game discovery is allowed under the disclosed deterministic amendment. Original noisy MC gate remains FAIL, not retroactively passed. DO cadence samples are not feedback-equilibrium values."
+}

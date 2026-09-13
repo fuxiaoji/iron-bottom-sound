@@ -1,0 +1,32 @@
+[
+  {
+    "geometry": "crossing",
+    "h": 1,
+    "mode": "exact_history",
+    "symmetry": true,
+    "cap": 200,
+    "tol": 0.05,
+    "n": 8,
+    "complete": true,
+    "C": 0.0,
+    "CI_lo": 0.0,
+    "CI_hi": 0.0,
+    "near_zero": true,
+    "CI_contains_zero": true
+  },
+  {
+    "geometry": "crossing",
+    "h": 6,
+    "mode": "exact_history",
+    "symmetry": true,
+    "cap": 200,
+    "tol": 0.05,
+    "n": 8,
+    "complete": true,
+    "C": 1.254361580663601,
+    "CI_lo": -0.6273584978939162,
+    "CI_hi": 4.366796586937241,
+    "near_zero": false,
+    "CI_contains_zero": true
+  }
+]
