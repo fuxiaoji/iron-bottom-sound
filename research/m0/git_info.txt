@@ -1,0 +1,11 @@
+repo=https://github.com/fuxiaoji/iron-bottom-sound.git
+branch_audited=research/m0-validation
+commit=7ab8ac4acdf029e6ea14346d568c3f509abd9390
+research_branch=research/m0-validation
+status_at_audit_start=clean
+log:
+7ab8ac4 docs(governance): record batch commit hash 25f202c in havedone.md
+25f202c docs(governance): pipeline constitution, stage-prompt registry, project memory
+5572b73 docs(v14): handoff document and copy-paste prompt for a larger machine
+09372a9 research(v14): budgeted replanning study — theory, solver, frozen design, draft
+fc77a65 feat: bigmap engine, custom scenarios, savegame and replay UI

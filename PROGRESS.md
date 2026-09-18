@@ -70,6 +70,10 @@
 
 ---
 
+## 1.5 M0 多主线验证（独立于论文流水线，分支 research/m0-validation）
+
+2026-09-18 完成 P0 审计 + P1 Exact Lab + A0/B0/C0/D0 cheap kill tests，止步于 checkpoint（M0 计划纪律：PI 审查前不进 discovery）。结论：**A=WEAK，B=PASS_TO_DISCOVERY（条件性，IBS 反例未做），C=FAIL（borderline F12 待 PI 裁定），D=FAIL**。证据入口 `research/m0/CHEAP_KILL_REPORT.md`；IBS 对局预算 2238/20000；生产模块零改动。详见 `havedone.md` 2026-09-18 M0 条目与 `memory/m0-cheap-kill-findings.md`。
+
 ## 2. 阶段台账
 
 > **重要**：阶段 1–11 在 2026-09-13 之前已有历史产物（v12/v13/v14 研究线），但这些产物是在本流水线成立**之前**产生的，其"是否符合本流水线的阶段定义与门控要求"**尚未按本流水线重新核验**，因此统一标记 ⟨待核⟩，不得直接升为 ✅。

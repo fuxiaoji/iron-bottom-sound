@@ -1,0 +1,113 @@
+[IBS-S-03] policy=uniform ...
+  seed=11 reached=True samples=53025 width=0.199
+  seed=22 reached=True samples=53000 width=0.200
+  seed=33 reached=True samples=53025 width=0.199
+  seed=44 reached=True samples=53000 width=0.200
+  seed=55 reached=True samples=53025 width=0.199
+[IBS-S-03] policy=largest_width ...
+  seed=11 reached=True samples=51500 width=0.199
+  seed=22 reached=True samples=51575 width=0.199
+  seed=33 reached=True samples=51725 width=0.199
+  seed=44 reached=True samples=51075 width=0.199
+  seed=55 reached=True samples=51450 width=0.199
+[IBS-S-03] policy=variance_aware ...
+  seed=11 reached=True samples=43150 width=0.199
+  seed=22 reached=True samples=43250 width=0.200
+  seed=33 reached=True samples=42300 width=0.199
+  seed=44 reached=True samples=43275 width=0.199
+  seed=55 reached=True samples=42575 width=0.199
+[IBS-S-03] policy=support_weighted ...
+  seed=11 reached=False samples=None width=1.184
+  seed=22 reached=False samples=None width=1.096
+  seed=33 reached=False samples=None width=1.174
+  seed=44 reached=False samples=None width=1.400
+  seed=55 reached=False samples=None width=0.767
+[IBS-S-03] policy=cert_sensitivity ...
+  seed=11 reached=True samples=14800 width=0.200
+  seed=22 reached=True samples=78125 width=0.199
+  seed=33 reached=True samples=14325 width=0.181
+  seed=44 reached=False samples=None width=0.215
+  seed=55 reached=True samples=15900 width=0.200
+[IBS-S-01] policy=uniform ...
+  seed=11 reached=True samples=52750 width=0.200
+  seed=22 reached=True samples=52750 width=0.200
+  seed=33 reached=True samples=52750 width=0.200
+  seed=44 reached=True samples=52750 width=0.200
+  seed=55 reached=True samples=52750 width=0.200
+[IBS-S-01] policy=largest_width ...
+  seed=11 reached=True samples=52800 width=0.199
+  seed=22 reached=True samples=52800 width=0.199
+  seed=33 reached=True samples=52375 width=0.199
+  seed=44 reached=True samples=52600 width=0.200
+  seed=55 reached=True samples=52775 width=0.200
+[IBS-S-01] policy=variance_aware ...
+  seed=11 reached=True samples=45875 width=0.200
+  seed=22 reached=True samples=47025 width=0.200
+  seed=33 reached=True samples=48250 width=0.200
+  seed=44 reached=True samples=47850 width=0.200
+  seed=55 reached=True samples=44675 width=0.200
+[IBS-S-01] policy=support_weighted ...
+  seed=11 reached=False samples=None width=0.859
+  seed=22 reached=False samples=None width=0.979
+  seed=33 reached=False samples=None width=0.971
+  seed=44 reached=False samples=None width=1.019
+  seed=55 reached=False samples=None width=1.039
+[IBS-S-01] policy=cert_sensitivity ...
+  seed=11 reached=False samples=None width=0.801
+  seed=22 reached=False samples=None width=0.715
+  seed=33 reached=False samples=None width=0.789
+  seed=44 reached=False samples=None width=0.999
+  seed=55 reached=False samples=None width=0.911
+{
+  "verdict": "FAIL",
+  "reasons": [
+    "candidate never reached the target width (or uniform never did, making savings undefined)"
+  ],
+  "per_scenario": {
+    "IBS-S-03": {
+      "uniform": {
+        "median": 53025,
+        "saving": 0.0
+      },
+      "largest_width": {
+        "median": 51500,
+        "saving": 0.02876001885902879
+      },
+      "variance_aware": {
+        "median": 43150,
+        "saving": 0.1862329090051862
+      },
+      "support_weighted": {
+        "median": null,
+        "saving": null
+      },
+      "cert_sensitivity": {
+        "median": 15350.0,
+        "saving": 0.7105139085337104
+      }
+    },
+    "IBS-S-01": {
+      "uniform": {
+        "median": 52750,
+        "saving": 0.0
+      },
+      "largest_width": {
+        "median": 52775,
+        "saving": -0.00047393364928915993
+      },
+      "variance_aware": {
+        "median": 47025,
+        "saving": 0.10853080568720375
+      },
+      "support_weighted": {
+        "median": null,
+        "saving": null
+      },
+      "cert_sensitivity": {
+        "median": null,
+        "saving": null
+      }
+    }
+  }
+}
+C0_SIM_EXIT=0

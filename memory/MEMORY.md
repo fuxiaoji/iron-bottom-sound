@@ -17,6 +17,7 @@
 | [delegation-audit-policy.md](delegation-audit-policy.md) | 派发子 agent 的选型、并行与**产出审计**纪律 | feedback |
 | [paper-v14-state.md](paper-v14-state.md) | v14 论文与研究线的当前真实状态（含未完成项） | project |
 | [pending-user-slots.md](pending-user-slots.md) | 阻塞流水线的 8 个待用户确认槽位 | project |
+| [m0-cheap-kill-findings.md](m0-cheap-kill-findings.md) | M0 四线结论（A_WEAK/B条件/C FAIL borderline/D FAIL）、实验室退化陷阱与 C0 门冲突 | project |
 
 ---
 

@@ -1,0 +1,27 @@
+ENV {"platform": "macOS-26.3-arm64-arm-64bit-Mach-O", "machine": "arm64", "python": "3.14.6", "cpu_count": 10, "executable": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/bin/python"}
+
+=== 1. DETERMINISM (same seed + same policy, repeated) ===
+  IBS-S-01 seed=1 balanced vs balanced: turns=7 score={'axis': 9, 'allies': 11} n_events=524 digest=303123622834 err=None (5.73s)
+  IBS-S-01 seed=1 torpedo vs cautious: turns=7 score={'axis': 2, 'allies': 6} n_events=430 digest=743518090086 err=None (13.38s)
+  IBS-S-03 seed=7 adaptive vs line: turns=4 score={'axis': 0, 'allies': 0} n_events=210 digest=438257659038 err=None (14.89s)
+  IBS-S-03 seed=7 adaptive vs line: turns=4 score={'axis': 0, 'allies': 0} n_events=210 digest=438257659038 err=None (14.65s)
+  -> identical-config repeat matched: True
+
+=== 2. AUTO-TERMINATION ===
+  IBS-S-01: COMPLETE turns=7 winner=None n_events=524 (5.22s) err=None
+  IBS-S-02: NOT_COMPLETE turns=None winner=None n_events=None (0.02s) err=KeyError: 'Scenario IBS-S-02 is catalogued but not playable'
+  IBS-S-03: COMPLETE turns=4 winner=axis n_events=165 (1.49s) err=None
+  IBS-S-EM-01: COMPLETE turns=12 winner=None n_events=963 (35.13s) err=None
+  IBS-S-14: NOT_COMPLETE turns=None winner=None n_events=None (0.03s) err=KeyError: 'Scenario IBS-S-14 is catalogued but not playable'
+
+=== 3. REALISTIC-COMMAND MODE ===
+  IBS-S-01 (realistic): turns=7 winner=None phase=complete (6.03s) err=None
+  IBS-S-03 (realistic): turns=4 winner=axis phase=complete (0.83s) err=None
+
+=== 4. TIMING (per match, seconds) ===
+  n=5 mean=9.74s median=5.22s max=35.13s
+
+=== 5. THROUGHPUT (20 workers, IBS-S-01) ===
+  20 matches in 53.7s -> 0.37 matches/s, errors=0
+
+wrote research/m0/logs/p0_baseline.json

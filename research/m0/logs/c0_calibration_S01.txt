@@ -1,0 +1,19 @@
+pilot: 12 matches on IBS-S-01 ...
+TIME_ESTIMATE: 39.1 min for 30/cell (pilot 49.6s for 12 matches) -> n_cell=30
+running 1080 matches on IBS-S-01 (30/cell, 12 workers)
+  120/1080  0.61 matches/s  eta 26.0 min
+  240/1080  0.55 matches/s  eta 25.3 min
+  360/1080  0.41 matches/s  eta 29.4 min
+  480/1080  0.54 matches/s  eta 18.4 min
+  600/1080  0.60 matches/s  eta 13.2 min
+  720/1080  0.59 matches/s  eta 10.2 min
+  840/1080  0.57 matches/s  eta 7.0 min
+  960/1080  0.56 matches/s  eta 3.6 min
+  1080/1080  0.56 matches/s  eta 0.0 min
+{
+  "scenario": "IBS-S-01",
+  "n_ok": 1080,
+  "n_failed": 0,
+  "wall_seconds": 1914.8671950420248,
+  "matches_per_second": 0.564007782261003
+}

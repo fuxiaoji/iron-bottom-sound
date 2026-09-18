@@ -1,0 +1,147 @@
+{
+  "n_decision_nodes": 1573,
+  "n_games": 74,
+  "delta_mean": 0.8493324856961221,
+  "delta_median": 0.0,
+  "delta_max": 2.0,
+  "delta_min": 0.0,
+  "delta_std": 0.9631783444793527,
+  "frac_near_zero": 0.5505403687221869,
+  "threshold_near_zero": 0.1,
+  "by_family_mean": {
+    "anticor": 0.7283236994219653,
+    "coordination": 1.0635838150289016,
+    "delayed": 0.7514450867052023,
+    "null": 1.0
+  },
+  "by_horizon_mean": {
+    "0": 1.0870406189555126,
+    "1": 1.0064794816414686,
+    "2": 0.5681818181818182,
+    "3": 0.47513812154696133,
+    "4": 0.36666666666666664
+  },
+  "by_commitment_mean": {
+    "1": 0.8642578125,
+    "2": 0.8214936247723132
+  },
+  "within_snapshot_delta_spread_mean": 1.3650793650793651,
+  "within_snapshot_delta_spread_max": 2.0,
+  "n_snapshot_groups": 189,
+  "best_nonoracle_candidates": {
+    "periodic_P2": {
+      "method": "periodic_P2",
+      "saving": 0.33333333333333337,
+      "retention": 1.0,
+      "game_id": "discovery_grid_T3b3K3L2_coordination"
+    },
+    "periodic_P3": {
+      "method": "periodic_P3",
+      "saving": 0.5,
+      "retention": 1.0,
+      "game_id": "discovery_grid_T4b3K2L2_coordination"
+    },
+    "random_k1": {
+      "method": "random_k1",
+      "saving": 0.6666666666666667,
+      "retention": 0.8333333333333333,
+      "game_id": "discovery_grid_T3b2K2L2_anticor"
+    },
+    "random_k2": {
+      "method": "random_k2",
+      "saving": 0.33333333333333337,
+      "retention": 1.0,
+      "game_id": "discovery_grid_T3b2K2L2_anticor"
+    },
+    "periodic_P4": {
+      "method": "periodic_P4",
+      "saving": 0.75,
+      "retention": 1.0,
+      "game_id": "discovery_grid_T4b2K2L2_anticor"
+    },
+    "random_k3": {
+      "method": "random_k3",
+      "saving": 0.25,
+      "retention": 1.0,
+      "game_id": "discovery_grid_T4b2K2L2_anticor"
+    },
+    "random_k4": {
+      "method": "random_k4",
+      "saving": 0.19999999999999996,
+      "retention": 1.0,
+      "game_id": "discovery_grid_T5b2K2L2_anticor"
+    }
+  },
+  "oracle_frontier_points": 142,
+  "n_zero_span_games": 28,
+  "n_frontier_games": 74,
+  "trivial_schedule_pass_rate": 0.23880597014925373,
+  "n_evaluable_points": 268,
+  "n_trivial_pass_points": 64,
+  "trivial_pass_examples": [
+    {
+      "game_id": "discovery_grid_T3b3K3L2_coordination",
+      "method": "periodic_P2",
+      "saving": 0.33333333333333337,
+      "retention": 1.0
+    },
+    {
+      "game_id": "discovery_grid_T3b3K3L3_coordination",
+      "method": "periodic_P2",
+      "saving": 0.33333333333333337,
+      "retention": 1.0
+    },
+    {
+      "game_id": "discovery_grid_T4b3K2L2_coordination",
+      "method": "periodic_P3",
+      "saving": 0.5,
+      "retention": 1.0
+    },
+    {
+      "game_id": "discovery_grid_T4b3K2L3_coordination",
+      "method": "periodic_P3",
+      "saving": 0.5,
+      "retention": 1.0
+    },
+    {
+      "game_id": "discovery_grid_T3b2K2L2_anticor",
+      "method": "periodic_P2",
+      "saving": 0.33333333333333337,
+      "retention": 1.0
+    },
+    {
+      "game_id": "discovery_grid_T3b2K2L2_anticor",
+      "method": "periodic_P3",
+      "saving": 0.6666666666666667,
+      "retention": 1.0
+    },
+    {
+      "game_id": "discovery_grid_T3b2K2L2_anticor",
+      "method": "random_k2",
+      "saving": 0.33333333333333337,
+      "retention": 1.0
+    },
+    {
+      "game_id": "discovery_grid_T3b2K2L3_anticor",
+      "method": "periodic_P2",
+      "saving": 0.33333333333333337,
+      "retention": 1.0
+    },
+    {
+      "game_id": "discovery_grid_T3b2K2L3_anticor",
+      "method": "periodic_P3",
+      "saving": 0.6666666666666667,
+      "retention": 1.0
+    },
+    {
+      "game_id": "discovery_grid_T3b2K2L3_anticor",
+      "method": "random_k2",
+      "saving": 0.33333333333333337,
+      "retention": 1.0
+    }
+  ],
+  "verdict": "A_WEAK",
+  "verdict_reasons": [
+    "28/74 games have zero compute-value span (never-plan == always-plan)"
+  ]
+}

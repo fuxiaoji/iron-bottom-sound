@@ -1,0 +1,32 @@
+{
+  "sealed_games": {
+    "n_games": 72,
+    "mean": 0.29074074074074074,
+    "max": 1.0,
+    "n_games_with_any_disagreement": 24,
+    "n_games_with_any_value_gap": 0,
+    "n_games_with_any_delta_gap": 24,
+    "max_v_gap": 0.0,
+    "max_delta_gap": 2.0,
+    "max_snapshot_regret": 2.0,
+    "mean_snapshot_regret": 0.3611111111111111,
+    "n_games_with_snapshot_regret": 18
+  },
+  "control_games": {
+    "n_games": 2,
+    "mean": 0.0,
+    "max": 0.0,
+    "n_games_with_any_disagreement": 0,
+    "n_games_with_any_value_gap": 0,
+    "n_games_with_any_delta_gap": 0,
+    "max_v_gap": 0.0,
+    "max_delta_gap": 0.0,
+    "max_snapshot_regret": 0.0,
+    "mean_snapshot_regret": 0.0,
+    "n_games_with_snapshot_regret": 0
+  },
+  "sealed_vs_control_action_disagreement": 0.29074074074074074,
+  "note": "sealed = coordination/anticor/delayed/pathdep families; control = opponent-blind 'null' family",
+  "verdict": "PASS_TO_DISCOVERY",
+  "verdict_reasons": []
+}

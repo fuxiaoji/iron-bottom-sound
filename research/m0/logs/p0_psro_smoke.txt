@@ -1,0 +1,15 @@
+PSRO smoke evidence
+==================
+Command: PYTHONPATH=backend/src .venv/bin/python rl/psro.py --smoke --out /tmp/m0_psro/smoke
+Process stdout/stderr: EMPTY (the tool is silent on success; exit code 0).
+Evidence below extracted from the checkpoint it wrote (out dir kept outside the repo on purpose):
+
+stage: complete
+round: 1
+game_count: 2
+n_strategies: 2
+strategies: ['balanced', 'psro-r1']
+meta_distribution: {'balanced': 1.0}
+primary_scenario: IBS-S-EM-01
+ruleset: realistic-v1
+config: {"dashboard_port": 8765, "fitness_revision": 2, "generations": 1, "out": "/tmp/m0_psro/smoke", "population": 1, "primary_scenario": "IBS-S-EM-01", "rounds": 1, "ruleset": "realistic-v1", "scenarios": ["IBS-S-EM-01"], "seed": 20260829, "seeds_per_slot": 1, "smoke": true, "workers": 2}

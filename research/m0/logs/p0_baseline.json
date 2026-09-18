@@ -1,0 +1,266 @@
+{
+  "env": {
+    "platform": "macOS-26.3-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "python": "3.14.6",
+    "cpu_count": 10,
+    "executable": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/bin/python"
+  },
+  "determinism": [
+    {
+      "scenario_id": "IBS-S-01",
+      "seed": 1,
+      "axis_profile": "balanced",
+      "allies_profile": "balanced",
+      "realistic": false,
+      "seconds": 5.732854790985584,
+      "error": null,
+      "turns": 7,
+      "phase": "complete",
+      "score": {
+        "axis": 9,
+        "allies": 11
+      },
+      "n_events": 524,
+      "winner": "None",
+      "completed": true,
+      "passed": true,
+      "axis_plans": 25,
+      "allies_plans": 25,
+      "events_digest": 303123622834
+    },
+    {
+      "scenario_id": "IBS-S-01",
+      "seed": 1,
+      "axis_profile": "torpedo",
+      "allies_profile": "cautious",
+      "realistic": false,
+      "seconds": 13.379604207992088,
+      "error": null,
+      "turns": 7,
+      "phase": "complete",
+      "score": {
+        "axis": 2,
+        "allies": 6
+      },
+      "n_events": 430,
+      "winner": "allies",
+      "completed": true,
+      "passed": true,
+      "axis_plans": 25,
+      "allies_plans": 25,
+      "events_digest": 743518090086
+    },
+    {
+      "scenario_id": "IBS-S-03",
+      "seed": 7,
+      "axis_profile": "adaptive",
+      "allies_profile": "line",
+      "realistic": false,
+      "seconds": 14.888785041985102,
+      "error": null,
+      "turns": 4,
+      "phase": "complete",
+      "score": {
+        "axis": 0,
+        "allies": 0
+      },
+      "n_events": 210,
+      "winner": "allies",
+      "completed": true,
+      "passed": true,
+      "axis_plans": 16,
+      "allies_plans": 16,
+      "events_digest": 438257659038
+    },
+    {
+      "scenario_id": "IBS-S-03",
+      "seed": 7,
+      "axis_profile": "adaptive",
+      "allies_profile": "line",
+      "realistic": false,
+      "seconds": 14.647875750029925,
+      "error": null,
+      "turns": 4,
+      "phase": "complete",
+      "score": {
+        "axis": 0,
+        "allies": 0
+      },
+      "n_events": 210,
+      "winner": "allies",
+      "completed": true,
+      "passed": true,
+      "axis_plans": 16,
+      "allies_plans": 16,
+      "events_digest": 438257659038
+    }
+  ],
+  "termination": [
+    {
+      "scenario_id": "IBS-S-01",
+      "seed": 1,
+      "axis_profile": "balanced",
+      "allies_profile": "balanced",
+      "realistic": false,
+      "seconds": 5.220577375032008,
+      "error": null,
+      "turns": 7,
+      "phase": "complete",
+      "score": {
+        "axis": 9,
+        "allies": 11
+      },
+      "n_events": 524,
+      "winner": "None",
+      "completed": true,
+      "passed": true,
+      "axis_plans": 25,
+      "allies_plans": 25,
+      "events_digest": 303123622834
+    },
+    {
+      "scenario_id": "IBS-S-02",
+      "seed": 1,
+      "axis_profile": "balanced",
+      "allies_profile": "balanced",
+      "realistic": false,
+      "seconds": 0.022353084001224488,
+      "error": "KeyError: 'Scenario IBS-S-02 is catalogued but not playable'"
+    },
+    {
+      "scenario_id": "IBS-S-03",
+      "seed": 1,
+      "axis_profile": "balanced",
+      "allies_profile": "balanced",
+      "realistic": false,
+      "seconds": 1.4934249579673633,
+      "error": null,
+      "turns": 4,
+      "phase": "complete",
+      "score": {
+        "axis": 0,
+        "allies": 0
+      },
+      "n_events": 165,
+      "winner": "axis",
+      "completed": true,
+      "passed": true,
+      "axis_plans": 16,
+      "allies_plans": 16,
+      "events_digest": 283719702425
+    },
+    {
+      "scenario_id": "IBS-S-EM-01",
+      "seed": 1,
+      "axis_profile": "balanced",
+      "allies_profile": "balanced",
+      "realistic": false,
+      "seconds": 35.13066083402373,
+      "error": null,
+      "turns": 12,
+      "phase": "complete",
+      "score": {
+        "axis": 7,
+        "allies": 6
+      },
+      "n_events": 963,
+      "winner": "None",
+      "completed": true,
+      "passed": true,
+      "axis_plans": 45,
+      "allies_plans": 45,
+      "events_digest": 715512848602
+    },
+    {
+      "scenario_id": "IBS-S-14",
+      "seed": 1,
+      "axis_profile": "balanced",
+      "allies_profile": "balanced",
+      "realistic": false,
+      "seconds": 0.027390833012759686,
+      "error": "KeyError: 'Scenario IBS-S-14 is catalogued but not playable'"
+    },
+    {
+      "scenario_id": "IBS-S-01",
+      "seed": 1,
+      "axis_profile": "balanced",
+      "allies_profile": "balanced",
+      "realistic": true,
+      "seconds": 6.025713375012856,
+      "error": null,
+      "turns": 7,
+      "phase": "complete",
+      "score": {
+        "axis": 7,
+        "allies": 10
+      },
+      "n_events": 564,
+      "winner": "None",
+      "completed": true,
+      "passed": true,
+      "axis_plans": 26,
+      "allies_plans": 26,
+      "events_digest": 750977851582
+    },
+    {
+      "scenario_id": "IBS-S-03",
+      "seed": 1,
+      "axis_profile": "balanced",
+      "allies_profile": "balanced",
+      "realistic": true,
+      "seconds": 0.827744708978571,
+      "error": null,
+      "turns": 4,
+      "phase": "complete",
+      "score": {
+        "axis": 0,
+        "allies": 0
+      },
+      "n_events": 136,
+      "winner": "axis",
+      "completed": true,
+      "passed": true,
+      "axis_plans": 17,
+      "allies_plans": 17,
+      "events_digest": 858871796053
+    }
+  ],
+  "timing": {
+    "n": 5,
+    "mean": 9.739624250202905,
+    "median": 5.220577375032008,
+    "min": 0.827744708978571,
+    "max": 35.13066083402373
+  },
+  "throughput": {
+    "n": 20,
+    "wall_seconds": 53.67545966600301,
+    "matches_per_second": 0.37260975731648205,
+    "workers": 20,
+    "errors": 0
+  },
+  "failures": [
+    {
+      "stage": "termination",
+      "scenario_id": "IBS-S-02",
+      "seed": 1,
+      "axis_profile": "balanced",
+      "allies_profile": "balanced",
+      "realistic": false,
+      "seconds": 0.022353084001224488,
+      "error": "KeyError: 'Scenario IBS-S-02 is catalogued but not playable'"
+    },
+    {
+      "stage": "termination",
+      "scenario_id": "IBS-S-14",
+      "seed": 1,
+      "axis_profile": "balanced",
+      "allies_profile": "balanced",
+      "realistic": false,
+      "seconds": 0.027390833012759686,
+      "error": "KeyError: 'Scenario IBS-S-14 is catalogued but not playable'"
+    }
+  ],
+  "determinism_identical_repeat_matched": true
+}

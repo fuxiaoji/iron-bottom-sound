@@ -1,0 +1,37 @@
+......................................F................................. [ 13%]
+........................................................................ [ 27%]
+........................................................................ [ 40%]
+........................................................................ [ 54%]
+........................................................................ [ 68%]
+........................................................................ [ 81%]
+........................................................................ [ 95%]
+.........................                                                [100%]
+=================================== FAILURES ===================================
+______ test_tutorial_api_reaches_second_turn_and_serves_canonical_counter ______
+
+    def test_tutorial_api_reaches_second_turn_and_serves_canonical_counter() -> None:
+        client = TestClient(app)
+        asset = client.get(f"/assets/counters/{quote('德国-DD-卡尔加尔斯特.png')}")
+        assert asset.status_code == 200
+        assert asset.headers["content-type"] == "image/png"
+>       assert hashlib.sha256(asset.content).hexdigest() == (
+            "918196c7a6450f13aed798a47f48dd90f659611c49f6677d343878c871714eb6"
+        )
+E       AssertionError: assert '5c54f8aa1e0d...835e26de0d17e' == '918196c7a645...878c871714eb6'
+E         
+E         - 918196c7a6450f13aed798a47f48dd90f659611c49f6677d343878c871714eb6
+E         + 5c54f8aa1e0de32074b42a1751c077d4efe417b18e29b28e740835e26de0d17e
+
+tests/test_api_llm_storage.py:73: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv/lib/python3.14/site-packages/starlette/testclient.py:53
+  /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter

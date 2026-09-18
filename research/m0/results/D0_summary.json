@@ -1,0 +1,89 @@
+{
+  "pool_size": 684,
+  "n_games": 74,
+  "inseparable_pairs": [
+    [
+      "MYO",
+      "OPT"
+    ],
+    [
+      "NBU",
+      "NOM"
+    ]
+  ],
+  "methods": {
+    "random": {
+      "n_runs": 4,
+      "identification_rate": 0.16,
+      "tests_mean": 27.25,
+      "tests_median": 25.0,
+      "tests_max": 36,
+      "budget_accuracy_at_5": 0.0
+    },
+    "hardest": {
+      "n_runs": 0,
+      "identification_rate": 0.0,
+      "tests_mean": null,
+      "tests_median": null,
+      "tests_max": null,
+      "budget_accuracy_at_5": 0.0
+    },
+    "disagreement": {
+      "n_runs": 1,
+      "identification_rate": 0.2,
+      "tests_mean": 11,
+      "tests_median": 11,
+      "tests_max": 11,
+      "budget_accuracy_at_5": 0.0
+    },
+    "infogain": {
+      "n_runs": 0,
+      "identification_rate": 0.0,
+      "tests_mean": null,
+      "tests_median": null,
+      "tests_max": null,
+      "budget_accuracy_at_5": 0.0
+    }
+  },
+  "efficiency_vs_random": {
+    "disagreement": 2.272727272727273
+  },
+  "accuracy_gain_at_5_vs_random": {
+    "hardest": 0,
+    "disagreement": 0,
+    "infogain": 0
+  },
+  "per_type": {
+    "OPT": {
+      "identified_runs": 0,
+      "median_tests": null
+    },
+    "MYO": {
+      "identified_runs": 0,
+      "median_tests": null
+    },
+    "NOM": {
+      "identified_runs": 0,
+      "median_tests": null
+    },
+    "NBU": {
+      "identified_runs": 0,
+      "median_tests": null
+    },
+    "AMB": {
+      "identified_runs": 5,
+      "median_tests": 23
+    }
+  },
+  "n_defect_types_identifiable": 1,
+  "verdict": "D_FAIL",
+  "verdict_reasons": [
+    "only 1/4 defect types identifiable",
+    "inseparable pairs: [('MYO', 'OPT'), ('NBU', 'NOM')]"
+  ],
+  "gates": {
+    "efficiency": ">= 2x fewer tests than random",
+    "or_accuracy_gain": ">= +20pp at budget 5",
+    "mechanism_requirement": ">= 4 defect types identifiable"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "LABEL": "POST_HOC rescue probe - does not count toward the pre-declared gate",
+  "family": "setup (final-turn payoff on opponent's accumulated action)",
+  "pool_size": 60,
+  "inseparable_pairs": [
+    [
+      "MYO",
+      "OPT"
+    ],
+    [
+      "MYO",
+      "NOM"
+    ],
+    [
+      "MYO",
+      "NBU"
+    ],
+    [
+      "NOM",
+      "OPT"
+    ],
+    [
+      "NBU",
+      "OPT"
+    ],
+    [
+      "NBU",
+      "NOM"
+    ],
+    [
+      "AMB",
+      "OPT"
+    ],
+    [
+      "AMB",
+      "MYO"
+    ],
+    [
+      "AMB",
+      "NOM"
+    ],
+    [
+      "AMB",
+      "NBU"
+    ]
+  ],
+  "methods": {
+    "random": {
+      "n_identified": 0,
+      "median_tests": null
+    },
+    "disagreement": {
+      "n_identified": 0,
+      "median_tests": null
+    },
+    "infogain": {
+      "n_identified": 0,
+      "median_tests": null
+    }
+  },
+  "per_type": {
+    "OPT": {
+      "identified_runs": 0,
+      "median_tests": null
+    },
+    "MYO": {
+      "identified_runs": 0,
+      "median_tests": null
+    },
+    "NOM": {
+      "identified_runs": 0,
+      "median_tests": null
+    },
+    "NBU": {
+      "identified_runs": 0,
+      "median_tests": null
+    },
+    "AMB": {
+      "identified_runs": 0,
+      "median_tests": null
+    }
+  },
+  "interpretation": "if MYO/NBU now separate, the pre-declared D_FAIL is family-limited (generator lacked structure), not a fundamental unidentifiability; if they still coincide, the defects as defined are not expressible in this action/commitment model"
+}

@@ -1,0 +1,420 @@
+{
+  "target_width": 0.2,
+  "alpha": 0.05,
+  "batch": 25,
+  "seeds": [
+    11,
+    22,
+    33,
+    44,
+    55
+  ],
+  "scenarios": {
+    "IBS-S-03": {
+      "true_value": 0.06666666666666665,
+      "policies": {
+        "uniform": {
+          "runs": [
+            {
+              "seed": 11,
+              "reached": true,
+              "samples": 53025,
+              "final_width": 0.19860391915937778
+            },
+            {
+              "seed": 22,
+              "reached": true,
+              "samples": 53000,
+              "final_width": 0.1997296513061158
+            },
+            {
+              "seed": 33,
+              "reached": true,
+              "samples": 53025,
+              "final_width": 0.19913523810872868
+            },
+            {
+              "seed": 44,
+              "reached": true,
+              "samples": 53000,
+              "final_width": 0.1997472441822617
+            },
+            {
+              "seed": 55,
+              "reached": true,
+              "samples": 53025,
+              "final_width": 0.19860391915937775
+            }
+          ],
+          "n_reached": 5,
+          "median_samples": 53025,
+          "mean_samples": 53015,
+          "max_samples": 53025,
+          "saving_vs_uniform": 0.0
+        },
+        "largest_width": {
+          "runs": [
+            {
+              "seed": 11,
+              "reached": true,
+              "samples": 51500,
+              "final_width": 0.1986039191593777
+            },
+            {
+              "seed": 22,
+              "reached": true,
+              "samples": 51575,
+              "final_width": 0.19860391915937778
+            },
+            {
+              "seed": 33,
+              "reached": true,
+              "samples": 51725,
+              "final_width": 0.1990978005367784
+            },
+            {
+              "seed": 44,
+              "reached": true,
+              "samples": 51075,
+              "final_width": 0.19860391915937767
+            },
+            {
+              "seed": 55,
+              "reached": true,
+              "samples": 51450,
+              "final_width": 0.19911084829743597
+            }
+          ],
+          "n_reached": 5,
+          "median_samples": 51500,
+          "mean_samples": 51465,
+          "max_samples": 51725,
+          "saving_vs_uniform": 0.02876001885902879
+        },
+        "variance_aware": {
+          "runs": [
+            {
+              "seed": 11,
+              "reached": true,
+              "samples": 43150,
+              "final_width": 0.19860391915937772
+            },
+            {
+              "seed": 22,
+              "reached": true,
+              "samples": 43250,
+              "final_width": 0.19999463729514702
+            },
+            {
+              "seed": 33,
+              "reached": true,
+              "samples": 42300,
+              "final_width": 0.1986039191593778
+            },
+            {
+              "seed": 44,
+              "reached": true,
+              "samples": 43275,
+              "final_width": 0.19860391915937783
+            },
+            {
+              "seed": 55,
+              "reached": true,
+              "samples": 42575,
+              "final_width": 0.19860391915937775
+            }
+          ],
+          "n_reached": 5,
+          "median_samples": 43150,
+          "mean_samples": 42910,
+          "max_samples": 43275,
+          "saving_vs_uniform": 0.1862329090051862
+        },
+        "support_weighted": {
+          "runs": [
+            {
+              "seed": 11,
+              "reached": false,
+              "samples": null,
+              "final_width": 1.1841292368708216
+            },
+            {
+              "seed": 22,
+              "reached": false,
+              "samples": null,
+              "final_width": 1.0959484240082429
+            },
+            {
+              "seed": 33,
+              "reached": false,
+              "samples": null,
+              "final_width": 1.1735215040390976
+            },
+            {
+              "seed": 44,
+              "reached": false,
+              "samples": null,
+              "final_width": 1.4000199526648411
+            },
+            {
+              "seed": 55,
+              "reached": false,
+              "samples": null,
+              "final_width": 0.7670384336473606
+            }
+          ],
+          "n_reached": 0,
+          "median_samples": null,
+          "mean_samples": null,
+          "max_samples": null
+        },
+        "cert_sensitivity": {
+          "runs": [
+            {
+              "seed": 11,
+              "reached": true,
+              "samples": 14800,
+              "final_width": 0.19986539093444605
+            },
+            {
+              "seed": 22,
+              "reached": true,
+              "samples": 78125,
+              "final_width": 0.19934170923929864
+            },
+            {
+              "seed": 33,
+              "reached": true,
+              "samples": 14325,
+              "final_width": 0.18062427203823062
+            },
+            {
+              "seed": 44,
+              "reached": false,
+              "samples": null,
+              "final_width": 0.21497596755789428
+            },
+            {
+              "seed": 55,
+              "reached": true,
+              "samples": 15900,
+              "final_width": 0.19966480667850478
+            }
+          ],
+          "n_reached": 4,
+          "median_samples": 15350.0,
+          "mean_samples": 30787.5,
+          "max_samples": 78125,
+          "saving_vs_uniform": 0.7105139085337104
+        }
+      }
+    },
+    "IBS-S-01": {
+      "true_value": 0.5428571428571428,
+      "policies": {
+        "uniform": {
+          "runs": [
+            {
+              "seed": 11,
+              "reached": true,
+              "samples": 52750,
+              "final_width": 0.19990440637972107
+            },
+            {
+              "seed": 22,
+              "reached": true,
+              "samples": 52750,
+              "final_width": 0.19982446296123535
+            },
+            {
+              "seed": 33,
+              "reached": true,
+              "samples": 52750,
+              "final_width": 0.19993157217353286
+            },
+            {
+              "seed": 44,
+              "reached": true,
+              "samples": 52750,
+              "final_width": 0.19980313965684204
+            },
+            {
+              "seed": 55,
+              "reached": true,
+              "samples": 52750,
+              "final_width": 0.1998448761097058
+            }
+          ],
+          "n_reached": 5,
+          "median_samples": 52750,
+          "mean_samples": 52750,
+          "max_samples": 52750,
+          "saving_vs_uniform": 0.0
+        },
+        "largest_width": {
+          "runs": [
+            {
+              "seed": 11,
+              "reached": true,
+              "samples": 52800,
+              "final_width": 0.1993270054022539
+            },
+            {
+              "seed": 22,
+              "reached": true,
+              "samples": 52800,
+              "final_width": 0.19942502437723736
+            },
+            {
+              "seed": 33,
+              "reached": true,
+              "samples": 52375,
+              "final_width": 0.19943715726346478
+            },
+            {
+              "seed": 44,
+              "reached": true,
+              "samples": 52600,
+              "final_width": 0.1998133327055498
+            },
+            {
+              "seed": 55,
+              "reached": true,
+              "samples": 52775,
+              "final_width": 0.19952822529489855
+            }
+          ],
+          "n_reached": 5,
+          "median_samples": 52775,
+          "mean_samples": 52670,
+          "max_samples": 52800,
+          "saving_vs_uniform": -0.00047393364928915993
+        },
+        "variance_aware": {
+          "runs": [
+            {
+              "seed": 11,
+              "reached": true,
+              "samples": 45875,
+              "final_width": 0.19970766676263396
+            },
+            {
+              "seed": 22,
+              "reached": true,
+              "samples": 47025,
+              "final_width": 0.1996001461968086
+            },
+            {
+              "seed": 33,
+              "reached": true,
+              "samples": 48250,
+              "final_width": 0.19983290058703335
+            },
+            {
+              "seed": 44,
+              "reached": true,
+              "samples": 47850,
+              "final_width": 0.19965099826503346
+            },
+            {
+              "seed": 55,
+              "reached": true,
+              "samples": 44675,
+              "final_width": 0.1999195063925414
+            }
+          ],
+          "n_reached": 5,
+          "median_samples": 47025,
+          "mean_samples": 46735,
+          "max_samples": 48250,
+          "saving_vs_uniform": 0.10853080568720375
+        },
+        "support_weighted": {
+          "runs": [
+            {
+              "seed": 11,
+              "reached": false,
+              "samples": null,
+              "final_width": 0.8593476946300983
+            },
+            {
+              "seed": 22,
+              "reached": false,
+              "samples": null,
+              "final_width": 0.9793476946300983
+            },
+            {
+              "seed": 33,
+              "reached": false,
+              "samples": null,
+              "final_width": 0.9713733709605264
+            },
+            {
+              "seed": 44,
+              "reached": false,
+              "samples": null,
+              "final_width": 1.0193476946300983
+            },
+            {
+              "seed": 55,
+              "reached": false,
+              "samples": null,
+              "final_width": 1.0393476946300984
+            }
+          ],
+          "n_reached": 0,
+          "median_samples": null,
+          "mean_samples": null,
+          "max_samples": null
+        },
+        "cert_sensitivity": {
+          "runs": [
+            {
+              "seed": 11,
+              "reached": false,
+              "samples": null,
+              "final_width": 0.8013764122902739
+            },
+            {
+              "seed": 22,
+              "reached": false,
+              "samples": null,
+              "final_width": 0.7148690677720043
+            },
+            {
+              "seed": 33,
+              "reached": false,
+              "samples": null,
+              "final_width": 0.7891134331584153
+            },
+            {
+              "seed": 44,
+              "reached": false,
+              "samples": null,
+              "final_width": 0.9993476946300983
+            },
+            {
+              "seed": 55,
+              "reached": false,
+              "samples": null,
+              "final_width": 0.9113764122902739
+            }
+          ],
+          "n_reached": 0,
+          "median_samples": null,
+          "mean_samples": null,
+          "max_samples": null
+        }
+      }
+    }
+  },
+  "verdict": "FAIL",
+  "verdict_reasons": [
+    "candidate never reached the target width (or uniform never did, making savings undefined)"
+  ],
+  "gates": {
+    "pass": ">=40% saving on both scenarios",
+    "small": "10-40% or inconsistent",
+    "fail": "<10%"
+  }
+}
