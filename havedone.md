@@ -779,3 +779,17 @@
 - **最终判定**：`E1_SIGNAL=PASS / E1_PREDICTABILITY=FAIL / E1_COMPUTE_VALUE=NOT_RUN(moot) / E1_NOVELTY=AMBIGUOUS(moot)`；`E2_SIGNAL=PASS / E2_LONG_HORIZON_VALUE=FAIL / E2_CAUSALITY=FAIL / E2_NOVELTY=AMBIGUOUS(moot)`；**BEST_SUPPORTED_TRACK = NONE，SECONDARY_TRACK = NONE**。按计划 §21：停止围绕 hidden commitment / torpedo 挖题，回到全系统重新选题扫描。
 - **纪律记录**：修正案（profile 表、两级采样配额）全部先于结果；`Side.other()` 不存在、order 未持久化、numpy bool 序列化等 8 项失败/修复全部留档 `FAILURES_AND_COUNTEREXAMPLES.md`；"+19% 相对改善"系小分母伪影，门按原始配对差评估。预算：~760 个对局当量 / ≤15,000；0 付费 LLM。
 - **提交**：`e3dc6a9`（stage-1）+ 本批（stage-2+交付）；包 `research/m1_5/M1_5_NEW_MAINLINE_CHECKPOINT.zip` sha256 `23113572945faefc…`（1.9MB，65 文件）。
+
+
+## 2026-09-20 — M2-0 组织智能主线验证：A_FAIL_ORACLE / B_ORACLE_ONLY / C_MODULE → RESET_REQUIRED，Bundle 交付
+
+- **范围**：M2-0 三条新主线（A 动态决策实体抽象 / B 失败感知指挥组织 / C 阶段自适应粒度）的第一阶段验证。分支 `research/m2-0-organizational-intelligence`（基线 `48846a9`）；计划原文落库；生产模块零改动。
+- **P0（PASS）**：模式语义审计（classic=逐舰集中决策、realistic=逐编队+指挥状态机；`PlayerObservation` 无编队字段——系统本质是 side-level centralized commander，不是 MARL）；**docs 4 vs code 8 编队上限不一致只记录未修**，正式实验只用 ≤4；30/30 试跑全完成；转移→中断 1:1 链验证。
+- **P1b（PASS）**：Exact Team-Abstraction Lab，双独立求解器（DP vs 显式树）1e-12 一致，4 个必需 case 全部可证构造，6/6 测试。
+- **D0（PASS）**：ResearchGroupExecutor（classic 语义宏展开→真 validator）；发现并遵守"分区必须覆盖全部存活舰"的 validator 约束；no-silent-repair 用构造性反例验证。
+- **Track A（A_FAIL_ORACLE）**：60 快照（2 场景×3 profile 对）× P0-P8 候选分区 × 5 CRN reps，3 次机械修正案（全在出数前）。**flat 在 71% 快照上并列最优、68% 分区评估损失恰为 0**——压缩 60-77% 真实存在但 flat 已是上限，fixed-loss 门 11.4%<20%、结构化对随机 18.4% 无优势 → oracle gap 不存在，A2 按纪律跳过，未训练任何模型。
+- **Track B（B0 PASS / B1 PASS / B2 B_ORACLE_ONLY）**：B0 普查 150 局全完成——**65% 局出现指挥转移/中断**（门 5%）、226 独立案例、58 格；EM-01 达 94%。B1 paired 层级实验 12 个自然冲击案例 **25% 敏感度 ≥0.05、max 0.767**（双场景；3 个层级改变冲击时点的案例按保守方向剔除）。B2 七种组织规则：唯一非退化改进规则 low_exposure **场景反向**（EM-01 +0.252 / S-01 −0.083）；flagship_max_vp 与 default 完全相同（31/31 平）；初判 PASS 系小分母伪影，已按严格配对分析改判 **B_ORACLE_ONLY** 并留档理由。
+- **Track C（C_MODULE）**：粒度由**场景而非阶段**主导（S-03 全期 K=1 / S-01 全期 K=2）；gunnery/torpedo 在 HEAD 无编组杠杆，阶段自适应主张无法跨阶段检验。
+- **最终判定**：`A_VERDICT=A_FAIL_ORACLE`；`B_VERDICT=B_ORACLE_ONLY`；`C_VERDICT=C_MODULE`；**BEST_EVIDENCE_TRACK=NONE**；阶段结论 **RESET_REQUIRED**（无 MAINLINE_READY 方向；后续若重试需先换 continuation regime：对抗/搜索型对手、接触期快照、绑定胜利边际的值函数）。
+- **纪律记录**：9 项 bug/失败全留档（含 `.kind/.type`、command_disrupted 非事件、succession 字段不存在、F4 全舰覆盖约束、F6 变体仅 axis、B2 小分母伪影改判）；每项阈值先于结果预注册；未跑 MAPPO/QMIX/GNN；预算在对局/续局双上限内；0 付费 LLM。
+- **提交**：`0620fde`(P0)→`1702344`(P1b+D0)→`7fad588`(判定+报告)→本批；包 `research/m2_0/M2_0_ORGANIZATIONAL_INTELLIGENCE_VALIDATION_BUNDLE.zip` sha256 `d539ab28…`（47 文件）。

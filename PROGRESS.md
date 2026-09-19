@@ -82,6 +82,10 @@
 
 2026-09-19 完成 E1/E2 双轨验证：**E1 FAIL（E1_FAIL_PREDICTABILITY：可见特征 AUROC≤0.47，尽管 rho 稀疏且重大）**；**E2 FAIL（E2_FAIL_HEURISTIC_ONLY + E2_FAIL_CAUSALITY：48.5% 排名变化但续局 +0.02/60% 平局，true≈shuffled）**。**BEST_SUPPORTED_TRACK = NONE**。证据入口 `research/m1_5/00_EXECUTIVE_SUMMARY.md`；包 sha256 `23113572945faefc…`。预算 ~760/15000 rollouts。
 
+## 1.8 M2-0 组织智能验证（分支 research/m2-0-organizational-intelligence）
+
+2026-09-20 完成：基础设施全 PASS（模式审计/Exact Lab 双求解器/D0 宏执行器）；**A_FAIL_ORACLE**（flat 71% 并列最优、无压缩 gap）、**B_ORACLE_ONLY**（B0 65% 中断率、B1 max 0.767 但设计规则场景反向）、**C_MODULE**（场景主导）。**RESET_REQUIRED**：无 MAINLINE_READY；隐藏承诺/组织智能两轮选题均被 oracle-first cheap-kill 系统排除。证据入口 `research/m2_0/00_EXECUTIVE_SUMMARY.md`；包 sha256 `d539ab28…`。
+
 ## 2. 阶段台账
 
 > **重要**：阶段 1–11 在 2026-09-13 之前已有历史产物（v12/v13/v14 研究线），但这些产物是在本流水线成立**之前**产生的，其"是否符合本流水线的阶段定义与门控要求"**尚未按本流水线重新核验**，因此统一标记 ⟨待核⟩，不得直接升为 ✅。
