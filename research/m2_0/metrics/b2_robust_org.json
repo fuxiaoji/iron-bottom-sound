@@ -1,0 +1,1273 @@
+{
+ "summary": {
+  "default": {
+   "n_shock_pairs": 31,
+   "mean_h2": -5.8197174677931595e-18,
+   "mean_diff_vs_default": 0.0
+  },
+  "random0": {
+   "n_shock_pairs": 31,
+   "mean_h2": 0.07225806451612903,
+   "mean_diff_vs_default": 0.07225806451612904
+  },
+  "random1": {
+   "n_shock_pairs": 30,
+   "mean_h2": 0.06133333333333333,
+   "mean_diff_vs_default": 0.04133333333333334
+  },
+  "random2": {
+   "n_shock_pairs": 27,
+   "mean_h2": 0.16296296296296298,
+   "mean_diff_vs_default": 0.09629629629629631
+  },
+  "flagship_max_vp": {
+   "n_shock_pairs": 31,
+   "mean_h2": -5.8197174677931595e-18,
+   "mean_diff_vs_default": 0.0
+  },
+  "flagship_low_exposure": {
+   "n_shock_pairs": 30,
+   "mean_h2": 0.138,
+   "mean_diff_vs_default": 0.11800000000000001
+  },
+  "reserve_fastest": {
+   "n_shock_pairs": 0,
+   "mean_h2": null,
+   "mean_diff_vs_default": null
+  },
+  "best_relative_improver": {
+   "org": "flagship_low_exposure",
+   "relative": 118000000.0,
+   "abs": 0.11800000000000001
+  },
+  "gate": ">=10% post-shock loss reduction vs default, nominal penalty <=2%",
+  "verdict": "B_ORACLE_ONLY",
+  "verdict_correction_reason": "The coded PASS came from the 118000000x relative figure (default mean ~0: small-denominator artifact). Strict paired analysis: the only non-degenerate improver (flagship_low_exposure, +0.118) is scenario-opposed (EM-01 +0.252, S-01 -0.083); flagship_max_vp is degenerate (identical to default, 31/31 exact ties); random arms' +0.04..+0.10 with 16-24/31 ties is noise-level. No non-future-reading organization satisfies the gate in both scenarios. Recorded as B_ORACLE_ONLY (effect exists only in one regime / not robust)."
+ },
+ "rows": [
+  {
+   "scenario": "IBS-S-01",
+   "seed": 100,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.46
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.46
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.62
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.7
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.46
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -0.62
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 101,
+   "arms": {
+    "default": {
+     "shock": false,
+     "error": ""
+    },
+    "random0": {
+     "shock": false,
+     "error": ""
+    },
+    "random1": {
+     "shock": false,
+     "error": ""
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.18
+    },
+    "flagship_max_vp": {
+     "shock": false,
+     "error": ""
+    },
+    "flagship_low_exposure": {
+     "shock": false,
+     "error": ""
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 102,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 0.38
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 0.38
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 0.38
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.38
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 0.38
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 0.38
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 103,
+   "arms": {
+    "default": {
+     "shock": false,
+     "error": ""
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.24000000000000002
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.24000000000000002
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.22
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.24000000000000002
+    },
+    "flagship_low_exposure": {
+     "shock": false,
+     "error": ""
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 104,
+   "arms": {
+    "default": {
+     "shock": false,
+     "error": ""
+    },
+    "random0": {
+     "shock": false,
+     "error": ""
+    },
+    "random1": {
+     "shock": false,
+     "error": ""
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.28
+    },
+    "flagship_max_vp": {
+     "shock": false,
+     "error": ""
+    },
+    "flagship_low_exposure": {
+     "shock": false,
+     "error": ""
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 105,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.26
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.26
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.62
+    },
+    "random2": {
+     "shock": false,
+     "error": ""
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.26
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -0.62
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 106,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.6
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.6
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -1.0
+    },
+    "random2": {
+     "shock": false,
+     "error": ""
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.6
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -1.0
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 107,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.6
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.6
+    },
+    "random1": {
+     "shock": false,
+     "error": ""
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.62
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.6
+    },
+    "flagship_low_exposure": {
+     "shock": false,
+     "error": ""
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 108,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.34
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.34
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.34
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.34
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.34
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -0.34
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 109,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 0.26
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 0.26
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 0.36
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.36
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 0.26
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 0.36
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 110,
+   "arms": {
+    "default": {
+     "shock": false,
+     "error": ""
+    },
+    "random0": {
+     "shock": false,
+     "error": ""
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -1.0
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.62
+    },
+    "flagship_max_vp": {
+     "shock": false,
+     "error": ""
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -1.0
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 111,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.42
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.42
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.42
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.42
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.42
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -0.42
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 112,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.68
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.68
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.78
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.76
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.68
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -0.78
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 113,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.28
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.28
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.06
+    },
+    "random2": {
+     "shock": false,
+     "error": ""
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.28
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -0.06
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 114,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.5
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.5
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.8
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.7
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.5
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -0.8
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 115,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.04
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.04
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.04
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.04
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.04
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -0.04
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 116,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.46
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.46
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.46
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.46
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.46
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -0.46
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 117,
+   "arms": {
+    "default": {
+     "shock": false,
+     "error": ""
+    },
+    "random0": {
+     "shock": false,
+     "error": ""
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.48
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.48
+    },
+    "flagship_max_vp": {
+     "shock": false,
+     "error": ""
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -0.48
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-active-heavy: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 100,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 0.5599999999999999
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 0.96
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 0.96
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.96
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 0.5599999999999999
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 0.96
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 101,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 0.2
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 0.14
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 0.14
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.14
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 0.2
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 0.24000000000000002
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 102,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 0.08
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 0.08
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 0.08
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.08
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 0.08
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 103,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 0.2
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 0.2
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 0.2
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.2
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 0.2
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 0.2
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 104,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.66
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.6
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.6
+    },
+    "random2": {
+     "shock": false,
+     "error": ""
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.66
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -0.76
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 105,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 0.0
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 0.24000000000000002
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 0.24000000000000002
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.24000000000000002
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 0.0
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 0.24000000000000002
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 106,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.060000000000000005
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.060000000000000005
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.060000000000000005
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.060000000000000005
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.060000000000000005
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -0.060000000000000005
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 107,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 0.7
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 108,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 0.27999999999999997
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 0.27999999999999997
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 0.27999999999999997
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.46
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 0.27999999999999997
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 0.46
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 109,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.1
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -0.1
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -0.1
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": -0.1
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.1
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": -0.1
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 110,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -0.2
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 0.42000000000000004
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 0.42000000000000004
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.42000000000000004
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -0.2
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 0.42000000000000004
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 111,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 0.6
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 0.6
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 0.6
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.08
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 0.6
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 112,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 0.8400000000000001
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 0.8400000000000001
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 113,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 0.0
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 0.8200000000000001
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 0.8200000000000001
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.8200000000000001
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 0.0
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 0.8200000000000001
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 114,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 0.96
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 0.96
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 0.96
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.96
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 0.96
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 0.92
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 115,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 1.0
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 116,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": -1.0
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": -1.0
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": -1.0
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.2
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": -1.0
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 0.2
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 117,
+   "arms": {
+    "default": {
+     "shock": true,
+     "h2_mean": 0.3
+    },
+    "random0": {
+     "shock": true,
+     "h2_mean": 0.3
+    },
+    "random1": {
+     "shock": true,
+     "h2_mean": 0.3
+    },
+    "random2": {
+     "shock": true,
+     "h2_mean": 0.3
+    },
+    "flagship_max_vp": {
+     "shock": true,
+     "h2_mean": 0.3
+    },
+    "flagship_low_exposure": {
+     "shock": true,
+     "h2_mean": 0.3
+    },
+    "reserve_fastest": {
+     "shock": false,
+     "error": "setup invalid (axis): ['axis-cruiser-line: flagship and rese"
+    }
+   }
+  }
+ ]
+}

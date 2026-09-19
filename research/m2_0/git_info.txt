@@ -1,0 +1,9 @@
+repo=https://github.com/fuxiaoji/iron-bottom-sound.git
+branch=research/m2-0-organizational-intelligence
+parent=48846a9
+log:
+1702344 research(m2-0): P1b exact team lab (6/6) + D0 ResearchGroupExecutor (PASS, 5 passed 1 declared skip)
+0620fde research(m2-0): P0 mode-semantics audit + pilot runs (30/30 complete; transfer->disruption chain verified; ~0.2-0.4 s/game-turn)
+48846a9 docs(m1.5): record dual-track FAIL verdict + checkpoint zip 23113573 in havedone/PROGRESS/memory
+6c5b409 research(m1.5): E1 killed at T2 (predictability FAIL), E2 killed at T2/T3 (no long-horizon value, causality FAIL) — full checkpoint docs
+e3dc6a9 research(m1.5): stage-1 cheap-kill — E1-T1 PASS, E2-T1 PASS (pre-registered thresholds)

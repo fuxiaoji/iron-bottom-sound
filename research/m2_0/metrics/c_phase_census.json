@@ -1,0 +1,41 @@
+{
+  "summary": {
+    "IBS-S-01/contact": {
+      "n": 13,
+      "median_min_safe_K": 2,
+      "median_saving": 0.375,
+      "K_distribution": {
+        "2": 9,
+        "3": 3,
+        "5": 1
+      }
+    },
+    "IBS-S-01/early": {
+      "n": 6,
+      "median_min_safe_K": 2.0,
+      "median_saving": 0.6333333333333333,
+      "K_distribution": {
+        "2": 5,
+        "3": 1
+      }
+    },
+    "IBS-S-03/contact": {
+      "n": 9,
+      "median_min_safe_K": 1,
+      "median_saving": 0.75,
+      "K_distribution": {
+        "1": 9
+      }
+    },
+    "IBS-S-03/early": {
+      "n": 7,
+      "median_min_safe_K": 1,
+      "median_saving": 0.8,
+      "K_distribution": {
+        "1": 7
+      }
+    }
+  },
+  "verdict": "C_MODULE",
+  "reason": "movement granularity compresses heavily in both phases (median min-safe K 1-2); gunnery/torpedo granularity is ship-level by rule at HEAD (no group lever exists without new machinery), so a phase-ADAPTIVE claim cannot be tested across phases; the movement-only evidence makes C a Track A module, not a mainline."
+}

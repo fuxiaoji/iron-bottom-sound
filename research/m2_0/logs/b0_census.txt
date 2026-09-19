@@ -1,0 +1,59 @@
+B0 census: 150 realistic matches
+  20/150 (149s) completed=20
+  40/150 (207s) completed=40
+  60/150 (267s) completed=60
+  80/150 (267s) completed=80
+  100/150 (267s) completed=100
+  120/150 (521s) completed=120
+  140/150 (702s) completed=140
+{
+  "n": 150,
+  "completed": 150,
+  "wall_min": 12.956267714500427,
+  "IBS-S-01": {
+    "n": 50,
+    "completed": 50,
+    "matches_with_transfer_or_disruption": 43,
+    "rate": 0.86,
+    "total_transfers": 78,
+    "total_disruptions": 78,
+    "total_detaches": 256,
+    "total_dissolved": 58,
+    "profiles_seen": 25
+  },
+  "IBS-S-03": {
+    "n": 50,
+    "completed": 50,
+    "matches_with_transfer_or_disruption": 8,
+    "rate": 0.16,
+    "total_transfers": 11,
+    "total_disruptions": 11,
+    "total_detaches": 30,
+    "total_dissolved": 0,
+    "profiles_seen": 25
+  },
+  "IBS-S-EM-01": {
+    "n": 50,
+    "completed": 50,
+    "matches_with_transfer_or_disruption": 47,
+    "rate": 0.94,
+    "total_transfers": 137,
+    "total_disruptions": 137,
+    "total_detaches": 446,
+    "total_dissolved": 116,
+    "profiles_seen": 25
+  },
+  "overall": {
+    "matches_with_transfer_or_disruption": 98,
+    "rate": 0.6533333333333333,
+    "independent_disruption_cases": 226,
+    "scenario_profile_cells": 58
+  },
+  "gate": {
+    "c1_rate_ge_5pct": true,
+    "c2_cases_ge_30": true,
+    "c3_multi_cell": true
+  },
+  "verdict": "PASS"
+}
+B0_EXIT=0

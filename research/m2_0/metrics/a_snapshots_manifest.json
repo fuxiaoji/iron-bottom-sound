@@ -1,0 +1,482 @@
+[
+  {
+    "snapshot_id": "IBS-S-01_s1_balanced-balanced_t2_axis",
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 2,
+    "side": "axis",
+    "n_candidates": 14
+  },
+  {
+    "snapshot_id": "IBS-S-01_s1_balanced-balanced_t2_allies",
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 2,
+    "side": "allies",
+    "n_candidates": 20
+  },
+  {
+    "snapshot_id": "IBS-S-01_s1_balanced-balanced_t3_axis",
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 3,
+    "side": "axis",
+    "n_candidates": 16
+  },
+  {
+    "snapshot_id": "IBS-S-01_s1_balanced-balanced_t3_allies",
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 3,
+    "side": "allies",
+    "n_candidates": 17
+  },
+  {
+    "snapshot_id": "IBS-S-01_s1_balanced-balanced_t4_axis",
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 4,
+    "side": "axis",
+    "n_candidates": 10
+  },
+  {
+    "snapshot_id": "IBS-S-01_s1_balanced-balanced_t4_allies",
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 4,
+    "side": "allies",
+    "n_candidates": 21
+  },
+  {
+    "snapshot_id": "IBS-S-01_s1_balanced-balanced_t5_axis",
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 5,
+    "side": "axis",
+    "n_candidates": 5
+  },
+  {
+    "snapshot_id": "IBS-S-01_s1_balanced-balanced_t5_allies",
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 5,
+    "side": "allies",
+    "n_candidates": 23
+  },
+  {
+    "snapshot_id": "IBS-S-01_s1_balanced-balanced_t6_axis",
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 6,
+    "side": "axis",
+    "n_candidates": 6
+  },
+  {
+    "snapshot_id": "IBS-S-01_s1_balanced-balanced_t6_allies",
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 6,
+    "side": "allies",
+    "n_candidates": 27
+  },
+  {
+    "snapshot_id": "IBS-S-01_s1_balanced-balanced_t7_allies",
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 7,
+    "side": "allies",
+    "n_candidates": 24
+  },
+  {
+    "snapshot_id": "IBS-S-01_s2_balanced-balanced_t2_axis",
+    "scenario": "IBS-S-01",
+    "seed": 2,
+    "turn": 2,
+    "side": "axis",
+    "n_candidates": 15
+  },
+  {
+    "snapshot_id": "IBS-S-01_s2_balanced-balanced_t2_allies",
+    "scenario": "IBS-S-01",
+    "seed": 2,
+    "turn": 2,
+    "side": "allies",
+    "n_candidates": 20
+  },
+  {
+    "snapshot_id": "IBS-S-01_s2_balanced-balanced_t3_axis",
+    "scenario": "IBS-S-01",
+    "seed": 2,
+    "turn": 3,
+    "side": "axis",
+    "n_candidates": 8
+  },
+  {
+    "snapshot_id": "IBS-S-01_s2_balanced-balanced_t3_allies",
+    "scenario": "IBS-S-01",
+    "seed": 2,
+    "turn": 3,
+    "side": "allies",
+    "n_candidates": 20
+  },
+  {
+    "snapshot_id": "IBS-S-01_s2_balanced-balanced_t4_axis",
+    "scenario": "IBS-S-01",
+    "seed": 2,
+    "turn": 4,
+    "side": "axis",
+    "n_candidates": 8
+  },
+  {
+    "snapshot_id": "IBS-S-01_s2_balanced-balanced_t4_allies",
+    "scenario": "IBS-S-01",
+    "seed": 2,
+    "turn": 4,
+    "side": "allies",
+    "n_candidates": 18
+  },
+  {
+    "snapshot_id": "IBS-S-01_s2_balanced-balanced_t5_allies",
+    "scenario": "IBS-S-01",
+    "seed": 2,
+    "turn": 5,
+    "side": "allies",
+    "n_candidates": 22
+  },
+  {
+    "snapshot_id": "IBS-S-01_s2_balanced-balanced_t6_allies",
+    "scenario": "IBS-S-01",
+    "seed": 2,
+    "turn": 6,
+    "side": "allies",
+    "n_candidates": 24
+  },
+  {
+    "snapshot_id": "IBS-S-01_s2_balanced-balanced_t7_allies",
+    "scenario": "IBS-S-01",
+    "seed": 2,
+    "turn": 7,
+    "side": "allies",
+    "n_candidates": 24
+  },
+  {
+    "snapshot_id": "IBS-S-01_s3_balanced-balanced_t2_axis",
+    "scenario": "IBS-S-01",
+    "seed": 3,
+    "turn": 2,
+    "side": "axis",
+    "n_candidates": 14
+  },
+  {
+    "snapshot_id": "IBS-S-01_s3_balanced-balanced_t2_allies",
+    "scenario": "IBS-S-01",
+    "seed": 3,
+    "turn": 2,
+    "side": "allies",
+    "n_candidates": 20
+  },
+  {
+    "snapshot_id": "IBS-S-01_s3_balanced-balanced_t3_axis",
+    "scenario": "IBS-S-01",
+    "seed": 3,
+    "turn": 3,
+    "side": "axis",
+    "n_candidates": 19
+  },
+  {
+    "snapshot_id": "IBS-S-01_s3_balanced-balanced_t3_allies",
+    "scenario": "IBS-S-01",
+    "seed": 3,
+    "turn": 3,
+    "side": "allies",
+    "n_candidates": 20
+  },
+  {
+    "snapshot_id": "IBS-S-01_s3_balanced-balanced_t4_axis",
+    "scenario": "IBS-S-01",
+    "seed": 3,
+    "turn": 4,
+    "side": "axis",
+    "n_candidates": 5
+  },
+  {
+    "snapshot_id": "IBS-S-01_s3_balanced-balanced_t4_allies",
+    "scenario": "IBS-S-01",
+    "seed": 3,
+    "turn": 4,
+    "side": "allies",
+    "n_candidates": 21
+  },
+  {
+    "snapshot_id": "IBS-S-01_s3_balanced-balanced_t5_axis",
+    "scenario": "IBS-S-01",
+    "seed": 3,
+    "turn": 5,
+    "side": "axis",
+    "n_candidates": 5
+  },
+  {
+    "snapshot_id": "IBS-S-01_s3_balanced-balanced_t5_allies",
+    "scenario": "IBS-S-01",
+    "seed": 3,
+    "turn": 5,
+    "side": "allies",
+    "n_candidates": 25
+  },
+  {
+    "snapshot_id": "IBS-S-01_s3_balanced-balanced_t6_axis",
+    "scenario": "IBS-S-01",
+    "seed": 3,
+    "turn": 6,
+    "side": "axis",
+    "n_candidates": 5
+  },
+  {
+    "snapshot_id": "IBS-S-01_s3_balanced-balanced_t6_allies",
+    "scenario": "IBS-S-01",
+    "seed": 3,
+    "turn": 6,
+    "side": "allies",
+    "n_candidates": 24
+  },
+  {
+    "snapshot_id": "IBS-S-03_s1_balanced-balanced_t1_allies",
+    "scenario": "IBS-S-03",
+    "seed": 1,
+    "turn": 1,
+    "side": "allies",
+    "n_candidates": 10
+  },
+  {
+    "snapshot_id": "IBS-S-03_s1_balanced-balanced_t2_axis",
+    "scenario": "IBS-S-03",
+    "seed": 1,
+    "turn": 2,
+    "side": "axis",
+    "n_candidates": 6
+  },
+  {
+    "snapshot_id": "IBS-S-03_s1_balanced-balanced_t2_allies",
+    "scenario": "IBS-S-03",
+    "seed": 1,
+    "turn": 2,
+    "side": "allies",
+    "n_candidates": 10
+  },
+  {
+    "snapshot_id": "IBS-S-03_s1_balanced-balanced_t3_axis",
+    "scenario": "IBS-S-03",
+    "seed": 1,
+    "turn": 3,
+    "side": "axis",
+    "n_candidates": 6
+  },
+  {
+    "snapshot_id": "IBS-S-03_s1_balanced-balanced_t3_allies",
+    "scenario": "IBS-S-03",
+    "seed": 1,
+    "turn": 3,
+    "side": "allies",
+    "n_candidates": 6
+  },
+  {
+    "snapshot_id": "IBS-S-03_s1_balanced-balanced_t4_axis",
+    "scenario": "IBS-S-03",
+    "seed": 1,
+    "turn": 4,
+    "side": "axis",
+    "n_candidates": 6
+  },
+  {
+    "snapshot_id": "IBS-S-03_s2_balanced-balanced_t1_allies",
+    "scenario": "IBS-S-03",
+    "seed": 2,
+    "turn": 1,
+    "side": "allies",
+    "n_candidates": 10
+  },
+  {
+    "snapshot_id": "IBS-S-03_s2_balanced-balanced_t2_axis",
+    "scenario": "IBS-S-03",
+    "seed": 2,
+    "turn": 2,
+    "side": "axis",
+    "n_candidates": 6
+  },
+  {
+    "snapshot_id": "IBS-S-03_s2_balanced-balanced_t2_allies",
+    "scenario": "IBS-S-03",
+    "seed": 2,
+    "turn": 2,
+    "side": "allies",
+    "n_candidates": 13
+  },
+  {
+    "snapshot_id": "IBS-S-03_s2_balanced-balanced_t3_axis",
+    "scenario": "IBS-S-03",
+    "seed": 2,
+    "turn": 3,
+    "side": "axis",
+    "n_candidates": 3
+  },
+  {
+    "snapshot_id": "IBS-S-03_s2_balanced-balanced_t3_allies",
+    "scenario": "IBS-S-03",
+    "seed": 2,
+    "turn": 3,
+    "side": "allies",
+    "n_candidates": 12
+  },
+  {
+    "snapshot_id": "IBS-S-03_s2_balanced-balanced_t4_allies",
+    "scenario": "IBS-S-03",
+    "seed": 2,
+    "turn": 4,
+    "side": "allies",
+    "n_candidates": 16
+  },
+  {
+    "snapshot_id": "IBS-S-03_s3_balanced-balanced_t1_allies",
+    "scenario": "IBS-S-03",
+    "seed": 3,
+    "turn": 1,
+    "side": "allies",
+    "n_candidates": 10
+  },
+  {
+    "snapshot_id": "IBS-S-03_s3_balanced-balanced_t2_allies",
+    "scenario": "IBS-S-03",
+    "seed": 3,
+    "turn": 2,
+    "side": "allies",
+    "n_candidates": 15
+  },
+  {
+    "snapshot_id": "IBS-S-03_s3_balanced-balanced_t3_axis",
+    "scenario": "IBS-S-03",
+    "seed": 3,
+    "turn": 3,
+    "side": "axis",
+    "n_candidates": 7
+  },
+  {
+    "snapshot_id": "IBS-S-03_s3_balanced-balanced_t3_allies",
+    "scenario": "IBS-S-03",
+    "seed": 3,
+    "turn": 3,
+    "side": "allies",
+    "n_candidates": 15
+  },
+  {
+    "snapshot_id": "IBS-S-03_s3_balanced-balanced_t4_allies",
+    "scenario": "IBS-S-03",
+    "seed": 3,
+    "turn": 4,
+    "side": "allies",
+    "n_candidates": 8
+  },
+  {
+    "snapshot_id": "IBS-S-03_s4_balanced-balanced_t1_allies",
+    "scenario": "IBS-S-03",
+    "seed": 4,
+    "turn": 1,
+    "side": "allies",
+    "n_candidates": 10
+  },
+  {
+    "snapshot_id": "IBS-S-03_s4_balanced-balanced_t2_allies",
+    "scenario": "IBS-S-03",
+    "seed": 4,
+    "turn": 2,
+    "side": "allies",
+    "n_candidates": 19
+  },
+  {
+    "snapshot_id": "IBS-S-03_s4_balanced-balanced_t3_allies",
+    "scenario": "IBS-S-03",
+    "seed": 4,
+    "turn": 3,
+    "side": "allies",
+    "n_candidates": 7
+  },
+  {
+    "snapshot_id": "IBS-S-03_s4_balanced-balanced_t4_axis",
+    "scenario": "IBS-S-03",
+    "seed": 4,
+    "turn": 4,
+    "side": "axis",
+    "n_candidates": 3
+  },
+  {
+    "snapshot_id": "IBS-S-03_s4_balanced-balanced_t4_allies",
+    "scenario": "IBS-S-03",
+    "seed": 4,
+    "turn": 4,
+    "side": "allies",
+    "n_candidates": 7
+  },
+  {
+    "snapshot_id": "IBS-S-03_s5_balanced-balanced_t1_allies",
+    "scenario": "IBS-S-03",
+    "seed": 5,
+    "turn": 1,
+    "side": "allies",
+    "n_candidates": 10
+  },
+  {
+    "snapshot_id": "IBS-S-03_s5_balanced-balanced_t2_allies",
+    "scenario": "IBS-S-03",
+    "seed": 5,
+    "turn": 2,
+    "side": "allies",
+    "n_candidates": 12
+  },
+  {
+    "snapshot_id": "IBS-S-03_s5_balanced-balanced_t3_allies",
+    "scenario": "IBS-S-03",
+    "seed": 5,
+    "turn": 3,
+    "side": "allies",
+    "n_candidates": 7
+  },
+  {
+    "snapshot_id": "IBS-S-03_s5_balanced-balanced_t4_allies",
+    "scenario": "IBS-S-03",
+    "seed": 5,
+    "turn": 4,
+    "side": "allies",
+    "n_candidates": 7
+  },
+  {
+    "snapshot_id": "IBS-S-03_s6_balanced-balanced_t1_allies",
+    "scenario": "IBS-S-03",
+    "seed": 6,
+    "turn": 1,
+    "side": "allies",
+    "n_candidates": 10
+  },
+  {
+    "snapshot_id": "IBS-S-03_s6_balanced-balanced_t2_axis",
+    "scenario": "IBS-S-03",
+    "seed": 6,
+    "turn": 2,
+    "side": "axis",
+    "n_candidates": 7
+  },
+  {
+    "snapshot_id": "IBS-S-03_s6_balanced-balanced_t2_allies",
+    "scenario": "IBS-S-03",
+    "seed": 6,
+    "turn": 2,
+    "side": "allies",
+    "n_candidates": 17
+  },
+  {
+    "snapshot_id": "IBS-S-03_s6_balanced-balanced_t3_allies",
+    "scenario": "IBS-S-03",
+    "seed": 6,
+    "turn": 3,
+    "side": "allies",
+    "n_candidates": 8
+  }
+]

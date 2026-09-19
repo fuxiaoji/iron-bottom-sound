@@ -1,0 +1,6 @@
+claim_id,track,claim,evidence_type,experiment_ids,supporting_result,counterevidence,scope_limit,status
+M2-C1,A,grouping is nearly lossless under scripted continuation,exact oracle over 60 snapshots,A1-ORACLE-005,L=0 on 68% of evaluations,none,"H=1, scripted, 2 scenarios",SUPPORTED
+M2-C2,A,dynamic partitions have a compression-value advantage over flat,oracle comparison,A1-ORACLE-005,none,flat tied-best on 71%; fixed-loss 11.4%<20%; struct==random,same,REFUTED
+M2-C3,B,natural command-node failures are frequent and consequential,census + paired shock experiment,B0-CENSUS-006; B1-SENS-007,65% incidence; sensitivity max 0.767,median sensitivity 0 (sparse),"realistic mode, scripted commanders",SUPPORTED_WITH_SCOPE
+M2-C4,B,a simple pre-battle organization rule robustly reduces post-shock loss,7-arm paired oracle,B2-ROBUST-008,none,best rule scenario-opposed (EM +0.252 / S-01 -0.083); max_vp degenerate,"36 cells, 2 scenarios",REFUTED
+M2-C5,C,desired decision-entity granularity is phase-adaptive,phase-split census,C0-PHASE-009,none,scenario dominates phase (K stable within scenario),movement only at HEAD,REFUTED

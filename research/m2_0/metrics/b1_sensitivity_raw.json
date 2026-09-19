@@ -1,0 +1,722 @@
+[
+ {
+  "scenario": "IBS-S-01",
+  "seed": 100,
+  "variant": "default",
+  "shock_turn": 2,
+  "h2_mean": -0.43333333333333335,
+  "h2_se": 0.027216552697590865,
+  "n_prefix_events": 33
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 100,
+  "variant": "rev_flagship_g0",
+  "shock_turn": 2,
+  "h2_mean": -0.6333333333333333,
+  "h2_se": 0.07200822998230957,
+  "n_prefix_events": 32
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 100,
+  "variant": "mid_flagship_g0",
+  "shock_turn": 2,
+  "h2_mean": -0.6333333333333333,
+  "h2_se": 0.07200822998230957,
+  "n_prefix_events": 32
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 100,
+  "variant": "rev_flagship_g1",
+  "shock_turn": 2,
+  "h2_mean": -0.43333333333333335,
+  "h2_se": 0.027216552697590865,
+  "n_prefix_events": 32
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 100,
+  "variant": "rev_flagship_g2",
+  "shock_turn": 2,
+  "h2_mean": -0.43333333333333335,
+  "h2_se": 0.027216552697590865,
+  "n_prefix_events": 33
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 100,
+  "variant": "rev_flagship_g3",
+  "shock_turn": 2,
+  "h2_mean": -0.43333333333333335,
+  "h2_se": 0.027216552697590865,
+  "n_prefix_events": 33
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 100,
+  "variant": "mid_flagship_g3",
+  "shock_turn": 2,
+  "h2_mean": -0.43333333333333335,
+  "h2_se": 0.027216552697590865,
+  "n_prefix_events": 33
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 102,
+  "variant": "default",
+  "shock_turn": 4,
+  "h2_mean": 0.3666666666666667,
+  "h2_se": 0.027216552697590875,
+  "n_prefix_events": 125
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 102,
+  "variant": "rev_flagship_g0",
+  "shock_turn": 4,
+  "h2_mean": 0.3666666666666667,
+  "h2_se": 0.027216552697590875,
+  "n_prefix_events": 125
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 102,
+  "variant": "mid_flagship_g0",
+  "shock_turn": 4,
+  "h2_mean": 0.3666666666666667,
+  "h2_se": 0.027216552697590875,
+  "n_prefix_events": 125
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 102,
+  "variant": "rev_flagship_g1",
+  "shock_turn": 4,
+  "h2_mean": 0.3666666666666667,
+  "h2_se": 0.027216552697590875,
+  "n_prefix_events": 125
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 102,
+  "variant": "rev_flagship_g2",
+  "shock_turn": 4,
+  "h2_mean": 0.3666666666666667,
+  "h2_se": 0.027216552697590875,
+  "n_prefix_events": 125
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 102,
+  "variant": "rev_flagship_g3",
+  "shock_turn": 4,
+  "h2_mean": 0.3666666666666667,
+  "h2_se": 0.027216552697590875,
+  "n_prefix_events": 125
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 102,
+  "variant": "mid_flagship_g3",
+  "shock_turn": 4,
+  "h2_mean": 0.3666666666666667,
+  "h2_se": 0.027216552697590875,
+  "n_prefix_events": 125
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 105,
+  "variant": "default",
+  "shock_turn": 1,
+  "h2_mean": -0.23333333333333334,
+  "h2_se": 0.07200822998230956,
+  "n_prefix_events": 10
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 105,
+  "variant": "rev_flagship_g0",
+  "error": "shock turn mismatch 3"
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 105,
+  "variant": "mid_flagship_g0",
+  "error": "shock turn mismatch 3"
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 105,
+  "variant": "rev_flagship_g1",
+  "shock_turn": 1,
+  "h2_mean": -0.23333333333333334,
+  "h2_se": 0.07200822998230956,
+  "n_prefix_events": 10
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 105,
+  "variant": "rev_flagship_g2",
+  "shock_turn": 1,
+  "h2_mean": -0.23333333333333334,
+  "h2_se": 0.07200822998230956,
+  "n_prefix_events": 10
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 105,
+  "variant": "rev_flagship_g3",
+  "shock_turn": 1,
+  "h2_mean": -0.23333333333333334,
+  "h2_se": 0.07200822998230956,
+  "n_prefix_events": 10
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 105,
+  "variant": "mid_flagship_g3",
+  "shock_turn": 1,
+  "h2_mean": -0.23333333333333334,
+  "h2_se": 0.07200822998230956,
+  "n_prefix_events": 10
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 106,
+  "variant": "default",
+  "shock_turn": 2,
+  "h2_mean": -0.6,
+  "h2_se": 0.16329931618554522,
+  "n_prefix_events": 37
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 106,
+  "variant": "rev_flagship_g0",
+  "error": "shock turn mismatch 5"
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 106,
+  "variant": "mid_flagship_g0",
+  "error": "shock turn mismatch 5"
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 106,
+  "variant": "rev_flagship_g1",
+  "shock_turn": 2,
+  "h2_mean": -0.6,
+  "h2_se": 0.16329931618554522,
+  "n_prefix_events": 37
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 106,
+  "variant": "rev_flagship_g2",
+  "shock_turn": 2,
+  "h2_mean": -0.6,
+  "h2_se": 0.16329931618554522,
+  "n_prefix_events": 37
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 106,
+  "variant": "rev_flagship_g3",
+  "shock_turn": 2,
+  "h2_mean": -0.6,
+  "h2_se": 0.16329931618554522,
+  "n_prefix_events": 37
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 106,
+  "variant": "mid_flagship_g3",
+  "shock_turn": 2,
+  "h2_mean": -0.6,
+  "h2_se": 0.16329931618554522,
+  "n_prefix_events": 37
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 107,
+  "variant": "default",
+  "shock_turn": 2,
+  "h2_mean": -0.6,
+  "h2_se": 0.04714045207910316,
+  "n_prefix_events": 44
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 107,
+  "variant": "rev_flagship_g0",
+  "error": "shock turn mismatch None"
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 107,
+  "variant": "mid_flagship_g0",
+  "error": "shock turn mismatch None"
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 107,
+  "variant": "rev_flagship_g1",
+  "shock_turn": 2,
+  "h2_mean": -0.6,
+  "h2_se": 0.04714045207910316,
+  "n_prefix_events": 45
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 107,
+  "variant": "rev_flagship_g2",
+  "shock_turn": 2,
+  "h2_mean": -0.6,
+  "h2_se": 0.04714045207910316,
+  "n_prefix_events": 44
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 107,
+  "variant": "rev_flagship_g3",
+  "shock_turn": 2,
+  "h2_mean": -0.6,
+  "h2_se": 0.04714045207910316,
+  "n_prefix_events": 44
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 107,
+  "variant": "mid_flagship_g3",
+  "shock_turn": 2,
+  "h2_mean": -0.6,
+  "h2_se": 0.04714045207910316,
+  "n_prefix_events": 44
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 108,
+  "variant": "default",
+  "shock_turn": 2,
+  "h2_mean": -0.3333333333333333,
+  "h2_se": 0.027216552697590875,
+  "n_prefix_events": 62
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 108,
+  "variant": "rev_flagship_g0",
+  "shock_turn": 2,
+  "h2_mean": -0.3333333333333333,
+  "h2_se": 0.027216552697590875,
+  "n_prefix_events": 62
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 108,
+  "variant": "mid_flagship_g0",
+  "shock_turn": 2,
+  "h2_mean": -0.4,
+  "h2_se": 0.047140452079103175,
+  "n_prefix_events": 63
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 108,
+  "variant": "rev_flagship_g1",
+  "shock_turn": 2,
+  "h2_mean": -0.3333333333333333,
+  "h2_se": 0.027216552697590875,
+  "n_prefix_events": 62
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 108,
+  "variant": "rev_flagship_g2",
+  "shock_turn": 2,
+  "h2_mean": -0.3333333333333333,
+  "h2_se": 0.027216552697590875,
+  "n_prefix_events": 62
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 108,
+  "variant": "rev_flagship_g3",
+  "shock_turn": 2,
+  "h2_mean": -0.3333333333333333,
+  "h2_se": 0.027216552697590875,
+  "n_prefix_events": 62
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 108,
+  "variant": "mid_flagship_g3",
+  "shock_turn": 2,
+  "h2_mean": -0.3333333333333333,
+  "h2_se": 0.027216552697590875,
+  "n_prefix_events": 62
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 109,
+  "variant": "default",
+  "shock_turn": 3,
+  "h2_mean": 0.2,
+  "h2_se": 0.04714045207910317,
+  "n_prefix_events": 62
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 109,
+  "variant": "rev_flagship_g0",
+  "error": "shock turn mismatch 4"
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 109,
+  "variant": "mid_flagship_g0",
+  "error": "shock turn mismatch 4"
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 109,
+  "variant": "rev_flagship_g1",
+  "shock_turn": 3,
+  "h2_mean": 0.2,
+  "h2_se": 0.04714045207910317,
+  "n_prefix_events": 62
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 109,
+  "variant": "rev_flagship_g2",
+  "shock_turn": 3,
+  "h2_mean": 0.2,
+  "h2_se": 0.04714045207910317,
+  "n_prefix_events": 62
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 109,
+  "variant": "rev_flagship_g3",
+  "shock_turn": 3,
+  "h2_mean": 0.2,
+  "h2_se": 0.04714045207910317,
+  "n_prefix_events": 62
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 109,
+  "variant": "mid_flagship_g3",
+  "shock_turn": 3,
+  "h2_mean": 0.2,
+  "h2_se": 0.04714045207910317,
+  "n_prefix_events": 62
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 111,
+  "variant": "default",
+  "shock_turn": 2,
+  "h2_mean": -0.43333333333333335,
+  "h2_se": 0.05443310539518174,
+  "n_prefix_events": 44
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 111,
+  "variant": "rev_flagship_g0",
+  "shock_turn": 2,
+  "h2_mean": -0.43333333333333335,
+  "h2_se": 0.05443310539518174,
+  "n_prefix_events": 44
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 111,
+  "variant": "mid_flagship_g0",
+  "shock_turn": 2,
+  "h2_mean": -0.43333333333333335,
+  "h2_se": 0.05443310539518174,
+  "n_prefix_events": 44
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 111,
+  "variant": "rev_flagship_g1",
+  "shock_turn": 2,
+  "h2_mean": -0.43333333333333335,
+  "h2_se": 0.05443310539518174,
+  "n_prefix_events": 44
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 111,
+  "variant": "rev_flagship_g2",
+  "shock_turn": 2,
+  "h2_mean": -0.43333333333333335,
+  "h2_se": 0.05443310539518174,
+  "n_prefix_events": 44
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 111,
+  "variant": "rev_flagship_g3",
+  "shock_turn": 2,
+  "h2_mean": -0.43333333333333335,
+  "h2_se": 0.05443310539518174,
+  "n_prefix_events": 44
+ },
+ {
+  "scenario": "IBS-S-01",
+  "seed": 111,
+  "variant": "mid_flagship_g3",
+  "shock_turn": 2,
+  "h2_mean": -0.43333333333333335,
+  "h2_se": 0.05443310539518174,
+  "n_prefix_events": 44
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 100,
+  "variant": "default",
+  "shock_turn": 3,
+  "h2_mean": 0.5666666666666667,
+  "h2_se": 0.027216552697590865,
+  "n_prefix_events": 40
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 100,
+  "variant": "rev_flagship_g0",
+  "shock_turn": 3,
+  "h2_mean": 0.5666666666666667,
+  "h2_se": 0.027216552697590865,
+  "n_prefix_events": 40
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 100,
+  "variant": "mid_flagship_g0",
+  "shock_turn": 3,
+  "h2_mean": 0.5666666666666667,
+  "h2_se": 0.027216552697590865,
+  "n_prefix_events": 40
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 100,
+  "variant": "rev_flagship_g1",
+  "shock_turn": 3,
+  "h2_mean": 0.5666666666666667,
+  "h2_se": 0.027216552697590865,
+  "n_prefix_events": 40
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 100,
+  "variant": "mid_flagship_g1",
+  "shock_turn": 3,
+  "h2_mean": 0.5666666666666667,
+  "h2_se": 0.027216552697590865,
+  "n_prefix_events": 40
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 100,
+  "variant": "rev_flagship_g2",
+  "error": "shock turn mismatch 4"
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 100,
+  "variant": "mid_flagship_g2",
+  "error": "shock turn mismatch 6"
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 101,
+  "variant": "default",
+  "shock_turn": 3,
+  "h2_mean": 0.2,
+  "h2_se": 0.0,
+  "n_prefix_events": 57
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 101,
+  "variant": "rev_flagship_g0",
+  "shock_turn": 3,
+  "h2_mean": 0.2,
+  "h2_se": 0.0,
+  "n_prefix_events": 57
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 101,
+  "variant": "mid_flagship_g0",
+  "shock_turn": 3,
+  "h2_mean": 0.2,
+  "h2_se": 0.0,
+  "n_prefix_events": 57
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 101,
+  "variant": "rev_flagship_g1",
+  "shock_turn": 3,
+  "h2_mean": 0.2,
+  "h2_se": 0.0,
+  "n_prefix_events": 57
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 101,
+  "variant": "mid_flagship_g1",
+  "shock_turn": 3,
+  "h2_mean": 0.2,
+  "h2_se": 0.0,
+  "n_prefix_events": 57
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 101,
+  "variant": "rev_flagship_g2",
+  "error": "shock turn mismatch 5"
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 101,
+  "variant": "mid_flagship_g2",
+  "error": "shock turn mismatch 4"
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 102,
+  "variant": "default",
+  "shock_turn": 3,
+  "h2_mean": 0.06666666666666667,
+  "h2_se": 0.02721655269759087,
+  "n_prefix_events": 39
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 102,
+  "variant": "rev_flagship_g0",
+  "shock_turn": 3,
+  "h2_mean": 0.06666666666666667,
+  "h2_se": 0.02721655269759087,
+  "n_prefix_events": 39
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 102,
+  "variant": "mid_flagship_g0",
+  "shock_turn": 3,
+  "h2_mean": 0.06666666666666667,
+  "h2_se": 0.02721655269759087,
+  "n_prefix_events": 39
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 102,
+  "variant": "rev_flagship_g1",
+  "shock_turn": 3,
+  "h2_mean": 0.8333333333333334,
+  "h2_se": 0.07200822998230957,
+  "n_prefix_events": 40
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 102,
+  "variant": "mid_flagship_g1",
+  "shock_turn": 3,
+  "h2_mean": 0.8333333333333334,
+  "h2_se": 0.07200822998230957,
+  "n_prefix_events": 40
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 102,
+  "variant": "rev_flagship_g2",
+  "shock_turn": 3,
+  "h2_mean": 0.06666666666666667,
+  "h2_se": 0.02721655269759087,
+  "n_prefix_events": 39
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 102,
+  "variant": "mid_flagship_g2",
+  "shock_turn": 3,
+  "h2_mean": 0.06666666666666667,
+  "h2_se": 0.02721655269759087,
+  "n_prefix_events": 39
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 103,
+  "variant": "default",
+  "shock_turn": 2,
+  "h2_mean": 0.2,
+  "h2_se": 0.0,
+  "n_prefix_events": 10
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 103,
+  "variant": "rev_flagship_g0",
+  "shock_turn": 2,
+  "h2_mean": 0.2,
+  "h2_se": 0.0,
+  "n_prefix_events": 10
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 103,
+  "variant": "mid_flagship_g0",
+  "shock_turn": 2,
+  "h2_mean": 0.2,
+  "h2_se": 0.0,
+  "n_prefix_events": 10
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 103,
+  "variant": "rev_flagship_g1",
+  "shock_turn": 2,
+  "h2_mean": 0.2,
+  "h2_se": 0.0,
+  "n_prefix_events": 10
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 103,
+  "variant": "mid_flagship_g1",
+  "shock_turn": 2,
+  "h2_mean": 0.2,
+  "h2_se": 0.0,
+  "n_prefix_events": 10
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 103,
+  "variant": "rev_flagship_g2",
+  "shock_turn": 2,
+  "h2_mean": 0.2,
+  "h2_se": 0.0,
+  "n_prefix_events": 10
+ },
+ {
+  "scenario": "IBS-S-EM-01",
+  "seed": 103,
+  "variant": "mid_flagship_g2",
+  "shock_turn": 2,
+  "h2_mean": 0.2,
+  "h2_se": 0.0,
+  "n_prefix_events": 10
+ }
+]

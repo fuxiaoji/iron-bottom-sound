@@ -1,0 +1,27 @@
+  IBS-S-01 s100: shock at T2
+  IBS-S-01 s102: shock at T4
+  IBS-S-01 s105: shock at T1
+  IBS-S-01 s106: shock at T2
+  IBS-S-01 s107: shock at T2
+  IBS-S-01 s108: shock at T2
+  IBS-S-01 s109: shock at T3
+  IBS-S-01 s111: shock at T2
+  IBS-S-EM-01 s100: shock at T3
+  IBS-S-EM-01 s101: shock at T3
+  IBS-S-EM-01 s102: shock at T3
+  IBS-S-EM-01 s103: shock at T2
+12 natural shock cases
+{
+  "n_cases": 12,
+  "n_cases_ge_005": 3,
+  "frac_ge_005": 0.25,
+  "median_sensitivity": 0.0,
+  "max_sensitivity": 0.7666666666666667,
+  "scenarios": [
+    "IBS-S-01",
+    "IBS-S-EM-01"
+  ],
+  "gate": ">=20% of valid shock cases with sensitivity >= 0.05, >=2 scenarios",
+  "verdict": "PASS"
+}
+B1_EXIT=0

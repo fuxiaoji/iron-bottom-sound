@@ -1,0 +1,81 @@
+IBS-S-01 s100: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-01 s101: default=- random0=- random1=- random2=S flagship_max_vp=- flagship_low_exposure=- reserve_fastest=-
+IBS-S-01 s102: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-01 s103: default=- random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=- reserve_fastest=-
+IBS-S-01 s104: default=- random0=- random1=- random2=S flagship_max_vp=- flagship_low_exposure=- reserve_fastest=-
+IBS-S-01 s105: default=S random0=S random1=S random2=- flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-01 s106: default=S random0=S random1=S random2=- flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-01 s107: default=S random0=S random1=- random2=S flagship_max_vp=S flagship_low_exposure=- reserve_fastest=-
+IBS-S-01 s108: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-01 s109: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-01 s110: default=- random0=- random1=S random2=S flagship_max_vp=- flagship_low_exposure=S reserve_fastest=-
+IBS-S-01 s111: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-01 s112: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-01 s113: default=S random0=S random1=S random2=- flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-01 s114: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-01 s115: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-01 s116: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-01 s117: default=- random0=- random1=S random2=S flagship_max_vp=- flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s100: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s101: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s102: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s103: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s104: default=S random0=S random1=S random2=- flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s105: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s106: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s107: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s108: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s109: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s110: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s111: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s112: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s113: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s114: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s115: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s116: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+IBS-S-EM-01 s117: default=S random0=S random1=S random2=S flagship_max_vp=S flagship_low_exposure=S reserve_fastest=-
+{
+  "default": {
+    "n_shock_pairs": 31,
+    "mean_h2": -5.8197174677931595e-18,
+    "mean_diff_vs_default": 0.0
+  },
+  "random0": {
+    "n_shock_pairs": 31,
+    "mean_h2": 0.07225806451612903,
+    "mean_diff_vs_default": 0.07225806451612904
+  },
+  "random1": {
+    "n_shock_pairs": 30,
+    "mean_h2": 0.06133333333333333,
+    "mean_diff_vs_default": 0.04133333333333334
+  },
+  "random2": {
+    "n_shock_pairs": 27,
+    "mean_h2": 0.16296296296296298,
+    "mean_diff_vs_default": 0.09629629629629631
+  },
+  "flagship_max_vp": {
+    "n_shock_pairs": 31,
+    "mean_h2": -5.8197174677931595e-18,
+    "mean_diff_vs_default": 0.0
+  },
+  "flagship_low_exposure": {
+    "n_shock_pairs": 30,
+    "mean_h2": 0.138,
+    "mean_diff_vs_default": 0.11800000000000001
+  },
+  "reserve_fastest": {
+    "n_shock_pairs": 0,
+    "mean_h2": null,
+    "mean_diff_vs_default": null
+  },
+  "best_relative_improver": {
+    "org": "flagship_low_exposure",
+    "relative": 118000000.0,
+    "abs": 0.11800000000000001
+  },
+  "gate": ">=10% post-shock loss reduction vs default, nominal penalty <=2%",
+  "verdict": "PASS"
+}
+B2_EXIT=0

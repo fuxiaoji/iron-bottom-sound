@@ -1,0 +1,113 @@
+{
+  "summary": {
+    "n_cases": 12,
+    "n_cases_ge_005": 3,
+    "frac_ge_005": 0.25,
+    "median_sensitivity": 0.0,
+    "max_sensitivity": 0.7666666666666667,
+    "scenarios": [
+      "IBS-S-01",
+      "IBS-S-EM-01"
+    ],
+    "gate": ">=20% of valid shock cases with sensitivity >= 0.05, >=2 scenarios",
+    "verdict": "PASS"
+  },
+  "sens_rows": [
+    {
+      "scenario": "IBS-S-01",
+      "seed": 100,
+      "n_arms": 7,
+      "sensitivity": 0.19999999999999996,
+      "best": "default",
+      "worst": "rev_flagship_g0"
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 102,
+      "n_arms": 7,
+      "sensitivity": 0.0,
+      "best": "default",
+      "worst": "default"
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 105,
+      "n_arms": 5,
+      "sensitivity": 0.0,
+      "best": "default",
+      "worst": "default"
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 106,
+      "n_arms": 5,
+      "sensitivity": 0.0,
+      "best": "default",
+      "worst": "default"
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 107,
+      "n_arms": 5,
+      "sensitivity": 0.0,
+      "best": "default",
+      "worst": "default"
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 108,
+      "n_arms": 7,
+      "sensitivity": 0.06666666666666671,
+      "best": "default",
+      "worst": "mid_flagship_g0"
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 109,
+      "n_arms": 5,
+      "sensitivity": 0.0,
+      "best": "default",
+      "worst": "default"
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 111,
+      "n_arms": 7,
+      "sensitivity": 0.0,
+      "best": "default",
+      "worst": "default"
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 100,
+      "n_arms": 5,
+      "sensitivity": 0.0,
+      "best": "default",
+      "worst": "default"
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 101,
+      "n_arms": 5,
+      "sensitivity": 0.0,
+      "best": "default",
+      "worst": "default"
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 102,
+      "n_arms": 7,
+      "sensitivity": 0.7666666666666667,
+      "best": "rev_flagship_g1",
+      "worst": "default"
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 103,
+      "n_arms": 7,
+      "sensitivity": 0.0,
+      "best": "default",
+      "worst": "default"
+    }
+  ]
+}

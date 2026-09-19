@@ -62,3 +62,54 @@ each ≈ ≤20 batch evaluations) × 5 reps ≈ ≤6,000 continuations per scena
 inside the plan's 50,000 continuation budget. If the measured per-continuation
 time makes this exceed ~2.5 h, the snapshot cap drops to 30 per scenario
 **before** any result is inspected (mechanics amendment, pre-declared here).
+
+
+## AMENDMENT A-MECH-01 (mechanics, pre-declared trigger fired, BEFORE any A1 number existed)
+
+The per-partition macro search as first coded (greedy per-group macro search in
+full-partition context) is computationally infeasible at the frozen budget: the
+first smoke snapshot ran >75 min without completing because each group's macro
+trial re-evaluates the whole partition (groups interact through fire
+resolution), giving ~O(6^groups) continuation batches per partition.
+
+Amendment (mechanics only — the value definition, epsilon, gates, budgets and
+candidate lists are unchanged): **each group's macro is chosen independently**
+by evaluating that group's 6 macros with all OTHER groups at HOLD, then taking
+the argmax; the partition value is then evaluated once with the chosen macro
+combination. This bounds evaluations at ~7 x n_groups + 1 per partition. The
+independence approximation is **conservative for the oracle** (it can only
+underestimate the best achievable partition value, i.e. it works against
+finding large L = flat - partition gaps in favour of... it biases L downward,
+making A1 gates HARDER to pass). The amendment is recorded before any
+partition value from the amended pipeline was inspected. First smoke run after
+amendment will confirm per-snapshot time <= ~2 min; if not, the snapshot cap
+drops to 30/scenario per the pre-declared fallback.
+
+
+## AMENDMENT A-MECH-02 (mechanics, before any A1 number existed)
+
+A-MECH-01's independent macro choice still exceeded budget (~25 min/snapshot):
+each macro trial ran the full 5-replicate CRN evaluation, and 1-turn scripted
+continuations of late-game states are individually expensive.
+
+Amendment (mechanics only): the **macro-selection phase** uses rep=0 only (a
+single deterministic continuation per macro trial); the **partition value**
+(the only number entering A1 statistics) keeps the full 5-replicate CRN
+evaluation. Macro choice is thus a heuristic pre-selector; all reported values
+retain the pre-registered precision. Additionally the per-partition final
+evaluation failure mode is recorded per snapshot (first failing group/macro)
+instead of a bare None.
+
+Estimated cost/snapshot: ~20 partitions x ~7 groups x 6 macros x 1 rep + ~20
+x 5 final reps ≈ 940 continuations ≈ 8-15 min. Fallback if still >20
+min/snapshot: snapshot cap drops to 30/scenario (pre-declared) AND macro
+trials are restricted to {HOLD, STRAIGHT_FAST, LEADER_PROPOSAL}.
+
+
+## AMENDMENT A-MECH-03 (the pre-declared fallback, fired)
+
+A-MECH-02 measured 1241 s/snapshot (20/20 partitions evaluated; values show
+real spread). The pre-declared fallback drops the snapshot cap to 30/scenario
+(60 total). With 10 workers ≈ 60 x 1241 s / 10 ≈ 2.1 h. The cap reduction is
+outcome-blind: snapshots are taken in (profile_pair, seed, turn) order as
+before, simply truncated.
