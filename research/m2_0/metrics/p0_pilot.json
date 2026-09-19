@@ -1,0 +1,642 @@
+{
+  "rows": [
+    {
+      "scenario": "IBS-S-01",
+      "seed": 1,
+      "mode": "classic",
+      "seconds": 5.029332334001083,
+      "completed": true,
+      "error": null,
+      "turns": 7,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 2,
+      "mode": "classic",
+      "seconds": 23.653497666004114,
+      "completed": true,
+      "error": null,
+      "turns": 7,
+      "winner": "allies",
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 3,
+      "mode": "classic",
+      "seconds": 5.004893833945971,
+      "completed": true,
+      "error": null,
+      "turns": 7,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 4,
+      "mode": "classic",
+      "seconds": 4.705496417009272,
+      "completed": true,
+      "error": null,
+      "turns": 7,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 5,
+      "mode": "classic",
+      "seconds": 23.75189945899183,
+      "completed": true,
+      "error": null,
+      "turns": 7,
+      "winner": "allies",
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 1,
+      "mode": "realistic",
+      "seconds": 5.660968417010736,
+      "completed": true,
+      "error": null,
+      "turns": 7,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 4,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 6,
+      "dissolved": 1
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 2,
+      "mode": "realistic",
+      "seconds": 18.074532750004437,
+      "completed": true,
+      "error": null,
+      "turns": 7,
+      "winner": "allies",
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 1,
+        "command_disrupted": 1,
+        "ship_detached": 7,
+        "ship_withdrawn": 2
+      },
+      "n_formations_final": 6,
+      "dissolved": 2
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 3,
+      "mode": "realistic",
+      "seconds": 19.771615790959913,
+      "completed": true,
+      "error": null,
+      "turns": 7,
+      "winner": "allies",
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 1,
+        "command_disrupted": 1,
+        "ship_detached": 11,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 6,
+      "dissolved": 1
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 4,
+      "mode": "realistic",
+      "seconds": 21.992746583011467,
+      "completed": true,
+      "error": null,
+      "turns": 7,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 12,
+        "ship_withdrawn": 1
+      },
+      "n_formations_final": 6,
+      "dissolved": 2
+    },
+    {
+      "scenario": "IBS-S-01",
+      "seed": 5,
+      "mode": "realistic",
+      "seconds": 25.753512290946674,
+      "completed": true,
+      "error": null,
+      "turns": 7,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 2,
+        "command_disrupted": 2,
+        "ship_detached": 8,
+        "ship_withdrawn": 2
+      },
+      "n_formations_final": 6,
+      "dissolved": 3
+    },
+    {
+      "scenario": "IBS-S-03",
+      "seed": 1,
+      "mode": "classic",
+      "seconds": 2.4651173329912126,
+      "completed": true,
+      "error": null,
+      "turns": 4,
+      "winner": "axis",
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-03",
+      "seed": 2,
+      "mode": "classic",
+      "seconds": 2.272763249988202,
+      "completed": true,
+      "error": null,
+      "turns": 4,
+      "winner": "allies",
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-03",
+      "seed": 3,
+      "mode": "classic",
+      "seconds": 2.6999531670007855,
+      "completed": true,
+      "error": null,
+      "turns": 4,
+      "winner": "allies",
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-03",
+      "seed": 4,
+      "mode": "classic",
+      "seconds": 10.220518250018358,
+      "completed": true,
+      "error": null,
+      "turns": 4,
+      "winner": "allies",
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-03",
+      "seed": 5,
+      "mode": "classic",
+      "seconds": 1.9337001249659806,
+      "completed": true,
+      "error": null,
+      "turns": 4,
+      "winner": "allies",
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-03",
+      "seed": 1,
+      "mode": "realistic",
+      "seconds": 1.1186438750009984,
+      "completed": true,
+      "error": null,
+      "turns": 4,
+      "winner": "axis",
+      "n_formations_setup": 2,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 2,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-03",
+      "seed": 2,
+      "mode": "realistic",
+      "seconds": 1.9668585829786025,
+      "completed": true,
+      "error": null,
+      "turns": 4,
+      "winner": "allies",
+      "n_formations_setup": 2,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 2,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-03",
+      "seed": 3,
+      "mode": "realistic",
+      "seconds": 3.383334082958754,
+      "completed": true,
+      "error": null,
+      "turns": 4,
+      "winner": "allies",
+      "n_formations_setup": 2,
+      "command_events": {
+        "formation_command_transferred": 3,
+        "command_disrupted": 3,
+        "ship_detached": 1,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 2,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-03",
+      "seed": 4,
+      "mode": "realistic",
+      "seconds": 14.827482584048994,
+      "completed": true,
+      "error": null,
+      "turns": 4,
+      "winner": "axis",
+      "n_formations_setup": 2,
+      "command_events": {
+        "formation_command_transferred": 1,
+        "command_disrupted": 1,
+        "ship_detached": 5,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 2,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-03",
+      "seed": 5,
+      "mode": "realistic",
+      "seconds": 1.8022607500315644,
+      "completed": true,
+      "error": null,
+      "turns": 4,
+      "winner": "axis",
+      "n_formations_setup": 2,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 2,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 1,
+      "mode": "classic",
+      "seconds": 49.814724250056315,
+      "completed": true,
+      "error": null,
+      "turns": 12,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 2,
+      "mode": "classic",
+      "seconds": 30.908692416967824,
+      "completed": true,
+      "error": null,
+      "turns": 12,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 3,
+      "mode": "classic",
+      "seconds": 37.17793649999658,
+      "completed": true,
+      "error": null,
+      "turns": 12,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 4,
+      "mode": "classic",
+      "seconds": 22.459930084005464,
+      "completed": true,
+      "error": null,
+      "turns": 12,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 5,
+      "mode": "classic",
+      "seconds": 25.69481670798268,
+      "completed": true,
+      "error": null,
+      "turns": 12,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 0,
+        "command_disrupted": 0,
+        "ship_detached": 0,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 0,
+      "dissolved": 0
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 1,
+      "mode": "realistic",
+      "seconds": 52.436223208962474,
+      "completed": true,
+      "error": null,
+      "turns": 12,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 3,
+        "command_disrupted": 3,
+        "ship_detached": 9,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 6,
+      "dissolved": 3
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 2,
+      "mode": "realistic",
+      "seconds": 41.98775320802815,
+      "completed": true,
+      "error": null,
+      "turns": 12,
+      "winner": "axis",
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 2,
+        "command_disrupted": 2,
+        "ship_detached": 8,
+        "ship_withdrawn": 2
+      },
+      "n_formations_final": 6,
+      "dissolved": 3
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 3,
+      "mode": "realistic",
+      "seconds": 40.67559699999401,
+      "completed": true,
+      "error": null,
+      "turns": 12,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 2,
+        "command_disrupted": 2,
+        "ship_detached": 12,
+        "ship_withdrawn": 0
+      },
+      "n_formations_final": 6,
+      "dissolved": 2
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 4,
+      "mode": "realistic",
+      "seconds": 31.325242792023346,
+      "completed": true,
+      "error": null,
+      "turns": 12,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 4,
+        "command_disrupted": 4,
+        "ship_detached": 5,
+        "ship_withdrawn": 1
+      },
+      "n_formations_final": 6,
+      "dissolved": 3
+    },
+    {
+      "scenario": "IBS-S-EM-01",
+      "seed": 5,
+      "mode": "realistic",
+      "seconds": 24.342000374977943,
+      "completed": true,
+      "error": null,
+      "turns": 12,
+      "winner": null,
+      "n_formations_setup": 0,
+      "command_events": {
+        "formation_command_transferred": 2,
+        "command_disrupted": 2,
+        "ship_detached": 7,
+        "ship_withdrawn": 5
+      },
+      "n_formations_final": 6,
+      "dissolved": 2
+    }
+  ],
+  "summary": {
+    "IBS-S-01/classic": {
+      "n": 5,
+      "completed": 5,
+      "sec_per_game_mean": 12.429023941990454,
+      "turns_mean": 7,
+      "errors": [],
+      "total_command_transfers": 0,
+      "total_disruptions": 0,
+      "total_detaches": 0,
+      "total_dissolved": 0
+    },
+    "IBS-S-01/realistic": {
+      "n": 5,
+      "completed": 5,
+      "sec_per_game_mean": 18.250675166386646,
+      "turns_mean": 7,
+      "errors": [],
+      "total_command_transfers": 4,
+      "total_disruptions": 4,
+      "total_detaches": 42,
+      "total_dissolved": 9
+    },
+    "IBS-S-03/classic": {
+      "n": 5,
+      "completed": 5,
+      "sec_per_game_mean": 3.9184104249929077,
+      "turns_mean": 4,
+      "errors": [],
+      "total_command_transfers": 0,
+      "total_disruptions": 0,
+      "total_detaches": 0,
+      "total_dissolved": 0
+    },
+    "IBS-S-03/realistic": {
+      "n": 5,
+      "completed": 5,
+      "sec_per_game_mean": 4.619715975003783,
+      "turns_mean": 4,
+      "errors": [],
+      "total_command_transfers": 4,
+      "total_disruptions": 4,
+      "total_detaches": 6,
+      "total_dissolved": 0
+    },
+    "IBS-S-EM-01/classic": {
+      "n": 5,
+      "completed": 5,
+      "sec_per_game_mean": 33.21121999180177,
+      "turns_mean": 12,
+      "errors": [],
+      "total_command_transfers": 0,
+      "total_disruptions": 0,
+      "total_detaches": 0,
+      "total_dissolved": 0
+    },
+    "IBS-S-EM-01/realistic": {
+      "n": 5,
+      "completed": 5,
+      "sec_per_game_mean": 38.15336331679718,
+      "turns_mean": 12,
+      "errors": [],
+      "total_command_transfers": 13,
+      "total_disruptions": 13,
+      "total_detaches": 41,
+      "total_dissolved": 13
+    }
+  }
+}
