@@ -1,0 +1,190 @@
+{
+  "n_evaluable_main": 120,
+  "n_control": 44,
+  "all_evaluable": {
+    "outcome": {
+      "n": 120,
+      "rho_abs": {
+        "median": 0.0,
+        "max": 0.5333333333333333,
+        "p90": 0.06666666666666676
+      },
+      "rho_norm": {
+        "median": 0.0,
+        "max": 0.9999999999999993
+      },
+      "stake": {
+        "median": 0.16666666666666669,
+        "max": 2.0
+      },
+      "frac_low": 0.9166666666666666,
+      "frac_high_meaningful": 0.08333333333333333,
+      "n_high_meaningful": 10,
+      "high_stake_median": 0.2666666666666667,
+      "ci_passing_frac_high": 0.15,
+      "action_disagreement_rate": 0.3333333333333333
+    },
+    "damage_diff": {
+      "n": 120,
+      "rho_abs": {
+        "median": 0.0,
+        "max": 0.03783783783783784,
+        "p90": 0.014682539682539686
+      },
+      "rho_norm": {
+        "median": 0.0,
+        "max": 1.0
+      },
+      "stake": {
+        "median": 0.02709235209235209,
+        "max": 0.16190476190476188
+      },
+      "frac_low": 0.9666666666666667,
+      "frac_high_meaningful": 0.03333333333333333,
+      "n_high_meaningful": 4,
+      "high_stake_median": 0.044591488039763906,
+      "ci_passing_frac_high": 0.13636363636363635,
+      "action_disagreement_rate": 0.3333333333333333
+    }
+  },
+  "ci_passing": {
+    "outcome": {
+      "n": 30,
+      "rho_abs": {
+        "median": 0.0,
+        "max": 0.5333333333333333,
+        "p90": 0.1333333333333333
+      },
+      "rho_norm": {
+        "median": 0.0,
+        "max": 0.6666666666666666
+      },
+      "stake": {
+        "median": 0.5666666666666667,
+        "max": 2.0
+      },
+      "frac_low": 0.8333333333333334,
+      "frac_high_meaningful": 0.16666666666666666,
+      "n_high_meaningful": 5,
+      "high_stake_median": 0.3333333333333333,
+      "ci_passing_frac_high": 0.15,
+      "action_disagreement_rate": 0.3333333333333333
+    },
+    "damage_diff": {
+      "n": 30,
+      "rho_abs": {
+        "median": 0.0,
+        "max": 0.03783783783783784,
+        "p90": 0.02022988505747126
+      },
+      "rho_norm": {
+        "median": 0.0,
+        "max": 0.84
+      },
+      "stake": {
+        "median": 0.048712998712998716,
+        "max": 0.16190476190476188
+      },
+      "frac_low": 0.9,
+      "frac_high_meaningful": 0.1,
+      "n_high_meaningful": 3,
+      "high_stake_median": 0.04504504504504505,
+      "ci_passing_frac_high": 0.13636363636363635,
+      "action_disagreement_rate": 0.3333333333333333
+    }
+  },
+  "control_B": {
+    "outcome": {
+      "n": 44,
+      "rho_abs": {
+        "median": 0.0,
+        "max": 0.1333333333333333,
+        "p90": 0.06666666666666665
+      },
+      "rho_norm": {
+        "median": 0.0,
+        "max": 0.6666666666666666
+      },
+      "stake": {
+        "median": 0.16666666666666669,
+        "max": 2.0
+      },
+      "frac_low": 0.9318181818181818,
+      "frac_high_meaningful": 0.06818181818181818,
+      "n_high_meaningful": 3,
+      "high_stake_median": 0.2666666666666667,
+      "ci_passing_frac_high": 0.1111111111111111,
+      "action_disagreement_rate": 0.2727272727272727
+    },
+    "damage_diff": {
+      "n": 44,
+      "rho_abs": {
+        "median": 0.0,
+        "max": 0.03333333333333333,
+        "p90": 0.007407407407407404
+      },
+      "rho_norm": {
+        "median": 0.0,
+        "max": 1.0
+      },
+      "stake": {
+        "median": 0.03120258813029897,
+        "max": 0.16190476190476188
+      },
+      "frac_low": 0.9772727272727273,
+      "frac_high_meaningful": 0.022727272727272728,
+      "n_high_meaningful": 1,
+      "high_stake_median": 0.11515151515151516,
+      "ci_passing_frac_high": 0.1,
+      "action_disagreement_rate": 0.2727272727272727
+    }
+  },
+  "scenario_conditioned_ci_passing": {
+    "IBS-S-01": {
+      "n": 12,
+      "outcome": {
+        "frac_high": 0.3333333333333333
+      },
+      "damage_diff": {
+        "frac_high": 0.08333333333333333
+      }
+    },
+    "IBS-S-03": {
+      "n": 18,
+      "outcome": {
+        "frac_high": 0.05555555555555555
+      },
+      "damage_diff": {
+        "frac_high": 0.1111111111111111
+      }
+    }
+  },
+  "gate": {
+    "outcome": {
+      "frac_low": 0.8333333333333334,
+      "frac_high": 0.16666666666666666,
+      "high_stake_median": 0.3333333333333333,
+      "c1_ge_50pct_low": true,
+      "c2_ge_10pct_high": true,
+      "c3_not_tiny_stake": true
+    },
+    "damage_diff": {
+      "frac_low": 0.9,
+      "frac_high": 0.1,
+      "high_stake_median": 0.04504504504504505,
+      "c1_ge_50pct_low": true,
+      "c2_ge_10pct_high": true,
+      "c3_not_tiny_stake": true
+    }
+  },
+  "verdict": {
+    "outcome": "PASS",
+    "damage_diff": "PASS"
+  },
+  "thresholds": {
+    "FLOOR_DAMAGE": 0.02,
+    "FLOOR_OUTCOME": 0.1,
+    "LOW_NORM": 0.05,
+    "HIGH_NORM": 0.1
+  }
+}

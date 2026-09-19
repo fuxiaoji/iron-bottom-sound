@@ -1,0 +1,50 @@
+{
+  "n_decisions": 200,
+  "n_matches_started": 42,
+  "n_scenarios": 2,
+  "lambda": 1.0,
+  "hybrid_vs_direct_top1_change_rate_all": 0.485,
+  "hybrid_vs_direct_top1_change_rate_nondegenerate": [
+    0.5594405594405595,
+    143
+  ],
+  "influence_only_vs_direct_top1_change_rate_all": 0.59,
+  "influence_only_vs_direct_top1_change_rate_nondegenerate": [
+    0.7062937062937062,
+    143
+  ],
+  "median_rank_corr_direct_hybrid_nondegenerate": 0.8171456809846703,
+  "per_scenario": {
+    "IBS-S-01": {
+      "n": 100,
+      "hybrid_change_rate": 0.49
+    },
+    "IBS-S-03": {
+      "n": 100,
+      "hybrid_change_rate": 0.48
+    }
+  },
+  "per_profile": {
+    "adaptive": {
+      "n": 40,
+      "hybrid_change_rate": 0.35
+    },
+    "area_denial": {
+      "n": 40,
+      "hybrid_change_rate": 0.625
+    },
+    "break_crossing_t": {
+      "n": 40,
+      "hybrid_change_rate": 0.575
+    },
+    "crossfire": {
+      "n": 40,
+      "hybrid_change_rate": 0.35
+    },
+    "direct_attack": {
+      "n": 40,
+      "hybrid_change_rate": 0.525
+    }
+  },
+  "gate_threshold": 0.2
+}
