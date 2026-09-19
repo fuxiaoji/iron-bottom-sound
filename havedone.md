@@ -767,3 +767,15 @@
 - **结构性发现（给 PI）**：隐藏承诺**频繁改变价值**（65/120 对 outcome 跨分支差 ≥0.2）但**很少重排游戏自身候选集的动作**——"价值分歧 ≠ 决策混叠"的差距正是本门要测的东西，在 IBS 鱼雷窗口很大；置信与遗憾在可行预算下反相关（排名可分辨的 pair 恰是两界都有鲁棒动作的 pair）；脚本化续局 + "不发射"鲁棒候选是主要 regime-killer。若 PI 要救活：接触时刻最优续局 Q、全合法批次候选集、绑定想定胜利边际的值函数——均为 M2 规模，未执行。
 - **纪律记录**：功效扩展先注册后执行（G1-POWER-002）；一个 falsy-zero 分析 bug（把 control_a_max_diff=0.0 当缺失）在读取最终数字前修复；未为过门修改任何 pair 定义/阈值；pair 密度不足时未追加网格轮次（避免 threshold-chasing）。预算：~35k/50k rollouts，0 付费 LLM，引擎 0 改动。
 - **提交**：`27f23b2`（G1 全部代码+证据）；包 `research/m1/M1_G1_CHECKPOINT.zip` sha256 `7f79f8ab…`（37 文件，2.4MB→245KB）。
+
+
+## 2026-09-19 — M1.5 新主线双轨 cheap-kill：E1 FAIL（不可预测）、E2 FAIL（无长期价值+因果不成立），BEST_SUPPORTED_TRACK = NONE
+
+- **范围**：M1.5 验证两条新主线 E1（Selective Opponent Reasoning）与 E2（Strategic Influence Planning）。分支 `research/m1_5`（基线 `261482f`）；计划原文落库 `M1_5_CCF-A_New_Mainline_Cheap_Kill_Plan.md`；阈值全部**预注册**（`research/m1_5/PRE_REGISTRATION.md`）。生产模块零改动；新增 sklearn 1.9.1 到项目 .venv（可逆已记录）。
+- **E1-T1（PASS）**：从 M1 G1 冻结的 15-rep Q 表重算 rho（120 可评估对，每对=一个含两个一致承诺的信息态）。CI-passing 子集：主值 83.3% 低 rho / 16.7% 高有意义 rho（floor 0.10 胜率 + norm 0.10），高 rho 的 stake 中位 **0.333**（33 个百分点胜率）；副值 90%/10%/0.045。预注册三门全过——"稀少但重大"结构成立。
+- **E1-T2（FAIL，kill）**：仅用可见特征（敌距/编队展开/鱼雷就绪/损伤/比分等 13 维）预测 high-rho，5 折 CV × 3 模型族：AUROC 0.459/0.367/0.469（≤随机），预算内召回 0-31%（门 70%），**假阴性包含 76-100% 遗憾质量**。`E1_FAIL_PREDICTABILITY` 触发，E1 按计划 §15 停止（T3 的 gate 无从构建）。科学含义：criticality 藏在隐藏航路与鱼雷航道的几何关系里，公开棋盘读不出。
+- **E2-T1（PASS）**：200 个可达鱼雷决策（2 场景 × 5 doctrine profiles × 40；HEAD 审计确认 9 个影响字段全部存在；legacy profile 不进反事实机器→预注册修正案换 profile）。Hybrid(λ=1) vs Direct top-1 变化 **48.5%**（非退化 55.9%），各场景 33%/30%、各 doctrine 35-62.5%；30 个强案例落盘。
+- **E2-T2/T3（FAIL，kill）**：40 个变化状态 × 3 arm（direct/hybrid/shuffled）× 5 CRN reps 真实续局：hybrid vs direct **+0.02，10W/6L/24T**（S-01 恰为 0.000，S-03 +0.04，均无 ≥10% 改善）；**true ≈ shuffled**（−0.01，5W/5L/30T）且 shuffled vs direct +0.03——影响标签不携带"选个不同动作"之外的任何信号。`E2_FAIL_HEURISTIC_ONLY` + `E2_FAIL_CAUSALITY` 同时触发。
+- **最终判定**：`E1_SIGNAL=PASS / E1_PREDICTABILITY=FAIL / E1_COMPUTE_VALUE=NOT_RUN(moot) / E1_NOVELTY=AMBIGUOUS(moot)`；`E2_SIGNAL=PASS / E2_LONG_HORIZON_VALUE=FAIL / E2_CAUSALITY=FAIL / E2_NOVELTY=AMBIGUOUS(moot)`；**BEST_SUPPORTED_TRACK = NONE，SECONDARY_TRACK = NONE**。按计划 §21：停止围绕 hidden commitment / torpedo 挖题，回到全系统重新选题扫描。
+- **纪律记录**：修正案（profile 表、两级采样配额）全部先于结果；`Side.other()` 不存在、order 未持久化、numpy bool 序列化等 8 项失败/修复全部留档 `FAILURES_AND_COUNTEREXAMPLES.md`；"+19% 相对改善"系小分母伪影，门按原始配对差评估。预算：~760 个对局当量 / ≤15,000；0 付费 LLM。
+- **提交**：`e3dc6a9`（stage-1）+ 本批（stage-2+交付）；包 `research/m1_5/M1_5_NEW_MAINLINE_CHECKPOINT.zip` sha256 `23113572945faefc…`（1.9MB，65 文件）。
