@@ -754,3 +754,16 @@
 - **D0（D=FAIL）**：5 类缺陷 zoo（OPT/MYO/NOM/NBU/AMB；COMMITMENT-FORGETFUL 因 replan 弱支配不可表达而预先弃用）；684 测试节点。**MYO≡OPT、NBU≡NOM 在全部 684 测试上答案全同→4/5 类型原理性不可识别**（本实验室支付族不惩罚短视：coordination/anticor 平稳、delayed/pathdep 只在末轮支付）。AMB 可识别（random 中位 23–27，disagreement 11=2.3×）；greedy infogain 识别 0/5（在不可分对上死锁）——greedy 贝叶斯选择劣于随机的干净反例。POST_HOC setup 族救援探针完全退化（5 类全同 60/60），已标注不计入门。
 - **产出**：`research/m0/` 下 AUDIT/BASELINE_STATUS/CHEAP_KILL_REPORT（含 verdict 表）/CHEAP_KILL_SCORECARD/EXPERIMENT_REGISTRY（17 行）/FAILURES_AND_COUNTEREXAMPLES（F1–F13）/TREE/git_info/environment + exact_lab + c0_psro + d0_diaggame + 7 图 + 全部 metrics JSON/CSV + 日志。M0_CHEAP_KILL_CHECKPOINT.zip 打包待 PI。
 - **验证**：exact_lab 17/17、c0_psro 6/6 单测通过；校准 2160/2160 成功零失败；生产 pytest 1 预存失败已记录未修。**未做**：discovery/confirmatory/freeze、IBS 迁移实验、文献矩阵（B 的 PASS_TO_DISCOVERY 不构成 novelty 主张）。
+
+
+## 2026-09-19 — M1 G1：IBS 自然 commitment 决策混叠门 — FAIL，按纪律停在 checkpoint（B_TOY_ONLY）
+
+- **范围**：M1 唯一主线 Decision-Sufficient State Learning under Hidden Commitments 的 G1（IBS 自然混叠验证）。分支 `research/m1-decision-state`（基线 `7f9ed4a`）；M1 计划原文落库为 `M1_CCF-A_Decision_Sufficient_State_Learning_Plan.md`。**生产模块零改动**；禁止项全部未触碰（无 G2/OpenSpiel/神经网络/DSRL/PPO/PSRO 扩展）。
+- **结构审计**：`sealed_orders` 真实一等隐藏状态（engine.py:1712 写 / :1718 读 / :966 side-filtered 视图；observe() 永不泄漏）；`MOVEMENT_PLANNING→TORPEDO_PLANNING` 是真实的"已封存未执行"窗口；`_torpedo_candidates` 只读己方封存移动、`torpedo_assist` 只用可见信息（引擎文档明示"不读敌方封存计划"）。
+- **Pair 生成（全合法管线）**：预声明网格 {S-03,S-01}×seeds 1-12×turns 1-4×每节点 ≤3 近舰变体+1 远舰对照 → 273 对（200 主 + 73 对照 B），1 次生成失败。全部通过 public-obs/legal-actions/own-sealed 三重哈希相等；axis 视图哈希**不同**（干预只改隐藏状态的程序化证明）。备选承诺取自 `engine.movement_candidates`，无任何 state surgery。
+- **Q 估计**：确定性脚本化续局（双方 TacticalCommander balanced），CRN dice-stream replicates。5-rep pilot：120/200 可评估但仅 8 个过任务 CI 规则（功效墙）→ 预注册的 outcome-blind 功效扩展至 15 reps（164 对，注册先于看结果）。主值=胜负结果，副值=归一化损伤差。
+- **最终数字（15 reps）**：主值置信有效 20 对（S-03:12/S-01:8），**≥0.10 占 20%**（4/20，max 0.40）；副值 22 对，36%（8/22，max 0.84）；nontrivial 仅 6/11（门要求 ≥25）。对照 B：主值 22% ≥0.10 **不低于主组**（20%）；副值 10% 低于 36%。Control A 全部 273 对 bit-identical（管线确定性证明）。
+- **G1_IBS_NATURALITY = FAIL**（合取门三处不过：pair 数、有效数、主值下对照分离）；**FINAL_M1_STATUS = B_TOY_ONLY**。现象真实存在且可审计（10 个强案例，board 渲染+Q 表+regret 分解），但预声明网格下的自然密度 ~1/11-20 远低于门。
+- **结构性发现（给 PI）**：隐藏承诺**频繁改变价值**（65/120 对 outcome 跨分支差 ≥0.2）但**很少重排游戏自身候选集的动作**——"价值分歧 ≠ 决策混叠"的差距正是本门要测的东西，在 IBS 鱼雷窗口很大；置信与遗憾在可行预算下反相关（排名可分辨的 pair 恰是两界都有鲁棒动作的 pair）；脚本化续局 + "不发射"鲁棒候选是主要 regime-killer。若 PI 要救活：接触时刻最优续局 Q、全合法批次候选集、绑定想定胜利边际的值函数——均为 M2 规模，未执行。
+- **纪律记录**：功效扩展先注册后执行（G1-POWER-002）；一个 falsy-zero 分析 bug（把 control_a_max_diff=0.0 当缺失）在读取最终数字前修复；未为过门修改任何 pair 定义/阈值；pair 密度不足时未追加网格轮次（避免 threshold-chasing）。预算：~35k/50k rollouts，0 付费 LLM，引擎 0 改动。
+- **提交**：`27f23b2`（G1 全部代码+证据）；包 `research/m1/M1_G1_CHECKPOINT.zip` sha256 `7f79f8ab…`（37 文件，2.4MB→245KB）。

@@ -74,6 +74,10 @@
 
 2026-09-18 完成 P0 审计 + P1 Exact Lab + A0/B0/C0/D0 cheap kill tests，止步于 checkpoint（M0 计划纪律：PI 审查前不进 discovery）。结论：**A=WEAK，B=PASS_TO_DISCOVERY（条件性，IBS 反例未做），C=FAIL（borderline F12 待 PI 裁定），D=FAIL**。证据入口 `research/m0/CHEAP_KILL_REPORT.md`；IBS 对局预算 2238/20000；生产模块零改动。详见 `havedone.md` 2026-09-18 M0 条目与 `memory/m0-cheap-kill-findings.md`。
 
+## 1.6 M1 G1（分支 research/m1-decision-state）
+
+2026-09-19 完成 G1（IBS 自然 commitment 决策混叠验证）：**G1_IBS_NATURALITY = FAIL → FINAL_M1_STATUS = B_TOY_ONLY**，按纪律停在 checkpoint（未进 G2/神经网络/DSRL/PPO）。现象真实可审计（10 强案例，max normalized regret 0.84 damage / 0.40 outcome，CI-passing）但自然密度 6-11 nontrivial pairs << 25；主值下对照不更低。证据入口 `research/m1/g1/G1_EXECUTIVE_SUMMARY.md`；包 `research/m1/M1_G1_CHECKPOINT.zip`。预算 ~35k/50k rollouts。
+
 ## 2. 阶段台账
 
 > **重要**：阶段 1–11 在 2026-09-13 之前已有历史产物（v12/v13/v14 研究线），但这些产物是在本流水线成立**之前**产生的，其"是否符合本流水线的阶段定义与门控要求"**尚未按本流水线重新核验**，因此统一标记 ⟨待核⟩，不得直接升为 ✅。
