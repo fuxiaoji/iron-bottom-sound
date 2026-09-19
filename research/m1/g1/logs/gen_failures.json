@@ -1,0 +1,15 @@
+[
+  {
+    "stage": "build_pair",
+    "scenario": "IBS-S-01",
+    "seed": 4,
+    "turn": 2,
+    "errors": [
+      {
+        "axis_movement": [
+          "IBS-U-IJN-HATSUYUKI: circling direction must remain constant"
+        ]
+      }
+    ]
+  }
+]
