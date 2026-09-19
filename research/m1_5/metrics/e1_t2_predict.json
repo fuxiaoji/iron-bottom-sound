@@ -1,0 +1,54 @@
+{
+  "n": 120,
+  "positives": 13,
+  "feature_names": [
+    "n_own",
+    "n_enemy_visible",
+    "nearest_enemy_dist",
+    "mean_enemy_dist",
+    "bearing_delta",
+    "enemy_spread",
+    "own_spread",
+    "own_torpedo_ready",
+    "own_damage_frac",
+    "score_margin",
+    "turn",
+    "own_hp_total",
+    "visible_enemy_vp"
+  ],
+  "models": {
+    "logreg": {
+      "auroc_mean": 0.4591991341991342,
+      "auroc_std": 0.1380914684475411,
+      "auprc_mean": 0.1448087098087098,
+      "recall_at_20pct": 0.15384615384615385,
+      "recall_at_30pct": 0.3076923076923077,
+      "fn_regret_mass_frac_at_20pct": 0.8811808279171438,
+      "fn_regret_mass_frac_at_30pct": 0.7654292764560482
+    },
+    "gbdt": {
+      "auroc_mean": 0.366991341991342,
+      "auroc_std": 0.08189347846298216,
+      "auprc_mean": 0.12338697534349709,
+      "recall_at_20pct": 0.0,
+      "recall_at_30pct": 0.23076923076923078,
+      "fn_regret_mass_frac_at_20pct": 1.0,
+      "fn_regret_mass_frac_at_30pct": 0.8106937229638029
+    },
+    "mlp_small": {
+      "auroc_mean": 0.46922799422799427,
+      "auroc_std": 0.10773165523192325,
+      "auprc_mean": 0.17018613022011864,
+      "recall_at_20pct": 0.15384615384615385,
+      "recall_at_30pct": 0.15384615384615385,
+      "fn_regret_mass_frac_at_20pct": 0.8756697345923361,
+      "fn_regret_mass_frac_at_30pct": 0.8756697345923361
+    }
+  },
+  "gate": {
+    "auroc_ge_075": false,
+    "recall_20_30_ge_070": false
+  },
+  "verdict": "FAIL",
+  "note": "labels carry noise on non-CI-passing pairs (rho measured, ranking uncertain)"
+}

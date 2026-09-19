@@ -1,0 +1,49 @@
+{
+  "n_states": 40,
+  "n_complete": 40,
+  "reps": 5,
+  "n_incomplete": 0,
+  "incomplete_examples": [],
+  "hybrid_vs_direct": {
+    "mean_diff": 0.02,
+    "median_diff": 0.0,
+    "win_loss_tie": [
+      10,
+      6,
+      24
+    ],
+    "mean_relative_improvement": 0.18875
+  },
+  "hybrid_vs_shuffled": {
+    "mean_diff": -0.010000000000000004,
+    "median_diff": 0.0,
+    "win_loss_tie": [
+      5,
+      5,
+      30
+    ],
+    "mean_relative_improvement": null
+  },
+  "shuffled_vs_direct": {
+    "mean_diff": 0.030000000000000006,
+    "median_diff": 0.0,
+    "win_loss_tie": [
+      5,
+      1,
+      34
+    ],
+    "mean_relative_improvement": null
+  },
+  "hybrid_vs_direct_IBS-S-01": {
+    "n": 20,
+    "mean_diff": 5.551115123125783e-18,
+    "median_diff": 0.0,
+    "wins": 3
+  },
+  "hybrid_vs_direct_IBS-S-03": {
+    "n": 20,
+    "mean_diff": 0.039999999999999994,
+    "median_diff": 0.0,
+    "wins": 7
+  }
+}

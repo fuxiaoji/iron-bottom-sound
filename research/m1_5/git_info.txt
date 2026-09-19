@@ -1,0 +1,7 @@
+repo=https://github.com/fuxiaoji/iron-bottom-sound.git
+branch=research/m1_5
+parent_commit=261482f
+log:
+e3dc6a9 research(m1.5): stage-1 cheap-kill — E1-T1 PASS, E2-T1 PASS (pre-registered thresholds)
+261482f docs(m1): record G1 FAIL verdict + checkpoint zip 7f79f8ab in havedone/PROGRESS/memory
+27f23b2 research(m1): G1 natural aliasing gate — FAIL, stop at checkpoint (B_TOY_ONLY)

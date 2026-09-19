@@ -117,6 +117,7 @@ def capture_decision(eng, state, side, profile_name):
             "option_id": opt.option_id,
             "doctrine": str(opt.doctrine),
             "target_id": opt.target_id,
+            "order": opt.order,
             "expected_hits": float(opt.expected_hits),
             "salvo": int(opt.order.get("count", 1)),
             "denial_score": float(opt.denial_score),

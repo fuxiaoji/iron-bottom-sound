@@ -1,4 +1,4 @@
-sampled 200 decisions from 42 matches (1222s)
+sampled 200 decisions from 42 matches (1161s)
 {
   "n_decisions": 200,
   "n_matches_started": 42,
@@ -49,4 +49,3 @@ sampled 200 decisions from 42 matches (1222s)
   },
   "gate_threshold": 0.2
 }
-EXIT=0

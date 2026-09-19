@@ -1,0 +1,6 @@
+claim_id,track,claim_text,evidence_type,experiment_ids,supports_claim,counterevidence,scope_limit,status
+E1-C1,E1,decision-criticality under hidden commitments is sparse but consequential in IBS torpedo states,exact recomputation over frozen Q tables,E1-T1-RHO,83-90% low-rho; 10-17% high with stake median 0.333 (outcome),none measured,conditional on a live commitment difference; 2 commitments per state,SUPPORTED_WITH_SCOPE
+E1-C2,E1,criticality is predictable from agent-visible features,"5-fold CV, 3 model families",E1-T2-PREDICT,none,AUROC 0.37-0.47; FN regret mass 76-100%,single-snapshot features; noisy labels on 90/120 pairs (declared),REFUTED
+E2-C1,E2,planner influence features frequently change the selected torpedo action,heuristic ranking over 200 reachable decisions,E2-T1-SIGNAL,48.5% top-1 change; consistent across scenarios and doctrines,none at heuristic level,heuristic-level; artifact status unresolved until T2,SUPPORTED_WITH_SCOPE
+E2-C2,E2,influence-aware selection yields better long-horizon outcomes,CRN simulator continuations,E2-T2-ROLLOUT,none,"+0.02 mean, 60% ties, S-01 exactly 0","40 states, scripted continuation",REFUTED
+E2-C3,E2,the effect is caused by strategic influence rather than action change per se,shuffled-label ablation,E2-T3-CAUSAL,none,true ≈ shuffled (-0.01); shuffled ≈ direct (+0.03),same 40 states,REFUTED
