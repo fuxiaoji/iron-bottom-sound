@@ -814,3 +814,17 @@
 - **对 PI 的开放解读（未判定）**：(a) evaluator 家族无法为位置价值定价（位置优势需要对手多回合有意利用才兑现）→ SCRIPTED_FLATTENING 假说未被推翻；(b) intent→plan 编译器太粗（60° 六角量化 + 逐舰贪心匹配）无法表达专家战术。修复后的 harness 已足以区分两者——下一步是 PI 的决定。
 - **预算与纪律**：gold 阶段约 700 次续局；所有阈值先于结果预注册；F9-F15 六项新失败/修复留档；未跑 mass census、未训练任何模型、生产引擎零改动。
 - **提交**：`014f235`→`210c417`→`c8f67f7`→本批；包 `research/m2_1/M2_1R_MEASUREMENT_GOLD_CHECKPOINT.zip` sha256 `d3c77d05…`（41 文件）。
+
+
+## 2026-09-21 — M2.1-R2 机制金分解：规则引擎对几何陡峭定价（3/5 PASS），失败定位到案例构建与战术假设——按门停止
+
+- **背景**：PI 判定 M2.1-R 的端到端 Gold Gate 无法定位失败环节，命令分解为 Stage A（规则机制）/ B（编译器保真）/ C（价值兑现），本轮只做 A。状态更正：GOLD_END_TO_END_GATE=FAIL、MECHANISTIC_GOLD_GATE=NOT_TESTED、COMPILER_FIDELITY=UNRESOLVED、VALUE_REALIZATION=UNRESOLVED。
+- **Stage A 结果（MECHANISTIC_GOLD_GATE = FAIL，3/5）**：
+  - **MG1 BROADSIDE = PASS（+92.9%）**：hold（宽舷 3 炮位）vs 60° 转向（1 炮位）受控实验（两段式探针先学目标战后位置——同时移动使先验方位失效，F18）；公共距离期望命中 3.00 vs 1.56。关键规则事实：首 MF 必须直航（无 cost-0 转向计划）。
+  - **MG2 CROSSING_T = PASS（1.68×）**：抢 T 臂 own GF 651 > enemy 486，净交换 +41.6 vs 平行臂 +24.7（≥1.25×），64 对纵向修正。反直觉记录：PARALLEL 臂总 GF 更高（736）——故事在方位角不在火力总量。
+  - **MG3 RANGE_CONTROL = PASS（2.72×）**：EM-01 BB 在 d=15 vs d=17 期望命中 2.56 vs 0.94——射程修正极陡。
+  - **MG4 = FAIL（CASE_CONSTRUCTION_FAIL）**：真实 TorpedoOrder 三种瞄准方案下两臂在 T+1 路由上逐 13 位小数相同——鱼雷未能约束下一回合路由。 torpedo 持久性语义需源码研究；按菜单分类为案例构建失败（非规则 bug 主张）。
+  - **MG5 = FAIL（TACTICAL_ASSUMPTION_NOT_SUPPORTED）**：DISPERSE 边际反而更好（82.7 vs 56.6）——炮程 8+ hex 超过 6 hex 集群间距，局部优势在期望命中边际上无法体现。
+- **科学结论（对 PI 最重要）**：**规则引擎不是问题**——航向/方位/射程在规则内有 2-3 倍级别的陡峭定价，"LOW_LEVERAGE_PLATFORM" 在规则层被杀死。此前各轮的平坦 E0 必然来自编译器（60° 量化+逐舰贪心无法把舰队摆进规则奖励的几何）或价值兑现层（脚本/对抗续局不为位置优势兑现）——Stage B/C 现在有具体的 MG 几何作为验收标准，去模糊化完成。
+- **失败与修复留档**：F16（对手鱼雷批次未提交）、F17（同发射器重复订单非法）、F18（先验方位在同时移动下失效→两段式设计）、F19（D66 期望积分而非 2d6）、F20（MG3 相对差距除零伪影）。
+- **提交与打包**：`c8f67f7`→`75b9f55`→本批；包 `research/m2_1/M2_1R2_MECHANISTIC_GOLD_CHECKPOINT.zip` sha256 `d2556f1b…`（49 文件）。预算：~2500 次评估；0 付费 LLM；引擎零改动；未训练模型；未跑 mass census；Stage B/C 未进入。

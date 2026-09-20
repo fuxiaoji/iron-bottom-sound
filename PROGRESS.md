@@ -94,6 +94,10 @@
 
 2026-09-20：PI 判定原 E0 无效（gunnery 分支对手批次未提交）。四项修复完成并验证（U1 公式+单测、derived-seed replicates、双方 submit+seal、P0/T0/T1/T2/Terminal、显式 baseline），另修 F9/F10 两个自找 bug。5 个 Gold Cases 全部建成并评估：**GOLD_EVALUATOR_GATE = FAIL**（0/5 ≥0.05；最大 0.033；G1 在 E3 下反号）。按指令停止，未跑 mass census。包 sha256 `d3c77d05…`。开放问题：SCRIPTED_FLATTENING vs 候选编译器太粗——修复后的 harness 已可区分。
 
+## 1.11 M2.1-R2 机制金分解（分支 research/m2-1-platform-audit）
+
+2026-09-21 Stage A 完成：**MECHANISTIC_GOLD_GATE = FAIL（3/5）**——规则引擎对几何陡峭定价（MG1 +92.9% broadside / MG2 1.68× cross-T / MG3 2.72× 射程），MG4 案例构建失败、MG5 战术假设在平台尺度不成立。失败定位成功：问题在编译器与价值兑现层，不在规则引擎。按指令停止（Stage B/C 未进入）。包 sha256 `d2556f1b…`。
+
 ## 2. 阶段台账
 
 > **重要**：阶段 1–11 在 2026-09-13 之前已有历史产物（v12/v13/v14 研究线），但这些产物是在本流水线成立**之前**产生的，其"是否符合本流水线的阶段定义与门控要求"**尚未按本流水线重新核验**，因此统一标记 ⟨待核⟩，不得直接升为 ✅。

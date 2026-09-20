@@ -23,6 +23,7 @@
 | [m20-org-intel-reset-required.md](m20-org-intel-reset-required.md) | M2-0 组织智能三线全灭→RESET_REQUIRED；脚本化续局是系统性 regime 杀手 | project |
 | [m21-platform-audit-partial.md](m21-platform-audit-partial.md) | M2.1 部分审计：规则 0 bug；同 seed≠CRN 实证；炮击层低杠杆；movement 因候选覆盖质疑未判定 | project |
 | [m21r-gold-gate-fail.md](m21r-gold-gate-fail.md) | M2.1-R 测量修复完成但 Gold Gate FAIL（0/5）；G1 对抗下反号；开放=洗平 vs 编译器表达力 | project |
+| [m21r2-mechanistic-decomposition.md](m21r2-mechanistic-decomposition.md) | M2.1-R2 机制分解：规则引擎陡峭定价几何（MG1/2/3 PASS）——问题定位在编译器与价值兑现层 | project |
 
 ---
 
