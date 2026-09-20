@@ -1,0 +1,5 @@
+claim_id,layer,claim,evidence_type,experiment_ids,supporting_result,counterevidence,scope_limit,status
+M21-C1,rules,engine implements written rules without bugs affecting experiment semantics,source audit + live probes,P0-CONF-001,0 BUG/UNKNOWN; probes pass,none,at commit 184f605; 8-vs-4 cap recorded not fixed,SUPPORTED
+M21-C2,rng,same-seed branches are draw-aligned (CRN usable),branch probe,P1-RNG-002,none,45 vs 63 draws; divergence at dice event 2,all action-differing branches,REFUTED
+M21-C3,gunnery,gunnery target allocation has decision leverage,E0 census,E0-GUN-003,hold-vs-fire gap,median 0.000-0.018; zero states >=0.05,30 snapshots; scripted continuation,REFUTED (allocation-level; hold-vs-fire trivially supported)
+M21-C4,movement/torpedo/realistic,movement/torpedo/command layers have leverage,-,E0-MOV-004/TORP-005/E1-008,not measured,n/a,-,OPEN (interrupted)

@@ -1,0 +1,9 @@
+repo=https://github.com/fuxiaoji/iron-bottom-sound.git
+branch=research/m2-1-platform-audit
+parent=184f605
+log:
+210c417 research(m2-1): fix registry field mismatch
+2edf77d research(m2-1): stage stopped by PI at 80/93 — gunnery layer LOW, movement/torpedo NOT_MEASURED, coverage FAIL recorded with fix spec
+7d8d415 research(m2-1): record user-raised coverage risk F8 + pre-register the three masking tests
+09308a7 research(m2-1): P0 conformance PASS (0 bug/unknown; illegal-move fallback = interface choice; 8-vs-4 cap recorded) + P1 RNG audit: MATCHED_INITIAL_SEEDS_ONLY (draw counts diverge on real branches)
+184f605 docs(m2-0): record RESET_REQUIRED verdicts + bundle d539ab28 in havedone/PROGRESS/memory
