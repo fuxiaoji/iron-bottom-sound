@@ -1,0 +1,560 @@
+[
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t1_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t1_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t2_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t2_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t2_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t2_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t3_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t3_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t3_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t3_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t4_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t4_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t4_axis_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-01",
+  "n_candidates": 7
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t4_allies_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-01",
+  "n_candidates": 6
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t4_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t4_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t5_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 13
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t5_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 15
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t5_axis_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-01",
+  "n_candidates": 6
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t5_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t5_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t6_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 11
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t6_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t7_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 12
+ },
+ {
+  "snapshot_id": "IBS-S-01_s1_balanced-balanced_t7_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 15
+ },
+ {
+  "snapshot_id": "IBS-S-01_s2_balanced-balanced_t2_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 13
+ },
+ {
+  "snapshot_id": "IBS-S-01_s2_balanced-balanced_t2_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 13
+ },
+ {
+  "snapshot_id": "IBS-S-01_s2_balanced-balanced_t2_allies_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-01",
+  "n_candidates": 6
+ },
+ {
+  "snapshot_id": "IBS-S-01_s2_balanced-balanced_t3_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-01_s2_balanced-balanced_t3_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-01",
+  "n_candidates": 15
+ },
+ {
+  "snapshot_id": "IBS-S-01_s2_balanced-balanced_t3_allies_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-01",
+  "n_candidates": 7
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t1_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 10
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t1_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 12
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t1_axis_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-03",
+  "n_candidates": 7
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t1_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-03",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t1_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-03",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t2_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 12
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t2_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 13
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t2_allies_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-03",
+  "n_candidates": 7
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t2_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-03",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t2_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-03",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t3_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t3_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t3_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-03",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t3_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-03",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t4_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 12
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t4_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 12
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t4_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-03",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-03_s1_balanced-balanced_t4_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-03",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-03_s2_balanced-balanced_t1_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 11
+ },
+ {
+  "snapshot_id": "IBS-S-03_s2_balanced-balanced_t1_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 13
+ },
+ {
+  "snapshot_id": "IBS-S-03_s2_balanced-balanced_t1_axis_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-03",
+  "n_candidates": 7
+ },
+ {
+  "snapshot_id": "IBS-S-03_s2_balanced-balanced_t1_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-03",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-03_s2_balanced-balanced_t1_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-03",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-03_s2_balanced-balanced_t2_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 13
+ },
+ {
+  "snapshot_id": "IBS-S-03_s2_balanced-balanced_t2_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 13
+ },
+ {
+  "snapshot_id": "IBS-S-03_s2_balanced-balanced_t2_allies_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-03",
+  "n_candidates": 7
+ },
+ {
+  "snapshot_id": "IBS-S-03_s2_balanced-balanced_t3_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-03_s2_balanced-balanced_t3_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 13
+ },
+ {
+  "snapshot_id": "IBS-S-03_s2_balanced-balanced_t4_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 11
+ },
+ {
+  "snapshot_id": "IBS-S-03_s2_balanced-balanced_t4_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-03",
+  "n_candidates": 11
+ },
+ {
+  "snapshot_id": "IBS-S-03_s3_balanced-balanced_t1_axis_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-03",
+  "n_candidates": 7
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t1_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t1_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t2_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 12
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t2_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 12
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t2_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t2_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t3_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 13
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t3_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 11
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t3_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t3_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t4_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t4_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 13
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t4_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t4_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t5_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 10
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t5_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 12
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t5_axis_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t5_allies_gunnery",
+  "layer": "gunnery",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 9
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t6_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 13
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t6_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 12
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t7_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t7_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t8_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 11
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t8_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 15
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t9_axis_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 15
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t9_allies_movement",
+  "layer": "movement",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 14
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t11_axis_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 7
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t11_allies_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 6
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s1_balanced-balanced_t12_axis_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 6
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s2_balanced-balanced_t7_axis_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 6
+ },
+ {
+  "snapshot_id": "IBS-S-EM-01_s2_balanced-balanced_t8_axis_torpedo",
+  "layer": "torpedo",
+  "scenario": "IBS-S-EM-01",
+  "n_candidates": 7
+ }
+]

@@ -1,0 +1,5 @@
+IBS-S-01: {'movement': 16, 'gunnery': 10, 'torpedo': 5}
+IBS-S-03: {'movement': 16, 'gunnery': 10, 'torpedo': 5}
+IBS-S-EM-01: {'movement': 16, 'gunnery': 10, 'torpedo': 5}
+total snapshots: 93
+EXIT=0
