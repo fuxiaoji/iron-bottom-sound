@@ -803,3 +803,14 @@
 - **E0 炮击层（完成，30 快照×3 场景）**：中位 λ(90-10) 0.000-0.018，**无任何状态 ≥0.05**；hold-vs-fire 差异真实（即时 U1 0.237 vs 0.20-0.23，11 检定 vs 0）但**目标分配级差异≈0**（五个 profile 的炮击批次完全相同——自动分配器即共识）。GUNNERY_LEVERAGE=LOW。
 - **movement/torpedo 层（未测完）**：第一次运行 63 个 movement 快照因 dict-candidate 反序列化 bug 全失败；修复后重跑到 80/93 被 PI 指示停止，movement 层数值在进程内未落盘。**用户（游戏专家）提出关键覆盖性质疑（F8）**：候选集缺少联合战术计划（抢舷侧全火力、crossing T、鱼雷航道封锁、距离控制变速）——movement 杠杆在任何判定前必须先扩充候选并经 E2/E3（脚本续局洗平检验）重测。
 - **打包**：`research/m2_1/M2_1_PLATFORM_STRATEGIC_LEVERAGE_AUDIT.zip` sha256 `4977395c…`（27 文件）。EXECUTIVE_SUMMARY 全部字段如实标注（movement/torpedo/realistic=NOT_MEASURED；E1/E2/E3=NOT_RUN；平台判定=INCOMPLETE；B=KEEP_SUSPENDED；NEXT_PI_DECISION_NEEDED 列出三条路线）。提交 `09308a7`→`014f235`。
+
+
+## 2026-09-20 — M2.1-R 测量修复 + Gold Cases：GOLD_EVALUATOR_GATE = FAIL，按指令停止交 PI
+
+- **背景**：PI 审查 M2.1 checkpoint 后判定测量 harness 有缺陷（四项），原 E0 作废（GUNNERY_LEVERAGE=INVALID_PENDING_RERUN），命令先修测量再建 5 类 Gold Cases 验证 evaluator，门 = ≥4/5 案例产生 ≥0.05 战术分离。
+- **四项修复全部完成并验证**：① U1 改回冻结定义（损伤 VP/快照固定 VP 总量，sunk=1），4/4 单测过（零损伤=0/敌方全沉>0/己方全沉<0/对称=0）；② replicates 改用 sha256(snapshot|replicate) 派生 seed 重键（保留 branch-point counter），同 replicate 各 arm 同 seed，仍称 matched-seed 不称 CRN；③ gunnery 分支对手批次现在**真正 submit**（原实现只 choose_plan 未提交——正是 PI 发现的 bug，F13 确认），修复后 hold P0=0.0 vs fire P0=0.0978 可测；④ 检查点重定义 P0/T0/T1/T2/Terminal（原 H0 循环根本不执行当回合 resolution）；⑤ __baseline__ 移除，baseline=POLICY_BALANCED 走同一管线。
+- **额外自找并修复两个 harness bug**：F9 gold 几何采样只 advance 一次（舰未动）；**F10 航向算术 off-by-one**（`((bearing-1)%6)+1 ≡ bearing`）导致全部战术意图坍缩为同一批次（9/9 舰计划相同）——修正后候选 9/9 分化。
+- **Gold Gate 结果（GOLD_EVALUATOR_GATE = FAIL，0/5 分离）**：5 案例全部建成（reachable replay states，全部过真 validator）。T2 差距：G1 unmask +0.003、G2 cross-T +0.012、G3 range spread 0.033（最大）、G4/G5 +0.004——方向 4/5 偏战术候选但幅度全部低于 0.05 门。**E3 关键发现：G1 在对抗评估器下反号**（unmask +0.011@E0 → −0.015@E3：暴露舷侧同时暴露自己）；E3 把 E0 差距压缩 2-4 倍。G4 的鱼雷走廊价值在 movement 层不可表达（需 torpedo 层候选），已记录为案例设计缺口。
+- **对 PI 的开放解读（未判定）**：(a) evaluator 家族无法为位置价值定价（位置优势需要对手多回合有意利用才兑现）→ SCRIPTED_FLATTENING 假说未被推翻；(b) intent→plan 编译器太粗（60° 六角量化 + 逐舰贪心匹配）无法表达专家战术。修复后的 harness 已足以区分两者——下一步是 PI 的决定。
+- **预算与纪律**：gold 阶段约 700 次续局；所有阈值先于结果预注册；F9-F15 六项新失败/修复留档；未跑 mass census、未训练任何模型、生产引擎零改动。
+- **提交**：`014f235`→`210c417`→`c8f67f7`→本批；包 `research/m2_1/M2_1R_MEASUREMENT_GOLD_CHECKPOINT.zip` sha256 `d3c77d05…`（41 文件）。

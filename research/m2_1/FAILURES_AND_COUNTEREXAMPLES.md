@@ -95,3 +95,19 @@ M2.1 checkpoint are therefore INVALID_PENDING_RERUN, exactly as the PI ruled.
 The repaired evaluator (repair/evaluator.py) scripts AND submits the opponent
 batch through the standard advance() machine, verified by the repaired
 gunnery probe (hold vs fire now differ at P0: 0.0 vs 0.0978).
+
+## F14. G2/G3/G4/G5 arm-value collapse explained (movement-intent aliasing)
+CLOSE_RANGE (G3), PRESS_CORRIDOR (G4) and CONCENTRATE (G5) all compile to the
+same fleet-level steering ("head at the enemy, fast"), so their arm values are
+identical by construction; OPEN/REFUSE/DISPERSE likewise alias to "head away,
+fast". The intent vocabulary is thus effectively 2 movement plans per case in
+these states, and the 90-10 spread over them cannot exceed the CLOSE-vs-OPEN
+gap. A future gate needs intents that compile to DIFFERENT geometry (e.g.
+unmask vs narrow are the only pair that diverges on all 9 ships).
+
+## F15. E3 definition subtlety in the gold run
+Gold E3 re-keys the seed by the arm-independent (snapshot|replicate) string,
+so adversarial and scripted arms share streams until divergence — but because
+the opponent profile differs, its order stream diverges immediately at its
+first choice; matched-seed holds only up to that point. Reported as
+matched-seed, per the standing RNG audit.
