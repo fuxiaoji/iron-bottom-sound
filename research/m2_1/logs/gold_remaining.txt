@@ -1,0 +1,5 @@
+G3_RANGE_CONTROL: IBS-S-01 s1 t2 sep=None
+G4_TORPEDO_CORRIDOR_DENIAL: IBS-S-01 s1 t2 sep=False
+G5_LOCAL_FORCE_SUPERIORITY: IBS-S-01 s1 t2 sep=False
+{"built": 5, "separated": 0, "required": ">=4 of 5 with clear separation", "verdict": "GOLD_EVALUATOR_GATE=FAIL"}
+EXIT=0

@@ -1,0 +1,239 @@
+{
+ "cases": {
+  "G1_BROADSIDE_UNMASKING": {
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 2,
+   "side": "allies",
+   "candidates": [
+    "UNMASK_BROADSIDE",
+    "KEEP_NARROW"
+   ],
+   "geometry": {
+    "UNMASK_BROADSIDE": {
+     "expected_hits": 0.0,
+     "broadside_ships": 4,
+     "narrow_ships": 5,
+     "mounts_total": 8
+    },
+    "KEEP_NARROW": {
+     "expected_hits": 0.0,
+     "broadside_ships": 4,
+     "narrow_ships": 5,
+     "mounts_total": 8
+    }
+   },
+   "e0": {
+    "UNMASK_BROADSIDE": {
+     "P0": 0.04512753433616743,
+     "T0": 0.06049590697072711,
+     "T1": 0.07732576775742243,
+     "T2": 0.09023180656274181
+    },
+    "KEEP_NARROW": {
+     "P0": 0.04512753433616743,
+     "T0": 0.04927302912914423,
+     "T1": 0.07456617722804773,
+     "T2": 0.08707841319352111
+    }
+   },
+   "e3": {
+    "UNMASK_BROADSIDE": 0.0572641986311051,
+    "KEEP_NARROW": 0.07163364213723926
+   },
+   "tactical_separation_T2": false
+  },
+  "G2_CROSSING_THE_T": {
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 2,
+   "side": "allies",
+   "candidates": [
+    "CROSS_T",
+    "KEEP_NARROW"
+   ],
+   "geometry": {
+    "CROSS_T": {
+     "expected_hits": 0.0,
+     "broadside_ships": 6,
+     "narrow_ships": 3,
+     "mounts_total": 8
+    },
+    "KEEP_NARROW": {
+     "expected_hits": 0.0,
+     "broadside_ships": 4,
+     "narrow_ships": 5,
+     "mounts_total": 8
+    }
+   },
+   "e0": {
+    "CROSS_T": {
+     "P0": 0.04512753433616743,
+     "T0": 0.06196635498793772,
+     "T1": 0.07442691600964983,
+     "T2": 0.09927003452183308
+    },
+    "KEEP_NARROW": {
+     "P0": 0.04512753433616743,
+     "T0": 0.04927302912914423,
+     "T1": 0.07456617722804773,
+     "T2": 0.08707841319352111
+    }
+   },
+   "e3": {
+    "CROSS_T": 0.0735069486868048,
+    "KEEP_NARROW": 0.07163364213723926
+   },
+   "tactical_separation_T2": false
+  },
+  "G3_RANGE_CONTROL": {
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 2,
+   "side": "allies",
+   "candidates": [
+    "CLOSE",
+    "OPEN",
+    "MAINTAIN"
+   ],
+   "geometry": {
+    "CLOSE": {
+     "expected_hits": 0.0,
+     "broadside_ships": 6,
+     "narrow_ships": 3,
+     "mounts_total": 8
+    },
+    "OPEN": {
+     "expected_hits": 0.0,
+     "broadside_ships": 4,
+     "narrow_ships": 5,
+     "mounts_total": 8
+    },
+    "MAINTAIN": {
+     "expected_hits": 0.0,
+     "broadside_ships": 4,
+     "narrow_ships": 5,
+     "mounts_total": 8
+    }
+   },
+   "e0": {
+    "CLOSE": {
+     "P0": 0.04512753433616743,
+     "T0": 0.05534494282695721,
+     "T1": 0.06769616474652446,
+     "T2": 0.10252814331951021
+    },
+    "OPEN": {
+     "P0": 0.04512753433616743,
+     "T0": 0.07335278630242659,
+     "T1": 0.07670473411480606,
+     "T2": 0.09915077728027369
+    },
+    "MAINTAIN": {
+     "P0": 0.04512753433616743,
+     "T0": 0.06662831173622541,
+     "T1": 0.08664155987896996,
+     "T2": 0.10439483777613275
+    }
+   },
+   "e3": {
+    "CLOSE": 0.08901801635614585,
+    "OPEN": 0.09028469532066653,
+    "MAINTAIN": 0.0808258887395578
+   },
+   "tactical_separation_T2": null
+  },
+  "G4_TORPEDO_CORRIDOR_DENIAL": {
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 2,
+   "side": "allies",
+   "candidates": [
+    "PRESS_CORRIDOR",
+    "REFUSE"
+   ],
+   "geometry": {
+    "PRESS_CORRIDOR": {
+     "expected_hits": 0.0,
+     "broadside_ships": 6,
+     "narrow_ships": 3,
+     "mounts_total": 8
+    },
+    "REFUSE": {
+     "expected_hits": 0.0,
+     "broadside_ships": 4,
+     "narrow_ships": 5,
+     "mounts_total": 8
+    }
+   },
+   "e0": {
+    "PRESS_CORRIDOR": {
+     "P0": 0.04512753433616743,
+     "T0": 0.05534494282695721,
+     "T1": 0.06769616474652446,
+     "T2": 0.10252814331951021
+    },
+    "REFUSE": {
+     "P0": 0.04512753433616743,
+     "T0": 0.07335278630242659,
+     "T1": 0.07670473411480606,
+     "T2": 0.09915077728027369
+    }
+   },
+   "e3": {
+    "PRESS_CORRIDOR": 0.08901801635614585,
+    "REFUSE": 0.09028469532066653
+   },
+   "tactical_separation_T2": false
+  },
+  "G5_LOCAL_FORCE_SUPERIORITY": {
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 2,
+   "side": "allies",
+   "candidates": [
+    "CONCENTRATE",
+    "DISPERSE"
+   ],
+   "geometry": {
+    "CONCENTRATE": {
+     "expected_hits": 0.0,
+     "broadside_ships": 6,
+     "narrow_ships": 3,
+     "mounts_total": 8
+    },
+    "DISPERSE": {
+     "expected_hits": 0.0,
+     "broadside_ships": 4,
+     "narrow_ships": 5,
+     "mounts_total": 8
+    }
+   },
+   "e0": {
+    "CONCENTRATE": {
+     "P0": 0.04512753433616743,
+     "T0": 0.05534494282695721,
+     "T1": 0.06769616474652446,
+     "T2": 0.10252814331951021
+    },
+    "DISPERSE": {
+     "P0": 0.04512753433616743,
+     "T0": 0.07335278630242659,
+     "T1": 0.07670473411480606,
+     "T2": 0.09915077728027369
+    }
+   },
+   "e3": {
+    "CONCENTRATE": 0.08901801635614585,
+    "DISPERSE": 0.09028469532066653
+   },
+   "tactical_separation_T2": false
+  }
+ },
+ "gate": {
+  "built": 5,
+  "separated": 0,
+  "required": ">=4 of 5 with clear separation",
+  "verdict": "GOLD_EVALUATOR_GATE=FAIL"
+ }
+}

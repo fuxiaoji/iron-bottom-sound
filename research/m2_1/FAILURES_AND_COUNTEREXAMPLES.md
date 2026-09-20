@@ -52,3 +52,46 @@ Also recorded: all five profiles produce IDENTICAL gunnery batches (checked
 at S-01 turn-1), so policy_* gunnery candidates are duplicates by
 construction; gunnery candidate diversity must come from target-assignment
 variants (concentrate/finish/hold/random), which the generator does build.
+
+
+---
+
+# M2.1-R measurement-repair failures (F9-F12)
+
+## F9. Gold-case geometry sampled one phase too early
+`gunnery_geometry` advanced the state only ONCE from movement_planning, which
+steps to TORPEDO_PLANNING — ships had not moved, so every candidate produced
+identical geometry. Fix: advance until phase == torpedo_effects (movement
+resolved, gunnery not yet fired).
+
+## F10. Heading arithmetic off-by-one collapsed tactical intents
+`((bearing - 1) % 6) + 1` is the identity on bearing, so UNMASK_BROADSIDE
+computed the same desired heading as KEEP_NARROW_CLOSE and all intent
+candidates collapsed to one joint batch (9/9 ships identical). Corrected wrap:
+`_hdg(bearing, k) = ((bearing - 1 + k) % 6) + 1`. After the fix the intent
+pairs select different plans for 9/9 ships. The collapse also silently
+invalidated the first gold-case run (0/5 with two cases comparing identical
+arms).
+
+## F11. Geometry sample point after scripted gunnery
+Even post-F9 the geometry sampler advanced through gunnery resolution, so
+`expected_hits` read 0 (mounts fired) and the "geometry" mixed movement
+posture with scripted-combat damage. Sample point for posture claims must be
+phase == GUNNERY (post-movement, pre-fire); the shipped gold cases report
+post-gunnery geometry instead, and G1's geometry proof is therefore weaker
+than the plan requires (value-path evidence used instead).
+
+## F12. Stale G1/G2 json entries across intent fix
+The G1/G2 entries in gold_cases.json predated the F10 fix; a re-run
+(gold_g12.py) replaced them before the gate verdict. Any earlier copy of the
+json (22:31 version) is obsolete.
+
+## F13. Opponent gunnery batch never submitted in the original E0
+(The PI-identified bug, confirmed and fixed.) The original e0_scripted.py
+gunnery branch called `choose_plan` for the opponent but never
+`submit_orders`, so only the focal side's batch was sealed and `_resolve_gunnery`
+resolved an empty opponent set. The gunnery-layer LOW-leverage numbers in the
+M2.1 checkpoint are therefore INVALID_PENDING_RERUN, exactly as the PI ruled.
+The repaired evaluator (repair/evaluator.py) scripts AND submits the opponent
+batch through the standard advance() machine, verified by the repaired
+gunnery probe (hold vs fire now differ at P0: 0.0 vs 0.0978).
