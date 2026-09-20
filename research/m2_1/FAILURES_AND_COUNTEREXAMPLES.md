@@ -111,3 +111,36 @@ so adversarial and scripted arms share streams until divergence — but because
 the opponent profile differs, its order stream diverges immediately at its
 first choice; matched-seed holds only up to that point. Reported as
 matched-seed, per the standing RNG audit.
+
+---
+
+# M2.1-R2 failures (mechanistic gold decomposition)
+
+## F16. Opponent torpedo batch never submitted in MG4's turn rollover
+Same family as the original E0 bug: resolving from TORPEDO_PLANNING requires
+BOTH sides' torpedo batches; the loop advanced without submitting the
+opponent's. Fixed by scripting+submitting both sides before each advance.
+
+## F17. Same launcher twice = invalid torpedo batch
+A "spread" assembled from multiple combos of the SAME launcher fails
+validation. Fixed with a (ship, launcher) dedupe.
+
+## F18. Pre-turn bearing is stale under simultaneous movement
+MG1's first design chose broadside/narrow plans against the PRE-movement
+bearing; the target moves in the same resolution, so the realized aspect was
+uncorrelated with the chosen one (arms produced identical post states despite
+"opposite" intents). Fix: a two-pass design — a probe run learns the target's
+deterministic post-movement position, then the plans are chosen against the
+POST bearing. This is the correct pattern for any simultaneous-movement
+mechanistic case.
+
+## F19. D66 expectation, not 2d6
+Gunnery hits are looked up on a D66 table (11-66) with base-six step
+modifiers; an expectation integral over 2d6 sums (2-12) crashes with KeyError
+and is simply the wrong distribution. Fixed by integrating the 36 uniform D66
+outcomes through d66_adjust.
+
+## F20. MG3 relative-gap formula divided by an artificial epsilon
+`eh_diff / (min(a, b, 1e-9) + 1e-9)` produced 8e8. The raw numbers (2.56 vs
+0.94, a 2.72x ratio) are the honest report; formula recorded as a bug, gate
+unaffected.

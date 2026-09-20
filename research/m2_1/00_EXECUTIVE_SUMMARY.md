@@ -1,84 +1,57 @@
-# 00_EXECUTIVE_SUMMARY.md — M2.1-R measurement repair + gold-case gate
+# 00_EXECUTIVE_SUMMARY.md — M2.1-R2 Mechanistic Gold Decomposition
 
-**Stage stopped per PI stop rule: GOLD_EVALUATOR_GATE = FAIL.**
+**Stage A (Mechanistic Gold) complete. GATE = FAIL (3 of 5). Stage B/C NOT RUN
+(gated). Stopped per PI instruction.**
 
 ```
-RULE_ENGINE_CONFORMANCE = PASS   (unchanged from M2.1; re-verified)
-RNG_PAIRING_STATUS = MATCHED_INITIAL_SEEDS_ONLY
-    (replicate scheme REPAIRED: each replicate now uses an independent
-     sha256-derived state.seed; all arms of a replicate share it; branch-point
-     rng_counter untouched. Matched-seed at seed level.)
-
-ACTION_COVERAGE_MOVEMENT = REBUILT
-    intent-based generator (UNMASK_BROADSIDE / CROSS_T / CLOSE / OPEN /
-    MAINTAIN / CONCENTRATE / BREAK_CONTACT...), candidates verified to differ
-    on 9/9 ships. ORACLE/PUBLIC split designed but only PUBLIC built this round.
-
-MOVEMENT_LEVERAGE = NOT_MEASURED (gate failed before census)
-TORPEDO_LEVERAGE = NOT_MEASURED
-REALISTIC_COMMAND_LEVERAGE = NOT_MEASURED
-GUNNERY_LEVERAGE = INVALID_PENDING_RERUN (PI ruling upheld: the original
-    branch never submitted the opponent batch; repaired pipeline verified to
-    measure hold-vs-fire correctly: P0 U1 0.0 vs 0.0978)
-
-SCRIPTED_CONTINUATION_ATTENUATION = PARTIAL EVIDENCE
-    G1 unmasking wins at E0 (+0.011 T0) but LOSES under adversarial
-    opponent (-0.015): positional value exists but is response-dependent.
-    G2/G3/G4/G5: E3 compresses E0 spreads by 2-4x.
-HORIZON_MASKING = AMBIGUOUS (T0 favors cautious arms, T2 favors tactical
-    arms in G3/G4/G5 — a crossover, magnitudes 0.004-0.032)
-VICTORY_METRIC_MASKING = UNTESTED
-
-PLATFORM_DIAGNOSIS = UNRESOLVED
-IBS_FUTURE_ROLE = NO VERDICT (gate failed before the evidence existed)
-B_COMMAND_ORGANIZATION = KEEP_SUSPENDED
-NEXT_PI_DECISION_NEEDED =
-    1. the gate failed with PUBLIC tactical candidates compiled by a greedy
-       per-ship plan matcher (60-degree hex quantization). Options: invest in
-       a real intent-to-plan compiler (path-level maneuvers, multi-turn
-       shapes) and retry the gate; or
-    2. accept that the evaluator family (scripted + profile pool + local
-       minimax) cannot price positional value, and demote IBS to an
-       application benchmark; or
-    3. build the frozen Research Evaluation Policy first (E2/E3-grade), then
-       re-run the gate.
+MECHANISTIC_GOLD_GATE = FAIL (3/5: MG1 PASS, MG2 PASS, MG3 PASS,
+                              MG4 FAIL[CASE_CONSTRUCTION_FAIL],
+                              MG5 FAIL[TACTICAL_ASSUMPTION_NOT_SUPPORTED])
+COMPILER_FIDELITY = NOT_TESTED (Stage B gated)
+VALUE_REALIZATION = NOT_TESTED (Stage C gated)
+PLATFORM_DIAGNOSIS = NO_VERDICT (but see "the new fact" below)
 ```
 
-## What the repair accomplished (all PI items)
+## The decomposition worked — and located the problem
 
-1. U1 repaired to the frozen definition (damage VP / constant snapshot VP
-   total; sunk = full value); 4/4 unit tests pass (zero/no-damage, enemy
-   sunk > 0, own sunk < 0, symmetric = 0).
-2. Replicates re-keyed by sha256(snapshot, replicate) seeds; branch-point
-   counter untouched; no overlapping-stream offsets.
-3. Gunnery branch: opponent batch is now SUBMITTED (not just generated)
-   before seal; verified: hold P0 = 0.0 vs fire P0 = 0.0978 in the repaired
-   pipeline.
-4. Checkpoints redefined to P0/T0/T1/T2/Terminal with phase-machine-exact
-   boundaries.
-5. Baseline removed as a separate path; POLICY_BALANCED is the scripted
-   baseline arm through the identical pipeline.
+This round separated what every previous round conflated. The rule engine was
+measured directly, with no compiler, no neural net, no scripted continuation
+between the tactic and the meter:
 
-Plus two self-found harness bugs fixed en route: F9 (gold-case geometry
-sampled one advance too early), F10 (heading off-by-one collapsing all
-tactical intents into one batch — 9/9 ships identical plans).
-
-## Gold gate (the PI's accept/reject test)
-
-5/5 cases built and evaluated; **0/5 separated at T2 >= 0.05**:
-
-| case | tactical vs cautious (T2, E0) | E3 (adversarial) |
+| mechanism | rule-native measurement | verdict |
 |---|---|---|
-| G1 broadside unmasking | +0.003 | **flips negative (-0.015)** |
-| G2 crossing the T | +0.012 | wiped (0.074 vs 0.072) |
-| G3 range control | spread 0.033 | compressed to 0.009 |
-| G4 torpedo corridor (movement proxy) | +0.004 | wiped |
-| G5 local force concentration | +0.004 | wiped |
+| broadside vs narrow aspect | +92.9% expected hits at common distance (3 vs 1 mounts bearing) | **priced steeply** |
+| crossing the T | own GF 651 vs enemy 486; net exchange 1.68x parallel; 64 longitudinal pairs | **priced steeply** |
+| range control (2 hexes for a BB) | 2.56 vs 0.94 expected hits | **priced steeply** |
+| torpedo corridor denial | turn-T launches had ZERO effect on T+1 routes (arms identical to 13 decimals) | case construction failed |
+| local force superiority | concentrate margin WORSE than disperse (56.6 vs 82.7) — gun range exceeds fleet spacing | assumption unsupported at this scale |
 
-The direction is consistently pro-tactical at T2 in 4 of 5 cases and G3's
-range-control spread (0.033) is the largest measured — but everything sits
-3-10x below the gate, and E3 either compresses or flips the sign. Under the
-plan's own vocabulary: the platform question remains UNRESOLVED between
-"scripted/adversarial evaluators flatten real positional value" and "the
-candidate compiler cannot express the tactics". The repaired harness is now
-good enough to tell them apart — that next measurement is the PI's call.
+**The rule engine is not the problem.** Heading, aspect and range carry
+2-3x consequences inside the rules. This kills the "LOW_LEVERAGE_PLATFORM"
+reading at its root: a platform whose rules price a 60-degree turn at +93%
+expected hits is not a low-leverage game.
+
+The earlier rounds' flat E0 numbers must therefore come from one or both of:
+
+1. **COMPILER_FIDELITY**: the intent-to-plan compiler (60-degree hex
+   quantization + greedy per-ship plan matching) cannot steer fleets into the
+   geometries the rules reward. Stage B was built to test exactly this and
+   now has sharp per-case targets to test against (the MG geometries).
+2. **VALUE_REALIZATION**: the evaluator family (scripted continuation,
+   profile pool, local minimax) does not cash in positional advantages that
+   the rules would eventually pay out. The G1 adversarial flip (unmasking
+   wins at E0, loses at E3) already shows value realization is
+   response-dependent.
+
+Stage B and Stage C — now unblurred — are the next two experiments, in that
+order, each with a crisp PASS/FAIL against the MG geometries recorded here.
+
+## Integrity notes
+
+- All 5 cases are RESEARCH_MICRO_SANITY_CASEs built from reachable replay
+  states; every order passed the full validator; zero state surgery.
+- Three new harness failures found and fixed during construction (F16
+  opponent torpedo submission, F17 same-launcher duplicate orders, F18
+  post-movement bearing staleness) plus one metric gap (F19 D66 vs 2d6
+  expectation — expectation must integrate the 36-outcome D66 table).
+- Budget: ~2,500 route/continuation evaluations; 0 paid LLM; engine untouched.

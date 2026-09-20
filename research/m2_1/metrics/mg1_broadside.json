@@ -1,0 +1,27 @@
+{
+ "BROADSIDE": {
+  "post_bearing": 2,
+  "post_rel": 1,
+  "distance": 4,
+  "mounts_bearing": 3,
+  "main_gf_bearing": 5.0,
+  "expected_hits": 2.999999999999995
+ },
+ "NARROW": {
+  "post_bearing": 1,
+  "post_rel": 5,
+  "distance": 3,
+  "mounts_bearing": 1,
+  "main_gf_bearing": 5.0,
+  "expected_hits": 1.5555555555555556
+ },
+ "verdict": {
+  "gate": "PASS",
+  "threshold": ">= +25% available main-GF (post-movement bearing) or common-distance expected hits",
+  "gf_improvement_pct": 0.0,
+  "eh_improvement_pct_common_distance": 92.9,
+  "d_ref": 4,
+  "post_rel_broad": 1,
+  "post_rel_narrow": 5
+ }
+}

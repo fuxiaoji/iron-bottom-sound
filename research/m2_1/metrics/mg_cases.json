@@ -1,0 +1,22 @@
+{
+ "MG5": {
+  "CONCENTRATE": {
+   "own_active_ships": 9,
+   "own_usable_gf": 527.0,
+   "own_expected_hits": 96.58333333333366,
+   "enemy_expected_hits": 40.00000000000074,
+   "hit_margin": 56.58333333333292
+  },
+  "DISPERSE": {
+   "own_active_ships": 9,
+   "own_usable_gf": 593.0,
+   "own_expected_hits": 121.00000000000026,
+   "enemy_expected_hits": 38.250000000000675,
+   "hit_margin": 82.74999999999957
+  },
+  "gate": {
+   "margin_ratio": 0.6837865055387699,
+   "verdict": "FAIL"
+  }
+ }
+}
