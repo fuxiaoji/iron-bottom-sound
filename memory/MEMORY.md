@@ -21,6 +21,7 @@
 | [m1-g1-fail-b-toy-only.md](m1-g1-fail-b-toy-only.md) | M1 G1=FAIL（B_TOY_ONLY）：价值分歧普遍但决策混叠稀少；复活杠杆清单 | project |
 | [m15-both-tracks-fail-none.md](m15-both-tracks-fail-none.md) | M1.5 双轨全灭（E1 不可预测/E2 无因果）——commitment 挖题线终结，需全系统重选题 | project |
 | [m20-org-intel-reset-required.md](m20-org-intel-reset-required.md) | M2-0 组织智能三线全灭→RESET_REQUIRED；脚本化续局是系统性 regime 杀手 | project |
+| [m21-platform-audit-partial.md](m21-platform-audit-partial.md) | M2.1 部分审计：规则 0 bug；同 seed≠CRN 实证；炮击层低杠杆；movement 因候选覆盖质疑未判定 | project |
 
 ---
 

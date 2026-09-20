@@ -86,6 +86,10 @@
 
 2026-09-20 完成：基础设施全 PASS（模式审计/Exact Lab 双求解器/D0 宏执行器）；**A_FAIL_ORACLE**（flat 71% 并列最优、无压缩 gap）、**B_ORACLE_ONLY**（B0 65% 中断率、B1 max 0.767 但设计规则场景反向）、**C_MODULE**（场景主导）。**RESET_REQUIRED**：无 MAINLINE_READY；隐藏承诺/组织智能两轮选题均被 oracle-first cheap-kill 系统排除。证据入口 `research/m2_0/00_EXECUTIVE_SUMMARY.md`；包 sha256 `d539ab28…`。
 
+## 1.9 M2.1 平台杠杆审计（分支 research/m2-1-platform-audit，PARTIAL）
+
+2026-09-20：P0 PASS（0 BUG/UNKNOWN）；P1 **MATCHED_INITIAL_SEEDS_ONLY**（同 seed ≠ CRN，分支后 draw 数必错位）；E0 炮击层完成——**低杠杆**（无状态 ≥0.05，分配级差异≈0）；movement/torpedo/realistic 层未测完（PI 指示停止，80/93），且 movement 候选集被专家指出缺联合战术计划（F8）。平台判定 INCOMPLETE，包 sha256 `4977395c…`。PI 三选一：扩候选重测 movement / 上 E2-E3 测洗平假说 / 接受现状降级 IBS。
+
 ## 2. 阶段台账
 
 > **重要**：阶段 1–11 在 2026-09-13 之前已有历史产物（v12/v13/v14 研究线），但这些产物是在本流水线成立**之前**产生的，其"是否符合本流水线的阶段定义与门控要求"**尚未按本流水线重新核验**，因此统一标记 ⟨待核⟩，不得直接升为 ✅。

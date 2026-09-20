@@ -793,3 +793,13 @@
 - **最终判定**：`A_VERDICT=A_FAIL_ORACLE`；`B_VERDICT=B_ORACLE_ONLY`；`C_VERDICT=C_MODULE`；**BEST_EVIDENCE_TRACK=NONE**；阶段结论 **RESET_REQUIRED**（无 MAINLINE_READY 方向；后续若重试需先换 continuation regime：对抗/搜索型对手、接触期快照、绑定胜利边际的值函数）。
 - **纪律记录**：9 项 bug/失败全留档（含 `.kind/.type`、command_disrupted 非事件、succession 字段不存在、F4 全舰覆盖约束、F6 变体仅 axis、B2 小分母伪影改判）；每项阈值先于结果预注册；未跑 MAPPO/QMIX/GNN；预算在对局/续局双上限内；0 付费 LLM。
 - **提交**：`0620fde`(P0)→`1702344`(P1b+D0)→`7fad588`(判定+报告)→本批；包 `research/m2_0/M2_0_ORGANIZATIONAL_INTELLIGENCE_VALIDATION_BUNDLE.zip` sha256 `d539ab28…`（47 文件）。
+
+
+## 2026-09-20 — M2.1 平台杠杆审计：P0 PASS / RNG=MATCHED_INITIAL_SEEDS_ONLY / 炮击层低杠杆；movement/torpedo 未测完，按 PI 指示提前打包（PARTIAL）
+
+- **范围**：M2.1 平台体检。分支 `research/m2-1-platform-audit`（基线 `184f605`）；计划原文落库；生产模块零改动；0 付费 LLM。
+- **P0（PASS，无 blocker）**：逐条源码+探针核实（封存/观察不泄漏实测、1PP2=120° 转+1MF、S-01 鱼雷 T4 前封锁实测、S-03 qualifying=沉没或全速≤2、EM-01 erma 计分）。0 BUG/0 UNKNOWN；非法移动 fallback=接口更严（INTENTIONAL_INTERFACE_STRICTER）；编队上限 8-vs-4 记录不修。
+- **P1（MATCHED_INITIAL_SEEDS_ONLY）**：引擎每次掷骰=独立 Random(seed*1e6+counter)。决定性探针：同一炮击快照 HOLD(45 draws) vs FIRE(63 draws)，第 2 个骰子事件错位——**同 seed ≠ CRN**，全阶段禁用 CRN 措辞，杠杆一律带 bootstrap CI。
+- **E0 炮击层（完成，30 快照×3 场景）**：中位 λ(90-10) 0.000-0.018，**无任何状态 ≥0.05**；hold-vs-fire 差异真实（即时 U1 0.237 vs 0.20-0.23，11 检定 vs 0）但**目标分配级差异≈0**（五个 profile 的炮击批次完全相同——自动分配器即共识）。GUNNERY_LEVERAGE=LOW。
+- **movement/torpedo 层（未测完）**：第一次运行 63 个 movement 快照因 dict-candidate 反序列化 bug 全失败；修复后重跑到 80/93 被 PI 指示停止，movement 层数值在进程内未落盘。**用户（游戏专家）提出关键覆盖性质疑（F8）**：候选集缺少联合战术计划（抢舷侧全火力、crossing T、鱼雷航道封锁、距离控制变速）——movement 杠杆在任何判定前必须先扩充候选并经 E2/E3（脚本续局洗平检验）重测。
+- **打包**：`research/m2_1/M2_1_PLATFORM_STRATEGIC_LEVERAGE_AUDIT.zip` sha256 `4977395c…`（27 文件）。EXECUTIVE_SUMMARY 全部字段如实标注（movement/torpedo/realistic=NOT_MEASURED；E1/E2/E3=NOT_RUN；平台判定=INCOMPLETE；B=KEEP_SUSPENDED；NEXT_PI_DECISION_NEEDED 列出三条路线）。提交 `09308a7`→`014f235`。
