@@ -867,3 +867,13 @@
 - **G 普查**：movement 52 状态/104 状态侧，beam 按序号奇偶单侧（n=49，不用任何臂的产出选侧）。**`damaged` 层为空、`late` 仅 16、配额缺 S-01 −4 / S-03 −4**——结构性原因（S-01 只到 turn 7、S-03 只到 turn 4；无 `mid` 桶），如实报告不回填。判定 **MOVEMENT = MIXED**：卡在冻结的「中位相对增益 ≥0.30」（实测 0.000，因中位状态机会为零），而机会率 0.375/0.235/0.125 与外部性结构相反；`LOCAL_ONLY_MECHANISM` 明确不成立。torpedo：**当前 AI 平均 RouteReduction = 0.000**（6/15 状态开火却零约束），公开臂 ≈0.010，full-state 0.020–0.316。
 - **失败留档 M22R-F1..F5** + 两条常备反例。两处崩溃（Counter 键 set/tuple 不可序列化）各损失约 30 分钟算力，之后改为逐状态 JSONL 落盘，崩溃不再丢数据。
 - **提交与打包**：包 `research/m2_2r/M2_2R_B1E_NATURAL_OPPORTUNITY_BUNDLE.zip` sha256 `302c9bf1…`（43 文件）。预算约 5000 次引擎评估；0 付费 LLM；生产引擎零改动；未训练模型；**未进入 RL/GNN/论文方法设计**。按指令停止。
+
+
+## 2026-09-21 — M2.3 主线分歧裁决：JTC = FAIL，BARD = FAIL，MAINLINE_CANDIDATE = NONE
+
+- **历史冻结**：M2.1-R2.1 = FAIL_3_OF_5、M2.2 B0 = FAIL/BLOCKED_BY_METRIC_VALIDITY、B1E = TORPEDO_PARTIAL_OBSERVABILITY、movement = MIXED 全部原样保留；MG3 改注为 `HISTORICAL_PROXY_PASS / EXECUTABLE_INVALID` + `SUPERSEDED_BY_MG3E_EXECUTABLE_PASS`（不改判）。另附 **M22R-F6 勘误**：B1E 的 damaged 层为空是谓词死代码（`hull_max` vs `max_hull`），不是指挥官不打损耗；旧数字不受影响（死标签不改变状态选择），已在 05/00 加 ERRATUM 块并保留原判。
+- **JTC = FAIL**（无混淆不报）：多意图条款仅 I1 达标；协调条款在**同一** 35 个机会状态上 JOINT 1.048 < GREEDY 1.428 < RANDOM 1.831。**我把混淆写进判决正文**：cheap surrogate 逐舰可加 → greedy 是它的精确最优解，该臂在结构上无法检验协调（M23-F3）；真实交互项（集火/分火）不在 surrogate 内。补的三意图（Broadside / Executable Range / Raking）中 I2 在补充面板近乎不出现（0–0.167），与 MG3-E 需扫 162 个状态才找到一致。
+- **BARD = FAIL**：14 个同公开历史信息集（观测哈希与合法动作集在代码里强制一致）。真实集冲突成立（11/14 crossover，5/14 无 ε-good 共享动作，R_shared 0.45–0.98），但**匹配对照把效应砍半并抹掉两个场景** → 仅 S-01 存留；公开规划器只恢复天花板的 0.611/0.226/0.086，当前 AI 全 0.000。**12/14 集 R_shared 曾恰为 0.000 是我的锚点 bug**（M23-F1）——修正后才是上面这些数字；错误锚点的运行也留档，因为它本会把结论写成 ARTIFACT。
+- **MAINLINE_CANDIDATE = NONE**。按 PI 规则不强行选；两条线各自的下一步已写明（含交互项的联合 surrogate；S-01 存留信息集）。
+- **补充普查（supplemental，不改写旧 prevalence）**：MID 窗口 105 行、DAMAGED 事件条件 105 行；**PI 字面 damaged 判据不具区分度**（池内 234/234 满足、217/234 连 strict 0.75·max_hull 也满足），已如实标注为条件样本、不作损伤对比主张。
+- **包** `research/m2_3/M2_3_MAINLINE_DISAMBIGUATION_BUNDLE.zip` sha256 `85d3e41f…`（含 00–12 全部文档、预注册、registry/claims/failures/manifest、metrics/figures/cases/code_patch/logs）。约 3000 次引擎评估；0 付费 LLM；生产引擎零改动；**未进入 RL/GNN/Transformer/论文写作**。按指令停止。

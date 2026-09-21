@@ -39,6 +39,12 @@ B1E_VERDICT (frozen §7 first-match order) = TORPEDO_PARTIAL_OBSERVABILITY
 state-sides by index parity. Quota shortfalls S-01 −4, S-03 −4, EM-01 0; the
 `damaged` stratum is **empty** and `late` thin — reported, not back-filled.
 
+> **ERRATUM (M2.3, M22R-F6).** The `damaged` stratum is empty because the
+> predicate was dead code (`hull_max` vs the model's `max_hull`), **not** because
+> the commanders avoid damage: after the fix, S-01 18/18, S-03 9/9 and EM-01
+> 24/33 scanned states qualify. State selection and all rates below are
+> unaffected. See `05_B1E_MOVEMENT_CENSUS.md`.
+
 | arm | n | mechanism-opportunity rate | usable-tactical rate | negative-externality rate | median ΔL1 |
 |---|---|---|---|---|---|
 | BEAM_SEARCH_COMPILER | 49 | 0.245 | **0.694** | **0.020** | **+0.972** |

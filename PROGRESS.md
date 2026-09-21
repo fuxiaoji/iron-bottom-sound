@@ -129,6 +129,18 @@
 - **失败留档 M22R-F1..F5**：判定条款引用不存在的第二机制行 / 二值 payoff 退化 / 桶标签丢弃中局状态 / 地图边缘 `neighbor()` 抛异常 / 空断言换真不变量。两次崩溃各损失约 30 分钟算力后改为 JSONL 逐条落盘。
 - **预算**：约 5000 次引擎评估；0 付费 LLM；生产引擎零改动；未进入 RL/GNN/论文方法。包 `M2_2R_B1E_NATURAL_OPPORTUNITY_BUNDLE.zip` sha256 `302c9bf1…`（43 文件）。按指令停止。
 
+## 1.15 M2.3 主线分歧裁决（分支 research/m2-2-compiler-fidelity）
+
+2026-09-21：对两个候选做 cheap-kill。预注册 `research/m2_3/PRE_REGISTRATION_M23.md` 先于测量冻结；历史 gate 与旧普查原样保留（另加 M22R-F6 勘误：B1E 的 damaged 谓词是死代码 `hull_max`→`max_hull`）。
+
+**JTC = FAIL**：`JTC_MULTI_INTENT = FAIL`（仅 I1 在两个场景达 ≥20%）；`JTC_JOINT_COORDINATION_EFFECT = FAIL`——在**同一** 35 个机会状态上 JOINT **1.048** < PER_SHIP_GREEDY **1.428** < RANDOM **1.831**；机制机会率上 greedy 在 8 个场景×意图格中有 5 个 ≥ joint。**关键混淆已写进判决本身（M23-F3）**：我的 cheap surrogate 逐舰可加，所以 greedy 是它的**精确最优解**，该臂结构上无法检验「协调」；真实交互项（集火加成/分火惩罚）不在 surrogate 里。故 FAIL 按冻结规则如实输出，并附「需以含交互项的 surrogate 重测」的建议，而不是就此判 JTC 死刑。
+
+**BARD = FAIL**：14 个信息集（同公开历史、观测哈希与合法动作集在代码中强制一致并逐集记录）。真实隐藏集上冲突成立（11/14 有 best-action crossover、5/14 无 ε-good 共享动作），但 **size/diversity 匹配对照后 0.357 → 0.214**，且仅 S-01 一个场景存留 → `MATCHED_CONTROL = FAIL`；`PUBLIC_RECOVERY = FAIL`（最优公开规划器只恢复天花板的 0.611/0.226/0.086，当前 AI 全场景 0.000）。既非 ARTIFACT（池化 21.4% 过线）也非 INFORMATION_LIMIT_ONLY（≥2 场景未满足）。**结论：此前的 TORPEDO_PARTIAL_OBSERVABILITY 信号主要是假设集构造效应。**
+
+**MAINLINE_CANDIDATE = NONE**（两条线都未过各自的冻结门槛；按 PI 规则不强行选）。
+
+自查并修复的三处自身缺陷：M23-F1 匹配对照锚点错位（使 12/14 集恰为 0.000，本会误判 ARTIFACT；两次运行都留档）、M23-F2 跨不同状态集比较（违反 §4.2）、M23-F4 规划器计分口径不一致（出现 0.336 > 天花板 0.124 的不可比）。M23-F5 记录 BARD 落地前必须的三处管线修复（含 JTC 的退化基线准入规则）。预算约 3000 次引擎评估；0 付费 LLM；生产引擎零改动；未进入 RL/GNN/论文写作。包 `M2_3_MAINLINE_DISAMBIGUATION_BUNDLE.zip` sha256 `85d3e41f…`。按指令停止。
+
 ## 2. 阶段台账
 
 > **重要**：阶段 1–11 在 2026-09-13 之前已有历史产物（v12/v13/v14 研究线），但这些产物是在本流水线成立**之前**产生的，其"是否符合本流水线的阶段定义与门控要求"**尚未按本流水线重新核验**，因此统一标记 ⟨待核⟩，不得直接升为 ✅。

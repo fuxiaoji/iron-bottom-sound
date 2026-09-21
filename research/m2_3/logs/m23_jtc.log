@@ -1,0 +1,77 @@
+  IBS-S-01 [mid]: pool=48 picked=12 strict=45
+  IBS-S-03 [mid]: pool=32 picked=12 strict=23
+  IBS-S-EM-01 [mid]: pool=80 picked=12 strict=46
+  [mid] IBS-S-01 s1 t3 axis: 3 intent rows
+  [mid] IBS-S-01 s1 t4 allies: 3 intent rows
+  [mid] IBS-S-01 s1 t4 axis: 3 intent rows
+  [mid] IBS-S-01 s1 t5 allies: 3 intent rows
+  [mid] IBS-S-01 s1 t5 axis: 3 intent rows
+  [mid] IBS-S-01 s2 t3 allies: 3 intent rows
+  [mid] IBS-S-01 s2 t3 axis: 3 intent rows
+  [mid] IBS-S-01 s2 t4 allies: 3 intent rows
+  [mid] IBS-S-01 s2 t4 axis: 3 intent rows
+  [mid] IBS-S-01 s2 t5 allies: 3 intent rows
+  [mid] IBS-S-01 s2 t5 axis: 3 intent rows
+  [mid] IBS-S-03 s1 t2 allies: 3 intent rows
+  [mid] IBS-S-03 s1 t2 axis: 3 intent rows
+  [mid] IBS-S-03 s1 t3 allies: 3 intent rows
+  [mid] IBS-S-03 s1 t3 axis: 3 intent rows
+  [mid] IBS-S-03 s2 t2 allies: 3 intent rows
+  [mid] IBS-S-03 s2 t2 axis: 3 intent rows
+  [mid] IBS-S-03 s2 t3 allies: 3 intent rows
+  [mid] IBS-S-03 s2 t3 axis: 3 intent rows
+  [mid] IBS-S-03 s3 t2 allies: 3 intent rows
+  [mid] IBS-S-03 s3 t2 axis: 3 intent rows
+  [mid] IBS-S-03 s3 t3 allies: 3 intent rows
+  [mid] IBS-S-03 s3 t3 axis: 3 intent rows
+  [mid] IBS-S-EM-01 s1 t4 allies: 3 intent rows
+  [mid] IBS-S-EM-01 s1 t4 axis: 3 intent rows
+  [mid] IBS-S-EM-01 s1 t5 allies: 3 intent rows
+  [mid] IBS-S-EM-01 s1 t5 axis: 3 intent rows
+  [mid] IBS-S-EM-01 s1 t6 allies: 3 intent rows
+  [mid] IBS-S-EM-01 s1 t6 axis: 3 intent rows
+  [mid] IBS-S-EM-01 s1 t7 allies: 3 intent rows
+  [mid] IBS-S-EM-01 s1 t7 axis: 3 intent rows
+  [mid] IBS-S-EM-01 s1 t8 allies: 3 intent rows
+  [mid] IBS-S-EM-01 s1 t8 axis: 3 intent rows
+  [mid] IBS-S-EM-01 s2 t4 allies: 3 intent rows
+  [mid] IBS-S-EM-01 s2 t4 axis: 3 intent rows
+  IBS-S-01 [damaged]: pool=86 picked=12 strict=82
+  IBS-S-03 [damaged]: pool=39 picked=12 strict=34
+  IBS-S-EM-01 [damaged]: pool=109 picked=12 strict=101
+  [damaged] IBS-S-01 s1 t2 axis: 3 intent rows
+  [damaged] IBS-S-01 s1 t3 axis: 3 intent rows
+  [damaged] IBS-S-01 s1 t4 allies: 3 intent rows
+  [damaged] IBS-S-01 s1 t4 axis: 3 intent rows
+  [damaged] IBS-S-01 s1 t5 allies: 3 intent rows
+  [damaged] IBS-S-01 s1 t5 axis: 3 intent rows
+  [damaged] IBS-S-01 s1 t6 allies: 3 intent rows
+  [damaged] IBS-S-01 s1 t6 axis: 3 intent rows
+  [damaged] IBS-S-01 s1 t7 allies: 3 intent rows
+  [damaged] IBS-S-01 s1 t7 axis: 3 intent rows
+  [damaged] IBS-S-01 s2 t2 axis: 3 intent rows
+  [damaged] IBS-S-03 s1 t2 axis: 3 intent rows
+  [damaged] IBS-S-03 s1 t3 axis: 3 intent rows
+  [damaged] IBS-S-03 s1 t4 axis: 3 intent rows
+  [damaged] IBS-S-03 s2 t2 allies: 3 intent rows
+  [damaged] IBS-S-03 s2 t2 axis: 3 intent rows
+  [damaged] IBS-S-03 s2 t3 allies: 3 intent rows
+  [damaged] IBS-S-03 s2 t3 axis: 3 intent rows
+  [damaged] IBS-S-03 s2 t4 allies: 3 intent rows
+  [damaged] IBS-S-03 s2 t4 axis: 3 intent rows
+  [damaged] IBS-S-03 s3 t2 allies: 3 intent rows
+  [damaged] IBS-S-03 s3 t3 allies: 3 intent rows
+  [damaged] IBS-S-03 s3 t3 axis: 3 intent rows
+  [damaged] IBS-S-EM-01 s1 t6 allies: 3 intent rows
+  [damaged] IBS-S-EM-01 s1 t7 allies: 3 intent rows
+  [damaged] IBS-S-EM-01 s1 t8 allies: 3 intent rows
+  [damaged] IBS-S-EM-01 s1 t9 allies: 3 intent rows
+  [damaged] IBS-S-EM-01 s1 t9 axis: 3 intent rows
+  [damaged] IBS-S-EM-01 s1 t10 allies: 3 intent rows
+  [damaged] IBS-S-EM-01 s1 t11 allies: 3 intent rows
+  [damaged] IBS-S-EM-01 s1 t11 axis: 3 intent rows
+  [damaged] IBS-S-EM-01 s1 t12 allies: 3 intent rows
+  [damaged] IBS-S-EM-01 s1 t12 axis: 3 intent rows
+  [damaged] IBS-S-EM-01 s2 t5 axis: 3 intent rows
+  [damaged] IBS-S-EM-01 s2 t6 allies: 3 intent rows
+done: 210 (state, intent) rows in 1448.8s

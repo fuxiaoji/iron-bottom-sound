@@ -1,0 +1,78 @@
+  IBS-S-01: information sets=8 (pool 36)
+  IBS-S-03: information sets=8 (pool 24)
+  IBS-S-EM-01: information sets=8 (pool 33)
+  IBS-S-01 s1 t2: hidden=6 actions=288 Rsh_true=0.966 Rsh_match=0.655 mat=True/True recovery=0.0
+  IBS-S-01 s1 t5: hidden=6 actions=114 Rsh_true=0.000 Rsh_match=0.000 mat=False/False recovery=None
+  IBS-S-01 s1 t6: hidden=4 actions=240 Rsh_true=0.000 Rsh_match=0.000 mat=False/False recovery=0.0
+  IBS-S-01 s2 t3: hidden=5 actions=236 Rsh_true=0.975 Rsh_match=0.800 mat=True/True recovery=0.0
+  IBS-S-03 s1 t2: hidden=5 actions=160 Rsh_true=0.075 Rsh_match=0.200 mat=False/False recovery=0.0
+  IBS-S-03 s1 t3: hidden=6 actions=160 Rsh_true=0.000 Rsh_match=0.000 mat=False/False recovery=None
+  IBS-S-03 s2 t2: hidden=6 actions=192 Rsh_true=0.450 Rsh_match=0.050 mat=True/False recovery=0.0
+  IBS-S-03 s2 t3: hidden=6 actions=160 Rsh_true=0.775 Rsh_match=0.075 mat=True/False recovery=0.0
+  IBS-S-03 s3 t2: hidden=6 actions=224 Rsh_true=0.075 Rsh_match=0.050 mat=False/False recovery=0.0
+  IBS-S-03 s3 t3: hidden=6 actions=192 Rsh_true=0.875 Rsh_match=0.800 mat=True/True recovery=0.0
+  IBS-S-EM-01 s1 t4: hidden=6 actions=336 Rsh_true=0.025 Rsh_match=0.100 mat=False/False recovery=0.0
+  IBS-S-EM-01 s1 t6: hidden=6 actions=240 Rsh_true=0.000 Rsh_match=0.000 mat=False/False recovery=None
+  IBS-S-EM-01 s1 t8: hidden=6 actions=240 Rsh_true=0.000 Rsh_match=0.000 mat=False/False recovery=0.0
+  IBS-S-EM-01 s1 t9: hidden=2 actions=240 Rsh_true=0.000 Rsh_match=0.000 mat=False/False recovery=0.0
+{
+ "n_sets": 14,
+ "material_true_rate": 0.35714285714285715,
+ "material_match_rate": 0.21428571428571427,
+ "material_naive_rate": 0.0,
+ "median_R_shared_true": 0.05,
+ "median_R_shared_match": 0.05,
+ "scenarios_with_material_match_ge_20pct": [
+  "IBS-S-01"
+ ],
+ "per_scenario": {
+  "IBS-S-01": {
+   "n": 4,
+   "material_true_rate": 0.5,
+   "material_match_rate": 0.5,
+   "material_naive_rate": 0.0,
+   "median_R_shared_true": 0.4827586206896552,
+   "median_R_shared_match": 0.3275862068965517,
+   "median_R_bayes_true": 0.16379310344827586,
+   "mean_planner": {
+    "CURRENT_ADAPTIVE": 0.0,
+    "SIMPLE_PUBLIC_PROXY": 0.0020833333333333333,
+    "PUBLIC_SET_COVER_ROBUST": 0.0,
+    "PUBLIC_BELIEF_EXPECTED": 0.07976190476190476,
+    "FULL_STATE_CEILING": 0.1304946633825944
+   }
+  },
+  "IBS-S-03": {
+   "n": 6,
+   "material_true_rate": 0.5,
+   "material_match_rate": 0.16666666666666666,
+   "material_naive_rate": 0.0,
+   "median_R_shared_true": 0.26249999999999996,
+   "median_R_shared_match": 0.0625,
+   "median_R_bayes_true": 0.075,
+   "mean_planner": {
+    "CURRENT_ADAPTIVE": 0.0,
+    "SIMPLE_PUBLIC_PROXY": 0.0,
+    "PUBLIC_SET_COVER_ROBUST": 0.0,
+    "PUBLIC_BELIEF_EXPECTED": 0.04458333333333333,
+    "FULL_STATE_CEILING": 0.19694444444444445
+   }
+  },
+  "IBS-S-EM-01": {
+   "n": 4,
+   "material_true_rate": 0.0,
+   "material_match_rate": 0.0,
+   "material_naive_rate": 0.0,
+   "median_R_shared_true": 0.0,
+   "median_R_shared_match": 0.0,
+   "median_R_bayes_true": 0.0,
+   "mean_planner": {
+    "CURRENT_ADAPTIVE": 0.0,
+    "SIMPLE_PUBLIC_PROXY": 0.02185960591133005,
+    "PUBLIC_SET_COVER_ROBUST": 0.0,
+    "PUBLIC_BELIEF_EXPECTED": 0.004310344827586207,
+    "FULL_STATE_CEILING": 0.050379720853858785
+   }
+  }
+ }
+}

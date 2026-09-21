@@ -1,0 +1,7 @@
+{
+ "n_sets": 14,
+ "rejections": {
+  "few_valid_variants": 6,
+  "out_of_range": 4
+ }
+}

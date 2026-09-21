@@ -77,3 +77,32 @@ configurations, yet the proxy's argmax contained no informative configuration.
 Rank correlations on tie-dominated spaces are not evidence; the tie-set
 decomposition is. Carried forward from `research/m2_2/` because the torpedo
 census is where the temptation recurs.
+
+## M22R-F6 (found in M2.3, corrected here) — the `damaged` predicate never fired
+
+`_hull_frac` read `getattr(s, "hull_max", s.hull)`; the model field is
+**`max_hull`**, so the fallback silently made `start == now` and the fraction
+identically 1.0. The `damaged` label could therefore never be assigned, and the
+B1E census reported an empty `damaged` stratum and attributed it to the scripted
+commanders not producing hull loss. That attribution was **wrong**, and it was
+wrong because of a silently-defaulting attribute read — the same failure shape as
+a bare `except` that swallows an error.
+
+Measured after the fix (3 seeds per scenario, all movement-planning states from
+turn 2): S-01 18/18, S-03 9/9, EM-01 24/33 states satisfy "≥1 surviving ship with
+`hull < max_hull`". So the stratum was never empty; the predicate was dead.
+
+**Impact on the old numbers: none.** `_hull_frac` was used only to assign the
+`damaged` label, and the picker selects states by the labels a state carries. A
+dead label changes no selection, so the 52-state / 104-state-side census, its
+per-arm rates and the MIXED verdict are unaffected. What was wrong is the
+*explanation* of the coverage gap, and that is corrected in the M2.1... see the
+ERRATUM block in `05_B1E_MOVEMENT_CENSUS.md`.
+
+**Second finding, independent of my bug:** with the predicate fixed it fires at
+almost every state, because ships are not at full health to begin with. The PI's
+literal damaged rule ("≥1 surviving ship with hull < max_hull, or a key system
+down") is therefore not discriminative. M2.3's supplemental panel reports the
+literal rule as specified and, beside it, the fraction of states satisfying a
+stricter `hull ≤ 0.75·max_hull` threshold, so the conditional probability can be
+read against a predicate that actually separates states.

@@ -22,9 +22,18 @@ structural: S-01 and S-03 end at turns 7 and 4, so `late` is unreachable there;
 and with only four labels and no `mid` bucket a mid-game state that is neither
 early, the contact turn, damaged nor late carries **no** label and is dropped
 from the pool (M22R-F3). **The `damaged` stratum is empty across the whole
-census**: the scripted balanced commanders do not produce ≥25 % hull loss inside
-the scanned windows. Any claim in this bundle about damaged-fleet behaviour would
-therefore have no evidence behind it, and none is made.
+census.** Any claim in this bundle about damaged-fleet behaviour would therefore
+have no evidence behind it, and none is made.
+
+> **ERRATUM (added in M2.3, M22R-F6).** The explanation originally given here —
+> "the scripted balanced commanders do not produce ≥25 % hull loss inside the
+> scanned windows" — is **wrong**. The `damaged` predicate was dead code: it read
+> `getattr(s, "hull_max", s.hull)` while the model field is `max_hull`, so the
+> fraction was identically 1.0. Measured after the fix, **S-01 18/18, S-03 9/9,
+> EM-01 24/33** scanned states satisfy "≥1 surviving ship with `hull < max_hull`".
+> The stratum was never empty; the label was. The 52-state selection and every
+> rate in this file are **unaffected**, because `_hull_frac` only ever assigned a
+> label and the picker consumes labels — a dead label changes no selection.
 
 ## Pooled results (all 104 state-sides, `metrics/b1e_movement_pooled.json`)
 

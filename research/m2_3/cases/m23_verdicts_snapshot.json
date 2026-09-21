@@ -1,0 +1,93 @@
+{
+ "JTC": {
+  "verdict": "FAIL",
+  "JTC_MULTI_INTENT": "FAIL",
+  "JTC_JOINT_COORDINATION_EFFECT": "FAIL",
+  "intents_with_team_beneficial_ge20pct_in_ge2_scenarios": {
+   "I1_BROADSIDE": [
+    "IBS-S-01",
+    "IBS-S-EM-01"
+   ]
+  },
+  "not_carried_by_broadside_bug": false,
+  "single_scenario_only": false,
+  "joint_mean_dU_on_common_opportunity_set": 1.048412698412698,
+  "gaps_vs": {
+   "PER_SHIP_GREEDY": {
+    "mean_dU_on_common_opp_set": 1.427777777777777,
+    "beat_by_25pct": false
+   },
+   "RANDOM_MATCHED_BUDGET": {
+    "mean_dU_on_common_opp_set": 1.8309523809523804,
+    "beat_by_25pct": false
+   },
+   "common_opportunity_states": 35
+  },
+  "n_rows": 760,
+  "rejections": {
+   "pair_lost_during_movement": 2
+  },
+  "panels": {
+   "mid": 105,
+   "damaged": 105
+  },
+  "damaged_pool_diagnostics": {
+   "IBS-S-01": {
+    "pool_state_sides": 86,
+    "strict_0.75max_pool_state_sides": 82
+   },
+   "IBS-S-03": {
+    "pool_state_sides": 39,
+    "strict_0.75max_pool_state_sides": 34
+   },
+   "IBS-S-EM-01": {
+    "pool_state_sides": 109,
+    "strict_0.75max_pool_state_sides": 101
+   }
+  }
+ },
+ "BARD": {
+  "verdict": "FAIL",
+  "BARD_MATCHED_CONTROL": "FAIL",
+  "BARD_ACTION_CONFLICT": "PASS",
+  "BARD_PUBLIC_RECOVERY": "FAIL",
+  "material_rate_true": 0.35714285714285715,
+  "material_rate_matched": 0.21428571428571427,
+  "material_rate_naive": 0.0,
+  "scenarios_material_after_match": [
+   "IBS-S-01"
+  ],
+  "scenarios_no_eps_good": [
+   "IBS-S-01",
+   "IBS-S-03"
+  ],
+  "recovery_ratios": {
+   "IBS-S-01": {
+    "best_public": 0.07976190476190476,
+    "ceiling": 0.1304946633825944,
+    "ratio": 0.6112273306384384
+   },
+   "IBS-S-03": {
+    "best_public": 0.04458333333333333,
+    "ceiling": 0.19694444444444445,
+    "ratio": 0.22637517630465442
+   },
+   "IBS-S-EM-01": {
+    "best_public": 0.004310344827586207,
+    "ceiling": 0.050379720853858785,
+    "ratio": 0.08555713994703605
+   }
+  },
+  "scenarios_recovery_ge50pct": [
+   "IBS-S-01"
+  ],
+  "reading_note": "pooled matched rate 0.214 vs the 20% bar; the >=2-scenarios clause is met by 1 scenario(s)",
+  "n_sets": 14,
+  "rejections": {
+   "few_valid_variants": 6,
+   "out_of_range": 4
+  },
+  "degenerate_matched_matrices": 3
+ },
+ "MAINLINE_CANDIDATE": "NONE"
+}

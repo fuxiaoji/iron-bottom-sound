@@ -1,0 +1,16 @@
+claim,value,evidence,confidence
+HISTORICAL_GATES_PRESERVED,YES,01_HISTORICAL_STATUS.md,recorded
+MG3_STATUS,SUPERSEDED_BY_MG3E_EXECUTABLE_PASS,research/m2_2r/metrics/mg3e.json + 01 doc,annotated
+MG3_HISTORICAL,HISTORICAL_PROXY_PASS / EXECUTABLE_INVALID,research/m2_2/04_MG3_RANGE_FIDELITY.md,recorded
+JTC_MULTI_INTENT,FAIL (only I1 >=20% in >=2 scenarios),metrics/m23_verdicts.json,measured
+JTC_JOINT_COORDINATION_EFFECT,FAIL (joint 1.048 < greedy 1.428 < random 1.831 on 35 common states),metrics/m23_verdicts.json,measured
+JTC_VERDICT,FAIL,06_JTC_VERDICT.md,measured
+JTC confound (M23-F3),separable surrogate => greedy is its exact optimizer,04 doc decomposition argument,argued + measured
+BARD_MATCHED_CONTROL,FAIL (pooled 21.4% clears the bar; 1 of 3 scenarios),metrics/m23_bard.json,measured
+BARD_ACTION_CONFLICT,PASS (11/14 crossover; 5/14 no eps-good action),metrics/m23_bard.json,measured
+BARD_PUBLIC_RECOVERY,FAIL (0.611/0.226/0.086 of ceiling),metrics/m23_bard.json,measured
+BARD_VERDICT,FAIL,11_BARD_VERDICT.md,measured
+PUBLIC_INFORMATION_GAP,NOT CLAIMED (word unused),whole bundle,naming rule held
+MAINLINE_CANDIDATE,NONE,metrics/m23_verdicts.json,frozen rule
+damaged literal predicate,234/234 pool state-sides satisfy it; 217/234 strict,metrics/m23_jtc_census.json,measured
+M22R-F6 erratum,damaged label was dead code (hull_max vs max_hull),research/m2_2r/FAILURES_AND_COUNTEREXAMPLES.md,corrected

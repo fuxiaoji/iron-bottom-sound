@@ -72,7 +72,7 @@ def _engage_count(eng, st, side):
 def _hull_frac(st, side):
     ships = [s for s in st.ships.values() if s.side == side]
     now = sum(s.hull for s in ships)
-    start = sum(getattr(s, "hull_max", s.hull) or s.hull for s in ships)
+    start = sum(s.max_hull for s in ships)  # field is max_hull; M22R-F6 fixed
     return now / max(1.0, float(start))
 
 

@@ -1,0 +1,52 @@
+{
+ "intents": [
+  "I1_BROADSIDE",
+  "I2_RANGE",
+  "I3_RAKING"
+ ],
+ "windows": {
+  "IBS-S-01": [
+   3,
+   5
+  ],
+  "IBS-S-03": [
+   2,
+   3
+  ],
+  "IBS-S-EM-01": [
+   4,
+   8
+  ]
+ },
+ "real_budget": 8,
+ "beam_width": 64,
+ "mid_pool_diagnostics": {
+  "IBS-S-01": {
+   "pool_state_sides": 48,
+   "strict_0.75max_pool_state_sides": 45
+  },
+  "IBS-S-03": {
+   "pool_state_sides": 32,
+   "strict_0.75max_pool_state_sides": 23
+  },
+  "IBS-S-EM-01": {
+   "pool_state_sides": 80,
+   "strict_0.75max_pool_state_sides": 46
+  }
+ },
+ "damaged_pool_diagnostics": {
+  "IBS-S-01": {
+   "pool_state_sides": 86,
+   "strict_0.75max_pool_state_sides": 82
+  },
+  "IBS-S-03": {
+   "pool_state_sides": 39,
+   "strict_0.75max_pool_state_sides": 34
+  },
+  "IBS-S-EM-01": {
+   "pool_state_sides": 109,
+   "strict_0.75max_pool_state_sides": 101
+  }
+ },
+ "n_rows": 210
+}
