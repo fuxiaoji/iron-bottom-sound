@@ -17,4 +17,4 @@ metadata:
 
 **反例（常备）**：公开分与真实 RR 的 Spearman = +0.676，只报相关系数会得出"公开信号可排序"的错误结论——并列集分解才是证据。
 
-`NATURAL_OPPORTUNITY_RATE = NOT_MEASURED`（B1 以 B0 PASS 为门，未运行）。失败留档 M22-F1..F5 见 `research/m2_2/FAILURES_AND_COUNTEREXAMPLES.md`。相关：[[m21r21-mechanistic-repair]] [[m21r2-mechanistic-decomposition]] [[m21r-gold-gate-fail]] [[m21-platform-audit-partial]]
+`NATURAL_OPPORTUNITY_RATE = NOT_MEASURED`（B1 以 B0 PASS 为门，未运行）。失败留档 M22-F1..F6 见 `research/m2_2/FAILURES_AND_COUNTEREXAMPLES.md`。相关：[[m21r21-mechanistic-repair]] [[m21r2-mechanistic-decomposition]] [[m21r-gold-gate-fail]] [[m21-platform-audit-partial]]

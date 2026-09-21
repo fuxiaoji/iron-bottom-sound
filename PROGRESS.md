@@ -113,7 +113,7 @@
 3. **MG3 注册度量落在可交战包线之外（M22-F4）**：冻结 PASS 比较 15/17 格处期望命中 2.56/0.94（精确复现）。该状态盟军能见度 **13 格**、radar 可选规则 **OFF**，两臂 `_can_see` 均为 False——引擎会 `gunnery_rejected`。引擎真实计量下两臂均为 **0.000**，gold gap = 0。注册度量只查 `_mount_can_bear`、无 `_can_see` 门；MG3 在 R2.1 冻结故从未获得 MG2/MG4 拿到过的能见度修复。**历史判决逐字保留**，M2.2 只加诊断。
 4. **鱼雷走廊是全状态现象（MG4）**：gold 精确复现（RouteReduction **0.966**、时空接触 12/12 与引擎一致、预测段与 R2.1 记录相同）。可部署的公开信息搜索 **0.107**、当前 AI **0.000**（该状态一条鱼雷令都不发）。公开目标是**并列主导**的：其 argmax 并列集内 RR 跨 0.00–0.97，而真正最优配置在公开目标上得分**最低**（overlap 1 / 最大 5）→ `PUBLIC_INFORMATION_GAP = CONFIRMED`。
 
-失败留档：M22-F1（混合侧秩统计伪影）F2（搜索重复计炮）F3（`movement_candidates` 是合法计划空间的子集且 speed 须取 `movement_cost`）F4（MG3 度量缺能见度门）F5（MG4 gold 即全状态 argmax，F=1 平凡）。B1 自然普查**未运行**（预注册以 B0 PASS 为门）。预算：~450 次引擎评估；0 付费 LLM；生产引擎零改动；未训练模型。包 `M2_2_TACTICAL_COMPILER_FIDELITY_BUNDLE.zip` sha256 `595e9572…`。
+失败留档：M22-F1（混合侧秩统计伪影）F2（搜索重复计炮）F3（`movement_candidates` 是合法计划空间的子集且 speed 须取 `movement_cost`）F4（MG3 度量缺能见度门）F5（MG4 gold 即全状态 argmax，F=1 平凡）F6（图 3 曾把 LEAD_TURN_ALLOWED 的结论挂到 CORRIDOR_BLOB 上）。B1 自然普查**未运行**（预注册以 B0 PASS 为门）。预算：~450 次引擎评估；0 付费 LLM；生产引擎零改动；未训练模型。包 `M2_2_TACTICAL_COMPILER_FIDELITY_BUNDLE.zip` sha256 `595e9572…`。
 
 ## 2. 阶段台账
 
