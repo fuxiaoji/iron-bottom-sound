@@ -66,5 +66,17 @@
    "pos_rew (per agent)"
   ]
  },
- "workspace_git_head": "c557dc638d718fbef8e09ce4a26ee472262ae1d6"
+ "workspace_git_head": "c557dc638d718fbef8e09ce4a26ee472262ae1d6",
+ "sampling_semantics": {
+  "quantiles_from": "500 clean episodes, median validation checkpoint",
+  "clean_Q25": 160.57351839530747,
+  "clean_Q50": 204.03114017066036,
+  "clean_Q75": 243.94458454798587,
+  "clean_IQR": 83.3710661526784,
+  "clean_mean": 198.05474978056228,
+  "random_mean": 26.049500955806796,
+  "track_b_failure_definition": "episode_return < clean_Q25",
+  "track_c_valid_failure_definition": "paired identical initial seed: clean_return >= clean_Q50 AND faulted_return < clean_Q25 AND clean_return - faulted_return >= 0.5*clean_IQR",
+  "no_native_binary_success": true
+ }
 }

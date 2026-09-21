@@ -53,6 +53,27 @@
    },
    "median_seed": 1,
    "selection_rule": "median mean_return across seeds 0,1,2"
+  },
+  "sampling": {
+   "per_seed": {
+    "0": {
+     "mean_return": 172.6603296328744,
+     "n": 100,
+     "checkpoint": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/runs/mappo_sampling_s0/mappo_sampling_mlp__21fb3391_26_09_21-18_46_23/checkpoints/checkpoint_600000.pt"
+    },
+    "1": {
+     "mean_return": 196.95911592483506,
+     "n": 100,
+     "checkpoint": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/runs/mappo_sampling_s1/mappo_sampling_mlp__8fe6feb9_26_09_21-18_46_23/checkpoints/checkpoint_600000.pt"
+    },
+    "2": {
+     "mean_return": 204.88536471118493,
+     "n": 100,
+     "checkpoint": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/runs/mappo_sampling_s2/mappo_sampling_mlp__2a0fb38d_26_09_21-18_46_23/checkpoints/checkpoint_600000.pt"
+    }
+   },
+   "median_seed": 1,
+   "selection_rule": "median mean_return across seeds 0,1,2"
   }
  },
  "clean_summary": {

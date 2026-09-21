@@ -1,0 +1,2735 @@
+{
+ "valid_failures": 23,
+ "attempted": 1000,
+ "identifiable_fraction_le3cells": 0.9565217391304348,
+ "unique_fraction": 0.782608695652174,
+ "mean_causal_cells": 1.1304347826086956,
+ "probes": {
+  "RANDOM@10pct": {
+   "top1_hit_rate": 0.08695652173913043,
+   "n": 23
+  },
+  "TEMPORAL_BINARY@10pct": {
+   "top1_hit_rate": 0.13043478260869565,
+   "n": 23
+  },
+  "AGENT_FIRST@10pct": {
+   "top1_hit_rate": 0.0,
+   "n": 23
+  },
+  "INFLUENCE@10pct": {
+   "top1_hit_rate": 0.0,
+   "n": 23
+  },
+  "RANDOM@20pct": {
+   "top1_hit_rate": 0.2608695652173913,
+   "n": 23
+  },
+  "TEMPORAL_BINARY@20pct": {
+   "top1_hit_rate": 0.4782608695652174,
+   "n": 23
+  },
+  "AGENT_FIRST@20pct": {
+   "top1_hit_rate": 0.17391304347826086,
+   "n": 23
+  },
+  "INFLUENCE@20pct": {
+   "top1_hit_rate": 0.0,
+   "n": 23
+  },
+  "RANDOM@25pct": {
+   "top1_hit_rate": 0.2608695652173913,
+   "n": 23
+  },
+  "TEMPORAL_BINARY@25pct": {
+   "top1_hit_rate": 0.4782608695652174,
+   "n": 23
+  },
+  "AGENT_FIRST@25pct": {
+   "top1_hit_rate": 0.17391304347826086,
+   "n": 23
+  },
+  "INFLUENCE@25pct": {
+   "top1_hit_rate": 0.0,
+   "n": 23
+  }
+ },
+ "cases": [
+  {
+   "seed": 40020,
+   "fault": {
+    "modality": "obs_corrupt",
+    "agents": [
+     2
+    ],
+    "t_start": 40,
+    "t_end": 60,
+    "severity": 0.5
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 115.86863708496094,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 115.86863708496094,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 115.86863708496094,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 115.86863708496094,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 115.86863708496094,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 115.86863708496094,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 115.86863708496094,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 115.86863708496094,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 115.86863708496094,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 115.86863708496094,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 115.86863708496094,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 115.86863708496094,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 154.42391967773438,
+     "success": true
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 149.99940490722656,
+     "success": true
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 115.86863708496094,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     2,
+     2
+    ],
+    [
+     2,
+     3
+    ]
+   ],
+   "n_causal": 2,
+   "minimal_repair": [
+    2,
+    2
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40075,
+   "fault": {
+    "modality": "obs_corrupt",
+    "agents": [
+     1
+    ],
+    "t_start": 40,
+    "t_end": 60,
+    "severity": 0.5
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 126.47122192382812,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 126.47122192382812,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 126.47122192382812,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 126.47122192382812,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 126.47122192382812,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 126.47122192382812,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 126.47122192382812,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 163.65957641601562,
+     "success": true
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 160.48851013183594,
+     "success": true
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 126.47122192382812,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 126.47122192382812,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 126.47122192382812,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 126.47122192382812,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 126.47122192382812,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 126.47122192382812,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     1,
+     2
+    ],
+    [
+     1,
+     3
+    ]
+   ],
+   "n_causal": 2,
+   "minimal_repair": [
+    1,
+    2
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40215,
+   "fault": {
+    "modality": "obs_corrupt",
+    "agents": [
+     0
+    ],
+    "t_start": 40,
+    "t_end": 60,
+    "severity": 0.5
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 90.18669891357422,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 90.18669891357422,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 158.93433380126953,
+     "success": true
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 90.18999481201172,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 90.18669891357422,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 90.18669891357422,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 90.18669891357422,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 90.18669891357422,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 90.18669891357422,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 90.18669891357422,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 90.18669891357422,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 90.18669891357422,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 90.18669891357422,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 90.18669891357422,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 90.18669891357422,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     0,
+     2
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    0,
+    2
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40244,
+   "fault": {
+    "modality": "act_drop",
+    "agents": [
+     2
+    ],
+    "t_start": 20,
+    "t_end": 40,
+    "severity": 0.8
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 113.02125549316406,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 113.02125549316406,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 113.02125549316406,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 113.02125549316406,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 113.02125549316406,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 113.02125549316406,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 113.02125549316406,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 113.02125549316406,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 113.02125549316406,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 113.02125549316406,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 113.02125549316406,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 154.18524169921875,
+     "success": true
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 143.61080932617188,
+     "success": true
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 113.02125549316406,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 113.02125549316406,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     2
+    ]
+   ],
+   "n_causal": 2,
+   "minimal_repair": [
+    2,
+    1
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40273,
+   "fault": {
+    "modality": "act_drop",
+    "agents": [
+     2
+    ],
+    "t_start": 60,
+    "t_end": 80,
+    "severity": 1.0
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 107.23759460449219,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 107.23759460449219,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 107.23759460449219,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 107.23759460449219,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 107.23759460449219,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 107.23759460449219,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 107.23759460449219,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 107.23759460449219,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 107.23759460449219,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 107.23759460449219,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 107.23759460449219,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 107.23759460449219,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 107.23759460449219,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 154.17070770263672,
+     "success": true
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 108.11549377441406,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     2,
+     3
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    2,
+    3
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40298,
+   "fault": {
+    "modality": "act_drop",
+    "agents": [
+     0
+    ],
+    "t_start": 20,
+    "t_end": 40,
+    "severity": 0.5
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 103.35887145996094,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 143.52362823486328,
+     "success": true
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 134.0878143310547,
+     "success": true
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 103.35887145996094,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 103.35887145996094,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 103.35887145996094,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 103.35887145996094,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 103.35887145996094,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 103.35887145996094,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 103.35887145996094,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 103.35887145996094,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 103.35887145996094,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 103.35887145996094,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 103.35887145996094,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 103.35887145996094,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   "n_causal": 2,
+   "minimal_repair": [
+    0,
+    1
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40339,
+   "fault": {
+    "modality": "obs_corrupt",
+    "agents": [
+     1
+    ],
+    "t_start": 60,
+    "t_end": 80,
+    "severity": 0.8
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 118.73025512695312,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 118.73025512695312,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 118.73025512695312,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 118.73025512695312,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 118.73025512695312,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 118.73025512695312,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 118.73025512695312,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 118.73025512695312,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 160.50833129882812,
+     "success": true
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 117.45451354980469,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 118.73025512695312,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 118.73025512695312,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 118.73025512695312,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 118.73025512695312,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 118.73025512695312,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     1,
+     3
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    1,
+    3
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40345,
+   "fault": {
+    "modality": "obs_corrupt",
+    "agents": [
+     0
+    ],
+    "t_start": 20,
+    "t_end": 40,
+    "severity": 1.0
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 95.95330810546875,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 158.96873474121094,
+     "success": true
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 98.28414916992188,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 95.95330810546875,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 95.95330810546875,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 95.95330810546875,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 95.95330810546875,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 95.95330810546875,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 95.95330810546875,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 95.95330810546875,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 95.95330810546875,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 95.95330810546875,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 95.95330810546875,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 95.95330810546875,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 95.95330810546875,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     0,
+     1
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    0,
+    1
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40377,
+   "fault": {
+    "modality": "act_drop",
+    "agents": [
+     2
+    ],
+    "t_start": 40,
+    "t_end": 60,
+    "severity": 1.0
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 73.02122497558594,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 73.02122497558594,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 73.02122497558594,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 73.02122497558594,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 73.02122497558594,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 73.02122497558594,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 73.02122497558594,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 73.02122497558594,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 73.02122497558594,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 73.02122497558594,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 73.02122497558594,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 73.02122497558594,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 154.51995849609375,
+     "success": true
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 75.86856079101562,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 73.02122497558594,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     2,
+     2
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    2,
+    2
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40413,
+   "fault": {
+    "modality": "act_drop",
+    "agents": [
+     0
+    ],
+    "t_start": 60,
+    "t_end": 80,
+    "severity": 1.0
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 94.4787826538086,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 94.4787826538086,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 94.4787826538086,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 150.56643676757812,
+     "success": true
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 100.63213348388672,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 94.4787826538086,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 94.4787826538086,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 94.4787826538086,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 94.4787826538086,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 94.4787826538086,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 94.4787826538086,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 94.4787826538086,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 94.4787826538086,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 94.4787826538086,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 94.4787826538086,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     0,
+     3
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    0,
+    3
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40427,
+   "fault": {
+    "modality": "act_drop",
+    "agents": [
+     1
+    ],
+    "t_start": 40,
+    "t_end": 60,
+    "severity": 0.8
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 97.27496337890625,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 97.27496337890625,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 97.27496337890625,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 97.27496337890625,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 97.27496337890625,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 97.27496337890625,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 97.27496337890625,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 156.39356231689453,
+     "success": true
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 95.98379516601562,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 97.27496337890625,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 97.27496337890625,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 97.27496337890625,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 97.27496337890625,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 97.27496337890625,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 97.27496337890625,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     1,
+     2
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    1,
+    2
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40461,
+   "fault": {
+    "modality": "act_drop",
+    "agents": [
+     2
+    ],
+    "t_start": 40,
+    "t_end": 60,
+    "severity": 0.5
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 82.9284439086914,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 82.9284439086914,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 82.9284439086914,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 82.9284439086914,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 82.9284439086914,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 82.9284439086914,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 82.9284439086914,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 82.9284439086914,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 82.9284439086914,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 82.9284439086914,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 82.9284439086914,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 82.9284439086914,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 144.3639678955078,
+     "success": true
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 82.9284439086914,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 82.9284439086914,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     2,
+     2
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    2,
+    2
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40489,
+   "fault": {
+    "modality": "obs_corrupt",
+    "agents": [
+     2
+    ],
+    "t_start": 60,
+    "t_end": 80,
+    "severity": 0.8
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 89.65544128417969,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 89.65544128417969,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 89.65544128417969,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 89.65544128417969,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 89.65544128417969,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 89.65544128417969,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 89.65544128417969,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 89.65544128417969,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 89.65544128417969,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 89.65544128417969,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 89.65544128417969,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 89.65544128417969,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 89.65544128417969,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 150.03199768066406,
+     "success": true
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 93.94258117675781,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     2,
+     3
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    2,
+    3
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40526,
+   "fault": {
+    "modality": "act_drop",
+    "agents": [
+     1
+    ],
+    "t_start": 60,
+    "t_end": 80,
+    "severity": 0.5
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 98.47343444824219,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 98.47343444824219,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 98.47343444824219,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 98.47343444824219,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 98.47343444824219,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 98.47343444824219,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 98.47343444824219,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 98.47343444824219,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 140.34290313720703,
+     "success": true
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 100.71661376953125,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 98.47343444824219,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 98.47343444824219,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 98.47343444824219,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 98.47343444824219,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 98.47343444824219,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     1,
+     3
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    1,
+    3
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40574,
+   "fault": {
+    "modality": "obs_corrupt",
+    "agents": [
+     1
+    ],
+    "t_start": 60,
+    "t_end": 80,
+    "severity": 0.5
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 108.64297485351562,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 108.64297485351562,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 108.64297485351562,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 108.64297485351562,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 108.64297485351562,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 108.64297485351562,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 108.64297485351562,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 108.64297485351562,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 151.85060119628906,
+     "success": true
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 112.85955047607422,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 108.64297485351562,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 108.64297485351562,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 108.64297485351562,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 108.64297485351562,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 108.64297485351562,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     1,
+     3
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    1,
+    3
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40648,
+   "fault": {
+    "modality": "obs_corrupt",
+    "agents": [
+     1
+    ],
+    "t_start": 40,
+    "t_end": 60,
+    "severity": 0.8
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 72.223388671875,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 72.223388671875,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 72.223388671875,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 72.223388671875,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 72.223388671875,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 72.223388671875,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 72.223388671875,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 155.30992126464844,
+     "success": true
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 72.23382568359375,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 72.223388671875,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 72.223388671875,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 72.223388671875,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 72.223388671875,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 72.223388671875,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 72.223388671875,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     1,
+     2
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    1,
+    2
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40670,
+   "fault": {
+    "modality": "obs_corrupt",
+    "agents": [
+     2
+    ],
+    "t_start": 60,
+    "t_end": 80,
+    "severity": 0.5
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 81.13247680664062,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 81.13247680664062,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 81.13247680664062,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 81.13247680664062,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 81.13247680664062,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 81.13247680664062,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 81.13247680664062,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 81.13247680664062,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 81.13247680664062,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 81.13247680664062,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 81.13247680664062,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 81.13247680664062,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 81.13247680664062,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 134.7747344970703,
+     "success": true
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 83.58576965332031,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     2,
+     3
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    2,
+    3
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40671,
+   "fault": {
+    "modality": "obs_corrupt",
+    "agents": [
+     0
+    ],
+    "t_start": 60,
+    "t_end": 80,
+    "severity": 1.0
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 98.57991027832031,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 98.57991027832031,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 98.57991027832031,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 119.05851745605469,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 98.01008605957031,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 98.57991027832031,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 98.57991027832031,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 98.57991027832031,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 98.57991027832031,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 98.57991027832031,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 98.57991027832031,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 98.57991027832031,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 98.57991027832031,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 98.57991027832031,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 98.57991027832031,
+     "success": false
+    }
+   ],
+   "causal_cells": [],
+   "n_causal": 0,
+   "minimal_repair": null,
+   "repair_queries": 15
+  },
+  {
+   "seed": 40690,
+   "fault": {
+    "modality": "obs_corrupt",
+    "agents": [
+     2
+    ],
+    "t_start": 40,
+    "t_end": 60,
+    "severity": 0.5
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 70.57992553710938,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 70.57992553710938,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 70.57992553710938,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 70.57992553710938,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 70.57992553710938,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 70.57992553710938,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 70.57992553710938,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 70.57992553710938,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 70.57992553710938,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 70.57992553710938,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 70.57992553710938,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 70.57992553710938,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 139.47667694091797,
+     "success": true
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 73.13424682617188,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 70.57992553710938,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     2,
+     2
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    2,
+    2
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40723,
+   "fault": {
+    "modality": "act_drop",
+    "agents": [
+     0
+    ],
+    "t_start": 40,
+    "t_end": 60,
+    "severity": 0.8
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 77.32722473144531,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 77.32722473144531,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 131.91787719726562,
+     "success": true
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 76.38587951660156,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 77.32722473144531,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 77.32722473144531,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 77.32722473144531,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 77.32722473144531,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 77.32722473144531,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 77.32722473144531,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 77.32722473144531,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 77.32722473144531,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 77.32722473144531,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 77.32722473144531,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 77.32722473144531,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     0,
+     2
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    0,
+    2
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40815,
+   "fault": {
+    "modality": "obs_corrupt",
+    "agents": [
+     2
+    ],
+    "t_start": 60,
+    "t_end": 80,
+    "severity": 1.0
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 86.09248352050781,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 86.09248352050781,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 86.09248352050781,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 86.09248352050781,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 86.09248352050781,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 86.09248352050781,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 86.09248352050781,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 86.09248352050781,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 86.09248352050781,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 86.09248352050781,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 86.09248352050781,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 86.09248352050781,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 86.09248352050781,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 148.96002960205078,
+     "success": true
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 86.19685363769531,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     2,
+     3
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    2,
+    3
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40875,
+   "fault": {
+    "modality": "act_drop",
+    "agents": [
+     0
+    ],
+    "t_start": 60,
+    "t_end": 80,
+    "severity": 0.8
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 113.51985168457031,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 113.51985168457031,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 113.51985168457031,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 158.40614318847656,
+     "success": true
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 115.74124145507812,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 113.51985168457031,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 113.51985168457031,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 113.51985168457031,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 113.51985168457031,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 113.51985168457031,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 113.51985168457031,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 113.51985168457031,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 113.51985168457031,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 113.51985168457031,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 113.51985168457031,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     0,
+     3
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    0,
+    3
+   ],
+   "repair_queries": 15
+  },
+  {
+   "seed": 40896,
+   "fault": {
+    "modality": "act_drop",
+    "agents": [
+     1
+    ],
+    "t_start": 60,
+    "t_end": 80,
+    "severity": 1.0
+   },
+   "cells": [
+    {
+     "agent": 0,
+     "window": 0,
+     "return": 94.29327392578125,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 1,
+     "return": 94.29327392578125,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 2,
+     "return": 94.29327392578125,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 3,
+     "return": 94.29327392578125,
+     "success": false
+    },
+    {
+     "agent": 0,
+     "window": 4,
+     "return": 94.29327392578125,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 0,
+     "return": 94.29327392578125,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 1,
+     "return": 94.29327392578125,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 2,
+     "return": 94.29327392578125,
+     "success": false
+    },
+    {
+     "agent": 1,
+     "window": 3,
+     "return": 149.51419830322266,
+     "success": true
+    },
+    {
+     "agent": 1,
+     "window": 4,
+     "return": 94.48466491699219,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 0,
+     "return": 94.29327392578125,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 1,
+     "return": 94.29327392578125,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 2,
+     "return": 94.29327392578125,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 3,
+     "return": 94.29327392578125,
+     "success": false
+    },
+    {
+     "agent": 2,
+     "window": 4,
+     "return": 94.29327392578125,
+     "success": false
+    }
+   ],
+   "causal_cells": [
+    [
+     1,
+     3
+    ]
+   ],
+   "n_causal": 1,
+   "minimal_repair": [
+    1,
+    3
+   ],
+   "repair_queries": 15
+  }
+ ]
+}

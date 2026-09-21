@@ -1,0 +1,222 @@
+{
+ "universe_target_per_task": 165,
+ "ks": [
+  25,
+  50,
+  100,
+  200
+ ],
+ "tasks": {
+  "balance": {
+   "n_universe": 165,
+   "failure_fraction": 0.14615384615384616,
+   "n_boundary_cells": 99,
+   "median_seed": 1,
+   "methods": [
+    {
+     "name": "RANDOM",
+     "by_k": {
+      "25": {
+       "discovered": 10,
+       "queries": 25
+      },
+      "50": {
+       "discovered": 38,
+       "queries": 50
+      },
+      "100": {
+       "discovered": 79,
+       "queries": 100
+      },
+      "200": {
+       "discovered": 99,
+       "queries": 200
+      }
+     }
+    },
+    {
+     "name": "STRATIFIED",
+     "by_k": {
+      "25": {
+       "discovered": 20,
+       "queries": 25
+      },
+      "50": {
+       "discovered": 33,
+       "queries": 50
+      },
+      "100": {
+       "discovered": 62,
+       "queries": 100
+      },
+      "200": {
+       "discovered": 99,
+       "queries": 200
+      }
+     }
+    },
+    {
+     "name": "GENERIC_UNCERTAINTY",
+     "by_k": {
+      "25": {
+       "discovered": 13,
+       "queries": 25
+      },
+      "50": {
+       "discovered": 42,
+       "queries": 50
+      },
+      "100": {
+       "discovered": 62,
+       "queries": 100
+      },
+      "200": {
+       "discovered": 99,
+       "queries": 200
+      }
+     }
+    },
+    {
+     "name": "STRUCTURE_AWARE",
+     "by_k": {
+      "25": {
+       "discovered": 30,
+       "queries": 25
+      },
+      "50": {
+       "discovered": 56,
+       "queries": 50
+      },
+      "100": {
+       "discovered": 90,
+       "queries": 100
+      },
+      "200": {
+       "discovered": 99,
+       "queries": 200
+      }
+     }
+    }
+   ],
+   "rows": []
+  },
+  "sampling": {
+   "n_universe": 165,
+   "failure_fraction": 0.3153846153846154,
+   "n_boundary_cells": 145,
+   "median_seed": 1,
+   "methods": [
+    {
+     "name": "RANDOM",
+     "by_k": {
+      "25": {
+       "discovered": 38,
+       "queries": 25
+      },
+      "50": {
+       "discovered": 80,
+       "queries": 50
+      },
+      "100": {
+       "discovered": 118,
+       "queries": 100
+      },
+      "200": {
+       "discovered": 145,
+       "queries": 200
+      }
+     }
+    },
+    {
+     "name": "STRATIFIED",
+     "by_k": {
+      "25": {
+       "discovered": 27,
+       "queries": 25
+      },
+      "50": {
+       "discovered": 50,
+       "queries": 50
+      },
+      "100": {
+       "discovered": 97,
+       "queries": 100
+      },
+      "200": {
+       "discovered": 145,
+       "queries": 200
+      }
+     }
+    },
+    {
+     "name": "GENERIC_UNCERTAINTY",
+     "by_k": {
+      "25": {
+       "discovered": 0,
+       "queries": 25
+      },
+      "50": {
+       "discovered": 40,
+       "queries": 50
+      },
+      "100": {
+       "discovered": 117,
+       "queries": 100
+      },
+      "200": {
+       "discovered": 145,
+       "queries": 200
+      }
+     }
+    },
+    {
+     "name": "STRUCTURE_AWARE",
+     "by_k": {
+      "25": {
+       "discovered": 34,
+       "queries": 25
+      },
+      "50": {
+       "discovered": 67,
+       "queries": 50
+      },
+      "100": {
+       "discovered": 118,
+       "queries": 100
+      },
+      "200": {
+       "discovered": 145,
+       "queries": 200
+      }
+     }
+    }
+   ],
+   "rows": []
+  }
+ },
+ "registry": {
+  "ok": true,
+  "violations": {},
+  "counts": {
+   "B|balance|universe_label": {
+    "attempted": 165,
+    "SUCCESS": 165,
+    "REJECTED_WITH_REASON": 0,
+    "ERROR_WITH_TRACE": 0
+   },
+   "B|sampling|universe_label": {
+    "attempted": 165,
+    "SUCCESS": 165,
+    "REJECTED_WITH_REASON": 0,
+    "ERROR_WITH_TRACE": 0
+   }
+  },
+  "totals": {
+   "attempted": 330,
+   "SUCCESS": 330,
+   "REJECTED_WITH_REASON": 0,
+   "ERROR_WITH_TRACE": 0
+  }
+ },
+ "wall_seconds": 365.8
+}

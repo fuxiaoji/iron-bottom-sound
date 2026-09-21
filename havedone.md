@@ -907,3 +907,12 @@
 - **注册器硬化完成并对账通过**：261 = 259 SUCCESS + 0 REJECTED + 2 ERROR（2 个 ERROR 为我 Track A 试跑崩溃，按红线保留）。
 - **Track A 运行器实现并试跑**（克隆短回滚 + 冻结随机候选 + 分离 RNG + 等预算四分配 + oracle），正式 200 状态运行未执行；**Track B/C = NOT_RUN**（≠ BLOCKED）；Track D NOT_ACTIVATED。
 - 包 `PHASE_A_MAINLINE_SELECTION_BUNDLE.zip` sha256 `a57d066d6e0ad03d…`（93 文件，含 A0 分片检查点与两份新文档）。未进入 Phase B。
+
+
+## 2026-09-21 — Phase A v3.1 执行完毕：A_KILL / B_KILL（含披露缺陷）/ C 部分+工程阻塞
+
+- Sampling 质量门 PASS（d=3.43），任务对锁定 BALANCE+SAMPLING，分位数冻结。
+- **Track A = A_KILL**：异质性 PASS 但 oracle−Uniform16 仅 +0.0002/+0.0022（门槛 0.08）；UNIFORM_64 反而领先 → 「重分配固定预算」无价值。
+- **Track B = B_KILL**：边界非平凡 PASS，但 structure-aware 召回与 random 恰好相等（1.0/1.0）、generic 找到 0 格——因为我的 universe 仅 165 格而 K 到 200，顶端构造性饱和；已披露该缺陷并给重跑建议（2000–5000 格）。
+- **Track C**：balance 侧 78.3% 唯一因果格 / 95.7% ≤3 格；200 例大跑外推 2.9h 超预算 → `C_ENGINEERING_BLOCKED` + 50 例标定交付。
+- **Track D** NOT_ACTIVATED；未填 SELECTED_MAINLINE。包 `b2a947ef11aaf03c…`（112 文件）。

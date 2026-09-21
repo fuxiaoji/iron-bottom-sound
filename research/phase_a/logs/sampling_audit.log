@@ -1,2 +1,27 @@
   sampling s0: mean_return=172.660
   sampling s1: mean_return=196.959
+  sampling s2: mean_return=204.885
+  median seed = 1
+  clean done
+  random done
+{
+ "quality_gate": {
+  "1_trained_gt_random": true,
+  "2_bootstrap_ci_excludes_0": true,
+  "3_standardised_effect_ge_0.5": true,
+  "4_error_rate_le_1pct": true
+ },
+ "status": "PASS",
+ "clean": {
+  "Q25": 160.57351839530747,
+  "Q50": 204.03114017066036,
+  "Q75": 243.94458454798587,
+  "IQR": 83.3710661526784,
+  "mean": 198.05474978056228,
+  "n": 500
+ },
+ "random_mean": 26.049500955806796,
+ "cohens_d": 3.4327165091345764,
+ "reconcile_ok": true,
+ "wall_seconds": 2037.7
+}

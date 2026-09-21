@@ -1,0 +1,45 @@
+{
+ "task": "sampling",
+ "median_seed": 1,
+ "per_seed": {
+  "0": {
+   "mean_return": 172.6603296328744,
+   "n": 100,
+   "checkpoint": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/runs/mappo_sampling_s0/mappo_sampling_mlp__21fb3391_26_09_21-18_46_23/checkpoints/checkpoint_600000.pt"
+  },
+  "1": {
+   "mean_return": 196.95911592483506,
+   "n": 100,
+   "checkpoint": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/runs/mappo_sampling_s1/mappo_sampling_mlp__8fe6feb9_26_09_21-18_46_23/checkpoints/checkpoint_600000.pt"
+  },
+  "2": {
+   "mean_return": 204.88536471118493,
+   "n": 100,
+   "checkpoint": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/runs/mappo_sampling_s2/mappo_sampling_mlp__2a0fb38d_26_09_21-18_46_23/checkpoints/checkpoint_600000.pt"
+  }
+ },
+ "clean": {
+  "Q25": 160.57351839530747,
+  "Q50": 204.03114017066036,
+  "Q75": 243.94458454798587,
+  "IQR": 83.3710661526784,
+  "mean": 198.05474978056228,
+  "n": 500
+ },
+ "random_mean_return": 26.049500955806796,
+ "mean_difference": 172.00524882475548,
+ "bootstrap_ci_mean_diff": [
+  166.39288874037845,
+  177.4741857834542
+ ],
+ "cohens_d": 3.4327165091345764,
+ "n_episodes": 1000,
+ "error_rate": 0.0,
+ "quality_gate": {
+  "1_trained_gt_random": true,
+  "2_bootstrap_ci_excludes_0": true,
+  "3_standardised_effect_ge_0.5": true,
+  "4_error_rate_le_1pct": true
+ },
+ "status": "PASS"
+}

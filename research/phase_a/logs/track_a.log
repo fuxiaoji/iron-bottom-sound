@@ -1,0 +1,45 @@
+[balance] 200 states (median seed 1)
+  balance 10/200  16s
+  balance 20/200  32s
+  balance 30/200  49s
+  balance 40/200  63s
+  balance 50/200  78s
+  balance 60/200  95s
+  balance 70/200  110s
+  balance 80/200  125s
+  balance 90/200  141s
+  balance 100/200  158s
+  balance 110/200  171s
+  balance 120/200  187s
+  balance 130/200  204s
+  balance 140/200  218s
+  balance 150/200  233s
+  balance 160/200  249s
+  balance 170/200  265s
+  balance 180/200  280s
+  balance 190/200  295s
+  balance 200/200  311s
+[balance] means={'UNIFORM_16': 0.066, 'UNIFORM_4': 0.03, 'UNIFORM_64': 0.098, 'RANDOM_ALLOCATION': 0.033, 'UNCERTAINTY_HEURISTIC': 0.042, 'HINDSIGHT_ORACLE': 0.065} conc=0.523
+[sampling] 200 states (median seed 1)
+  sampling 10/200  375s
+  sampling 20/200  423s
+  sampling 30/200  474s
+  sampling 40/200  519s
+  sampling 50/200  566s
+  sampling 60/200  616s
+  sampling 70/200  665s
+  sampling 80/200  710s
+  sampling 90/200  757s
+  sampling 100/200  806s
+  sampling 110/200  847s
+  sampling 120/200  892s
+  sampling 130/200  938s
+  sampling 140/200  981s
+  sampling 150/200  1026s
+  sampling 160/200  1072s
+  sampling 170/200  1117s
+  sampling 180/200  1167s
+  sampling 190/200  1224s
+  sampling 200/200  1277s
+[sampling] means={'UNIFORM_16': 1.295, 'UNIFORM_4': 0.71, 'UNIFORM_64': 1.674, 'RANDOM_ALLOCATION': 0.696, 'UNCERTAINTY_HEURISTIC': 0.281, 'HINDSIGHT_ORACLE': 1.219} conc=0.562
+wrote /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/metrics/track_a.json (1277.2s)

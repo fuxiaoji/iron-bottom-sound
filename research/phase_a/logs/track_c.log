@@ -1,0 +1,6 @@
+[balance] valid failures collected: 23 (attempted 1000) 524s
+  balance matrix 5/23 542s
+  balance matrix 10/23 560s
+  balance matrix 15/23 578s
+  balance matrix 20/23 594s
+[balance] ident=0.9565217391304348 unique=0.782608695652174 mean_cells=1.1304347826086956 per_case=26.3s

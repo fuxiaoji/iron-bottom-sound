@@ -179,6 +179,17 @@
 - **Track B/C = NOT_RUN**（按 PI 口径：NOT_RUN ≠ BLOCKED）；Track D = NOT_ACTIVATED。
 - 交付：`PHASE_A_MAINLINE_SELECTION_BUNDLE.zip`（93 文件，sha256 `a57d066d6e0ad03d…`），含 `history/A0_PARTIAL_CHECKPOINT/`（v3.0 包原文）、新增 `10_A0_ERRATA_AND_TASK_SWITCH.md`（E1 判据失效 / E2 注册器路径 / E3 三个坏仪器 / E4 误启批次 / E5 饱和换任务）与 `11_SAMPLING_POLICY_AUDIT.md`（协议、部分数字、明确标注未产生分位数）。未输出 SELECTED_MAINLINE；0 付费 LLM；未训练 RL/GNN/Transformer。
 
+## 1.20 Phase A v3.1 执行：Track A/B/C 全部跑过（A_KILL / B_KILL / C 部分+工程阻塞）
+
+2026-09-21：按 v3.1 指令完成三轨执行。**未填 SELECTED_MAINLINE**（PI 决定）。
+
+- **任务对锁定**：BALANCE + SAMPLING。Sampling 质量门 **PASS**：clean Q25/Q50/Q75 = 160.57/204.03/243.94、IQR 83.37、均值 198.05；random 均值 26.05；均值差 172.01、bootstrap CI [166.4,177.5]；**Cohen d = 3.43**；错误率 0。分位数已冻结进 `ENVIRONMENT_LOCK.json`，并定义 B/C 的失败语义。
+- **Track A = A_KILL**：异质性 **PASS**（top-25% 集中度 0.523/0.562 ≥0.50），但 oracle 相对 Uniform-16 的归一化增益仅 **+0.0002 / +0.0022**（门槛 0.08，CI 虽排除 0 但效应低两个数量级）。且 **UNIFORM_64 (0.098/1.674) > UNIFORM_16**——「更多规划有帮助、重分配固定总量没有」，与假设相反。分母健康（121.2/−27.7 与 198.1/26.0），非分母伪影。
+- **Track B = B_KILL（含我披露的设计缺陷）**：非平凡边界 **PASS**（失败率 0.146/0.315 在 5–50% 带内），但 structure-aware 召回 == random（**恰好 1.0/1.0**）、generic 基线找到 **0** 个边界格。根因：我构造的 universe 只有 **165 格**而冻结 K 一直到 200 → 扫描顶端被构造性饱和，1.8× 门槛不可能满足。**故 B_KILL 是按测量如实报告，但它不足以证明 structured acquisition 无用**；建议以 ≥2000–5000 格 universe 重跑（每标签约 2.7s，约 2.5h/任务）。
+- **Track C = C_CALIBRATION_PARTIAL + C_ENGINEERING_BLOCKED**：balance 侧完成 23 个有效因果失败，**78.3% 只有唯一因果格、95.7% ≤3 格、均值 1.13 格**（问题稀疏且良定）；sampling 侧未跑完。冻结的 200 失败大跑外推 **5260s/任务（两任务约 2.9h）超出余量** → 按 v3.1 成本规则报工程阻塞并交付 50 例标定（实得 23 例），而非事后缩小设计。
+- **Track D = NOT_ACTIVATED**。注册器对账通过；所有数字由 `phase_a_verdicts.py` 从原始 JSON/CSV 生成。
+- 包 `PHASE_A_MAINLINE_SELECTION_BUNDLE.zip` sha256 `b2a947ef11aaf03c…`（112 文件；含 `history/A0_PARTIAL_CHECKPOINT/`、10/11 文档）。0 付费 LLM；未训练 RL/GNN/Transformer；未进入 Phase B。
+
 ## 2. 阶段台账
 
 > **重要**：阶段 1–11 在 2026-09-13 之前已有历史产物（v12/v13/v14 研究线），但这些产物是在本流水线成立**之前**产生的，其"是否符合本流水线的阶段定义与门控要求"**尚未按本流水线重新核验**，因此统一标记 ⟨待核⟩，不得直接升为 ✅。

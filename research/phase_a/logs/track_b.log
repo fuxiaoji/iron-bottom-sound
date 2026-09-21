@@ -1,0 +1,21 @@
+[balance] universe=165 agents=3 median_seed=1
+  balance universe 50/165 14s
+  balance universe 100/165 28s
+  balance universe 150/165 43s
+[balance] failure_fraction=0.146 boundary=99
+[sampling] universe=165 agents=3 median_seed=1
+  sampling universe 50/165 144s
+  sampling universe 100/165 240s
+  sampling universe 150/165 337s
+[sampling] failure_fraction=0.315 boundary=145
+{
+ "balance": {
+  "failure_fraction": 0.14615384615384616,
+  "n_boundary": 99
+ },
+ "sampling": {
+  "failure_fraction": 0.3153846153846154,
+  "n_boundary": 145
+ }
+}
+reconcile ok=True wall=365.8s
