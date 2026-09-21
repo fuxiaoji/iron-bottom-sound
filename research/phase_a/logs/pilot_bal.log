@@ -1,0 +1,100 @@
+/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv_phase_a/lib/python3.9/site-packages/torchrl/collectors/collectors.py:882: UserWarning: total_frames (200000) is not exactly divisible by frames_per_batch (6000). This means 4000 additional frames will be collected.To silence this message, set the environment variable RL_WARNINGS to False.
+  warnings.warn(
+
+Algorithm: mappo, Task: vmas/balance
+
+Loaded config:
+
+experiment:
+  sampling_device: cpu
+  train_device: cpu
+  buffer_device: cpu
+  share_policy_params: true
+  prefer_continuous_actions: true
+  collect_with_grad: false
+  parallel_collection: false
+  gamma: 0.99
+  lr: 5.0e-05
+  adam_eps: 1.0e-06
+  adam_extra_kwargs: {}
+  clip_grad_norm: true
+  clip_grad_val: 5.0
+  soft_target_update: true
+  polyak_tau: 0.005
+  hard_target_update_frequency: 5
+  exploration_eps_init: 0.8
+  exploration_eps_end: 0.01
+  exploration_anneal_frames: null
+  max_n_iters: null
+  max_n_frames: 200000
+  on_policy_collected_frames_per_batch: 6000
+  on_policy_n_envs_per_worker: 10
+  on_policy_n_minibatch_iters: 45
+  on_policy_minibatch_size: 400
+  off_policy_collected_frames_per_batch: 6000
+  off_policy_n_envs_per_worker: 10
+  off_policy_n_optimizer_steps: 1000
+  off_policy_train_batch_size: 128
+  off_policy_memory_size: 1000000
+  off_policy_init_random_frames: 0
+  off_policy_use_prioritized_replay_buffer: false
+  off_policy_prb_alpha: 0.6
+  off_policy_prb_beta: 0.4
+  evaluation: true
+  render: false
+  evaluation_interval: 120000
+  evaluation_episodes: 10
+  evaluation_deterministic_actions: true
+  evaluation_static: false
+  loggers:
+  - csv
+  project_name: benchmarl
+  wandb_extra_kwargs: {}
+  create_json: true
+  save_folder: null
+  restore_file: null
+  restore_map_location: null
+  checkpoint_interval: 0
+  checkpoint_at_end: false
+  keep_checkpoints_num: 3
+  exclude_buffer_from_checkpoint: false
+algorithm:
+  share_param_critic: true
+  clip_epsilon: 0.2
+  entropy_coef: 0.0
+  critic_coef: 1.0
+  loss_critic_type: l2
+  lmbda: 0.9
+  scale_mapping: biased_softplus_1.0
+  use_tanh_normal: true
+  minibatch_advantage: false
+task:
+  max_steps: 100
+  n_agents: 4
+  random_package_pos_on_line: true
+  package_mass: 5.0
+model:
+  name: mlp
+  num_cells:
+  - 256
+  - 256
+  layer_class: torch.nn.Linear
+  activation_class: torch.nn.Tanh
+  activation_kwargs: null
+  norm_class: null
+  norm_kwargs: null
+  num_feature_dims: 1
+critic_model:
+  name: mlp
+  num_cells:
+  - 256
+  - 256
+  layer_class: torch.nn.Linear
+  activation_class: torch.nn.Tanh
+  activation_kwargs: null
+  norm_class: null
+  norm_kwargs: null
+  num_feature_dims: 1
+seed: 0
+
+  0%|          | 0/34 [00:00<?, ?it/s]mean return = -5.373796463012695:   3%|▎         | 1/34 [00:10<05:42, 10.39s/it]mean return = -5.859036445617676:   6%|▌         | 2/34 [00:19<05:04,  9.51s/it]mean return = -4.502751350402832:   9%|▉         | 3/34 [00:28<04:49,  9.35s/it]mean return = -3.1729116439819336:  12%|█▏        | 4/34 [00:37<04:33,  9.12s/it]mean return = -3.7123255729675293:  15%|█▍        | 5/34 [00:45<04:20,  8.98s/it]mean return = -0.5406178832054138:  18%|█▊        | 6/34 [00:55<04:13,  9.04s/it]mean return = -0.81998610496521:  21%|██        | 7/34 [01:04<04:04,  9.04s/it]  mean return = 1.1817402839660645:  24%|██▎       | 8/34 [01:13<03:56,  9.08s/it]mean return = 2.403832197189331:  26%|██▋       | 9/34 [01:22<03:50,  9.21s/it] mean return = 5.324133396148682:  29%|██▉       | 10/34 [01:31<03:38,  9.12s/it]mean return = 10.44405460357666:  32%|███▏      | 11/34 [01:41<03:31,  9.19s/it]mean return = 14.967549324035645:  35%|███▌      | 12/34 [01:49<03:20,  9.11s/it]mean return = 19.387081146240234:  38%|███▊      | 13/34 [01:58<03:10,  9.05s/it]mean return = 21.899995803833008:  41%|████      | 14/34 [02:07<03:00,  9.00s/it]mean return = 27.127742767333984:  44%|████▍     | 15/34 [02:16<02:50,  8.96s/it]mean return = 29.7142333984375:  47%|████▋     | 16/34 [02:25<02:41,  9.00s/it]  mean return = 33.4266242980957:  50%|█████     | 17/34 [02:34<02:31,  8.94s/it]mean return = 33.681800842285156:  53%|█████▎    | 18/34 [02:43<02:22,  8.93s/it]mean return = 34.060848236083984:  56%|█████▌    | 19/34 [02:52<02:13,  8.87s/it]mean return = 34.75611877441406:  59%|█████▉    | 20/34 [03:01<02:06,  9.00s/it] mean return = 39.58124923706055:  62%|██████▏   | 21/34 [03:10<01:58,  9.09s/it]mean return = 38.90021514892578:  65%|██████▍   | 22/34 [03:19<01:48,  9.08s/it]mean return = 40.874267578125:  68%|██████▊   | 23/34 [03:28<01:39,  9.06s/it]  mean return = 44.25626754760742:  71%|███████   | 24/34 [03:37<01:30,  9.00s/it]mean return = 43.28217315673828:  74%|███████▎  | 25/34 [03:46<01:20,  8.98s/it]mean return = 45.04872131347656:  76%|███████▋  | 26/34 [03:55<01:11,  8.98s/it]mean return = 43.6601448059082:  79%|███████▉  | 27/34 [04:05<01:03,  9.11s/it] mean return = 45.47252655029297:  82%|████████▏ | 28/34 [04:14<00:54,  9.09s/it]mean return = 47.74485778808594:  85%|████████▌ | 29/34 [04:22<00:44,  9.00s/it]mean return = 47.00456619262695:  88%|████████▊ | 30/34 [04:31<00:35,  8.98s/it]mean return = 46.51609802246094:  91%|█████████ | 31/34 [04:41<00:27,  9.09s/it]mean return = 47.10050582885742:  94%|█████████▍| 32/34 [04:50<00:18,  9.09s/it]mean return = 47.35687255859375:  97%|█████████▋| 33/34 [04:58<00:08,  8.87s/it]mean return = 47.0558967590332: 100%|██████████| 34/34 [05:07<00:00,  8.74s/it] mean return = 47.0558967590332: 100%|██████████| 34/34 [05:07<00:00,  9.03s/it]

@@ -1,0 +1,142 @@
+[
+ {
+  "task": "navigation",
+  "n_agents": 4,
+  "obs0": [
+   32,
+   18
+  ],
+  "act0": [
+   32,
+   2
+  ],
+  "frames_per_s": 12415,
+  "ok": true
+ },
+ {
+  "task": "balance",
+  "n_agents": 3,
+  "obs0": [
+   32,
+   16
+  ],
+  "act0": [
+   32,
+   2
+  ],
+  "frames_per_s": 12944,
+  "ok": true
+ },
+ {
+  "task": "transport",
+  "n_agents": 4,
+  "obs0": [
+   32,
+   11
+  ],
+  "act0": [
+   32,
+   2
+  ],
+  "frames_per_s": 21225,
+  "ok": true
+ },
+ {
+  "task": "sampling",
+  "n_agents": 3,
+  "obs0": [
+   32,
+   24
+  ],
+  "act0": [
+   32,
+   2
+  ],
+  "frames_per_s": 4784,
+  "ok": true
+ },
+ {
+  "task": "dispersion",
+  "n_agents": 4,
+  "obs0": [
+   32,
+   16
+  ],
+  "act0": [
+   32,
+   2
+  ],
+  "frames_per_s": 17414,
+  "ok": true
+ },
+ {
+  "task": "give_way",
+  "n_agents": 2,
+  "obs0": [
+   32,
+   4
+  ],
+  "act0": [
+   32,
+   2
+  ],
+  "frames_per_s": 6618,
+  "ok": true
+ },
+ {
+  "task": "joint_passage",
+  "n_agents": 2,
+  "obs0": [
+   32,
+   10
+  ],
+  "act0": [
+   32,
+   2
+  ],
+  "frames_per_s": 1014,
+  "ok": true
+ },
+ {
+  "task": "wheel",
+  "n_agents": 4,
+  "obs0": [
+   32,
+   13
+  ],
+  "act0": [
+   32,
+   2
+  ],
+  "frames_per_s": 20239,
+  "ok": true
+ },
+ {
+  "task": "flocking",
+  "n_agents": 4,
+  "obs0": [
+   32,
+   18
+  ],
+  "act0": [
+   32,
+   2
+  ],
+  "frames_per_s": 6141,
+  "ok": true
+ },
+ {
+  "task": "dropout",
+  "n_agents": 4,
+  "obs0": [
+   32,
+   7
+  ],
+  "act0": [
+   32,
+   2
+  ],
+  "frames_per_s": 25376,
+  "ok": true
+ }
+]

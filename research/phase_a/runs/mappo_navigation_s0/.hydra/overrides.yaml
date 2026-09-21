@@ -1,0 +1,10 @@
+- algorithm=mappo
+- task=vmas/navigation
+- seed=0
+- experiment.max_n_frames=600000
+- experiment.loggers=[csv]
+- experiment.train_device=cpu
+- experiment.sampling_device=cpu
+- experiment.render=False
+- experiment.checkpoint_interval=120000
+- experiment.checkpoint_at_end=True

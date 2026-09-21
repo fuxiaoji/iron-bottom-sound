@@ -1,0 +1,8 @@
+[A0.2 TASK SWITCH, pre-Track] 2026-09-21
+navigation: 500 clean episodes on the median checkpoint (seed 0) -> success_rate = 1.000
+            => SATURATED_GE_95PCT. Per PRE_REGISTRATION_PHASE_A §3 the task is
+            replaced BEFORE any Track result is inspected.
+replacement: vmas/sampling (3 agents, coverage/spread coordination - structurally
+            distinct from balance's shared-rigid-body coupling)
+reason recorded here and in 01_ENVIRONMENT_POLICY_AUDIT.md; no Track measurement
+has been taken at the time of this switch.

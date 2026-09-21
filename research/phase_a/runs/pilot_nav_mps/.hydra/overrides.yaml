@@ -1,0 +1,8 @@
+- algorithm=mappo
+- task=vmas/navigation
+- seed=1
+- experiment.max_n_frames=100000
+- experiment.loggers=[csv]
+- experiment.train_device=mps
+- experiment.sampling_device=cpu
+- experiment.render=False

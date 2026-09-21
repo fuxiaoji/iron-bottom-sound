@@ -1,0 +1,83 @@
+{
+ "selection": {
+  "navigation": {
+   "per_seed": {
+    "0": {
+     "mean_return": 16.06054233573377,
+     "success_rate": 1.0,
+     "n": 100,
+     "wall_seconds": 8.8,
+     "checkpoint": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/runs/mappo_navigation_s0/mappo_navigation_mlp__e5b07070_26_09_21-17_57_38/checkpoints/checkpoint_600000.pt"
+    },
+    "1": {
+     "mean_return": 16.032373494915664,
+     "success_rate": 1.0,
+     "n": 100,
+     "wall_seconds": 8.5,
+     "checkpoint": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/runs/mappo_navigation_s1/mappo_navigation_mlp__0c31d416_26_09_21-17_57_38/checkpoints/checkpoint_600000.pt"
+    },
+    "2": {
+     "mean_return": 16.386185813224873,
+     "success_rate": 1.0,
+     "n": 100,
+     "wall_seconds": 9.5,
+     "checkpoint": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/runs/mappo_navigation_s2/mappo_navigation_mlp__26a14faa_26_09_21-17_57_38/checkpoints/checkpoint_600000.pt"
+    }
+   },
+   "median_seed": 0,
+   "selection_rule": "median mean_return across seeds 0,1,2"
+  },
+  "balance": {
+   "per_seed": {
+    "0": {
+     "mean_return": 118.46019069671631,
+     "success_rate": 0.91,
+     "n": 100,
+     "wall_seconds": 19.4,
+     "checkpoint": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/runs/mappo_balance_s0/mappo_balance_mlp__709d19f1_26_09_21-18_12_56/checkpoints/checkpoint_600000.pt"
+    },
+    "1": {
+     "mean_return": 123.24037170410156,
+     "success_rate": 0.9,
+     "n": 100,
+     "wall_seconds": 19.9,
+     "checkpoint": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/runs/mappo_balance_s1/mappo_balance_mlp__02bcd5c2_26_09_21-18_12_59/checkpoints/checkpoint_600000.pt"
+    },
+    "2": {
+     "mean_return": 124.4803621673584,
+     "success_rate": 0.9,
+     "n": 100,
+     "wall_seconds": 19.9,
+     "checkpoint": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/runs/mappo_balance_s2/mappo_balance_mlp__c3476647_26_09_21-18_13_02/checkpoints/checkpoint_600000.pt"
+    }
+   },
+   "median_seed": 1,
+   "selection_rule": "median mean_return across seeds 0,1,2"
+  }
+ },
+ "clean_summary": {
+  "navigation": {
+   "n_clean_episodes": 500,
+   "mean_return": 16.073164859186857,
+   "std_return": 3.5530753135681152,
+   "success_rate": 1.0,
+   "return_p25": 13.64656600356102,
+   "errors": 0,
+   "rejected": 0,
+   "median_seed": 0,
+   "saturation_flag": "SATURATED_GE_95PCT"
+  },
+  "balance": {
+   "n_clean_episodes": 500,
+   "mean_return": 121.22592592620849,
+   "std_return": 25.690750122070312,
+   "success_rate": 0.876,
+   "return_p25": 115.73341369628906,
+   "errors": 0,
+   "rejected": 0,
+   "median_seed": 1,
+   "saturation_flag": "OK"
+  }
+ },
+ "wall_seconds": 227.2
+}

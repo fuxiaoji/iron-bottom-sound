@@ -1,0 +1,12 @@
+exp_id,stage,subject,task,seeds,budget,status,artifact
+A0-ENV,A0,environment install + lock,-,-,112 s,SUCCESS,ENVIRONMENT_LOCK.json
+A0-BASE,A0,MAPPO base policy (BenchMARL),"navigation,balance","0,1,2",600k frames/seed,6 SUCCESS 0 REJECTED 0 ERROR,raw/training_registry.csv
+A0-CLEAN,A0,500 clean episodes + median-seed selection,"navigation,balance",median seed,500 ep/task,SUCCESS (0 errors),raw/track_common/clean_baseline.csv
+A0-PC-A,A0,positive control: budget allocation,toy,-,4 budgets x 64 evals,PASS,raw/positive_controls.json
+A0-PC-B,A0,positive control: boundary recovery,toy,20 query seeds x 4 K,4 K budgets,PASS,raw/positive_controls.json
+A0-PC-C,A0,positive control: counterfactual repair,toy,-,30 cells + 144 windows,PASS,raw/positive_controls.json
+A0-SWITCH,A0,navigation saturation -> task switch,navigation -> sampling,-,-,"SATURATED_GE_95PCT, replaced pre-Track",logs/task_switch.log
+A1,A,adaptive planning compute,-,-,-,BLOCKED (not run),PRE_REGISTRATION_PHASE_A.md ss5
+B1,B,active failure-boundary discovery,-,-,-,BLOCKED (not run),PRE_REGISTRATION_PHASE_A.md ss6
+C1,C,budgeted counterfactual attribution,-,-,-,BLOCKED (not run),PRE_REGISTRATION_PHASE_A.md ss7
+D1,D,event-triggered resilience,-,-,-,NOT_ACTIVATED,PRE_REGISTRATION_PHASE_A.md ss8

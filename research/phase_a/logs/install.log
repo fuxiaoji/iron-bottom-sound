@@ -1,0 +1,59 @@
++ cd /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound
++ /usr/bin/python3 -m venv .venv_phase_a
++ tail -2
++ tail -2
++ .venv_phase_a/bin/python -m pip install -q --upgrade pip
++ echo '=== installing torch ==='
+=== installing torch ===
++ .venv_phase_a/bin/python -m pip install torch==2.14.0
++ tail -5
+ERROR: Could not find a version that satisfies the requirement torch==2.14.0 (from versions: 1.9.0, 1.10.0, 1.10.1, 1.10.2, 1.11.0, 1.12.0, 1.12.1, 1.13.0, 1.13.1, 2.0.0, 2.0.1, 2.1.0, 2.1.1, 2.1.2, 2.2.0, 2.2.1, 2.2.2, 2.3.0, 2.3.1, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.7.1, 2.8.0)
+ERROR: No matching distribution found for torch==2.14.0
++ echo '=== installing vmas ==='
+=== installing vmas ===
++ .venv_phase_a/bin/python -m pip install vmas
++ tail -8
+  Building wheel for gym (pyproject.toml): started
+  Building wheel for gym (pyproject.toml): finished with status 'done'
+  Created wheel for gym: filename=gym-0.26.2-py3-none-any.whl size=827728 sha256=8f6071c99fb48ba1b89174321d9eb0759b307cedaa5ccba9737b6ecf2ce84f05
+  Stored in directory: /Users/Zhuanz1/Library/Caches/pip/wheels/af/2b/30/5e78b8b9599f2a2286a582b8da80594f654bf0e18d825a4405
+Successfully built vmas gym
+Installing collected packages: pyglet, mpmath, gym-notices, zipp, typing-extensions, sympy, six, numpy, networkx, MarkupSafe, fsspec, filelock, cloudpickle, jinja2, importlib_metadata, torch, gym, vmas
+
+Successfully installed MarkupSafe-3.0.3 cloudpickle-3.1.2 filelock-3.19.1 fsspec-2025.10.0 gym-0.26.2 gym-notices-0.0.8 importlib_metadata-8.7.1 jinja2-3.1.6 mpmath-1.3.0 networkx-3.2.1 numpy-2.0.2 pyglet-1.5.27 six-1.17.0 sympy-1.14.0 torch-2.8.0 typing-extensions-4.16.0 vmas-1.5.2 zipp-3.23.1
++ echo '=== vmas probe ==='
+=== vmas probe ===
++ tail -6
++ .venv_phase_a/bin/python -c '
+import vmas, torch
+print('\''vmas'\'', vmas.__version__ if hasattr(vmas,'\''__version__'\'') else '\''?'\'')
+print('\''torch'\'', torch.__version__, '\''mps'\'', torch.backends.mps.is_available())
+import vmas.scenarios
+print('\''n scenarios'\'', len([x for x in dir(vmas.scenarios) if not x.startswith('\''_'\'')]))
+'
+vmas 1.5.2
+torch 2.8.0 mps True
+n scenarios 11
++ echo '=== installing benchmarl ==='
+=== installing benchmarl ===
++ .venv_phase_a/bin/python -m pip install benchmarl
++ tail -12
+  Building wheel for benchmarl (pyproject.toml): started
+  Building wheel for benchmarl (pyproject.toml): finished with status 'done'
+  Created wheel for benchmarl: filename=benchmarl-1.5.2-py3-none-any.whl size=164639 sha256=e6b8970a9aa4d7dfc122a61e01d766ac6cc6cea6c4ddc07a28a888633304a3dd
+  Stored in directory: /Users/Zhuanz1/Library/Caches/pip/wheels/ec/48/53/b320fe67497b6e8b982789f1bd8540e6ef99c44fcae24d0615
+  Building wheel for antlr4-python3-runtime (pyproject.toml): started
+  Building wheel for antlr4-python3-runtime (pyproject.toml): finished with status 'done'
+  Created wheel for antlr4-python3-runtime: filename=antlr4_python3_runtime-4.9.3-py3-none-any.whl size=144590 sha256=9e09e8af213600a9a9a81657f7618d7f630731394af6100e0aaf41386036d485
+  Stored in directory: /Users/Zhuanz1/Library/Caches/pip/wheels/23/cf/80/f3efa822e6ab23277902ee9165fe772eeb1dfb8014f359020a
+Successfully built benchmarl antlr4-python3-runtime
+Installing collected packages: antlr4-python3-runtime, tqdm, PyYAML, pillow, packaging, orjson, av, pyvers, omegaconf, torchvision, tensordict, hydra-core, torchrl, benchmarl
+
+Successfully installed PyYAML-6.0.3 antlr4-python3-runtime-4.9.3 av-13.1.0 benchmarl-1.5.2 hydra-core-1.3.7 omegaconf-2.3.1 orjson-3.11.5 packaging-25.0 pillow-11.3.0 pyvers-0.1.0 tensordict-0.10.0 torchrl-0.10.1 torchvision-0.23.0 tqdm-4.70.1
++ echo '=== benchmarl probe ==='
+=== benchmarl probe ===
++ .venv_phase_a/bin/python -c 'import benchmarl; print('\''benchmarl ok'\'', getattr(benchmarl,'\''__version__'\'','\''?'\''))'
++ tail -5
+benchmarl ok 1.5.2
++ echo DONE_INSTALL
+DONE_INSTALL

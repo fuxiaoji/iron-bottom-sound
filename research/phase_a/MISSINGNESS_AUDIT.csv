@@ -1,0 +1,9 @@
+stage,task,method,attempted,success,rejected,error,status
+base_policy,balance,mappo,3,3,0,0,SUCCESS
+base_policy,navigation,mappo,3,3,0,0,SUCCESS
+base_policy,sampling,mappo,3,0,0,0,IN_PROGRESS
+clean_baseline,balance,frozen_policy,500,500,0,0,SUCCESS
+clean_baseline,navigation,frozen_policy,500,500,0,0,SUCCESS
+positive_control,TOY_A,instrument,1,1,0,0,PASS
+positive_control,TOY_B,instrument,1,1,0,0,PASS
+positive_control,TOY_C,instrument,1,1,0,0,PASS

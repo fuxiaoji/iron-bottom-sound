@@ -1,0 +1,39 @@
+{
+ "summary": {
+  "TOY_A": "PASS",
+  "TOY_B": "FAIL",
+  "TOY_C": "PASS",
+  "MEASUREMENT_BLOCKER": [
+   "B"
+  ]
+ },
+ "rows": [
+  {
+   "control": "TOY_A",
+   "status": "PASS",
+   "detail": "{\"curves\": {\"INSENSITIVE\": {\"0\": 0.9969096849209944, \"4\": 0.9969096849209944, \"16\": 0.9969096849209944, \"64\": 0.9969096849209944}, \"SENSITIVE\": {\"0\": 0.9969096849209944, \"4\": 1.1375346849209944, \"16\": 3.106284684920994, \"64\": 6.340659684920994}}, \"oracle_split\": {\"insensitive\": 4, \"sensitive\": 16}, \"sensitive_gain_b16\": 2.109375, \"insensitive_gain_b16\": 0.0, \"note\": \"total 20 admits 4+16 and 16+4\"}",
+   "attempted": 512,
+   "valid": 512,
+   "rejected": 0,
+   "error": 0
+  },
+  {
+   "control": "TOY_B",
+   "status": "FAIL",
+   "detail": "{\"space\": 1920, \"boundary_size\": 494, \"recall\": {\"25\": {\"random\": 0.27692307692307694, \"structured\": 0.14777327935222667, \"ratio\": 0.5336257309941519}, \"50\": {\"random\": 0.45475708502024287, \"structured\": 0.2550607287449393, \"ratio\": 0.5608724682839974}, \"100\": {\"random\": 0.705566801619433, \"structured\": 0.34817813765182204, \"ratio\": 0.49347295940324243}, \"200\": {\"random\": 0.9191295546558707, \"structured\": 0.647773279352227, \"ratio\": 0.7047681973350953}}, \"ratio_at_200\": 0.7047681973350953}",
+   "attempted": 160,
+   "valid": 160,
+   "rejected": 0,
+   "error": 0
+  },
+  {
+   "control": "TOY_C",
+   "status": "PASS",
+   "detail": "{\"fault_cells\": [[2, 3], [2, 4]], \"threshold\": 32.0, \"single_cell_restoring\": [], \"minimal_restoring_window\": [[2, 3], [2, 4]], \"n_restoring_windows\": 3, \"unique_minimal\": true}",
+   "attempted": 30,
+   "valid": 30,
+   "rejected": 0,
+   "error": 0
+  }
+ ]
+}

@@ -888,3 +888,13 @@
 - **kill 是有信息量的，不是预设的**：修完 bug 后首个状态 sanity check 显示 beam−greedy = **+0.972**（且出现 3.25/2.61 的交互项），S-03 中位 **+0.222** —— 符号直到整面板跑完前都是开放的；FAIL 来自平局（9/19）、EM-01 的大额亏损与打不过 sequential。
 - **自身缺陷全部记录**：M24-F1 主集用了 census 全部唯一状态侧（53，超集）而非冻结 35 组合；**M24-F2 精确评估失败被 `RuntimeError` 吞掉、状态静默丢弃（53→19、~30→11）**——正是红线 R3 的形态，已在每个面板标出真实 n 并写明未来修法；M24-F3 主集意图标签退化为全 I1，故条件概率只报了可算的两项；**M24-F4 交互臂两处真 bug**（φ 的 u_j 基点错、模型只匹配首个探针）— 在 Gate I 通过后重读代码发现，修复后 Gate II 从零重跑。
 - **包** `research/m2_4/M2_4_JTC_INTERACTION_LAST_GATE.zip` sha256 `5781e81a…`（35 文件，含 00–09 全部文档、预注册、registry/claims/failures/manifest、metrics/figures/cases/code_patch/logs）。0 碰撞事件、全部 gunnery 批次 `validate_orders` 通过；0 付费 LLM；生产引擎零改动；**未进入 RL/GNN/Transformer/论文写作**。按指令停止。
+
+
+## 2026-09-21 — Phase A v3.0（A0 完成 + 交付 bundle，Track A/B/C 未运行）
+
+- **新研究轴**：从 IBS 转向通用 MARL 问题（BenchMARL/VMAS）。装 BenchMARL 1.5.2 + VMAS 1.5.2 + torch 2.8.0（py3.9.6），112s；MPS 实测比 CPU 慢 2.1× → 冻结 CPU。
+- **A0 全部完成**：6/6 MAPPO 训练成功（3 seeds × 2 任务 × 600k 帧，检查点齐全，中位种子规则）；500 回合干净基线；三个正对照全 PASS；`ENVIRONMENT_LOCK.json` + `PRE_REGISTRATION_PHASE_A.md` 先于测量冻结。
+- **两处关键仪器发现**：(1) **预注册的原生 success 判据在本版 VMAS 失效**——终止时全 agent 已在目标半径内但 `final_rew`/`all_goal_reached` 仍为 False，照用会把能完成任务的策略报成 0% 成功；改为场景自身 `done()`。(2) **navigation 干净成功率 100% → 饱和**，按冻结规则在看 Track 前替换为 `sampling`。
+- **未运行 Track A/B/C**：状态 `BLOCKED`（非 FAIL），因为没有任何 Track 数字，报 PASS/KILL 即编造。冻结设计 + 已验证仪器 + 已验证策略齐备，可立即重跑。
+- **自身缺陷留档**：toy A/B/C 三处仪器缺陷（含一个同义反复的对照与一个比随机还差的结构化探针）、注册器路径 bug（6 个成功训练被写成 REJECTED）、以及我误启第二批训练（2 分钟内止损）。旧版全部保留为 `INVALID_*`。
+- 包 `PHASE_A_MAINLINE_SELECTION_BUNDLE.zip` sha256 `12f0deb934967cf2…`（72 文件）。0 付费 LLM；未训练 RL/GNN/Transformer；未进入 Phase B。

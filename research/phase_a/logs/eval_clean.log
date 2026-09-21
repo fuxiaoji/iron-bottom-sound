@@ -1,0 +1,40 @@
+  navigation s0: mean_return=16.061 success=1.00 n=100
+  navigation s1: mean_return=16.032 success=1.00 n=100
+  navigation s2: mean_return=16.386 success=1.00 n=100
+  navigation clean 100/500
+  navigation clean 200/500
+  navigation clean 300/500
+  navigation clean 400/500
+  navigation clean 500/500
+  balance s0: mean_return=118.460 success=0.91 n=100
+  balance s1: mean_return=123.240 success=0.90 n=100
+  balance s2: mean_return=124.480 success=0.90 n=100
+  balance clean 100/500
+  balance clean 200/500
+  balance clean 300/500
+  balance clean 400/500
+  balance clean 500/500
+{
+ "navigation": {
+  "n_clean_episodes": 500,
+  "mean_return": 16.073164859186857,
+  "std_return": 3.5530753135681152,
+  "success_rate": 1.0,
+  "return_p25": 13.64656600356102,
+  "errors": 0,
+  "rejected": 0,
+  "median_seed": 0,
+  "saturation_flag": "SATURATED_GE_95PCT"
+ },
+ "balance": {
+  "n_clean_episodes": 500,
+  "mean_return": 121.22592592620849,
+  "std_return": 25.690750122070312,
+  "success_rate": 0.876,
+  "return_p25": 115.73341369628906,
+  "errors": 0,
+  "rejected": 0,
+  "median_seed": 1,
+  "saturation_flag": "OK"
+ }
+}

@@ -1,0 +1,64 @@
+{
+ "phase": "A",
+ "execution_status": "A0_COMPLETE_TRACKS_NOT_RUN_IN_THIS_WINDOW",
+ "track_a": {
+  "status": "BLOCKED",
+  "heterogeneity": null,
+  "oracle_equal_budget_gain": null,
+  "learned_gap_recovery": null,
+  "blocker": "A0 completed and certified; Tracks A/B/C were not executed in this execution window. No Track number exists. Frozen design and validated instruments are in place for an immediate rerun (see REPRODUCE.md)."
+ },
+ "track_b": {
+  "status": "BLOCKED",
+  "boundary_recall_ratio_vs_random": null,
+  "structured_gain_vs_generic": null,
+  "blocker": "same as track_a; positive control B instrument validated (3.36x / 2.71x structured-vs-random recall at K=50/100 in the toy)"
+ },
+ "track_c": {
+  "status": "BLOCKED",
+  "identifiable_fraction": null,
+  "query_fraction": null,
+  "attribution_accuracy": null,
+  "blocker": "same as track_a; positive control C instrument validated (exhaustive repair recovers the unique 2-cell window)"
+ },
+ "track_d": {
+  "status": "NOT_ACTIVATED",
+  "reason": "conditional on Track B trajectories, which were not collected"
+ },
+ "recommended_for_pi_review": [],
+ "largest_valid_effect": "",
+ "largest_unresolved_risk": "the surviving base policy (balance, 87.6% success) is strong: perturbations must be severe enough to produce the pre-registered 5-50% failure band, and Track A planning headroom may be small at 87.6% clean success. The navigation replacement (sampling) is training and its clean baseline is not yet measured.",
+ "A0": {
+  "environment_lock": "ENVIRONMENT_LOCK.json",
+  "setup_seconds": 112,
+  "base_policy_runs": {
+   "attempted": 6,
+   "success": 6,
+   "rejected": 0,
+   "error": 0
+  },
+  "clean_baseline": {
+   "navigation": {
+    "n": 500,
+    "success_rate": 1.0,
+    "flag": "SATURATED_GE_95PCT",
+    "action": "TASK_REPLACED_BY_VMAS_SAMPLING"
+   },
+   "balance": {
+    "n": 500,
+    "success_rate": 0.876,
+    "flag": "OK",
+    "median_seed": 1
+   }
+  },
+  "positive_controls": {
+   "TOY_A": "PASS",
+   "TOY_B": "PASS",
+   "TOY_C": "PASS",
+   "MEASUREMENT_BLOCKER": []
+  },
+  "native_oracle": "scenario's own done(); VMAS final_rew/all_goal_reached rejected as inconsistent (see 01_ENVIRONMENT_POLICY_AUDIT.md)"
+ },
+ "SELECTED_MAINLINE": null,
+ "note": "The local AI must not fill SELECTED_MAINLINE; the PI decides after reviewing the bundle."
+}

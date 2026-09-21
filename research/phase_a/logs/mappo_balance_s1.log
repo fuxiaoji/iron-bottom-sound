@@ -1,0 +1,98 @@
+
+Algorithm: mappo, Task: vmas/balance
+
+Loaded config:
+
+experiment:
+  sampling_device: cpu
+  train_device: cpu
+  buffer_device: cpu
+  share_policy_params: true
+  prefer_continuous_actions: true
+  collect_with_grad: false
+  parallel_collection: false
+  gamma: 0.99
+  lr: 5.0e-05
+  adam_eps: 1.0e-06
+  adam_extra_kwargs: {}
+  clip_grad_norm: true
+  clip_grad_val: 5.0
+  soft_target_update: true
+  polyak_tau: 0.005
+  hard_target_update_frequency: 5
+  exploration_eps_init: 0.8
+  exploration_eps_end: 0.01
+  exploration_anneal_frames: null
+  max_n_iters: null
+  max_n_frames: 600000
+  on_policy_collected_frames_per_batch: 6000
+  on_policy_n_envs_per_worker: 10
+  on_policy_n_minibatch_iters: 45
+  on_policy_minibatch_size: 400
+  off_policy_collected_frames_per_batch: 6000
+  off_policy_n_envs_per_worker: 10
+  off_policy_n_optimizer_steps: 1000
+  off_policy_train_batch_size: 128
+  off_policy_memory_size: 1000000
+  off_policy_init_random_frames: 0
+  off_policy_use_prioritized_replay_buffer: false
+  off_policy_prb_alpha: 0.6
+  off_policy_prb_beta: 0.4
+  evaluation: true
+  render: false
+  evaluation_interval: 120000
+  evaluation_episodes: 10
+  evaluation_deterministic_actions: true
+  evaluation_static: false
+  loggers:
+  - csv
+  project_name: benchmarl
+  wandb_extra_kwargs: {}
+  create_json: true
+  save_folder: null
+  restore_file: null
+  restore_map_location: null
+  checkpoint_interval: 120000
+  checkpoint_at_end: true
+  keep_checkpoints_num: 3
+  exclude_buffer_from_checkpoint: false
+algorithm:
+  share_param_critic: true
+  clip_epsilon: 0.2
+  entropy_coef: 0.0
+  critic_coef: 1.0
+  loss_critic_type: l2
+  lmbda: 0.9
+  scale_mapping: biased_softplus_1.0
+  use_tanh_normal: true
+  minibatch_advantage: false
+task:
+  max_steps: 100
+  n_agents: 4
+  random_package_pos_on_line: true
+  package_mass: 5.0
+model:
+  name: mlp
+  num_cells:
+  - 256
+  - 256
+  layer_class: torch.nn.Linear
+  activation_class: torch.nn.Tanh
+  activation_kwargs: null
+  norm_class: null
+  norm_kwargs: null
+  num_feature_dims: 1
+critic_model:
+  name: mlp
+  num_cells:
+  - 256
+  - 256
+  layer_class: torch.nn.Linear
+  activation_class: torch.nn.Tanh
+  activation_kwargs: null
+  norm_class: null
+  norm_kwargs: null
+  num_feature_dims: 1
+seed: 1
+
+  0%|          | 0/100 [00:00<?, ?it/s]mean return = -5.283230304718018:   1%|          | 1/100 [00:11<19:33, 11.85s/it]mean return = -4.25490140914917:   2%|▏         | 2/100 [00:23<19:01, 11.65s/it] mean return = -3.4732553958892822:   3%|▎         | 3/100 [00:33<17:41, 10.94s/it]mean return = -3.3963656425476074:   4%|▍         | 4/100 [00:44<17:22, 10.86s/it]mean return = -2.614008665084839:   5%|▌         | 5/100 [00:54<16:47, 10.61s/it] mean return = -1.0059685707092285:   6%|▌         | 6/100 [01:05<17:05, 10.91s/it]mean return = 0.33263149857521057:   7%|▋         | 7/100 [01:16<16:46, 10.82s/it]mean return = 2.2869715690612793:   8%|▊         | 8/100 [01:27<16:44, 10.92s/it] mean return = 6.089907169342041:   9%|▉         | 9/100 [01:38<16:37, 10.96s/it] mean return = 10.091273307800293:  10%|█         | 10/100 [01:49<16:24, 10.94s/it]mean return = 14.938608169555664:  11%|█         | 11/100 [02:00<16:12, 10.93s/it]mean return = 19.469263076782227:  12%|█▏        | 12/100 [02:12<16:19, 11.13s/it]mean return = 24.76547622680664:  13%|█▎        | 13/100 [02:23<16:09, 11.15s/it] mean return = 27.876453399658203:  14%|█▍        | 14/100 [02:34<15:49, 11.04s/it]mean return = 30.652416229248047:  15%|█▌        | 15/100 [02:45<15:44, 11.11s/it]mean return = 32.60965347290039:  16%|█▌        | 16/100 [02:56<15:38, 11.17s/it] mean return = 34.307029724121094:  17%|█▋        | 17/100 [03:07<15:18, 11.07s/it]mean return = 39.44639587402344:  18%|█▊        | 18/100 [03:18<15:08, 11.08s/it] mean return = 38.34599685668945:  19%|█▉        | 19/100 [03:30<15:12, 11.27s/it]mean return = 40.913394927978516:  20%|██        | 20/100 [03:42<15:21, 11.52s/it]mean return = 41.709266662597656:  21%|██        | 21/100 [03:53<15:05, 11.47s/it]mean return = 43.77204513549805:  22%|██▏       | 22/100 [04:04<14:45, 11.35s/it] mean return = 43.63740921020508:  23%|██▎       | 23/100 [04:16<14:31, 11.32s/it]mean return = 44.68232345581055:  24%|██▍       | 24/100 [04:26<14:10, 11.19s/it]mean return = 45.64378356933594:  25%|██▌       | 25/100 [04:38<13:58, 11.19s/it]mean return = 47.13867950439453:  26%|██▌       | 26/100 [04:49<13:49, 11.21s/it]mean return = 46.51720428466797:  27%|██▋       | 27/100 [05:01<13:50, 11.38s/it]mean return = 47.247371673583984:  28%|██▊       | 28/100 [05:12<13:33, 11.29s/it]mean return = 46.25248718261719:  29%|██▉       | 29/100 [05:28<15:08, 12.80s/it] mean return = 47.09803771972656:  30%|███       | 30/100 [05:46<16:43, 14.33s/it]mean return = 50.33976364135742:  31%|███       | 31/100 [05:59<15:57, 13.88s/it]mean return = 48.32936096191406:  32%|███▏      | 32/100 [06:14<16:15, 14.35s/it]mean return = 48.961124420166016:  33%|███▎      | 33/100 [06:31<16:54, 15.15s/it]mean return = 49.643917083740234:  34%|███▍      | 34/100 [06:50<17:45, 16.14s/it]mean return = 50.804725646972656:  35%|███▌      | 35/100 [07:01<16:03, 14.83s/it]mean return = 50.61372756958008:  36%|███▌      | 36/100 [07:13<14:39, 13.75s/it] mean return = 50.507057189941406:  37%|███▋      | 37/100 [07:24<13:44, 13.09s/it]mean return = 50.22378921508789:  38%|███▊      | 38/100 [07:36<13:03, 12.64s/it] mean return = 49.38121795654297:  39%|███▉      | 39/100 [07:47<12:24, 12.21s/it]mean return = 51.74497604370117:  40%|████      | 40/100 [07:59<12:06, 12.11s/it]mean return = 53.12235641479492:  41%|████      | 41/100 [08:12<12:08, 12.35s/it]mean return = 51.13419723510742:  42%|████▏     | 42/100 [08:24<11:58, 12.38s/it]mean return = 51.07114028930664:  43%|████▎     | 43/100 [08:37<11:43, 12.35s/it]mean return = 52.04413604736328:  44%|████▍     | 44/100 [08:48<11:18, 12.12s/it]mean return = 52.09599304199219:  45%|████▌     | 45/100 [09:00<11:01, 12.02s/it]mean return = 53.03337097167969:  46%|████▌     | 46/100 [09:12<10:47, 11.99s/it]mean return = 52.280818939208984:  47%|████▋     | 47/100 [09:23<10:26, 11.82s/it]mean return = 54.16259765625:  48%|████▊     | 48/100 [09:36<10:23, 11.98s/it]    mean return = 52.95382308959961:  49%|████▉     | 49/100 [09:47<10:08, 11.93s/it]mean return = 53.10823059082031:  50%|█████     | 50/100 [09:59<09:52, 11.84s/it]mean return = 52.863704681396484:  51%|█████     | 51/100 [10:11<09:37, 11.78s/it]mean return = 55.17153549194336:  52%|█████▏    | 52/100 [10:23<09:26, 11.79s/it] mean return = 54.115867614746094:  53%|█████▎    | 53/100 [10:34<09:14, 11.81s/it]mean return = 53.09518051147461:  54%|█████▍    | 54/100 [10:46<09:01, 11.78s/it] mean return = 53.91562271118164:  55%|█████▌    | 55/100 [10:58<08:50, 11.78s/it]mean return = 54.0499153137207:  56%|█████▌    | 56/100 [11:10<08:45, 11.95s/it] mean return = 52.90869903564453:  57%|█████▋    | 57/100 [11:22<08:27, 11.80s/it]mean return = 53.93124008178711:  58%|█████▊    | 58/100 [11:33<08:14, 11.77s/it]mean return = 55.16817092895508:  59%|█████▉    | 59/100 [11:45<08:01, 11.74s/it]mean return = 50.40958786010742:  60%|██████    | 60/100 [11:58<08:03, 12.08s/it]mean return = 51.37580871582031:  61%|██████    | 61/100 [12:11<07:58, 12.28s/it]mean return = 52.52601623535156:  62%|██████▏   | 62/100 [12:23<07:48, 12.33s/it]mean return = 53.48805236816406:  63%|██████▎   | 63/100 [12:36<07:38, 12.40s/it]mean return = 52.452415466308594:  64%|██████▍   | 64/100 [12:48<07:27, 12.43s/it]mean return = 54.93335723876953:  65%|██████▌   | 65/100 [13:01<07:14, 12.42s/it] mean return = 54.09363555908203:  66%|██████▌   | 66/100 [13:13<06:59, 12.35s/it]mean return = 55.128379821777344:  67%|██████▋   | 67/100 [13:25<06:46, 12.32s/it]mean return = 52.0332145690918:  68%|██████▊   | 68/100 [13:37<06:34, 12.32s/it]  mean return = 50.49610900878906:  69%|██████▉   | 69/100 [13:48<06:10, 11.95s/it]mean return = 55.61807632446289:  70%|███████   | 70/100 [14:00<05:58, 11.96s/it]mean return = 54.09585952758789:  71%|███████   | 71/100 [14:11<05:39, 11.69s/it]mean return = 54.971824645996094:  72%|███████▏  | 72/100 [14:23<05:25, 11.61s/it]mean return = 54.65258026123047:  73%|███████▎  | 73/100 [14:34<05:10, 11.50s/it] mean return = 54.71445083618164:  74%|███████▍  | 74/100 [14:46<05:04, 11.69s/it]mean return = 54.48500442504883:  75%|███████▌  | 75/100 [14:57<04:48, 11.53s/it]mean return = 53.739566802978516:  76%|███████▌  | 76/100 [15:09<04:35, 11.46s/it]mean return = 52.1971549987793:  77%|███████▋  | 77/100 [15:20<04:20, 11.35s/it]  mean return = 55.07642364501953:  78%|███████▊  | 78/100 [15:32<04:14, 11.55s/it]mean return = 54.06464385986328:  79%|███████▉  | 79/100 [15:43<04:02, 11.53s/it]mean return = 53.0268669128418:  80%|████████  | 80/100 [15:55<03:54, 11.71s/it] mean return = 51.12741470336914:  81%|████████  | 81/100 [16:08<03:47, 11.96s/it]mean return = 54.9586296081543:  82%|████████▏ | 82/100 [16:20<03:34, 11.94s/it] mean return = 53.951210021972656:  83%|████████▎ | 83/100 [16:31<03:18, 11.70s/it]mean return = 56.02780532836914:  84%|████████▍ | 84/100 [16:42<03:05, 11.59s/it] mean return = 56.11213302612305:  85%|████████▌ | 85/100 [16:54<02:54, 11.65s/it]mean return = 55.90026092529297:  86%|████████▌ | 86/100 [17:06<02:42, 11.63s/it]mean return = 55.88261413574219:  87%|████████▋ | 87/100 [17:18<02:32, 11.72s/it]mean return = 56.66211700439453:  88%|████████▊ | 88/100 [17:29<02:18, 11.54s/it]mean return = 56.51462173461914:  89%|████████▉ | 89/100 [17:40<02:06, 11.48s/it]mean return = 55.70956039428711:  90%|█████████ | 90/100 [17:52<01:57, 11.75s/it]mean return = 57.23435974121094:  91%|█████████ | 91/100 [18:04<01:43, 11.54s/it]mean return = 56.35888671875:  92%|█████████▏| 92/100 [18:12<01:25, 10.63s/it]   mean return = 55.43022918701172:  93%|█████████▎| 93/100 [18:21<01:10, 10.07s/it]mean return = 57.282188415527344:  94%|█████████▍| 94/100 [18:29<00:57,  9.58s/it]mean return = 56.47876739501953:  95%|█████████▌| 95/100 [18:38<00:46,  9.24s/it] mean return = 53.998695373535156:  96%|█████████▌| 96/100 [18:46<00:36,  9.01s/it]mean return = 57.25835037231445:  97%|█████████▋| 97/100 [18:55<00:26,  8.84s/it] mean return = 56.35816192626953:  98%|█████████▊| 98/100 [19:03<00:17,  8.73s/it]mean return = 57.59082794189453:  99%|█████████▉| 99/100 [19:12<00:08,  8.69s/it]mean return = 55.68074417114258: 100%|██████████| 100/100 [19:20<00:00,  8.70s/it]mean return = 55.68074417114258: 100%|██████████| 100/100 [19:20<00:00, 11.61s/it]

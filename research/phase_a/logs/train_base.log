@@ -1,0 +1,7 @@
+  mappo_navigation_s0: REJECTED_NO_CHECKPOINT rc=0 924.8s
+  mappo_navigation_s1: REJECTED_NO_CHECKPOINT rc=0 917.8s
+  mappo_navigation_s2: REJECTED_NO_CHECKPOINT rc=0 921.8s
+  mappo_balance_s0: REJECTED_NO_CHECKPOINT rc=0 1082.5s
+  mappo_balance_s1: REJECTED_NO_CHECKPOINT rc=0 1163.8s
+  mappo_balance_s2: REJECTED_NO_CHECKPOINT rc=0 1082.0s
+training registry: 6 attempted, 0 SUCCESS -> /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/raw/training_registry.csv

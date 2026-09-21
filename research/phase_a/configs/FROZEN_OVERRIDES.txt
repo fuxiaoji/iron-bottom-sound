@@ -1,0 +1,14 @@
+# Phase A frozen training invocation (identical for every seed and task)
+benchmarl/run.py algorithm=mappo task=vmas/<task> seed=<0|1|2>
+  experiment.max_n_frames=600000
+  experiment.loggers=[csv]
+  experiment.train_device=cpu
+  experiment.sampling_device=cpu
+  experiment.render=False
+  experiment.checkpoint_interval=120000
+  experiment.checkpoint_at_end=True
+# BenchMARL defaults kept otherwise: share_policy_params=True,
+# on_policy_n_envs_per_worker=10, on_policy_collected_frames_per_batch=6000,
+# on_policy_n_minibatch_iters=45, evaluation_interval=120000, evaluation_episodes=10
+# Task configs are BenchMARL's own, unmodified:
+#   .venv_phase_a/.../benchmarl/conf/task/vmas/{navigation,balance,sampling}.yaml

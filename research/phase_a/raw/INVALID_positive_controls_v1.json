@@ -1,0 +1,40 @@
+{
+ "summary": {
+  "TOY_A": "FAIL",
+  "TOY_B": "FAIL",
+  "TOY_C": "PASS",
+  "MEASUREMENT_BLOCKER": [
+   "A",
+   "B"
+  ]
+ },
+ "rows": [
+  {
+   "control": "TOY_A",
+   "status": "FAIL",
+   "detail": "{\"curves\": {\"INSENSITIVE\": {\"0\": 0.9969096849209944, \"4\": 0.9969096849209944, \"16\": 0.9969096849209944, \"64\": 0.9969096849209944}, \"SENSITIVE\": {\"0\": 0.9969096849209944, \"4\": 1.0594096849209944, \"16\": 1.9344096849209944, \"64\": 3.3719096849209937}}, \"oracle_split\": {\"insensitive\": 16, \"sensitive\": 16}, \"sensitive_gain_b16\": 0.9375, \"insensitive_gain_b16\": 0.0}",
+   "attempted": 512,
+   "valid": 512,
+   "rejected": 0,
+   "error": 0
+  },
+  {
+   "control": "TOY_B",
+   "status": "FAIL",
+   "detail": "{\"boundary_size\": 142, \"recall\": {\"25\": {\"random\": 0.6961267605633802, \"structured\": 0.5563380281690141}, \"50\": {\"random\": 0.8950704225352112, \"structured\": 0.8028169014084504}, \"100\": {\"random\": 0.9855633802816902, \"structured\": 0.8873239436619718}, \"200\": {\"random\": 1.0, \"structured\": 0.9295774647887323}}, \"ratio_at_200\": 0.9295774647887323}",
+   "attempted": 160,
+   "valid": 160,
+   "rejected": 0,
+   "error": 0
+  },
+  {
+   "control": "TOY_C",
+   "status": "PASS",
+   "detail": "{\"fault_cells\": [[2, 3], [2, 4]], \"threshold\": 32.0, \"single_cell_restoring\": [], \"minimal_restoring_window\": [[2, 3], [2, 4]], \"n_restoring_windows\": 3, \"unique_minimal\": true}",
+   "attempted": 30,
+   "valid": 30,
+   "rejected": 0,
+   "error": 0
+  }
+ ]
+}

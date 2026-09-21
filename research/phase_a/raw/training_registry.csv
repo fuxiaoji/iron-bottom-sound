@@ -1,0 +1,10 @@
+run_id,task,seed,frames,status,returncode,wall_seconds,log_path,run_dir,trace_tail
+mappo_navigation_s0,navigation,0,600000,SUCCESS,0,,research/phase_a/logs/mappo_navigation_s0.log,research/phase_a/runs/mappo_navigation_s0,
+mappo_navigation_s1,navigation,1,600000,SUCCESS,0,,research/phase_a/logs/mappo_navigation_s1.log,research/phase_a/runs/mappo_navigation_s1,
+mappo_navigation_s2,navigation,2,600000,SUCCESS,0,,research/phase_a/logs/mappo_navigation_s2.log,research/phase_a/runs/mappo_navigation_s2,
+mappo_balance_s0,balance,0,600000,SUCCESS,0,,research/phase_a/logs/mappo_balance_s0.log,research/phase_a/runs/mappo_balance_s0,
+mappo_balance_s1,balance,1,600000,SUCCESS,0,,research/phase_a/logs/mappo_balance_s1.log,research/phase_a/runs/mappo_balance_s1,
+mappo_balance_s2,balance,2,600000,SUCCESS,0,,research/phase_a/logs/mappo_balance_s2.log,research/phase_a/runs/mappo_balance_s2,
+mappo_sampling_s0,sampling,0,600000,IN_PROGRESS,,,research/phase_a/logs/mappo_sampling_s0.log,research/phase_a/runs/mappo_sampling_s0,
+mappo_sampling_s1,sampling,1,600000,IN_PROGRESS,,,research/phase_a/logs/mappo_sampling_s1.log,research/phase_a/runs/mappo_sampling_s1,
+mappo_sampling_s2,sampling,2,600000,IN_PROGRESS,,,research/phase_a/logs/mappo_sampling_s2.log,research/phase_a/runs/mappo_sampling_s2,
