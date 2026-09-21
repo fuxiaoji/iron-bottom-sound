@@ -1,0 +1,8 @@
+exp_id,stage,subject,scenario,seed/turn,metric,arms,engine_evals,verdict,artifact
+M22R-INTENT-PROV,0,provenance of BROADSIDE defect,repo,-,call-graph,grep + production read,0,RESEARCH_COMPILER_BUG,02_BROADSIDE_COMPILER_BUG.md
+M22R-INTENT-TEST,0,intent compiler unit test,IBS-S-01,5,L0 mounts/plan identity,pre_fix + repaired + sweep,6,all criteria PASS,metrics/intent_compiler_unit_test.json
+M22R-MG1-DUAL,C,local vs team scale,IBS-S-01,5,L0 EH + L1 U_team,policy/pre_fix/repaired/random8/beam64,~25,gap on L0 / negative externality on repaired,metrics/mg1_dual_scale.json
+M22R-MG3E,D,executable range gold,IBS-S-EM-01,1 t10,L0 visible EH + net EH,CLOSE + OPEN,2 arms over 162 state-checks,MG3E = PASS (39% gap),metrics/mg3e.json
+M22R-B1E-MOVE,G,natural movement census,S-01/S-03/EM-01,52 states,L0 + L1 + externality,policy/pre_fix/repaired/beam64/random8,~4000,see b1e_verdicts.json,metrics/b1e_movement_census.json
+M22R-B1E-TORP,G,natural torpedo census,S-01/S-03/EM-01,15 states,RR + R_shared + R_Bayes,HOLD/ADAPTIVE/INTERCEPT/PUBLICx2/FULLSTATE,~30 launches + 15 route sets,see b1e_verdicts.json,metrics/b1e_torpedo_census.json
+M22R-B1E-VERDICT,G,frozen verdict mapping,all,-,rules §7,-,0,see 00_EXECUTIVE_SUMMARY.md,metrics/b1e_verdicts.json

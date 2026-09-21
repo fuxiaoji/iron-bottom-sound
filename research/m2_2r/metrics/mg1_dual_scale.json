@@ -1,0 +1,162 @@
+{
+ "case": {
+  "scenario": "IBS-S-01",
+  "seed": 5,
+  "side": "axis",
+  "focal": "IBS-U-IJN-AOBA",
+  "target": "IBS-U-USN-FARENHOLT",
+  "gold_plan": "1P",
+  "counter_plan": "1S1P"
+ },
+ "reproduction": {
+  "recorded_vs_reproduced": {
+   "post_rel_broad": [
+    1,
+    1
+   ],
+   "post_rel_narrow": [
+    5,
+    5
+   ],
+   "distance_broad": [
+    4,
+    4
+   ],
+   "distance_narrow": [
+    3,
+    3
+   ],
+   "mounts_broad": [
+    3,
+    3
+   ],
+   "mounts_narrow": [
+    1,
+    1
+   ],
+   "eh_pct": [
+    92.9,
+    92.9
+   ]
+  },
+  "reproduced": true,
+  "geometry": {
+   "BROADSIDE": {
+    "post_rel": 1,
+    "distance": 4,
+    "mounts_bearing": 3,
+    "main_gf_bearing": 5.0,
+    "eh_at_dref": 2.999999999999995
+   },
+   "NARROW": {
+    "post_rel": 5,
+    "distance": 3,
+    "mounts_bearing": 1,
+    "main_gf_bearing": 5.0,
+    "eh_at_dref": 1.5555555555555556
+   }
+  }
+ },
+ "metrics": {
+  "L0": "focal->target legal visible-fire EH, usable mounts",
+  "L1": "U_team = FIRE_SEARCH own EH - enemy EH (frozen)",
+  "externality": "delta_L1 - delta_L0"
+ },
+ "arms": {
+  "CURRENT_POLICY": {
+   "L0_eh": 1.6111111111111112,
+   "L0_mounts": 2,
+   "L0_visible": true,
+   "L1_U_team": -6.722222222222221,
+   "delta_L0": 0.0,
+   "delta_L1": 0.0,
+   "externality": 0.0,
+   "rel_L0": 0.0,
+   "MECHANISM_OPPORTUNITY": false,
+   "USABLE_TACTICAL_OPPORTUNITY": false,
+   "MECHANISM_SUCCESS_BUT_NEGATIVE_EXTERNALITY": false
+  },
+  "CURRENT_INTENT_PRE_FIX": {
+   "L0_eh": 1.5555555555555556,
+   "L0_mounts": 1,
+   "L0_visible": true,
+   "L1_U_team": -18.083333333333336,
+   "delta_L0": -0.05555555555555558,
+   "delta_L1": -11.361111111111114,
+   "externality": -11.305555555555559,
+   "rel_L0": -0.03448275862068967,
+   "MECHANISM_OPPORTUNITY": false,
+   "USABLE_TACTICAL_OPPORTUNITY": false,
+   "MECHANISM_SUCCESS_BUT_NEGATIVE_EXTERNALITY": false
+  },
+  "REPAIRED_INTENT_BASELINE": {
+   "L0_eh": 2.2777777777777777,
+   "L0_mounts": 2,
+   "L0_visible": true,
+   "L1_U_team": -12.555555555555554,
+   "delta_L0": 0.6666666666666665,
+   "delta_L1": -5.833333333333332,
+   "externality": -6.499999999999998,
+   "rel_L0": 0.41379310344827575,
+   "MECHANISM_OPPORTUNITY": true,
+   "USABLE_TACTICAL_OPPORTUNITY": false,
+   "MECHANISM_SUCCESS_BUT_NEGATIVE_EXTERNALITY": true
+  },
+  "RANDOM_LEGAL": {
+   "L0_eh": 2.1944444444444446,
+   "L0_mounts": 2.75,
+   "L0_visible": true,
+   "L1_U_team": -8.694444444444445,
+   "delta_L0": 0.5833333333333335,
+   "delta_L1": -1.9722222222222232,
+   "externality": -2.5555555555555567,
+   "rel_L0": 0.36206896551724144,
+   "MECHANISM_OPPORTUNITY": true,
+   "USABLE_TACTICAL_OPPORTUNITY": false,
+   "MECHANISM_SUCCESS_BUT_NEGATIVE_EXTERNALITY": true
+  },
+  "BEAM_SEARCH_COMPILER": {
+   "L0_eh": 2.0833333333333335,
+   "L0_mounts": 3,
+   "L0_visible": true,
+   "L1_U_team": 0.6944444444444464,
+   "delta_L0": 0.4722222222222223,
+   "delta_L1": 7.416666666666668,
+   "externality": 6.9444444444444455,
+   "rel_L0": 0.2931034482758621,
+   "MECHANISM_OPPORTUNITY": true,
+   "USABLE_TACTICAL_OPPORTUNITY": true,
+   "MECHANISM_SUCCESS_BUT_NEGATIVE_EXTERNALITY": false
+  }
+ },
+ "beam_assign": {
+  "IBS-U-IJN-AOBA": "1SS1S1S1S",
+  "IBS-U-IJN-FURUTAKA": "1SS1S1P1P",
+  "IBS-U-IJN-KINUGASA": "1SS3P",
+  "IBS-U-IJN-FUBUKI": "4S1P1P",
+  "IBS-U-IJN-HATSUYUKI": "1PP1P1P"
+ },
+ "beam_meta": {
+  "n_joints_played": 64,
+  "pool_sizes": {
+   "IBS-U-IJN-AOBA": 7,
+   "IBS-U-IJN-FURUTAKA": 8,
+   "IBS-U-IJN-KINUGASA": 8,
+   "IBS-U-IJN-FUBUKI": 8,
+   "IBS-U-IJN-HATSUYUKI": 7
+  }
+ },
+ "thresholds": {
+  "relative": 0.25,
+  "absolute": 0.05
+ },
+ "headline": {
+  "beam_local_gain_over_policy": 0.4722222222222223,
+  "beam_team_gain_over_policy": 7.416666666666668,
+  "beam_externality": 6.9444444444444455,
+  "repaired_local_gain_over_policy": 0.6666666666666665,
+  "repaired_team_gain_over_policy": -5.833333333333332,
+  "pre_fix_local_gain_over_policy": -0.05555555555555558,
+  "pre_fix_team_gain_over_policy": -11.361111111111114
+ }
+}

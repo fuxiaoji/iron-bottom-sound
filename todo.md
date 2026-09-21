@@ -28,7 +28,9 @@
 | T-9 | 阶段 15 决策：`PROCEED` / `REFINE` / `PIVOT` 并登记 `PROGRESS.md` §0.1 循环表 | 15 | T-8 | 待办 |
 | T-10 | 阶段 18 方法论-证据一致性逐行核查（draft vs log/results） | 18 | T-9 | 待办 |
 | T-11 | 阶段 23 引用真实性与相关性双查（≥30 篇、年份下限） | 23 | T-7 | 待办 |
-| T-13 | M2.2 后续：等 PI 决策（机制值尺度 / MG3 度量 / MG4 公开信息缺口是否升为研究问题 / B1 是否重写预注册） | — | 用户输入 | 阻塞 |
+| T-13 | M2.2-R/B1E 已完成（判定 TORPEDO_PARTIAL_OBSERVABILITY + movement MIXED，包 `1ce46fa8…`） | — | 无 | 完成 |
+| T-14 | 等 PI 裁决：① torpedo partial observability 是否升为主线（建议先做 size/diversity-matched subset 对照分离假设 B）② MG3 是否改注为 superseded-by-MG3-E ③ 「编译整条线而非单舰」是否立题 ④ 后续 census 是否加 `mid` 桶与 range 臂（修 M22R-F1/F3） | — | 用户输入 | 阻塞 |
+| T-15 | 技术债：`b1e.py` 的 Counter 序列化已修，但 `summarize` 仍是崩溃丢全量的结构（现靠 JSONL 恢复）；建议改为流式汇总 | — | 无 | 待办 |
 | T-12 | 阶段 22 套用目标会议 LaTeX 模板并导出 | 22 | T-4 | 待办 |
 
 ## 已完成（本会话 2026-09-18，证据已归档至 `havedone.md`）

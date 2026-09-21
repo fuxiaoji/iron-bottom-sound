@@ -1,0 +1,205 @@
+{
+ "movement": {
+  "verdict": "MIXED",
+  "note": "frozen thresholds not jointly met in any single branch",
+  "inputs": {
+   "mechanism_rows_in_census": 1,
+   "mechanism_note": "one local mechanism quantity (focal-pair legal visible-fire EH) driven by five arms; Range's executable status comes from MG3-E, not from a second census row (M22R-F1)",
+   "scenarios_with_mech_opp_ge_20pct": [
+    "IBS-S-01",
+    "IBS-S-EM-01"
+   ],
+   "median_beam_median_rel_L0": 0.0,
+   "random_clearly_worse": true,
+   "max_scenario_mech_opp_rate": 0.375,
+   "median_usable_rate": 0.625,
+   "median_externality": 0.5972222222222225,
+   "not_driven_by_one_scenario": true
+  },
+  "per_scenario": {
+   "IBS-S-01": {
+    "BEAM_SEARCH_COMPILER": {
+     "n": 16,
+     "mech_opp_rate": 0.375,
+     "usable_rate": 1.0,
+     "neg_externality_rate": 0.0,
+     "median_delta_L0": 0.125,
+     "median_delta_L1": 2.7916666666666705,
+     "median_rel_L0": 0.20389461626575023,
+     "median_externality": 2.2916666666666696
+    },
+    "REPAIRED_INTENT_BASELINE": {
+     "n": 32,
+     "mech_opp_rate": 0.46875,
+     "usable_rate": 0.40625,
+     "neg_externality_rate": 0.3125,
+     "median_delta_L0": 0.11111111111111116,
+     "median_delta_L1": -1.7777777777777781,
+     "median_rel_L0": 0.22222222222222232,
+     "median_externality": -1.986111111111112
+    },
+    "CURRENT_INTENT_PRE_FIX": {
+     "n": 31,
+     "mech_opp_rate": 0.4838709677419355,
+     "usable_rate": 0.45161290322580644,
+     "neg_externality_rate": 0.25806451612903225,
+     "median_delta_L0": 0.11111111111111116,
+     "median_delta_L1": -2.1388888888888875,
+     "median_rel_L0": 0.22222222222222232,
+     "median_externality": -2.2222222222222223
+    },
+    "RANDOM_LEGAL": {
+     "n": 32,
+     "mech_opp_rate": 0.46875,
+     "usable_rate": 0.625,
+     "neg_externality_rate": 0.15625,
+     "median_delta_L0": 0.17361111111111116,
+     "median_delta_L1": 0.37326388888888795,
+     "median_rel_L0": 0.14236111111111105,
+     "median_externality": -0.32291666666666796
+    }
+   },
+   "IBS-S-03": {
+    "BEAM_SEARCH_COMPILER": {
+     "n": 16,
+     "mech_opp_rate": 0.125,
+     "usable_rate": 0.625,
+     "neg_externality_rate": 0.0,
+     "median_delta_L0": 0.0,
+     "median_delta_L1": 0.541666666666667,
+     "median_rel_L0": 0.0,
+     "median_externality": 0.5972222222222225
+    },
+    "REPAIRED_INTENT_BASELINE": {
+     "n": 31,
+     "mech_opp_rate": 0.3225806451612903,
+     "usable_rate": 0.3548387096774194,
+     "neg_externality_rate": 0.1935483870967742,
+     "median_delta_L0": -0.08333333333333337,
+     "median_delta_L1": -0.2222222222222222,
+     "median_rel_L0": -0.08571428571428576,
+     "median_externality": -0.25
+    },
+    "CURRENT_INTENT_PRE_FIX": {
+     "n": 31,
+     "mech_opp_rate": 0.3225806451612903,
+     "usable_rate": 0.3870967741935484,
+     "neg_externality_rate": 0.16129032258064516,
+     "median_delta_L0": 0.0,
+     "median_delta_L1": 0.0,
+     "median_rel_L0": 0.0,
+     "median_externality": -0.11111111111111105
+    },
+    "RANDOM_LEGAL": {
+     "n": 32,
+     "mech_opp_rate": 0.1875,
+     "usable_rate": 0.375,
+     "neg_externality_rate": 0.21875,
+     "median_delta_L0": -0.08680555555555564,
+     "median_delta_L1": -2.220446049250313e-16,
+     "median_rel_L0": -0.132996632996633,
+     "median_externality": 0.13020833333333354
+    }
+   },
+   "IBS-S-EM-01": {
+    "BEAM_SEARCH_COMPILER": {
+     "n": 17,
+     "mech_opp_rate": 0.23529411764705882,
+     "usable_rate": 0.47058823529411764,
+     "neg_externality_rate": 0.058823529411764705,
+     "median_delta_L0": 0.0,
+     "median_delta_L1": 0.0,
+     "median_rel_L0": 0.0,
+     "median_externality": 0.0
+    },
+    "REPAIRED_INTENT_BASELINE": {
+     "n": 40,
+     "mech_opp_rate": 0.15,
+     "usable_rate": 0.4,
+     "neg_externality_rate": 0.025,
+     "median_delta_L0": 0.0,
+     "median_delta_L1": 0.0,
+     "median_rel_L0": 0.0,
+     "median_externality": 0.0
+    },
+    "CURRENT_INTENT_PRE_FIX": {
+     "n": 39,
+     "mech_opp_rate": 0.1282051282051282,
+     "usable_rate": 0.41025641025641024,
+     "neg_externality_rate": 0.0,
+     "median_delta_L0": 0.0,
+     "median_delta_L1": 0.0,
+     "median_rel_L0": 0.0,
+     "median_externality": 0.0
+    },
+    "RANDOM_LEGAL": {
+     "n": 40,
+     "mech_opp_rate": 0.25,
+     "usable_rate": 0.25,
+     "neg_externality_rate": 0.1,
+     "median_delta_L0": 0.0,
+     "median_delta_L1": 0.0,
+     "median_rel_L0": 0.0,
+     "median_externality": 0.0
+    }
+   }
+  },
+  "n_state_arms": 357
+ },
+ "torpedo": {
+  "verdict": "TORPEDO_PARTIAL_OBSERVABILITY",
+  "scenarios_with_material_ge_20pct": [
+   "IBS-S-01",
+   "IBS-S-EM-01"
+  ],
+  "material_rate_pooled": 0.26666666666666666,
+  "median_R_shared_pooled": 0.3333333333333333,
+  "per_scenario": {
+   "IBS-S-01": {
+    "n": 4,
+    "material_rate": 0.5,
+    "median_R_shared": 0.5833333333333333,
+    "median_R_bayes_uniform": 0.12789786967418545,
+    "mean_RR": {
+     "HOLD": 0.0,
+     "CURRENT_ADAPTIVE": 0.0,
+     "INTERCEPT_ASSIST": 0.008620689655172414,
+     "PUBLIC_SET_COVER": 0.0,
+     "PUBLIC_BELIEF_AWARE": 0.0,
+     "FULL_STATE_CEILING": 0.3163793103448276
+    },
+    "current_fired_rate": 0.25
+   },
+   "IBS-S-03": {
+    "n": 5,
+    "material_rate": 0.0,
+    "median_R_shared": 0.0,
+    "median_R_bayes_uniform": 0.0,
+    "mean_RR": {
+     "HOLD": 0.0,
+     "CURRENT_ADAPTIVE": 0.0,
+     "INTERCEPT_ASSIST": 0.0,
+     "PUBLIC_SET_COVER": 0.0,
+     "PUBLIC_BELIEF_AWARE": 0.0,
+     "FULL_STATE_CEILING": 0.02
+    },
+    "current_fired_rate": 0.6
+   },
+   "IBS-S-EM-01": {
+    "n": 6,
+    "material_rate": 0.3333333333333333,
+    "median_R_shared": 0.3333333333333333,
+    "median_R_bayes_uniform": 0.14814814814814814,
+    "mean_RR": {
+     "HOLD": 0.0,
+     "CURRENT_ADAPTIVE": 0.0,
+     "INTERCEPT_ASSIST": 0.004166666666666667,
+     "PUBLIC_SET_COVER": 0.029166666666666664,
+     "PUBLIC_BELIEF_AWARE": 0.029166666666666664,
+     "FULL_STATE_CEILING": 0.20314039408866993
+    },
+    "current_fired_rate": 0.16666666666666666
+   }
+  }
+ }
+}

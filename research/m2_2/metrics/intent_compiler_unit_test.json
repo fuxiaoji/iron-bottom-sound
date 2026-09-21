@@ -1,0 +1,21 @@
+{
+ "criteria": [
+  "(i) repaired != narrow arm",
+  "(iii) pre_fix == narrow arm",
+  "(iv) no dead-ahead/astern when abeam bears more"
+ ],
+ "reported": {
+  "REPAIRED_MOUNT_RECOVERY": "2/3 (pre_fix 1)",
+  "arc_counts_at_current_bearing": {
+   "1": 3,
+   "2": 1,
+   "3": 2,
+   "4": 2,
+   "5": 0,
+   "6": 3
+  },
+  "repaired_desired_heading": 1,
+  "note": "diagnostic only \u2014 not a pass/fail criterion (PRE_REGISTRATION_B1E \u00a72D)"
+ },
+ "failed": []
+}

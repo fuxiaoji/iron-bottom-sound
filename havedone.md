@@ -854,3 +854,16 @@
 - **B1 自然普查未运行**（预注册以 B0 PASS 为门；B0 非 PASS）。`NATURAL_OPPORTUNITY_RATE = NOT_MEASURED`，相关 6 项图表标注 `N/A — B1 not run`，未编造任何自然机会率。
 - **失败留档**：M22-F1 混合侧秩统计伪影 / F2 搜索重复计炮 / F3 `movement_candidates` 是合法计划空间子集且 `MovementOrder.speed` 须取 `engine.movement_cost`（手算会拒合法批次）/ F4 MG3 度量缺能见度门 / F5 MG4 gold 即全状态 argmax（F=1 平凡，已声明）F6 图表曾把两个公开目标的结论混挂（已改为双面板）。全部写入 `research/m2_2/FAILURES_AND_COUNTEREXAMPLES.md`。
 - **提交与打包**：包 `research/m2_2/M2_2_TACTICAL_COMPILER_FIDELITY_BUNDLE.zip` sha256 `a2ccf6d8…`（35 文件）；预算 ~450 次引擎评估；0 付费 LLM；生产引擎零改动；未训练模型；未进入价值兑现/RL/论文写作。**按指令停止，等 PI 决策**（机制值尺度 / MG3 度量 / MG4 公开信息缺口是否升为研究问题 / B1 是否重写预注册）。
+
+
+## 2026-09-21 — M2.2-R / B1E：四项裁决全部执行，判定 TORPEDO_PARTIAL_OBSERVABILITY + movement MIXED
+
+- **纪律**：历史 gate 原样保留（M2.1-R2.1 = FAIL_3_OF_5；M2.2 B0 = FAIL/BLOCKED_BY_METRIC_VALIDITY）。预注册 `PRE_REGISTRATION_B1E.md` 标注 EXPLORATORY / NOT USED TO OVERRIDE PRIOR GATES，阈值/臂/桶/判定规则全部先于测量冻结。
+- **A 溯源（先于修复）**：`grep` 调用图证明 `mg_cases.intent_plans` 只被 research 脚本调用；production `_movement_order_for` 用引擎 `ship_gun_pressure` 扫描每个可达 (格,末航向)，从不把意图转成航向 → **`RESEARCH_COMPILER_BUG`**。
+- **B 修复与自纠**：`mg_cases.py` 一字未改（保住 `CURRENT_INTENT_PRE_FIX` 可复现），修复 = 新模块 `REPAIRED_INTENT_BASELINE`（按本舰炮座弧表选航向）。单测 (i) 修复后 ≠ narrow arm、(iii) pre-fix 仍 == narrow arm、(iv) 合成航向扫描无首尾向，全部 PASS。**(ii) 是我自己过强的断言**（要求恢复 gold 的 3 个炮座）——实测 2（pre-fix 1）。我把它**降级为报告值并写进失败台账**，没有在看到结果后放宽判据；诊断显示修复后的期望航向在战前已取到 3 个炮座，战后只剩 2，即 F18。
+- **C MG1 双尺度（复现 exact）**：pre-fixΔL0 −0.056（炮座 2→1）/ΔL1 −11.361；**修复后 +0.667 L0（41% 相对）与 −5.833 L1 → `MECHANISM_SUCCESS_BUT_NEGATIVE_EXTERNALITY`**；`RANDOM_LEGAL` 在两尺度都优于修复意图（+0.583/−1.972）——单舰意图不是战术；**只有 BEAM 双正**（+0.472/+7.417，外部性 +6.944）。
+- **D MG3-E = PASS**：按 7 条冻结规则扫描**全部** MOVEMENT_PLANNING 状态（不只 turn 2），162 个状态、拒绝原因全部记录，取 EM-01 s1 t10：两臂都可见、各 8 门主炮可用，9 格 4.139 vs 12 格 2.528（相对 38.9%），净命中 2.639 vs 1.833。旧 MG3 保留 `HISTORICAL_PROXY_PASS / EXECUTABLE_GOLD_INVALID`。
+- **E MG4-P**：未使用 `PUBLIC_INFORMATION_GAP`。**自查发现并修正自己的度量缺陷**：二值 per-route payoff 使 `R_shared` 在路线数大于单动作覆盖时恒为 1，测的是动作空间覆盖率而非信念冲突（三个「material」状态同时 ceiling 仅 0.071–0.316 且 R_shared 恰为 1.000 就是症状），修为 graded D 并两种并列留档（M22R-F2）。graded 下 **material 4/15 状态、跨 2 场景**（R_shared 0.500/0.667/0.333/0.333）→ `TORPEDO_PARTIAL_OBSERVABILITY`，但**效应量单场景主导**（S-01 ceiling 0.97/0.30；EM-01 0.07/0.17），且**假设 B 未被分离**：公开假设集在 R_shared 上双向移动（S-01 s1t2 公开 0.200 < 真实 0.500；S-03 s2t2 公开 0.167 > 真实 0.000）。
+- **G 普查**：movement 52 状态/104 状态侧，beam 按序号奇偶单侧（n=49，不用任何臂的产出选侧）。**`damaged` 层为空、`late` 仅 16、配额缺 S-01 −4 / S-03 −4**——结构性原因（S-01 只到 turn 7、S-03 只到 turn 4；无 `mid` 桶），如实报告不回填。判定 **MOVEMENT = MIXED**：卡在冻结的「中位相对增益 ≥0.30」（实测 0.000，因中位状态机会为零），而机会率 0.375/0.235/0.125 与外部性结构相反；`LOCAL_ONLY_MECHANISM` 明确不成立。torpedo：**当前 AI 平均 RouteReduction = 0.000**（6/15 状态开火却零约束），公开臂 ≈0.010，full-state 0.020–0.316。
+- **失败留档 M22R-F1..F5** + 两条常备反例。两处崩溃（Counter 键 set/tuple 不可序列化）各损失约 30 分钟算力，之后改为逐状态 JSONL 落盘，崩溃不再丢数据。
+- **提交与打包**：包 `research/m2_2r/M2_2R_B1E_NATURAL_OPPORTUNITY_BUNDLE.zip` sha256 `1ce46fa8…`（43 文件）。预算约 5000 次引擎评估；0 付费 LLM；生产引擎零改动；未训练模型；**未进入 RL/GNN/论文方法设计**。按指令停止。

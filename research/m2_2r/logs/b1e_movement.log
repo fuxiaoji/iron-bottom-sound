@@ -1,0 +1,78 @@
+=== IBS-S-01 ===
+  IBS-S-01: pool=16 picked=16 labels={'early': 16, 'contact': 8} pool_labels={'early': 16, 'contact': 8}
+  s1 t2 {'early', 'contact'}: sides=['axis', 'allies']
+  s1 t3 {'early'}: sides=['axis', 'allies']
+  s2 t2 {'early', 'contact'}: sides=['axis', 'allies']
+  s2 t3 {'early'}: sides=['axis', 'allies']
+  s3 t2 {'early', 'contact'}: sides=['axis', 'allies']
+  s3 t3 {'early'}: sides=['axis', 'allies']
+  s4 t2 {'early', 'contact'}: sides=['axis', 'allies']
+  s4 t3 {'early'}: sides=['axis', 'allies']
+  s5 t2 {'early', 'contact'}: sides=['axis', 'allies']
+  s5 t3 {'early'}: sides=['axis', 'allies']
+  s6 t2 {'early', 'contact'}: sides=['axis', 'allies']
+  s6 t3 {'early'}: sides=['axis', 'allies']
+  s7 t2 {'early', 'contact'}: sides=['axis', 'allies']
+  s7 t3 {'early'}: sides=['axis', 'allies']
+  s8 t2 {'early', 'contact'}: sides=['axis', 'allies']
+  s8 t3 {'early'}: sides=['axis', 'allies']
+=== IBS-S-03 ===
+  IBS-S-03: pool=16 picked=16 labels={'early': 16} pool_labels={'early': 16}
+  s1 t2 {'early'}: sides=['axis', 'allies']
+  s1 t3 {'early'}: sides=['axis', 'allies']
+  s2 t2 {'early'}: sides=['axis', 'allies']
+  s2 t3 {'early'}: sides=['axis', 'allies']
+  s3 t2 {'early'}: sides=['axis', 'allies']
+  s3 t3 {'early'}: sides=['axis', 'allies']
+  s4 t2 {'early'}: sides=['axis', 'allies']
+  s4 t3 {'early'}: sides=['axis', 'allies']
+  s5 t2 {'early'}: sides=['axis', 'allies']
+  s5 t3 {'early'}: sides=['axis', 'allies']
+  s6 t2 {'early'}: sides=['axis', 'allies']
+  s6 t3 {'early'}: sides=['axis', 'allies']
+  s7 t2 {'early'}: sides=['axis', 'allies']
+  s7 t3 {'early'}: sides=['axis', 'allies']
+  s8 t2 {'early'}: sides=['axis', 'allies']
+  s8 t3 {'early'}: sides=['axis', 'allies']
+=== IBS-S-EM-01 ===
+  IBS-S-EM-01: pool=61 picked=20 labels={'early': 8, 'contact': 7, 'late': 8} pool_labels={'early': 16, 'contact': 8, 'late': 40}
+  s1 t2 {'early'}: sides=['axis', 'allies']
+  s1 t3 {'early', 'contact'}: sides=['axis', 'allies']
+  s1 t8 {'late'}: sides=['axis', 'allies']
+  s1 t9 {'late'}: sides=['axis', 'allies']
+  s1 t10 {'late'}: sides=['axis', 'allies']
+  s1 t11 {'late'}: sides=['axis', 'allies']
+  s1 t12 {'late'}: sides=['axis', 'allies']
+  s2 t2 {'early'}: sides=['axis', 'allies']
+  s2 t3 {'early'}: sides=['axis', 'allies']
+  s2 t5 {'contact'}: sides=['axis', 'allies']
+  s2 t8 {'late'}: sides=['axis', 'allies']
+  s3 t2 {'early'}: sides=['axis', 'allies']
+  s3 t3 {'early'}: sides=['axis', 'allies']
+  s3 t9 {'contact', 'late'}: sides=['axis', 'allies']
+  s4 t2 {'early'}: sides=['axis', 'allies']
+  s4 t3 {'early'}: sides=['axis', 'allies']
+  s4 t11 {'contact', 'late'}: sides=['axis', 'allies']
+  s5 t5 {'contact'}: sides=['axis', 'allies']
+  s6 t4 {'contact'}: sides=['axis', 'allies']
+  s7 t5 {'contact'}: sides=['axis', 'allies']
+Traceback (most recent call last):
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/m2_2r/scripts/b1e.py", line 1029, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/m2_2r/scripts/b1e.py", line 1009, in main
+    movement_census()
+    ~~~~~~~~~~~~~~~^^
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/m2_2r/scripts/b1e.py", line 400, in movement_census
+    (OUT / "b1e_movement_census.json").write_text(json.dumps(out, indent=1, default=str))
+                                                  ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py", line 242, in dumps
+    **kw).encode(obj)
+          ~~~~~~^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/encoder.py", line 202, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+  File "/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/encoder.py", line 263, in iterencode
+    return _iterencode(o, 0)
+TypeError: keys must be str, int, float, bool or None, not tuple
+when serializing dict item 'buckets'
+when serializing dict item 'summary'

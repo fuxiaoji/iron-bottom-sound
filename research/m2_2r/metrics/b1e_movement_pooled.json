@@ -1,0 +1,42 @@
+{
+ "BEAM_SEARCH_COMPILER": {
+  "n": 49,
+  "mech_opp_rate": 0.24489795918367346,
+  "usable_rate": 0.6938775510204082,
+  "neg_ext_rate": 0.02040816326530612,
+  "median_dL0": 0.0,
+  "median_dL1": 0.9722222222222268,
+  "median_rel_L0": 0.0,
+  "median_ext": 0.8611111111111107
+ },
+ "REPAIRED_INTENT_BASELINE": {
+  "n": 103,
+  "mech_opp_rate": 0.30097087378640774,
+  "usable_rate": 0.3883495145631068,
+  "neg_ext_rate": 0.1650485436893204,
+  "median_dL0": 0.0,
+  "median_dL1": 0.0,
+  "median_rel_L0": 0.0,
+  "median_ext": 0.0
+ },
+ "CURRENT_INTENT_PRE_FIX": {
+  "n": 101,
+  "mech_opp_rate": 0.297029702970297,
+  "usable_rate": 0.4158415841584158,
+  "neg_ext_rate": 0.12871287128712872,
+  "median_dL0": 0.0,
+  "median_dL1": 0.0,
+  "median_rel_L0": 0.0,
+  "median_ext": 0.0
+ },
+ "RANDOM_LEGAL": {
+  "n": 104,
+  "mech_opp_rate": 0.2980769230769231,
+  "usable_rate": 0.40384615384615385,
+  "neg_ext_rate": 0.15384615384615385,
+  "median_dL0": 0.0,
+  "median_dL1": 0.0,
+  "median_rel_L0": 0.0,
+  "median_ext": 0.0
+ }
+}

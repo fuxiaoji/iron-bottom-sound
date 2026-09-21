@@ -1,0 +1,20 @@
+{
+ "arms": [
+  "HOLD",
+  "CURRENT_ADAPTIVE",
+  "INTERCEPT_ASSIST",
+  "PUBLIC_SET_COVER",
+  "PUBLIC_BELIEF_AWARE",
+  "FULL_STATE_CEILING"
+ ],
+ "materiality": {
+  "R_shared_ge": 0.25,
+  "requires_different_best": true
+ },
+ "shortfalls": {
+  "IBS-S-01": 0,
+  "IBS-S-03": 0,
+  "IBS-S-EM-01": 0
+ },
+ "n_states": 15
+}

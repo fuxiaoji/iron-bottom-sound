@@ -1,0 +1,61 @@
+{
+ "mg1": {
+  "scenario": "IBS-S-01",
+  "seed": 5,
+  "side": "axis",
+  "gold_plan": "1P",
+  "counter_plan": "1S1P",
+  "policy_plan": "1P1P1P1P",
+  "pre_fix_plan": "1S1P",
+  "repaired_plan": "1SS1P"
+ },
+ "mg3e": {
+  "scenario": "IBS-S-EM-01",
+  "seed": 1,
+  "side": "allies",
+  "focal": "IBS-U-USN-ERMA-IOWA",
+  "target": "IBS-U-IJN-ERMA-KURAMA",
+  "turn": 10,
+  "arms": {
+   "CLOSE": {
+    "plan": "1S2P",
+    "own_visible": true,
+    "own_mounts": [
+     "P1",
+     "P2",
+     "P3",
+     "S-S1",
+     "S-S2",
+     "S-S3",
+     "S-S4",
+     "S-S5"
+    ],
+    "own_eh": 4.138888888888889,
+    "return_eh": 1.5,
+    "net_eh": 2.6388888888888893,
+    "distance": 9,
+    "executable": true
+   },
+   "OPEN": {
+    "plan": "1P1P1P",
+    "own_visible": true,
+    "own_mounts": [
+     "P1",
+     "P2",
+     "P3",
+     "S-P1",
+     "S-P2",
+     "S-P3",
+     "S-P4",
+     "S-P5"
+    ],
+    "own_eh": 2.5277777777777777,
+    "return_eh": 0.6944444444444444,
+    "net_eh": 1.8333333333333333,
+    "distance": 12,
+    "executable": true
+   }
+  }
+ },
+ "notes": "MG1 and MG3-E frozen case definitions; MG4's case is in research/m2_1 (R2.1) and re-verified in research/m2_2."
+}

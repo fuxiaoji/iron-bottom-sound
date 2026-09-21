@@ -1,0 +1,18 @@
+claim,value,evidence,confidence
+M2.1-R2.1 gate,FAIL_3_OF_5 (historical, unchanged),research/m2_1/05_REPAIRED_GOLD_GATE.md,recorded
+M2.2 gate,FAIL / BLOCKED_BY_METRIC_VALIDITY (historical, unchanged),research/m2_2/00_EXECUTIVE_SUMMARY.md,recorded
+BROADSIDE bug provenance,RESEARCH_COMPILER_BUG,02 doc call-graph evidence,proven by call graph
+pre-fix intent cost,-0.056 L0 (mounts 2->1) and -11.361 L1,metrics/mg1_dual_scale.json,measured, exact reproduction
+repaired intent gain,+0.667 L0 (41% rel) with -5.833 L1,metrics/mg1_dual_scale.json,measured
+MECHANISM_SUCCESS_BUT_NEGATIVE_EXTERNALITY,CONFIRMED on the repaired intent arm,metrics/mg1_dual_scale.json,measured
+beam on MG1,+0.472 L0 and +7.417 L1 (only arm positive on both),metrics/mg1_dual_scale.json,measured
+MG3 historical status,HISTORICAL_PROXY_PASS / EXECUTABLE_GOLD_INVALID,research/m2_2/04_MG3_RANGE_FIDELITY.md,recorded + diagnosed
+MG3-E,MG3E = PASS,metrics/mg3e.json,measured, 162 state-checks
+MG4 status,PUBLIC_PROXY_AMBIGUITY -> TORPEDO_PARTIAL_OBSERVABILITY,metrics/b1e_torpedo_census.json,measured, frozen rule
+material shared-action regret,4 of 15 states across 2 scenarios,R_shared 0.500/0.667/0.333/0.333,measured, single-scenario-dominant
+deployed torpedo planner,pooled mean route reduction 0.000,metrics/b1e_torpedo_census.json,measured
+public torpedo arms,pooled mean route reduction 0.010,metrics/b1e_torpedo_census.json,measured
+full-state torpedo ceiling,0.020-0.316 by scenario,metrics/b1e_torpedo_census.json,measured
+binary per-route payoff,DEGENERATE (M22R-F2),risk_binary in metrics/b1e_torpedo_census.json,counterexample of record
+movement census verdict,see b1e_verdicts.json,metrics/b1e_movement_census.json,measured
+L2 long-horizon value,NOT MEASURED,deferred to M2.3 by PRE_REGISTRATION_B1E,not run, by design

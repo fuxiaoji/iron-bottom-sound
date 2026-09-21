@@ -24,6 +24,7 @@
 | [m21-platform-audit-partial.md](m21-platform-audit-partial.md) | M2.1 部分审计：规则 0 bug；同 seed≠CRN 实证；炮击层低杠杆；movement 因候选覆盖质疑未判定 | project |
 | [m21r-gold-gate-fail.md](m21r-gold-gate-fail.md) | M2.1-R 测量修复完成但 Gold Gate FAIL（0/5）；G1 对抗下反号；开放=洗平 vs 编译器表达力 | project |
 | [m21r2-mechanistic-decomposition.md](m21r2-mechanistic-decomposition.md) | M2.1-R2 机制分解：规则引擎陡峭定价几何（MG1/2/3 PASS）——问题定位在编译器与价值兑现层 | project |
+| [m22r-b1e-census.md](m22r-b1e-census.md) | M2.2-R/B1E 自然普查：L0/L1 双尺度（intent 正局部/负外部性）、意图 bug=research-only、MG3-E PASS、graded vs binary per-route payoff 的陷阱、当前 AI 鱼雷 RR=0 | project |
 | [m22-compiler-fidelity.md](m22-compiler-fidelity.md) | M2.2 编译器保真 FAIL（0/3）：机制值尺度改变符号（MG1 舰队 vs 舰对）、意图编译器把舷射转反、MG3 度量不可执行、MG4 走廊是全状态现象 | project |
 | [m21r21-mechanistic-repair.md](m21r21-mechanistic-repair.md) | M2.1-R2.1 修复 F21/F22/F23：MG4 翻转 PASS（鱼雷走廊 28/29）；Crossing-T 定位到编译器占位 | project |
 
