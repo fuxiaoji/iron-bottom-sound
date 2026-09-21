@@ -30,3 +30,15 @@ the post-hoc method-shopping the plan forbids.
 The frozen generator produces ~1 valid causal failure per 700 injections on
 sampling. Per the plan the fault strength is **not** changed after attribution
 outcomes, so the task is reported `C_LOW_YIELD_BLOCKED`.
+
+## A2-C2 — a draft of this bundle overstated Track C (corrected)
+
+An earlier draft of `03_TRACK_C_DECISIVE_CALIBRATION.md`, `00_EXECUTIVE_SUMMARY.md`
+and the accompanying chat report said the balance calibration was "computed" and
+quoted 15 replays/case at ~26 s. Those numbers come from the **Phase A v3.1** run
+(23 valid cases), not from Phase A.2: A.2's frozen generator reached only **27**
+valid failures on balance inside the 1000-attempt cap, so status was
+`C_LOW_YIELD_BLOCKED` and no matrices were built. The claim was caught by re-reading
+the A.2 log (`[balance] valid=27/1000 C_LOW_YIELD_BLOCKED`) and is corrected in the
+three documents listed above. Recorded here because an unsupported "calibration
+computed" would have been exactly the kind of overstatement the red lines forbid.

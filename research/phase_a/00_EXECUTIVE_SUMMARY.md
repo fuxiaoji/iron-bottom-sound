@@ -44,12 +44,15 @@ again fails on acquisition design rather than cleanly on the hypothesis.
 
 ## C — blocked by the frozen instrument, not by evidence
 
-Balance: valid failures accumulate at ~3.2 % of attempts; matrices are computed
-(3 agents × 5 windows = 15 replays per case, ~26 s). Sampling: **~1 valid failure
-per 700 injections** under the frozen material rule (clean ≥ Q50, faulted < Q25,
-drop ≥ 0.5·IQR) → fewer than 30 after the 1000-attempt cap ⇒ `C_LOW_YIELD_BLOCKED`
-for that task, exactly as the plan prescribes. No fault strength was changed after
-the outcome and no C gate is claimed.
+**Both tasks are low-yield blocked.** Balance reached only **27** valid causal
+failures inside the 1000-attempt cap (~2.7 % yield); sampling reached **1** (~0.1 %)
+under the frozen material rule (clean ≥ Q50, faulted < Q25, drop ≥ 0.5·IQR). Both
+are below the 30-valid threshold, so **no repair matrix was built in A.2 and no C
+gate is evaluated**. No fault strength was changed after the outcome.
+
+*Correction*: an earlier draft of this summary and of `03_...` said the balance
+calibration was computed, quoting 15 replays/case at ~26 s — those numbers come from
+the **Phase A v3.1** run (23 cases), not from A.2.
 
 ## The signal the PI should weigh
 

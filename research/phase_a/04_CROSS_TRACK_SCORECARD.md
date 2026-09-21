@@ -2,7 +2,7 @@
 
 | | Track A | Track B | Track C |
 |---|---|---|---|
-| valid scientific run? | **yes** (200 states × 2 tasks, paired matrix, exact knapsack oracle) | **partially** — universe/K now valid, but the structured acquisition is my own weak implementation | **no** — sampling side low-yield blocked; balance calibration computed |
+| valid scientific run? | **yes** (200 states × 2 tasks, paired matrix, exact knapsack oracle) | **partially** — universe/K now valid, but the structured acquisition is my own weak implementation | **no** — sampling side low-yield blocked; balance also low-yield blocked (27/1000); the 23-case matrix on record is from Phase A v3.1 |
 | cross-task effect? | no (fails on both) | balance only so far | balance only |
 | strong-baseline gap? | oracle over Uniform-16: +0.011 % / +0.13 % (gate 8 %) | RANDOM is strongest; structured below generic at every K | not evaluated (gates require both tasks) |
 | equal-resource comparison? | yes (total 16·N for all allocators) | yes (identical query counts, 30 reps) | yes (all replays counted) |

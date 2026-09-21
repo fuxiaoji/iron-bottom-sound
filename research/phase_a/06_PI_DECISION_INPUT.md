@@ -14,8 +14,8 @@
    **my structured-acquisition implementation**, not the sizing.
 3. **Track C's sampling side is low-yield blocked** by the frozen generator: ~1
    valid causal failure per 700 injections against the frozen
-   Q50/Q25/0.5·IQR rule. The balance calibration is complete and shows sparse,
-   mostly unique causal structure.
+   Q50/Q25/0.5·IQR rule. Neither task reached 30 valid failures, so A.2 built no matrices; the sparse,
+   mostly unique structure observed earlier comes from the Phase A v3.1 run.
 
 ## Repeated failure mode worth the PI's attention
 

@@ -19,3 +19,4 @@
 [balance] registry ok=True
   sampling labels 200/2700 554s
   sampling labels 400/2700 845s
+  sampling labels 600/2700 1136s

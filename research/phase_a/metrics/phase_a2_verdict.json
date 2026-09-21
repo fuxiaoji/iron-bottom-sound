@@ -65,9 +65,20 @@
   "caveat": "the failure is again entangled with my acquisition design; the universe is now valid, but a bisection-to-transition strategy was not implemented, so this is not a clean scientific kill of the hypothesis"
  },
  "track_c": {
-  "status": "balance matrices computed; sampling C_LOW_YIELD_BLOCKED",
-  "sampling_yield": "~1 valid failure per 700 attempts (cap 1000) -> <30 valid -> C_LOW_YIELD_BLOCKED per plan",
-  "note": "ground truth = minimal successful repair set from the exhaustive matrix; injection metadata kept in a separate file"
+  "status": "C_LOW_YIELD_BLOCKED (both tasks)",
+  "balance": {
+   "valid_failures": 27,
+   "attempts": 1000,
+   "yield": 0.027
+  },
+  "sampling": {
+   "valid_failures": 1,
+   "attempts": 800,
+   "yield": 0.00125
+  },
+  "matrices_built_in_A2": false,
+  "correction": "an earlier draft described the balance calibration as computed; that figure came from the Phase A v3.1 run, not from A.2",
+  "note": "ground truth would be the minimal successful repair set from the exhaustive matrix; no C gate is evaluated because both tasks fail the 30-valid threshold"
  },
  "track_d": {
   "status": "NOT_ACTIVATED"
