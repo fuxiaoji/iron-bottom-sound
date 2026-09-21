@@ -1,65 +1,75 @@
-# 00_EXECUTIVE_SUMMARY.md — Phase A.2 Decisive Validation
+# 00_EXECUTIVE_SUMMARY.md — Phase A.3 (B/C decisive correction)
 
 ```
-PHASE_A2_COMPLETE = YES (this window)
-TRACK_A_AUDITED = A_KILL_CONFIRMED   (Phase A aggregate INVALID, corrected)
-TRACK_B = B_KILL_FOR_MAINLINE        (balance side complete; sampling running; design-defect caveat)
-TRACK_C = C_LOW_YIELD_BLOCKED (sampling) / calibration computed (balance)
-TRACK_D = NOT_ACTIVATED
-SELECTED_MAINLINE = NONE (for the PI to confirm)
+PHASE_A3_COMPLETE = YES
+TRACK_B = B_KILL_FOR_MAINLINE        (valid run; acquisition instrument finally competent)
+TRACK_C = C_GENERATOR_FEASIBILITY_FAIL (both tasks, under the frozen locality cap)
+MAINLINE_CANDIDATE per selection rule = NONE   (PI confirms)
 ```
 
-## A — the oracle audit found the defect the PI suspected
+## Track B — the hypothesis finally got its fair test, and failed
 
-Phase A's "HINDSIGHT_ORACLE" was a **greedy gain-per-unit heuristic**, and on
-sampling it scored **1.2193 < 1.2947** for plain Uniform-16 — impossible, since
-all-16 is feasible under 16·N. The Phase A aggregate is therefore **INVALID**. The
-exact multiple-choice-knapsack oracle gives:
+For the first time in this project, Track B's instrument is demonstrably competent:
+the mandatory acquisition positive control **PASS** (corrected endpoint-probe +
+bisection strategy beats random **61x at K=50 and 46x at K=100** on a synthetic pool
+with the same line/severity geometry and known monotone transitions). The rerun then
+executed on the immutable 2700-cell label tables (16 seeds x 165 grid) with 30
+repetitions per task x method x K and full query traces.
+
+Result: the pre-registered severity-line boundary **does not exist** in these tasks.
 
 | | balance | sampling |
 |---|---|---|
-| V_oracle | 0.082146 | 1.514451 |
-| V_uniform16 | 0.066388 | 1.294673 |
-| corrected gap (normalised) | **+0.000106** | **+0.001278** |
-| paired bootstrap CI | [+0.0043, +0.0349] | [+0.1366, +0.3096] |
-| allocation counts 0/4/16/64 | 12/60/109/19 | 45/60/65/30 |
+| failure fraction (gate 5-50 %) | 0.223 PASS | 0.409 PASS |
+| transition-line fraction (gate >= 20 %) | **0.0024 FAIL** | **0.0120 FAIL** |
+| true transition edges | **3** in 1260 lines | **20** in 1260 lines |
+| STRUCTURED/RANDOM recall at K=100 | 0.0 / 0.0 (no edge findable) | **5.0x** (0.0250 vs 0.0050) |
+| STRUCTURED vs GENERIC at K=100 | 0.0 vs 0.0111 | +658 % relative |
 
-`A_KILL_CONFIRMED`: the corrected gain is 0.011 % / 0.13 % against an 8 % gate, so
-the earlier *direction* survives on corrected evidence. The learnability probe is
-not run (gated on the oracle gate passing on both tasks).
+`B_NONTRIVIAL_BOUNDARY = FAIL` — the kill. The failure response of these cooperative
+tasks is determined by **(initial seed, window, modality) context**, not by a
+within-line severity threshold: under the frozen grid, a perturbation line is almost
+always either entirely failed or entirely clean. Even restricted to the 720
+multi-severity lines per task that can in principle contain a transition, the share
+is 0.42 % (balance) and 2.08 % (sampling) against the 20 % gate.
 
-## B — sizing fixed, hypothesis still not fairly tested
+The one positive signal: on sampling, the corrected structured acquisition achieves
+**5x random** boundary recall at K=100 (and beats the generic learner 7.6x) — with a
+competent instrument the multi-agent structure effect appears, but there is almost
+no boundary for it to find. Per the PI rule this does not select a mainline.
 
-16 frozen seeds × 165 grid = **2700 cells/task** (K ≤ 10 % satisfied), real
-ExtraTrees generic learner, 30 repetitions. Balance recall at K=200:
+## Track C — generator infeasible under the locality cap
 
-| RANDOM | STRATIFIED | GENERIC_ACTIVE | STRUCTURED_ACTIVE |
+C0 ran exactly as frozen: 14 ordered settings per task x family grid, 100 paired
+vectorised episodes per setting (dedicated seeds 80 000+), no repair matrices, no
+attribution outcomes. All **28 settings** across 3 families x 2 tasks landed below
+the 10 % band floor:
+
+- balance: best = obs_corrupt sigma 1.2, window 8 → yield **6.9 %** (LCB 3.4 %),
+  with the fault demonstrably applied (mean return shift −38.7);
+- sampling: best mean shift **−2.8 return** against a required drop of 41.7
+  (0.5·IQR) — 8-step local faults physically cannot cross the materiality rule;
+  every yield = 0.000.
+
+```
+C0 = C_GENERATOR_FEASIBILITY_FAIL on both tasks
+=> C_IDENTIFIABLE / C_QUERY_EFFICIENT / C_NONTRIVIAL: NOT_EVALUATED (gates need
+   the generator; per plan §4.4 no family reached the band under the locality cap)
+```
+
+Context that makes this closure solid rather than premature: the pre-cap evidence
+(the v3.1 generator with 20-step windows, i.e. *violating* the locality cap) reached
+only 2.7 % (balance) and 0.1 % (sampling) — so the cap is not the binding constraint
+for sampling at all, and removing it on balance still does not reach the band at
+these strengths.
+
+## Cross-track
+
+| | A | B | C |
 |---|---|---|---|
-| **0.211** | 0.100 | 0.078 | 0.033 |
+| final | A_KILL_CONFIRMED (A.2, corrected oracle) | **B_KILL_FOR_MAINLINE** | **C_GENERATOR_FEASIBILITY_FAIL** |
+| on corrected/valid evidence | yes | yes (competent instrument, first time) | yes (28-setting calibration, faults verified applied) |
 
-`B_ACTIVE_EFFICIENCY` and `B_MULTIAGENT_STRUCTURE` both FAIL — structured is below
-generic at every K. **Caveat carried in the verdict**: my STRUCTURED_ACTIVE queries
-each severity line at mid/min/max and never bisects to the transition, so this run
-again fails on acquisition design rather than cleanly on the hypothesis.
-
-## C — blocked by the frozen instrument, not by evidence
-
-**Both tasks are low-yield blocked.** Balance reached only **27** valid causal
-failures inside the 1000-attempt cap (~2.7 % yield); sampling reached **1** (~0.1 %)
-under the frozen material rule (clean ≥ Q50, faulted < Q25, drop ≥ 0.5·IQR). Both
-are below the 30-valid threshold, so **no repair matrix was built in A.2 and no C
-gate is evaluated**. No fault strength was changed after the outcome.
-
-*Correction*: an earlier draft of this summary and of `03_...` said the balance
-calibration was computed, quoting 15 replays/case at ~26 s — those numbers come from
-the **Phase A v3.1** run (23 cases), not from A.2.
-
-## The signal the PI should weigh
-
-This is the third time in Phase A that a "kill" was traced to my instrument rather
-than to the world: a greedy heuristic named oracle (A), a universe smaller than K
-(B v3.1), and now a non-bisecting structured acquisition (B A.2). In every case the
-tell was an impossible or exactly-suspicious number. Track A is killed **on
-corrected evidence** and is safe to treat as dead; Track B has still never been
-given a competent acquisition; Track C is blocked by a frozen generator rule rather
-than refuted.
+```
+MAINLINE_CANDIDATE = NONE
+```

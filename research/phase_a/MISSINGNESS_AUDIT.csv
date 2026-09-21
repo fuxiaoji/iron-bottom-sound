@@ -5,12 +5,19 @@ A,sampling,planning_operator,SUCCESS,200
 A0,balance,random_policy,SUCCESS,500
 A0,sampling,frozen_policy,SUCCESS,800
 A0,sampling,random_policy,SUCCESS,500
+B,balance,GENERIC_ACTIVE,SUCCESS,120
+B,balance,RANDOM,SUCCESS,120
+B,balance,STRATIFIED_RANDOM,SUCCESS,120
+B,balance,STRUCTURED_ACTIVE,SUCCESS,120
 B,balance,universe_label,SUCCESS,2865
-B,sampling,universe_label,SUCCESS,722
+B,sampling,GENERIC_ACTIVE,SUCCESS,120
+B,sampling,RANDOM,SUCCESS,120
+B,sampling,STRATIFIED_RANDOM,SUCCESS,120
+B,sampling,STRUCTURED_ACTIVE,SUCCESS,120
+B,sampling,universe_label,SUCCESS,2865
 C,balance,exhaustive_repair,SUCCESS,23
 C,balance,fault_generation,REJECTED_WITH_REASON,1958
 C,balance,fault_generation,SUCCESS,50
-C,sampling,fault_generation,REJECTED_WITH_REASON,1754
+C,sampling,fault_generation,REJECTED_WITH_REASON,1999
 C,sampling,fault_generation,SUCCESS,1
-
-# reconciliation: {"attempted": 9583, "SUCCESS": 5869, "REJECTED_WITH_REASON": 3712, "ERROR_WITH_TRACE": 2, "reconciles": true}
+# reconciliation: {"attempted": 12931, "SUCCESS": 8972, "REJECTED_WITH_REASON": 3957, "ERROR_WITH_TRACE": 2, "reconciles": true}

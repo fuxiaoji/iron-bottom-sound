@@ -24,3 +24,22 @@ Track B has now failed three times for three different instrument reasons (unive
 rewarded coverage). No run to date has given the multi-agent-structure hypothesis a
 competent acquisition strategy, and the record says so instead of presenting three
 failures as one verdict.
+
+## Phase A.3 — the honest kills
+
+- **Track B (valid kill):** with a competent instrument proven at 61x/46x over
+  random on synthetic geometry, the real universes contain only 3 (balance) and 20
+  (sampling) true adjacent-severity transitions across 1260 lines each. The gate
+  needs >= 20 % of lines to contain a transition; the measured share is 0.42 % and
+  2.08 % even restricted to the 720 multi-severity lines that can in principle
+  transition. The pre-registered boundary does not exist in these cooperative tasks
+  under the frozen grid.
+- **Track C (generator infeasibility):** under the 8-step locality cap the best
+  reachable yields are 6.9 % (balance) and 0.0 % (sampling) against a 10 % floor —
+  with faults verified applied via mean-shift diagnostics (−38.7 and −2.8 return).
+  The pre-cap v3.1 evidence (20-step windows: 2.7 % / 0.1 %) shows removing the cap
+  does not rescue sampling, and does not reach the band on balance either.
+
+## Carried disclosure
+The Phase A v3.1 23-case balance matrix (78.3 % unique minimal repair) is cited as
+an indication only; per the PI it is not A.3 evidence.

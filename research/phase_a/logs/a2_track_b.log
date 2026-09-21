@@ -20,3 +20,32 @@
   sampling labels 200/2700 554s
   sampling labels 400/2700 845s
   sampling labels 600/2700 1136s
+  sampling labels 800/2700 1427s
+  sampling labels 1000/2700 1719s
+  sampling labels 1200/2700 2004s
+  sampling labels 1400/2700 2288s
+  sampling labels 1600/2700 2574s
+  sampling labels 1800/2700 2858s
+  sampling labels 2000/2700 3143s
+  sampling labels 2200/2700 3428s
+  sampling labels 2400/2700 3714s
+  sampling labels 2600/2700 3999s
+[sampling] G=225 M=12 universe=2700 fail=0.409 lines=1260 edges=20
+  sampling RANDOM K=25: recall=0.0133
+  sampling RANDOM K=50: recall=0.0600
+  sampling RANDOM K=100: recall=0.0967
+  sampling RANDOM K=200: recall=0.1800
+  sampling STRATIFIED_RANDOM K=25: recall=0.0133
+  sampling STRATIFIED_RANDOM K=50: recall=0.0567
+  sampling STRATIFIED_RANDOM K=100: recall=0.0533
+  sampling STRATIFIED_RANDOM K=200: recall=0.1283
+  sampling GENERIC_ACTIVE K=25: recall=0.0183
+  sampling GENERIC_ACTIVE K=50: recall=0.0367
+  sampling GENERIC_ACTIVE K=100: recall=0.0833
+  sampling GENERIC_ACTIVE K=200: recall=0.1050
+  sampling STRUCTURED_ACTIVE K=25: recall=0.0067
+  sampling STRUCTURED_ACTIVE K=50: recall=0.0083
+  sampling STRUCTURED_ACTIVE K=100: recall=0.0383
+  sampling STRUCTURED_ACTIVE K=200: recall=0.0583
+[sampling] registry ok=True
+wrote metrics/a2_track_b.json (4338.5s)

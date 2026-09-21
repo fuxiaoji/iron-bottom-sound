@@ -15,3 +15,13 @@
 
 Not included: model checkpoints (see `checkpoints_manifest/` for SHA256 + path) and
 `runs/` scratch directories.
+
+## Phase A.3 additions
+| path | content |
+|---|---|
+| `raw/track_b_a3/acquisition_{task}.json` | corrected-acquisition recall per method x K (30 reps) |
+| `raw/track_b_a3/trace_{task}_{method}_K{K}_rep0.json` | full query order for the first repetition |
+| `raw/track_c_calibration/{task}_{family}.csv` | all 100 paired episodes per setting + per-setting summary (yield, LCB, mean shifts) |
+| `raw/track_c_failures/`, `raw/track_c_repairs/` | empty by design (C0 failed; C1/C2 not run) |
+| `metrics/a3_track_b.json`, `a3_track_c0.json`, `phase_a3_verdict.json` | stage aggregates and final verdicts |
+| `figures/a3_b_and_c0.png` | acquisition curves + all 28 C0 settings against the band |

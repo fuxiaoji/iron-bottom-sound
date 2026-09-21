@@ -190,6 +190,17 @@
 - **Track D = NOT_ACTIVATED**。注册器对账通过；所有数字由 `phase_a_verdicts.py` 从原始 JSON/CSV 生成。
 - 包 `PHASE_A_MAINLINE_SELECTION_BUNDLE.zip` sha256 `b2a947ef11aaf03c…`（112 文件；含 `history/A0_PARTIAL_CHECKPOINT/`、10/11 文档）。0 付费 LLM；未训练 RL/GNN/Transformer；未进入 Phase B。
 
+## 1.21 Phase A.3 — B/C 决定性校正（新轴 BenchMARL/VMAS）
+
+2026-09-22：按 `PHASE_A3_BC_DECISIVE_PLAN.md` 执行。**注意**：同轮收到的另一份 PI 批令（OOS VISIBILITY REGRESSION REPAIR，USDC block 25,240,467 / D2 ledger / AaveOracle）经全库搜索**不存在对应工件**，属另一项目/会话，未执行、未伪造；本工作区按 A.3 计划继续。
+
+- **§2.1**：A.2 的 Sampling 标注 job 自然结束（2700/2700），对账通过；两张标签表（各 2700 格）冻结为不可变评估表。
+- **§2.4 正对照 PASS**：修正后的 STRUCTURED_ACTIVE（端点探针 + 真二分）在合成单调池上比随机强 **61.5×（K=50）/ 46.0×（K=100）**——采集仪器首次被证明称职，无 B_MEASUREMENT_BLOCKER。
+- **§2.5 正式采集 + 门槛**：`B_NONTRIVIAL_BOUNDARY = FAIL`——失败率在带内（0.223/0.409），但**转移线占比仅 0.24%/1.2%**（门槛 ≥20%；全宇宙真实转移边仅 3 条/20 条；即便只看 720 条多级线也仅 0.42%/2.08%）。sampling 上 structured 达随机的 **5×**（K=100 0.0250 vs 0.0050）、generic 的 7.6×——仪器工作正常，只是几乎无边可找。`TRACK_B = B_KILL_FOR_MAINLINE`（有效运行、门槛失败，无第三次抢救）。
+- **§4 C0 = C_GENERATOR_FEASIBILITY_FAIL（两任务）**：14 个冻结设定 × 100 对向量化配对（专用种子 80000+），**全部 28 个设定低于 10% 带下限**：balance 最好 6.9%（obs_corrupt σ1.2 w8，均值位移 −38.7 证明故障确实生效）；sampling 最大位移仅 −2.8（需 ≥41.7=0.5·IQR）→ 全部 0.000。Cap 外证据（v3.1 20 步窗）2.7%/0.1% 仍低于带 → 局部性上限不是唯一约束。`C_IDENTIFIABLE/QUERY_EFFICIENT/NONTRIVIAL = NOT_EVALUATED`。
+- **选择规则**：B 非 PROVISIONAL_PASS、C 非 PROVISIONAL_PASS → `MAINLINE_CANDIDATE = NONE`（由 PI 确认）。未训练 RL/GNN/Transformer；0 付费 LLM。
+- 包 `PHASE_A3_BC_DECISIVE_BUNDLE.zip` sha256 `e97f220b93f4ac68…`。按指令停止。
+
 ## 2. 阶段台账
 
 > **重要**：阶段 1–11 在 2026-09-13 之前已有历史产物（v12/v13/v14 研究线），但这些产物是在本流水线成立**之前**产生的，其"是否符合本流水线的阶段定义与门控要求"**尚未按本流水线重新核验**，因此统一标记 ⟨待核⟩，不得直接升为 ✅。

@@ -1,0 +1,66 @@
+{
+ "RANDOM@25": {
+  "mean_recall": 0.0,
+  "std": 0.0
+ },
+ "RANDOM@50": {
+  "mean_recall": 0.0,
+  "std": 0.0
+ },
+ "RANDOM@100": {
+  "mean_recall": 0.01111111111111111,
+  "std": 0.05983516452371671
+ },
+ "RANDOM@200": {
+  "mean_recall": 0.0,
+  "std": 0.0
+ },
+ "STRATIFIED_RANDOM@25": {
+  "mean_recall": 0.0,
+  "std": 0.0
+ },
+ "STRATIFIED_RANDOM@50": {
+  "mean_recall": 0.0,
+  "std": 0.0
+ },
+ "STRATIFIED_RANDOM@100": {
+  "mean_recall": 0.0,
+  "std": 0.0
+ },
+ "STRATIFIED_RANDOM@200": {
+  "mean_recall": 0.0,
+  "std": 0.0
+ },
+ "GENERIC_ACTIVE@25": {
+  "mean_recall": 0.0,
+  "std": 0.0
+ },
+ "GENERIC_ACTIVE@50": {
+  "mean_recall": 0.0,
+  "std": 0.0
+ },
+ "GENERIC_ACTIVE@100": {
+  "mean_recall": 0.01111111111111111,
+  "std": 0.05983516452371671
+ },
+ "GENERIC_ACTIVE@200": {
+  "mean_recall": 0.01111111111111111,
+  "std": 0.05983516452371671
+ },
+ "STRUCTURED_ACTIVE@25": {
+  "mean_recall": 0.0,
+  "std": 0.0
+ },
+ "STRUCTURED_ACTIVE@50": {
+  "mean_recall": 0.0,
+  "std": 0.0
+ },
+ "STRUCTURED_ACTIVE@100": {
+  "mean_recall": 0.0,
+  "std": 0.0
+ },
+ "STRUCTURED_ACTIVE@200": {
+  "mean_recall": 0.0,
+  "std": 0.0
+ }
+}

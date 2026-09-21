@@ -1,0 +1,241 @@
+{
+ "positive_control": {
+  "pass": true,
+  "n_pool": 3600,
+  "n_lines": 1680,
+  "n_edges": 287,
+  "recall": {
+   "25": {
+    "random": 0.0,
+    "structured": 0.007549361207897792,
+    "ratio": 7549361.207897792
+   },
+   "50": {
+    "random": 0.00023228803716608595,
+    "structured": 0.014285714285714287,
+    "ratio": 61.50000000000001
+   },
+   "100": {
+    "random": 0.0005807200929152149,
+    "structured": 0.026713124274099897,
+    "ratio": 46.00000000000002
+   },
+   "200": {
+    "random": 0.0026713124274099884,
+    "structured": 0.054123112659698026,
+    "ratio": 20.26086956521739
+   }
+  },
+  "gate": "structured beats random at K=50 AND K=100",
+  "status": "PASS"
+ },
+ "tasks": {
+  "balance": {
+   "n_cells": 2700,
+   "n_lines": 1260,
+   "failure_fraction": 0.22296296296296297,
+   "n_true_edges": 3,
+   "transition_line_fraction": 0.002380952380952381,
+   "acquisition": {
+    "RANDOM@25": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "RANDOM@50": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "RANDOM@100": {
+     "mean_recall": 0.01111111111111111,
+     "std": 0.05983516452371671
+    },
+    "RANDOM@200": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "STRATIFIED_RANDOM@25": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "STRATIFIED_RANDOM@50": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "STRATIFIED_RANDOM@100": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "STRATIFIED_RANDOM@200": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "GENERIC_ACTIVE@25": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "GENERIC_ACTIVE@50": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "GENERIC_ACTIVE@100": {
+     "mean_recall": 0.01111111111111111,
+     "std": 0.05983516452371671
+    },
+    "GENERIC_ACTIVE@200": {
+     "mean_recall": 0.01111111111111111,
+     "std": 0.05983516452371671
+    },
+    "STRUCTURED_ACTIVE@25": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "STRUCTURED_ACTIVE@50": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "STRUCTURED_ACTIVE@100": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "STRUCTURED_ACTIVE@200": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    }
+   }
+  },
+  "sampling": {
+   "n_cells": 2700,
+   "n_lines": 1260,
+   "failure_fraction": 0.40925925925925927,
+   "n_true_edges": 20,
+   "transition_line_fraction": 0.011904761904761904,
+   "acquisition": {
+    "RANDOM@25": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "RANDOM@50": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "RANDOM@100": {
+     "mean_recall": 0.005000000000000001,
+     "std": 0.015
+    },
+    "RANDOM@200": {
+     "mean_recall": 0.0033333333333333335,
+     "std": 0.012472191289246471
+    },
+    "STRATIFIED_RANDOM@25": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "STRATIFIED_RANDOM@50": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "STRATIFIED_RANDOM@100": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "STRATIFIED_RANDOM@200": {
+     "mean_recall": 0.0016666666666666668,
+     "std": 0.008975274678557507
+    },
+    "GENERIC_ACTIVE@25": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "GENERIC_ACTIVE@50": {
+     "mean_recall": 0.0,
+     "std": 0.0
+    },
+    "GENERIC_ACTIVE@100": {
+     "mean_recall": 0.0033333333333333335,
+     "std": 0.012472191289246471
+    },
+    "GENERIC_ACTIVE@200": {
+     "mean_recall": 0.008333333333333333,
+     "std": 0.02608745973749755
+    },
+    "STRUCTURED_ACTIVE@25": {
+     "mean_recall": 0.005000000000000001,
+     "std": 0.014999999999999998
+    },
+    "STRUCTURED_ACTIVE@50": {
+     "mean_recall": 0.006666666666666667,
+     "std": 0.016996731711975948
+    },
+    "STRUCTURED_ACTIVE@100": {
+     "mean_recall": 0.025,
+     "std": 0.03354101966249685
+    },
+    "STRUCTURED_ACTIVE@200": {
+     "mean_recall": 0.023333333333333334,
+     "std": 0.030912061651652344
+    }
+   }
+  }
+ },
+ "registry": {
+  "ok": true,
+  "violations": {},
+  "counts": {
+   "B|balance|RANDOM": {
+    "attempted": 120,
+    "SUCCESS": 120,
+    "REJECTED_WITH_REASON": 0,
+    "ERROR_WITH_TRACE": 0
+   },
+   "B|balance|STRATIFIED_RANDOM": {
+    "attempted": 120,
+    "SUCCESS": 120,
+    "REJECTED_WITH_REASON": 0,
+    "ERROR_WITH_TRACE": 0
+   },
+   "B|balance|GENERIC_ACTIVE": {
+    "attempted": 120,
+    "SUCCESS": 120,
+    "REJECTED_WITH_REASON": 0,
+    "ERROR_WITH_TRACE": 0
+   },
+   "B|balance|STRUCTURED_ACTIVE": {
+    "attempted": 120,
+    "SUCCESS": 120,
+    "REJECTED_WITH_REASON": 0,
+    "ERROR_WITH_TRACE": 0
+   },
+   "B|sampling|RANDOM": {
+    "attempted": 120,
+    "SUCCESS": 120,
+    "REJECTED_WITH_REASON": 0,
+    "ERROR_WITH_TRACE": 0
+   },
+   "B|sampling|STRATIFIED_RANDOM": {
+    "attempted": 120,
+    "SUCCESS": 120,
+    "REJECTED_WITH_REASON": 0,
+    "ERROR_WITH_TRACE": 0
+   },
+   "B|sampling|GENERIC_ACTIVE": {
+    "attempted": 120,
+    "SUCCESS": 120,
+    "REJECTED_WITH_REASON": 0,
+    "ERROR_WITH_TRACE": 0
+   },
+   "B|sampling|STRUCTURED_ACTIVE": {
+    "attempted": 120,
+    "SUCCESS": 120,
+    "REJECTED_WITH_REASON": 0,
+    "ERROR_WITH_TRACE": 0
+   }
+  },
+  "totals": {
+   "attempted": 960,
+   "SUCCESS": 960,
+   "REJECTED_WITH_REASON": 0,
+   "ERROR_WITH_TRACE": 0
+  }
+ },
+ "wall_seconds": 629.9
+}

@@ -1,0 +1,68 @@
+{
+ "phase": "A.3",
+ "created": "2026-09-21T22:05:28Z",
+ "pre_registration": "PRE_REGISTRATION_PHASE_A3.md",
+ "track_b": {
+  "status": "B_KILL_FOR_MAINLINE",
+  "run_validity": "VALID (positive control PASS: corrected bisection beats random 61x/46x at K=50/100 on synthetic monotone geometry; labels immutable 2700/task; 30 reps; full traces saved)",
+  "gates": {
+   "B_NONTRIVIAL_BOUNDARY": "FAIL (failure fractions 0.223/0.409 in band, BUT transition-line fraction 0.0024/0.0120 << 0.20)",
+   "B_ACTIVE_EFFICIENCY": "FAIL (structured/random at K=100: balance 0/0 undefined, sampling 0.0250/0.0050 = 5.0x on one task only)",
+   "B_MULTIAGENT_STRUCTURE": "FAIL (structured vs generic at K=100: balance 0 vs 0.0111; sampling 0.0250 vs 0.0033 = +658% on one task only)"
+  },
+  "per_task": {
+   "balance": {
+    "failure_fraction": 0.22296296296296297,
+    "transition_line_fraction": 0.002380952380952381,
+    "recall_at_K100": {
+     "structured": 0.0,
+     "random": 0.01111111111111111,
+     "generic": 0.01111111111111111
+    }
+   },
+   "sampling": {
+    "failure_fraction": 0.40925925925925927,
+    "transition_line_fraction": 0.011904761904761904,
+    "recall_at_K100": {
+     "structured": 0.025,
+     "random": 0.005000000000000001,
+     "generic": 0.0033333333333333335
+    }
+   }
+  },
+  "key_finding": "under the frozen perturbation grid the severity-axis boundary is nearly absent: only 3 (balance) and 20 (sampling) true adjacent-severity transitions exist across 1260 lines each; failure is determined by (seed, window, modality) context, not by a within-line severity threshold"
+ },
+ "track_c": {
+  "status": "C_GENERATOR_FEASIBILITY_FAIL (both tasks)",
+  "protocol": "C0 calibration: 14 frozen settings x 100 paired vectorised episodes per task, dedicated seeds 80000+, no repair matrices, no attribution outcomes",
+  "balance": {
+   "max_yield": 0.069,
+   "max_yield_setting": "obs_corrupt sigma=1.2 w=8",
+   "lcb_at_max": 0.034,
+   "mean_shift_w8": "-38.7 return (fault applied and large)",
+   "verdict": "no family reaches the 10% band under the 8-step locality cap"
+  },
+  "sampling": {
+   "max_yield": 0.0,
+   "max_mean_shift": -2.8,
+   "needed_drop": 41.685,
+   "verdict": "8-step local faults move return by ~1-3 points; the 0.5*IQR materiality rule is unreachable under the cap"
+  },
+  "gates": {
+   "C_IDENTIFIABLE": "NOT_EVALUATED",
+   "C_QUERY_EFFICIENT": "NOT_EVALUATED",
+   "C_NONTRIVIAL": "NOT_EVALUATED"
+  },
+  "mainline_eligibility": "FAIL (requires both tasks >= C_GENERATOR_NARROW)"
+ },
+ "track_a": {
+  "status": "A_KILL_CONFIRMED (from A.2; not touched per plan)"
+ },
+ "track_d": {
+  "status": "NOT_ACTIVATED"
+ },
+ "MAINLINE_CANDIDATE": "NONE (B fails its gate; C generator-infeasible; selection belongs to the PI)",
+ "SELECTED_MAINLINE": null,
+ "largest_valid_effect": "corrected STRUCTURED_ACTIVE on sampling reaches 5x random boundary recall at K=100 (0.0250 vs 0.0050) \u2014 instrument works, boundary barely exists",
+ "largest_unresolved_risk": "the severity grid (1-4 levels/modality) makes transition detection coarse; a denser severity axis is the only route to reviving B, and it is a new perturbation design (forbidden here)"
+}

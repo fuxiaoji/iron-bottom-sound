@@ -1,0 +1,111 @@
+{
+ "settings_order": {
+  "act_drop": [
+   [
+    0.5,
+    8
+   ],
+   [
+    1.0,
+    8
+   ],
+   [
+    1.0,
+    4
+   ],
+   [
+    1.0,
+    2
+   ],
+   [
+    1.0,
+    1
+   ]
+  ],
+  "obs_corrupt": [
+   [
+    0.3,
+    8
+   ],
+   [
+    0.6,
+    8
+   ],
+   [
+    1.2,
+    8
+   ],
+   [
+    1.2,
+    4
+   ],
+   [
+    1.2,
+    2
+   ],
+   [
+    1.2,
+    1
+   ]
+  ],
+  "act_delay": [
+   [
+    2,
+    8
+   ],
+   [
+    4,
+    8
+   ],
+   [
+    4,
+    4
+   ]
+  ]
+ },
+ "band": [
+  0.1,
+  0.3
+ ],
+ "lcb": 0.05,
+ "n_pairs": 100,
+ "calibration_seeds": "80000+ (dedicated, never reused)",
+ "tasks": {
+  "balance": {
+   "families": {
+    "act_drop": {
+     "chosen": null,
+     "tried": 5
+    },
+    "obs_corrupt": {
+     "chosen": null,
+     "tried": 6
+    },
+    "act_delay": {
+     "chosen": null,
+     "tried": 3
+    }
+   },
+   "n_families_passed": 0,
+   "C0_verdict": "C_GENERATOR_FEASIBILITY_FAIL"
+  },
+  "sampling": {
+   "families": {
+    "act_drop": {
+     "chosen": null,
+     "tried": 5
+    },
+    "obs_corrupt": {
+     "chosen": null,
+     "tried": 6
+    },
+    "act_delay": {
+     "chosen": null,
+     "tried": 3
+    }
+   },
+   "n_families_passed": 0,
+   "C0_verdict": "C_GENERATOR_FEASIBILITY_FAIL"
+  }
+ }
+}

@@ -1,0 +1,46 @@
+{
+ "target_per_task": 50,
+ "max_attempts": 1000,
+ "budgets": [
+  0.1,
+  0.2,
+  0.25
+ ],
+ "tasks": {
+  "balance": {
+   "attempted": 1000,
+   "valid": 27,
+   "status": "C_LOW_YIELD_BLOCKED"
+  },
+  "sampling": {
+   "attempted": 1000,
+   "valid": 1,
+   "status": "C_LOW_YIELD_BLOCKED"
+  }
+ },
+ "registry": {
+  "ok": true,
+  "violations": {},
+  "counts": {
+   "C|balance|fault_generation": {
+    "attempted": 1000,
+    "SUCCESS": 27,
+    "REJECTED_WITH_REASON": 973,
+    "ERROR_WITH_TRACE": 0
+   },
+   "C|sampling|fault_generation": {
+    "attempted": 1000,
+    "SUCCESS": 1,
+    "REJECTED_WITH_REASON": 999,
+    "ERROR_WITH_TRACE": 0
+   }
+  },
+  "totals": {
+   "attempted": 2000,
+   "SUCCESS": 28,
+   "REJECTED_WITH_REASON": 1972,
+   "ERROR_WITH_TRACE": 0
+  }
+ },
+ "wall_seconds": 3266.0
+}

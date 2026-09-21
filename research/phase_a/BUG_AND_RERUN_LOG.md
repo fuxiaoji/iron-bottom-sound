@@ -42,3 +42,22 @@ valid failures on balance inside the 1000-attempt cap, so status was
 the A.2 log (`[balance] valid=27/1000 C_LOW_YIELD_BLOCKED`) and is corrected in the
 three documents listed above. Recorded here because an unsupported "calibration
 computed" would have been exactly the kind of overstatement the red lines forbid.
+
+## A3-B1 — a3_track_b ran headless in the background (no defect)
+The whole Track B rerun (positive control + 2 tasks x 4 methods x 4 K x 30 reps =
+960 acquisition runs) executed deterministically from cached labels; reconcile ok.
+
+## A3-C1 — CSV schema crash in the first C0 attempt (fixed, rerun from zero)
+Per-episode rows and per-setting summary rows were written through one DictWriter
+with the fieldnames of whichever rows came first → `ValueError: dict contains fields
+not in fieldnames`. The run crashed after the act_drop settings had completed. Fixed
+with a fixed superset schema + `extrasaction="ignore"`; the calibration seeds are
+dedicated and deterministic, so the rerun-from-zero reproduced identical numbers.
+
+## A3-C2 — an impossible all-zero yield triggered a machinery sanity check
+The first C0 attempt showed yield = 0.000 for every setting. Because "exactly zero
+everywhere" has been a bug signature in this project three times before, a mean-shift
+diagnostic (faulted mean − clean mean) was added before accepting any verdict: the
+shifts are large and correctly signed (balance obs_corrupt σ1.2 w8: −38.7; sampling
+max −2.8), proving the faults are applied and the zeros are real. The verdict
+`C_GENERATOR_FEASIBILITY_FAIL` therefore stands on verified-applied faults.

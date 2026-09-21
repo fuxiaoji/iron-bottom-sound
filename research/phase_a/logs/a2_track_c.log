@@ -35,3 +35,20 @@
   sampling attempts=700 valid=1 2440s
   sampling attempts=750 valid=1 2577s
   sampling attempts=800 valid=1 2716s
+  sampling attempts=850 valid=1 2853s
+  sampling attempts=900 valid=1 2991s
+  sampling attempts=950 valid=1 3129s
+  sampling attempts=1000 valid=1 3266s
+[sampling] valid=1/1000 C_LOW_YIELD_BLOCKED
+{
+ "balance": {
+  "attempted": 1000,
+  "valid": 27,
+  "status": "C_LOW_YIELD_BLOCKED"
+ },
+ "sampling": {
+  "attempted": 1000,
+  "valid": 1,
+  "status": "C_LOW_YIELD_BLOCKED"
+ }
+}

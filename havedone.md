@@ -916,3 +916,11 @@
 - **Track B = B_KILL**：边界非平凡 PASS，但 structure-aware 召回与 random 恰好相等（1.0/1.0）、generic 找到 0 格——因为我的 universe 仅 165 格而 K 到 200，顶端构造性饱和；已披露该缺陷并给重跑建议（2000–5000 格）。
 - **Track C**：balance 侧 78.3% 唯一因果格 / 95.7% ≤3 格；200 例大跑外推 2.9h 超预算 → `C_ENGINEERING_BLOCKED` + 50 例标定交付。
 - **Track D** NOT_ACTIVATED；未填 SELECTED_MAINLINE。包 `b2a947ef11aaf03c…`（112 文件）。
+
+
+## 2026-09-22 — Phase A.3：B 有效重跑（首次用上称职仪器）→ B_KILL_FOR_MAINLINE；C0 生成器两任务均不可行
+
+- **OOS 指令不匹配披露**：收到的 OOS VISIBILITY REGRESSION REPAIR 批令在本工作区无任何对应工件（D2 ledger / AaveOracle / OOS 窗口），未执行；按附件 A.3 计划执行。
+- **B**：正对照 PASS（61×/46×）；正式采集在不可变标签表上完成。`B_NONTRIVIAL_BOUNDARY=FAIL`（转移线 0.24%/1.2% vs ≥20%；真实边 3/20 条）→ `B_KILL_FOR_MAINLINE`。sampling 上 structured=随机 5 倍、generic 7.6 倍（K=100）——仪器对了，但边界几乎不存在。
+- **C**：C0 冻结网格 28 设定 × 100 配对全低于 10% 带（balance 最高 6.9%、sampling 0%）；均值位移诊断证明故障已应用 → `C_GENERATOR_FEASIBILITY_FAIL`（两任务）。cap 外证据表明去掉上限也不够。
+- 注册器对账 **12931 = 8972 + 3957 + 2** 通过。包 `PHASE_A3_BC_DECISIVE_BUNDLE.zip` sha256 `e97f220b93f4ac68…`。未进入 Phase B；不选主线。
