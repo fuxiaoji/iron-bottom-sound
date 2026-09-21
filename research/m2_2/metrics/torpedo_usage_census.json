@@ -1,0 +1,110 @@
+{
+ "note": "deployed TacticalCommander(profile=balanced) torpedo-order count at TORPEDO_PLANNING, turn>=2",
+ "states": [
+  {
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 2,
+   "axis": 0,
+   "allies": 0
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 2,
+   "turn": 2,
+   "axis": 0,
+   "allies": 2
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 3,
+   "turn": 2,
+   "axis": 0,
+   "allies": 2
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 4,
+   "turn": 2,
+   "axis": 0,
+   "allies": 0
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 5,
+   "turn": 2,
+   "axis": 0,
+   "allies": 2
+  },
+  {
+   "scenario": "IBS-S-03",
+   "seed": 1,
+   "turn": 2,
+   "axis": 0,
+   "allies": 2
+  },
+  {
+   "scenario": "IBS-S-03",
+   "seed": 2,
+   "turn": 2,
+   "axis": 0,
+   "allies": 2
+  },
+  {
+   "scenario": "IBS-S-03",
+   "seed": 3,
+   "turn": 2,
+   "axis": 2,
+   "allies": 0
+  },
+  {
+   "scenario": "IBS-S-03",
+   "seed": 4,
+   "turn": 2,
+   "axis": 0,
+   "allies": 2
+  },
+  {
+   "scenario": "IBS-S-03",
+   "seed": 5,
+   "turn": 2,
+   "axis": 0,
+   "allies": 4
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 1,
+   "turn": 2,
+   "axis": 0,
+   "allies": 0
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 2,
+   "turn": 2,
+   "axis": 0,
+   "allies": 0
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 3,
+   "turn": 2,
+   "axis": 0,
+   "allies": 0
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 4,
+   "turn": 2,
+   "axis": 0,
+   "allies": 0
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 5,
+   "turn": 2,
+   "axis": 0,
+   "allies": 0
+  }
+ ]
+}

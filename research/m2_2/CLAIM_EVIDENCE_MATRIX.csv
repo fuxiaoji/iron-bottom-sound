@@ -1,0 +1,18 @@
+claim,value,evidence,confidence
+M21R21_GOLD_GATE,"FAIL_3_OF_5 (historical, preserved)",research/m2_1/05_REPAIRED_GOLD_GATE.md,recorded
+GOLD_COMPILER_GAP,FAIL (0 of 3; 1 of 3 computable),metrics/b0_gold_compiler_fidelity.json GATE,measured
+F(SEARCH) MG1 pair panel,+0.876,b0 json MG1.supplementary.fidelity,"measured, single case"
+F(CURRENT_POLICY) MG1 pair panel,-0.178,b0 json MG1.supplementary.fidelity,"measured, single case"
+F(CURRENT_INTENT_COMPILER) MG1,-2.535 (plan identical to counter arm 1S1P),b0 json + intent geometry probe,"measured, exact plan identity"
+"MG1 gold gap, fleet margin",-5.844 (gold worse than random mean),b0 json MG1.primary,measured
+F(SEARCH) MG4 public,+0.107,b0 json MG4.primary.fidelity,measured
+F(CURRENT_POLICY) MG4,0.000 (0 torpedo orders at that state),b0 json + torpedo_usage_census.json,measured
+F(FULL_STATE_CORRIDOR_CEILING) MG4,"1.000 (identity, M22-F5)",b0 json,"definitional, disclosed"
+MG4 corridor reproduction,route reduction 0.9655; 12/12 engine agreement,b0 json MG4.engine_cross_validation,reproduced vs R2.1 exact
+MG3 registered arms reproduction,2.556 vs 0.944 EH at 15/17 hex,b0 json MG3.verification,reproduced vs R2.1 exact
+MG3 arms are not executable,"visibility 13 hex, radar rule OFF, can_see False both arms","b0 json + engine code l.4283-4306, l.3403","measured, code-cited"
+PUBLIC_INFORMATION_GAP MG4,CONFIRMED (tie sets span RR 0.00-0.97),mg4_public_signal_diagnostic.json,measured
+fire evaluator agreement,"Spearman 0.908, same-target 0.888, mean rel own-EH diff 0.191",fire_calibration.json,measured
+CURRENT_POLICY torpedo usage,"fires in 7/15 turn-2 states (allies), 1/15 (axis)",torpedo_usage_census.json,measured
+NATURAL_OPPORTUNITY_RATE,NOT_MEASURED (B1 gated off),06_B1_CENSUS_NOT_RUN.md,"not run, by rule"
+RULE_LEVERAGE MG1/MG3/MG4,"CONFIRMED (historical, unchanged by M2.2)",research/m2_1/05_REPAIRED_GOLD_GATE.md,recorded

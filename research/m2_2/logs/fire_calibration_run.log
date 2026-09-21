@@ -1,0 +1,15 @@
+M2.2 fire evaluator calibration — summary
+{
+ "n_states": 20,
+ "spearman_net_eh": 0.9082706766917293,
+ "mean_abs_net_eh_diff": 2.6055555555555556,
+ "max_abs_net_eh_diff": 4.888888888888889,
+ "mean_same_target_fraction": 0.8880555555555556,
+ "mean_rel_diff_own_eh": 0.1913292774357418,
+ "wall_seconds": 86.42164397239685,
+ "verdict": "HEURISTIC_PARTIAL (rank corr >=0.7) - report both"
+}
+
+M22-F2: the first version of fire_search multiplied firepower by the mount count;
+it reported spearman_own_eh 0.290 and per-side net -0.333. After the option-representation
+fix the numbers above were produced.

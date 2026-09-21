@@ -840,3 +840,17 @@
 - **最终门**：MG1 f`rozen PASS` / MG2 FAIL / MG3 frozen PASS / MG4 PASS / MG5 FAIL = **3/5 → MECHANISTIC_GOLD_GATE = FAIL（阈值不变）**。Stage B/C 未进入。
 - **科学结论更新**：PI 的判断被证据进一步修正——不仅"炮位展开与距离控制"在规则层有强杠杆，**鱼雷海域拒止也是**（合法长程走廊剥夺 28/29 条下一回合路线，且与引擎自身接触事件逐条吻合）。Crossing-T 的失败已定位到"能否占据舷射位置"，即 Stage B 要回答的编译器问题。
 - **提交与打包**：`75b9f55`→`786c925`→本批；包 `research/m2_1/M2_1R21_MECHANISTIC_REPAIR_CHECKPOINT.zip` sha256 `2874b578…`（41 文件）。预算 ~1200 次评估；0 付费 LLM；引擎零改动；阈值全部先于修复后测量预注册。
+
+
+## 2026-09-21 — M2.2 战术编译器保真审计：门 FAIL，但抓到三件比门更重要的事
+
+- **背景与纪律**：PI 指令明确"这不是把 M2.1-R2.1 的 3/5 FAIL 改成 PASS"，历史判决（MG1/MG3/MG4 = VALID PASS，MG2/MG5 = FAIL，门 3/5）**逐字保留**。禁止：为凑 4/5 重修 MG2/MG5、训练 MAPPO/QMIX/GNN/Transformer、发明论文方法、改生产规则、把研究搜索叫 optimal/oracle。全部遵守。先在 `research/m2_2/PRE_REGISTRATION_M22.md` 冻结命名纪律、机制值、保真度公式与下限、B0 门（≥2/3：SEARCH ≥0.70 且 CURRENT ≤0.40）、搜索预算（每舰 ≤8 计划 / beam 宽度 64 / 鱼雷 ≤400 配置）与 B1 门，之后才开始测量。
+- **先修自己的测量工具再量**：`FIRE_SEARCH` 首版把同一炮座列表在每个 mount id 下重复累加，导致 5 炮位舰被算成 49 条目、搜索比启发式还差——**负相关就是症状**（搜索的选项集包含启发式的分配方式，不可能严格更差）。修好后 20 状态校准 Spearman(net EH) 由 −0.333 变 **+0.908**，同目标率 0.888 → `HEURISTIC_PARTIAL`，两个评估器并列报告。若沿用首版数字，整轮机制值都会是伪影。
+- **B0 结果（GOLD_COMPILER_GAP = FAIL，0/3；冻结度量下仅 1/3 可计算）**：
+  - **MG1 同一冻结公式在两个尺度上结论相反**：舰队级 gold −12.17 < 随机均值 −6.32（gap −5.84，按预注册"分母必须为正"不可计算）；舰对级同公式 gold +1.89 > 随机 +1.44，保真度翻为 GAP（SEARCH **+0.876**、CURRENT_POLICY **−0.178**）。展开舷射赢舰对、输舰队——把 M2.1-R 的"暴露对称"精确隔离到单舰。案例复现 **7/7 不变量精确吻合**（post_rel 1/5、距离 4/3、炮位 3/1、+92.9%）。
+  - **现有意图编译器转错方向**：intent `BROADSIDE` 下 `mg_cases.intent_plans` 给焦点舰发 **`1S1P`**，与**反向臂逐字符相同**；post_rel 5、1 炮位（gold：1、3 炮位），舰对保真度 **−2.53**。表达式 `((b-1+1)%6)+1` 取错方向。任何"发意图让 AI 编译"的组织结构都会继承这个反向转向——本轮最可直接修的动作项。
+  - **MG3 注册度量不可执行（M22-F4）**：冻结 PASS 的 2.56 vs 0.94 落在 15/17 格，而该状态盟军能见度 **13 格**且 radar 规则 **OFF**，两臂 `_can_see=False`（引擎会 `gunnery_rejected`；代码 l.4283-4306、l.3403）。引擎真实计量下两臂 **0.000**。注册度量只查 `_mount_can_bear`；MG3 在 R2.1 被冻结，从未拿到 MG2/MG4 的能见度修复。**历史 PASS 判决不动**，加诊断。
+  - **MG4 走廊已复现且是全状态现象**：gold RouteReduction **0.966**、时空接触 **12/12** 与引擎 `torpedo_contact` 一致、预测段与 R2.1 记录逐格相同。公开信息搜索 **0.107**、当前 AI **0.000**（该状态 0 条鱼雷令；但全库 15 个 turn-2 状态中 8 个至少一方开火——声明精确化，未过度概括）。公开目标**并列主导**：argmax 并列集 RR 跨 0.00–0.97，真正最优配置公开得分最低（overlap 1 / 最大 5）→ `PUBLIC_INFORMATION_GAP = CONFIRMED`。**注意反例**：公开分与真实 RR 的 Spearman = +0.676，若只报相关系数会得出"公开信号可排序"的错误结论——并列集分解才是证据，已登记为常备反例。
+- **B1 自然普查未运行**（预注册以 B0 PASS 为门；B0 非 PASS）。`NATURAL_OPPORTUNITY_RATE = NOT_MEASURED`，相关 6 项图表标注 `N/A — B1 not run`，未编造任何自然机会率。
+- **失败留档**：M22-F1 混合侧秩统计伪影 / F2 搜索重复计炮 / F3 `movement_candidates` 是合法计划空间子集且 `MovementOrder.speed` 须取 `engine.movement_cost`（手算会拒合法批次）/ F4 MG3 度量缺能见度门 / F5 MG4 gold 即全状态 argmax（F=1 平凡，已声明）。全部写入 `research/m2_2/FAILURES_AND_COUNTEREXAMPLES.md`。
+- **提交与打包**：包 `research/m2_2/M2_2_TACTICAL_COMPILER_FIDELITY_BUNDLE.zip` sha256 `b6531b37…`（35 文件）；预算 ~450 次引擎评估；0 付费 LLM；生产引擎零改动；未训练模型；未进入价值兑现/RL/论文写作。**按指令停止，等 PI 决策**（机制值尺度 / MG3 度量 / MG4 公开信息缺口是否升为研究问题 / B1 是否重写预注册）。

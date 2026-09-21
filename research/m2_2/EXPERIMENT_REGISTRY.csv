@@ -1,0 +1,9 @@
+exp_id,stage,mech,scenario,seed,metric,methods,engine_eval,verdict,artifact
+M22-CAL-01,B0-prep,fire evaluator,20-state pool,-,Spearman net EH,LEGAL_FIRE_HEURISTIC vs FIRE_SEARCH,40 net_eh panels,HEURISTIC_PARTIAL (0.908),metrics/fire_calibration.json
+M22-B0-MG1,B0,MG1 broadside,IBS-S-01,5,fleet margin / pair margin,"gold,counter,random8,policy,intent,intent-lever,beam64",~100,GOLD_GAP_NONPOSITIVE (primary); GAP (pair panel),metrics/b0_gold_compiler_fidelity.json
+M22-B0-MG3,B0,MG3 range,IBS-S-EM-01,1,fleet margin / pair margin,"gold,counter,random8,policy,intent x2,intent-lever x2,beam64",~90,GOLD_GAP_NONPOSITIVE,metrics/b0_gold_compiler_fidelity.json
+M22-B0-MG4,B0,MG4 corridor,IBS-S-01,1,route reduction,"gold,random8,policy,intent,public x3,ceiling",~60 + 12 route resolutions,NO_GAP (F_public 0.107),metrics/b0_gold_compiler_fidelity.json
+M22-DIAG-01,B0-diag,MG4 public signal,IBS-S-01,1,tie-set RR span,3 public objectives,"288 configs, projection only",PUBLIC_INFORMATION_GAP,metrics/mg4_public_signal_diagnostic.json
+M22-CEN-01,B0-diag,torpedo usage,S-01/S-03/EM-01,1-5,torpedo order count,deployed commander,15 states x 2 sides,8/15 states fire,metrics/torpedo_usage_census.json
+M22-MG3-VIS,B0-diag,MG3 visibility,IBS-S-EM-01,1,_can_see / distance,-,2 arms,can_see False both arms,figures/fig04_mg3_visibility_horizon.png
+M22-B1,B1,natural census,-,-,-,-,0,NOT RUN (gated on B0 PASS),-

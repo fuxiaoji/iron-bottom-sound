@@ -1,0 +1,1816 @@
+{
+ "n_configs": 288,
+ "n_routes": 29,
+ "objective_cells": 90,
+ "max_overlap": 1,
+ "n_ties": 68,
+ "tie_rr": [
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.03448275862068961,
+  0.03448275862068961,
+  0.03448275862068961,
+  0.03448275862068961,
+  0.03448275862068961,
+  0.03448275862068961,
+  0.10344827586206895,
+  0.10344827586206895,
+  0.2068965517241379,
+  0.2068965517241379,
+  0.9655172413793104,
+  0.9655172413793104,
+  0.9655172413793104,
+  0.9655172413793104
+ ],
+ "full_state_best": {
+  "overlap": 1,
+  "rr": 0.9655172413793104
+ },
+ "n_rr_positive": 14,
+ "rr_positive_overlap_range": [
+  1,
+  1
+ ],
+ "per_config": [
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.9655172413793104,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.9655172413793104,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.03448275862068961,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.2068965517241379,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.03448275862068961,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.10344827586206895,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.03448275862068961,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.9655172413793104,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.9655172413793104,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.03448275862068961,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.2068965517241379,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 0,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.03448275862068961,
+   "setting_index": 0,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.10344827586206895,
+   "setting_index": 0,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 1,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.03448275862068961,
+   "setting_index": 1,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  },
+  {
+   "overlap": 1,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "A"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "B"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "X"
+  },
+  {
+   "overlap": 0,
+   "rr": 0.0,
+   "setting_index": 2,
+   "launch_angle": "Y"
+  }
+ ]
+}
