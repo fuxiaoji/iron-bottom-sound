@@ -169,6 +169,16 @@
 - **Track A/B/C = BLOCKED（未运行，非 FAIL）**：无任何 Track 数字，报告 KILL/PASS 即属编造；按计划 §10 以 BLOCKED + 原因记录，冻结设计、阈值、已验证仪器与已验证策略齐备可立即重跑。Track D = NOT_ACTIVATED（依赖 Track B）。
 - 包 `PHASE_A_MAINLINE_SELECTION_BUNDLE.zip`（72 文件，109 KB，sha256 `12f0deb934967cf2…`，副本在 ~/Downloads）。0 付费 LLM；未训练 RL/GNN/Transformer（仅冻结基策所需 MAPPO）；未进入方法开发 Phase B。按指令停止。
 
+## 1.19 Phase A v3.1（PI 续跑指令：A0 已接受，Track 未跑）
+
+2026-09-21：按 v3.1 指令执行。`A0_STATUS = ACCEPTED_WITH_ERRATA`；任务对锁定 **VMAS/BALANCE + VMAS/SAMPLING**（navigation 因 100% 饱和在看 Track 前换出，唯一冻结后备 = WIND_FLOCKING）。
+
+- **Sampling 训练完成**：3/3 seeds × 600k 帧，检查点齐全；验证回报 s0 172.66 / s1 196.96 / s2 进行中。**500 clean + 500 random 与四条件质量门仍在运行**（trained>random / bootstrap CI>0 / Cohen d≥0.5 / 错误率≤1%），**Q25/Q50/IQR 尚未产生，因此 Track B/C 语义不得先行套用**——我没有猜任何数字。
+- **注册器已按指令硬化**：append-only CSV + 每 ≤10 单元 JSONL 检查点 + finally 块写唯一终态（SUCCESS / REJECTED_WITH_REASON / ERROR_WITH_TRACE，含异常类型/消息/trace 路径）+ 对账断言。当前对账 **261 = 259 SUCCESS + 0 REJECTED + 2 ERROR**，`reconciles = true`（2 个 ERROR 是我 Track A 试跑时的崩溃，已按红线保留而非抹掉）。
+- **Track A 运行器已实现并试跑通过**（克隆式短回滚 + 冻结随机策略候选 + 分离搜索/评估 RNG + 0/4/16/64 预算 + 四种等预算分配 + oracle），**但 200 状态×2 任务的正式运行未在此窗口执行**（依赖 sampling 中位种子，由运行中的审计确定）。
+- **Track B/C = NOT_RUN**（按 PI 口径：NOT_RUN ≠ BLOCKED）；Track D = NOT_ACTIVATED。
+- 交付：`PHASE_A_MAINLINE_SELECTION_BUNDLE.zip`（93 文件，sha256 `a57d066d6e0ad03d…`），含 `history/A0_PARTIAL_CHECKPOINT/`（v3.0 包原文）、新增 `10_A0_ERRATA_AND_TASK_SWITCH.md`（E1 判据失效 / E2 注册器路径 / E3 三个坏仪器 / E4 误启批次 / E5 饱和换任务）与 `11_SAMPLING_POLICY_AUDIT.md`（协议、部分数字、明确标注未产生分位数）。未输出 SELECTED_MAINLINE；0 付费 LLM；未训练 RL/GNN/Transformer。
+
 ## 2. 阶段台账
 
 > **重要**：阶段 1–11 在 2026-09-13 之前已有历史产物（v12/v13/v14 研究线），但这些产物是在本流水线成立**之前**产生的，其"是否符合本流水线的阶段定义与门控要求"**尚未按本流水线重新核验**，因此统一标记 ⟨待核⟩，不得直接升为 ✅。

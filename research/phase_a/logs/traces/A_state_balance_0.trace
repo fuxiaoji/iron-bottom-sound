@@ -1,0 +1,23 @@
+Traceback (most recent call last):
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/scripts/track_a.py", line 270, in main
+    per_budget, d = measure_state(task, stoch, snap, obs, SEED_SEARCH + si,
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/scripts/track_a.py", line 156, in measure_state
+    cands = candidate_set(actor_stoch, obs, max(BUDGETS), rng)
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/scripts/track_a.py", line 101, in candidate_set
+    cands.append(actor_stoch.sample_action(obs, rng))
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv_phase_a/lib/python3.9/site-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/scripts/track_a.py", line 62, in sample_action
+    return [self.sample_action(o, rng) for o in obs]
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/scripts/track_a.py", line 62, in <listcomp>
+    return [self.sample_action(o, rng) for o in obs]
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv_phase_a/lib/python3.9/site-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/phase_a/scripts/track_a.py", line 68, in sample_action
+    eps = torch.randn(mean.shape, generator=rng)
+TypeError: randn() received an invalid combination of arguments - got (torch.Size, generator=Random), but expected one of:
+ * (tuple of ints size, *, torch.Generator generator, tuple of names names, torch.dtype dtype = None, torch.layout layout = None, torch.device device = None, bool pin_memory = False, bool requires_grad = False)
+ * (tuple of ints size, *, torch.Generator generator, Tensor out = None, torch.dtype dtype = None, torch.layout layout = None, torch.device device = None, bool pin_memory = False, bool requires_grad = False)
+ * (tuple of ints size, *, Tensor out = None, torch.dtype dtype = None, torch.layout layout = None, torch.device device = None, bool pin_memory = False, bool requires_grad = False)
+ * (tuple of ints size, *, tuple of names names, torch.dtype dtype = None, torch.layout layout = None, torch.device device = None, bool pin_memory = False, bool requires_grad = False)
+

@@ -10,3 +10,8 @@ A1,A,adaptive planning compute,-,-,-,BLOCKED (not run),PRE_REGISTRATION_PHASE_A.
 B1,B,active failure-boundary discovery,-,-,-,BLOCKED (not run),PRE_REGISTRATION_PHASE_A.md ss6
 C1,C,budgeted counterfactual attribution,-,-,-,BLOCKED (not run),PRE_REGISTRATION_PHASE_A.md ss7
 D1,D,event-triggered resilience,-,-,-,NOT_ACTIVATED,PRE_REGISTRATION_PHASE_A.md ss8
+A1-RUNNER,A,Track A runner implemented + piloted,-,-,-,PILOTED (full run NOT_RUN),"scripts/track_a.py, metrics/track_a_pilot.json"
+S1,A0,sampling 3x600k MAPPO training,sampling,"0,1,2",600k frames,3 SUCCESS,raw/training_registry.csv
+S2,A0,sampling 500 clean + 500 random + quality gate,sampling,median,1100 episodes,RUNNING,raw/track_common/sampling_audit.csv
+B1R,B,Track B runner,-,-,-,NOT_RUN,PRE_REGISTRATION_PHASE_A.md ss6
+C1R,C,Track C runner,-,-,-,NOT_RUN,PRE_REGISTRATION_PHASE_A.md ss7

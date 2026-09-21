@@ -128,11 +128,19 @@ class Perturbation:
         return self.t_start <= t <= self.t_end
 
 
+def _torch_gen(rng):
+    """torch.randn needs a torch.Generator; derive one deterministically from the
+    Python RNG so every perturbation stream stays reproducible and disjoint."""
+    g = torch.Generator()
+    g.manual_seed(rng.randrange(2 ** 31))
+    return g
+
+
 def apply_observation_noise(obs_list, pert, rng):
     out = []
     for i, o in enumerate(obs_list):
         if i in pert.agents:
-            out.append(o + torch.randn(o.shape, generator=rng) * pert.severity)
+            out.append(o + torch.randn(o.shape, generator=_torch_gen(rng)) * pert.severity)
         else:
             out.append(o)
     return out
@@ -145,9 +153,10 @@ def apply_action_perturbation(actions, pert, rng, memory):
             out.append(a)
             continue
         if pert.modality == "act_noise":
-            out.append(torch.clamp(a + torch.randn(a.shape, generator=rng) * pert.severity, -1, 1))
+            out.append(torch.clamp(
+                a + torch.randn(a.shape, generator=_torch_gen(rng)) * pert.severity, -1, 1))
         elif pert.modality == "act_drop":
-            keep = (torch.rand(a.shape, generator=rng) > pert.severity).float()
+            keep = (torch.rand(a.shape, generator=_torch_gen(rng)) > pert.severity).float()
             out.append(a * keep)
         elif pert.modality == "act_delay":
             out.append(memory.get(i, a))       # one-step delayed action

@@ -898,3 +898,12 @@
 - **未运行 Track A/B/C**：状态 `BLOCKED`（非 FAIL），因为没有任何 Track 数字，报 PASS/KILL 即编造。冻结设计 + 已验证仪器 + 已验证策略齐备，可立即重跑。
 - **自身缺陷留档**：toy A/B/C 三处仪器缺陷（含一个同义反复的对照与一个比随机还差的结构化探针）、注册器路径 bug（6 个成功训练被写成 REJECTED）、以及我误启第二批训练（2 分钟内止损）。旧版全部保留为 `INVALID_*`。
 - 包 `PHASE_A_MAINLINE_SELECTION_BUNDLE.zip` sha256 `12f0deb934967cf2…`（72 文件）。0 付费 LLM；未训练 RL/GNN/Transformer；未进入 Phase B。
+
+
+## 2026-09-21 — Phase A v3.1：A0 接受（带勘误），任务对锁定，Track 未跑
+
+- **任务对锁定**：BALANCE + SAMPLING（navigation 100% 饱和已在看 Track 前换出）；唯一后备 WIND_FLOCKING。
+- **Sampling**：3/3 训练完成；验证回报 172.66 / 196.96 /（s2 进行中）；500 clean + 500 random + 四条件质量门**仍在运行**，分位数未产生 → Track B/C 语义未套用。
+- **注册器硬化完成并对账通过**：261 = 259 SUCCESS + 0 REJECTED + 2 ERROR（2 个 ERROR 为我 Track A 试跑崩溃，按红线保留）。
+- **Track A 运行器实现并试跑**（克隆短回滚 + 冻结随机候选 + 分离 RNG + 等预算四分配 + oracle），正式 200 状态运行未执行；**Track B/C = NOT_RUN**（≠ BLOCKED）；Track D NOT_ACTIVATED。
+- 包 `PHASE_A_MAINLINE_SELECTION_BUNDLE.zip` sha256 `a57d066d6e0ad03d…`（93 文件，含 A0 分片检查点与两份新文档）。未进入 Phase B。

@@ -1,25 +1,28 @@
 {
  "phase": "A",
- "execution_status": "A0_COMPLETE_TRACKS_NOT_RUN_IN_THIS_WINDOW",
+ "execution_status": "A0_ACCEPTED__SAMPLING_AUDIT_RUNNING__TRACKS_NOT_RUN",
  "track_a": {
-  "status": "BLOCKED",
+  "status": "NOT_RUN",
   "heterogeneity": null,
   "oracle_equal_budget_gain": null,
   "learned_gap_recovery": null,
-  "blocker": "A0 completed and certified; Tracks A/B/C were not executed in this execution window. No Track number exists. Frozen design and validated instruments are in place for an immediate rerun (see REPRODUCE.md)."
+  "blocker": "A0 completed and certified; Tracks A/B/C were not executed in this execution window. No Track number exists. Frozen design and validated instruments are in place for an immediate rerun (see REPRODUCE.md).",
+  "note": "runner implemented and piloted (measurement path works end-to-end on 2 states x 2 tasks); full 200-state run not executed in this window; blocked on the sampling median seed which the running audit defines"
  },
  "track_b": {
-  "status": "BLOCKED",
+  "status": "NOT_RUN",
   "boundary_recall_ratio_vs_random": null,
   "structured_gain_vs_generic": null,
-  "blocker": "same as track_a; positive control B instrument validated (3.36x / 2.71x structured-vs-random recall at K=50/100 in the toy)"
+  "blocker": "same as track_a; positive control B instrument validated (3.36x / 2.71x structured-vs-random recall at K=50/100 in the toy)",
+  "note": "perturbation hooks and hardened registry ready; no perturbation evaluated"
  },
  "track_c": {
-  "status": "BLOCKED",
+  "status": "NOT_RUN",
   "identifiable_fraction": null,
   "query_fraction": null,
   "attribution_accuracy": null,
-  "blocker": "same as track_a; positive control C instrument validated (exhaustive repair recovers the unique 2-cell window)"
+  "blocker": "same as track_a; positive control C instrument validated (exhaustive repair recovers the unique 2-cell window)",
+  "note": "no fault injected; exhaustive-matrix cost estimate not yet taken"
  },
  "track_d": {
   "status": "NOT_ACTIVATED",
@@ -27,7 +30,7 @@
  },
  "recommended_for_pi_review": [],
  "largest_valid_effect": "",
- "largest_unresolved_risk": "the surviving base policy (balance, 87.6% success) is strong: perturbations must be severe enough to produce the pre-registered 5-50% failure band, and Track A planning headroom may be small at 87.6% clean success. The navigation replacement (sampling) is training and its clean baseline is not yet measured.",
+ "largest_unresolved_risk": "sampling policy quality is not yet decided: its clean/random episodes and the four-condition gate are still running. Track B/C semantics depend on the frozen sampling quantiles, so no Track row may be emitted before they exist.",
  "A0": {
   "environment_lock": "ENVIRONMENT_LOCK.json",
   "setup_seconds": 112,
@@ -60,5 +63,16 @@
   "native_oracle": "scenario's own done(); VMAS final_rew/all_goal_reached rejected as inconsistent (see 01_ENVIRONMENT_POLICY_AUDIT.md)"
  },
  "SELECTED_MAINLINE": null,
- "note": "The local AI must not fill SELECTED_MAINLINE; the PI decides after reviewing the bundle."
+ "note": "The local AI must not fill SELECTED_MAINLINE; the PI decides after reviewing the bundle.",
+ "directive": "v3.1 (PI continuation after A0)",
+ "A0_STATUS": "ACCEPTED_WITH_ERRATA",
+ "task_lock": {
+  "pair": [
+   "vmas/balance",
+   "vmas/sampling"
+  ],
+  "fallback": "vmas/wind_flocking",
+  "switched_out": "vmas/navigation (SATURATED_GE_95PCT, pre-Track)"
+ },
+ "updated_utc": "2026-09-21T14:00:50Z"
 }
