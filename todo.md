@@ -30,7 +30,8 @@
 | T-11 | 阶段 23 引用真实性与相关性双查（≥30 篇、年份下限） | 23 | T-7 | 待办 |
 | T-13 | M2.2-R/B1E 已完成（判定 TORPEDO_PARTIAL_OBSERVABILITY + movement MIXED，包 `1ce46fa8…`） | — | 无 | 完成 |
 | T-13b | M2.3 已完成：JTC = FAIL（含 M23-F3 surrogate 可加性混淆）、BARD = FAIL（匹配对照砍半效应）、MAINLINE_CANDIDATE = NONE，包 `85d3e41f…` | — | 无 | 完成 |
-| T-16 | 建议（未执行，需 PI 批准 + 新预注册）：① 用含交互项的 surrogate（集火/分火）重测 JTC；② 深挖 BARD 唯一经匹配存留的 S-01 信息集；③ 修 M22R-F3 的 `mid` 桶 | — | 用户输入 | 待办 |
+| T-13c | M2.4 已完成：INTERACTION_STRUCTURE=PRESENT 但 JTC_INTERACTION_GATE=FAIL（六条全否）→ **JTC 永久 kill**；BARD 归档；包 `5781e81a…` | — | 无 | 完成 |
+| T-17 | 主线状态：JTC 与 BARD 均已 kill/归档，`IBS_NEXT_ROLE = APPLICATION_BENCHMARK_ONLY`。后续若继续，需 PI 给出新研究轴（现有确认资产：MG1/MG3-E/MG4 机制、B1E 双尺度外部性、BARD 指标集、永久 kill 的 JTC 结论） | — | 用户输入 | 阻塞 |
 | T-14 | 等 PI 裁决：① torpedo partial observability 是否升为主线（建议先做 size/diversity-matched subset 对照分离假设 B）② MG3 是否改注为 superseded-by-MG3-E ③ 「编译整条线而非单舰」是否立题 ④ 后续 census 是否加 `mid` 桶与 range 臂（修 M22R-F1/F3） | — | 用户输入 | 阻塞 |
 | T-15 | 技术债：`b1e.py` 的 Counter 序列化已修，但 `summarize` 仍是崩溃丢全量的结构（现靠 JSONL 恢复）；建议改为流式汇总 | — | 无 | 待办 |
 | T-12 | 阶段 22 套用目标会议 LaTeX 模板并导出 | 22 | T-4 | 待办 |

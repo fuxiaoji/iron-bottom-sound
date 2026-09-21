@@ -1,0 +1,132 @@
+  main state-sides: 53
+    main 1/53
+    main 6/53
+    main 11/53
+    main 16/53
+    main 21/53
+    main 26/53
+    main 31/53
+    main 36/53
+    main 41/53
+    main 46/53
+    main 51/53
+  supplemental IBS-S-01: 10/96
+  supplemental IBS-S-03: 10/42
+  supplemental IBS-S-EM-01: 10/123
+  supplemental done IBS-S-01: 5 total
+  supplemental done IBS-S-03: 10 total
+  supplemental done IBS-S-EM-01: 11 total
+{
+ "panels": {
+  "main": {
+   "panel": "main",
+   "n": 19,
+   "delta_greedy": {
+    "mean": -0.38888888888888895,
+    "median": 0.0,
+    "win": 6,
+    "tie": 9,
+    "loss": 4,
+    "win_rate": 0.3157894736842105,
+    "bootstrap_ci": [
+     0.0,
+     0.11111111111111338
+    ]
+   },
+   "delta_seq": {
+    "mean": -1.3713450292397666,
+    "median": 0.0,
+    "bootstrap_ci": [
+     -0.7222222222222197,
+     0.0
+    ]
+   },
+   "delta_random": {
+    "median": -0.08333333333333393
+   },
+   "per_scenario": {
+    "IBS-S-01": {
+     "n": 10,
+     "median": 0.0,
+     "mean": -0.02499999999999982
+    },
+    "IBS-S-03": {
+     "n": 6,
+     "median": 0.22222222222222227,
+     "mean": 0.4305555555555555
+    },
+    "IBS-S-EM-01": {
+     "n": 3,
+     "median": -4.194444444444444,
+     "mean": -3.240740740740742
+    }
+   },
+   "scenarios_median_positive": 1,
+   "robust_median_after_dropping_top2": 0.0,
+   "exact_evals_mean": 44.0
+  },
+  "supplemental": {
+   "panel": "supplemental",
+   "n": 11,
+   "delta_greedy": {
+    "mean": -0.08585858585858554,
+    "median": 0.0,
+    "win": 5,
+    "tie": 4,
+    "loss": 2,
+    "win_rate": 0.45454545454545453,
+    "bootstrap_ci": [
+     0.0,
+     0.861111111111111
+    ]
+   },
+   "delta_seq": {
+    "mean": -1.3409090909090915,
+    "median": 0.0,
+    "bootstrap_ci": [
+     -0.6944444444444446,
+     0.0
+    ]
+   },
+   "delta_random": {
+    "median": 0.0
+   },
+   "per_scenario": {
+    "IBS-S-01": {
+     "n": 5,
+     "median": 0.7222222222222241,
+     "mean": 0.38888888888888945
+    },
+    "IBS-S-03": {
+     "n": 5,
+     "median": 0.0,
+     "mean": 0.2611111111111111
+    },
+    "IBS-S-EM-01": {
+     "n": 1,
+     "median": -4.194444444444444,
+     "mean": -4.194444444444444
+    }
+   },
+   "scenarios_median_positive": 1,
+   "robust_median_after_dropping_top2": 0.0,
+   "exact_evals_mean": 43.54545454545455
+  }
+ },
+ "conditions": {
+  "1_median_positive_in_ge2_scenarios": false,
+  "2_pooled_win_rate_ge_060": false,
+  "3_pooled_median_ge_floor": false,
+  "4_not_worse_than_sequential": false,
+  "5_random_clearly_worse": false,
+  "6_not_driven_by_extremes": false
+ },
+ "JTC_INTERACTION_GATE": "FAIL"
+}
+{
+ "INTERACTION_STRUCTURE": "PRESENT",
+ "JTC_INTERACTION_GATE": "FAIL",
+ "JTC_FINAL_STATUS": "PERMANENTLY_KILL",
+ "BARD_FINAL_STATUS": "ARCHIVED",
+ "IBS_NEXT_ROLE": "APPLICATION_BENCHMARK_ONLY"
+}

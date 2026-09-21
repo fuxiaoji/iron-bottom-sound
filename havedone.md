@@ -877,3 +877,14 @@
 - **MAINLINE_CANDIDATE = NONE**。按 PI 规则不强行选；两条线各自的下一步已写明（含交互项的联合 surrogate；S-01 存留信息集）。
 - **补充普查（supplemental，不改写旧 prevalence）**：MID 窗口 105 行、DAMAGED 事件条件 105 行；**PI 字面 damaged 判据不具区分度**（池内 234/234 满足、217/234 连 strict 0.75·max_hull 也满足），已如实标注为条件样本、不作损伤对比主张。
 - **包** `research/m2_3/M2_3_MAINLINE_DISAMBIGUATION_BUNDLE.zip` sha256 `85d3e41f…`（含 00–12 全部文档、预注册、registry/claims/failures/manifest、metrics/figures/cases/code_patch/logs）。约 3000 次引擎评估；0 付费 LLM；生产引擎零改动；**未进入 RL/GNN/Transformer/论文写作**。按指令停止。
+
+
+## 2026-09-21 — M2.4 JTC 交互感知最后机会门：交互存在，协调收益不成立 → JTC 永久 kill
+
+- **纪律**：历史 gate 与 M2.3 判定原样保留；本轮是 PI 批准的**唯一一次**重测，若 FAIL 即永久 kill。预注册先于测量冻结（φ 定义与 0.05 practical floor、24 次 engine-exact 评估等预算、六条 PASS 条件、pilot 选取规则）。
+- **Gate I = PRESENT**：10 pilot / 150 舰对全部 engine-exact。median |φ|=0.000、p90 **0.556**、max **4.139**、**28%** 舰对 ≥0.05。并补了一项交互专测：用 engine-exact 的 q_i 构成的**精确可加模型**对精确联合值的一致性仅 **0.037** —— 说明「加性模型不足」是交互而非代理粗糙（原冻结判据用的是 cheap surrogate 的一致性 0.175，会把两件事混为一谈，已两种并列报告）。
+- **Gate II = FAIL（六条全否）**：主集 **19** 个可评状态侧（尝试 53）**6 胜/9 平/4 负**、win rate **0.316**、中位 **+0.000**、CI [+0.000,+0.111]；逐场景 S-01 0.000 / S-03 **+0.222** / EM-01 **−4.194**；**打不过 sequential 精确坐标上升**（CI [−0.722,0.000]）；打不过等预算随机（−0.083）。**最有信息量的比较是「逐舰依次 + 精确接受」就已吃掉全部可得的协调收益**，显式建模 φ_ij 并据此搜索在该预算下不增值。
+- **判定**：`INTERACTION_STRUCTURE = PRESENT`、`JTC_INTERACTION_GATE = FAIL`、`JTC_FINAL_STATUS = PERMANENTLY_KILL`、`BARD_FINAL_STATUS = ARCHIVED`、`IBS_NEXT_ROLE = APPLICATION_BENCHMARK_ONLY`。
+- **kill 是有信息量的，不是预设的**：修完 bug 后首个状态 sanity check 显示 beam−greedy = **+0.972**（且出现 3.25/2.61 的交互项），S-03 中位 **+0.222** —— 符号直到整面板跑完前都是开放的；FAIL 来自平局（9/19）、EM-01 的大额亏损与打不过 sequential。
+- **自身缺陷全部记录**：M24-F1 主集用了 census 全部唯一状态侧（53，超集）而非冻结 35 组合；**M24-F2 精确评估失败被 `RuntimeError` 吞掉、状态静默丢弃（53→19、~30→11）**——正是红线 R3 的形态，已在每个面板标出真实 n 并写明未来修法；M24-F3 主集意图标签退化为全 I1，故条件概率只报了可算的两项；**M24-F4 交互臂两处真 bug**（φ 的 u_j 基点错、模型只匹配首个探针）— 在 Gate I 通过后重读代码发现，修复后 Gate II 从零重跑。
+- **包** `research/m2_4/M2_4_JTC_INTERACTION_LAST_GATE.zip` sha256 `5781e81a…`（35 文件，含 00–09 全部文档、预注册、registry/claims/failures/manifest、metrics/figures/cases/code_patch/logs）。0 碰撞事件、全部 gunnery 批次 `validate_orders` 通过；0 付费 LLM；生产引擎零改动；**未进入 RL/GNN/Transformer/论文写作**。按指令停止。

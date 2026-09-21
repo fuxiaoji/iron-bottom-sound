@@ -1,0 +1,5 @@
+exp_id,stage,subject,states,metric,arms,exact_evals,verdict,artifact
+M24-GATE1,JTC,interaction existence,10 pre-registered pilots,phi_ij = U_ij-U_i-U_j+U_0,per-ship additive-best pairs,~450,INTERACTION_STRUCTURE = PRESENT,metrics/m24_gate1_interaction.json
+M24-GATE2-MAIN,JTC,equal-budget coordination,19 evaluable main state-sides (53 attempted),U_exact,5 methods (24-eval budget each),~840,JTC_INTERACTION_GATE = FAIL,metrics/m24_gate2_coordination.json
+M24-GATE2-SUP,JTC,equal-budget coordination,11 evaluable supplemental state-sides (~30 scanned),U_exact,5 methods,~480,secondary panel,metrics/m24_gate2_coordination.json
+M24-FINAL,M2.4,frozen mapping,all,-,-,-,JTC_FINAL_STATUS = PERMANENTLY_KILL,metrics/m24_final.json

@@ -1,0 +1,24 @@
+  pilot IBS-S-01 s1 t2 axis I1_BROADSIDE: pairs=10 median|phi|=0.41666666666666696 agree(surrogate)=0.2756521739130435 agree(exact-additive)=0.03304347826086956
+  pilot IBS-S-01 s1 t2 axis I2_RANGE: pairs=10 median|phi|=0.41666666666666696 agree(surrogate)=0.2756521739130435 agree(exact-additive)=0.03304347826086956
+  pilot IBS-S-01 s1 t2 axis I3_RAKING: pairs=10 median|phi|=0.41666666666666696 agree(surrogate)=0.2756521739130435 agree(exact-additive)=0.03304347826086956
+  pilot IBS-S-01 s1 t3 axis I1_BROADSIDE: pairs=10 median|phi|=0.0 agree(surrogate)=0.011304347826086957 agree(exact-additive)=0.036521739130434785
+  pilot IBS-S-01 s1 t3 axis I2_RANGE: pairs=10 median|phi|=0.0 agree(surrogate)=0.011304347826086957 agree(exact-additive)=0.036521739130434785
+  pilot IBS-S-01 s1 t3 axis I3_RAKING: pairs=10 median|phi|=0.0 agree(surrogate)=0.011304347826086957 agree(exact-additive)=0.036521739130434785
+  pilot IBS-S-01 s1 t4 allies I1_BROADSIDE: pairs=28 median|phi|=0.0 agree(surrogate)=0.17482517482517482 agree(exact-additive)=0.4195804195804196
+  pilot IBS-S-01 s1 t4 allies I2_RANGE: pairs=28 median|phi|=0.0 agree(surrogate)=0.17482517482517482 agree(exact-additive)=0.4195804195804196
+  pilot IBS-S-01 s1 t4 allies I3_RAKING: pairs=28 median|phi|=0.0 agree(surrogate)=0.17482517482517482 agree(exact-additive)=0.4195804195804196
+  pilot IBS-S-01 s1 t4 axis I1_BROADSIDE: pairs=6 median|phi|=0.0694444444444442 agree(surrogate)=0.0808695652173913 agree(exact-additive)=0.16
+{
+ "n_pairs": 150,
+ "median_abs_phi": 0.0,
+ "p90_abs_phi": 0.5555555555555554,
+ "max_abs_phi": 4.1388888888889,
+ "practical_nonzero_fraction": 0.28,
+ "median_surrogate_vs_exact_agreement": 0.17482517482517482,
+ "median_exact_additive_model_vs_exact_agreement": 0.036521739130434785,
+ "frozen_rule_verdict": "PRESENT",
+ "interaction_specific_reading": "PRESENT",
+ "INTERACTION_STRUCTURE": "PRESENT",
+ "note": "the frozen gate keys on the cheap surrogate's agreement, which conflates guide quality with interaction; both readings are reported (see 03_INTERACTION_EXISTENCE.md)"
+}
+INTERACTION_STRUCTURE = PRESENT -> Gate II

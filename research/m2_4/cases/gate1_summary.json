@@ -1,0 +1,13 @@
+{
+ "n_pairs": 150,
+ "median_abs_phi": 0.0,
+ "p90_abs_phi": 0.5555555555555554,
+ "max_abs_phi": 4.1388888888889,
+ "practical_nonzero_fraction": 0.28,
+ "median_surrogate_vs_exact_agreement": 0.17482517482517482,
+ "median_exact_additive_model_vs_exact_agreement": 0.036521739130434785,
+ "frozen_rule_verdict": "PRESENT",
+ "interaction_specific_reading": "PRESENT",
+ "INTERACTION_STRUCTURE": "PRESENT",
+ "note": "the frozen gate keys on the cheap surrogate's agreement, which conflates guide quality with interaction; both readings are reported (see 03_INTERACTION_EXISTENCE.md)"
+}

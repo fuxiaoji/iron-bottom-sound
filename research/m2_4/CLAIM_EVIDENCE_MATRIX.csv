@@ -1,0 +1,16 @@
+claim,value,evidence,confidence
+HISTORICAL_GATES_PRESERVED,YES,01_M23_POSTMORTEM.md,recorded
+INTERACTION_STRUCTURE,PRESENT,metrics/m24_gate1_interaction.json,measured
+phi distribution,median 0.000 / p90 0.556 / max 4.139 / 28% >= 0.05,metrics/m24_gate1_interaction.json,measured
+exact additive model agreement,median 0.037 (poor predictor),metrics/m24_gate1_interaction.json,measured
+JTC_INTERACTION_GATE,FAIL (all six conditions false),metrics/m24_gate2_coordination.json,measured
+joint vs greedy,win/tie/loss 6/9/4; median +0.000; CI [+0.000,+0.111],metrics/m24_gate2_coordination.json,measured
+joint vs sequential BR,median +0.000; CI [-0.722,+0.000],metrics/m24_gate2_coordination.json,measured
+joint vs random,median -0.083,metrics/m24_gate2_coordination.json,measured
+per-scenario medians,S-01 0.000 / S-03 +0.222 / EM-01 -4.194,metrics/m24_gate2_coordination.json,measured
+JTC_FINAL_STATUS,PERMANENTLY_KILL,08_FINAL_JTC_DECISION.md,frozen rule
+BARD_FINAL_STATUS,ARCHIVED,09_BARD_ARCHIVE_NOTE.md,PI decision
+IBS_NEXT_ROLE,APPLICATION_BENCHMARK_ONLY,metrics/m24_final.json,frozen rule
+state loss,53 attempted -> 19 recorded; ~30 -> 11 (M24-F2),metrics/m24_gate2_coordination.json,disclosed defect
+intent conditional,P(delta>0 | I1) = 6/19; supplemental 5/11,metrics/m24_gate2_coordination.json,measured (labels degenerate, M24-F3)
+collisions,0 events across all evaluated states,metrics/m24_gate2_coordination.json,measured
