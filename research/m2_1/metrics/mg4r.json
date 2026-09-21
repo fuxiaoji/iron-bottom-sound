@@ -1,0 +1,132 @@
+{
+ "persistence_probe": [
+  {
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "track_id": "TT-2-IBS-U-USN-FARENHOLT-TT1-1",
+   "launcher": "IBS-U-USN-FARENHOLT",
+   "position": "N8",
+   "heading": 5,
+   "range_remaining": 2,
+   "distance_travelled": 8,
+   "speed_cycle": [
+    8,
+    8,
+    2
+   ],
+   "next_turn_allowance": 8,
+   "launched_turn": 2,
+   "now_turn": 3,
+   "survives": true,
+   "travelled": true,
+   "visible_to_victim": true
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 2,
+   "track_id": "TT-2-IBS-U-USN-FARENHOLT-TT1-1",
+   "launcher": "IBS-U-USN-FARENHOLT",
+   "position": "N8",
+   "heading": 5,
+   "range_remaining": 2,
+   "distance_travelled": 8,
+   "speed_cycle": [
+    8,
+    8,
+    2
+   ],
+   "next_turn_allowance": 8,
+   "launched_turn": 2,
+   "now_turn": 3,
+   "survives": true,
+   "travelled": true,
+   "visible_to_victim": true
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 3,
+   "track_id": "TT-2-IBS-U-USN-FARENHOLT-TT1-1",
+   "launcher": "IBS-U-USN-FARENHOLT",
+   "position": "T6",
+   "heading": 6,
+   "range_remaining": 3,
+   "distance_travelled": 7,
+   "speed_cycle": [
+    8,
+    8,
+    2
+   ],
+   "next_turn_allowance": 8,
+   "launched_turn": 2,
+   "now_turn": 3,
+   "survives": true,
+   "travelled": true,
+   "visible_to_victim": true
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 4,
+   "track_id": "TT-2-IBS-U-USN-FARENHOLT-TT1-1",
+   "launcher": "IBS-U-USN-FARENHOLT",
+   "position": "V4",
+   "heading": 6,
+   "range_remaining": 2,
+   "distance_travelled": 8,
+   "speed_cycle": [
+    8,
+    8,
+    2
+   ],
+   "next_turn_allowance": 8,
+   "launched_turn": 2,
+   "now_turn": 3,
+   "survives": true,
+   "travelled": true,
+   "visible_to_victim": true
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 5,
+   "track_id": "TT-2-IBS-U-USN-FARENHOLT-TT1-1",
+   "launcher": "IBS-U-USN-FARENHOLT",
+   "position": "N8",
+   "heading": 5,
+   "range_remaining": 2,
+   "distance_travelled": 8,
+   "speed_cycle": [
+    8,
+    8,
+    2
+   ],
+   "next_turn_allowance": 8,
+   "launched_turn": 2,
+   "now_turn": 3,
+   "survives": true,
+   "travelled": true,
+   "visible_to_victim": true
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 6,
+   "track_id": "TT-2-IBS-U-USN-FARENHOLT-TT1-1",
+   "launcher": "IBS-U-USN-FARENHOLT",
+   "position": "N10",
+   "heading": 5,
+   "range_remaining": 4,
+   "distance_travelled": 6,
+   "speed_cycle": [
+    8,
+    8,
+    2
+   ],
+   "next_turn_allowance": 8,
+   "launched_turn": 2,
+   "now_turn": 3,
+   "survives": true,
+   "travelled": true,
+   "visible_to_victim": true
+  }
+ ],
+ "corridor": null,
+ "verdict": "CASE_CONSTRUCTION_FAIL"
+}

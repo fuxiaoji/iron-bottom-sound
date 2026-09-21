@@ -1,0 +1,141 @@
+{
+ "MG2R": {
+  "scenario": "IBS-S-01",
+  "seed": 1,
+  "enemy_line_heading": 2,
+  "CROSS_T": {
+   "own_team_gf": 165.0,
+   "own_team_eh": 22.416666666666668,
+   "own_active_shooters": 9,
+   "own_longitudinal_fraction": 0.4444444444444444,
+   "enemy_team_gf": 61.0,
+   "enemy_team_eh": 9.972222222222223,
+   "net_eh": 12.444444444444445,
+   "own_batch_valid": true,
+   "own_batch_errors": [],
+   "selected_targets": {
+    "IBS-U-USN-FARENHOLT": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-LAFFEY": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-SAN-FRANCISCO": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-BOISE": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-SALT-LAKE-CITY": "IBS-U-IJN-FURUTAKA",
+    "IBS-U-USN-HELENA": "IBS-U-IJN-FURUTAKA",
+    "IBS-U-USN-BUCHANAN": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-MCCALLA": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-DUNCAN": "IBS-U-IJN-AOBA"
+   },
+   "aspects": {
+    "IBS-U-USN-FARENHOLT": "bow_stern",
+    "IBS-U-USN-LAFFEY": "broadside",
+    "IBS-U-USN-SAN-FRANCISCO": "broadside",
+    "IBS-U-USN-BOISE": "broadside",
+    "IBS-U-USN-SALT-LAKE-CITY": "bow_stern",
+    "IBS-U-USN-HELENA": "bow_stern",
+    "IBS-U-USN-BUCHANAN": "broadside",
+    "IBS-U-USN-MCCALLA": "broadside",
+    "IBS-U-USN-DUNCAN": "bow_stern"
+   }
+  },
+  "PARALLEL": {
+   "own_team_gf": 165.0,
+   "own_team_eh": 16.166666666666668,
+   "own_active_shooters": 9,
+   "own_longitudinal_fraction": 0.8888888888888888,
+   "enemy_team_gf": 61.0,
+   "enemy_team_eh": 8.194444444444445,
+   "net_eh": 7.972222222222223,
+   "own_batch_valid": true,
+   "own_batch_errors": [],
+   "selected_targets": {
+    "IBS-U-USN-FARENHOLT": "IBS-U-IJN-FURUTAKA",
+    "IBS-U-USN-LAFFEY": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-SAN-FRANCISCO": "IBS-U-IJN-FURUTAKA",
+    "IBS-U-USN-BOISE": "IBS-U-IJN-FURUTAKA",
+    "IBS-U-USN-SALT-LAKE-CITY": "IBS-U-IJN-AOBA",
+    "IBS-U-USN-HELENA": "IBS-U-IJN-AOBA",
+    "IBS-U-USN-BUCHANAN": "IBS-U-IJN-AOBA",
+    "IBS-U-USN-MCCALLA": "IBS-U-IJN-AOBA",
+    "IBS-U-USN-DUNCAN": "IBS-U-IJN-AOBA"
+   },
+   "aspects": {
+    "IBS-U-USN-FARENHOLT": "bow_stern",
+    "IBS-U-USN-LAFFEY": "broadside",
+    "IBS-U-USN-SAN-FRANCISCO": "bow_stern",
+    "IBS-U-USN-BOISE": "bow_stern",
+    "IBS-U-USN-SALT-LAKE-CITY": "bow_stern",
+    "IBS-U-USN-HELENA": "bow_stern",
+    "IBS-U-USN-BUCHANAN": "bow_stern",
+    "IBS-U-USN-MCCALLA": "bow_stern",
+    "IBS-U-USN-DUNCAN": "bow_stern"
+   }
+  },
+  "gate": {
+   "own_gf_gt_enemy": true,
+   "net_eh_positive": true,
+   "longitudinal_frac_ge_50pct": false,
+   "ratio_1_25x": true,
+   "dual_win": true,
+   "batch_valid": true,
+   "verdict": "FAIL"
+  }
+ },
+ "MG5R": {
+  "scenario": "IBS-S-01",
+  "seed": 1,
+  "isolated_enemy": "IBS-U-IJN-FUBUKI",
+  "CONCENTRATE": {
+   "own_active_shooters": 9,
+   "own_team_eh": 20.833333333333332,
+   "enemy_team_eh": 7.638888888888889,
+   "net_legal_eh": 13.194444444444443,
+   "own_batch_valid": true,
+   "target_distribution": {
+    "IBS-U-IJN-FUBUKI": 4,
+    "IBS-U-IJN-AOBA": 4,
+    "IBS-U-IJN-HATSUYUKI": 1
+   },
+   "enemy_active_shooters": 4,
+   "fire_graph": {
+    "IBS-U-USN-FARENHOLT": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-LAFFEY": "IBS-U-IJN-AOBA",
+    "IBS-U-USN-SAN-FRANCISCO": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-BOISE": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-SALT-LAKE-CITY": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-HELENA": "IBS-U-IJN-AOBA",
+    "IBS-U-USN-BUCHANAN": "IBS-U-IJN-AOBA",
+    "IBS-U-USN-MCCALLA": "IBS-U-IJN-AOBA",
+    "IBS-U-USN-DUNCAN": "IBS-U-IJN-HATSUYUKI"
+   }
+  },
+  "DISPERSE": {
+   "own_active_shooters": 9,
+   "own_team_eh": 24.499999999999996,
+   "enemy_team_eh": 5.277777777777778,
+   "net_legal_eh": 19.222222222222218,
+   "own_batch_valid": true,
+   "target_distribution": {
+    "IBS-U-IJN-FUBUKI": 4,
+    "IBS-U-IJN-AOBA": 3,
+    "IBS-U-IJN-KINUGASA": 2
+   },
+   "enemy_active_shooters": 4,
+   "fire_graph": {
+    "IBS-U-USN-FARENHOLT": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-LAFFEY": "IBS-U-IJN-AOBA",
+    "IBS-U-USN-SAN-FRANCISCO": "IBS-U-IJN-KINUGASA",
+    "IBS-U-USN-BOISE": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-SALT-LAKE-CITY": "IBS-U-IJN-KINUGASA",
+    "IBS-U-USN-HELENA": "IBS-U-IJN-AOBA",
+    "IBS-U-USN-BUCHANAN": "IBS-U-IJN-AOBA",
+    "IBS-U-USN-MCCALLA": "IBS-U-IJN-FUBUKI",
+    "IBS-U-USN-DUNCAN": "IBS-U-IJN-FUBUKI"
+   }
+  },
+  "gate": {
+   "margin_ratio": 0.6864161849710984,
+   "ratio_ge_125": false,
+   "more_active": false,
+   "verdict": "FAIL"
+  }
+ }
+}

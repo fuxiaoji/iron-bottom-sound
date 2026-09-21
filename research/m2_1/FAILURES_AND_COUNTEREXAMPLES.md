@@ -144,3 +144,51 @@ outcomes through d66_adjust.
 `eh_diff / (min(a, b, 1e-9) + 1e-9)` produced 8e8. The raw numbers (2.56 vs
 0.94, a 2.72x ratio) are the honest report; formula recorded as a bug, gate
 unaffected.
+
+---
+
+# M2.1-R2.1 repair failures (F21-F23)
+
+## F21_GUN_MOUNT_MULTI_TARGET_DOUBLE_COUNT  (PI-identified)
+`measure_side()` iterated (ship -> target -> mount) and added a mount's
+firepower and expected hits once per *visible target* it could bear on. One
+mount covering three targets counted three times. Consequence: MG2's usable
+GF and both sides' expected hits in M2.1-R2 were not legal gunnery
+allocations; MG2's 1.68x ratio and MG5's 56.6-vs-82.7 margin are void.
+
+Repair: `scripts/mg/legal_fire2.py` — each mount allocated at most once, one
+target per ship, greedy best-response iteration for the coupled
+concentration/splitting choice, engine-exact `_gunnery_modifiers`, and the
+resulting batch submitted through `validate_orders(_prepared=True)`.
+
+Two further fidelity defects found while repairing:
+- **modifier grouping**: the engine passes
+  `attackers = len(attacking_ships[target])` and
+  `target_count = len(targets_per_attacker[attacker])`; the first repair pass
+  assumed both were 1.
+- **per-kind hit tables**: the engine groups attacks by
+  `(attacker, target, mount.kind)`, so primary and secondary batteries are
+  separate lookups; the first repair pass summed all bearing mounts into one
+  firepower total.
+- **visibility**: `_mount_can_bear` passing does not imply the validator
+  accepts the order — `_can_see` is required too (one arm produced an invalid
+  batch until this was added).
+
+## F22_SPACETIME_SEGMENT_OFF_BY_ONE
+`t1_segment()` returned `path[allowance : allowance + cycle[1]]`, but
+`path[allowance]` is the hex the track already occupies when the turn begins;
+the turn's first landing is `path[allowance + 1]`. Verified against a real
+launched track (search predicted `[T8,T7,T6,T5,T4,T3]`, the engine track
+moved `[T7,T6,T5,T4,T3,T2]`). After the fix the geometric preselection and the
+engine's own contact verdict agree on 29/29 routes.
+
+## F23_TORPEDO_AIMING_CONFINED_TO_INTERCEPT_COMBOS
+`eng.torpedo_tactical_combos` returned only 2 identical intercept-aimed
+configurations for the S-01 shooter, so no corridor could be built from that
+API. The legal configuration space (launcher x launch MF x side x angle x
+setting, 288 configurations) had to be enumerated directly, with each
+candidate projected through the engine's own `_project_torpedo_path` and only
+the final choice submitted as a real validated `TorpedoOrder`. This is the
+first concrete instance of the *compiler* limitation the M2.2 line is meant to
+study: the platform's own candidate generator does not expose the aiming
+freedom the rules permit.

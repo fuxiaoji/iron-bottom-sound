@@ -1,0 +1,286 @@
+{
+ "search": [
+  {
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "n_configs": 288,
+   "n_routes": 29,
+   "best_intersect": 28,
+   "best_setting": 2,
+   "best_range": 25
+  }
+ ],
+ "corridor": {
+  "scenario": "IBS-S-01",
+  "seed": 1,
+  "victim": "IBS-U-IJN-AOBA",
+  "track": "TT-2-IBS-U-USN-FARENHOLT-TT1-1",
+  "n_routes": 29,
+  "contact_routes": 28,
+  "safe_routes": 1,
+  "contact_fraction": 0.9655172413793104,
+  "cross_validation": {
+   "checked": 29,
+   "agree": 29
+  },
+  "t1_predicted": [
+   [
+    1,
+    "T8"
+   ],
+   [
+    2,
+    "T7"
+   ],
+   [
+    3,
+    "T6"
+   ],
+   [
+    4,
+    "T5"
+   ]
+  ],
+  "rows": [
+   {
+    "plan": "1S1S2P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1SS1S1P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1SS2P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1S1S1P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1S1S1P1P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1PP1P1P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "0",
+    "geo_unsafe": false,
+    "first_contact_mf": null,
+    "engine_contact": false,
+    "engine_ran": true
+   },
+   {
+    "plan": "1SS1P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1S2P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1S3P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1PP2S",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1PP1S",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1S1P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1S1P1P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1S2P1P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1P1P2S",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1P1P1S",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1P1",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "2P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "2S1P1P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1P2P1S",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1P2",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "2P1",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "3P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "4P",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "1P3",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "2P2",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   },
+   {
+    "plan": "3P1",
+    "geo_unsafe": true,
+    "first_contact_mf": 1,
+    "engine_contact": true,
+    "engine_ran": true
+   }
+  ],
+  "gate": {
+   "contact_fraction_ge_025": true,
+   "engine_agreement_full": true,
+   "verdict": "PASS"
+  }
+ },
+ "launch": {
+  "scenario": "IBS-S-01",
+  "seed": 1,
+  "valid": true,
+  "track": "TT-2-IBS-U-USN-FARENHOLT-TT1-1",
+  "position": "T9",
+  "heading": 6,
+  "range_remaining": 21,
+  "distance_travelled": 4,
+  "set_len": 13,
+  "t1_predicted": [
+   [
+    1,
+    "T8"
+   ],
+   [
+    2,
+    "T7"
+   ],
+   [
+    3,
+    "T6"
+   ],
+   [
+    4,
+    "T5"
+   ]
+  ],
+  "victim": "IBS-U-IJN-AOBA"
+ },
+ "verdict": "PASS"
+}

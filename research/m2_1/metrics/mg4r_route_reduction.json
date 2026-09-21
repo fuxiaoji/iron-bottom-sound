@@ -1,0 +1,21 @@
+{
+ "torpedo_arm": {
+  "routes": 29,
+  "contact": 28,
+  "safe": 1
+ },
+ "no_torpedo_arm": {
+  "routes": 29,
+  "safe": 29
+ },
+ "route_reduction": 0.9655172413793104,
+ "br_route_torpedo_arm_only_safe": [
+  "0"
+ ],
+ "br_identity_changes": true,
+ "gate": {
+  "reduction_ge_025": true,
+  "br_changes_or_at_risk": true,
+  "verdict": "PASS"
+ }
+}
