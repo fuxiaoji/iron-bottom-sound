@@ -1,0 +1,558 @@
+{
+ "MG1": {
+  "mech": "MG1_BROADSIDE",
+  "scenario": "IBS-S-01",
+  "seed": 5,
+  "side": "axis",
+  "focal": "IBS-U-IJN-AOBA",
+  "target": "IBS-U-USN-FARENHOLT",
+  "gold_plan": "1P",
+  "ref_plan": "1S1P",
+  "verification": {
+   "recorded_vs_reproduced": {
+    "post_rel_broad": [
+     1,
+     1
+    ],
+    "post_rel_narrow": [
+     5,
+     5
+    ],
+    "distance_broad": [
+     4,
+     4
+    ],
+    "distance_narrow": [
+     3,
+     3
+    ],
+    "mounts_broad": [
+     3,
+     3
+    ],
+    "mounts_narrow": [
+     1,
+     1
+    ],
+    "eh_pct": [
+     92.9,
+     92.9
+    ]
+   },
+   "reproduced": true,
+   "geometry": {
+    "BROADSIDE": {
+     "post_rel": 1,
+     "distance": 4,
+     "mounts_bearing": 3,
+     "main_gf_bearing": 5.0,
+     "eh_at_dref": 2.999999999999995
+    },
+    "NARROW": {
+     "post_rel": 5,
+     "distance": 3,
+     "mounts_bearing": 1,
+     "main_gf_bearing": 5.0,
+     "eh_at_dref": 1.5555555555555556
+    }
+   }
+  },
+  "primary_metric": "fleet EH margin (NetEH, LEGAL_FIRE_HEURISTIC)",
+  "primary": {
+   "mechanism_value": {
+    "MANUAL_GOLD": -12.166666666666668,
+    "REGISTERED_COUNTER_ARM": -12.36111111111111,
+    "RANDOM_LEGAL_MEAN": -6.322916666666668,
+    "RANDOM_LEGAL_MAX": -3.583333333333332,
+    "CURRENT_POLICY": -5.472222222222223,
+    "CURRENT_INTENT_COMPILER": -14.36111111111111,
+    "CURRENT_INTENT_ON_LEVER_SHIP": -12.36111111111111,
+    "BEAM_SEARCH_COMPILER": 5.472222222222223
+   },
+   "gold_gap": -5.84375,
+   "status": "GOLD_GAP_NONPOSITIVE",
+   "fidelity": {
+    "CURRENT_POLICY": null,
+    "CURRENT_INTENT_COMPILER": null,
+    "CURRENT_INTENT_ON_LEVER_SHIP": null,
+    "BEAM_SEARCH_COMPILER": null
+   }
+  },
+  "supplementary_metric": "pair M_broad (focal vs its recorded target, lambda=1) \u2014 SUPPLEMENTARY, same frozen formula restricted to the case pair",
+  "supplementary": {
+   "mechanism_value": {
+    "MANUAL_GOLD": 1.888888888888889,
+    "REGISTERED_COUNTER_ARM": 0.3055555555555556,
+    "RANDOM_LEGAL_MEAN": 1.4409722222222223,
+    "RANDOM_LEGAL_MAX": 2.166666666666667,
+    "CURRENT_POLICY": 1.3611111111111112,
+    "CURRENT_INTENT_COMPILER": 0.3055555555555556,
+    "CURRENT_INTENT_ON_LEVER_SHIP": 0.3055555555555556,
+    "BEAM_SEARCH_COMPILER": 1.8333333333333335
+   },
+   "gold_gap": 0.44791666666666674,
+   "status": "COMPUTABLE",
+   "fidelity": {
+    "CURRENT_POLICY": -0.17829457364341092,
+    "CURRENT_INTENT_COMPILER": -2.534883720930232,
+    "CURRENT_INTENT_ON_LEVER_SHIP": -2.534883720930232,
+    "BEAM_SEARCH_COMPILER": 0.875968992248062
+   }
+  },
+  "mechanism_value": {
+   "MANUAL_GOLD": -12.166666666666668,
+   "REGISTERED_COUNTER_ARM": -12.36111111111111,
+   "RANDOM_LEGAL_MEAN": -6.322916666666668,
+   "RANDOM_LEGAL_MAX": -3.583333333333332,
+   "CURRENT_POLICY": -5.472222222222223,
+   "CURRENT_INTENT_COMPILER": -14.36111111111111,
+   "CURRENT_INTENT_ON_LEVER_SHIP": -12.36111111111111,
+   "BEAM_SEARCH_COMPILER": 5.472222222222223
+  },
+  "fidelity": {
+   "CURRENT_POLICY": null,
+   "CURRENT_INTENT_COMPILER": null,
+   "CURRENT_INTENT_ON_LEVER_SHIP": null,
+   "BEAM_SEARCH_COMPILER": null
+  },
+  "gold_gap": -5.84375,
+  "gold_too_small": true,
+  "random_draws": [
+   {
+    "plan": "1PP1S",
+    "net_eh": -7.2500000000000036,
+    "pair_net": 2.166666666666667
+   },
+   {
+    "plan": "1P1",
+    "net_eh": -8.416666666666671,
+    "pair_net": 2.166666666666667
+   },
+   {
+    "plan": "1PP1P1P",
+    "net_eh": -5.472222222222223,
+    "pair_net": 1.3611111111111112
+   },
+   {
+    "plan": "1P1P2S",
+    "net_eh": -5.666666666666666,
+    "pair_net": 0.8888888888888887
+   },
+   {
+    "plan": "1P1",
+    "net_eh": -8.416666666666671,
+    "pair_net": 2.166666666666667
+   },
+   {
+    "plan": "3P1",
+    "net_eh": -5.611111111111111,
+    "pair_net": 1.1388888888888888
+   },
+   {
+    "plan": "1P3P1S",
+    "net_eh": -3.583333333333332,
+    "pair_net": 1.0555555555555558
+   },
+   {
+    "plan": "1S1S3P",
+    "net_eh": -6.166666666666666,
+    "pair_net": 0.5833333333333334
+   }
+  ],
+  "beam_meta": {
+   "n_joints_played": 64,
+   "pool_sizes": {
+    "IBS-U-IJN-AOBA": 7,
+    "IBS-U-IJN-FURUTAKA": 8,
+    "IBS-U-IJN-KINUGASA": 8,
+    "IBS-U-IJN-FUBUKI": 8,
+    "IBS-U-IJN-HATSUYUKI": 7
+   }
+  },
+  "beam_assign": {
+   "IBS-U-IJN-AOBA": "1SS1S1S1S",
+   "IBS-U-IJN-FURUTAKA": "1SS1S1P1P",
+   "IBS-U-IJN-KINUGASA": "1SS3P",
+   "IBS-U-IJN-FUBUKI": "4S1P1P",
+   "IBS-U-IJN-HATSUYUKI": "1PP1P1P"
+  },
+  "unit": "EH margin (NetEH, LEGAL_FIRE_HEURISTIC)",
+  "verdict": "GOLD_GAP_NONPOSITIVE"
+ },
+ "MG3": {
+  "mech": "MG3_RANGE_CONTROL",
+  "scenario": "IBS-S-EM-01",
+  "seed": 1,
+  "side": "allies",
+  "bb": "IBS-U-USN-ERMA-IOWA",
+  "near": "IBS-U-IJN-ERMA-SHIMAKAZE",
+  "gold_plan": "3P",
+  "ref_plan": "1P1P1P",
+  "policy_plan": "1P2P2P",
+  "verification": {
+   "arms": {
+    "CLOSE": {
+     "distance": 15,
+     "bb_primary_gf": 114.0,
+     "expected_hits": 2.5555555555555554
+    },
+    "OPEN": {
+     "distance": 17,
+     "bb_primary_gf": 38.0,
+     "expected_hits": 0.9444444444444444
+    }
+   }
+  },
+  "arms": {
+   "CLOSE_ARM": {
+    "net_eh": 0.0,
+    "own_eh": 0.8333333333333334,
+    "enemy_eh": 0.8333333333333334,
+    "pair_net": 0.0
+   },
+   "OPEN_ARM": {
+    "net_eh": 0.0,
+    "own_eh": 0.8333333333333334,
+    "enemy_eh": 0.8333333333333334,
+    "pair_net": 0.0
+   }
+  },
+  "primary_metric": "fleet EH margin (NetEH, LEGAL_FIRE_HEURISTIC)",
+  "primary": {
+   "mechanism_value": {
+    "MANUAL_GOLD": 0.0,
+    "GOLD_ARM": "CLOSE",
+    "COUNTER_ARM": "OPEN",
+    "COUNTER_ARM_VALUE": 0.0,
+    "RANDOM_LEGAL_MEAN": 0.0,
+    "RANDOM_LEGAL_MAX": 0.0,
+    "CURRENT_POLICY": 0.0,
+    "CURRENT_INTENT_COMPILER": 0.0,
+    "CURRENT_INTENT_ON_LEVER_SHIP": 0.0,
+    "BEAM_SEARCH_COMPILER": 0.6388888888888888
+   },
+   "gold_gap": 0.0,
+   "status": "GOLD_GAP_NONPOSITIVE",
+   "fidelity": {
+    "CURRENT_POLICY": null,
+    "CURRENT_INTENT_COMPILER": null,
+    "CURRENT_INTENT_ON_LEVER_SHIP": null,
+    "BEAM_SEARCH_COMPILER": null
+   }
+  },
+  "supplementary_metric": "pair M_broad (BB vs nearest enemy, lambda=1) \u2014 SUPPLEMENTARY",
+  "supplementary": {
+   "mechanism_value": {
+    "MANUAL_GOLD": 0.0,
+    "GOLD_ARM": "CLOSE",
+    "COUNTER_ARM": "OPEN",
+    "COUNTER_ARM_VALUE": 0.0,
+    "RANDOM_LEGAL_MEAN": 0.0,
+    "RANDOM_LEGAL_MAX": 0.0,
+    "CURRENT_POLICY": 0.0,
+    "CURRENT_INTENT_COMPILER": 0.0,
+    "CURRENT_INTENT_ON_LEVER_SHIP": 0.0,
+    "BEAM_SEARCH_COMPILER": 0.0
+   },
+   "gold_gap": 0.0,
+   "status": "GOLD_GAP_NONPOSITIVE",
+   "fidelity": {
+    "CURRENT_POLICY": null,
+    "CURRENT_INTENT_COMPILER": null,
+    "CURRENT_INTENT_ON_LEVER_SHIP": null,
+    "BEAM_SEARCH_COMPILER": null
+   }
+  },
+  "registered_metric_arms": {
+   "CLOSE": 2.5555555555555554,
+   "OPEN": 0.9444444444444444
+  },
+  "intent_both_directions": {
+   "CLOSE": -0.3611111111111111,
+   "OPEN": 0.0
+  },
+  "intent_on_lever_ship_only": {
+   "CLOSE": 0.0,
+   "OPEN": 0.0
+  },
+  "beam_meta": {
+   "n_joints_played": 64,
+   "pool_sizes": {
+    "IBS-U-USN-ERMA-IOWA": 8,
+    "IBS-U-USN-ERMA-NEW-JERSEY": 8,
+    "IBS-U-USN-ERMA-MISSOURI": 8,
+    "IBS-U-USN-ERMA-WISCONSIN": 8,
+    "IBS-U-USN-ERMA-ALASKA": 8,
+    "IBS-U-USN-ERMA-GUAM": 8,
+    "IBS-U-USN-ERMA-DES-MOINES": 8,
+    "IBS-U-USN-ERMA-SALEM": 8,
+    "IBS-U-USN-ERMA-WORCESTER": 8,
+    "IBS-U-USN-ERMA-ALLEN-M-SUMNER": 8,
+    "IBS-U-USN-ERMA-INGRAHAM": 8,
+    "IBS-U-USN-ERMA-COOPER": 8
+   }
+  },
+  "beam_assign": {
+   "IBS-U-USN-ERMA-IOWA": "1S2S2",
+   "IBS-U-USN-ERMA-NEW-JERSEY": "1S3S1",
+   "IBS-U-USN-ERMA-MISSOURI": "1SS1",
+   "IBS-U-USN-ERMA-WISCONSIN": "1PP1P1P",
+   "IBS-U-USN-ERMA-ALASKA": "1P",
+   "IBS-U-USN-ERMA-GUAM": "1P",
+   "IBS-U-USN-ERMA-DES-MOINES": "5P",
+   "IBS-U-USN-ERMA-SALEM": "5P",
+   "IBS-U-USN-ERMA-WORCESTER": "5P",
+   "IBS-U-USN-ERMA-ALLEN-M-SUMNER": "5S1S",
+   "IBS-U-USN-ERMA-INGRAHAM": "1P",
+   "IBS-U-USN-ERMA-COOPER": "6P"
+  },
+  "mechanism_value": {
+   "MANUAL_GOLD": 0.0,
+   "GOLD_ARM": "CLOSE",
+   "COUNTER_ARM": "OPEN",
+   "COUNTER_ARM_VALUE": 0.0,
+   "RANDOM_LEGAL_MEAN": 0.0,
+   "RANDOM_LEGAL_MAX": 0.0,
+   "CURRENT_POLICY": 0.0,
+   "CURRENT_INTENT_COMPILER": 0.0,
+   "CURRENT_INTENT_ON_LEVER_SHIP": 0.0,
+   "BEAM_SEARCH_COMPILER": 0.6388888888888888
+  },
+  "fidelity": {
+   "CURRENT_POLICY": null,
+   "CURRENT_INTENT_COMPILER": null,
+   "CURRENT_INTENT_ON_LEVER_SHIP": null,
+   "BEAM_SEARCH_COMPILER": null
+  },
+  "gold_gap": 0.0,
+  "gold_too_small": true,
+  "unit": "EH margin (NetEH, LEGAL_FIRE_HEURISTIC)",
+  "verdict": "GOLD_GAP_NONPOSITIVE"
+ },
+ "MG4": {
+  "mech": "MG4_TORPEDO_CORRIDOR",
+  "scenario": "IBS-S-01",
+  "seed": 1,
+  "victim": "IBS-U-IJN-AOBA",
+  "shooter": "IBS-U-USN-FARENHOLT",
+  "n_routes": 29,
+  "n_configs": 288,
+  "gold_config": {
+   "launcher_id": "TT1",
+   "launch_at_mf": "1",
+   "launch_hex": "q=20 r=2",
+   "bearing": "4",
+   "torp_heading": "6",
+   "launch_side": "starboard",
+   "launch_angle": "X",
+   "setting_index": "2",
+   "salvo": "2",
+   "cycle": "[5, 4, 4]",
+   "range": "25",
+   "distance": "12",
+   "rr": "0.9655172413793104",
+   "safe": "1",
+   "_ov": "1"
+  },
+  "gold_t1_segment": [
+   [
+    1,
+    "T8"
+   ],
+   [
+    2,
+    "T7"
+   ],
+   [
+    3,
+    "T6"
+   ],
+   [
+    4,
+    "T5"
+   ]
+  ],
+  "engine_cross_validation": {
+   "checked": 12,
+   "agree": 12,
+   "predicted": [
+    [
+     1,
+     "T8"
+    ],
+    [
+     2,
+     "T7"
+    ],
+    [
+     3,
+     "T6"
+    ],
+    [
+     4,
+     "T5"
+    ]
+   ],
+   "valid": true
+  },
+  "current_policy_detail": {
+   "n_orders": 0,
+   "note": "no legal torpedo plan"
+  },
+  "intent_detail": {
+   "combos": 225,
+   "chosen": {
+    "launcher_id": "TT1",
+    "setting_index": 0,
+    "launch_angle": "A",
+    "launch_at_mf": 0,
+    "salvo_size": 1
+   }
+  },
+  "public_objectives": {
+   "LEAD_HOLD_COURSE": {
+    "objective_cells": 30,
+    "max_overlap": 1,
+    "n_configs_tied": 12,
+    "tie_set_rr_min": 0.0,
+    "tie_set_rr_max": 0.10344827586206895,
+    "tie_set_rr_median": 0.03448275862068961,
+    "tie_set_informative_ge_050": 0,
+    "chosen_rr": 0.10344827586206895,
+    "chosen": {
+     "setting_index": 0,
+     "launch_side": "starboard",
+     "launch_angle": "Y",
+     "launch_at_mf": 5
+    }
+   },
+   "LEAD_TURN_ALLOWED": {
+    "objective_cells": 90,
+    "max_overlap": 1,
+    "n_configs_tied": 68,
+    "tie_set_rr_min": 0.0,
+    "tie_set_rr_max": 0.9655172413793104,
+    "tie_set_rr_median": 0.0,
+    "tie_set_informative_ge_050": 4,
+    "chosen_rr": 0.10344827586206895,
+    "chosen": {
+     "setting_index": 0,
+     "launch_side": "starboard",
+     "launch_angle": "Y",
+     "launch_at_mf": 5
+    }
+   },
+   "CORRIDOR_BLOB": {
+    "objective_cells": 240,
+    "max_overlap": 5,
+    "n_configs_tied": 4,
+    "tie_set_rr_min": 0.0,
+    "tie_set_rr_max": 0.0,
+    "tie_set_rr_median": 0.0,
+    "tie_set_informative_ge_050": 0,
+    "chosen_rr": 0.0,
+    "chosen": {
+     "setting_index": 1,
+     "launch_side": "starboard",
+     "launch_angle": "Y",
+     "launch_at_mf": 1
+    }
+   }
+  },
+  "public_best_objective": "LEAD_HOLD_COURSE",
+  "random_draws": [
+   {
+    "setting": 0,
+    "angle": "Y",
+    "rr": 0.0
+   },
+   {
+    "setting": 2,
+    "angle": "X",
+    "rr": 0.0
+   },
+   {
+    "setting": 0,
+    "angle": "B",
+    "rr": 0.0
+   },
+   {
+    "setting": 1,
+    "angle": "Y",
+    "rr": 0.0
+   },
+   {
+    "setting": 2,
+    "angle": "Y",
+    "rr": 0.0
+   },
+   {
+    "setting": 1,
+    "angle": "A",
+    "rr": 0.0
+   },
+   {
+    "setting": 0,
+    "angle": "X",
+    "rr": 0.0
+   },
+   {
+    "setting": 1,
+    "angle": "X",
+    "rr": 0.0
+   }
+  ],
+  "unit": "route reduction RR = 1 - safe/total over the victim's legal routes",
+  "mechanism_value": {
+   "MANUAL_GOLD": 0.9655172413793104,
+   "RANDOM_LEGAL_MEAN": 0.0,
+   "RANDOM_LEGAL_MAX": 0.0,
+   "CURRENT_POLICY": 0.0,
+   "CURRENT_INTENT_COMPILER": 0.03448275862068961,
+   "PUBLIC_CORRIDOR_SEARCH": 0.10344827586206895,
+   "FULL_STATE_CORRIDOR_CEILING": 0.9655172413793104
+  },
+  "fidelity": {
+   "CURRENT_POLICY": 0.0,
+   "CURRENT_INTENT_COMPILER": 0.03571428571428567,
+   "PUBLIC_CORRIDOR_SEARCH": 0.10714285714285712,
+   "FULL_STATE_CORRIDOR_CEILING": 1.0
+  },
+  "gold_gap": 0.9655172413793104,
+  "gold_gap_ok": true,
+  "gold_too_small": false,
+  "primary": {
+   "mechanism_value": {
+    "MANUAL_GOLD": 0.9655172413793104,
+    "RANDOM_LEGAL_MEAN": 0.0,
+    "RANDOM_LEGAL_MAX": 0.0,
+    "CURRENT_POLICY": 0.0,
+    "CURRENT_INTENT_COMPILER": 0.03448275862068961,
+    "PUBLIC_CORRIDOR_SEARCH": 0.10344827586206895,
+    "FULL_STATE_CORRIDOR_CEILING": 0.9655172413793104
+   },
+   "gold_gap": 0.9655172413793104,
+   "fidelity": {
+    "CURRENT_POLICY": 0.0,
+    "CURRENT_INTENT_COMPILER": 0.03571428571428567,
+    "PUBLIC_CORRIDOR_SEARCH": 0.10714285714285712,
+    "FULL_STATE_CORRIDOR_CEILING": 1.0
+   },
+   "status": "COMPUTABLE"
+  },
+  "verdict": "NO_GAP",
+  "fidelity_note": "MANUAL_GOLD for MG4 equals the FULL_STATE argmax because the M2.1-R2.1 gold was itself constructed by that search; F(FULL_STATE)=1 is therefore trivial and the deployable number is F(PUBLIC_CORRIDOR_SEARCH)."
+ },
+ "GATE": {
+  "GOLD_COMPILER_GAP": "FAIL",
+  "cases_with_gap": 0,
+  "required": 2,
+  "per_mechanism": {
+   "MG1": "GOLD_GAP_NONPOSITIVE",
+   "MG3": "GOLD_GAP_NONPOSITIVE",
+   "MG4": "NO_GAP"
+  },
+  "threshold": ">=2 of 3: SEARCH fidelity >= 0.70 AND CURRENT_POLICY fidelity <= 0.40",
+  "wall_seconds": 127.3
+ }
+}

@@ -1,0 +1,1342 @@
+{
+ "arms": [
+  "HOLD",
+  "CURRENT_ADAPTIVE",
+  "INTERCEPT_ASSIST",
+  "PUBLIC_SET_COVER",
+  "PUBLIC_BELIEF_AWARE",
+  "FULL_STATE_CEILING"
+ ],
+ "materiality": {
+  "R_shared_ge": 0.25,
+  "requires_different_best": true
+ },
+ "states": [
+  {
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 2,
+   "side": "allies",
+   "shooter": "IBS-U-USN-FARENHOLT",
+   "victim": "IBS-U-IJN-AOBA",
+   "n_routes": 29,
+   "n_routes_coverable": 28,
+   "n_configs": 288,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.034482758620689655,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.9655172413793104
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.05,
+    "FULL_STATE_CEILING": 0.31896551724137934
+   },
+   "R_shared": 0.5,
+   "R_bayes_uniform": 0.038690476190476185,
+   "DIFFERENT_BEST": true,
+   "n_distinct_best_actions": 2,
+   "best_set_jaccard_first_last": 0.21428571428571427,
+   "material": true,
+   "risk_binary": {
+    "R_shared": 0.0,
+    "R_bayes": 0.0,
+    "n_coverable": 28,
+    "n_distinct_best": 1,
+    "jaccard": null,
+    "best_action_index": 46,
+    "V_min": 1.0,
+    "V_max": 1.0
+   },
+   "material_binary": false,
+   "risk_public_hypotheses": {
+    "R_shared": 0.2,
+    "n_coverable": 3,
+    "n_distinct_best": 3
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 0,
+    "segs_nonempty": 0
+   },
+   "intercept_meta": {
+    "combos": 225,
+    "chosen": {
+     "launcher_id": "TT1",
+     "setting_index": 0,
+     "launch_angle": "A",
+     "launch_at_mf": 0,
+     "salvo_size": 1
+    }
+   },
+   "public_choice": {
+    "setting": 2,
+    "side": "starboard",
+    "angle": "B"
+   },
+   "fullstate_choice": {
+    "setting": 2,
+    "side": "starboard",
+    "angle": "X"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 5,
+   "side": "allies",
+   "shooter": "IBS-U-USN-LAFFEY",
+   "victim": "IBS-U-IJN-HATSUYUKI",
+   "n_routes": 29,
+   "n_routes_coverable": 0,
+   "n_configs": 114,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.0,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "R_shared": null,
+   "R_bayes_uniform": null,
+   "DIFFERENT_BEST": false,
+   "n_distinct_best_actions": 0,
+   "best_set_jaccard_first_last": null,
+   "material": false,
+   "risk_binary": {
+    "R_shared": null,
+    "R_bayes": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0,
+    "jaccard": null,
+    "V_min": null,
+    "V_max": null
+   },
+   "material_binary": false,
+   "risk_public_hypotheses": {
+    "R_shared": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 0,
+    "segs_nonempty": 0
+   },
+   "intercept_meta": {
+    "combos": 123,
+    "chosen": {
+     "launcher_id": "TT2",
+     "setting_index": 0,
+     "launch_angle": "A",
+     "launch_at_mf": 0,
+     "salvo_size": 1
+    }
+   },
+   "public_choice": {
+    "setting": 0,
+    "side": "starboard",
+    "angle": "A"
+   },
+   "fullstate_choice": {
+    "setting": 0,
+    "side": "starboard",
+    "angle": "A"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 6,
+   "side": "allies",
+   "shooter": "IBS-U-USN-MCCALLA",
+   "victim": "IBS-U-IJN-HATSUYUKI",
+   "n_routes": 29,
+   "n_routes_coverable": 0,
+   "n_configs": 240,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.0,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0625,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "R_shared": null,
+   "R_bayes_uniform": null,
+   "DIFFERENT_BEST": false,
+   "n_distinct_best_actions": 0,
+   "best_set_jaccard_first_last": null,
+   "material": false,
+   "risk_binary": {
+    "R_shared": null,
+    "R_bayes": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0,
+    "jaccard": null,
+    "V_min": null,
+    "V_max": null
+   },
+   "material_binary": false,
+   "risk_public_hypotheses": {
+    "R_shared": 0.0,
+    "n_coverable": 1,
+    "n_distinct_best": 1
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 0,
+    "segs_nonempty": 0
+   },
+   "intercept_meta": {
+    "combos": 243,
+    "chosen": {
+     "launcher_id": "TT1",
+     "setting_index": 0,
+     "launch_angle": "A",
+     "launch_at_mf": 0,
+     "salvo_size": 1
+    }
+   },
+   "public_choice": {
+    "setting": 2,
+    "side": "port",
+    "angle": "X"
+   },
+   "fullstate_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-01",
+   "seed": 2,
+   "turn": 5,
+   "side": "allies",
+   "shooter": "IBS-U-USN-BUCHANAN",
+   "victim": "IBS-U-IJN-HATSUYUKI",
+   "n_routes": 40,
+   "n_routes_coverable": 38,
+   "n_configs": 288,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.0,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.3
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.07916666666666666
+   },
+   "R_shared": 0.6666666666666666,
+   "R_bayes_uniform": 0.21710526315789475,
+   "DIFFERENT_BEST": true,
+   "n_distinct_best_actions": 5,
+   "best_set_jaccard_first_last": 0.0,
+   "material": true,
+   "risk_binary": {
+    "R_shared": 1.0,
+    "R_bayes": 0.6842105263157895,
+    "n_coverable": 38,
+    "n_distinct_best": 4,
+    "jaccard": 0.0,
+    "best_action_index": 0,
+    "V_min": 1.0,
+    "V_max": 1.0
+   },
+   "material_binary": true,
+   "risk_public_hypotheses": {
+    "R_shared": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 4,
+    "segs_nonempty": 4
+   },
+   "intercept_meta": {
+    "combos": 228,
+    "chosen": {
+     "launcher_id": "TT1",
+     "setting_index": 1,
+     "launch_angle": "B",
+     "launch_at_mf": 4,
+     "salvo_size": 2
+    }
+   },
+   "public_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "fullstate_choice": {
+    "setting": 2,
+    "side": "starboard",
+    "angle": "A"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-03",
+   "seed": 1,
+   "turn": 2,
+   "side": "allies",
+   "shooter": "IBS-U-RN-JACKAL",
+   "victim": "IBS-U-KM-HANS-LODY",
+   "n_routes": 40,
+   "n_routes_coverable": 3,
+   "n_configs": 160,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.0,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.075
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.01625
+   },
+   "R_shared": 0.0,
+   "R_bayes_uniform": 0.0,
+   "DIFFERENT_BEST": false,
+   "n_distinct_best_actions": 1,
+   "best_set_jaccard_first_last": null,
+   "material": false,
+   "risk_binary": {
+    "R_shared": 0.0,
+    "R_bayes": 0.0,
+    "n_coverable": 3,
+    "n_distinct_best": 1,
+    "jaccard": null,
+    "best_action_index": 51,
+    "V_min": 1.0,
+    "V_max": 1.0
+   },
+   "material_binary": false,
+   "risk_public_hypotheses": {
+    "R_shared": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 2,
+    "segs_nonempty": 2
+   },
+   "intercept_meta": {
+    "combos": 320,
+    "chosen": {
+     "launcher_id": "TT1",
+     "setting_index": 0,
+     "launch_angle": "A",
+     "launch_at_mf": 0,
+     "salvo_size": 1
+    }
+   },
+   "public_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "fullstate_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "Y"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-03",
+   "seed": 1,
+   "turn": 3,
+   "side": "allies",
+   "shooter": "IBS-U-RN-KASHMIR",
+   "victim": "IBS-U-KM-RICHARD-BEITZEN",
+   "n_routes": 40,
+   "n_routes_coverable": 0,
+   "n_configs": 160,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.0,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "R_shared": null,
+   "R_bayes_uniform": null,
+   "DIFFERENT_BEST": false,
+   "n_distinct_best_actions": 0,
+   "best_set_jaccard_first_last": null,
+   "material": false,
+   "risk_binary": {
+    "R_shared": null,
+    "R_bayes": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0,
+    "jaccard": null,
+    "V_min": null,
+    "V_max": null
+   },
+   "material_binary": false,
+   "risk_public_hypotheses": {
+    "R_shared": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 0,
+    "segs_nonempty": 0
+   },
+   "intercept_meta": {
+    "combos": 64,
+    "chosen": {
+     "launcher_id": "TT1",
+     "setting_index": 0,
+     "launch_angle": "A",
+     "launch_at_mf": 0,
+     "salvo_size": 1
+    }
+   },
+   "public_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "fullstate_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-03",
+   "seed": 2,
+   "turn": 2,
+   "side": "allies",
+   "shooter": "IBS-U-RN-KASHMIR",
+   "victim": "IBS-U-KM-RICHARD-BEITZEN",
+   "n_routes": 40,
+   "n_routes_coverable": 1,
+   "n_configs": 192,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.0,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.025
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.041666666666666664,
+    "FULL_STATE_CEILING": 0.0125
+   },
+   "R_shared": 0.0,
+   "R_bayes_uniform": 0.0,
+   "DIFFERENT_BEST": false,
+   "n_distinct_best_actions": 1,
+   "best_set_jaccard_first_last": null,
+   "material": false,
+   "risk_binary": {
+    "R_shared": 0.0,
+    "R_bayes": 0.0,
+    "n_coverable": 1,
+    "n_distinct_best": 1,
+    "jaccard": null,
+    "best_action_index": 95,
+    "V_min": 1.0,
+    "V_max": 1.0
+   },
+   "material_binary": false,
+   "risk_public_hypotheses": {
+    "R_shared": 0.16666666666666666,
+    "n_coverable": 3,
+    "n_distinct_best": 3
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 2,
+    "segs_nonempty": 2
+   },
+   "intercept_meta": {
+    "combos": 224,
+    "chosen": {
+     "launcher_id": "TT1",
+     "setting_index": 0,
+     "launch_angle": "B",
+     "launch_at_mf": 0,
+     "salvo_size": 1
+    }
+   },
+   "public_choice": {
+    "setting": 1,
+    "side": "port",
+    "angle": "X"
+   },
+   "fullstate_choice": {
+    "setting": 1,
+    "side": "starboard",
+    "angle": "Y"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-03",
+   "seed": 3,
+   "turn": 2,
+   "side": "allies",
+   "shooter": "IBS-U-RN-KASHMIR",
+   "victim": "IBS-U-KM-HANS-LODY",
+   "n_routes": 40,
+   "n_routes_coverable": 0,
+   "n_configs": 224,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.0,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.20833333333333334,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "R_shared": null,
+   "R_bayes_uniform": null,
+   "DIFFERENT_BEST": false,
+   "n_distinct_best_actions": 0,
+   "best_set_jaccard_first_last": null,
+   "material": false,
+   "risk_binary": {
+    "R_shared": null,
+    "R_bayes": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0,
+    "jaccard": null,
+    "V_min": null,
+    "V_max": null
+   },
+   "material_binary": false,
+   "risk_public_hypotheses": {
+    "R_shared": 0.0,
+    "n_coverable": 1,
+    "n_distinct_best": 1
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 0,
+    "segs_nonempty": 0
+   },
+   "intercept_meta": {
+    "combos": 12,
+    "chosen": {
+     "launcher_id": "TT1",
+     "setting_index": 0,
+     "launch_angle": "X",
+     "launch_at_mf": 0,
+     "salvo_size": 1
+    }
+   },
+   "public_choice": {
+    "setting": 0,
+    "side": "starboard",
+    "angle": "Y"
+   },
+   "fullstate_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-03",
+   "seed": 4,
+   "turn": 2,
+   "side": "allies",
+   "shooter": "IBS-U-RN-JAVELIN",
+   "victim": "IBS-U-KM-RICHARD-BEITZEN",
+   "n_routes": 40,
+   "n_routes_coverable": 0,
+   "n_configs": 128,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.0,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "R_shared": null,
+   "R_bayes_uniform": null,
+   "DIFFERENT_BEST": false,
+   "n_distinct_best_actions": 0,
+   "best_set_jaccard_first_last": null,
+   "material": false,
+   "risk_binary": {
+    "R_shared": null,
+    "R_bayes": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0,
+    "jaccard": null,
+    "V_min": null,
+    "V_max": null
+   },
+   "material_binary": false,
+   "risk_public_hypotheses": {
+    "R_shared": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 2,
+    "segs_nonempty": 0
+   },
+   "intercept_meta": {
+    "combos": 280,
+    "chosen": {
+     "launcher_id": "TT1",
+     "setting_index": 0,
+     "launch_angle": "B",
+     "launch_at_mf": 0,
+     "salvo_size": 2
+    }
+   },
+   "public_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "fullstate_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 1,
+   "turn": 3,
+   "side": "allies",
+   "shooter": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+   "victim": "IBS-U-IJN-ERMA-SHIMAKAZE",
+   "n_routes": 40,
+   "n_routes_coverable": 39,
+   "n_configs": 288,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.025,
+    "PUBLIC_SET_COVER": 0.175,
+    "PUBLIC_BELIEF_AWARE": 0.175,
+    "FULL_STATE_CEILING": 0.975
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.041666666666666664,
+    "FULL_STATE_CEILING": 0.1775
+   },
+   "R_shared": 0.0,
+   "R_bayes_uniform": 0.0,
+   "DIFFERENT_BEST": false,
+   "n_distinct_best_actions": 1,
+   "best_set_jaccard_first_last": null,
+   "material": false,
+   "risk_binary": {
+    "R_shared": 0.0,
+    "R_bayes": 0.0,
+    "n_coverable": 39,
+    "n_distinct_best": 1,
+    "jaccard": null,
+    "best_action_index": 23,
+    "V_min": 1.0,
+    "V_max": 1.0
+   },
+   "material_binary": false,
+   "risk_public_hypotheses": {
+    "R_shared": 0.0,
+    "n_coverable": 1,
+    "n_distinct_best": 1
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 0,
+    "segs_nonempty": 0
+   },
+   "intercept_meta": {
+    "combos": 324,
+    "chosen": {
+     "launcher_id": "TT1",
+     "setting_index": 0,
+     "launch_angle": "Y",
+     "launch_at_mf": 0,
+     "salvo_size": 1
+    }
+   },
+   "public_choice": {
+    "setting": 2,
+    "side": "starboard",
+    "angle": "Y"
+   },
+   "fullstate_choice": {
+    "setting": 2,
+    "side": "starboard",
+    "angle": "Y"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 1,
+   "turn": 4,
+   "side": "allies",
+   "shooter": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+   "victim": "IBS-U-IJN-ERMA-SHIMAKAZE",
+   "n_routes": 40,
+   "n_routes_coverable": 0,
+   "n_configs": 336,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.0,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.05,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "R_shared": null,
+   "R_bayes_uniform": null,
+   "DIFFERENT_BEST": false,
+   "n_distinct_best_actions": 0,
+   "best_set_jaccard_first_last": null,
+   "material": false,
+   "risk_binary": {
+    "R_shared": null,
+    "R_bayes": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0,
+    "jaccard": null,
+    "V_min": null,
+    "V_max": null
+   },
+   "material_binary": false,
+   "risk_public_hypotheses": {
+    "R_shared": 0.2,
+    "n_coverable": 2,
+    "n_distinct_best": 2
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 0,
+    "segs_nonempty": 0
+   },
+   "intercept_meta": {
+    "combos": 486,
+    "chosen": {
+     "launcher_id": "TT1",
+     "setting_index": 2,
+     "launch_angle": "B",
+     "launch_at_mf": 2,
+     "salvo_size": 1
+    }
+   },
+   "public_choice": {
+    "setting": 2,
+    "side": "port",
+    "angle": "B"
+   },
+   "fullstate_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 1,
+   "turn": 6,
+   "side": "allies",
+   "shooter": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+   "victim": "IBS-U-IJN-ERMA-SHIMAKAZE",
+   "n_routes": 40,
+   "n_routes_coverable": 0,
+   "n_configs": 240,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.0,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "R_shared": null,
+   "R_bayes_uniform": null,
+   "DIFFERENT_BEST": false,
+   "n_distinct_best_actions": 0,
+   "best_set_jaccard_first_last": null,
+   "material": false,
+   "risk_binary": {
+    "R_shared": null,
+    "R_bayes": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0,
+    "jaccard": null,
+    "V_min": null,
+    "V_max": null
+   },
+   "material_binary": false,
+   "risk_public_hypotheses": {
+    "R_shared": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 0,
+    "segs_nonempty": 0
+   },
+   "intercept_meta": {
+    "combos": 0
+   },
+   "public_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "fullstate_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 1,
+   "turn": 8,
+   "side": "allies",
+   "shooter": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+   "victim": "IBS-U-IJN-ERMA-IBUKI",
+   "n_routes": 14,
+   "n_routes_coverable": 2,
+   "n_configs": 240,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.0,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.07142857142857142
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.023809523809523808
+   },
+   "R_shared": 0.3333333333333333,
+   "R_bayes_uniform": 0.16666666666666666,
+   "DIFFERENT_BEST": true,
+   "n_distinct_best_actions": 2,
+   "best_set_jaccard_first_last": 0.0,
+   "material": true,
+   "risk_binary": {
+    "R_shared": 1.0,
+    "R_bayes": 0.5,
+    "n_coverable": 2,
+    "n_distinct_best": 2,
+    "jaccard": 0.0,
+    "best_action_index": 0,
+    "V_min": 1.0,
+    "V_max": 1.0
+   },
+   "material_binary": true,
+   "risk_public_hypotheses": {
+    "R_shared": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 0,
+    "segs_nonempty": 0
+   },
+   "intercept_meta": {
+    "combos": 252,
+    "chosen": {
+     "launcher_id": "TT1",
+     "setting_index": 1,
+     "launch_angle": "X",
+     "launch_at_mf": 4,
+     "salvo_size": 2
+    }
+   },
+   "public_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "fullstate_choice": {
+    "setting": 0,
+    "side": "starboard",
+    "angle": "A"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 1,
+   "turn": 10,
+   "side": "allies",
+   "shooter": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+   "victim": "IBS-U-IJN-ERMA-KURAMA",
+   "n_routes": 40,
+   "n_routes_coverable": 0,
+   "n_configs": 96,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.0,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.08333333333333333,
+    "FULL_STATE_CEILING": 0.0
+   },
+   "R_shared": null,
+   "R_bayes_uniform": null,
+   "DIFFERENT_BEST": false,
+   "n_distinct_best_actions": 0,
+   "best_set_jaccard_first_last": null,
+   "material": false,
+   "risk_binary": {
+    "R_shared": null,
+    "R_bayes": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0,
+    "jaccard": null,
+    "V_min": null,
+    "V_max": null
+   },
+   "material_binary": false,
+   "risk_public_hypotheses": {
+    "R_shared": 0.3333333333333333,
+    "n_coverable": 2,
+    "n_distinct_best": 2
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 0,
+    "segs_nonempty": 0
+   },
+   "intercept_meta": {
+    "combos": 192,
+    "chosen": {
+     "launcher_id": "TT1",
+     "setting_index": 0,
+     "launch_angle": "X",
+     "launch_at_mf": 1,
+     "salvo_size": 2
+    }
+   },
+   "public_choice": {
+    "setting": 1,
+    "side": "starboard",
+    "angle": "Y"
+   },
+   "fullstate_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  },
+  {
+   "scenario": "IBS-S-EM-01",
+   "seed": 1,
+   "turn": 11,
+   "side": "allies",
+   "shooter": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+   "victim": "IBS-U-IJN-ERMA-KURAMA",
+   "n_routes": 29,
+   "n_routes_coverable": 9,
+   "n_configs": 144,
+   "n_public_hypotheses": 4,
+   "RR_by_arm": {
+    "HOLD": 0.0,
+    "CURRENT_ADAPTIVE": 0.0,
+    "INTERCEPT_ASSIST": 0.0,
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.1724137931034483
+   },
+   "graded_cover": {
+    "PUBLIC_SET_COVER": 0.0,
+    "PUBLIC_BELIEF_AWARE": 0.0,
+    "FULL_STATE_CEILING": 0.048850574712643674
+   },
+   "R_shared": 0.3333333333333333,
+   "R_bayes_uniform": 0.14814814814814814,
+   "DIFFERENT_BEST": true,
+   "n_distinct_best_actions": 2,
+   "best_set_jaccard_first_last": 0.0,
+   "material": true,
+   "risk_binary": {
+    "R_shared": 1.0,
+    "R_bayes": 0.4444444444444444,
+    "n_coverable": 9,
+    "n_distinct_best": 2,
+    "jaccard": 0.0,
+    "best_action_index": 0,
+    "V_min": 1.0,
+    "V_max": 1.0
+   },
+   "material_binary": true,
+   "risk_public_hypotheses": {
+    "R_shared": null,
+    "n_coverable": 0,
+    "n_distinct_best": 0
+   },
+   "per_route_payoff": "D_grad = blocked fraction of the route's own trajectory",
+   "current_meta": {
+    "n_orders": 2,
+    "segs_nonempty": 0
+   },
+   "intercept_meta": {
+    "combos": 522,
+    "chosen": {
+     "launcher_id": "TT1",
+     "setting_index": 0,
+     "launch_angle": "A",
+     "launch_at_mf": 2,
+     "salvo_size": 2
+    }
+   },
+   "public_choice": {
+    "setting": 0,
+    "side": "port",
+    "angle": "A"
+   },
+   "fullstate_choice": {
+    "setting": 1,
+    "side": "port",
+    "angle": "B"
+   },
+   "public_hypotheses": [
+    "hold_course_turn-1",
+    "hold_course_turn+0",
+    "hold_course_turn+1",
+    "hold_in_place"
+   ],
+   "public_inputs": [
+    "victim.position",
+    "victim.heading",
+    "victim.current_speed",
+    "map_bounds",
+    "engine._mount_can_bear/_can_see on own ships"
+   ]
+  }
+ ],
+ "shortfalls": {
+  "IBS-S-01": 0,
+  "IBS-S-03": 0,
+  "IBS-S-EM-01": 0
+ },
+ "summary": {
+  "n_states": 15,
+  "states_per_scenario": {
+   "IBS-S-01": 4,
+   "IBS-S-03": 5,
+   "IBS-S-EM-01": 6
+  },
+  "material_rate_pooled": 0.26666666666666666,
+  "median_R_shared_pooled": 0.3333333333333333,
+  "per_scenario": {
+   "IBS-S-01": {
+    "n": 4,
+    "material_rate": 0.5,
+    "median_R_shared": 0.5833333333333333,
+    "median_R_bayes_uniform": 0.12789786967418545,
+    "mean_RR": {
+     "HOLD": 0.0,
+     "CURRENT_ADAPTIVE": 0.0,
+     "INTERCEPT_ASSIST": 0.008620689655172414,
+     "PUBLIC_SET_COVER": 0.0,
+     "PUBLIC_BELIEF_AWARE": 0.0,
+     "FULL_STATE_CEILING": 0.3163793103448276
+    },
+    "current_fired_rate": 0.25
+   },
+   "IBS-S-03": {
+    "n": 5,
+    "material_rate": 0.0,
+    "median_R_shared": 0.0,
+    "median_R_bayes_uniform": 0.0,
+    "mean_RR": {
+     "HOLD": 0.0,
+     "CURRENT_ADAPTIVE": 0.0,
+     "INTERCEPT_ASSIST": 0.0,
+     "PUBLIC_SET_COVER": 0.0,
+     "PUBLIC_BELIEF_AWARE": 0.0,
+     "FULL_STATE_CEILING": 0.02
+    },
+    "current_fired_rate": 0.6
+   },
+   "IBS-S-EM-01": {
+    "n": 6,
+    "material_rate": 0.3333333333333333,
+    "median_R_shared": 0.3333333333333333,
+    "median_R_bayes_uniform": 0.14814814814814814,
+    "mean_RR": {
+     "HOLD": 0.0,
+     "CURRENT_ADAPTIVE": 0.0,
+     "INTERCEPT_ASSIST": 0.004166666666666667,
+     "PUBLIC_SET_COVER": 0.029166666666666664,
+     "PUBLIC_BELIEF_AWARE": 0.029166666666666664,
+     "FULL_STATE_CEILING": 0.20314039408866993
+    },
+    "current_fired_rate": 0.16666666666666666
+   }
+  },
+  "verdict_inputs": {
+   "material_ge_20pct_in_ge_2_scenarios": true
+  }
+ },
+ "wall_seconds": 118.7
+}

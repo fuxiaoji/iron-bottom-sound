@@ -1,0 +1,3479 @@
+{
+ "budget": 24,
+ "floors": {
+  "gain": 0.05
+ },
+ "main": [
+  {
+   "panel": "main",
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 2,
+   "side": "axis",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 5,
+   "U": {
+    "CURRENT_PRODUCTION": -11.472222222222218,
+    "PER_SHIP_GREEDY_ADDITIVE": -5.416666666666666,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -0.44444444444444287,
+    "RANDOM_MATCHED_BUDGET": -2.916666666666668,
+    "INTERACTION_AWARE_BEAM": -4.444444444444445
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 5,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 15
+   },
+   "total_evals": 46,
+   "n_q_probes": 10,
+   "n_pair_probes": 10,
+   "pair_probes": [
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": -0.38888888888889106,
+     "a_i": "2P3",
+     "a_j": "1SS3P"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": -0.7777777777777803,
+     "a_i": "2P3",
+     "a_j": "1SS4P"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": 3.2500000000000053,
+     "a_i": "2P3",
+     "a_j": "1SS1S2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "a_i": "2P3",
+     "a_j": "1S1S1P"
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.24999999999999822,
+     "a_i": "1SS3P",
+     "a_j": "1SS4P"
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": 2.6111111111111125,
+     "a_i": "1SS3P",
+     "a_j": "1SS1S2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "a_i": "1SS3P",
+     "a_j": "1S1S1P"
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": -0.027777777777775015,
+     "a_i": "1SS4P",
+     "a_j": "1SS1S2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "a_i": "1SS4P",
+     "a_j": "1S1S1P"
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "a_i": "1SS1S2P1P",
+     "a_j": "1S1S1P"
+    }
+   ],
+   "delta_joint_greedy": 0.9722222222222214,
+   "delta_joint_seq": -4.000000000000002,
+   "delta_joint_random": -1.5277777777777768,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 45,
+    "visible_pairs": 45,
+    "aspects": {
+     "broadside": 22,
+     "bow_stern": 23
+    },
+    "range_mean": 9.088888888888889,
+    "split_fire_ships": 5,
+    "concentration_max": 5
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 3,
+   "side": "axis",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 5,
+   "U": {
+    "CURRENT_PRODUCTION": -7.333333333333332,
+    "PER_SHIP_GREEDY_ADDITIVE": -1.8611111111111125,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -1.8611111111111125,
+    "RANDOM_MATCHED_BUDGET": 2.916666666666666,
+    "INTERACTION_AWARE_BEAM": -1.8611111111111125
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 6,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 11
+   },
+   "total_evals": 43,
+   "n_q_probes": 10,
+   "n_pair_probes": 10,
+   "pair_probes": [
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": -0.3888888888888893,
+     "a_i": "1S1S2P1P",
+     "a_j": "1S1S3"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": 0.0,
+     "a_i": "1S1S2P1P",
+     "a_j": "1P1S"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": 0.0,
+     "a_i": "1S1S2P1P",
+     "a_j": "1P"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.6666666666666661,
+     "a_i": "1S1S2P1P",
+     "a_j": "1P1P3P"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "1P1S"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "1P"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.19444444444444642,
+     "a_i": "1S1S3",
+     "a_j": "1P1P3P"
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": 0.0,
+     "a_i": "1P1S",
+     "a_j": "1P"
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "1P1S",
+     "a_j": "1P1P3P"
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "1P",
+     "a_j": "1P1P3P"
+    }
+   ],
+   "delta_joint_greedy": 0.0,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": -4.777777777777779,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 28,
+    "visible_pairs": 28,
+    "aspects": {
+     "broadside": 16,
+     "bow_stern": 12
+    },
+    "range_mean": 10.428571428571429,
+    "split_fire_ships": 4,
+    "concentration_max": 4
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 4,
+   "side": "axis",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 4,
+   "U": {
+    "CURRENT_PRODUCTION": -6.055555555555555,
+    "PER_SHIP_GREEDY_ADDITIVE": -4.416666666666667,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -3.694444444444443,
+    "RANDOM_MATCHED_BUDGET": -1.8333333333333304,
+    "INTERACTION_AWARE_BEAM": -3.694444444444443
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 5,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 11
+   },
+   "total_evals": 42,
+   "n_q_probes": 8,
+   "n_pair_probes": 6,
+   "pair_probes": [
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "1SS1P",
+     "a_j": "1SS4P"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": -0.22222222222222143,
+     "a_i": "1SS1P",
+     "a_j": "3S2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": 0.0,
+     "a_i": "1SS1P",
+     "a_j": "1P2S"
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.0,
+     "a_i": "1SS4P",
+     "a_j": "3S2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": 0.0,
+     "a_i": "1SS4P",
+     "a_j": "1P2S"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": 0.0,
+     "a_i": "3S2P1P",
+     "a_j": "1P2S"
+    }
+   ],
+   "delta_joint_greedy": 0.7222222222222241,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": -1.8611111111111125,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 26,
+    "visible_pairs": 28,
+    "aspects": {
+     "broadside": 15,
+     "bow_stern": 11
+    },
+    "range_mean": 10.846153846153847,
+    "split_fire_ships": 4,
+    "concentration_max": 2
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 6,
+   "side": "axis",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 3,
+   "U": {
+    "CURRENT_PRODUCTION": -5.222222222222221,
+    "PER_SHIP_GREEDY_ADDITIVE": -0.9444444444444446,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -0.9444444444444446,
+    "RANDOM_MATCHED_BUDGET": -1.777777777777776,
+    "INTERACTION_AWARE_BEAM": -1.6388888888888893
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 3,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 9
+   },
+   "total_evals": 38,
+   "n_q_probes": 6,
+   "n_pair_probes": 3,
+   "pair_probes": [
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": -0.02777777777777679,
+     "a_i": "1S3P",
+     "a_j": "1S1S1P1P"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.3888888888888893,
+     "a_i": "1S3P",
+     "a_j": "1SS1S1P1P"
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": -0.11111111111111072,
+     "a_i": "1S1S1P1P",
+     "a_j": "1SS1S1P1P"
+    }
+   ],
+   "delta_joint_greedy": -0.6944444444444446,
+   "delta_joint_seq": -0.6944444444444446,
+   "delta_joint_random": 0.13888888888888662,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 14,
+    "visible_pairs": 14,
+    "aspects": {
+     "broadside": 9,
+     "bow_stern": 5
+    },
+    "range_mean": 9.571428571428571,
+    "split_fire_ships": 3,
+    "concentration_max": 2
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 7,
+   "side": "axis",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 2,
+   "U": {
+    "CURRENT_PRODUCTION": -1.5833333333333335,
+    "PER_SHIP_GREEDY_ADDITIVE": -1.2777777777777777,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -1.2777777777777777,
+    "RANDOM_MATCHED_BUDGET": -1.2777777777777777,
+    "INTERACTION_AWARE_BEAM": -1.2777777777777777
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 1,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 0
+   },
+   "total_evals": 27,
+   "n_q_probes": 4,
+   "n_pair_probes": 1,
+   "pair_probes": [
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "1P1P4P",
+     "a_j": "2S2"
+    }
+   ],
+   "delta_joint_greedy": 0.0,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": 0.0,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 8,
+    "visible_pairs": 10,
+    "aspects": {
+     "bow_stern": 2,
+     "broadside": 6
+    },
+    "range_mean": 13.0,
+    "split_fire_ships": 2,
+    "concentration_max": 1
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-01",
+   "seed": 2,
+   "turn": 2,
+   "side": "axis",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 5,
+   "U": {
+    "CURRENT_PRODUCTION": -15.916666666666666,
+    "PER_SHIP_GREEDY_ADDITIVE": -6.888888888888891,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -6.888888888888891,
+    "RANDOM_MATCHED_BUDGET": -1.916666666666666,
+    "INTERACTION_AWARE_BEAM": -6.888888888888891
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 5,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 12
+   },
+   "total_evals": 43,
+   "n_q_probes": 10,
+   "n_pair_probes": 10,
+   "pair_probes": [
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "a_i": "6P",
+     "a_j": "3P2"
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.0,
+     "a_i": "6P",
+     "a_j": "2P3"
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": 0.8333333333333339,
+     "a_i": "6P",
+     "a_j": "1P4"
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "6P",
+     "a_j": "1P2P1S"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.0,
+     "a_i": "3P2",
+     "a_j": "2P3"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": 0.0,
+     "a_i": "3P2",
+     "a_j": "1P4"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "3P2",
+     "a_j": "1P2P1S"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": -1.7763568394002505e-15,
+     "a_i": "2P3",
+     "a_j": "1P4"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "2P3",
+     "a_j": "1P2P1S"
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "1P4",
+     "a_j": "1P2P1S"
+    }
+   ],
+   "delta_joint_greedy": 0.0,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": -4.972222222222225,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 43,
+    "visible_pairs": 43,
+    "aspects": {
+     "broadside": 33,
+     "bow_stern": 10
+    },
+    "range_mean": 9.093023255813954,
+    "split_fire_ships": 5,
+    "concentration_max": 5
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-01",
+   "seed": 2,
+   "turn": 3,
+   "side": "axis",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 4,
+   "U": {
+    "CURRENT_PRODUCTION": -7.472222222222222,
+    "PER_SHIP_GREEDY_ADDITIVE": -5.833333333333335,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -5.000000000000002,
+    "RANDOM_MATCHED_BUDGET": 0.47222222222222143,
+    "INTERACTION_AWARE_BEAM": -5.722222222222221
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 4,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 11
+   },
+   "total_evals": 41,
+   "n_q_probes": 8,
+   "n_pair_probes": 6,
+   "pair_probes": [
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "a_i": "1P1P3P",
+     "a_j": "1P2P1S"
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 2.0277777777777795,
+     "a_i": "1P1P3P",
+     "a_j": "1P1P2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 1.2500000000000009,
+     "a_i": "1P1P3P",
+     "a_j": "1P1P2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "1P2P1S",
+     "a_j": "1P1P2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.0,
+     "a_i": "1P2P1S",
+     "a_j": "1P1P2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 1.5833333333333348,
+     "a_i": "1P1P2P1P",
+     "a_j": "1P1P2P1P"
+    }
+   ],
+   "delta_joint_greedy": 0.11111111111111338,
+   "delta_joint_seq": -0.7222222222222197,
+   "delta_joint_random": -6.194444444444443,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 36,
+    "visible_pairs": 36,
+    "aspects": {
+     "bow_stern": 15,
+     "broadside": 21
+    },
+    "range_mean": 10.0,
+    "split_fire_ships": 4,
+    "concentration_max": 4
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-01",
+   "seed": 2,
+   "turn": 4,
+   "side": "allies",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 9,
+   "U": {
+    "CURRENT_PRODUCTION": -0.5277777777777786,
+    "PER_SHIP_GREEDY_ADDITIVE": -4.111111111111112,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -1.8611111111111107,
+    "RANDOM_MATCHED_BUDGET": 3.083333333333333,
+    "INTERACTION_AWARE_BEAM": -4.111111111111112
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 10,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 18
+   },
+   "total_evals": 54,
+   "n_q_probes": 18,
+   "n_pair_probes": 36,
+   "pair_probes": [
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": -0.055555555555557135,
+     "a_i": "1S5P",
+     "a_j": "1SS1"
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-BUCHANAN",
+     "phi": 0.0,
+     "a_i": "1S5P",
+     "a_j": "3S2S"
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "a_i": "1S5P",
+     "a_j": "1S1S2P"
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "a_i": "1S5P",
+     "a_j": "3P"
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "a_i": "1S5P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-SALT-LAKE-CITY",
+     "phi": 0.0,
+     "a_i": "1S5P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "a_i": "1S5P",
+     "a_j": "1SS1S2P"
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-BOISE",
+     "phi": 8.881784197001252e-16,
+     "a_i": "1S5P",
+     "a_j": "2P2S"
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-BUCHANAN",
+     "phi": 0.0,
+     "a_i": "1SS1",
+     "a_j": "3S2S"
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "a_i": "1SS1",
+     "a_j": "1S1S2P"
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "a_i": "1SS1",
+     "a_j": "3P"
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "a_i": "1SS1",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-SALT-LAKE-CITY",
+     "phi": 0.0,
+     "a_i": "1SS1",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "a_i": "1SS1",
+     "a_j": "1SS1S2P"
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-BOISE",
+     "phi": -8.881784197001252e-16,
+     "a_i": "1SS1",
+     "a_j": "2P2S"
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "a_i": "3S2S",
+     "a_j": "1S1S2P"
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "a_i": "3S2S",
+     "a_j": "3P"
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "a_i": "3S2S",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-SALT-LAKE-CITY",
+     "phi": 0.0,
+     "a_i": "3S2S",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "a_i": "3S2S",
+     "a_j": "1SS1S2P"
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-BOISE",
+     "phi": 0.0,
+     "a_i": "3S2S",
+     "a_j": "2P2S"
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "a_i": "1S1S2P",
+     "a_j": "3P"
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "a_i": "1S1S2P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-SALT-LAKE-CITY",
+     "phi": 0.0,
+     "a_i": "1S1S2P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "a_i": "1S1S2P",
+     "a_j": "1SS1S2P"
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-BOISE",
+     "phi": 0.0,
+     "a_i": "1S1S2P",
+     "a_j": "2P2S"
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "a_i": "3P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-SALT-LAKE-CITY",
+     "phi": 0.0,
+     "a_i": "3P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "a_i": "3P",
+     "a_j": "1SS1S2P"
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-BOISE",
+     "phi": 0.0,
+     "a_i": "3P",
+     "a_j": "2P2S"
+    },
+    {
+     "i": "IBS-U-USN-MCCALLA",
+     "j": "IBS-U-USN-SALT-LAKE-CITY",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-MCCALLA",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "1SS1S2P"
+    },
+    {
+     "i": "IBS-U-USN-MCCALLA",
+     "j": "IBS-U-USN-BOISE",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "2P2S"
+    },
+    {
+     "i": "IBS-U-USN-SALT-LAKE-CITY",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "1SS1S2P"
+    },
+    {
+     "i": "IBS-U-USN-SALT-LAKE-CITY",
+     "j": "IBS-U-USN-BOISE",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "2P2S"
+    },
+    {
+     "i": "IBS-U-USN-SAN-FRANCISCO",
+     "j": "IBS-U-USN-BOISE",
+     "phi": 0.0,
+     "a_i": "1SS1S2P",
+     "a_j": "2P2S"
+    }
+   ],
+   "delta_joint_greedy": 0.0,
+   "delta_joint_seq": -2.250000000000001,
+   "delta_joint_random": -7.194444444444445,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 19,
+    "visible_pairs": 21,
+    "aspects": {
+     "bow_stern": 7,
+     "broadside": 12
+    },
+    "range_mean": 9.368421052631579,
+    "split_fire_ships": 9,
+    "concentration_max": 7
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-01",
+   "seed": 2,
+   "turn": 4,
+   "side": "axis",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 3,
+   "U": {
+    "CURRENT_PRODUCTION": 0.5277777777777786,
+    "PER_SHIP_GREEDY_ADDITIVE": 2.6388888888888893,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 2.6388888888888893,
+    "RANDOM_MATCHED_BUDGET": 1.5277777777777781,
+    "INTERACTION_AWARE_BEAM": 2.6388888888888893
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 3,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 6
+   },
+   "total_evals": 35,
+   "n_q_probes": 6,
+   "n_pair_probes": 3,
+   "pair_probes": [
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": -0.2777777777777777,
+     "a_i": "2",
+     "a_j": "1S5P"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "2",
+     "a_j": "3S1P1P"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "1S5P",
+     "a_j": "3S1P1P"
+    }
+   ],
+   "delta_joint_greedy": 0.0,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": 1.1111111111111112,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 24,
+    "visible_pairs": 24,
+    "aspects": {
+     "broadside": 20,
+     "bow_stern": 4
+    },
+    "range_mean": 9.5,
+    "split_fire_ships": 3,
+    "concentration_max": 3
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-01",
+   "seed": 2,
+   "turn": 5,
+   "side": "allies",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 9,
+   "U": {
+    "CURRENT_PRODUCTION": 3.638888888888889,
+    "PER_SHIP_GREEDY_ADDITIVE": 5.555555555555555,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 6.444444444444445,
+    "RANDOM_MATCHED_BUDGET": 9.333333333333336,
+    "INTERACTION_AWARE_BEAM": 4.194444444444443
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 12,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 23
+   },
+   "total_evals": 61,
+   "n_q_probes": 14,
+   "n_pair_probes": 13,
+   "pair_probes": [
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": -4.440892098500626e-16,
+     "a_i": "0",
+     "a_j": "1S1P"
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-BOISE",
+     "phi": -2.220446049250313e-15,
+     "a_i": "0",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "3S1S"
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-DUNCAN",
+     "phi": -0.05555555555555847,
+     "a_i": "0",
+     "a_j": "1S5P"
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": -4.440892098500626e-16,
+     "a_i": "0",
+     "a_j": "1SS1S1P1P"
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-BUCHANAN",
+     "phi": -8.881784197001252e-16,
+     "a_i": "0",
+     "a_j": "3P"
+    },
+    {
+     "i": "IBS-U-USN-MCCALLA",
+     "j": "IBS-U-USN-BOISE",
+     "phi": -4.440892098500626e-16,
+     "a_i": "1S1P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-MCCALLA",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "a_i": "1S1P",
+     "a_j": "3S1S"
+    },
+    {
+     "i": "IBS-U-USN-MCCALLA",
+     "j": "IBS-U-USN-DUNCAN",
+     "phi": -4.440892098500626e-16,
+     "a_i": "1S1P",
+     "a_j": "1S5P"
+    },
+    {
+     "i": "IBS-U-USN-MCCALLA",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": 4.440892098500626e-16,
+     "a_i": "1S1P",
+     "a_j": "1SS1S1P1P"
+    },
+    {
+     "i": "IBS-U-USN-MCCALLA",
+     "j": "IBS-U-USN-BUCHANAN",
+     "phi": 4.440892098500626e-16,
+     "a_i": "1S1P",
+     "a_j": "3P"
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "3S1S"
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-DUNCAN",
+     "phi": 0.6944444444444415,
+     "a_i": "0",
+     "a_j": "1S5P"
+    }
+   ],
+   "delta_joint_greedy": -1.3611111111111125,
+   "delta_joint_seq": -2.2500000000000018,
+   "delta_joint_random": -5.138888888888893,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 12,
+    "visible_pairs": 14,
+    "aspects": {
+     "broadside": 6,
+     "bow_stern": 6
+    },
+    "range_mean": 9.416666666666666,
+    "split_fire_ships": 7,
+    "concentration_max": 7
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-03",
+   "seed": 1,
+   "turn": 2,
+   "side": "axis",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 3,
+   "U": {
+    "CURRENT_PRODUCTION": 0.44444444444444453,
+    "PER_SHIP_GREEDY_ADDITIVE": 0.0,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 0.44444444444444453,
+    "RANDOM_MATCHED_BUDGET": 0.44444444444444453,
+    "INTERACTION_AWARE_BEAM": 0.44444444444444453
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 3,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 2
+   },
+   "total_evals": 31,
+   "n_q_probes": 6,
+   "n_pair_probes": 3,
+   "pair_probes": [
+    {
+     "i": "IBS-U-KM-HANS-LODY",
+     "j": "IBS-U-KM-KARL-GALSTER",
+     "phi": 0.0,
+     "a_i": "3S2P1P",
+     "a_j": "1P4S"
+    },
+    {
+     "i": "IBS-U-KM-HANS-LODY",
+     "j": "IBS-U-KM-RICHARD-BEITZEN",
+     "phi": 0.0,
+     "a_i": "3S2P1P",
+     "a_j": "1P1S1S"
+    },
+    {
+     "i": "IBS-U-KM-KARL-GALSTER",
+     "j": "IBS-U-KM-RICHARD-BEITZEN",
+     "phi": 0.0,
+     "a_i": "1P4S",
+     "a_j": "1P1S1S"
+    }
+   ],
+   "delta_joint_greedy": 0.44444444444444453,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": 0.0,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 1,
+    "visible_pairs": 1,
+    "aspects": {
+     "broadside": 1
+    },
+    "range_mean": 3.0,
+    "split_fire_ships": 3,
+    "concentration_max": 3
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-03",
+   "seed": 1,
+   "turn": 3,
+   "side": "allies",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 4,
+   "U": {
+    "CURRENT_PRODUCTION": 0.0,
+    "PER_SHIP_GREEDY_ADDITIVE": 0.0,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 0.0,
+    "RANDOM_MATCHED_BUDGET": 0.0,
+    "INTERACTION_AWARE_BEAM": 0.0
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 5,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 5
+   },
+   "total_evals": 36,
+   "n_q_probes": 8,
+   "n_pair_probes": 6,
+   "pair_probes": [
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-JERSEY",
+     "phi": 0.0,
+     "a_i": "1SS1S2P",
+     "a_j": "1S2S2S"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-JUPITER",
+     "phi": 0.0,
+     "a_i": "1SS1S2P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "1SS1S2P",
+     "a_j": "2P2"
+    },
+    {
+     "i": "IBS-U-RN-JERSEY",
+     "j": "IBS-U-RN-JUPITER",
+     "phi": 0.0,
+     "a_i": "1S2S2S",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-RN-JERSEY",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "1S2S2S",
+     "a_j": "2P2"
+    },
+    {
+     "i": "IBS-U-RN-JUPITER",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "2P2"
+    }
+   ],
+   "delta_joint_greedy": 0.0,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": 0.0,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 0,
+    "visible_pairs": 0,
+    "aspects": {},
+    "range_mean": null,
+    "split_fire_ships": 4,
+    "concentration_max": 4
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-03",
+   "seed": 1,
+   "turn": 4,
+   "side": "axis",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 3,
+   "U": {
+    "CURRENT_PRODUCTION": 0.44444444444444453,
+    "PER_SHIP_GREEDY_ADDITIVE": 0.44444444444444453,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 0.44444444444444453,
+    "RANDOM_MATCHED_BUDGET": 0.44444444444444453,
+    "INTERACTION_AWARE_BEAM": 0.44444444444444453
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 4,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 5
+   },
+   "total_evals": 35,
+   "n_q_probes": 6,
+   "n_pair_probes": 3,
+   "pair_probes": [
+    {
+     "i": "IBS-U-KM-HANS-LODY",
+     "j": "IBS-U-KM-KARL-GALSTER",
+     "phi": 0.0,
+     "a_i": "3S1P1P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-KM-HANS-LODY",
+     "j": "IBS-U-KM-RICHARD-BEITZEN",
+     "phi": 0.0,
+     "a_i": "3S1P1P",
+     "a_j": "1S4S1P"
+    },
+    {
+     "i": "IBS-U-KM-KARL-GALSTER",
+     "j": "IBS-U-KM-RICHARD-BEITZEN",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "1S4S1P"
+    }
+   ],
+   "delta_joint_greedy": 0.0,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": 0.0,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 1,
+    "visible_pairs": 1,
+    "aspects": {
+     "broadside": 1
+    },
+    "range_mean": 4.0,
+    "split_fire_ships": 3,
+    "concentration_max": 3
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-03",
+   "seed": 2,
+   "turn": 3,
+   "side": "allies",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 5,
+   "U": {
+    "CURRENT_PRODUCTION": 1.25,
+    "PER_SHIP_GREEDY_ADDITIVE": 1.4166666666666665,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 1.4166666666666665,
+    "RANDOM_MATCHED_BUDGET": 1.4166666666666665,
+    "INTERACTION_AWARE_BEAM": 1.4166666666666665
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 6,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 6
+   },
+   "total_evals": 38,
+   "n_q_probes": 10,
+   "n_pair_probes": 10,
+   "pair_probes": [
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-JACKAL",
+     "phi": 0.0,
+     "a_i": "1P4P",
+     "a_j": "1PP2P1"
+    },
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-JERSEY",
+     "phi": 0.0,
+     "a_i": "1P4P",
+     "a_j": "2P1S"
+    },
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-JUPITER",
+     "phi": 0.0,
+     "a_i": "1P4P",
+     "a_j": "1PP2P1"
+    },
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "1P4P",
+     "a_j": "2S2P"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-JERSEY",
+     "phi": 0.0,
+     "a_i": "1PP2P1",
+     "a_j": "2P1S"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-JUPITER",
+     "phi": 0.0,
+     "a_i": "1PP2P1",
+     "a_j": "1PP2P1"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "1PP2P1",
+     "a_j": "2S2P"
+    },
+    {
+     "i": "IBS-U-RN-JERSEY",
+     "j": "IBS-U-RN-JUPITER",
+     "phi": 0.0,
+     "a_i": "2P1S",
+     "a_j": "1PP2P1"
+    },
+    {
+     "i": "IBS-U-RN-JERSEY",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "2P1S",
+     "a_j": "2S2P"
+    },
+    {
+     "i": "IBS-U-RN-JUPITER",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "1PP2P1",
+     "a_j": "2S2P"
+    }
+   ],
+   "delta_joint_greedy": 0.0,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": 0.0,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 2,
+    "visible_pairs": 2,
+    "aspects": {
+     "broadside": 1,
+     "bow_stern": 1
+    },
+    "range_mean": 2.0,
+    "split_fire_ships": 5,
+    "concentration_max": 5
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-03",
+   "seed": 2,
+   "turn": 4,
+   "side": "allies",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 5,
+   "U": {
+    "CURRENT_PRODUCTION": -1.1666666666666667,
+    "PER_SHIP_GREEDY_ADDITIVE": -0.861111111111111,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -0.3055555555555556,
+    "RANDOM_MATCHED_BUDGET": 0.0,
+    "INTERACTION_AWARE_BEAM": 0.0
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 5,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 12
+   },
+   "total_evals": 43,
+   "n_q_probes": 10,
+   "n_pair_probes": 10,
+   "pair_probes": [
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-JUPITER",
+     "phi": -1.7222222222222223,
+     "a_i": "3S1P1P",
+     "a_j": "1SS2S1P1P"
+    },
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-JACKAL",
+     "phi": 0.0,
+     "a_i": "3S1P1P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-JERSEY",
+     "phi": 0.0,
+     "a_i": "3S1P1P",
+     "a_j": "1PP2P"
+    },
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "3S1P1P",
+     "a_j": "5P1P"
+    },
+    {
+     "i": "IBS-U-RN-JUPITER",
+     "j": "IBS-U-RN-JACKAL",
+     "phi": 0.0,
+     "a_i": "1SS2S1P1P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-RN-JUPITER",
+     "j": "IBS-U-RN-JERSEY",
+     "phi": 0.0,
+     "a_i": "1SS2S1P1P",
+     "a_j": "1PP2P"
+    },
+    {
+     "i": "IBS-U-RN-JUPITER",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "1SS2S1P1P",
+     "a_j": "5P1P"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-JERSEY",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "1PP2P"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "5P1P"
+    },
+    {
+     "i": "IBS-U-RN-JERSEY",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "1PP2P",
+     "a_j": "5P1P"
+    }
+   ],
+   "delta_joint_greedy": 0.861111111111111,
+   "delta_joint_seq": 0.3055555555555556,
+   "delta_joint_random": 0.0,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 1,
+    "visible_pairs": 1,
+    "aspects": {
+     "broadside": 1
+    },
+    "range_mean": 4.0,
+    "split_fire_ships": 5,
+    "concentration_max": 5
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-03",
+   "seed": 3,
+   "turn": 3,
+   "side": "axis",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 3,
+   "U": {
+    "CURRENT_PRODUCTION": -4.440892098500626e-16,
+    "PER_SHIP_GREEDY_ADDITIVE": -0.75,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 0.8611111111111116,
+    "RANDOM_MATCHED_BUDGET": 0.6111111111111116,
+    "INTERACTION_AWARE_BEAM": 0.5277777777777777
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 4,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 9
+   },
+   "total_evals": 39,
+   "n_q_probes": 6,
+   "n_pair_probes": 3,
+   "pair_probes": [
+    {
+     "i": "IBS-U-KM-HANS-LODY",
+     "j": "IBS-U-KM-KARL-GALSTER",
+     "phi": -4.440892098500626e-16,
+     "a_i": "1S1S2P1P",
+     "a_j": "1S5P"
+    },
+    {
+     "i": "IBS-U-KM-HANS-LODY",
+     "j": "IBS-U-KM-RICHARD-BEITZEN",
+     "phi": 0.8888888888888883,
+     "a_i": "1S1S2P1P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-KM-KARL-GALSTER",
+     "j": "IBS-U-KM-RICHARD-BEITZEN",
+     "phi": 0.0,
+     "a_i": "1S5P",
+     "a_j": "0"
+    }
+   ],
+   "delta_joint_greedy": 1.2777777777777777,
+   "delta_joint_seq": -0.3333333333333339,
+   "delta_joint_random": -0.08333333333333393,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 4,
+    "visible_pairs": 4,
+    "aspects": {
+     "broadside": 4
+    },
+    "range_mean": 2.75,
+    "split_fire_ships": 3,
+    "concentration_max": 3
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-EM-01",
+   "seed": 1,
+   "turn": 6,
+   "side": "axis",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 12,
+   "U": {
+    "CURRENT_PRODUCTION": 0.0,
+    "PER_SHIP_GREEDY_ADDITIVE": 2.583333333333333,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 2.583333333333333,
+    "RANDOM_MATCHED_BUDGET": 2.0,
+    "INTERACTION_AWARE_BEAM": 2.583333333333333
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 12,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 23
+   },
+   "total_evals": 61,
+   "n_q_probes": 13,
+   "n_pair_probes": 10,
+   "pair_probes": [
+    {
+     "i": "IBS-U-IJN-ERMA-MAKINAMI",
+     "j": "IBS-U-IJN-ERMA-AZUMA",
+     "phi": 0.0,
+     "a_i": "1P4P",
+     "a_j": "1P1P2P"
+    },
+    {
+     "i": "IBS-U-IJN-ERMA-MAKINAMI",
+     "j": "IBS-U-IJN-ERMA-GOKASE",
+     "phi": 0.0,
+     "a_i": "1P4P",
+     "a_j": "1P1P4P"
+    },
+    {
+     "i": "IBS-U-IJN-ERMA-MAKINAMI",
+     "j": "IBS-U-IJN-ERMA-IBUKI",
+     "phi": 0.0,
+     "a_i": "1P4P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-IJN-ERMA-MAKINAMI",
+     "j": "IBS-U-IJN-ERMA-ISHIKARI",
+     "phi": 0.0,
+     "a_i": "1P4P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-IJN-ERMA-MAKINAMI",
+     "j": "IBS-U-IJN-ERMA-KAZEGUMO",
+     "phi": 0.4166666666666667,
+     "a_i": "1P4P",
+     "a_j": "1P4P"
+    },
+    {
+     "i": "IBS-U-IJN-ERMA-MAKINAMI",
+     "j": "IBS-U-IJN-ERMA-KURAMA",
+     "phi": 0.0,
+     "a_i": "1P4P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-IJN-ERMA-AZUMA",
+     "j": "IBS-U-IJN-ERMA-GOKASE",
+     "phi": 0.0,
+     "a_i": "1P1P2P",
+     "a_j": "1P1P4P"
+    },
+    {
+     "i": "IBS-U-IJN-ERMA-AZUMA",
+     "j": "IBS-U-IJN-ERMA-IBUKI",
+     "phi": 0.0,
+     "a_i": "1P1P2P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-IJN-ERMA-AZUMA",
+     "j": "IBS-U-IJN-ERMA-ISHIKARI",
+     "phi": 0.0,
+     "a_i": "1P1P2P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-IJN-ERMA-AZUMA",
+     "j": "IBS-U-IJN-ERMA-KAZEGUMO",
+     "phi": 0.0,
+     "a_i": "1P1P2P",
+     "a_j": "1P4P"
+    }
+   ],
+   "delta_joint_greedy": 0.0,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": 0.583333333333333,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 0,
+    "visible_pairs": 0,
+    "aspects": {},
+    "range_mean": null,
+    "split_fire_ships": 12,
+    "concentration_max": 12
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-EM-01",
+   "seed": 1,
+   "turn": 9,
+   "side": "allies",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 12,
+   "U": {
+    "CURRENT_PRODUCTION": 4.555555555555558,
+    "PER_SHIP_GREEDY_ADDITIVE": 2.4999999999999973,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 8.277777777777779,
+    "RANDOM_MATCHED_BUDGET": 4.750000000000001,
+    "INTERACTION_AWARE_BEAM": -1.6944444444444464
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 21,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 19
+   },
+   "total_evals": 66,
+   "n_q_probes": 16,
+   "n_pair_probes": 28,
+   "pair_probes": [
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-INGRAHAM",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "5P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-DES-MOINES",
+     "phi": -1.4722222222222214,
+     "a_i": "1S1S3",
+     "a_j": "1P1P1P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-ALASKA",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-GUAM",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": 0.2500000000000009,
+     "a_i": "1S1S3",
+     "a_j": "1S1S2"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-DES-MOINES",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1P1P1P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-ALASKA",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-GUAM",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": -0.6388888888888875,
+     "a_i": "5P",
+     "a_j": "1S1S2"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-DES-MOINES",
+     "j": "IBS-U-USN-ERMA-ALASKA",
+     "phi": 0.0,
+     "a_i": "1P1P1P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-DES-MOINES",
+     "j": "IBS-U-USN-ERMA-GUAM",
+     "phi": 0.0,
+     "a_i": "1P1P1P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-DES-MOINES",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "1P1P1P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-DES-MOINES",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "1P1P1P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-DES-MOINES",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": 0.0,
+     "a_i": "1P1P1P",
+     "a_j": "1S1S2"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-GUAM",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1S1S2"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-GUAM",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-GUAM",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-GUAM",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1S1S2"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-IOWA",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-IOWA",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1S1S2"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-MISSOURI",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1S1S2"
+    }
+   ],
+   "delta_joint_greedy": -4.194444444444444,
+   "delta_joint_seq": -9.972222222222225,
+   "delta_joint_random": -6.444444444444447,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 22,
+    "visible_pairs": 22,
+    "aspects": {
+     "broadside": 22
+    },
+    "range_mean": 10.863636363636363,
+    "split_fire_ships": 12,
+    "concentration_max": 11
+   }
+  },
+  {
+   "panel": "main",
+   "scenario": "IBS-S-EM-01",
+   "seed": 2,
+   "turn": 6,
+   "side": "allies",
+   "intent": "I1_BROADSIDE",
+   "n_ships": 12,
+   "U": {
+    "CURRENT_PRODUCTION": 4.638888888888889,
+    "PER_SHIP_GREEDY_ADDITIVE": 3.1944444444444438,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 3.805555555555556,
+    "RANDOM_MATCHED_BUDGET": 12.055555555555555,
+    "INTERACTION_AWARE_BEAM": -2.3333333333333375
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 12,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 19
+   },
+   "total_evals": 57,
+   "n_q_probes": 16,
+   "n_pair_probes": 28,
+   "pair_probes": [
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-GUAM",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "5P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-INGRAHAM",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "5P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "5P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-COOPER",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1S3P1P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-DES-MOINES",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1S1S3P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "j": "IBS-U-USN-ERMA-GUAM",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "5P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "j": "IBS-U-USN-ERMA-INGRAHAM",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "5P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "5P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "j": "IBS-U-USN-ERMA-COOPER",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "1S3P1P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "j": "IBS-U-USN-ERMA-DES-MOINES",
+     "phi": -3.083333333333334,
+     "a_i": "0",
+     "a_j": "1S1S3P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-GUAM",
+     "j": "IBS-U-USN-ERMA-INGRAHAM",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-GUAM",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "5P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-GUAM",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "5P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-GUAM",
+     "j": "IBS-U-USN-ERMA-COOPER",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1S3P1P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-GUAM",
+     "j": "IBS-U-USN-ERMA-DES-MOINES",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1S1S3P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "5P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "5P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-COOPER",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "1S3P1P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-DES-MOINES",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "1S1S3P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-IOWA",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "5P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-IOWA",
+     "j": "IBS-U-USN-ERMA-COOPER",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1S3P1P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-IOWA",
+     "j": "IBS-U-USN-ERMA-DES-MOINES",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1S1S3P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-MISSOURI",
+     "j": "IBS-U-USN-ERMA-COOPER",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1S3P1P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-MISSOURI",
+     "j": "IBS-U-USN-ERMA-DES-MOINES",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1S1S3P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-DES-MOINES",
+     "phi": -4.166666666666668,
+     "a_i": "1S3P1P",
+     "a_j": "1S1S3P"
+    }
+   ],
+   "delta_joint_greedy": -5.527777777777781,
+   "delta_joint_seq": -6.138888888888893,
+   "delta_joint_random": -14.388888888888893,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 24,
+    "visible_pairs": 24,
+    "aspects": {
+     "bow_stern": 6,
+     "broadside": 18
+    },
+    "range_mean": 9.208333333333334,
+    "split_fire_ships": 12,
+    "concentration_max": 12
+   }
+  }
+ ],
+ "supplemental": [
+  {
+   "panel": "supplemental",
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 2,
+   "side": "allies",
+   "intent": "SUPPLEMENTAL",
+   "n_ships": 9,
+   "U": {
+    "CURRENT_PRODUCTION": 11.472222222222218,
+    "PER_SHIP_GREEDY_ADDITIVE": 12.472222222222221,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 13.805555555555557,
+    "RANDOM_MATCHED_BUDGET": 15.333333333333332,
+    "INTERACTION_AWARE_BEAM": 13.416666666666668
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 11,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 23
+   },
+   "total_evals": 60,
+   "n_q_probes": 12,
+   "n_pair_probes": 10,
+   "pair_probes": [
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-BOISE",
+     "phi": 0.22222222222221966,
+     "a_i": "1P2P3P",
+     "a_j": "1S4P"
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-HELENA",
+     "phi": -3.1388888888888964,
+     "a_i": "1P2P3P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-DUNCAN",
+     "phi": -0.9444444444444464,
+     "a_i": "1P2P3P",
+     "a_j": "1P2P3P"
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-BUCHANAN",
+     "phi": -0.5000000000000036,
+     "a_i": "1P2P3P",
+     "a_j": "1P3P1P"
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": -2.444444444444448,
+     "a_i": "1P2P3P",
+     "a_j": "1P1P4P"
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-HELENA",
+     "phi": -0.6388888888888928,
+     "a_i": "1S4P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-DUNCAN",
+     "phi": -0.08333333333333215,
+     "a_i": "1S4P",
+     "a_j": "1P2P3P"
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-BUCHANAN",
+     "phi": 0.0,
+     "a_i": "1S4P",
+     "a_j": "1P3P1P"
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": -0.22222222222222143,
+     "a_i": "1S4P",
+     "a_j": "1P1P4P"
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-DUNCAN",
+     "phi": -1.5000000000000053,
+     "a_i": "0",
+     "a_j": "1P2P3P"
+    }
+   ],
+   "delta_joint_greedy": 0.9444444444444464,
+   "delta_joint_seq": -0.3888888888888893,
+   "delta_joint_random": -1.9166666666666643,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 43,
+    "visible_pairs": 43,
+    "aspects": {
+     "broadside": 31,
+     "bow_stern": 12
+    },
+    "range_mean": 8.767441860465116,
+    "split_fire_ships": 9,
+    "concentration_max": 9
+   }
+  },
+  {
+   "panel": "supplemental",
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 2,
+   "side": "axis",
+   "intent": "SUPPLEMENTAL",
+   "n_ships": 5,
+   "U": {
+    "CURRENT_PRODUCTION": -11.472222222222218,
+    "PER_SHIP_GREEDY_ADDITIVE": -5.416666666666666,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -0.44444444444444287,
+    "RANDOM_MATCHED_BUDGET": -2.916666666666668,
+    "INTERACTION_AWARE_BEAM": -4.444444444444445
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 5,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 15
+   },
+   "total_evals": 46,
+   "n_q_probes": 10,
+   "n_pair_probes": 10,
+   "pair_probes": [
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": -0.38888888888889106,
+     "a_i": "2P3",
+     "a_j": "1SS3P"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": -0.7777777777777803,
+     "a_i": "2P3",
+     "a_j": "1SS4P"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": 3.2500000000000053,
+     "a_i": "2P3",
+     "a_j": "1SS1S2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "a_i": "2P3",
+     "a_j": "1S1S1P"
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.24999999999999822,
+     "a_i": "1SS3P",
+     "a_j": "1SS4P"
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": 2.6111111111111125,
+     "a_i": "1SS3P",
+     "a_j": "1SS1S2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "a_i": "1SS3P",
+     "a_j": "1S1S1P"
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": -0.027777777777775015,
+     "a_i": "1SS4P",
+     "a_j": "1SS1S2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "a_i": "1SS4P",
+     "a_j": "1S1S1P"
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "a_i": "1SS1S2P1P",
+     "a_j": "1S1S1P"
+    }
+   ],
+   "delta_joint_greedy": 0.9722222222222214,
+   "delta_joint_seq": -4.000000000000002,
+   "delta_joint_random": -1.5277777777777768,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 45,
+    "visible_pairs": 45,
+    "aspects": {
+     "broadside": 22,
+     "bow_stern": 23
+    },
+    "range_mean": 9.088888888888889,
+    "split_fire_ships": 5,
+    "concentration_max": 5
+   }
+  },
+  {
+   "panel": "supplemental",
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 3,
+   "side": "axis",
+   "intent": "SUPPLEMENTAL",
+   "n_ships": 5,
+   "U": {
+    "CURRENT_PRODUCTION": -7.333333333333332,
+    "PER_SHIP_GREEDY_ADDITIVE": -1.8611111111111125,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -1.8611111111111125,
+    "RANDOM_MATCHED_BUDGET": 2.916666666666666,
+    "INTERACTION_AWARE_BEAM": -1.8611111111111125
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 6,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 11
+   },
+   "total_evals": 43,
+   "n_q_probes": 10,
+   "n_pair_probes": 10,
+   "pair_probes": [
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": -0.3888888888888893,
+     "a_i": "1S1S2P1P",
+     "a_j": "1S1S3"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": 0.0,
+     "a_i": "1S1S2P1P",
+     "a_j": "1P1S"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": 0.0,
+     "a_i": "1S1S2P1P",
+     "a_j": "1P"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.6666666666666661,
+     "a_i": "1S1S2P1P",
+     "a_j": "1P1P3P"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "1P1S"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "1P"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.19444444444444642,
+     "a_i": "1S1S3",
+     "a_j": "1P1P3P"
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": 0.0,
+     "a_i": "1P1S",
+     "a_j": "1P"
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "1P1S",
+     "a_j": "1P1P3P"
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "1P",
+     "a_j": "1P1P3P"
+    }
+   ],
+   "delta_joint_greedy": 0.0,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": -4.777777777777779,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 28,
+    "visible_pairs": 28,
+    "aspects": {
+     "broadside": 16,
+     "bow_stern": 12
+    },
+    "range_mean": 10.428571428571429,
+    "split_fire_ships": 4,
+    "concentration_max": 4
+   }
+  },
+  {
+   "panel": "supplemental",
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 4,
+   "side": "axis",
+   "intent": "SUPPLEMENTAL",
+   "n_ships": 4,
+   "U": {
+    "CURRENT_PRODUCTION": -6.055555555555555,
+    "PER_SHIP_GREEDY_ADDITIVE": -4.416666666666667,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -3.694444444444443,
+    "RANDOM_MATCHED_BUDGET": -1.8333333333333304,
+    "INTERACTION_AWARE_BEAM": -3.694444444444443
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 5,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 11
+   },
+   "total_evals": 42,
+   "n_q_probes": 8,
+   "n_pair_probes": 6,
+   "pair_probes": [
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "a_i": "1SS1P",
+     "a_j": "1SS4P"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": -0.22222222222222143,
+     "a_i": "1SS1P",
+     "a_j": "3S2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": 0.0,
+     "a_i": "1SS1P",
+     "a_j": "1P2S"
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.0,
+     "a_i": "1SS4P",
+     "a_j": "3S2P1P"
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": 0.0,
+     "a_i": "1SS4P",
+     "a_j": "1P2S"
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-AOBA",
+     "phi": 0.0,
+     "a_i": "3S2P1P",
+     "a_j": "1P2S"
+    }
+   ],
+   "delta_joint_greedy": 0.7222222222222241,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": -1.8611111111111125,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 26,
+    "visible_pairs": 28,
+    "aspects": {
+     "broadside": 15,
+     "bow_stern": 11
+    },
+    "range_mean": 10.846153846153847,
+    "split_fire_ships": 4,
+    "concentration_max": 2
+   }
+  },
+  {
+   "panel": "supplemental",
+   "scenario": "IBS-S-01",
+   "seed": 1,
+   "turn": 6,
+   "side": "axis",
+   "intent": "SUPPLEMENTAL",
+   "n_ships": 3,
+   "U": {
+    "CURRENT_PRODUCTION": -5.222222222222221,
+    "PER_SHIP_GREEDY_ADDITIVE": -0.9444444444444446,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -0.9444444444444446,
+    "RANDOM_MATCHED_BUDGET": -1.777777777777776,
+    "INTERACTION_AWARE_BEAM": -1.6388888888888893
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 3,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 9
+   },
+   "total_evals": 38,
+   "n_q_probes": 6,
+   "n_pair_probes": 3,
+   "pair_probes": [
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": -0.02777777777777679,
+     "a_i": "1S3P",
+     "a_j": "1S1S1P1P"
+    },
+    {
+     "i": "IBS-U-IJN-KINUGASA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.3888888888888893,
+     "a_i": "1S3P",
+     "a_j": "1SS1S1P1P"
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": -0.11111111111111072,
+     "a_i": "1S1S1P1P",
+     "a_j": "1SS1S1P1P"
+    }
+   ],
+   "delta_joint_greedy": -0.6944444444444446,
+   "delta_joint_seq": -0.6944444444444446,
+   "delta_joint_random": 0.13888888888888662,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 14,
+    "visible_pairs": 14,
+    "aspects": {
+     "broadside": 9,
+     "bow_stern": 5
+    },
+    "range_mean": 9.571428571428571,
+    "split_fire_ships": 3,
+    "concentration_max": 2
+   }
+  },
+  {
+   "panel": "supplemental",
+   "scenario": "IBS-S-03",
+   "seed": 1,
+   "turn": 2,
+   "side": "axis",
+   "intent": "SUPPLEMENTAL",
+   "n_ships": 3,
+   "U": {
+    "CURRENT_PRODUCTION": 0.44444444444444453,
+    "PER_SHIP_GREEDY_ADDITIVE": 0.0,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 0.44444444444444453,
+    "RANDOM_MATCHED_BUDGET": 0.44444444444444453,
+    "INTERACTION_AWARE_BEAM": 0.44444444444444453
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 3,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 2
+   },
+   "total_evals": 31,
+   "n_q_probes": 6,
+   "n_pair_probes": 3,
+   "pair_probes": [
+    {
+     "i": "IBS-U-KM-HANS-LODY",
+     "j": "IBS-U-KM-KARL-GALSTER",
+     "phi": 0.0,
+     "a_i": "3S2P1P",
+     "a_j": "1P4S"
+    },
+    {
+     "i": "IBS-U-KM-HANS-LODY",
+     "j": "IBS-U-KM-RICHARD-BEITZEN",
+     "phi": 0.0,
+     "a_i": "3S2P1P",
+     "a_j": "1P1S1S"
+    },
+    {
+     "i": "IBS-U-KM-KARL-GALSTER",
+     "j": "IBS-U-KM-RICHARD-BEITZEN",
+     "phi": 0.0,
+     "a_i": "1P4S",
+     "a_j": "1P1S1S"
+    }
+   ],
+   "delta_joint_greedy": 0.44444444444444453,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": 0.0,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 1,
+    "visible_pairs": 1,
+    "aspects": {
+     "broadside": 1
+    },
+    "range_mean": 3.0,
+    "split_fire_ships": 3,
+    "concentration_max": 3
+   }
+  },
+  {
+   "panel": "supplemental",
+   "scenario": "IBS-S-03",
+   "seed": 1,
+   "turn": 4,
+   "side": "allies",
+   "intent": "SUPPLEMENTAL",
+   "n_ships": 4,
+   "U": {
+    "CURRENT_PRODUCTION": -0.44444444444444453,
+    "PER_SHIP_GREEDY_ADDITIVE": 0.0,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 0.0,
+    "RANDOM_MATCHED_BUDGET": 0.0,
+    "INTERACTION_AWARE_BEAM": 0.0
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 5,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 6
+   },
+   "total_evals": 37,
+   "n_q_probes": 8,
+   "n_pair_probes": 6,
+   "pair_probes": [
+    {
+     "i": "IBS-U-RN-KASHMIR",
+     "j": "IBS-U-RN-JACKAL",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-RN-KASHMIR",
+     "j": "IBS-U-RN-JERSEY",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "1P1P4P"
+    },
+    {
+     "i": "IBS-U-RN-KASHMIR",
+     "j": "IBS-U-RN-JUPITER",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "6P"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-JERSEY",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "1P1P4P"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-JUPITER",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "6P"
+    },
+    {
+     "i": "IBS-U-RN-JERSEY",
+     "j": "IBS-U-RN-JUPITER",
+     "phi": 0.0,
+     "a_i": "1P1P4P",
+     "a_j": "6P"
+    }
+   ],
+   "delta_joint_greedy": 0.0,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": 0.0,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 1,
+    "visible_pairs": 1,
+    "aspects": {
+     "broadside": 1
+    },
+    "range_mean": 4.0,
+    "split_fire_ships": 4,
+    "concentration_max": 4
+   }
+  },
+  {
+   "panel": "supplemental",
+   "scenario": "IBS-S-03",
+   "seed": 1,
+   "turn": 4,
+   "side": "axis",
+   "intent": "SUPPLEMENTAL",
+   "n_ships": 3,
+   "U": {
+    "CURRENT_PRODUCTION": 0.44444444444444453,
+    "PER_SHIP_GREEDY_ADDITIVE": 0.44444444444444453,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 0.44444444444444453,
+    "RANDOM_MATCHED_BUDGET": 0.44444444444444453,
+    "INTERACTION_AWARE_BEAM": 0.44444444444444453
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 4,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 5
+   },
+   "total_evals": 35,
+   "n_q_probes": 6,
+   "n_pair_probes": 3,
+   "pair_probes": [
+    {
+     "i": "IBS-U-KM-HANS-LODY",
+     "j": "IBS-U-KM-KARL-GALSTER",
+     "phi": 0.0,
+     "a_i": "3S1P1P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-KM-HANS-LODY",
+     "j": "IBS-U-KM-RICHARD-BEITZEN",
+     "phi": 0.0,
+     "a_i": "3S1P1P",
+     "a_j": "1S4S1P"
+    },
+    {
+     "i": "IBS-U-KM-KARL-GALSTER",
+     "j": "IBS-U-KM-RICHARD-BEITZEN",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "1S4S1P"
+    }
+   ],
+   "delta_joint_greedy": 0.0,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": 0.0,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 1,
+    "visible_pairs": 1,
+    "aspects": {
+     "broadside": 1
+    },
+    "range_mean": 4.0,
+    "split_fire_ships": 3,
+    "concentration_max": 3
+   }
+  },
+  {
+   "panel": "supplemental",
+   "scenario": "IBS-S-03",
+   "seed": 2,
+   "turn": 3,
+   "side": "allies",
+   "intent": "SUPPLEMENTAL",
+   "n_ships": 5,
+   "U": {
+    "CURRENT_PRODUCTION": 1.25,
+    "PER_SHIP_GREEDY_ADDITIVE": 1.4166666666666665,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 1.4166666666666665,
+    "RANDOM_MATCHED_BUDGET": 1.4166666666666665,
+    "INTERACTION_AWARE_BEAM": 1.4166666666666665
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 6,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 6
+   },
+   "total_evals": 38,
+   "n_q_probes": 10,
+   "n_pair_probes": 10,
+   "pair_probes": [
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-JACKAL",
+     "phi": 0.0,
+     "a_i": "1P4P",
+     "a_j": "1PP2P1"
+    },
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-JERSEY",
+     "phi": 0.0,
+     "a_i": "1P4P",
+     "a_j": "2P1S"
+    },
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-JUPITER",
+     "phi": 0.0,
+     "a_i": "1P4P",
+     "a_j": "1PP2P1"
+    },
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "1P4P",
+     "a_j": "2S2P"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-JERSEY",
+     "phi": 0.0,
+     "a_i": "1PP2P1",
+     "a_j": "2P1S"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-JUPITER",
+     "phi": 0.0,
+     "a_i": "1PP2P1",
+     "a_j": "1PP2P1"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "1PP2P1",
+     "a_j": "2S2P"
+    },
+    {
+     "i": "IBS-U-RN-JERSEY",
+     "j": "IBS-U-RN-JUPITER",
+     "phi": 0.0,
+     "a_i": "2P1S",
+     "a_j": "1PP2P1"
+    },
+    {
+     "i": "IBS-U-RN-JERSEY",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "2P1S",
+     "a_j": "2S2P"
+    },
+    {
+     "i": "IBS-U-RN-JUPITER",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "1PP2P1",
+     "a_j": "2S2P"
+    }
+   ],
+   "delta_joint_greedy": 0.0,
+   "delta_joint_seq": 0.0,
+   "delta_joint_random": 0.0,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 2,
+    "visible_pairs": 2,
+    "aspects": {
+     "broadside": 1,
+     "bow_stern": 1
+    },
+    "range_mean": 2.0,
+    "split_fire_ships": 5,
+    "concentration_max": 5
+   }
+  },
+  {
+   "panel": "supplemental",
+   "scenario": "IBS-S-03",
+   "seed": 2,
+   "turn": 4,
+   "side": "allies",
+   "intent": "SUPPLEMENTAL",
+   "n_ships": 5,
+   "U": {
+    "CURRENT_PRODUCTION": -1.1666666666666667,
+    "PER_SHIP_GREEDY_ADDITIVE": -0.861111111111111,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": -0.3055555555555556,
+    "RANDOM_MATCHED_BUDGET": 0.0,
+    "INTERACTION_AWARE_BEAM": 0.0
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 5,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 12
+   },
+   "total_evals": 43,
+   "n_q_probes": 10,
+   "n_pair_probes": 10,
+   "pair_probes": [
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-JUPITER",
+     "phi": -1.7222222222222223,
+     "a_i": "3S1P1P",
+     "a_j": "1SS2S1P1P"
+    },
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-JACKAL",
+     "phi": 0.0,
+     "a_i": "3S1P1P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-JERSEY",
+     "phi": 0.0,
+     "a_i": "3S1P1P",
+     "a_j": "1PP2P"
+    },
+    {
+     "i": "IBS-U-RN-JAVELIN",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "3S1P1P",
+     "a_j": "5P1P"
+    },
+    {
+     "i": "IBS-U-RN-JUPITER",
+     "j": "IBS-U-RN-JACKAL",
+     "phi": 0.0,
+     "a_i": "1SS2S1P1P",
+     "a_j": "0"
+    },
+    {
+     "i": "IBS-U-RN-JUPITER",
+     "j": "IBS-U-RN-JERSEY",
+     "phi": 0.0,
+     "a_i": "1SS2S1P1P",
+     "a_j": "1PP2P"
+    },
+    {
+     "i": "IBS-U-RN-JUPITER",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "1SS2S1P1P",
+     "a_j": "5P1P"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-JERSEY",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "1PP2P"
+    },
+    {
+     "i": "IBS-U-RN-JACKAL",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "0",
+     "a_j": "5P1P"
+    },
+    {
+     "i": "IBS-U-RN-JERSEY",
+     "j": "IBS-U-RN-KASHMIR",
+     "phi": 0.0,
+     "a_i": "1PP2P",
+     "a_j": "5P1P"
+    }
+   ],
+   "delta_joint_greedy": 0.861111111111111,
+   "delta_joint_seq": 0.3055555555555556,
+   "delta_joint_random": 0.0,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 1,
+    "visible_pairs": 1,
+    "aspects": {
+     "broadside": 1
+    },
+    "range_mean": 4.0,
+    "split_fire_ships": 5,
+    "concentration_max": 5
+   }
+  },
+  {
+   "panel": "supplemental",
+   "scenario": "IBS-S-EM-01",
+   "seed": 1,
+   "turn": 9,
+   "side": "allies",
+   "intent": "SUPPLEMENTAL",
+   "n_ships": 12,
+   "U": {
+    "CURRENT_PRODUCTION": 4.555555555555558,
+    "PER_SHIP_GREEDY_ADDITIVE": 2.4999999999999973,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 8.277777777777779,
+    "RANDOM_MATCHED_BUDGET": 4.750000000000001,
+    "INTERACTION_AWARE_BEAM": -1.6944444444444464
+   },
+   "evals": {
+    "CURRENT_PRODUCTION": 1,
+    "PER_SHIP_GREEDY_ADDITIVE": 1,
+    "SEQUENTIAL_TEAM_BEST_RESPONSE": 21,
+    "RANDOM_MATCHED_BUDGET": 24,
+    "INTERACTION_AWARE_BEAM": 19
+   },
+   "total_evals": 66,
+   "n_q_probes": 16,
+   "n_pair_probes": 28,
+   "pair_probes": [
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-INGRAHAM",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "5P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-DES-MOINES",
+     "phi": -1.4722222222222214,
+     "a_i": "1S1S3",
+     "a_j": "1P1P1P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-ALASKA",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-GUAM",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "1S1S3",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-COOPER",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": 0.2500000000000009,
+     "a_i": "1S1S3",
+     "a_j": "1S1S2"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-DES-MOINES",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1P1P1P"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-ALASKA",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-GUAM",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "5P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-INGRAHAM",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": -0.6388888888888875,
+     "a_i": "5P",
+     "a_j": "1S1S2"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-DES-MOINES",
+     "j": "IBS-U-USN-ERMA-ALASKA",
+     "phi": 0.0,
+     "a_i": "1P1P1P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-DES-MOINES",
+     "j": "IBS-U-USN-ERMA-GUAM",
+     "phi": 0.0,
+     "a_i": "1P1P1P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-DES-MOINES",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "1P1P1P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-DES-MOINES",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "1P1P1P",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-DES-MOINES",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": 0.0,
+     "a_i": "1P1P1P",
+     "a_j": "1S1S2"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-GUAM",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-ALASKA",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1S1S2"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-GUAM",
+     "j": "IBS-U-USN-ERMA-IOWA",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-GUAM",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-GUAM",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1S1S2"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-IOWA",
+     "j": "IBS-U-USN-ERMA-MISSOURI",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1PP2P1S"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-IOWA",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1S1S2"
+    },
+    {
+     "i": "IBS-U-USN-ERMA-MISSOURI",
+     "j": "IBS-U-USN-ERMA-ALLEN-M-SUMNER",
+     "phi": 0.0,
+     "a_i": "1PP2P1S",
+     "a_j": "1S1S2"
+    }
+   ],
+   "delta_joint_greedy": -4.194444444444444,
+   "delta_joint_seq": -9.972222222222225,
+   "delta_joint_random": -6.444444444444447,
+   "context": {
+    "collision_events": 0,
+    "legal_pairs": 22,
+    "visible_pairs": 22,
+    "aspects": {
+     "broadside": 22
+    },
+    "range_mean": 10.863636363636363,
+    "split_fire_ships": 12,
+    "concentration_max": 11
+   }
+  }
+ ],
+ "counts": {},
+ "verdict": {
+  "panels": {
+   "main": {
+    "panel": "main",
+    "n": 19,
+    "delta_greedy": {
+     "mean": -0.38888888888888895,
+     "median": 0.0,
+     "win": 6,
+     "tie": 9,
+     "loss": 4,
+     "win_rate": 0.3157894736842105,
+     "bootstrap_ci": [
+      0.0,
+      0.11111111111111338
+     ]
+    },
+    "delta_seq": {
+     "mean": -1.3713450292397666,
+     "median": 0.0,
+     "bootstrap_ci": [
+      -0.7222222222222197,
+      0.0
+     ]
+    },
+    "delta_random": {
+     "median": -0.08333333333333393
+    },
+    "per_scenario": {
+     "IBS-S-01": {
+      "n": 10,
+      "median": 0.0,
+      "mean": -0.02499999999999982
+     },
+     "IBS-S-03": {
+      "n": 6,
+      "median": 0.22222222222222227,
+      "mean": 0.4305555555555555
+     },
+     "IBS-S-EM-01": {
+      "n": 3,
+      "median": -4.194444444444444,
+      "mean": -3.240740740740742
+     }
+    },
+    "scenarios_median_positive": 1,
+    "robust_median_after_dropping_top2": 0.0,
+    "exact_evals_mean": 44.0
+   },
+   "supplemental": {
+    "panel": "supplemental",
+    "n": 11,
+    "delta_greedy": {
+     "mean": -0.08585858585858554,
+     "median": 0.0,
+     "win": 5,
+     "tie": 4,
+     "loss": 2,
+     "win_rate": 0.45454545454545453,
+     "bootstrap_ci": [
+      0.0,
+      0.861111111111111
+     ]
+    },
+    "delta_seq": {
+     "mean": -1.3409090909090915,
+     "median": 0.0,
+     "bootstrap_ci": [
+      -0.6944444444444446,
+      0.0
+     ]
+    },
+    "delta_random": {
+     "median": 0.0
+    },
+    "per_scenario": {
+     "IBS-S-01": {
+      "n": 5,
+      "median": 0.7222222222222241,
+      "mean": 0.38888888888888945
+     },
+     "IBS-S-03": {
+      "n": 5,
+      "median": 0.0,
+      "mean": 0.2611111111111111
+     },
+     "IBS-S-EM-01": {
+      "n": 1,
+      "median": -4.194444444444444,
+      "mean": -4.194444444444444
+     }
+    },
+    "scenarios_median_positive": 1,
+    "robust_median_after_dropping_top2": 0.0,
+    "exact_evals_mean": 43.54545454545455
+   }
+  },
+  "conditions": {
+   "1_median_positive_in_ge2_scenarios": false,
+   "2_pooled_win_rate_ge_060": false,
+   "3_pooled_median_ge_floor": false,
+   "4_not_worse_than_sequential": false,
+   "5_random_clearly_worse": false,
+   "6_not_driven_by_extremes": false
+  },
+  "JTC_INTERACTION_GATE": "FAIL"
+ },
+ "wall_seconds": 1973.1
+}

@@ -1,0 +1,2338 @@
+{
+ "pilot_locators": [
+  [
+   "IBS-S-01",
+   1,
+   2,
+   "axis",
+   "I1_BROADSIDE"
+  ],
+  [
+   "IBS-S-01",
+   1,
+   2,
+   "axis",
+   "I2_RANGE"
+  ],
+  [
+   "IBS-S-01",
+   1,
+   2,
+   "axis",
+   "I3_RAKING"
+  ],
+  [
+   "IBS-S-01",
+   1,
+   3,
+   "axis",
+   "I1_BROADSIDE"
+  ],
+  [
+   "IBS-S-01",
+   1,
+   3,
+   "axis",
+   "I2_RANGE"
+  ],
+  [
+   "IBS-S-01",
+   1,
+   3,
+   "axis",
+   "I3_RAKING"
+  ],
+  [
+   "IBS-S-01",
+   1,
+   4,
+   "allies",
+   "I1_BROADSIDE"
+  ],
+  [
+   "IBS-S-01",
+   1,
+   4,
+   "allies",
+   "I2_RANGE"
+  ],
+  [
+   "IBS-S-01",
+   1,
+   4,
+   "allies",
+   "I3_RAKING"
+  ],
+  [
+   "IBS-S-01",
+   1,
+   4,
+   "axis",
+   "I1_BROADSIDE"
+  ]
+ ],
+ "floors": {
+  "phi": 0.05,
+  "rank_agreement": 0.95
+ },
+ "pilots": [
+  {
+   "locator": {
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 2,
+    "side": "axis",
+    "intent": "I1_BROADSIDE",
+    "focal": "IBS-U-IJN-KINUGASA",
+    "target": "IBS-U-USN-DUNCAN",
+    "arms": {
+     "CURRENT_PRODUCTION_POLICY": {
+      "L0": {
+       "M": 1.3611111111111112,
+       "eh": 1.3611111111111112,
+       "executable": true,
+       "distance": 14,
+       "visible": true,
+       "mounts": 5,
+       "raking": 23,
+       "legal_pairs": 45,
+       "raking_fraction": 0.5111111111111111
+      },
+      "L1": {
+       "own_eh": 10.472222222222221,
+       "enemy_eh": 21.94444444444444,
+       "U_team": -11.472222222222218
+      }
+     },
+     "REPAIRED_RESEARCH_INTENT": {
+      "L0": {
+       "M": 0.8333333333333334,
+       "eh": 0.8333333333333334,
+       "executable": true,
+       "distance": 12,
+       "visible": true,
+       "mounts": 2,
+       "raking": 18,
+       "legal_pairs": 44,
+       "raking_fraction": 0.4090909090909091
+      },
+      "L1": {
+       "own_eh": 9.222222222222223,
+       "enemy_eh": 23.916666666666668,
+       "U_team": -14.694444444444445
+      }
+     },
+     "PER_SHIP_GREEDY": {
+      "L0": {
+       "M": 0.5277777777777778,
+       "eh": 0.5277777777777778,
+       "executable": true,
+       "distance": 16,
+       "visible": true,
+       "mounts": 5,
+       "raking": 25,
+       "legal_pairs": 43,
+       "raking_fraction": 0.5813953488372093
+      },
+      "L1": {
+       "own_eh": 8.722222222222221,
+       "enemy_eh": 14.138888888888888,
+       "U_team": -5.416666666666666
+      }
+     },
+     "JOINT_BEAM_SEARCH": {
+      "L0": {
+       "M": 1.3611111111111112,
+       "eh": 1.3611111111111112,
+       "executable": true,
+       "distance": 14,
+       "visible": true,
+       "mounts": 5,
+       "raking": 26,
+       "legal_pairs": 45,
+       "raking_fraction": 0.5777777777777777
+      },
+      "L1": {
+       "own_eh": 10.13888888888889,
+       "enemy_eh": 14.138888888888888,
+       "U_team": -3.9999999999999982
+      }
+     },
+     "RANDOM_MATCHED_BUDGET": {
+      "L0": {
+       "M": 1.3611111111111112,
+       "eh": 1.3611111111111112,
+       "executable": true,
+       "distance": 14,
+       "visible": true,
+       "mounts": 5,
+       "raking": 25,
+       "legal_pairs": 45,
+       "raking_fraction": 0.5555555555555556
+      },
+      "L1": {
+       "own_eh": 8.833333333333332,
+       "enemy_eh": 26.833333333333332,
+       "U_team": -18.0
+      }
+     }
+    },
+    "beam_selected_by_constraint": true,
+    "panel": "damaged"
+   },
+   "n_ships": 5,
+   "n_pairs": 10,
+   "phi_rows": [
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": -0.8333333333333268,
+     "distance": 4,
+     "phi_abs": 0.8333333333333268
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": -1.3611111111111072,
+     "distance": 2,
+     "phi_abs": 1.3611111111111072
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 4,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": -0.3333333333333339,
+     "distance": 4,
+     "phi_abs": 0.3333333333333339
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 4.1388888888889,
+     "distance": 6,
+     "phi_abs": 4.1388888888889
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 8,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": -0.5555555555555554,
+     "distance": 8,
+     "phi_abs": 0.5555555555555554
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 4,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.5,
+     "distance": 2,
+     "phi_abs": 0.5
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "distance": 6,
+     "phi_abs": 0.0
+    }
+   ],
+   "surrogate_vs_exact_agreement": 0.2756521739130435,
+   "exact_additive_model_vs_exact_agreement": 0.03304347826086956,
+   "n_failed_evals": 0,
+   "q_values": {
+    "IBS-U-IJN-AOBA": 1.5277777777777786,
+    "IBS-U-IJN-FUBUKI": 0.7499999999999929,
+    "IBS-U-IJN-FURUTAKA": 1.749999999999993,
+    "IBS-U-IJN-HATSUYUKI": 0.0,
+    "IBS-U-IJN-KINUGASA": -1.4444444444444446
+   },
+   "a0_U": -11.472222222222218
+  },
+  {
+   "locator": {
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 2,
+    "side": "axis",
+    "intent": "I2_RANGE",
+    "focal": "IBS-U-IJN-KINUGASA",
+    "target": "IBS-U-USN-DUNCAN",
+    "arms": {
+     "CURRENT_PRODUCTION_POLICY": {
+      "L0": {
+       "M": -14.0,
+       "eh": 1.3611111111111112,
+       "executable": true,
+       "distance": 14,
+       "visible": true,
+       "mounts": 5,
+       "raking": 23,
+       "legal_pairs": 45,
+       "raking_fraction": 0.5111111111111111
+      },
+      "L1": {
+       "own_eh": 10.472222222222221,
+       "enemy_eh": 21.94444444444444,
+       "U_team": -11.472222222222218
+      }
+     },
+     "REPAIRED_RANGE_CLOSE": {
+      "L0": {
+       "M": -14.0,
+       "eh": 1.3611111111111112,
+       "executable": true,
+       "distance": 14,
+       "visible": true,
+       "mounts": 5,
+       "raking": 23,
+       "legal_pairs": 45,
+       "raking_fraction": 0.5111111111111111
+      },
+      "L1": {
+       "own_eh": 10.472222222222221,
+       "enemy_eh": 21.94444444444444,
+       "U_team": -11.472222222222218
+      }
+     },
+     "REPAIRED_RANGE_OPEN": {
+      "L0": {
+       "M": -12.0,
+       "eh": 0.8333333333333334,
+       "executable": true,
+       "distance": 12,
+       "visible": true,
+       "mounts": 2,
+       "raking": 21,
+       "legal_pairs": 45,
+       "raking_fraction": 0.4666666666666667
+      },
+      "L1": {
+       "own_eh": 9.972222222222221,
+       "enemy_eh": 21.94444444444444,
+       "U_team": -11.972222222222218
+      }
+     },
+     "REPAIRED_RESEARCH_INTENT": {
+      "L0": {
+       "M": -12.0,
+       "eh": 0.8333333333333334,
+       "executable": true,
+       "distance": 12,
+       "visible": true,
+       "mounts": 2,
+       "raking": 21,
+       "legal_pairs": 45,
+       "raking_fraction": 0.4666666666666667
+      },
+      "L1": {
+       "own_eh": 9.972222222222221,
+       "enemy_eh": 21.94444444444444,
+       "U_team": -11.972222222222218
+      }
+     },
+     "PER_SHIP_GREEDY": {
+      "L0": {
+       "M": -16.0,
+       "eh": 0.5277777777777778,
+       "executable": true,
+       "distance": 16,
+       "visible": true,
+       "mounts": 5,
+       "raking": 25,
+       "legal_pairs": 43,
+       "raking_fraction": 0.5813953488372093
+      },
+      "L1": {
+       "own_eh": 8.722222222222221,
+       "enemy_eh": 14.138888888888888,
+       "U_team": -5.416666666666666
+      }
+     },
+     "JOINT_BEAM_SEARCH": {
+      "L0": {
+       "M": -14.0,
+       "eh": 1.3611111111111112,
+       "executable": true,
+       "distance": 14,
+       "visible": true,
+       "mounts": 5,
+       "raking": 26,
+       "legal_pairs": 45,
+       "raking_fraction": 0.5777777777777777
+      },
+      "L1": {
+       "own_eh": 10.13888888888889,
+       "enemy_eh": 14.138888888888888,
+       "U_team": -3.9999999999999982
+      }
+     },
+     "RANDOM_MATCHED_BUDGET": {
+      "L0": {
+       "M": -14.0,
+       "eh": 1.3611111111111112,
+       "executable": true,
+       "distance": 14,
+       "visible": true,
+       "mounts": 5,
+       "raking": 25,
+       "legal_pairs": 45,
+       "raking_fraction": 0.5555555555555556
+      },
+      "L1": {
+       "own_eh": 8.833333333333332,
+       "enemy_eh": 26.833333333333332,
+       "U_team": -18.0
+      }
+     }
+    },
+    "range_direction": "OPEN",
+    "beam_selected_by_constraint": true,
+    "panel": "damaged"
+   },
+   "n_ships": 5,
+   "n_pairs": 10,
+   "phi_rows": [
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": -0.8333333333333268,
+     "distance": 4,
+     "phi_abs": 0.8333333333333268
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": -1.3611111111111072,
+     "distance": 2,
+     "phi_abs": 1.3611111111111072
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 4,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": -0.3333333333333339,
+     "distance": 4,
+     "phi_abs": 0.3333333333333339
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 4.1388888888889,
+     "distance": 6,
+     "phi_abs": 4.1388888888889
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 8,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": -0.5555555555555554,
+     "distance": 8,
+     "phi_abs": 0.5555555555555554
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 4,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.5,
+     "distance": 2,
+     "phi_abs": 0.5
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "distance": 6,
+     "phi_abs": 0.0
+    }
+   ],
+   "surrogate_vs_exact_agreement": 0.2756521739130435,
+   "exact_additive_model_vs_exact_agreement": 0.03304347826086956,
+   "n_failed_evals": 0,
+   "q_values": {
+    "IBS-U-IJN-AOBA": 1.5277777777777786,
+    "IBS-U-IJN-FUBUKI": 0.7499999999999929,
+    "IBS-U-IJN-FURUTAKA": 1.749999999999993,
+    "IBS-U-IJN-HATSUYUKI": 0.0,
+    "IBS-U-IJN-KINUGASA": -1.4444444444444446
+   },
+   "a0_U": -11.472222222222218
+  },
+  {
+   "locator": {
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 2,
+    "side": "axis",
+    "intent": "I3_RAKING",
+    "focal": "IBS-U-IJN-KINUGASA",
+    "target": "IBS-U-USN-DUNCAN",
+    "arms": {
+     "CURRENT_PRODUCTION_POLICY": {
+      "L0": {
+       "M": 0.5111111111111111,
+       "eh": 1.3611111111111112,
+       "executable": true,
+       "distance": 14,
+       "visible": true,
+       "mounts": 5,
+       "raking": 23,
+       "legal_pairs": 45,
+       "raking_fraction": 0.5111111111111111
+      },
+      "L1": {
+       "own_eh": 10.472222222222221,
+       "enemy_eh": 21.94444444444444,
+       "U_team": -11.472222222222218
+      }
+     },
+     "REPAIRED_RESEARCH_INTENT": {
+      "L0": {
+       "M": 0.5111111111111111,
+       "eh": 1.3611111111111112,
+       "executable": true,
+       "distance": 13,
+       "visible": true,
+       "mounts": 5,
+       "raking": 23,
+       "legal_pairs": 45,
+       "raking_fraction": 0.5111111111111111
+      },
+      "L1": {
+       "own_eh": 10.472222222222221,
+       "enemy_eh": 21.94444444444444,
+       "U_team": -11.472222222222218
+      }
+     },
+     "PER_SHIP_GREEDY": {
+      "L0": {
+       "M": 0.5813953488372093,
+       "eh": 0.5277777777777778,
+       "executable": true,
+       "distance": 16,
+       "visible": true,
+       "mounts": 5,
+       "raking": 25,
+       "legal_pairs": 43,
+       "raking_fraction": 0.5813953488372093
+      },
+      "L1": {
+       "own_eh": 8.722222222222221,
+       "enemy_eh": 14.138888888888888,
+       "U_team": -5.416666666666666
+      }
+     },
+     "JOINT_BEAM_SEARCH": {
+      "L0": {
+       "M": 0.5777777777777777,
+       "eh": 1.3611111111111112,
+       "executable": true,
+       "distance": 14,
+       "visible": true,
+       "mounts": 5,
+       "raking": 26,
+       "legal_pairs": 45,
+       "raking_fraction": 0.5777777777777777
+      },
+      "L1": {
+       "own_eh": 10.13888888888889,
+       "enemy_eh": 14.138888888888888,
+       "U_team": -3.9999999999999982
+      }
+     },
+     "RANDOM_MATCHED_BUDGET": {
+      "L0": {
+       "M": 0.5116279069767442,
+       "eh": 0.5277777777777778,
+       "executable": true,
+       "distance": 16,
+       "visible": true,
+       "mounts": 5,
+       "raking": 22,
+       "legal_pairs": 43,
+       "raking_fraction": 0.5116279069767442
+      },
+      "L1": {
+       "own_eh": 6.722222222222222,
+       "enemy_eh": 11.055555555555554,
+       "U_team": -4.333333333333331
+      }
+     }
+    },
+    "beam_selected_by_constraint": true,
+    "panel": "damaged"
+   },
+   "n_ships": 5,
+   "n_pairs": 10,
+   "phi_rows": [
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": -0.8333333333333268,
+     "distance": 4,
+     "phi_abs": 0.8333333333333268
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": -1.3611111111111072,
+     "distance": 2,
+     "phi_abs": 1.3611111111111072
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 4,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": -0.3333333333333339,
+     "distance": 4,
+     "phi_abs": 0.3333333333333339
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 4.1388888888889,
+     "distance": 6,
+     "phi_abs": 4.1388888888889
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 8,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": -0.5555555555555554,
+     "distance": 8,
+     "phi_abs": 0.5555555555555554
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 4,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.5,
+     "distance": 2,
+     "phi_abs": 0.5
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "distance": 6,
+     "phi_abs": 0.0
+    }
+   ],
+   "surrogate_vs_exact_agreement": 0.2756521739130435,
+   "exact_additive_model_vs_exact_agreement": 0.03304347826086956,
+   "n_failed_evals": 0,
+   "q_values": {
+    "IBS-U-IJN-AOBA": 1.5277777777777786,
+    "IBS-U-IJN-FUBUKI": 0.7499999999999929,
+    "IBS-U-IJN-FURUTAKA": 1.749999999999993,
+    "IBS-U-IJN-HATSUYUKI": 0.0,
+    "IBS-U-IJN-KINUGASA": -1.4444444444444446
+   },
+   "a0_U": -11.472222222222218
+  },
+  {
+   "locator": {
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 3,
+    "side": "axis",
+    "intent": "I1_BROADSIDE",
+    "focal": "IBS-U-IJN-KINUGASA",
+    "target": "IBS-U-USN-BOISE",
+    "arms": {
+     "CURRENT_PRODUCTION_POLICY": {
+      "L0": {
+       "M": 0.5,
+       "eh": 0.5,
+       "executable": true,
+       "distance": 14,
+       "visible": true,
+       "mounts": 2,
+       "raking": 12,
+       "legal_pairs": 28,
+       "raking_fraction": 0.42857142857142855
+      },
+      "L1": {
+       "own_eh": 10.277777777777779,
+       "enemy_eh": 17.61111111111111,
+       "U_team": -7.333333333333332
+      }
+     },
+     "REPAIRED_RESEARCH_INTENT": {
+      "L0": {
+       "M": 0.6111111111111112,
+       "eh": 0.6111111111111112,
+       "executable": true,
+       "distance": 14,
+       "visible": true,
+       "mounts": 5,
+       "raking": 12,
+       "legal_pairs": 30,
+       "raking_fraction": 0.4
+      },
+      "L1": {
+       "own_eh": 11.944444444444445,
+       "enemy_eh": 10.611111111111112,
+       "U_team": 1.3333333333333321
+      }
+     },
+     "PER_SHIP_GREEDY": {
+      "L0": {
+       "M": 0.6111111111111112,
+       "eh": 0.6111111111111112,
+       "executable": true,
+       "distance": 15,
+       "visible": true,
+       "mounts": 5,
+       "raking": 13,
+       "legal_pairs": 27,
+       "raking_fraction": 0.48148148148148145
+      },
+      "L1": {
+       "own_eh": 10.333333333333334,
+       "enemy_eh": 12.194444444444446,
+       "U_team": -1.8611111111111125
+      }
+     },
+     "JOINT_BEAM_SEARCH": {
+      "L0": {
+       "M": 0.6111111111111112,
+       "eh": 0.6111111111111112,
+       "executable": true,
+       "distance": 15,
+       "visible": true,
+       "mounts": 5,
+       "raking": 14,
+       "legal_pairs": 29,
+       "raking_fraction": 0.4827586206896552
+      },
+      "L1": {
+       "own_eh": 10.36111111111111,
+       "enemy_eh": 25.916666666666664,
+       "U_team": -15.555555555555554
+      }
+     },
+     "RANDOM_MATCHED_BUDGET": {
+      "L0": {
+       "M": 0.6111111111111112,
+       "eh": 0.6111111111111112,
+       "executable": true,
+       "distance": 15,
+       "visible": true,
+       "mounts": 5,
+       "raking": 11,
+       "legal_pairs": 26,
+       "raking_fraction": 0.4230769230769231
+      },
+      "L1": {
+       "own_eh": 10.0,
+       "enemy_eh": 7.055555555555556,
+       "U_team": 2.9444444444444438
+      }
+     }
+    },
+    "beam_selected_by_constraint": true,
+    "panel": "mid"
+   },
+   "n_ships": 5,
+   "n_pairs": 10,
+   "phi_rows": [
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": 0.0,
+     "distance": 8,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.0,
+     "distance": 5,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 3,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "distance": 7,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.0,
+     "distance": 7,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 11,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "distance": 8,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.19444444444444642,
+     "distance": 8,
+     "phi_abs": 0.19444444444444642
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": -0.3888888888888893,
+     "distance": 2,
+     "phi_abs": 0.3888888888888893
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.6666666666666661,
+     "distance": 9,
+     "phi_abs": 0.6666666666666661
+    }
+   ],
+   "surrogate_vs_exact_agreement": 0.011304347826086957,
+   "exact_additive_model_vs_exact_agreement": 0.036521739130434785,
+   "n_failed_evals": 0,
+   "q_values": {
+    "IBS-U-IJN-AOBA": 0.0,
+    "IBS-U-IJN-FUBUKI": 0.0,
+    "IBS-U-IJN-FURUTAKA": 1.2499999999999982,
+    "IBS-U-IJN-HATSUYUKI": -0.3888888888888893,
+    "IBS-U-IJN-KINUGASA": 4.805555555555554
+   },
+   "a0_U": -7.333333333333332
+  },
+  {
+   "locator": {
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 3,
+    "side": "axis",
+    "intent": "I2_RANGE",
+    "focal": "IBS-U-IJN-KINUGASA",
+    "target": "IBS-U-USN-BOISE",
+    "arms": {
+     "CURRENT_PRODUCTION_POLICY": {
+      "L0": {
+       "M": -14.0,
+       "eh": 0.5,
+       "executable": true,
+       "distance": 14,
+       "visible": true,
+       "mounts": 2,
+       "raking": 12,
+       "legal_pairs": 28,
+       "raking_fraction": 0.42857142857142855
+      },
+      "L1": {
+       "own_eh": 10.277777777777779,
+       "enemy_eh": 17.61111111111111,
+       "U_team": -7.333333333333332
+      }
+     },
+     "REPAIRED_RANGE_CLOSE": {
+      "L0": {
+       "M": -15.0,
+       "eh": 0.6111111111111112,
+       "executable": true,
+       "distance": 15,
+       "visible": true,
+       "mounts": 5,
+       "raking": 11,
+       "legal_pairs": 26,
+       "raking_fraction": 0.4230769230769231
+      },
+      "L1": {
+       "own_eh": 9.0,
+       "enemy_eh": 12.972222222222223,
+       "U_team": -3.972222222222223
+      }
+     },
+     "REPAIRED_RANGE_OPEN": {
+      "L0": {
+       "M": -13.0,
+       "eh": 0.6111111111111112,
+       "executable": true,
+       "distance": 13,
+       "visible": true,
+       "mounts": 5,
+       "raking": 12,
+       "legal_pairs": 29,
+       "raking_fraction": 0.41379310344827586
+      },
+      "L1": {
+       "own_eh": 9.63888888888889,
+       "enemy_eh": 15.277777777777779,
+       "U_team": -5.638888888888889
+      }
+     },
+     "REPAIRED_RESEARCH_INTENT": {
+      "L0": {
+       "M": -13.0,
+       "eh": 0.6111111111111112,
+       "executable": true,
+       "distance": 13,
+       "visible": true,
+       "mounts": 5,
+       "raking": 12,
+       "legal_pairs": 29,
+       "raking_fraction": 0.41379310344827586
+      },
+      "L1": {
+       "own_eh": 9.63888888888889,
+       "enemy_eh": 15.277777777777779,
+       "U_team": -5.638888888888889
+      }
+     },
+     "PER_SHIP_GREEDY": {
+      "L0": {
+       "M": -15.0,
+       "eh": 0.6111111111111112,
+       "executable": true,
+       "distance": 15,
+       "visible": true,
+       "mounts": 5,
+       "raking": 13,
+       "legal_pairs": 27,
+       "raking_fraction": 0.48148148148148145
+      },
+      "L1": {
+       "own_eh": 10.333333333333334,
+       "enemy_eh": 12.194444444444446,
+       "U_team": -1.8611111111111125
+      }
+     },
+     "JOINT_BEAM_SEARCH": {
+      "L0": {
+       "M": -15.0,
+       "eh": 0.6111111111111112,
+       "executable": true,
+       "distance": 15,
+       "visible": true,
+       "mounts": 5,
+       "raking": 14,
+       "legal_pairs": 29,
+       "raking_fraction": 0.4827586206896552
+      },
+      "L1": {
+       "own_eh": 10.36111111111111,
+       "enemy_eh": 25.916666666666664,
+       "U_team": -15.555555555555554
+      }
+     },
+     "RANDOM_MATCHED_BUDGET": {
+      "L0": {
+       "M": -10.0,
+       "eh": 0.6111111111111112,
+       "executable": true,
+       "distance": 10,
+       "visible": true,
+       "mounts": 5,
+       "raking": 11,
+       "legal_pairs": 32,
+       "raking_fraction": 0.34375
+      },
+      "L1": {
+       "own_eh": 10.86111111111111,
+       "enemy_eh": 25.638888888888886,
+       "U_team": -14.777777777777775
+      }
+     }
+    },
+    "range_direction": "OPEN",
+    "beam_selected_by_constraint": false,
+    "panel": "mid"
+   },
+   "n_ships": 5,
+   "n_pairs": 10,
+   "phi_rows": [
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": 0.0,
+     "distance": 8,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.0,
+     "distance": 5,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 3,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "distance": 7,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.0,
+     "distance": 7,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 11,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "distance": 8,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.19444444444444642,
+     "distance": 8,
+     "phi_abs": 0.19444444444444642
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": -0.3888888888888893,
+     "distance": 2,
+     "phi_abs": 0.3888888888888893
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.6666666666666661,
+     "distance": 9,
+     "phi_abs": 0.6666666666666661
+    }
+   ],
+   "surrogate_vs_exact_agreement": 0.011304347826086957,
+   "exact_additive_model_vs_exact_agreement": 0.036521739130434785,
+   "n_failed_evals": 0,
+   "q_values": {
+    "IBS-U-IJN-AOBA": 0.0,
+    "IBS-U-IJN-FUBUKI": 0.0,
+    "IBS-U-IJN-FURUTAKA": 1.2499999999999982,
+    "IBS-U-IJN-HATSUYUKI": -0.3888888888888893,
+    "IBS-U-IJN-KINUGASA": 4.805555555555554
+   },
+   "a0_U": -7.333333333333332
+  },
+  {
+   "locator": {
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 3,
+    "side": "axis",
+    "intent": "I3_RAKING",
+    "focal": "IBS-U-IJN-KINUGASA",
+    "target": "IBS-U-USN-BOISE",
+    "arms": {
+     "CURRENT_PRODUCTION_POLICY": {
+      "L0": {
+       "M": 0.42857142857142855,
+       "eh": 0.5,
+       "executable": true,
+       "distance": 14,
+       "visible": true,
+       "mounts": 2,
+       "raking": 12,
+       "legal_pairs": 28,
+       "raking_fraction": 0.42857142857142855
+      },
+      "L1": {
+       "own_eh": 10.277777777777779,
+       "enemy_eh": 17.61111111111111,
+       "U_team": -7.333333333333332
+      }
+     },
+     "REPAIRED_RESEARCH_INTENT": {
+      "L0": {
+       "M": 0.38461538461538464,
+       "eh": 0.4166666666666667,
+       "executable": true,
+       "distance": 16,
+       "visible": true,
+       "mounts": 5,
+       "raking": 10,
+       "legal_pairs": 26,
+       "raking_fraction": 0.38461538461538464
+      },
+      "L1": {
+       "own_eh": 9.0,
+       "enemy_eh": 11.888888888888891,
+       "U_team": -2.888888888888891
+      }
+     },
+     "PER_SHIP_GREEDY": {
+      "L0": {
+       "M": 0.48148148148148145,
+       "eh": 0.6111111111111112,
+       "executable": true,
+       "distance": 15,
+       "visible": true,
+       "mounts": 5,
+       "raking": 13,
+       "legal_pairs": 27,
+       "raking_fraction": 0.48148148148148145
+      },
+      "L1": {
+       "own_eh": 10.333333333333334,
+       "enemy_eh": 12.194444444444446,
+       "U_team": -1.8611111111111125
+      }
+     },
+     "JOINT_BEAM_SEARCH": {
+      "L0": {
+       "M": 0.4827586206896552,
+       "eh": 0.4166666666666667,
+       "executable": true,
+       "distance": 16,
+       "visible": true,
+       "mounts": 5,
+       "raking": 14,
+       "legal_pairs": 29,
+       "raking_fraction": 0.4827586206896552
+      },
+      "L1": {
+       "own_eh": 10.36111111111111,
+       "enemy_eh": 25.916666666666664,
+       "U_team": -15.555555555555554
+      }
+     },
+     "RANDOM_MATCHED_BUDGET": {
+      "L0": {
+       "M": 0.4444444444444444,
+       "eh": 0.4166666666666667,
+       "executable": true,
+       "distance": 16,
+       "visible": true,
+       "mounts": 5,
+       "raking": 12,
+       "legal_pairs": 27,
+       "raking_fraction": 0.4444444444444444
+      },
+      "L1": {
+       "own_eh": 9.694444444444445,
+       "enemy_eh": 10.38888888888889,
+       "U_team": -0.6944444444444446
+      }
+     }
+    },
+    "beam_selected_by_constraint": true,
+    "panel": "mid"
+   },
+   "n_ships": 5,
+   "n_pairs": 10,
+   "phi_rows": [
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FUBUKI",
+     "phi": 0.0,
+     "distance": 8,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.0,
+     "distance": 5,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 3,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "distance": 7,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.0,
+     "distance": 7,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 11,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FUBUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "distance": 8,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.19444444444444642,
+     "distance": 8,
+     "phi_abs": 0.19444444444444642
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": -0.3888888888888893,
+     "distance": 2,
+     "phi_abs": 0.3888888888888893
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.6666666666666661,
+     "distance": 9,
+     "phi_abs": 0.6666666666666661
+    }
+   ],
+   "surrogate_vs_exact_agreement": 0.011304347826086957,
+   "exact_additive_model_vs_exact_agreement": 0.036521739130434785,
+   "n_failed_evals": 0,
+   "q_values": {
+    "IBS-U-IJN-AOBA": 0.0,
+    "IBS-U-IJN-FUBUKI": 0.0,
+    "IBS-U-IJN-FURUTAKA": 1.2499999999999982,
+    "IBS-U-IJN-HATSUYUKI": -0.3888888888888893,
+    "IBS-U-IJN-KINUGASA": 4.805555555555554
+   },
+   "a0_U": -7.333333333333332
+  },
+  {
+   "locator": {
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 4,
+    "side": "allies",
+    "intent": "I1_BROADSIDE",
+    "focal": "IBS-U-USN-BOISE",
+    "target": "IBS-U-IJN-FURUTAKA",
+    "arms": {
+     "CURRENT_PRODUCTION_POLICY": {
+      "L0": {
+       "M": 0.6944444444444444,
+       "eh": 0.6944444444444444,
+       "executable": false,
+       "distance": 26,
+       "visible": false,
+       "mounts": 7,
+       "raking": 6,
+       "legal_pairs": 24,
+       "raking_fraction": 0.25
+      },
+      "L1": {
+       "own_eh": 13.194444444444445,
+       "enemy_eh": 7.138888888888889,
+       "U_team": 6.055555555555555
+      }
+     },
+     "REPAIRED_RESEARCH_INTENT": null,
+     "PER_SHIP_GREEDY": null,
+     "RANDOM_MATCHED_BUDGET": {
+      "L0": {
+       "M": 0.6944444444444444,
+       "eh": 0.6944444444444444,
+       "executable": false,
+       "distance": 22,
+       "visible": false,
+       "mounts": 7,
+       "raking": 9,
+       "legal_pairs": 26,
+       "raking_fraction": 0.34615384615384615
+      },
+      "L1": {
+       "own_eh": 18.52777777777778,
+       "enemy_eh": 10.86111111111111,
+       "U_team": 7.666666666666668
+      }
+     }
+    },
+    "panel": "mid"
+   },
+   "n_ships": 9,
+   "n_pairs": 28,
+   "phi_rows": [
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-BUCHANAN",
+     "phi": 0.0,
+     "distance": 10,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-DUNCAN",
+     "phi": 0.0,
+     "distance": 19,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "distance": 7,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "distance": 13,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": 0.0,
+     "distance": 14,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 7,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-DUNCAN",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "distance": 11,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "distance": 5,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": 0.0,
+     "distance": 8,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "distance": 1,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "distance": 17,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "distance": 6,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": 0.0,
+     "distance": 6,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "distance": 10,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 15,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "distance": 11,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": -1.7763568394002505e-15,
+     "distance": 12,
+     "phi_abs": 1.7763568394002505e-15
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": -0.4166666666666661,
+     "distance": 11,
+     "phi_abs": 0.4166666666666661
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": -0.05555555555555536,
+     "distance": 2,
+     "phi_abs": 0.05555555555555536
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": 0.0,
+     "distance": 3,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "distance": 6,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": -0.666666666666667,
+     "distance": 9,
+     "phi_abs": 0.666666666666667
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": -0.05555555555555536,
+     "distance": 10,
+     "phi_abs": 0.05555555555555536
+    },
+    {
+     "i": "IBS-U-USN-MCCALLA",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    }
+   ],
+   "surrogate_vs_exact_agreement": 0.17482517482517482,
+   "exact_additive_model_vs_exact_agreement": 0.4195804195804196,
+   "n_failed_evals": 1,
+   "q_values": {
+    "IBS-U-USN-BOISE": 0.0,
+    "IBS-U-USN-BUCHANAN": -0.6666666666666661,
+    "IBS-U-USN-DUNCAN": 0.0,
+    "IBS-U-USN-FARENHOLT": 0.44444444444444464,
+    "IBS-U-USN-HELENA": -1.7777777777777786,
+    "IBS-U-USN-LAFFEY": -3.2222222222222214,
+    "IBS-U-USN-MCCALLA": 1.166666666666667,
+    "IBS-U-USN-SAN-FRANCISCO": 0.5555555555555554
+   },
+   "a0_U": 6.055555555555555
+  },
+  {
+   "locator": {
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 4,
+    "side": "allies",
+    "intent": "I2_RANGE",
+    "focal": "IBS-U-USN-BOISE",
+    "target": "IBS-U-IJN-FURUTAKA",
+    "arms": {
+     "CURRENT_PRODUCTION_POLICY": {
+      "L0": {
+       "M": -26.0,
+       "eh": 0.6944444444444444,
+       "executable": false,
+       "distance": 26,
+       "visible": false,
+       "mounts": 7,
+       "raking": 6,
+       "legal_pairs": 24,
+       "raking_fraction": 0.25
+      },
+      "L1": {
+       "own_eh": 13.194444444444445,
+       "enemy_eh": 7.138888888888889,
+       "U_team": 6.055555555555555
+      }
+     },
+     "REPAIRED_RANGE_CLOSE": {
+      "L0": {
+       "M": -24.0,
+       "eh": 0.6944444444444444,
+       "executable": false,
+       "distance": 24,
+       "visible": false,
+       "mounts": 7,
+       "raking": 6,
+       "legal_pairs": 25,
+       "raking_fraction": 0.24
+      },
+      "L1": {
+       "own_eh": 14.36111111111111,
+       "enemy_eh": 7.138888888888889,
+       "U_team": 7.222222222222221
+      }
+     },
+     "REPAIRED_RANGE_OPEN": {
+      "L0": {
+       "M": -22.0,
+       "eh": 0.6944444444444444,
+       "executable": false,
+       "distance": 22,
+       "visible": false,
+       "mounts": 7,
+       "raking": 6,
+       "legal_pairs": 25,
+       "raking_fraction": 0.24
+      },
+      "L1": {
+       "own_eh": 14.055555555555555,
+       "enemy_eh": 7.138888888888889,
+       "U_team": 6.916666666666666
+      }
+     },
+     "REPAIRED_RESEARCH_INTENT": {
+      "L0": {
+       "M": -22.0,
+       "eh": 0.6944444444444444,
+       "executable": false,
+       "distance": 22,
+       "visible": false,
+       "mounts": 7,
+       "raking": 6,
+       "legal_pairs": 25,
+       "raking_fraction": 0.24
+      },
+      "L1": {
+       "own_eh": 14.055555555555555,
+       "enemy_eh": 7.138888888888889,
+       "U_team": 6.916666666666666
+      }
+     },
+     "PER_SHIP_GREEDY": null,
+     "RANDOM_MATCHED_BUDGET": {
+      "L0": {
+       "M": -22.0,
+       "eh": 0.6944444444444444,
+       "executable": false,
+       "distance": 22,
+       "visible": false,
+       "mounts": 7,
+       "raking": 9,
+       "legal_pairs": 26,
+       "raking_fraction": 0.34615384615384615
+      },
+      "L1": {
+       "own_eh": 18.52777777777778,
+       "enemy_eh": 10.86111111111111,
+       "U_team": 7.666666666666668
+      }
+     }
+    },
+    "range_direction": "OPEN",
+    "panel": "mid"
+   },
+   "n_ships": 9,
+   "n_pairs": 28,
+   "phi_rows": [
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-BUCHANAN",
+     "phi": 0.0,
+     "distance": 10,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-DUNCAN",
+     "phi": 0.0,
+     "distance": 19,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "distance": 7,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "distance": 13,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": 0.0,
+     "distance": 14,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 7,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-DUNCAN",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "distance": 11,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "distance": 5,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": 0.0,
+     "distance": 8,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "distance": 1,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "distance": 17,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "distance": 6,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": 0.0,
+     "distance": 6,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "distance": 10,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 15,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "distance": 11,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": -1.7763568394002505e-15,
+     "distance": 12,
+     "phi_abs": 1.7763568394002505e-15
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": -0.4166666666666661,
+     "distance": 11,
+     "phi_abs": 0.4166666666666661
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": -0.05555555555555536,
+     "distance": 2,
+     "phi_abs": 0.05555555555555536
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": 0.0,
+     "distance": 3,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "distance": 6,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": -0.666666666666667,
+     "distance": 9,
+     "phi_abs": 0.666666666666667
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": -0.05555555555555536,
+     "distance": 10,
+     "phi_abs": 0.05555555555555536
+    },
+    {
+     "i": "IBS-U-USN-MCCALLA",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    }
+   ],
+   "surrogate_vs_exact_agreement": 0.17482517482517482,
+   "exact_additive_model_vs_exact_agreement": 0.4195804195804196,
+   "n_failed_evals": 1,
+   "q_values": {
+    "IBS-U-USN-BOISE": 0.0,
+    "IBS-U-USN-BUCHANAN": -0.6666666666666661,
+    "IBS-U-USN-DUNCAN": 0.0,
+    "IBS-U-USN-FARENHOLT": 0.44444444444444464,
+    "IBS-U-USN-HELENA": -1.7777777777777786,
+    "IBS-U-USN-LAFFEY": -3.2222222222222214,
+    "IBS-U-USN-MCCALLA": 1.166666666666667,
+    "IBS-U-USN-SAN-FRANCISCO": 0.5555555555555554
+   },
+   "a0_U": 6.055555555555555
+  },
+  {
+   "locator": {
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 4,
+    "side": "allies",
+    "intent": "I3_RAKING",
+    "focal": "IBS-U-USN-BOISE",
+    "target": "IBS-U-IJN-FURUTAKA",
+    "arms": {
+     "CURRENT_PRODUCTION_POLICY": {
+      "L0": {
+       "M": 0.25,
+       "eh": 0.6944444444444444,
+       "executable": false,
+       "distance": 26,
+       "visible": false,
+       "mounts": 7,
+       "raking": 6,
+       "legal_pairs": 24,
+       "raking_fraction": 0.25
+      },
+      "L1": {
+       "own_eh": 13.194444444444445,
+       "enemy_eh": 7.138888888888889,
+       "U_team": 6.055555555555555
+      }
+     },
+     "REPAIRED_RESEARCH_INTENT": {
+      "L0": {
+       "M": 0.24,
+       "eh": 0.6944444444444444,
+       "executable": false,
+       "distance": 21,
+       "visible": false,
+       "mounts": 7,
+       "raking": 6,
+       "legal_pairs": 25,
+       "raking_fraction": 0.24
+      },
+      "L1": {
+       "own_eh": 14.055555555555555,
+       "enemy_eh": 7.138888888888889,
+       "U_team": 6.916666666666666
+      }
+     },
+     "PER_SHIP_GREEDY": null,
+     "RANDOM_MATCHED_BUDGET": {
+      "L0": {
+       "M": 0.34615384615384615,
+       "eh": 0.6944444444444444,
+       "executable": false,
+       "distance": 22,
+       "visible": false,
+       "mounts": 7,
+       "raking": 9,
+       "legal_pairs": 26,
+       "raking_fraction": 0.34615384615384615
+      },
+      "L1": {
+       "own_eh": 18.52777777777778,
+       "enemy_eh": 10.86111111111111,
+       "U_team": 7.666666666666668
+      }
+     }
+    },
+    "panel": "mid"
+   },
+   "n_ships": 9,
+   "n_pairs": 28,
+   "phi_rows": [
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-BUCHANAN",
+     "phi": 0.0,
+     "distance": 10,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-DUNCAN",
+     "phi": 0.0,
+     "distance": 19,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "distance": 7,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "distance": 13,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": 0.0,
+     "distance": 14,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BOISE",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 7,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-DUNCAN",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "distance": 11,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "distance": 5,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": 0.0,
+     "distance": 8,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "distance": 1,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-BUCHANAN",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-FARENHOLT",
+     "phi": 0.0,
+     "distance": 17,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "distance": 6,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": 0.0,
+     "distance": 6,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "distance": 10,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-DUNCAN",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 15,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-HELENA",
+     "phi": 0.0,
+     "distance": 11,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": -1.7763568394002505e-15,
+     "distance": 12,
+     "phi_abs": 1.7763568394002505e-15
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": -0.4166666666666661,
+     "distance": 11,
+     "phi_abs": 0.4166666666666661
+    },
+    {
+     "i": "IBS-U-USN-FARENHOLT",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": -0.05555555555555536,
+     "distance": 2,
+     "phi_abs": 0.05555555555555536
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-LAFFEY",
+     "phi": 0.0,
+     "distance": 3,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": 0.0,
+     "distance": 6,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-HELENA",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-MCCALLA",
+     "phi": -0.666666666666667,
+     "distance": 9,
+     "phi_abs": 0.666666666666667
+    },
+    {
+     "i": "IBS-U-USN-LAFFEY",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": -0.05555555555555536,
+     "distance": 10,
+     "phi_abs": 0.05555555555555536
+    },
+    {
+     "i": "IBS-U-USN-MCCALLA",
+     "j": "IBS-U-USN-SAN-FRANCISCO",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    }
+   ],
+   "surrogate_vs_exact_agreement": 0.17482517482517482,
+   "exact_additive_model_vs_exact_agreement": 0.4195804195804196,
+   "n_failed_evals": 1,
+   "q_values": {
+    "IBS-U-USN-BOISE": 0.0,
+    "IBS-U-USN-BUCHANAN": -0.6666666666666661,
+    "IBS-U-USN-DUNCAN": 0.0,
+    "IBS-U-USN-FARENHOLT": 0.44444444444444464,
+    "IBS-U-USN-HELENA": -1.7777777777777786,
+    "IBS-U-USN-LAFFEY": -3.2222222222222214,
+    "IBS-U-USN-MCCALLA": 1.166666666666667,
+    "IBS-U-USN-SAN-FRANCISCO": 0.5555555555555554
+   },
+   "a0_U": 6.055555555555555
+  },
+  {
+   "locator": {
+    "scenario": "IBS-S-01",
+    "seed": 1,
+    "turn": 4,
+    "side": "axis",
+    "intent": "I1_BROADSIDE",
+    "focal": "IBS-U-IJN-KINUGASA",
+    "target": "IBS-U-USN-DUNCAN",
+    "arms": {
+     "CURRENT_PRODUCTION_POLICY": {
+      "L0": {
+       "M": 0.4166666666666667,
+       "eh": 0.4166666666666667,
+       "executable": false,
+       "distance": 19,
+       "visible": false,
+       "mounts": 5,
+       "raking": 11,
+       "legal_pairs": 26,
+       "raking_fraction": 0.4230769230769231
+      },
+      "L1": {
+       "own_eh": 7.138888888888889,
+       "enemy_eh": 13.194444444444445,
+       "U_team": -6.055555555555555
+      }
+     },
+     "REPAIRED_RESEARCH_INTENT": {
+      "L0": {
+       "M": 0.2777777777777778,
+       "eh": 0.2777777777777778,
+       "executable": false,
+       "distance": 21,
+       "visible": false,
+       "mounts": 5,
+       "raking": 6,
+       "legal_pairs": 21,
+       "raking_fraction": 0.2857142857142857
+      },
+      "L1": {
+       "own_eh": 6.055555555555555,
+       "enemy_eh": 13.027777777777779,
+       "U_team": -6.972222222222223
+      }
+     },
+     "PER_SHIP_GREEDY": {
+      "L0": {
+       "M": 0.2777777777777778,
+       "eh": 0.2777777777777778,
+       "executable": false,
+       "distance": 22,
+       "visible": false,
+       "mounts": 5,
+       "raking": 9,
+       "legal_pairs": 23,
+       "raking_fraction": 0.391304347826087
+      },
+      "L1": {
+       "own_eh": 7.444444444444444,
+       "enemy_eh": 8.5,
+       "U_team": -1.0555555555555562
+      }
+     },
+     "JOINT_BEAM_SEARCH": {
+      "L0": {
+       "M": 0.2777777777777778,
+       "eh": 0.2777777777777778,
+       "executable": false,
+       "distance": 22,
+       "visible": false,
+       "mounts": 5,
+       "raking": 9,
+       "legal_pairs": 23,
+       "raking_fraction": 0.391304347826087
+      },
+      "L1": {
+       "own_eh": 7.444444444444444,
+       "enemy_eh": 8.5,
+       "U_team": -1.0555555555555562
+      }
+     },
+     "RANDOM_MATCHED_BUDGET": {
+      "L0": {
+       "M": 0.4166666666666667,
+       "eh": 0.4166666666666667,
+       "executable": false,
+       "distance": 19,
+       "visible": false,
+       "mounts": 5,
+       "raking": 8,
+       "legal_pairs": 23,
+       "raking_fraction": 0.34782608695652173
+      },
+      "L1": {
+       "own_eh": 6.666666666666667,
+       "enemy_eh": 9.750000000000002,
+       "U_team": -3.083333333333335
+      }
+     }
+    },
+    "beam_selected_by_constraint": false,
+    "panel": "mid"
+   },
+   "n_ships": 4,
+   "n_pairs": 6,
+   "phi_rows": [
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-FURUTAKA",
+     "phi": 0.0,
+     "distance": 12,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": 0.0,
+     "distance": 7,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-AOBA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": 0.0,
+     "distance": 9,
+     "phi_abs": 0.0
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-HATSUYUKI",
+     "phi": -0.1388888888888884,
+     "distance": 12,
+     "phi_abs": 0.1388888888888884
+    },
+    {
+     "i": "IBS-U-IJN-FURUTAKA",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": -0.22222222222222143,
+     "distance": 4,
+     "phi_abs": 0.22222222222222143
+    },
+    {
+     "i": "IBS-U-IJN-HATSUYUKI",
+     "j": "IBS-U-IJN-KINUGASA",
+     "phi": -0.5,
+     "distance": 13,
+     "phi_abs": 0.5
+    }
+   ],
+   "surrogate_vs_exact_agreement": 0.0808695652173913,
+   "exact_additive_model_vs_exact_agreement": 0.16,
+   "n_failed_evals": 0,
+   "q_values": {
+    "IBS-U-IJN-AOBA": 0.0,
+    "IBS-U-IJN-FURUTAKA": 0.4166666666666661,
+    "IBS-U-IJN-HATSUYUKI": 0.5833333333333339,
+    "IBS-U-IJN-KINUGASA": 1.5
+   },
+   "a0_U": -6.055555555555555
+  }
+ ],
+ "summary": {
+  "n_pairs": 150,
+  "median_abs_phi": 0.0,
+  "p90_abs_phi": 0.5555555555555554,
+  "max_abs_phi": 4.1388888888889,
+  "practical_nonzero_fraction": 0.28,
+  "median_surrogate_vs_exact_agreement": 0.17482517482517482,
+  "median_exact_additive_model_vs_exact_agreement": 0.036521739130434785,
+  "frozen_rule_verdict": "PRESENT",
+  "interaction_specific_reading": "PRESENT",
+  "INTERACTION_STRUCTURE": "PRESENT",
+  "note": "the frozen gate keys on the cheap surrogate's agreement, which conflates guide quality with interaction; both readings are reported (see 03_INTERACTION_EXISTENCE.md)"
+ },
+ "wall_seconds": 106.4
+}
