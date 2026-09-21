@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-分支 `research/m2-2-compiler-fidelity`。预注册 `research/m2_2r/PRE_REGISTRATION_B1E.md`（EXPLORATORY，不覆盖旧 gate；旧 gate 原样保留）。包 `research/m2_2r/M2_2R_B1E_NATURAL_OPPORTUNITY_BUNDLE.zip` sha256 `1ce46fa8…`。
+分支 `research/m2-2-compiler-fidelity`。预注册 `research/m2_2r/PRE_REGISTRATION_B1E.md`（EXPLORATORY，不覆盖旧 gate；旧 gate 原样保留）。包 `research/m2_2r/M2_2R_B1E_NATURAL_OPPORTUNITY_BUNDLE.zip` sha256 `302c9bf1…`。
 
 **判定：`B1E_VERDICT = TORPEDO_PARTIAL_OBSERVABILITY`（冻结首命中序）；movement 分支 = MIXED。**
 

@@ -127,7 +127,7 @@
 - **G 普查**：movement 52 状态 / 104 状态侧（S-01 32、S-03 32、EM-01 40），beam 按序号奇偶取单侧（n=49）；配额缺口 S-01 −4、S-03 −4，**`damaged` 层为空**（如实报告，不回填）。判定 **MOVEMENT = MIXED**——卡在冻结的「中位相对增益 ≥0.30」条款（实测 0.000），而机会率（0.375/0.235）与外部性结构都指向另一侧；且 `LOCAL_ONLY_MECHANISM` 明确**不成立**（beam 可用战术率 0.694、中位外部性 +0.861）。torpedo 15 状态六臂：**当前 AI 平均 RouteReduction = 0.000**（40% 状态开火却零约束），两个公开臂 ≈0.010，full-state 天花板 0.020–0.316。
 - **最终判**：`B1E_VERDICT = TORPEDO_PARTIAL_OBSERVABILITY`（冻结首命中序），movement 分支 = MIXED。
 - **失败留档 M22R-F1..F5**：判定条款引用不存在的第二机制行 / 二值 payoff 退化 / 桶标签丢弃中局状态 / 地图边缘 `neighbor()` 抛异常 / 空断言换真不变量。两次崩溃各损失约 30 分钟算力后改为 JSONL 逐条落盘。
-- **预算**：约 5000 次引擎评估；0 付费 LLM；生产引擎零改动；未进入 RL/GNN/论文方法。包 `M2_2R_B1E_NATURAL_OPPORTUNITY_BUNDLE.zip` sha256 `1ce46fa8…`（43 文件）。按指令停止。
+- **预算**：约 5000 次引擎评估；0 付费 LLM；生产引擎零改动；未进入 RL/GNN/论文方法。包 `M2_2R_B1E_NATURAL_OPPORTUNITY_BUNDLE.zip` sha256 `302c9bf1…`（43 文件）。按指令停止。
 
 ## 2. 阶段台账
 

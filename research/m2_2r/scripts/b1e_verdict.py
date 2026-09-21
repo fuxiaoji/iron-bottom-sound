@@ -249,15 +249,17 @@ def fig_torpedo(tv, tvres):
     arms = list(st[0]["RR_by_arm"]) if st else []
     means = {a: [r["RR_by_arm"][a] for r in st] for a in arms}
     tshort = {"HOLD": "HOLD", "CURRENT_ADAPTIVE": "ADAPT",
-              "INTERCEPT_ASSIST": "INTERCEPT", "PUBLIC_SET_COVER": "PUB_SET",
-              "PUBLIC_BELIEF_AWARE": "PUB_BAYES", "FULL_STATE_CEILING": "FULLSTATE"}
+              "INTERCEPT_ASSIST": "INTERC", "PUBLIC_SET_COVER": "PSET",
+              "PUBLIC_BELIEF_AWARE": "PBAYES", "FULL_STATE_CEILING": "FULL"}
     bp = axes[0].boxplot([means[a] for a in arms],
                          tick_labels=[tshort.get(a, a[:8]) for a in arms],
                          patch_artist=True, showfliers=True)
     for p in bp["boxes"]:
         p.set_facecolor("#8ea9db")
     axes[0].set_ylabel("RouteReduction")
-    axes[0].set_title("route reduction by arm (n=%d states)" % len(st), fontsize=9)
+    axes[0].set_title("route reduction by arm (n=%d states)\n"
+                      "ADAPT = deployed · PSET/PBAYES = public · FULL = ceiling (not deployable)"
+                      % len(st), fontsize=8)
     axes[0].tick_params(axis="x", labelsize=7)
     axes[1].scatter([r["R_shared"] for r in st], [r["R_bayes_uniform"] for r in st],
                     s=22, c="#c00000")
