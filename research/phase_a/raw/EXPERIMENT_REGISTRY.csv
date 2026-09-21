@@ -9602,3 +9602,26 @@ B2_sampling_565,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"":
 B2_sampling_566,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
 C2_gen_sampling_761,C,sampling,fault_generation,1,REJECTED_WITH_REASON,not_a_valid_causal_failure,,,,2,0,0.0,{}
 B2_sampling_567,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+B2_sampling_568,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+C2_gen_sampling_762,C,sampling,fault_generation,1,REJECTED_WITH_REASON,not_a_valid_causal_failure,,,,2,0,0.0,{}
+B2_sampling_569,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+B2_sampling_570,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+C2_gen_sampling_763,C,sampling,fault_generation,1,REJECTED_WITH_REASON,not_a_valid_causal_failure,,,,2,0,0.0,{}
+B2_sampling_571,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+B2_sampling_572,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+C2_gen_sampling_764,C,sampling,fault_generation,1,REJECTED_WITH_REASON,not_a_valid_causal_failure,,,,2,0,0.0,{}
+B2_sampling_573,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+B2_sampling_574,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+C2_gen_sampling_765,C,sampling,fault_generation,1,REJECTED_WITH_REASON,not_a_valid_causal_failure,,,,2,0,0.0,{}
+B2_sampling_575,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+B2_sampling_576,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+C2_gen_sampling_766,C,sampling,fault_generation,1,REJECTED_WITH_REASON,not_a_valid_causal_failure,,,,2,0,0.0,{}
+B2_sampling_577,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+B2_sampling_578,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+C2_gen_sampling_767,C,sampling,fault_generation,1,REJECTED_WITH_REASON,not_a_valid_causal_failure,,,,2,0,0.0,{}
+B2_sampling_579,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+B2_sampling_580,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+C2_gen_sampling_768,C,sampling,fault_generation,1,REJECTED_WITH_REASON,not_a_valid_causal_failure,,,,2,0,0.0,{}
+B2_sampling_581,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
+C2_gen_sampling_769,C,sampling,fault_generation,1,REJECTED_WITH_REASON,not_a_valid_causal_failure,,,,2,0,0.0,{}
+B2_sampling_582,B,sampling,universe_label,1,SUCCESS,,,,,1,100,0.0,"{""failure"": 1}"
