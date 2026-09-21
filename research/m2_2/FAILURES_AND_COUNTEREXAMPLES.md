@@ -65,3 +65,15 @@ Reporting the correlation alone would have implied the public proxy carries
 signal usable for ranking. The tie-set decomposition is the evidence; the
 correlation is not. Kept as a standing counterexample for the project's use of
 rank statistics on tie-dominated spaces.
+
+## M22-F6 — a figure carried the wrong objective's conclusion
+
+The first `fig03` computed the `LEAD_TURN_ALLOWED` objective (max overlap 1, 68
+ties) while displaying the conclusion established for `CORRIDOR_BLOB` (max
+overlap 5, 4 ties, all uninformative). For `LEAD_TURN_ALLOWED` the statement "the
+argmax contains no informative configuration" is **false** — that tie set does
+contain the best configuration. The figure now shows both objectives side by
+side, each with its own tie set and its own claim: the blob objective's argmax is
+uninformative, and the lead objective's argmax is informative-but-unrankable
+(4 informative of 68). Recorded because the two facets are easily conflated and
+only together support the `PUBLIC_INFORMATION_GAP` diagnosis.

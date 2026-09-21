@@ -62,7 +62,9 @@ def fig01():
             ax.set_xticks(range(3))
             ax.set_xticklabels(["CURRENT\nPOLICY", "INTENT\nCOMPILER",
                                 "SEARCH"], fontsize=8)
-        ax.set_title(f"{m} — {r.get('primary_metric', '')[:34]}", fontsize=8)
+        label = r.get("primary_metric") or (
+            "route reduction" if m == "MG4" else "")
+        ax.set_title(f"{m} — {label[:34]}", fontsize=8)
         ax.set_ylim(-1.6, 1.6)
     axes[0].set_ylabel("fidelity  F = (M − M_random)/(M_gold − M_random)")
     fig.suptitle("B0 gold-compiler fidelity, primary (frozen) metric — "
@@ -113,8 +115,15 @@ def fig02():
 
 # ---------------------------------------------------------------- fig 03
 def fig03():
-    """MG4 public-signal diagnostic: recomputed from the frozen case with the
-    engine's own projection; shows why the public objective cannot rank."""
+    """MG4 public-signal diagnostic, both facets, recomputed from the frozen case
+    with the engine's own projection.
+
+    Panel A (CORRIDOR_BLOB): the objective's argmax contains NO informative
+    configuration.  Panel B (LEAD_TURN_ALLOWED): the argmax set contains the best
+    configuration and 64 uninformative ones — the public signal identifies a set
+    but cannot rank inside it.  Both statements are reported; neither alone is
+    the finding.
+    """
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from m22_b0 import public_corridor  # noqa: E402
     from mg.mg4r import launch_and_advance, route_trajectory, victim_routes  # noqa: E402
@@ -134,9 +143,10 @@ def fig03():
     cfgs = [c for c in cfgs if c["seg"]]
     for c in cfgs:
         c["rr"] = 1 - sum(1 for t in trajs.values() if not (t & c["seg"])) / len(trajs)
+
     vic = stT.ships[victim]
     sp = max(1, min(int(vic.current_speed or 2), 6))
-    cells = set()
+    lead = set()
     for t in (-1, 0, 1):
         h0 = ((vic.heading - 1 + t) % 6) + 1
         for a0 in range(0, sp + 1):
@@ -155,40 +165,57 @@ def fig03():
                 if n is None:
                     break
                 p = n
-                cells.add((mf, p.label))
-    for c in cfgs:
-        c["ov"] = len(c["seg"] & cells)
-    ov = [c["ov"] for c in cfgs]
-    rr = [c["rr"] for c in cfgs]
-    mx = max(ov)
-    fig, ax = plt.subplots(figsize=(6.2, 4))
-    ax.scatter(ov, rr, s=14, c="#8ea9db", edgecolors="none", label="288 legal configs")
-    tied = [c for c in cfgs if c["ov"] == mx]
-    ax.scatter([c["ov"] for c in tied], [c["rr"] for c in tied], s=42,
-               facecolors="none", edgecolors="#c00000", label=f"public-objective ties (n={len(tied)})")
+                lead.add((mf, p.label))
+    blob = public_corridor(stT, victim)
     best = max(cfgs, key=lambda c: c["rr"])
-    ax.scatter([best["ov"]], [best["rr"]], marker="*", s=180, c="#548235",
-               label="full-state best (RR 0.97)")
-    ax.set_xlabel("public objective score (forecast-corridor cell overlap)")
-    ax.set_ylabel("true route reduction")
-    ax.set_title("MG4 public-information gap: the objective's argmax contains no\n"
-                 "informative configuration; the best config scores low", fontsize=9)
-    ax.legend(fontsize=7, loc="upper right")
+
+    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.2), sharey=True)
+    diag = {"n_configs": len(cfgs), "n_routes": len(routes),
+            "full_state_best": {"overlap_blob": len(best["seg"] & blob),
+                               "overlap_lead": len(best["seg"] & lead),
+                               "rr": best["rr"]},
+            "objectives": {}}
+    for ax, (name, cells, claim) in zip(axes, (
+            ("CORRIDOR_BLOB", blob,
+             "argmax contains NO informative config"),
+            ("LEAD_TURN_ALLOWED", lead,
+             "argmax contains the best AND 64 uninformative ones"))):
+        for c in cfgs:
+            c["_ov"] = len(c["seg"] & cells)
+        ov = [c["_ov"] for c in cfgs]
+        rr = [c["rr"] for c in cfgs]
+        mx = max(ov)
+        tied = [c for c in cfgs if c["_ov"] == mx]
+        ax.scatter(ov, rr, s=16, c="#8ea9db", edgecolors="none", label="288 legal configs")
+        ax.scatter([c["_ov"] for c in tied], [c["rr"] for c in tied], s=54,
+                   facecolors="none", edgecolors="#c00000", linewidths=1.2,
+                   label=f"public argmax ties (n={len(tied)})")
+        ax.scatter([len(best["seg"] & cells)], [best["rr"]], marker="*", s=200,
+                   c="#548235", label=f"full-state best (RR {best['rr']:.2f})")
+        ax.set_xlabel(f"public objective score — {name}\n(overlap with forecast corridor, "
+                      f"{len(cells)} cells)")
+        ax.set_title(f"{name}: {claim}", fontsize=9)
+        ax.legend(fontsize=7, loc="center right")
+        ax.set_ylim(-0.06, 1.06)
+        ax.set_xlim(-0.35, mx + 0.5)
+        ax.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
+        diag["objectives"][name] = {
+            "objective_cells": len(cells), "max_overlap": mx, "n_ties": len(tied),
+            "tie_rr_min": min(c["rr"] for c in tied),
+            "tie_rr_max": max(c["rr"] for c in tied),
+            "n_ties_informative_ge_050": sum(1 for c in tied if c["rr"] >= 0.50),
+            "n_configs_overlap_positive": sum(1 for c in cfgs if c["_ov"] > 0)}
+    axes[0].set_ylabel("true route reduction")
+    fig.suptitle("MG4 public-information gap: the observation-only objective cannot rank "
+                 "configurations", fontsize=10)
     fig.tight_layout()
     fig.savefig(F / "fig03_mg4_public_signal.png", bbox_inches="tight")
     plt.close(fig)
-    (M / "mg4_public_signal_diagnostic.json").write_text(json.dumps(
-        {"n_configs": len(cfgs), "n_routes": len(routes), "objective_cells": len(cells),
-         "max_overlap": mx, "n_ties": len(tied),
-         "tie_rr": sorted(c["rr"] for c in tied),
-         "full_state_best": {"overlap": best["ov"], "rr": best["rr"]},
-         "n_rr_positive": sum(1 for c in cfgs if c["rr"] > 0),
-         "rr_positive_overlap_range": [min(c["ov"] for c in cfgs if c["rr"] > 0),
-                                       max(c["ov"] for c in cfgs if c["rr"] > 0)],
-         "per_config": [{"overlap": c["ov"], "rr": c["rr"],
-                         "setting_index": c["setting_index"],
-                         "launch_angle": c["launch_angle"]} for c in cfgs]},
-        indent=1))
+    diag["per_config"] = [{"overlap_blob": len(c["seg"] & blob),
+                           "overlap_lead": len(c["seg"] & lead), "rr": c["rr"],
+                           "setting_index": c["setting_index"],
+                           "launch_angle": c["launch_angle"]} for c in cfgs]
+    (M / "mg4_public_signal_diagnostic.json").write_text(json.dumps(diag, indent=1))
 
 
 # ---------------------------------------------------------------- fig 04

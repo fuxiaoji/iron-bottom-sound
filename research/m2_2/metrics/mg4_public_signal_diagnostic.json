@@ -1,1813 +1,2044 @@
 {
  "n_configs": 288,
  "n_routes": 29,
- "objective_cells": 90,
- "max_overlap": 1,
- "n_ties": 68,
- "tie_rr": [
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.0,
-  0.03448275862068961,
-  0.03448275862068961,
-  0.03448275862068961,
-  0.03448275862068961,
-  0.03448275862068961,
-  0.03448275862068961,
-  0.10344827586206895,
-  0.10344827586206895,
-  0.2068965517241379,
-  0.2068965517241379,
-  0.9655172413793104,
-  0.9655172413793104,
-  0.9655172413793104,
-  0.9655172413793104
- ],
  "full_state_best": {
-  "overlap": 1,
+  "overlap_blob": 1,
+  "overlap_lead": 1,
   "rr": 0.9655172413793104
  },
- "n_rr_positive": 14,
- "rr_positive_overlap_range": [
-  1,
-  1
- ],
+ "objectives": {
+  "CORRIDOR_BLOB": {
+   "objective_cells": 240,
+   "max_overlap": 5,
+   "n_ties": 4,
+   "tie_rr_min": 0.0,
+   "tie_rr_max": 0.0,
+   "n_ties_informative_ge_050": 0,
+   "n_configs_overlap_positive": 96
+  },
+  "LEAD_TURN_ALLOWED": {
+   "objective_cells": 90,
+   "max_overlap": 1,
+   "n_ties": 68,
+   "tie_rr_min": 0.0,
+   "tie_rr_max": 0.9655172413793104,
+   "n_ties_informative_ge_050": 4,
+   "n_configs_overlap_positive": 68
+  }
+ },
  "per_config": [
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 1,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 2,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 4,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 1,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 5,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 5,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.9655172413793104,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 1,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.9655172413793104,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.03448275862068961,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.2068965517241379,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 4,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 3,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 4,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.03448275862068961,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.10344827586206895,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 1,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.03448275862068961,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 2,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 1,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 2,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 1,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 2,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 4,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 1,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 5,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 5,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.9655172413793104,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 1,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.9655172413793104,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.03448275862068961,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.2068965517241379,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 4,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 3,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 4,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 0,
    "launch_angle": "B"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.03448275862068961,
    "setting_index": 0,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.10344827586206895,
    "setting_index": 0,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 2,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "A"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 1,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 1,
    "launch_angle": "X"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.03448275862068961,
    "setting_index": 1,
    "launch_angle": "Y"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 0,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
   },
   {
-   "overlap": 1,
+   "overlap_blob": 1,
+   "overlap_lead": 1,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "A"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 2,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "B"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 1,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "X"
   },
   {
-   "overlap": 0,
+   "overlap_blob": 2,
+   "overlap_lead": 0,
    "rr": 0.0,
    "setting_index": 2,
    "launch_angle": "Y"
