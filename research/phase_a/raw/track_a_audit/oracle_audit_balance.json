@@ -1,0 +1,30 @@
+{
+ "n_states": 200,
+ "total_budget": 3200,
+ "checks": {
+  "all_16_feasible": true,
+  "uniform16_spends_exactly_total": true,
+  "oracle_spends_exactly_total": true
+ },
+ "counts_oracle_allocation": {
+  "0": 12,
+  "4": 60,
+  "16": 109,
+  "64": 19
+ },
+ "V_uniform16_raw": 0.0663882064819336,
+ "V_oracle_raw": 0.08214637756347656,
+ "gap_raw": 0.015758171081542968,
+ "V_phaseA_greedy_raw": 0.06475296020507812,
+ "phaseA_greedy_below_uniform16": true,
+ "mu_base": 121.22592592620849,
+ "mu_random": -27.65745657348633,
+ "gap_normalised": 0.00010584237687893254,
+ "paired_bootstrap_ci_gap": [
+  0.004317855834960938,
+  0.034946022033691404
+ ],
+ "oracle_minus_greedy_raw": 0.017393417358398444,
+ "A2_oracle_gain_ge_0.08_NR": false,
+ "A2_ci_gt_0": true
+}

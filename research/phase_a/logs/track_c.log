@@ -4,3 +4,20 @@
   balance matrix 15/23 578s
   balance matrix 20/23 594s
 [balance] ident=0.9565217391304348 unique=0.782608695652174 mean_cells=1.1304347826086956 per_case=26.3s
+[sampling] valid failures collected: 0 (attempted 1000) 3271s
+[sampling] ident=None unique=None mean_cells=None per_case=3270.8s
+{
+ "balance": {
+  "valid_failures": 23,
+  "identifiable_fraction_le3cells": 0.9565217391304348,
+  "unique_fraction": 0.782608695652174,
+  "mean_causal_cells": 1.1304347826086956
+ },
+ "sampling": {
+  "valid_failures": 0,
+  "identifiable_fraction_le3cells": null,
+  "unique_fraction": null,
+  "mean_causal_cells": null
+ }
+}
+large-run estimate (both tasks): 1308330s; reconcile ok=True

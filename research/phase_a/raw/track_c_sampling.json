@@ -1,0 +1,58 @@
+{
+ "valid_failures": 0,
+ "attempted": 1000,
+ "identifiable_fraction_le3cells": null,
+ "unique_fraction": null,
+ "mean_causal_cells": null,
+ "probes": {
+  "RANDOM@10pct": {
+   "top1_hit_rate": 0.0,
+   "n": 0
+  },
+  "TEMPORAL_BINARY@10pct": {
+   "top1_hit_rate": 0.0,
+   "n": 0
+  },
+  "AGENT_FIRST@10pct": {
+   "top1_hit_rate": 0.0,
+   "n": 0
+  },
+  "INFLUENCE@10pct": {
+   "top1_hit_rate": 0.0,
+   "n": 0
+  },
+  "RANDOM@20pct": {
+   "top1_hit_rate": 0.0,
+   "n": 0
+  },
+  "TEMPORAL_BINARY@20pct": {
+   "top1_hit_rate": 0.0,
+   "n": 0
+  },
+  "AGENT_FIRST@20pct": {
+   "top1_hit_rate": 0.0,
+   "n": 0
+  },
+  "INFLUENCE@20pct": {
+   "top1_hit_rate": 0.0,
+   "n": 0
+  },
+  "RANDOM@25pct": {
+   "top1_hit_rate": 0.0,
+   "n": 0
+  },
+  "TEMPORAL_BINARY@25pct": {
+   "top1_hit_rate": 0.0,
+   "n": 0
+  },
+  "AGENT_FIRST@25pct": {
+   "top1_hit_rate": 0.0,
+   "n": 0
+  },
+  "INFLUENCE@25pct": {
+   "top1_hit_rate": 0.0,
+   "n": 0
+  }
+ },
+ "cases": []
+}

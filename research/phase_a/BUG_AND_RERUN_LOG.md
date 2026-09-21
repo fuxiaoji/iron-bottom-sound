@@ -1,63 +1,32 @@
-# BUG_AND_RERUN_LOG.md
+# BUG_AND_RERUN_LOG.md — Phase A.2
 
-Every entry preserves the buggy artefact and states whether a rerun was needed.
-Red line 6: buggy runs are kept as INVALID and the fixed experiment reruns from
-zero.
+Preserved per red line "preserve invalid runs"; no run was deleted.
 
-## B1 — positive-control instruments (Track-level, fixed, rerun)
+## A2-B1 — Track B `true_edges` serialization crash (fixed, rerun)
 
-- **Toy A v1** (`INVALID_positive_controls_v1.json`): the frozen budget set
-  {0,4,16,64} admits only the split 16+16 at total 32, so "the oracle spends more
-  on the planning-sensitive state" was **structurally impossible**. Fixed by
-  setting the toy total to 20 (splits 4+16 / 16+4). Rerun from zero → PASS.
-- **Toy B v1/v2** (`INVALID_positive_controls_v1.json`, `..._v2.json`): v1 used a
-  first-match `mid`-severity refinement that stopped refining columns whose
-  transition lay above mid-severity; v2 kept that flaw behind a bigger space; both
-  made the "structured" probe *worse* than random. Fixed by replacing the probe
-  with per-column bisection on the ordered axis **and** by adopting the standard
-  discovery definition (a boundary cell is discovered iff it or two of its
-  neighbours were queried with opposite labels). The diffuse "any queried
-  neighbour" definition was rejected explicitly because it rewards uniform coverage
-  rather than transition localisation. Rerun from zero → PASS.
-- **Toy C v1** (`INVALID_positive_controls_v1.json`): the first version was a
-  tautology (repairing a non-fault cell changed nothing) and its arithmetic had
-  the clean total already above the failure threshold. Redesigned as a 2-cell
-  time-window fault so that single-cell repairs fail and the minimal restoring set
-  is the window → PASS, and the control now actually tests minimality/uniqueness.
+`json.dump({"true_edges": [[list(k[0]), list(k[1]), ...]}` indexed the line key
+instead of using it, raising `TypeError: 'int' object is not iterable` after the
+balance labels had been written. Fixed to serialize the key directly. Because labels
+are cached in `raw/track_b_a2/labels_*.csv`, the rerun skipped labeling entirely and
+went straight to the truth/acquisition stages — no measurements were lost or
+duplicated.
 
-## B2 — training registry status check (registry only, no retraining)
+## A2-A1 — the Phase A "oracle" was not an oracle (audited, invalidated)
 
-`train_base.py` v1 looked for checkpoints under `run_dir/<run_id>/`, but BenchMARL
-writes them under `run_dir/<config-hash-dir>/checkpoints/`. All six successful
-runs were therefore recorded as `REJECTED_NO_CHECKPOINT`. The buggy registry is
-preserved as `raw/INVALID_training_registry_v1.csv`; the corrected registry was
-regenerated from ground truth (log present, no traceback, `checkpoint_600000.pt`
-present) and the training runs themselves needed no rerun — they completed with
-returncode 0 and two checkpoints each.
+Detailed in `01_TRACK_A_ORACLE_AUDIT.md`. The old aggregate is marked INVALID; the
+corrected computation reuses the same held-out matrix, so no new evaluations were
+required and the comparison stays paired.
 
-## B3 — native success oracle (instrument, corrected before any Track number)
+## A2-B2 — structured acquisition does not bisect (recorded, not "fixed")
 
-The pre-registered oracle used VMAS's `final_rew`/`ground_rew` fields; on this
-build they disagree with the scenario's own `done()` (verified: done() fires with
-all agents inside their goal radius while `all_goal_reached` is False). The
-reported success rate would have been 0 % for a policy that completes the task.
-Oracle replaced by the scenarios' own `done()` criteria (see
-`01_ENVIRONMENT_POLICY_AUDIT.md`), corrected **before** any Track measurement.
+The STRUCTURED_ACTIVE order queries mid/min/max severity per line and then fills.
+It cannot localise a transition between those probes, which is why it scores below
+random. This is left in place and reported as a design defect of the run rather than
+silently replaced, because replacing it after seeing the comparison would be exactly
+the post-hoc method-shopping the plan forbids.
 
-## B4 — task saturation and the A0.2 switch (not a bug, recorded for audit)
+## A2-C1 — sampling fault yield (instrument property, no change made)
 
-`vmas/navigation` reached 100 % clean success → `SATURATED_GE_95PCT` → replaced by
-`vmas/sampling` strictly before Track results, per the frozen A0.2 rule. The
-switch and its reason are in `logs/task_switch.log`.
-
-## B5 — operator error: a second training batch was launched unintentionally
-
-While the replacement task (`vmas/sampling`) was training, `train_base.py` was
-launched again in the same call without arguments. Its task list is frozen to
-`navigation,balance`, so it began a **second, unwanted** batch of those six runs,
-competing for CPU with the sampling runs and rewriting `raw/training_registry.csv`.
-The batch was killed within ~2 minutes; the corrected registry is regenerated from
-ground truth below and the navigation/balance checkpoints from the first batch are
-the ones used everywhere. Recorded here because an unaudited second batch is
-exactly the kind of silent duplication the red lines forbid, even though no
-scientific number was produced by it.
+The frozen generator produces ~1 valid causal failure per 700 injections on
+sampling. Per the plan the fault strength is **not** changed after attribution
+outcomes, so the task is reported `C_LOW_YIELD_BLOCKED`.

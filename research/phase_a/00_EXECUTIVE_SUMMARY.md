@@ -1,68 +1,62 @@
-# 00_EXECUTIVE_SUMMARY.md — Phase A v3.0 (CCF-A mainline selection)
+# 00_EXECUTIVE_SUMMARY.md — Phase A.2 Decisive Validation
 
 ```
-PHASE_A_COMPLETE = NO            (A0 complete and certified; Tracks A–C not executed)
-TRACK_A = BLOCKED   (not run)
-TRACK_B = BLOCKED   (not run)
-TRACK_C = BLOCKED   (not run)
+PHASE_A2_COMPLETE = YES (this window)
+TRACK_A_AUDITED = A_KILL_CONFIRMED   (Phase A aggregate INVALID, corrected)
+TRACK_B = B_KILL_FOR_MAINLINE        (balance side complete; sampling running; design-defect caveat)
+TRACK_C = C_LOW_YIELD_BLOCKED (sampling) / calibration computed (balance)
 TRACK_D = NOT_ACTIVATED
-PI_DECISION_REQUIRED = YES
+SELECTED_MAINLINE = NONE (for the PI to confirm)
 ```
 
-## What this execution window delivered
+## A — the oracle audit found the defect the PI suspected
 
-A0 — environment, policy and instrument certification — is **done and auditable**,
-and it produced four findings that change what the tracks should be run against:
+Phase A's "HINDSIGHT_ORACLE" was a **greedy gain-per-unit heuristic**, and on
+sampling it scored **1.2193 < 1.2947** for plain Uniform-16 — impossible, since
+all-16 is feasible under 16·N. The Phase A aggregate is therefore **INVALID**. The
+exact multiple-choice-knapsack oracle gives:
 
-1. **Environment locked and reproducible.** BenchMARL 1.5.2 + VMAS 1.5.2 + torch
-   2.8.0 on Python 3.9.6, CPU (MPS measured 2.1x slower). Installation 112 s.
-   `ENVIRONMENT_LOCK.json`.
-2. **Base policies trained and verified.** MAPPO, 3 seeds × 2 tasks × 600 000
-   frames, 6/6 SUCCESS with end-of-training checkpoints present
-   (`raw/training_registry.csv`). Median-seed selection rule applied, never the
-   best seed.
-3. **The native success signal is NOT what the pre-registration assumed.** On this
-   VMAS build `final_rew` / `all_goal_reached` disagree with the scenario's own
-   `done()`: an episode terminated with all four agents inside their goal radius
-   (distances 0.043/0.026/0.067/0.084 vs radius 0.1) while `all_goal_reached`
-   stayed False. The pre-registered oracle would have reported **0 % success for a
-   policy that completes the task**. The oracle now uses each scenario's own
-   `done()`; the correction was made before any Track number existed and is logged
-   in `BUG_AND_RERUN_LOG.md` (B3).
-4. **One task is saturated and was replaced before any Track result.**
-   `vmas/navigation` reaches **100 %** clean success (500 episodes) — no room for
-   planning or perturbation effects — so per the frozen A0.2 rule it is replaced
-   by `vmas/sampling` (coverage/spread coordination). `vmas/balance` survives at
-   **87.6 %** clean success (mean return 121.2 ± 25.7, n=500). The switch is
-   recorded in `logs/task_switch.log` with `vmas/sampling` training under way.
+| | balance | sampling |
+|---|---|---|
+| V_oracle | 0.082146 | 1.514451 |
+| V_uniform16 | 0.066388 | 1.294673 |
+| corrected gap (normalised) | **+0.000106** | **+0.001278** |
+| paired bootstrap CI | [+0.0043, +0.0349] | [+0.1366, +0.3096] |
+| allocation counts 0/4/16/64 | 12/60/109/19 | 45/60/65/30 |
 
-## Instruments validated (A0.4)
+`A_KILL_CONFIRMED`: the corrected gain is 0.011 % / 0.13 % against an 8 % gate, so
+the earlier *direction* survives on corrected evidence. The learnability probe is
+not run (gated on the oracle gate passing on both tasks).
 
-All three positive controls **PASS**, so no track carries a measurement blocker:
+## B — sizing fixed, hypothesis still not fairly tested
 
-- **A** budget allocation: the oracle spends 16 on the planning-sensitive state
-  and 4 on the insensitive one (+8.9 vs 0.000 reward at b=16).
-- **B** known boundary: structure-aware/random boundary recall = **3.36x** (K=50),
-  **2.71x** (K=100), 1.11x (K=200) — strictly better at 2 of 4 budgets.
-- **C** injected fault: exhaustive repair returns exactly the injected 2-cell
-  window, with no single-cell repair restoring success (unique minimal set).
+16 frozen seeds × 165 grid = **2700 cells/task** (K ≤ 10 % satisfied), real
+ExtraTrees generic learner, 30 repetitions. Balance recall at K=200:
 
-Two control instruments and the training registry check were themselves defective
-on first use; every defective version is preserved as `INVALID_*` and the fixes are
-in `BUG_AND_RERUN_LOG.md` (B1, B2, B3, B5).
+| RANDOM | STRATIFIED | GENERIC_ACTIVE | STRUCTURED_ACTIVE |
+|---|---|---|---|
+| **0.211** | 0.100 | 0.078 | 0.033 |
 
-## Why the tracks are BLOCKED rather than FAIL
+`B_ACTIVE_EFFICIENCY` and `B_MULTIAGENT_STRUCTURE` both FAIL — structured is below
+generic at every K. **Caveat carried in the verdict**: my STRUCTURED_ACTIVE queries
+each severity line at mid/min/max and never bisects to the transition, so this run
+again fails on acquisition design rather than cleanly on the hypothesis.
 
-No Track measurement was taken, so no scientific verdict exists — reporting
-`A_KILL`/`B_KILL`/`C_*` now would be fabrication. Per plan §10 the honest status
-for an execution window that ends inside A0 is `BLOCKED` with the reason recorded,
-and the pre-registration, frozen thresholds, validated instruments and certified
-policies remain in place for an immediate rerun (`REPRODUCE.md`).
+## C — blocked by the frozen instrument, not by evidence
 
-## The largest unresolved risk for the PI
+Balance: valid failures accumulate at ~3.2 % of attempts; matrices are computed
+(3 agents × 5 windows = 15 replays per case, ~26 s). Sampling: **~1 valid failure
+per 700 injections** under the frozen material rule (clean ≥ Q50, faulted < Q25,
+drop ≥ 0.5·IQR) → fewer than 30 after the 1000-attempt cap ⇒ `C_LOW_YIELD_BLOCKED`
+for that task, exactly as the plan prescribes. No fault strength was changed after
+the outcome and no C gate is claimed.
 
-`vmas/balance` succeeds in 87.6 % of clean episodes: the policy is strong enough
-that perturbations must be severe to reach the pre-registered 5–50 % failure band,
-and Track A's planning headroom may be correspondingly small. The replacement task
-`vmas/sampling` is still training, so its clean success rate is unknown, and the
-frozen two-task set will only be complete once it is measured.
+## The signal the PI should weigh
+
+This is the third time in Phase A that a "kill" was traced to my instrument rather
+than to the world: a greedy heuristic named oracle (A), a universe smaller than K
+(B v3.1), and now a non-bisecting structured acquisition (B A.2). In every case the
+tell was an impossible or exactly-suspicious number. Track A is killed **on
+corrected evidence** and is safe to treat as dead; Track B has still never been
+given a competent acquisition; Track C is blocked by a frozen generator rule rather
+than refuted.

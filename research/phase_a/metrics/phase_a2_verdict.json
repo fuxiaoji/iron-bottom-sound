@@ -1,0 +1,77 @@
+{
+ "phase": "A.2",
+ "created": "2026-09-21T16:15:04Z",
+ "track_a_audit": {
+  "status": "A_KILL_CONFIRMED",
+  "phase_a_v31_aggregate": "INVALID (greedy heuristic scored below the feasible all-16 allocation)",
+  "balance": {
+   "oracle": 0.08214637756347656,
+   "uniform16": 0.0663882064819336,
+   "gap_norm": 0.00010584237687893254,
+   "ci": [
+    0.004317855834960938,
+    0.034946022033691404
+   ],
+   "counts": {
+    "0": 12,
+    "4": 60,
+    "16": 109,
+    "64": 19
+   }
+  },
+  "sampling": {
+   "oracle": 1.5144505412954457,
+   "uniform16": 1.2946734855807902,
+   "gap_norm": 0.0012777345878472084,
+   "ci": [
+    0.13664025847475614,
+    0.3096436759032633
+   ],
+   "counts": {
+    "0": 45,
+    "4": 60,
+    "16": 65,
+    "64": 30
+   }
+  },
+  "gate": "corrected gain >=0.08 on both tasks: FAIL (0.000106 / 0.001278)"
+ },
+ "track_b": {
+  "status": "B_KILL_FOR_MAINLINE (balance side complete; sampling side still running)",
+  "universe": "M=16 frozen initial seeds x G=165 grid = 2700 cells per task (K<=10% rule satisfied)",
+  "balance_recall": {
+   "RANDOM": {
+    "25": 0.03333333333333333,
+    "50": 0.07777777777777777,
+    "100": 0.08888888888888888,
+    "200": 0.21111111111111108
+   },
+   "GENERIC_ACTIVE": {
+    "25": 0.02222222222222222,
+    "50": 0.02222222222222222,
+    "100": 0.02222222222222222,
+    "200": 0.07777777777777777
+   },
+   "STRUCTURED_ACTIVE": {
+    "25": 0.01111111111111111,
+    "50": 0.02222222222222222,
+    "100": 0.0,
+    "200": 0.03333333333333333
+   }
+  },
+  "finding": "RANDOM is the strongest method; STRUCTURED_ACTIVE (mid/min/max per severity line) does not localise transitions and GENERIC_ACTIVE (ExtraTrees vote entropy) is equally weak",
+  "B_ACTIVE_EFFICIENCY": "FAIL at every K (structured/random = 0.16 at K=200, gate 1.8)",
+  "B_MULTIAGENT_STRUCTURE": "FAIL (structured below generic at every K)",
+  "caveat": "the failure is again entangled with my acquisition design; the universe is now valid, but a bisection-to-transition strategy was not implemented, so this is not a clean scientific kill of the hypothesis"
+ },
+ "track_c": {
+  "status": "balance matrices computed; sampling C_LOW_YIELD_BLOCKED",
+  "sampling_yield": "~1 valid failure per 700 attempts (cap 1000) -> <30 valid -> C_LOW_YIELD_BLOCKED per plan",
+  "note": "ground truth = minimal successful repair set from the exhaustive matrix; injection metadata kept in a separate file"
+ },
+ "track_d": {
+  "status": "NOT_ACTIVATED"
+ },
+ "SELECTED_MAINLINE": null,
+ "PI_DECISION_REQUIRED": true
+}

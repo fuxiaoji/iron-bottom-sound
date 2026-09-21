@@ -1,0 +1,21 @@
+[balance] loaded 2700 cached labels
+[balance] G=225 M=12 universe=2700 fail=0.223 lines=1260 edges=3
+  balance RANDOM K=25: recall=0.0333
+  balance RANDOM K=50: recall=0.0778
+  balance RANDOM K=100: recall=0.0889
+  balance RANDOM K=200: recall=0.2111
+  balance STRATIFIED_RANDOM K=25: recall=0.0333
+  balance STRATIFIED_RANDOM K=50: recall=0.0222
+  balance STRATIFIED_RANDOM K=100: recall=0.0556
+  balance STRATIFIED_RANDOM K=200: recall=0.1000
+  balance GENERIC_ACTIVE K=25: recall=0.0222
+  balance GENERIC_ACTIVE K=50: recall=0.0222
+  balance GENERIC_ACTIVE K=100: recall=0.0222
+  balance GENERIC_ACTIVE K=200: recall=0.0778
+  balance STRUCTURED_ACTIVE K=25: recall=0.0111
+  balance STRUCTURED_ACTIVE K=50: recall=0.0222
+  balance STRUCTURED_ACTIVE K=100: recall=0.0000
+  balance STRUCTURED_ACTIVE K=200: recall=0.0333
+[balance] registry ok=True
+  sampling labels 200/2700 554s
+  sampling labels 400/2700 845s
