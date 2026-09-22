@@ -1,0 +1,1232 @@
+diff --git a/research/command_delay/audits/cd0_hash_seed_probe.json b/research/command_delay/audits/cd0_hash_seed_probe.json
+new file mode 100644
+index 00000000..45153898
+--- /dev/null
++++ b/research/command_delay/audits/cd0_hash_seed_probe.json
+@@ -0,0 +1,89 @@
++{
++ "all_stable": true,
++ "hash_seeds": [
++  "0",
++  "1",
++  "2",
++  "8"
++ ],
++ "n_unstable_rows": 0,
++ "rows": [
++  {
++   "digests": {
++    "0": "f5ec21e082b979619fe60d277ab4056e6e74181064386f390f4fec3879d5702e",
++    "1": "f5ec21e082b979619fe60d277ab4056e6e74181064386f390f4fec3879d5702e",
++    "2": "f5ec21e082b979619fe60d277ab4056e6e74181064386f390f4fec3879d5702e",
++    "8": "f5ec21e082b979619fe60d277ab4056e6e74181064386f390f4fec3879d5702e"
++   },
++   "n_unique": 1,
++   "stable": true,
++   "tag": "classic_s01"
++  },
++  {
++   "digests": {
++    "0": "c46300d8375f1a3154972dcea72fb6aa700345760c13d16707912568e7550759",
++    "1": "c46300d8375f1a3154972dcea72fb6aa700345760c13d16707912568e7550759",
++    "2": "c46300d8375f1a3154972dcea72fb6aa700345760c13d16707912568e7550759",
++    "8": "c46300d8375f1a3154972dcea72fb6aa700345760c13d16707912568e7550759"
++   },
++   "n_unique": 1,
++   "stable": true,
++   "tag": "classic_s03"
++  },
++  {
++   "digests": {
++    "0": "002f779200c98f6fd79720f638dff98d5df3e2e9c1ebc52e62bb7efa8c74c0f0",
++    "1": "002f779200c98f6fd79720f638dff98d5df3e2e9c1ebc52e62bb7efa8c74c0f0",
++    "2": "002f779200c98f6fd79720f638dff98d5df3e2e9c1ebc52e62bb7efa8c74c0f0",
++    "8": "002f779200c98f6fd79720f638dff98d5df3e2e9c1ebc52e62bb7efa8c74c0f0"
++   },
++   "n_unique": 1,
++   "stable": true,
++   "tag": "classic_em01"
++  },
++  {
++   "digests": {
++    "0": "917114fbb1dd6c842d53bee7baff2dd1a2327e15c8a5adb102db99517ef3f78e",
++    "1": "917114fbb1dd6c842d53bee7baff2dd1a2327e15c8a5adb102db99517ef3f78e",
++    "2": "917114fbb1dd6c842d53bee7baff2dd1a2327e15c8a5adb102db99517ef3f78e",
++    "8": "917114fbb1dd6c842d53bee7baff2dd1a2327e15c8a5adb102db99517ef3f78e"
++   },
++   "n_unique": 1,
++   "stable": true,
++   "tag": "realistic_s01"
++  },
++  {
++   "digests": {
++    "0": "6839300ceb1a9055ab6887ef6b11066c913d85b77f6f91ed47b94dac39aaebfb",
++    "1": "6839300ceb1a9055ab6887ef6b11066c913d85b77f6f91ed47b94dac39aaebfb",
++    "2": "6839300ceb1a9055ab6887ef6b11066c913d85b77f6f91ed47b94dac39aaebfb",
++    "8": "6839300ceb1a9055ab6887ef6b11066c913d85b77f6f91ed47b94dac39aaebfb"
++   },
++   "n_unique": 1,
++   "stable": true,
++   "tag": "realistic_s03"
++  },
++  {
++   "digests": {
++    "0": "4b746b4a5c4a32c535f84c0cedca2a082fdc43e4a970bb9af22a500d92e92038",
++    "1": "4b746b4a5c4a32c535f84c0cedca2a082fdc43e4a970bb9af22a500d92e92038",
++    "2": "4b746b4a5c4a32c535f84c0cedca2a082fdc43e4a970bb9af22a500d92e92038",
++    "8": "4b746b4a5c4a32c535f84c0cedca2a082fdc43e4a970bb9af22a500d92e92038"
++   },
++   "n_unique": 1,
++   "stable": true,
++   "tag": "realistic_em01"
++  },
++  {
++   "digests": {
++    "0": "3ff17dd387e8dd78c5c18d21f339081127df4a724a0cc609ba1a968fba838f35",
++    "1": "3ff17dd387e8dd78c5c18d21f339081127df4a724a0cc609ba1a968fba838f35",
++    "2": "3ff17dd387e8dd78c5c18d21f339081127df4a724a0cc609ba1a968fba838f35",
++    "8": "3ff17dd387e8dd78c5c18d21f339081127df4a724a0cc609ba1a968fba838f35"
++   },
++   "n_unique": 1,
++   "stable": true,
++   "tag": "realistic_s03_seed9"
++  }
++ ]
++}
+diff --git a/research/command_delay/audits/cd2_envelope_keys.json b/research/command_delay/audits/cd2_envelope_keys.json
+new file mode 100644
+index 00000000..db855e2b
+--- /dev/null
++++ b/research/command_delay/audits/cd2_envelope_keys.json
+@@ -0,0 +1,68 @@
++{
++ "command_delay_mode": {
++  "occurrences": 7,
++  "paths": [
++   "events[].payload.options.command_delay_mode"
++  ]
++ },
++ "movement_style": {
++  "occurrences": 54,
++  "paths": [
++   "events[].payload.order_batch.formation_movement[].movement_style",
++   "orders.10:movement_planning.allies.formation_movement[].movement_style",
++   "orders.10:movement_planning.axis.formation_movement[].movement_style",
++   "orders.11:movement_planning.allies.formation_movement[].movement_style",
++   "orders.11:movement_planning.axis.formation_movement[].movement_style",
++   "orders.12:movement_planning.allies.formation_movement[].movement_style",
++   "orders.12:movement_planning.axis.formation_movement[].movement_style",
++   "orders.1:movement_planning.allies.formation_movement[].movement_style",
++   "orders.1:movement_planning.axis.formation_movement[].movement_style",
++   "orders.2:movement_planning.allies.formation_movement[].movement_style",
++   "orders.2:movement_planning.axis.formation_movement[].movement_style",
++   "orders.3:movement_planning.allies.formation_movement[].movement_style",
++   "orders.3:movement_planning.axis.formation_movement[].movement_style",
++   "orders.4:movement_planning.allies.formation_movement[].movement_style",
++   "orders.4:movement_planning.axis.formation_movement[].movement_style",
++   "orders.5:movement_planning.allies.formation_movement[].movement_style",
++   "orders.5:movement_planning.axis.formation_movement[].movement_style",
++   "orders.6:movement_planning.allies.formation_movement[].movement_style",
++   "orders.6:movement_planning.axis.formation_movement[].movement_style",
++   "orders.7:movement_planning.allies.formation_movement[].movement_style",
++   "orders.7:movement_planning.axis.formation_movement[].movement_style",
++   "orders.8:movement_planning.allies.formation_movement[].movement_style",
++   "orders.8:movement_planning.axis.formation_movement[].movement_style",
++   "orders.9:movement_planning.allies.formation_movement[].movement_style",
++   "orders.9:movement_planning.axis.formation_movement[].movement_style"
++  ]
++ },
++ "reform_column": {
++  "occurrences": 54,
++  "paths": [
++   "events[].payload.order_batch.formation_movement[].reform_column",
++   "orders.10:movement_planning.allies.formation_movement[].reform_column",
++   "orders.10:movement_planning.axis.formation_movement[].reform_column",
++   "orders.11:movement_planning.allies.formation_movement[].reform_column",
++   "orders.11:movement_planning.axis.formation_movement[].reform_column",
++   "orders.12:movement_planning.allies.formation_movement[].reform_column",
++   "orders.12:movement_planning.axis.formation_movement[].reform_column",
++   "orders.1:movement_planning.allies.formation_movement[].reform_column",
++   "orders.1:movement_planning.axis.formation_movement[].reform_column",
++   "orders.2:movement_planning.allies.formation_movement[].reform_column",
++   "orders.2:movement_planning.axis.formation_movement[].reform_column",
++   "orders.3:movement_planning.allies.formation_movement[].reform_column",
++   "orders.3:movement_planning.axis.formation_movement[].reform_column",
++   "orders.4:movement_planning.allies.formation_movement[].reform_column",
++   "orders.4:movement_planning.axis.formation_movement[].reform_column",
++   "orders.5:movement_planning.allies.formation_movement[].reform_column",
++   "orders.5:movement_planning.axis.formation_movement[].reform_column",
++   "orders.6:movement_planning.allies.formation_movement[].reform_column",
++   "orders.6:movement_planning.axis.formation_movement[].reform_column",
++   "orders.7:movement_planning.allies.formation_movement[].reform_column",
++   "orders.7:movement_planning.axis.formation_movement[].reform_column",
++   "orders.8:movement_planning.allies.formation_movement[].reform_column",
++   "orders.8:movement_planning.axis.formation_movement[].reform_column",
++   "orders.9:movement_planning.allies.formation_movement[].reform_column",
++   "orders.9:movement_planning.axis.formation_movement[].reform_column"
++  ]
++ }
++}
+diff --git a/research/command_delay/audits/cd4_envelope_keys.json b/research/command_delay/audits/cd4_envelope_keys.json
+new file mode 100644
+index 00000000..53e9a5fc
+--- /dev/null
++++ b/research/command_delay/audits/cd4_envelope_keys.json
+@@ -0,0 +1,22 @@
++{
++ "command_delay_mode": {
++  "example": "events[].payload.options.command_delay_mode",
++  "n_paths": 1,
++  "occurrences": 7
++ },
++ "movement_style": {
++  "example": "events[].payload.order_batch.formation_movement[].movement_style",
++  "n_paths": 25,
++  "occurrences": 54
++ },
++ "reform_column": {
++  "example": "events[].payload.order_batch.formation_movement[].reform_column",
++  "n_paths": 25,
++  "occurrences": 54
++ },
++ "target_priorities": {
++  "example": "events[].payload.order_batch.target_priorities",
++  "n_paths": 99,
++  "occurrences": 391
++ }
++}
+diff --git a/research/command_delay/cd0/CD0_FREEZE_EVIDENCE.md b/research/command_delay/cd0/CD0_FREEZE_EVIDENCE.md
+new file mode 100644
+index 00000000..48ecdc4c
+--- /dev/null
++++ b/research/command_delay/cd0/CD0_FREEZE_EVIDENCE.md
+@@ -0,0 +1,124 @@
++# CD-0 冻结证据 · Command Delay Mode v2.2
++
++## 1. 冻结对象与基线
++
++| 项 | 值 |
++|---|---|
++| 冻结 tag | `realistic-command-v1-frozen` |
++| 冻结 commit | `d432a975151651fa7d6746b2f92e66b1e09d8d4a`（该分支 HEAD） |
++| 冻结文件面 | `backend/src/iron_bottom_sound/realistic_command.py`（IBS-R-RC-01…07）、`models.py` 的 `GameOptions.realistic_command` 语义、`Phase.FORMATION_SETUP` 流程 |
++| 基线 harness | `research/command_delay/golden_replay.py` |
++| 基线数据 | `research/command_delay/golden/*.json`（7 行矩阵）+ `GOLDEN_INDEX.json` |
++| 基线构建日志 | `logs/cd0_golden_build.log` |
++| 回归验证日志 | `logs/cd0_golden_check.log`（修复前）、`logs/cd0_golden_check_postfix.log`（修复后） |
++| 哈希种子探针 | `logs/cd0_hash_seed_probe.log`（修复前）、`logs/cd0_hash_seed_probe_postfix.log`（修复后） |
++| 探针 JSON | `audits/cd0_hash_seed_probe.json` |
++
++基线矩阵（双向均为确定性状态机 AI，故整局是 `(想定, seed, options)` 的纯函数）：
++
++| tag | 想定 | seed | 模式 | 事件数 |
++|---|---|---|---|---|
++| classic_s01 | IBS-S-01 | 20270830 | Classic | 586 |
++| classic_s03 | IBS-S-03 | 3 | Classic | 213 |
++| classic_em01 | IBS-S-EM-01 | 20270829 | Classic | 774 |
++| realistic_s01 | IBS-S-01 | 20270830 | Realistic | 486 |
++| realistic_s03 | IBS-S-03 | 3 | Realistic | 268 |
++| realistic_em01 | IBS-S-EM-01 | 20270829 | Realistic | 1545 |
++| realistic_s03_seed9 | IBS-S-03 | 9 | Realistic | 212 |
++
++七行全部 `passed=True`（终局合法、无友军碰撞、无友军鱼雷命中）。
++
++## 2. 冻结三面
++
++每行记录三个互相独立的可观测面，任何一个漂移都判 FAIL：
++
++1. `events` —— 裁决事件流（turn / phase / type / payload）。移动、炮击、损伤、指挥链任一裁决变化都会在此显现。
++2. `orders` —— 每个 (turn, phase, side) 已封存订单批次的完整 JSON。即使某次改动恰好没改变骰点，只要**规划器**（编队展开、后舰航迹、脱队判定）变了也会被抓到。
++3. `ships` / `formations` —— 终局逐舰 position/heading/hull/sunk/speed/command_status/formation_id 与编队指挥链。
++
++`game_id` 每次 `Engine.reset` 都是新 UUID 且被 `game_created` 事件记录，因此在录制前做掩码（`<GAME_ID>`），否则任何基线都不可能复现。
++
++## 3. 冻结投影比较法（为什么不是朴素字节 diff）
++
++新增可选字段会改变 `model_dump(mode="json")` 的文本（例如 `GameOptions` 多一个布尔量，就会出现在每个 `game_created` 载荷里）。若用朴素字节 diff，这类**纯信封增长**会被误报成语义漂移；反之若放宽比较，又会漏掉真正的语义变化。
++
++因此比较分两问：
++
++- **冻结语义是否变化？** 由 `project(actual, frozen)` 回答：递归、逐元素、成对投影，只忽略**冻结时不存在的 dict 键**，列表长度必须相等，已存在键的值必须完全一致。因此嵌套载荷内部的变化无法被隐藏——被丢掉的只能是新键，绝不可能是旧键的新值。
++- **数据模型是否增长？** 单独报告为 `envelope_keys_added` 路径集合，写入 `DATA_MODEL_DIFF.md` 供审查。
++
++## 4. CD0-F1：冻结面上发现的既有非确定性缺陷
++
++### 4.1 现象
++
++基线首次构建时 `realistic_s01` 在不同 `PYTHONHASHSEED` 下产出两个不同的 trees 摘要：
++
++```
++realistic_s01  HS=0 → 917114fbb1dd
++realistic_s01  HS=1 → 10679a78338d
++realistic_s01  HS=2 → 10679a78338d
++realistic_s01  HS=8 → 10679a78338d
++```
++
++其余 6 行在 HS∈{0,1,2,8} 下全部稳定；Classic 三行全部稳定。
++
++### 4.2 定位
++
++对 HS=0 与 HS=1 的两棵树做逐叶 diff，全文差异**只有 12 条**，全部形如：
++
++```
++events[352].payload.ship_ids[0]   HS0="IBS-U-USN-BUCHANAN"  HS1="IBS-U-USN-HELENA"
++events[353].payload.ship_ids[0]   HS0="IBS-U-USN-HELENA"    HS1="IBS-U-USN-BUCHANAN"
++```
++
++即 `formation_emergency_stop`（真实模式：友舰航路解冲突）的两条事件**互换顺序**，涉及的两组舰集合完全相同，且 `ships` / `orders` / `rng_counter` / `n_events` 全部一致。
++
++根因：`engine.py:3124` 以原生顺序遍历 `collision_sets`（`set[frozenset[str]]`），字符串哈希随机化即改变遍历顺序，进而改变事件发射顺序。
++
++### 4.3 性质判定：这是**修复**，不是语义变更
++
++同一函数内、同一变量的另一处循环（`engine.py:3144`，骰点友军碰撞路径）**已经**用 `sorted(collision_sets, key=lambda group: sorted(group))` 修过同类缺陷，仓库内还有专门的测试 `tests/test_tactical_ai.py::test_collision_resolution_is_deterministic_across_hash_seeds` 记录该 bug 的原始症状（"同 seed 跨进程战果分叉"）。也就是说：**哈希种子无关性是本仓库已经明文声明的契约**，而 3124 行是该契约的漏改孪生分支。命令延迟模式的验收标准第 10 条（每个消息事件与本地 agent 决策可复现/可审计）也要求它必须被修掉。
++
++### 4.4 修复与验证
++
++修复：`engine.py:3124` 改为与 3144 行同一规范排序键。
++
++```
++-                for collision_set in collision_sets:
+++                for collision_set in sorted(collision_sets, key=lambda group: sorted(group)):
++```
++
++修复后：
++
++| 检验 | 结果 |
++|---|---|
++| HS∈{0,1,2,8} 稳定性 | **PASS**，0 行不稳定（`logs/cd0_hash_seed_probe_postfix.log`） |
++| `realistic_s01` 摘要 | `917114fbb1dd` —— **与修复前冻结基线逐字节相同** |
++| 全部 7 行 golden 回归 | **PASS**（`logs/cd0_golden_check_postfix.log`） |
++| 信封新增键 | 0（`envelope keys added: 0`，见 CD-0 结束时的工作树） |
++
++**结论：修复改变了 0 个冻结值。** 规范排序键恰好与修复前代码在固定种子下产生的顺序一致，因此该行基线无需重建，冻结tag所指的语义与当前工作树完全一致，同时缺陷被永久消除。
++
++## 5. 既有测试基线（修复前，冻结 commit + 仅新增 research 文件）
++
++`logs/cd0_pytest_baseline.log`：3 项失败，全部为**既有失败**，与本次改动无关：
++
++| 失败项 | 性质 | 说明 |
++|---|---|---|
++| `test_tactical_ai.py::test_collision_resolution_is_deterministic_across_hash_seeds` | **测试夹具缺陷** | 用 `sys.executable -c` 起子进程，未传 `PYTHONPATH=backend/src`，子进程 `ModuleNotFoundError: No module named 'iron_bottom_sound'` → 断言 `returncode == 0` 失败。测试从未真正跑到比较阶段 |
++| `test_tactical_ai.py::test_ai_orders_deterministic_across_hash_seeds` | **测试夹具缺陷** | 同上，同一 `outcome()` 模式 |
++| `test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter` | **素材哈希不符** | `/assets/counters/德国-DD-卡尔加尔斯特.png` 实测 `5c54f8aa…` ≠ 硬编码期望 `918196c7…`。属于素材二进制内容问题，与引擎无关 |
++
++前两项必须在 CD-0 记录，因为它们是本项目"哈希种子无关性"契约**当前无法被自动验证**的原因；本次改用 `golden_replay.py --probe-hash-seeds`（显式传 `PYTHONPATH` 与环境变量）作为该契约的**有效**验证手段，并在 `logs/` 留下两份前后对照日志。该夹具缺陷不属本轮授权范围，未修，留待 PI 裁决（见 `BUG_AND_RERUN_LOG.md` CD0-F2）。
++
++## 6. 待裁决项：编队数量上限 1–4（文档）vs 8（代码）
++
++| 位置 | 陈述 |
++|---|---|
++| `docs/rules/realistic-command.md` §三 第 1 条（玩家可见规则） | "每方建立**一至四个**编队；每个编队至少两艘舰。" |
++| `realistic_command.py:44` | `MAX_FORMATIONS_PER_SIDE = 8`，注释为"用户裁定：编队上限由 4 放开到 8" |
++| `realistic_command.py:92-94` | 超出上限时把多余编队并入前一队（自动合并），而非报错 |
++
++即：**代码实现的是用户裁定的 8，玩家规则文档仍写 4**。二者当前不会导致裁决错误（代码路径自洽、测试断言用 `MAX_FORMATIONS_PER_SIDE`），但玩家按文档只能建 4 队，而系统允许 8 队，属文档-实现不一致。
++
++按 §一 授权顺序（想定特例 > 舰船记录/玩家辅助表 > 通用规则），并考虑到 8 是"用户裁定"而非规则推断，**本轮不改动任何一侧**（改代码会动冻结文件；改文档需要知道裁决是否仍然有效）。已在 `DATA_MODEL_DIFF.md` 与最终输出中列为 PI 裁决项 `CD0-Q1`。
+diff --git a/research/command_delay/golden_replay.py b/research/command_delay/golden_replay.py
+new file mode 100644
+index 00000000..e2666c9c
+--- /dev/null
++++ b/research/command_delay/golden_replay.py
+@@ -0,0 +1,403 @@
++"""CD-0 golden replay: freeze Classic and Realistic semantics before Command Delay.
++
++Run with ``--build`` to write the baselines from the frozen commit
++(``realistic-command-v1-frozen``); run with ``--check`` to assert the current
++working tree still reproduces them.
++
++What is frozen
++--------------
++Three independent surfaces per matrix row:
++
++1. ``events``  — the adjudication stream (turn/phase/type/payload), so any rule
++   change that alters movement, gunnery, damage or command-chain resolution
++   shows up.
++2. ``orders``  — the sealed order batch of every (turn, phase, side), so a
++   change in the *planner* (formation expansion, follower plans, detachments)
++   is caught even when it happens not to move the dice.
++3. ``ships`` / ``formations`` — final per-ship position/heading/hull/sunk and
++   the formation command chain, the coarse end state.
++
++Classic is replayed with ``GameOptions()``; Realistic with
++``GameOptions(realistic_command=True)``.  Both sides use the deterministic state
++machine AI, so a game is a pure function of (scenario, seed, options).
++
++Determinism by construction
++---------------------------
++Every row runs in a **child process with ``PYTHONHASHSEED`` pinned**, because the
++frozen tree was measured to be hash-order sensitive in one row (defect CD0-F1,
++see ``--probe-hash-seeds``).  Pinning the seed makes the baseline a reproducible
++property of the code rather than of the caller's environment; the cross-seed
++probe separately measures how much of that sensitivity is left.
++
++Frozen-projection comparison
++----------------------------
++A golden tree is compared through ``project(actual, frozen)``: dict keys that
++did not exist at freeze time are ignored, everything else must match exactly,
++and list lengths must match.  This separates two questions a plain byte diff
++would conflate:
++
++* **frozen semantics changed?** — answered by the projection.  A changed value,
++  a removed key, a resized or reordered list is drift and fails the check.
++* **data model grew?** — reported separately as ``envelope_added`` key paths
++  (e.g. a new ``GameOptions`` flag appears as one new key in every
++  ``game_created`` payload).  Additive growth is recorded in
++  ``DATA_MODEL_DIFF.md`` and never silently edits frozen semantics.
++
++The projection is applied recursively and pairwise, so it cannot hide a change
++inside a nested payload: only *new* keys are dropped, never new *values* of keys
++that already existed.
++
++Usage::
++
++    python research/command_delay/golden_replay.py --build
++    python research/command_delay/golden_replay.py --check
++    python research/command_delay/golden_replay.py --probe-hash-seeds 0,1,2,8
++"""
++from __future__ import annotations
++
++import argparse
++import hashlib
++import json
++import os
++import re
++import subprocess
++import sys
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parents[2]
++SRC = ROOT / "backend" / "src"
++GOLDEN_DIR = Path(__file__).resolve().parent / "golden"
++PINNED_HASH_SEED = "0"
++
++# Frozen matrix.  Seeds are the ones already used by the repository's own
++# realistic regression tests, so the baseline exercises the same scenarios the
++# project already trusts.
++MATRIX: tuple[dict, ...] = (
++    {"tag": "classic_s01", "scenario": "IBS-S-01", "seed": 20270830, "realistic": False},
++    {"tag": "classic_s03", "scenario": "IBS-S-03", "seed": 3, "realistic": False},
++    {"tag": "classic_em01", "scenario": "IBS-S-EM-01", "seed": 20270829, "realistic": False},
++    {"tag": "realistic_s01", "scenario": "IBS-S-01", "seed": 20270830, "realistic": True},
++    {"tag": "realistic_s03", "scenario": "IBS-S-03", "seed": 3, "realistic": True},
++    {"tag": "realistic_em01", "scenario": "IBS-S-EM-01", "seed": 20270829, "realistic": True},
++    {"tag": "realistic_s03_seed9", "scenario": "IBS-S-03", "seed": 9, "realistic": True},
++)
++
++# Scalars compared for exact equality on top of the projected trees.
++SCALARS = ("passed", "final_turn", "final_phase", "rng_counter", "n_events",
++           "n_order_batches")
++
++
++def canonical(value) -> str:
++    """Stable JSON text for hashing (sorted keys, no float noise)."""
++    return json.dumps(value, sort_keys=True, separators=(",", ":"), default=str)
++
++
++def digest(text: str) -> str:
++    return hashlib.sha256(text.encode("utf-8")).hexdigest()
++
++
++def project(actual, frozen):
++    """Keep only structure that existed at freeze time, recursively.
++
++    Returns ``(projected, drift)``.  ``drift`` lists human-readable paths where
++    the actual tree cannot be projected onto the frozen one: a missing key, a
++    type change, or a different list length.
++    """
++    if isinstance(frozen, dict):
++        if not isinstance(actual, dict):
++            return None, ["type"]
++        out = {}
++        drift: list[str] = []
++        for key, frozen_value in frozen.items():
++            if key not in actual:
++                drift.append(f"missing:{key}")
++                continue
++            value, sub = project(actual[key], frozen_value)
++            if sub:
++                drift.extend(f"{key}.{item}" for item in sub)
++            out[key] = value
++        return out, drift
++    if isinstance(frozen, list):
++        if not isinstance(actual, list):
++            return None, ["type"]
++        if len(actual) != len(frozen):
++            return None, [f"len:{len(actual)}!={len(frozen)}"]
++        out = []
++        drift = []
++        for index, frozen_item in enumerate(frozen):
++            value, sub = project(actual[index], frozen_item)
++            if sub:
++                drift.extend(f"[{index}].{item}" for item in sub)
++            out.append(value)
++        return out, drift
++    if isinstance(actual, type(frozen)) or (
++        isinstance(actual, (int, float)) and isinstance(frozen, (int, float))
++    ):
++        return actual, []
++    return None, ["type"]
++
++
++def envelope_added(actual, frozen, path: str = "") -> list[str]:
++    """Key paths present in ``actual`` but absent from ``frozen`` (report only)."""
++    found: list[str] = []
++    if isinstance(frozen, dict) and isinstance(actual, dict):
++        for key, value in actual.items():
++            here = f"{path}.{key}" if path else key
++            if key not in frozen:
++                found.append(here)
++            else:
++                found.extend(envelope_added(value, frozen[key], here))
++    elif isinstance(frozen, list) and isinstance(actual, list) and len(frozen) == len(actual):
++        for index, (item_actual, item_frozen) in enumerate(zip(actual, frozen)):
++            found.extend(envelope_added(item_actual, item_frozen, f"{path}[{index}]"))
++    return found
++
++
++def strip_indices(path: str) -> str:
++    """Collapse ``events[7].payload`` to ``events[].payload`` for reporting."""
++    return re.sub(r"\[\d+\]", "[]", path)
++
++
++def walk_diffs(actual, frozen, path: str = "") -> list[str]:
++    """Exact leaf/path diff between two trees, for diagnostics."""
++    out: list[str] = []
++    if isinstance(frozen, dict) and isinstance(actual, dict):
++        for key in sorted(set(frozen) | set(actual)):
++            here = f"{path}.{key}" if path else key
++            if key not in frozen:
++                out.append(f"{here}: ADDED")
++            elif key not in actual:
++                out.append(f"{here}: REMOVED")
++            else:
++                out.extend(walk_diffs(actual[key], frozen[key], here))
++    elif isinstance(frozen, list) and isinstance(actual, list):
++        if len(actual) != len(frozen):
++            out.append(f"{path}: LEN {len(actual)} != {len(frozen)}")
++        else:
++            for index, (a, b) in enumerate(zip(actual, frozen)):
++                out.extend(walk_diffs(a, b, f"{path}[{index}]"))
++    elif actual != frozen:
++        out.append(f"{path}: {json.dumps(frozen)[:160]} -> {json.dumps(actual)[:160]}")
++    return out
++
++
++# --------------------------------------------------------------------------- worker
++
++ROW_SCRIPT = r"""
++import json, sys
++sys.path.insert(0, sys.argv[1])
++from iron_bottom_sound.match import run_match
++from iron_bottom_sound.models import GameOptions
++
++spec = json.loads(sys.argv[2])
++options = GameOptions(realistic_command=bool(spec["realistic"]))
++report, engine, _sessions = run_match(
++    spec["scenario"], axis="tactical", allies="tactical", seed=spec["seed"],
++    options=options, request_limit=256,
++)
++state = engine.get(report.game_id)
++game_id = report.game_id
++
++
++def mask(value):
++    if isinstance(value, str):
++        return "<GAME_ID>" if value == game_id else value
++    if isinstance(value, dict):
++        return {k: mask(v) for k, v in value.items()}
++    if isinstance(value, (list, tuple)):
++        return [mask(v) for v in value]
++    return value
++
++
++events = [
++    {
++        "turn": e.turn,
++        "phase": e.phase.value,
++        "type": e.type,
++        "payload": mask(e.payload),
++    }
++    for e in state.events
++]
++orders = {
++    key: {side: batch.model_dump(mode="json") for side, batch in sealed.items()}
++    for key, sealed in state.sealed_orders.items()
++}
++ships = {
++    ship.id: {
++        "position": ship.position.label if ship.position else None,
++        "heading": ship.heading,
++        "hull": ship.hull,
++        "sunk": ship.sunk,
++        "speed": ship.current_speed,
++        "command_status": ship.command_status,
++        "formation_id": ship.formation_id,
++    }
++    for ship in state.ships.values()
++}
++formations = {
++    f.id: {
++        "side": f.side.value,
++        "ship_ids": f.ship_ids,
++        "leader_id": f.leader_id,
++        "flagship_id": f.flagship_id,
++        "status": f.status,
++    }
++    for f in state.formations.values()
++}
++json.dump(
++    {
++        "tag": spec["tag"],
++        "scenario": spec["scenario"],
++        "seed": spec["seed"],
++        "realistic_command": bool(spec["realistic"]),
++        "passed": bool(report.passed),
++        "failure_reason": report.failure_reason,
++        "final_turn": state.turn,
++        "final_phase": state.phase.value,
++        "rng_counter": state.rng_counter,
++        "n_events": len(events),
++        "n_order_batches": sum(len(sealed) for sealed in state.sealed_orders.values()),
++        "trees": {"events": events, "orders": orders, "ships": ships,
++                  "formations": formations},
++    },
++    sys.stdout,
++)
++"""
++
++
++def replay(spec: dict, hash_seed: str = PINNED_HASH_SEED) -> dict:
++    """Play one matrix row in a child process and return its record."""
++    env = dict(os.environ)
++    env["PYTHONHASHSEED"] = hash_seed
++    env.pop("PYTHONPATH", None)
++    completed = subprocess.run(
++        [sys.executable, "-c", ROW_SCRIPT, str(SRC), json.dumps(spec)],
++        cwd=str(ROOT), env=env, capture_output=True, text=True, timeout=1800,
++    )
++    if completed.returncode != 0:
++        raise RuntimeError(f"{spec['tag']}: child failed\n{completed.stderr[-4000:]}")
++    record = json.loads(completed.stdout)
++    record["hash_seed"] = hash_seed
++    record["digest_trees"] = digest(canonical(record["trees"]))
++    return record
++
++
++# --------------------------------------------------------------------------- modes
++
++def build() -> int:
++    GOLDEN_DIR.mkdir(parents=True, exist_ok=True)
++    index_rows = []
++    for spec in MATRIX:
++        record = replay(spec)
++        (GOLDEN_DIR / f"{spec['tag']}.json").write_text(
++            json.dumps(record, sort_keys=True) + "\n", encoding="utf-8"
++        )
++        index_rows.append({key: record[key] for key in
++                           ("tag", "scenario", "seed", "realistic_command", "passed",
++                            "final_turn", "final_phase", "rng_counter", "n_events",
++                            "n_order_batches", "digest_trees")})
++        print(f"[golden] {spec['tag']:<20} events={record['n_events']:<5} "
++              f"passed={record['passed']} digest={record['digest_trees'][:16]}")
++    (GOLDEN_DIR / "GOLDEN_INDEX.json").write_text(
++        json.dumps(
++            {
++                "frozen_tag": "realistic-command-v1-frozen",
++                "frozen_commit": "d432a975151651fa7d6746b2f92e66b1e09d8d4a",
++                "hash_seed_pinned": PINNED_HASH_SEED,
++                "matrix": [spec["tag"] for spec in MATRIX],
++                "scalars": list(SCALARS),
++                "comparison": "frozen-projection (added dict keys ignored and reported)",
++                "known_defect": "CD0-F1: engine.py:3124 iterates set[frozenset[str]] "
++                                "in hash order; see --probe-hash-seeds",
++                "records": index_rows,
++            },
++            indent=1, sort_keys=True,
++        ) + "\n",
++        encoding="utf-8",
++    )
++    return 0
++
++
++def check() -> int:
++    index_path = GOLDEN_DIR / "GOLDEN_INDEX.json"
++    if not index_path.exists():
++        print("FAIL: no golden baseline; run --build first")
++        return 2
++    index = json.loads(index_path.read_text(encoding="utf-8"))
++    failures: list[str] = []
++    envelope_all: dict[str, int] = {}
++    for expected_row in index["records"]:
++        tag = expected_row["tag"]
++        frozen = json.loads((GOLDEN_DIR / f"{tag}.json").read_text(encoding="utf-8"))
++        spec = next(item for item in MATRIX if item["tag"] == tag)
++        actual = replay(spec)
++        scalar_drift = [name for name in SCALARS if actual[name] != frozen[name]]
++        projected, drift = project(actual["trees"], frozen["trees"])
++        if not drift and canonical(projected) != canonical(frozen["trees"]):
++            drift = walk_diffs(projected, frozen["trees"])[:12]
++        added = sorted({strip_indices(path) for path in
++                        envelope_added(actual["trees"], frozen["trees"])})
++        for path in added:
++            envelope_all[path] = envelope_all.get(path, 0) + 1
++        if drift or scalar_drift:
++            failures.append(f"{tag}: scalars={scalar_drift} trees={drift[:6]}")
++            print(f"[check] {tag:<20} DRIFT scalars={scalar_drift} trees={drift[:4]}")
++        else:
++            print(f"[check] {tag:<20} OK  (envelope keys added: {len(added)})")
++    if envelope_all:
++        print("\nENVELOPE_KEYS_ADDED (additive only, not drift):")
++        for path in sorted(envelope_all):
++            print(f"  {path}  x{envelope_all[path]}")
++    if failures:
++        print("\nGOLDEN_REPLAY = FAIL")
++        for line in failures:
++            print("  " + line)
++        return 1
++    print("\nGOLDEN_REPLAY = PASS")
++    return 0
++
++
++def probe_hash_seeds(seeds: list[str]) -> int:
++    """Measure hash-order sensitivity of each row across processes."""
++    rows: list[dict] = []
++    unstable = 0
++    for spec in MATRIX:
++        digests: dict[str, str] = {}
++        for seed in seeds:
++            record = replay(spec, hash_seed=seed)
++            digests[seed] = record["digest_trees"]
++        unique = sorted(set(digests.values()))
++        stable = len(unique) == 1
++        unstable += 0 if stable else 1
++        rows.append({"tag": spec["tag"], "stable": stable,
++                     "digests": digests, "n_unique": len(unique)})
++        print(f"[probe] {spec['tag']:<20} stable={stable} n_unique={len(unique)} "
++              f"{ {k: v[:12] for k, v in digests.items()} }")
++    out = Path(__file__).resolve().parent / "audits" / "cd0_hash_seed_probe.json"
++    out.parent.mkdir(parents=True, exist_ok=True)
++    out.write_text(json.dumps(
++        {"hash_seeds": seeds, "rows": rows,
++         "n_unstable_rows": unstable, "all_stable": unstable == 0},
++        indent=1, sort_keys=True) + "\n", encoding="utf-8")
++    verdict = "PASS" if unstable == 0 else "FAIL"
++    print(f"\nHASH_SEED_STABILITY = {verdict}  ({unstable} unstable rows) -> {out}")
++    return 0 if unstable == 0 else 1
++
++
++def main() -> int:
++    parser = argparse.ArgumentParser()
++    group = parser.add_mutually_exclusive_group(required=True)
++    group.add_argument("--build", action="store_true")
++    group.add_argument("--check", action="store_true")
++    group.add_argument("--probe-hash-seeds", metavar="LIST")
++    args = parser.parse_args()
++    if args.build:
++        return build()
++    if args.check:
++        return check()
++    seeds = [item.strip() for item in args.probe_hash_seeds.split(",") if item.strip()]
++    return probe_hash_seeds(seeds)
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/research/command_delay/logs/cd0_golden_build.log b/research/command_delay/logs/cd0_golden_build.log
+new file mode 100644
+index 00000000..9149e66e
+--- /dev/null
++++ b/research/command_delay/logs/cd0_golden_build.log
+@@ -0,0 +1,7 @@
++[golden] classic_s01          events=586   passed=True digest=f5ec21e082b97961
++[golden] classic_s03          events=213   passed=True digest=c46300d8375f1a31
++[golden] classic_em01         events=774   passed=True digest=002f779200c98f6f
++[golden] realistic_s01        events=486   passed=True digest=917114fbb1dd6c84
++[golden] realistic_s03        events=268   passed=True digest=6839300ceb1a9055
++[golden] realistic_em01       events=1545  passed=True digest=4b746b4a5c4a32c5
++[golden] realistic_s03_seed9  events=212   passed=True digest=3ff17dd387e8dd78
+diff --git a/research/command_delay/logs/cd0_golden_check.log b/research/command_delay/logs/cd0_golden_check.log
+new file mode 100644
+index 00000000..81354e64
+--- /dev/null
++++ b/research/command_delay/logs/cd0_golden_check.log
+@@ -0,0 +1,9 @@
++[check] classic_s01          OK  (envelope keys added: 0)
++[check] classic_s03          OK  (envelope keys added: 0)
++[check] classic_em01         OK  (envelope keys added: 0)
++[check] realistic_s01        OK  (envelope keys added: 0)
++[check] realistic_s03        OK  (envelope keys added: 0)
++[check] realistic_em01       OK  (envelope keys added: 0)
++[check] realistic_s03_seed9  OK  (envelope keys added: 0)
++
++GOLDEN_REPLAY = PASS
+diff --git a/research/command_delay/logs/cd0_golden_check2.log b/research/command_delay/logs/cd0_golden_check2.log
+new file mode 100644
+index 00000000..ee9238d0
+--- /dev/null
++++ b/research/command_delay/logs/cd0_golden_check2.log
+@@ -0,0 +1,9 @@
++[check] classic_s01          OK
++[check] classic_s03          OK
++[check] classic_em01         OK
++[check] realistic_s01        OK
++[check] realistic_s03        OK
++[check] realistic_em01       OK
++[check] realistic_s03_seed9  OK
++
++GOLDEN_REPLAY = PASS
+diff --git a/research/command_delay/logs/cd0_golden_check_postfix.log b/research/command_delay/logs/cd0_golden_check_postfix.log
+new file mode 100644
+index 00000000..81354e64
+--- /dev/null
++++ b/research/command_delay/logs/cd0_golden_check_postfix.log
+@@ -0,0 +1,9 @@
++[check] classic_s01          OK  (envelope keys added: 0)
++[check] classic_s03          OK  (envelope keys added: 0)
++[check] classic_em01         OK  (envelope keys added: 0)
++[check] realistic_s01        OK  (envelope keys added: 0)
++[check] realistic_s03        OK  (envelope keys added: 0)
++[check] realistic_em01       OK  (envelope keys added: 0)
++[check] realistic_s03_seed9  OK  (envelope keys added: 0)
++
++GOLDEN_REPLAY = PASS
+diff --git a/research/command_delay/logs/cd0_hash_seed_probe.log b/research/command_delay/logs/cd0_hash_seed_probe.log
+new file mode 100644
+index 00000000..d31fcb20
+--- /dev/null
++++ b/research/command_delay/logs/cd0_hash_seed_probe.log
+@@ -0,0 +1,9 @@
++[probe] classic_s01          stable=True n_unique=1 {'0': 'f5ec21e082b9', '1': 'f5ec21e082b9', '2': 'f5ec21e082b9', '8': 'f5ec21e082b9'}
++[probe] classic_s03          stable=True n_unique=1 {'0': 'c46300d8375f', '1': 'c46300d8375f', '2': 'c46300d8375f', '8': 'c46300d8375f'}
++[probe] classic_em01         stable=True n_unique=1 {'0': '002f779200c9', '1': '002f779200c9', '2': '002f779200c9', '8': '002f779200c9'}
++[probe] realistic_s01        stable=False n_unique=2 {'0': '917114fbb1dd', '1': '10679a78338d', '2': '10679a78338d', '8': '10679a78338d'}
++[probe] realistic_s03        stable=True n_unique=1 {'0': '6839300ceb1a', '1': '6839300ceb1a', '2': '6839300ceb1a', '8': '6839300ceb1a'}
++[probe] realistic_em01       stable=True n_unique=1 {'0': '4b746b4a5c4a', '1': '4b746b4a5c4a', '2': '4b746b4a5c4a', '8': '4b746b4a5c4a'}
++[probe] realistic_s03_seed9  stable=True n_unique=1 {'0': '3ff17dd387e8', '1': '3ff17dd387e8', '2': '3ff17dd387e8', '8': '3ff17dd387e8'}
++
++HASH_SEED_STABILITY = FAIL  (1 unstable rows) -> /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/command_delay/audits/cd0_hash_seed_probe.json
+diff --git a/research/command_delay/logs/cd0_hash_seed_probe_postfix.log b/research/command_delay/logs/cd0_hash_seed_probe_postfix.log
+new file mode 100644
+index 00000000..dac2e11e
+--- /dev/null
++++ b/research/command_delay/logs/cd0_hash_seed_probe_postfix.log
+@@ -0,0 +1,9 @@
++[probe] classic_s01          stable=True n_unique=1 {'0': 'f5ec21e082b9', '1': 'f5ec21e082b9', '2': 'f5ec21e082b9', '8': 'f5ec21e082b9'}
++[probe] classic_s03          stable=True n_unique=1 {'0': 'c46300d8375f', '1': 'c46300d8375f', '2': 'c46300d8375f', '8': 'c46300d8375f'}
++[probe] classic_em01         stable=True n_unique=1 {'0': '002f779200c9', '1': '002f779200c9', '2': '002f779200c9', '8': '002f779200c9'}
++[probe] realistic_s01        stable=True n_unique=1 {'0': '917114fbb1dd', '1': '917114fbb1dd', '2': '917114fbb1dd', '8': '917114fbb1dd'}
++[probe] realistic_s03        stable=True n_unique=1 {'0': '6839300ceb1a', '1': '6839300ceb1a', '2': '6839300ceb1a', '8': '6839300ceb1a'}
++[probe] realistic_em01       stable=True n_unique=1 {'0': '4b746b4a5c4a', '1': '4b746b4a5c4a', '2': '4b746b4a5c4a', '8': '4b746b4a5c4a'}
++[probe] realistic_s03_seed9  stable=True n_unique=1 {'0': '3ff17dd387e8', '1': '3ff17dd387e8', '2': '3ff17dd387e8', '8': '3ff17dd387e8'}
++
++HASH_SEED_STABILITY = PASS  (0 unstable rows) -> /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/command_delay/audits/cd0_hash_seed_probe.json
+diff --git a/research/command_delay/logs/cd0_pytest_baseline.log b/research/command_delay/logs/cd0_pytest_baseline.log
+new file mode 100644
+index 00000000..54cef1b9
+--- /dev/null
++++ b/research/command_delay/logs/cd0_pytest_baseline.log
+@@ -0,0 +1,25 @@
++        )
++>       assert proc.returncode == 0, proc.stderr
++E       AssertionError: Traceback (most recent call last):
++E           File "<string>", line 3, in <module>
++E             from iron_bottom_sound.engine import IronBottomEngine, ORDER_PHASES
++E         ModuleNotFoundError: No module named 'iron_bottom_sound'
++E         
++E       assert 1 == 0
++E        +  where 1 = CompletedProcess(args=['/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/bin/python', '-c', "import json, sy...ttom_sound.engine import IronBottomEngine, ORDER_PHASES\nModuleNotFoundError: No module named \'iron_bottom_sound\'\n').returncode
++
++tests/test_tactical_ai.py:1114: AssertionError
++=============================== warnings summary ===============================
++.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
++  /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
++    from starlette.testclient import TestClient as TestClient  # noqa
++
++.venv/lib/python3.14/site-packages/starlette/testclient.py:53
++  /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
++    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
++
++-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
++=========================== short test summary info ============================
++FAILED tests/test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter
++FAILED tests/test_tactical_ai.py::test_collision_resolution_is_deterministic_across_hash_seeds
++FAILED tests/test_tactical_ai.py::test_ai_orders_deterministic_across_hash_seeds
+diff --git a/research/command_delay/logs/cd1_existing_realistic_tests.log b/research/command_delay/logs/cd1_existing_realistic_tests.log
+new file mode 100644
+index 00000000..c58e96e6
+--- /dev/null
++++ b/research/command_delay/logs/cd1_existing_realistic_tests.log
+@@ -0,0 +1 @@
++......................................                                   [100%]
+diff --git a/research/command_delay/logs/cd1_golden_check.log b/research/command_delay/logs/cd1_golden_check.log
+new file mode 100644
+index 00000000..e2969e7c
+--- /dev/null
++++ b/research/command_delay/logs/cd1_golden_check.log
+@@ -0,0 +1,61 @@
++[check] classic_s01          OK  (envelope keys added: 0)
++[check] classic_s03          OK  (envelope keys added: 0)
++[check] classic_em01         OK  (envelope keys added: 0)
++[check] realistic_s01        OK  (envelope keys added: 26)
++[check] realistic_s03        OK  (envelope keys added: 18)
++[check] realistic_em01       OK  (envelope keys added: 46)
++[check] realistic_s03_seed9  OK  (envelope keys added: 18)
++
++ENVELOPE_KEYS_ADDED (additive only, not drift):
++  events[].payload.order_batch.formation_movement[].movement_style  x4
++  events[].payload.order_batch.formation_movement[].reform_column  x4
++  orders.10:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.10:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.10:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.10:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.11:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.11:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.11:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.11:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.12:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.12:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.12:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.12:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.1:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.1:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.1:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.1:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.2:movement_planning.allies.formation_movement[].movement_style  x4
++  orders.2:movement_planning.allies.formation_movement[].reform_column  x4
++  orders.2:movement_planning.axis.formation_movement[].movement_style  x4
++  orders.2:movement_planning.axis.formation_movement[].reform_column  x4
++  orders.3:movement_planning.allies.formation_movement[].movement_style  x4
++  orders.3:movement_planning.allies.formation_movement[].reform_column  x4
++  orders.3:movement_planning.axis.formation_movement[].movement_style  x4
++  orders.3:movement_planning.axis.formation_movement[].reform_column  x4
++  orders.4:movement_planning.allies.formation_movement[].movement_style  x4
++  orders.4:movement_planning.allies.formation_movement[].reform_column  x4
++  orders.4:movement_planning.axis.formation_movement[].movement_style  x4
++  orders.4:movement_planning.axis.formation_movement[].reform_column  x4
++  orders.5:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.5:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.5:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.5:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.6:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.6:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.6:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.6:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.7:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.7:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.7:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.7:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.8:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.8:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.8:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.8:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.9:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.9:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.9:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.9:movement_planning.axis.formation_movement[].reform_column  x1
++
++GOLDEN_REPLAY = PASS
+diff --git a/research/command_delay/logs/cd2_golden_check.log b/research/command_delay/logs/cd2_golden_check.log
+new file mode 100644
+index 00000000..d81f868e
+--- /dev/null
++++ b/research/command_delay/logs/cd2_golden_check.log
+@@ -0,0 +1,62 @@
++[check] classic_s01          OK  (envelope keys added: 1)
++[check] classic_s03          OK  (envelope keys added: 1)
++[check] classic_em01         OK  (envelope keys added: 1)
++[check] realistic_s01        OK  (envelope keys added: 27)
++[check] realistic_s03        OK  (envelope keys added: 19)
++[check] realistic_em01       OK  (envelope keys added: 47)
++[check] realistic_s03_seed9  OK  (envelope keys added: 19)
++
++ENVELOPE_KEYS_ADDED (additive only, not drift):
++  events[].payload.options.command_delay_mode  x7
++  events[].payload.order_batch.formation_movement[].movement_style  x4
++  events[].payload.order_batch.formation_movement[].reform_column  x4
++  orders.10:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.10:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.10:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.10:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.11:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.11:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.11:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.11:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.12:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.12:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.12:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.12:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.1:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.1:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.1:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.1:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.2:movement_planning.allies.formation_movement[].movement_style  x4
++  orders.2:movement_planning.allies.formation_movement[].reform_column  x4
++  orders.2:movement_planning.axis.formation_movement[].movement_style  x4
++  orders.2:movement_planning.axis.formation_movement[].reform_column  x4
++  orders.3:movement_planning.allies.formation_movement[].movement_style  x4
++  orders.3:movement_planning.allies.formation_movement[].reform_column  x4
++  orders.3:movement_planning.axis.formation_movement[].movement_style  x4
++  orders.3:movement_planning.axis.formation_movement[].reform_column  x4
++  orders.4:movement_planning.allies.formation_movement[].movement_style  x4
++  orders.4:movement_planning.allies.formation_movement[].reform_column  x4
++  orders.4:movement_planning.axis.formation_movement[].movement_style  x4
++  orders.4:movement_planning.axis.formation_movement[].reform_column  x4
++  orders.5:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.5:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.5:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.5:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.6:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.6:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.6:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.6:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.7:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.7:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.7:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.7:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.8:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.8:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.8:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.8:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.9:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.9:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.9:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.9:movement_planning.axis.formation_movement[].reform_column  x1
++
++GOLDEN_REPLAY = PASS
+diff --git a/research/command_delay/logs/cd3_golden_check.log b/research/command_delay/logs/cd3_golden_check.log
+new file mode 100644
+index 00000000..d81f868e
+--- /dev/null
++++ b/research/command_delay/logs/cd3_golden_check.log
+@@ -0,0 +1,62 @@
++[check] classic_s01          OK  (envelope keys added: 1)
++[check] classic_s03          OK  (envelope keys added: 1)
++[check] classic_em01         OK  (envelope keys added: 1)
++[check] realistic_s01        OK  (envelope keys added: 27)
++[check] realistic_s03        OK  (envelope keys added: 19)
++[check] realistic_em01       OK  (envelope keys added: 47)
++[check] realistic_s03_seed9  OK  (envelope keys added: 19)
++
++ENVELOPE_KEYS_ADDED (additive only, not drift):
++  events[].payload.options.command_delay_mode  x7
++  events[].payload.order_batch.formation_movement[].movement_style  x4
++  events[].payload.order_batch.formation_movement[].reform_column  x4
++  orders.10:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.10:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.10:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.10:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.11:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.11:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.11:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.11:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.12:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.12:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.12:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.12:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.1:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.1:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.1:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.1:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.2:movement_planning.allies.formation_movement[].movement_style  x4
++  orders.2:movement_planning.allies.formation_movement[].reform_column  x4
++  orders.2:movement_planning.axis.formation_movement[].movement_style  x4
++  orders.2:movement_planning.axis.formation_movement[].reform_column  x4
++  orders.3:movement_planning.allies.formation_movement[].movement_style  x4
++  orders.3:movement_planning.allies.formation_movement[].reform_column  x4
++  orders.3:movement_planning.axis.formation_movement[].movement_style  x4
++  orders.3:movement_planning.axis.formation_movement[].reform_column  x4
++  orders.4:movement_planning.allies.formation_movement[].movement_style  x4
++  orders.4:movement_planning.allies.formation_movement[].reform_column  x4
++  orders.4:movement_planning.axis.formation_movement[].movement_style  x4
++  orders.4:movement_planning.axis.formation_movement[].reform_column  x4
++  orders.5:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.5:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.5:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.5:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.6:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.6:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.6:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.6:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.7:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.7:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.7:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.7:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.8:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.8:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.8:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.8:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.9:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.9:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.9:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.9:movement_planning.axis.formation_movement[].reform_column  x1
++
++GOLDEN_REPLAY = PASS
+diff --git a/research/command_delay/logs/cd4_golden_check.log b/research/command_delay/logs/cd4_golden_check.log
+new file mode 100644
+index 00000000..33db68b5
+--- /dev/null
++++ b/research/command_delay/logs/cd4_golden_check.log
+@@ -0,0 +1,161 @@
++[check] classic_s01          OK  (envelope keys added: 52)
++[check] classic_s03          OK  (envelope keys added: 34)
++[check] classic_em01         OK  (envelope keys added: 92)
++[check] realistic_s01        OK  (envelope keys added: 80)
++[check] realistic_s03        OK  (envelope keys added: 54)
++[check] realistic_em01       OK  (envelope keys added: 140)
++[check] realistic_s03_seed9  OK  (envelope keys added: 54)
++
++ENVELOPE_KEYS_ADDED (additive only, not drift):
++  events[].payload.options.command_delay_mode  x7
++  events[].payload.order_batch.formation_movement[].movement_style  x4
++  events[].payload.order_batch.formation_movement[].reform_column  x4
++  events[].payload.order_batch.target_priorities  x7
++  orders.10:gunnery.allies.target_priorities  x2
++  orders.10:gunnery.axis.target_priorities  x2
++  orders.10:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.10:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.10:movement_planning.allies.target_priorities  x2
++  orders.10:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.10:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.10:movement_planning.axis.target_priorities  x2
++  orders.10:reinforcement.allies.target_priorities  x2
++  orders.10:reinforcement.axis.target_priorities  x2
++  orders.10:torpedo_planning.allies.target_priorities  x2
++  orders.10:torpedo_planning.axis.target_priorities  x2
++  orders.11:gunnery.allies.target_priorities  x2
++  orders.11:gunnery.axis.target_priorities  x2
++  orders.11:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.11:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.11:movement_planning.allies.target_priorities  x2
++  orders.11:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.11:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.11:movement_planning.axis.target_priorities  x2
++  orders.11:reinforcement.allies.target_priorities  x2
++  orders.11:reinforcement.axis.target_priorities  x2
++  orders.11:torpedo_planning.allies.target_priorities  x2
++  orders.11:torpedo_planning.axis.target_priorities  x2
++  orders.12:gunnery.allies.target_priorities  x2
++  orders.12:gunnery.axis.target_priorities  x2
++  orders.12:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.12:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.12:movement_planning.allies.target_priorities  x2
++  orders.12:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.12:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.12:movement_planning.axis.target_priorities  x2
++  orders.12:reinforcement.allies.target_priorities  x2
++  orders.12:reinforcement.axis.target_priorities  x2
++  orders.12:torpedo_planning.allies.target_priorities  x2
++  orders.12:torpedo_planning.axis.target_priorities  x2
++  orders.1:formation_setup.allies.target_priorities  x4
++  orders.1:formation_setup.axis.target_priorities  x4
++  orders.1:gunnery.allies.target_priorities  x7
++  orders.1:gunnery.axis.target_priorities  x7
++  orders.1:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.1:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.1:movement_planning.allies.target_priorities  x3
++  orders.1:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.1:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.1:movement_planning.axis.target_priorities  x3
++  orders.1:reinforcement.allies.target_priorities  x3
++  orders.1:reinforcement.axis.target_priorities  x3
++  orders.1:torpedo_planning.allies.target_priorities  x3
++  orders.1:torpedo_planning.axis.target_priorities  x3
++  orders.2:gunnery.allies.target_priorities  x7
++  orders.2:gunnery.axis.target_priorities  x7
++  orders.2:movement_planning.allies.formation_movement[].movement_style  x4
++  orders.2:movement_planning.allies.formation_movement[].reform_column  x4
++  orders.2:movement_planning.allies.target_priorities  x7
++  orders.2:movement_planning.axis.formation_movement[].movement_style  x4
++  orders.2:movement_planning.axis.formation_movement[].reform_column  x4
++  orders.2:movement_planning.axis.target_priorities  x7
++  orders.2:reinforcement.allies.target_priorities  x7
++  orders.2:reinforcement.axis.target_priorities  x7
++  orders.2:torpedo_planning.allies.target_priorities  x7
++  orders.2:torpedo_planning.axis.target_priorities  x7
++  orders.3:gunnery.allies.target_priorities  x7
++  orders.3:gunnery.axis.target_priorities  x7
++  orders.3:movement_planning.allies.formation_movement[].movement_style  x4
++  orders.3:movement_planning.allies.formation_movement[].reform_column  x4
++  orders.3:movement_planning.allies.target_priorities  x7
++  orders.3:movement_planning.axis.formation_movement[].movement_style  x4
++  orders.3:movement_planning.axis.formation_movement[].reform_column  x4
++  orders.3:movement_planning.axis.target_priorities  x7
++  orders.3:reinforcement.allies.target_priorities  x7
++  orders.3:reinforcement.axis.target_priorities  x7
++  orders.3:torpedo_planning.allies.target_priorities  x7
++  orders.3:torpedo_planning.axis.target_priorities  x7
++  orders.4:gunnery.allies.target_priorities  x7
++  orders.4:gunnery.axis.target_priorities  x7
++  orders.4:movement_planning.allies.formation_movement[].movement_style  x4
++  orders.4:movement_planning.allies.formation_movement[].reform_column  x4
++  orders.4:movement_planning.allies.target_priorities  x7
++  orders.4:movement_planning.axis.formation_movement[].movement_style  x4
++  orders.4:movement_planning.axis.formation_movement[].reform_column  x4
++  orders.4:movement_planning.axis.target_priorities  x7
++  orders.4:reinforcement.allies.target_priorities  x7
++  orders.4:reinforcement.axis.target_priorities  x7
++  orders.4:torpedo_planning.allies.target_priorities  x7
++  orders.4:torpedo_planning.axis.target_priorities  x7
++  orders.5:gunnery.allies.target_priorities  x4
++  orders.5:gunnery.axis.target_priorities  x4
++  orders.5:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.5:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.5:movement_planning.allies.target_priorities  x4
++  orders.5:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.5:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.5:movement_planning.axis.target_priorities  x4
++  orders.5:reinforcement.allies.target_priorities  x4
++  orders.5:reinforcement.axis.target_priorities  x4
++  orders.5:torpedo_planning.allies.target_priorities  x4
++  orders.5:torpedo_planning.axis.target_priorities  x4
++  orders.6:gunnery.allies.target_priorities  x4
++  orders.6:gunnery.axis.target_priorities  x4
++  orders.6:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.6:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.6:movement_planning.allies.target_priorities  x4
++  orders.6:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.6:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.6:movement_planning.axis.target_priorities  x4
++  orders.6:reinforcement.allies.target_priorities  x4
++  orders.6:reinforcement.axis.target_priorities  x4
++  orders.6:torpedo_planning.allies.target_priorities  x4
++  orders.6:torpedo_planning.axis.target_priorities  x4
++  orders.7:gunnery.allies.target_priorities  x4
++  orders.7:gunnery.axis.target_priorities  x4
++  orders.7:movement_planning.allies.formation_movement[].movement_style  x2
++  orders.7:movement_planning.allies.formation_movement[].reform_column  x2
++  orders.7:movement_planning.allies.target_priorities  x4
++  orders.7:movement_planning.axis.formation_movement[].movement_style  x2
++  orders.7:movement_planning.axis.formation_movement[].reform_column  x2
++  orders.7:movement_planning.axis.target_priorities  x4
++  orders.7:reinforcement.allies.target_priorities  x4
++  orders.7:reinforcement.axis.target_priorities  x4
++  orders.7:torpedo_planning.allies.target_priorities  x4
++  orders.7:torpedo_planning.axis.target_priorities  x4
++  orders.8:gunnery.allies.target_priorities  x2
++  orders.8:gunnery.axis.target_priorities  x2
++  orders.8:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.8:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.8:movement_planning.allies.target_priorities  x2
++  orders.8:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.8:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.8:movement_planning.axis.target_priorities  x2
++  orders.8:reinforcement.allies.target_priorities  x2
++  orders.8:reinforcement.axis.target_priorities  x2
++  orders.8:torpedo_planning.allies.target_priorities  x2
++  orders.8:torpedo_planning.axis.target_priorities  x2
++  orders.9:gunnery.allies.target_priorities  x2
++  orders.9:gunnery.axis.target_priorities  x2
++  orders.9:movement_planning.allies.formation_movement[].movement_style  x1
++  orders.9:movement_planning.allies.formation_movement[].reform_column  x1
++  orders.9:movement_planning.allies.target_priorities  x2
++  orders.9:movement_planning.axis.formation_movement[].movement_style  x1
++  orders.9:movement_planning.axis.formation_movement[].reform_column  x1
++  orders.9:movement_planning.axis.target_priorities  x2
++  orders.9:reinforcement.allies.target_priorities  x2
++  orders.9:reinforcement.axis.target_priorities  x2
++  orders.9:torpedo_planning.allies.target_priorities  x2
++  orders.9:torpedo_planning.axis.target_priorities  x2
++
++GOLDEN_REPLAY = PASS

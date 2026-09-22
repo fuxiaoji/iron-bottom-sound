@@ -326,9 +326,7 @@ def superior_force_by_class(
     return None
 
 
-def own_hull_fraction(
-    engine: "IronBottomEngine", state: GameState, formation: FormationState,
-) -> float:
+def own_hull_fraction(state: GameState, formation: FormationState) -> float:
     """Fraction of the formation's hull boxes still afloat."""
     total = 0
     current = 0

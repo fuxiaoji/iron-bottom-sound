@@ -1,0 +1,33 @@
+{
+ "agent_decisions_scanned": 19,
+ "agent_decisions_with_gunnery_fields": [],
+ "decision_fields": [
+  "acknowledgement",
+  "audit",
+  "formation_id",
+  "phase",
+  "rationale_summary",
+  "report_actions",
+  "selected_contingency_branch",
+  "selected_movement_action_id",
+  "selected_movement_plan",
+  "target_priority_adjustments",
+  "turn"
+ ],
+ "directives_that_reached_the_selector": 222,
+ "forbidden_fields_on_decision": [],
+ "illegal_examples": [],
+ "invisible_target_fallback_legal": true,
+ "local_weight_limit": 0.5,
+ "local_weights_within_limit": true,
+ "policy_observation_has_no_gunnery": true,
+ "raw_gunnery_refusals": [
+  "every raw gunnery batch was refused"
+ ],
+ "sealed_gunnery_orders_checked": 54,
+ "sealed_gunnery_orders_illegal": 0,
+ "structural_guard_errors": [
+  "a formation agent may not emit gunnery machinery: mounts"
+ ],
+ "verdict": "PASS"
+}

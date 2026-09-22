@@ -1,0 +1,74 @@
+{
+ "autonomy_ladder": [
+  "engine legality",
+  "latest valid order",
+  "commander intent",
+  "coordination constraints",
+  "authorised contingency",
+  "local tactical optimisation",
+  "force preservation within mission and risk constraints",
+  "report deviation when communication resumes"
+ ],
+ "contingency_kinds": [
+  "explicit_signal_branch",
+  "local_condition_branch",
+  "loss_of_comm_branch"
+ ],
+ "doctrine_constants": {
+  "minimum_capability_hull_fraction": 0.4,
+  "superior_force_ratio": 1.5
+ },
+ "required_structure_present": {
+  "assumptions": true,
+  "commander_intent": true,
+  "commander_location": true,
+  "communications_plan": true,
+  "contingencies": true,
+  "coordination_measures": true,
+  "loss_of_comm_plan": true,
+  "mission": true,
+  "operating_area": false,
+  "rendezvous": true,
+  "report_requirements": true,
+  "risk_constraints": true,
+  "roe": true,
+  "target_priority_directives": true,
+  "task_to_formation": true,
+  "trigger_conditions": true
+ },
+ "structure_fields": [
+  "assumptions",
+  "commander_intent",
+  "commander_location",
+  "communications_plan",
+  "confirmed_turn",
+  "contingencies",
+  "coordination_measures",
+  "deadline_turn",
+  "expiry_turn",
+  "formation_id",
+  "issued_by",
+  "issued_turn",
+  "loss_of_comm_plan",
+  "mission",
+  "operating_area",
+  "order_id",
+  "rendezvous",
+  "report_requirements",
+  "risk_constraints",
+  "roe",
+  "side",
+  "target_priority_directives",
+  "task_to_formation",
+  "trigger_conditions",
+  "valid_from_turn",
+  "waypoint"
+ ],
+ "validation_errors_for_a_complete_order": [],
+ "validation_errors_when_a_branch_kind_is_missing": [
+  "missing explicit_signal_branch",
+  "missing local_condition_branch",
+  "missing loss_of_comm_branch"
+ ],
+ "verdict": "PASS"
+}

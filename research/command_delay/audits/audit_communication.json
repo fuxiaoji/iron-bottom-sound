@@ -1,0 +1,114 @@
+{
+ "abstraction_note": {
+  "explicitly_not": "no measured historical mean is claimed for any turn value",
+  "label": "SIMULATION_ABSTRACTION",
+  "loss_probabilities": "none defined; see integrity.apply_integrity",
+  "propagation": "modeled as zero at game scale; distance only selects the medium",
+  "source": "history: same-navy tactical traffic is a handling/encoding/relay/queue problem, not propagation; TBS short signals can complete inside one turn while coded W/T through a message centre takes materially longer"
+ },
+ "delay_samples": {
+  "blinker_2hops": 2,
+  "multi_hop_1hop": 2,
+  "tbs_short_amendment": 1,
+  "tbs_short_sitrep": 0,
+  "wt_coded": 1,
+  "wt_reencipher_relay_1hop": 2
+ },
+ "game": {
+  "authorities": {
+   "delegated": 2,
+   "fleet_directed": 2
+  },
+  "delivered_never_before_issued": true,
+  "handling_delays": {
+   "0": 64,
+   "1": 2,
+   "2": 11
+  },
+  "issued_delivered_observed_all_set": true,
+  "link_statuses": {
+   "blackout": 2,
+   "relayed": 1,
+   "stale": 1
+  },
+  "mediums": {
+   "blackout": 1,
+   "tbs_short": 65,
+   "wt_reencipher_relay": 11
+  },
+  "messages_total": 77,
+  "mission_orders": 2,
+  "report_ages": [
+   1,
+   2,
+   6,
+   6
+  ],
+  "scenario": "IBS-S-01",
+  "statuses": {
+   "delivered": 65,
+   "queued": 12
+  },
+  "tick": 46,
+  "turns": 7
+ },
+ "loss_probabilities_defined": [],
+ "no_probability_in_source": true,
+ "profiles": {
+  "blackout": {
+   "base_delay_turns": 0,
+   "description": "no delivery is possible; the message is never sent",
+   "label": "SIMULATION_ABSTRACTION",
+   "max_relay_hops": 0,
+   "per_relay_stage_turns": 0,
+   "propagation_turns": 0.0,
+   "requires_encipherment": false
+  },
+  "blinker": {
+   "base_delay_turns": 0,
+   "description": "direct visual; same or +1 turn, +1 per repeated-down stage",
+   "label": "SIMULATION_ABSTRACTION",
+   "max_relay_hops": 4,
+   "per_relay_stage_turns": 1,
+   "propagation_turns": 0.0,
+   "requires_encipherment": false
+  },
+  "multi_hop": {
+   "base_delay_turns": 1,
+   "description": "compound route; the total may reach t+2",
+   "label": "SIMULATION_ABSTRACTION",
+   "max_relay_hops": 4,
+   "per_relay_stage_turns": 1,
+   "propagation_turns": 0.0,
+   "requires_encipherment": true
+  },
+  "tbs_short": {
+   "base_delay_turns": 0,
+   "description": "short tactical signal; same turn if the channel is free",
+   "label": "SIMULATION_ABSTRACTION",
+   "max_relay_hops": 2,
+   "per_relay_stage_turns": 1,
+   "propagation_turns": 0.0,
+   "requires_encipherment": false
+  },
+  "wt_coded": {
+   "base_delay_turns": 1,
+   "description": "encode/transmit/decode/routing; base +1 turn",
+   "label": "SIMULATION_ABSTRACTION",
+   "max_relay_hops": 2,
+   "per_relay_stage_turns": 1,
+   "propagation_turns": 0.0,
+   "requires_encipherment": true
+  },
+  "wt_reencipher_relay": {
+   "base_delay_turns": 1,
+   "description": "relay or re-encipherment; +1 further turn",
+   "label": "SIMULATION_ABSTRACTION",
+   "max_relay_hops": 3,
+   "per_relay_stage_turns": 1,
+   "propagation_turns": 0.0,
+   "requires_encipherment": true
+  }
+ },
+ "verdict": "PASS"
+}

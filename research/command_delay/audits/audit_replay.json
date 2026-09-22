@@ -1,0 +1,16 @@
+{
+ "digests": {
+  "0": "148028d10d2291be1aaad55f09852aca0286349bd04d3b1e54227ac4db7f707b",
+  "1": "148028d10d2291be1aaad55f09852aca0286349bd04d3b1e54227ac4db7f707b",
+  "2": "148028d10d2291be1aaad55f09852aca0286349bd04d3b1e54227ac4db7f707b",
+  "5": "148028d10d2291be1aaad55f09852aca0286349bd04d3b1e54227ac4db7f707b"
+ },
+ "hash_seeds": [
+  "0",
+  "1",
+  "2",
+  "5"
+ ],
+ "unique": 1,
+ "verdict": "PASS"
+}

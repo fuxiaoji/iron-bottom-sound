@@ -1,0 +1,37 @@
+{
+ "allow_turn_together": true,
+ "common_speed_interval": [
+  0,
+  6
+ ],
+ "copies_no_hexes": true,
+ "declared_geometry_gate": false,
+ "default_geometry_column": true,
+ "default_style_follow_wake": true,
+ "formation_id": "axis-active-light",
+ "geometry": {
+  "axis": 1,
+  "heading": 4,
+  "reasons": [],
+  "same_heading": true,
+  "ship_ids": [
+   "IBS-U-KM-KARL-GALSTER",
+   "IBS-U-KM-RICHARD-BEITZEN",
+   "IBS-U-KM-HANS-LODY"
+  ],
+  "spacing": 1,
+  "straight": true,
+  "uniform_spacing": true
+ },
+ "off_line_refused": [
+  "members are not on one hex line: consecutive members do not lie on one axis"
+ ],
+ "scenario": "IBS-S-03",
+ "shared_token_sequence": [
+  "2"
+ ],
+ "valid_errors": [],
+ "valid_orders": 3,
+ "valid_plan": "2",
+ "verdict": "PASS"
+}

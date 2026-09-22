@@ -74,7 +74,12 @@ def priority_bonus(
     turn: int,
     local_limit: float | None = None,
 ) -> float:
-    """Compose the bonus for one target from fleet, local and doctrine terms."""
+    """Compose the bonus for one target from fleet, local and doctrine terms.
+
+    An empty directive set composes to exactly ``0.0``, so "no directive" means
+    "the raw expected-hit objective decides" — doctrine only ever adds on top of
+    a declared preference.
+    """
     total = 0.0
     for directive in directives:
         if directive.expires_turn is not None and directive.expires_turn < turn:
@@ -96,8 +101,6 @@ def priority_bonus(
         else:
             limit = local_limit if local_limit is not None else 1.0
             total += clamp_local(weight, limit)
-    if not directives:
-        return 0.0
     return total
 
 

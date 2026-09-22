@@ -1,0 +1,525 @@
+diff --git a/backend/src/iron_bottom_sound/engine.py b/backend/src/iron_bottom_sound/engine.py
+index 111d3e21..6b77fd19 100644
+--- a/backend/src/iron_bottom_sound/engine.py
++++ b/backend/src/iron_bottom_sound/engine.py
+@@ -1436,6 +1436,22 @@ class IronBottomEngine:
+     def validate_orders(self, game_id: str, batch: OrderBatch, _prepared: bool = False) -> ValidationResult:
+         state = self.get(game_id)
+         errors: list[str] = []
++        if state.options.command_delay_mode and state.phase == Phase.GUNNERY and not _prepared:
++            # Command Delay: the fleet and its formation agents may only publish
++            # target priorities; the engine's own selector builds every gunnery
++            # order.  A raw gunnery order in this mode is refused rather than
++            # ignored, so a formation agent cannot smuggle one through.
++            from .target_priority import auto_gunnery
++            if batch.gunnery:
++                return ValidationResult(valid=False, errors=[
++                    "Command Delay generates gunnery through the engine selector; "
++                    "submit target priority directives instead of gunnery orders"
++                ])
++            return self.validate_orders(
++                game_id,
++                batch.model_copy(update={"gunnery": auto_gunnery(self, state, batch.side)}, deep=True),
++                _prepared=True,
++            )
+         if state.options.realistic_command and not _prepared:
+             from .realistic_command import expand_movement_orders, prepare_gunnery
+             if state.phase == Phase.MOVEMENT_PLANNING:
+@@ -1684,13 +1700,23 @@ class IronBottomEngine:
+         state = self.get(game_id)
+         prepared = batch
+         detach_ids: list[str] = []
++        if state.options.command_delay_mode and state.phase == Phase.GUNNERY:
++            from .target_priority import auto_gunnery
++            if batch.gunnery:
++                return ValidationResult(valid=False, errors=[
++                    "Command Delay generates gunnery through the engine selector; "
++                    "submit target priority directives instead of gunnery orders"
++                ])
++            prepared = batch.model_copy(
++                update={"gunnery": auto_gunnery(self, state, batch.side)}, deep=True,
++            )
+         if state.options.realistic_command:
+             from .realistic_command import expand_movement_orders, prepare_gunnery
+             if state.phase == Phase.MOVEMENT_PLANNING:
+                 prepared, errors, detach_ids = expand_movement_orders(self, state, batch)
+                 if errors:
+                     return ValidationResult(valid=False, errors=errors)
+-            elif state.phase == Phase.GUNNERY:
++            elif state.phase == Phase.GUNNERY and not state.options.command_delay_mode:
+                 prepared = prepare_gunnery(self, state, batch)
+         validation = self.validate_orders(game_id, prepared, _prepared=True)
+         if not validation.valid:
+@@ -1813,6 +1839,13 @@ class IronBottomEngine:
+                                     payload={"ship_id": ship.id, "launcher_id": launcher.id},
+                                     rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
+                                 )
++        if state.options.command_delay_mode:
++            # Command Delay's single per-transition hook: authority refresh, link
++            # status, communication delivery and fleet reports.  Guarded by the
++            # new option, so Classic and Realistic never enter this branch and
++            # their replays are unchanged (CD-0 golden baseline).
++            from .command_delay import on_phase_advanced
++            on_phase_advanced(self, state)
+         self._event(state, "phase_changed", f"阶段：{state.phase.value}", rule=self._rule("IBS-R-05", 6, "5.0"))
+         return state.events[before:]
+ 
+@@ -3121,7 +3154,13 @@ class IronBottomEngine:
+                 # is granted per side, not per whole hex group: when an enemy
+                 # shares the contested hex, the friendly pair must still be
+                 # stopped rather than rolling a die-rolled friendly ram.
+-                for collision_set in collision_sets:
++                # Iterated in the same canonical order as the die-rolled loop
++                # below: ``collision_sets`` is a set of frozensets and its
++                # iteration order is string-hash dependent, so an unordered walk
++                # emits these events in a different sequence per
++                # PYTHONHASHSEED (CD0-F1: the realistic row of the CD-0 golden
++                # replay diverged across hash seeds on exactly this loop).
++                for collision_set in sorted(collision_sets, key=lambda group: sorted(group)):
+                     ids = sorted(collision_set)
+                     by_side: dict[Side, list[str]] = {}
+                     for ship_id in ids:
+diff --git a/backend/src/iron_bottom_sound/models.py b/backend/src/iron_bottom_sound/models.py
+index 705ccc92..f4e2b718 100644
+--- a/backend/src/iron_bottom_sound/models.py
++++ b/backend/src/iron_bottom_sound/models.py
+@@ -160,6 +160,9 @@ class GameOptions(BaseModel):
+     battle_report: bool = False
+     # 项目扩展：编队指挥链。默认关闭，保证旧存档和经典模式逐位兼容。
+     realistic_command: bool = False
++    # 命令延迟模式（新增模式，不改变 realistic_command 语义；见 command_delay.py）。
++    # 三个互斥入口：Classic(F,F) / Realistic(T,F) / Command Delay(T,T)。
++    command_delay_mode: bool = False
+     # 教学脚本只负责可审计的预置/固定事件；所有玩家命令仍走正式引擎。
+     tutorial_script: Literal["classic_night", "erma_grand_fleet"] | None = None
+ 
+@@ -348,6 +351,40 @@ class FormationMovementOrder(BaseModel):
+     leader_plan: str = "0"
+     spacing: Literal[1, 2] | None = None
+     speed_decision: FormationSpeedDecision | None = None
++    # ``None`` keeps the formation's declared style, which defaults to
++    # FOLLOW_WAKE, so an order written before this field existed still expands
++    # into the exact frozen follower behaviour.
++    movement_style: FormationMovementStyle | None = None
++    # Explicit IBS-R-RC-08 transition: move as a body this turn and return to
++    # FOLLOW_WAKE only if the formation ends the turn genuinely column-aligned.
++    reform_column: bool = False
++
++
++class FormationMovementStyle(StrEnum):
++    """How a formation moves as a body (project extension, IBS-R-RC-02/08).
++
++    ``FOLLOW_WAKE`` is the existing successive / follow-the-leader movement and
++    stays the default for every formation, so Realistic semantics are unchanged
++    unless a player explicitly selects the other style.
++    """
++
++    FOLLOW_WAKE = "follow_wake"
++    MOVE_TOGETHER = "move_together"
++
++
++class FormationGeometryKind(StrEnum):
++    """Declared geometry of a formation's ship line.
++
++    A ``COLUMN`` is line-ahead: the line axis is the leader's stern direction, so
++    the guide trail is a legal wake.  ``STRAIGHT_LINE`` means the ships are still
++    on one hex line with uniform spacing, but the axis is no longer parallel to
++    the bow-stern direction (line-abreast or oblique).  A simultaneous turn
++    rotates headings without rotating the axis, so ``MOVE_TOGETHER`` can leave a
++    formation oblique; it must not keep being treated as a column.
++    """
++
++    COLUMN = "column"
++    STRAIGHT_LINE = "straight_line"
+ 
+ 
+ class FormationState(BaseModel):
+@@ -367,6 +404,12 @@ class FormationState(BaseModel):
+     locked_heading: int | None = Field(default=None, ge=1, le=6)
+     locked_speed: int | None = Field(default=None, ge=0, le=8)
+     guide_trail: list[HexCoord] = Field(default_factory=list)
++    # Command Delay extension (CD-1).  Defaults reproduce the frozen Realistic
++    # behaviour exactly; these fields are declared state, not live measurements,
++    # and only change through an explicit MOVE_TOGETHER / REFORM_COLUMN action.
++    movement_style: FormationMovementStyle = FormationMovementStyle.FOLLOW_WAKE
++    geometry_kind: FormationGeometryKind = FormationGeometryKind.COLUMN
++    line_axis: int | None = Field(default=None, ge=1, le=6)
+ 
+ 
+ class CommandSuccession(BaseModel):
+@@ -491,6 +534,10 @@ class OrderBatch(BaseModel):
+     formation_setup: list[FormationSetupOrder] = Field(default_factory=list)
+     formation_movement: list[FormationMovementOrder] = Field(default_factory=list)
+     formation_speed_decisions: list[FormationSpeedDecision] = Field(default_factory=list)
++    # Command Delay: the only gunnery input a formation agent or a fleet order may
++    # supply.  The engine's selector still generates every GunneryOrder, mount
++    # allocation and firing solution (IBS-R-CD-06).
++    target_priorities: list[TargetPriorityDirective] = Field(default_factory=list)
+     confirmation: PhaseConfirmation = Field(default_factory=PhaseConfirmation)
+ 
+     @field_validator("smoke_ships")
+@@ -592,6 +639,253 @@ class MarkerState(BaseModel):
+     contact_truth: Literal["real", "decoy"] | None = None
+ 
+ 
++class AuthorityLevel(StrEnum):
++    """Who currently governs a formation's execution (IBS-R-CD-02)."""
++
++    FLEET_DIRECTED = "fleet_directed"
++    DELEGATED = "delegated"
++    LOCAL_AUTONOMY = "local_autonomy"
++
++
++class LinkStatus(StrEnum):
++    """Quality of the command link between fleet and a formation.
++
++    ``DIRECT`` is a same-turn short tactical signal, ``RELAYED`` is a signal that
++    needed a relay or re-encipherment stage, ``STALE`` means only reports older
++    than the current turn are available, and ``BLACKOUT`` means nothing has been
++    delivered.  The turn cost of each stage is an explicit simulation
++    abstraction, never a claimed historical measurement (see
++    ``communications/models.py``).
++    """
++
++    DIRECT = "direct"
++    RELAYED = "relayed"
++    STALE = "stale"
++    BLACKOUT = "blackout"
++
++
++class CommandAuthority(BaseModel):
++    """Fleet-level authority for one side."""
++
++    side: Side
++    level: AuthorityLevel = AuthorityLevel.DELEGATED
++    fleet_commander_ship_id: str | None = None
++    fleet_formation_id: str | None = None
++
++
++class FormationCommandState(BaseModel):
++    """Per-formation slice of the command-delay state machine."""
++
++    formation_id: str
++    commander_ship_id: str | None = None
++    authority: AuthorityLevel = AuthorityLevel.DELEGATED
++    link_status: LinkStatus = LinkStatus.DIRECT
++    # The fleet's knowledge of this formation, as last *reported*.  Filled from
++    # delivered messages; never read from the live formation during an
++    # observation, which is what stops remote exact state leaking upward.
++    reported_turn: int | None = None
++    reported_position: HexCoord | None = None
++    reported_heading: int | None = Field(default=None, ge=1, le=6)
++    reported_speed: int | None = Field(default=None, ge=0, le=8)
++    reported_ship_count: int | None = Field(default=None, ge=0)
++    reported_geometry_kind: FormationGeometryKind | None = None
++    # Phase the newest held report was drawn from: a later phase in the same turn
++    # is newer knowledge than an earlier one, which matters when two reports of
++    # one turn arrive out of order.
++    reported_phase: Phase | None = None
++    active_order_id: str | None = None
++    last_report_turn: int | None = None
++
++
++class ContractTerm(BaseModel):
++    """One agreed term between the fleet and a formation (CD-6 research hook)."""
++
++    term_id: str
++    description: str
++    obligor: str
++    beneficiary: str
++    measurable: str = ""
++    weight: float = 0.0
++
++
++class ContractState(BaseModel):
++    """A standing agreement a future incentive-aware policy would read.
++
++    Empty by default: a game with no declared contract carries an empty contract,
++    which is what keeps this stage an interface rather than a mechanic.
++    """
++
++    side: Side
++    formation_id: str
++    order_id: str | None = None
++    terms: list[ContractTerm] = Field(default_factory=list)
++    agreed_turn: int | None = None
++
++
++class LedgerEntry(BaseModel):
++    """One observable event a future reward could be derived from."""
++
++    turn: int
++    phase: str
++    formation_id: str
++    kind: str
++    value: float = 0.0
++    reason: str = ""
++    source_message_id: str | None = None
++    order_id: str | None = None
++    detail: dict[str, Any] = Field(default_factory=dict)
++
++
++class CommandDelayState(BaseModel):
++    """Whole-game state for the Command Delay mode (option-gated, default off)."""
++
++    tick: int = 0
++    authorities: dict[str, CommandAuthority] = Field(default_factory=dict)
++    formations: dict[str, FormationCommandState] = Field(default_factory=dict)
++    # CD-3 fills these; declared here so the data model is one review.
++    messages: list[CommandMessage] = Field(default_factory=list)
++    mission_orders: list[MissionOrder] = Field(default_factory=list)
++    # Local-agent output, kept for audit and for the gunnery selector.
++    local_directives: list[TargetPriorityDirective] = Field(default_factory=list)
++    # Stored as dumps, not as the agent's own type: this is an audit ledger, and
++    # keeping it schema-free avoids a data-model -> agent import cycle.
++    decisions: list[dict[str, Any]] = Field(default_factory=list)
++    # CD-6 research hooks: declared contracts and the incentive ledger.  Both stay
++    # empty until a researcher declares them; nothing in the runtime reads them
++    # back into a decision.
++    contracts: list[ContractState] = Field(default_factory=list)
++    ledger: list[LedgerEntry] = Field(default_factory=list)
++    next_sequence: int = 1
++
++
++class MessagePrecedence(StrEnum):
++    """Deterministic queue class for the command circuit (IBS-R-CD-05)."""
++
++    URGENT = "urgent"
++    OPERATIONAL = "operational"
++    ROUTINE = "routine"
++
++
++class CommunicationMedium(StrEnum):
++    """How a signal travels.
++
++    The turn cost of each medium is a *simulation abstraction* constrained by
++    history, not a measured average: same-navy tactical traffic is a handling /
++    encoding / relay / queue problem, never electromagnetic propagation at this
++    time scale.
++    """
++
++    TBS_SHORT = "tbs_short"
++    BLINKER = "blinker"
++    WT_CODED = "wt_coded"
++    WT_REENCIPHER_RELAY = "wt_reencipher_relay"
++    MULTI_HOP = "multi_hop"
++    BLACKOUT = "blackout"
++
++
++class MessageKind(StrEnum):
++    MISSION_ORDER = "mission_order"
++    AMENDMENT = "amendment"
++    SITREP = "sitrep"
++    CONTACT_REPORT = "contact_report"
++    ACKNOWLEDGEMENT = "acknowledgement"
++    CLARIFICATION = "clarification"
++    DEVIATION_REPORT = "deviation_report"
++
++
++class MessageStatus(StrEnum):
++    QUEUED = "queued"
++    DELIVERED = "delivered"
++    DROPPED = "dropped"
++    SUPERSEDED = "superseded"
++
++
++class CommandMessage(BaseModel):
++    """One signal, with issued / delivered / observed turns kept separate."""
++
++    message_id: str
++    side: Side
++    origin: str                      # ship or formation id that drafted it
++    destination: str                 # formation id (fleet traffic is addressed)
++    kind: MessageKind
++    precedence: MessagePrecedence = MessagePrecedence.OPERATIONAL
++    medium: CommunicationMedium = CommunicationMedium.TBS_SHORT
++    issued_turn: int
++    issued_phase: Phase
++    # Abstracted handling budget, in turns, as declared by the medium profile.
++    handling_delay: int = 0
++    relay_hops: int = 0
++    delivered_turn: int | None = None
++    delivered_phase: Phase | None = None
++    observed_turn: int | None = None
++    acknowledged_turn: int | None = None
++    status: MessageStatus = MessageStatus.QUEUED
++    reason: str | None = None
++    payload: dict[str, Any] = Field(default_factory=dict)
++    superseded_by: str | None = None
++
++
++class ContingencyBranch(StrEnum):
++    EXPLICIT_SIGNAL_BRANCH = "explicit_signal_branch"
++    LOCAL_CONDITION_BRANCH = "local_condition_branch"
++    LOSS_OF_COMM_BRANCH = "loss_of_comm_branch"
++
++
++class TargetPriorityDirective(BaseModel):
++    """A bounded priority weight. It can never make an illegal shot legal."""
++
++    formation_id: str
++    source: Literal["FLEET_ORDER", "LOCAL_AGENT", "DOCTRINE"]
++    target_id: str | None = None
++    target_class: str | None = None
++    objective_tag: str | None = None
++    weight: float = Field(default=0.0, ge=-1.0, le=1.0)
++    expires_turn: int | None = None
++    hard_restriction: bool = False
++
++
++class Contingency(BaseModel):
++    """A pre-briefed branch: three kinds only, never an arbitrary if/else."""
++
++    branch: ContingencyBranch
++    description: str = ""
++    trigger_condition: str | None = None
++    trigger_message_kind: MessageKind | None = None
++    requires_local_check: bool = False
++    fallback_task: str | None = None
++
++
++class MissionOrder(BaseModel):
++    """Mission Command order (IBS-R-CD-04), following the battle-plan structure."""
++
++    order_id: str
++    formation_id: str
++    side: Side
++    issued_turn: int
++    issued_by: str
++    mission: str
++    assumptions: list[str] = Field(default_factory=list)
++    trigger_conditions: list[str] = Field(default_factory=list)
++    commander_intent: str = ""
++    task_to_formation: str = ""
++    coordination_measures: list[str] = Field(default_factory=list)
++    operating_area: str | None = None
++    waypoint: HexCoord | None = None
++    deadline_turn: int | None = None
++    target_priority_directives: list[TargetPriorityDirective] = Field(default_factory=list)
++    roe: list[str] = Field(default_factory=list)
++    risk_constraints: list[str] = Field(default_factory=list)
++    report_requirements: list[str] = Field(default_factory=list)
++    communications_plan: list[str] = Field(default_factory=list)
++    commander_location: str | None = None
++    rendezvous: str | None = None
++    loss_of_comm_plan: list[str] = Field(default_factory=list)
++    contingencies: list[Contingency] = Field(default_factory=list)
++    valid_from_turn: int | None = None
++    expiry_turn: int | None = None
++    confirmed_turn: int | None = None
++
++
+ class GameState(BaseModel):
+     game_id: str
+     scenario_id: str
+@@ -643,6 +937,9 @@ class GameState(BaseModel):
+     )
+     winner: Side | None = None
+     victory_reason: str | None = None
++    # Command Delay mode state; ``None`` for Classic and Realistic, so those
++    # modes carry no extra state and their replays are unaffected.
++    command_delay: CommandDelayState | None = None
+ 
+ 
+ class PublicShip(BaseModel):
+diff --git a/backend/src/iron_bottom_sound/realistic_command.py b/backend/src/iron_bottom_sound/realistic_command.py
+index 6f398848..39fcabf8 100644
+--- a/backend/src/iron_bottom_sound/realistic_command.py
++++ b/backend/src/iron_bottom_sound/realistic_command.py
+@@ -12,12 +12,18 @@ from copy import deepcopy
+ from typing import TYPE_CHECKING, Any
+ 
+ from .data import load_scenario
++from .formation_maneuver import (
++    commit_sealed_style_transitions,
++    expand_move_together,
++    follow_wake_allowed,
++)
+ from .scenario_guidance import public_search_target
+ from .models import (
+     AIPlanSheet,
+     CommandSuccession,
+     ContactMovementOrder,
+     FormationMovementOrder,
++    FormationMovementStyle,
+     FormationSpeedDecision,
+     FormationSetupOrder,
+     FormationState,
+@@ -486,6 +492,22 @@ def expand_movement_orders(
+                 plan, engine.movement_commands(MovementOrder(ship_id=leader.id, plan=plan))
+             )
+             plan = str(min(forced_speed, engine._legal_speed_range(leader, state.turn)[1]))
++        # Command Delay CD-1: the one dispatch into the additive body-movement
++        # style.  Inert under the default FOLLOW_WAKE (and for any formation whose
++        # declared geometry is still a column), so the frozen path below is
++        # unchanged; the CD-0 golden replay is the proof.
++        style = order.movement_style or formation.movement_style
++        if style == FormationMovementStyle.MOVE_TOGETHER or order.reform_column:
++            body_orders, body_errors = expand_move_together(engine, state, formation, plan, members)
++            if body_errors:
++                errors.append(f"{formation.id}: " + "; ".join(body_errors))
++                continue
++            generated.extend(body_orders)
++            continue
++        allowed, refusal = follow_wake_allowed(formation)
++        if not allowed:
++            errors.append(f"{formation.id}: {refusal}")
++            continue
+         leader_cost = engine.movement_cost(plan, engine.movement_commands(MovementOrder(ship_id=leader.id, plan=plan)))
+         forced_incompatible = next(
+             (ship for ship in members if ship.forced_circle_turns), None
+@@ -716,6 +738,11 @@ def refresh_command_chain(engine: "IronBottomEngine", state: GameState) -> None:
+ 
+ 
+ def after_movement(engine: "IronBottomEngine", state: GameState) -> None:
++    # Command Delay CD-1: commit the declared geometry of any formation that
++    # moved as a body this turn.  Returns without touching state when no sealed
++    # order asked for MOVE_TOGETHER / REFORM_COLUMN, so the frozen Realistic
++    # replay is unaffected.
++    commit_sealed_style_transitions(engine, state)
+     for formation in state.formations.values():
+         active = [state.ships[ship_id] for ship_id in formation.ship_ids if state.ships[ship_id].position and not state.ships[ship_id].sunk and state.ships[ship_id].command_status == "attached"]
+         pending = [
+@@ -794,6 +821,26 @@ class RealisticCommander:
+             batch = OrderBatch(side=side, phase=state.phase, torpedoes=torpedoes)
+             intents = {order.ship_id: "编队舰执行近距鱼雷齐射" for order in torpedoes}
+             return self.tactical._finalize(engine, state, side, batch, intents)
++        if state.options.command_delay_mode and state.phase == Phase.GUNNERY:
++            # Command Delay CD-4: a commander on this mode does not submit gunnery
++            # orders at all.  It publishes target priorities and the engine's own
++            # selector generates every order, mount allocation and firing solution.
++            from .command_delay import gunnery_batch
++            batch = gunnery_batch(state, side)
++            plan = AIPlanSheet(
++                turn=state.turn, phase=state.phase,
++                situation_summary="按任务式命令公布目标优先级，炮位分配交由引擎选择器。",
++                phase_goal="在不越过授权边界的前提下影响火力分配。",
++                unit_intents={
++                    directive.target_id or directive.target_class or "priority": (
++                        f"{directive.source} 优先级 {directive.weight:+.2f}"
++                    )
++                    for directive in batch.target_priorities
++                },
++                orders=batch.model_dump(mode="json"),
++                contingency=["重点目标不可见/不可射时由选择器回退到其余合法目标"],
++            )
++            return plan, batch, []
+         if state.phase != Phase.MOVEMENT_PLANNING:
+             plan, batch, audits = self.tactical.choose_plan(engine, game_id, side)
+             return plan, batch, audits
+@@ -867,6 +914,15 @@ class RealisticCommander:
+             leader_plan = by_ship.get(leader.id, MovementOrder(ship_id=leader.id, plan="0")).plan
+             if search_target is not None:
+                 leader_plan = self._search_plan(engine, state, leader, search_target)
++            if state.options.command_delay_mode:
++                # Command Delay CD-4: the plan is whatever this formation's local
++                # agent selected from the engine's enumerated actions.  It is not
++                # re-derived here, and the engine still validates it below, so a
++                # bad agent choice fails loudly instead of being silently fixed.
++                from .command_delay import formation_plan
++                agent_plan = formation_plan(state, formation.id)
++                if agent_plan:
++                    leader_plan = agent_plan
+             leader_commands = engine.movement_commands(MovementOrder(ship_id=leader.id, plan=leader_plan))
+             if any(command.endswith("120") for command in leader_commands):
+                 # A 120-degree in-place impulse cannot propagate down a spaced

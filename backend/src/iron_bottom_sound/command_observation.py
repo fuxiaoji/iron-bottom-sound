@@ -167,7 +167,8 @@ def visible_enemies(
 
 
 def local_map_hexes(
-    engine: "IronBottomEngine", state: GameState, positions: list[HexCoord], contact_labels: set[str],
+    engine: "IronBottomEngine", state: GameState, positions: list[HexCoord],
+    contact_labels: set[str], side: Side,
 ) -> list[dict[str, Any]]:
     """Hexes within the formation's own optical range, with terrain and contacts.
 
@@ -175,7 +176,7 @@ def local_map_hexes(
     constructed: ``HexCoord`` rejects a negative column, so an off-map
     neighbourhood is skipped rather than built and caught.
     """
-    radius = _optical_range(state)
+    radius = _optical_range(state, side)
     cells: list[dict[str, Any]] = []
     for position in positions:
         for dq in range(-radius, radius + 1):
@@ -205,8 +206,19 @@ def local_map_hexes(
     return [deduped[label] for label in sorted(deduped)]
 
 
-def _optical_range(state: GameState) -> int:
-    return int(min(state.visibility.values())) if state.visibility else 0
+def _optical_range(state: GameState, side: Side | None = None) -> int:
+    """The horizon a view is granted.
+
+    With ``side`` given this is that side's own optical visibility, the same value
+    the engine uses for sighting; without it, the narrower of the two sides', so
+    a side-agnostic caller can never be handed a wider horizon than the stricter
+    side has.
+    """
+    if not state.visibility:
+        return 0
+    if side is not None:
+        return int(state.visibility[side.value])
+    return int(min(state.visibility.values()))
 
 
 def fleet_observation(engine: "IronBottomEngine", state: GameState, side: Side) -> FleetObservation:
@@ -279,7 +291,7 @@ def fleet_observation(engine: "IronBottomEngine", state: GameState, side: Side) 
         side=side,
         turn=state.turn,
         phase=state.phase,
-        visibility=_optical_range(state),
+        visibility=_optical_range(state, side),
         map_columns=state.map_columns,
         map_rows=state.map_rows,
         embarked_formation_id=embarked_id,
@@ -346,7 +358,7 @@ def formation_observation(
         formation_name=formation.name,
         turn=state.turn,
         phase=state.phase,
-        visibility=_optical_range(state),
+        visibility=_optical_range(state, side),
         map_columns=state.map_columns,
         map_rows=state.map_rows,
         authority=entry.authority if entry else AuthorityLevel.DELEGATED,
@@ -365,7 +377,10 @@ def formation_observation(
             "line_axis": formation.line_axis,
             "ships": [_ship_card(state, state.ships[ship_id]) for ship_id in members],
         },
-        local_map=local_map_hexes(engine, state, positions, contact_labels) if positions else [],
+        local_map=(
+            local_map_hexes(engine, state, positions, contact_labels, side)
+            if positions else []
+        ),
         local_contacts=[
             {
                 "ship_id": enemy.id,

@@ -47,12 +47,14 @@ TENSOR_SPEC: dict[str, dict[str, Any]] = {
                                     "heading_cos", "speed", "is_leader"]},
     "ships": {"width": 5, "fields": ["hull_fraction", "max_hull", "heading_sin",
                                      "heading_cos", "speed"], "per": "own ship"},
-    "contacts": {"width": 5, "fields": ["distance", "bearing_sin", "bearing_cos",
-                                        "is_priority_class", "class_rank"],
+    "contacts": {"width": 5, "fields": ["distance", "absolute_bearing_sin",
+                                        "absolute_bearing_cos", "is_priority_class",
+                                        "class_rank"],
                  "per": "local contact"},
     "comm": {"width": 4, "fields": ["link_rank", "authority_rank", "messages_received",
                                     "reports_age"]},
-    "objective": {"width": 3, "fields": ["has_waypoint", "has_order", "active_branches"]},
+    "objective": {"width": 3, "fields": ["has_waypoint", "has_order",
+                                        "declared_contingencies"]},
 }
 LINK_RANK = {"direct": 1.0, "relayed": 0.75, "stale": 0.4, "blackout": 0.0}
 AUTHORITY_RANK = {"fleet_directed": 1.0, "delegated": 0.6, "local_autonomy": 0.2}
@@ -66,6 +68,66 @@ def _heading_sin_cos(heading: int | None) -> tuple[float, float]:
 
     angle = math.radians((heading - 1) * 60)
     return round(math.sin(angle), 6), round(math.cos(angle), 6)
+
+
+# Axial deltas of the six IBS compass directions, indexed by heading 1..6.
+_AXIAL_DELTA = {1: (1, -1), 2: (1, 0), 3: (0, 1), 4: (-1, 1), 5: (-1, 0), 6: (0, -1)}
+
+
+def _axial_of(observation: dict, label: str | None) -> tuple[int, int] | None:
+    """Axial coordinates of a hex label, resolved through the local map."""
+    if not label:
+        return None
+    for cell in observation.get("local_map", []):
+        if cell["hex"] == label:
+            return (int(cell["q"]), int(cell["r"]))
+    return None
+
+
+def _guide_axial(observation) -> tuple[int, int] | None:
+    """The formation guide's own hex, taken from the local formation state."""
+    ships = {
+        ship["ship_id"]: ship for ship in observation.formation_state.get("ships", [])
+    }
+    leader = ships.get(observation.formation_state.get("leader_id"))
+    if leader is None and observation.formation_state.get("ships"):
+        leader = observation.formation_state["ships"][0]
+    payload = observation.model_dump(mode="json")
+    return _axial_of(payload, leader.get("position") if leader else None)
+
+
+def _contact_axial(observation, label: str | None) -> tuple[int, int] | None:
+    return _axial_of(observation.model_dump(mode="json"), label)
+
+
+def _bearing_direction(
+    origin: tuple[int, int] | None, target: tuple[int, int] | None,
+) -> int | None:
+    """Absolute compass direction 1..6 from origin to target, or ``None``.
+
+    Uses the same axial lattice the engine moves on, so the number is a real
+    direction.  It is deliberately **absolute**, not relative to the observer's
+    heading: the observer's own heading is already in the ``self`` block, so a
+    policy can derive the engine's relative aspect (0 = bow, as in
+    ``IronBottomEngine._relative_aspect``) itself without this module re-inventing
+    a second convention.
+    """
+    if origin is None or target is None:
+        return None
+    dq = target[0] - origin[0]
+    dr = target[1] - origin[1]
+    if (dq, dr) == (0, 0):
+        return None
+    for direction, (step_q, step_r) in sorted(_AXIAL_DELTA.items()):
+        for sign in (1, -1):
+            if (step_q * sign, step_r * sign) == (dq, dr):
+                return direction if sign == 1 else ((direction + 2) % 6) + 1
+    # Not on an exact lattice line: nearest of the six directions.
+    return min(
+        _AXIAL_DELTA,
+        key=lambda direction: abs(dq - _AXIAL_DELTA[direction][0])
+        + abs(dr - _AXIAL_DELTA[direction][1]),
+    )
 
 
 def policy_observation(
@@ -112,12 +174,15 @@ def observation_tensors(
         ]
         for ship in sorted(ships, key=lambda item: str(item.get("ship_id")))
     ]
+    guide_axial = _guide_axial(observation)
     contact_rows = []
     for contact in sorted(observation.local_contacts, key=lambda item: item["ship_id"]):
         target_class = contact.get("ship_type")
+        contact_axial = _contact_axial(observation, contact.get("position"))
+        bearing = _bearing_direction(guide_axial, contact_axial)
         contact_rows.append([
             float(contact.get("range") if contact.get("range") is not None else -1),
-            *_heading_sin_cos(None),
+            *_heading_sin_cos(bearing),
             1.0 if target_class in priority_classes else 0.0,
             float(CLASS_RANK.get(target_class or "", 0)),
         ])
@@ -133,8 +198,9 @@ def observation_tensors(
     objective_block = [
         1.0 if objective is not None and objective.waypoint is not None else 0.0,
         1.0 if objective is not None else 0.0,
-        float(len(observation.active_mission_order.contingencies)
-              if observation.active_mission_order else 0),
+        # Declared, not activated: which branch is active is the agent's own
+        # decision and belongs in the decision record, not in the observation.
+        float(len(objective.contingencies) if objective is not None else 0),
     ]
     return {
         "tensor_version": TENSOR_VERSION,

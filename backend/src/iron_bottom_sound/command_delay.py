@@ -173,22 +173,21 @@ def initialise(engine: "IronBottomEngine", state: GameState) -> None:
                 active_order_id=None,
             )
             _write_report(state, formation)
-    engine._event(
-        state, "command_delay_initialised",
-        "命令延迟模式：建立舰队—编队指挥链与权限表",
-        payload={
-            "tick": mode.tick,
-            "authorities": {
-                side.value: {
-                    "level": mode.authorities[side.value].level.value,
-                    "fleet_formation_id": mode.authorities[side.value].fleet_formation_id,
-                    "fleet_commander_ship_id": mode.authorities[side.value].fleet_commander_ship_id,
-                }
-                for side in Side if side.value in mode.authorities
+    # Emitted once per side with ``secret_side`` set.  The authority table names
+    # each side's fleet formation and fleet commander; an unfiltered event would
+    # hand the opponent's whole command chain to the other player, which the
+    # leakage audit checks for directly.
+    for side in Side:
+        engine._event(
+            state, "command_delay_initialised",
+            "命令延迟模式：建立舰队—编队指挥链与权限表",
+            payload={
+                "secret_side": side.value,
+                "tick": mode.tick,
+                **link_summary(state, side),
             },
-        },
-        rule=engine._rule(RULE_AUTHORITY, None, "命令延迟：权限状态"),
-    )
+            rule=engine._rule(RULE_AUTHORITY, None, "命令延迟：权限状态"),
+        )
 
 
 def _write_report(state: GameState, formation: FormationState) -> FormationCommandState:
@@ -240,7 +239,7 @@ def report_snapshot(state: GameState, formation: FormationState) -> dict[str, An
         "guide_speed": guide.current_speed if guide is not None else None,
         "ship_count": len(members),
         "geometry_kind": formation.geometry_kind,
-        "hull_fraction": round(delegation.own_hull_fraction(None, state, formation), 3),
+        "hull_fraction": round(delegation.own_hull_fraction(state, formation), 3),
         "contacts": 0,
     }
 
