@@ -736,6 +736,9 @@ class LedgerEntry(BaseModel):
     detail: dict[str, Any] = Field(default_factory=dict)
 
 
+from .formation_memory import FormationMemory  # noqa: E402  (no cycle: memory imports nothing)
+
+
 class CommandDelayState(BaseModel):
     """Whole-game state for the Command Delay mode (option-gated, default off)."""
 
@@ -755,6 +758,13 @@ class CommandDelayState(BaseModel):
     # back into a decision.
     contracts: list[ContractState] = Field(default_factory=list)
     ledger: list[LedgerEntry] = Field(default_factory=list)
+    # CD-10: one memory per formation (never shared, never side-global), and the raw
+    # agent transcript for the debug view and for replaying a game without the model.
+    memories: dict[str, FormationMemory] = Field(default_factory=dict)
+    agent_log: list[dict[str, Any]] = Field(default_factory=list)
+    # Which policy each side's formations run under, as a *label* only: the callable
+    # itself is held in process memory and never persisted.
+    policy_labels: dict[str, str] = Field(default_factory=dict)
     next_sequence: int = 1
 
 

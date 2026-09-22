@@ -95,7 +95,7 @@
   {
    "contacts": 5,
    "embarked": "allies-active-light",
-   "embarked_ships": 2,
+   "embarked_ships": 1,
    "exact_formation": [
     "allies-active-light"
    ],
@@ -110,7 +110,7 @@
   {
    "contacts": 7,
    "embarked": "axis-active-heavy",
-   "embarked_ships": 2,
+   "embarked_ships": 1,
    "exact_formation": [
     "axis-active-heavy"
    ],
@@ -125,7 +125,7 @@
   {
    "contacts": 4,
    "embarked": "allies-active-light",
-   "embarked_ships": 2,
+   "embarked_ships": 1,
    "exact_formation": [
     "allies-active-light"
    ],
@@ -152,7 +152,7 @@
   {
    "contacts": 2,
    "embarked": "allies-active-light",
-   "embarked_ships": 2,
+   "embarked_ships": 1,
    "exact_formation": [
     "allies-active-light"
    ],

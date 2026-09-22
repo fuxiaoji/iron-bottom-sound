@@ -58,10 +58,13 @@ export function StartScreen(props:Props){
  const chooseCommandMode=(value:CommandMode)=>{
    props.setCommandDelay(value==="command_delay");
    props.setRealistic(value!=="classic");
+   // 命令延迟模式下每个编队都由自己的 LLM 代理指挥，没有状态机对手可配：
+   // 选择该模式即切到 LLM 连接面板。
+   if(value==="command_delay")setMatchMode("llm");
  };
  const commandModeLabel=commandMode==="command_delay"?"命令延迟模式：任务式命令 + 通信延迟":commandMode==="realistic"?"真实模式：编队指挥":"经典模式：逐舰下令";
  const commandModeDetail=commandMode==="command_delay"
-   ?"舰队总指挥下达任务式命令，编队按本地情报自主执行；报文经 TBS/视觉/编码电文分层投递，链路会随距离退化。炮位分配仍由引擎选择器完成。"
+   ?"舰队总指挥用自然语言下达命令；每个编队由自己的 LLM 代理指挥（带记忆），报文经 TBS/视觉/编码电文分层投递，链路会随距离退化。炮位分配仍由引擎选择器完成。"
    :commandMode==="realistic"
    ?"只为领舰规划航路，后舰沿共享航迹；包含共同航速、指挥链和脱队撤离。"
    :"逐艘舰船填写移动、炮击与鱼雷订单。";
@@ -118,7 +121,9 @@ export function StartScreen(props:Props){
    <div className="setup-progress"><b><span>1</span>选择对手</b><b><span>2</span>选择战场</b><b><span>3</span>确认开战</b></div>
    <section className="setup-panel"><h2>1. 你要和谁对战？</h2><div className="mode-picks">
     <button className={matchMode==="hotseat"?"active":""} onClick={()=>chooseMode("hotseat")}><b>同机双人</b><span>秘密交接锁屏</span></button>
-    <button className={matchMode==="vs_ai"?"active":""} onClick={()=>chooseMode("vs_ai")}><b>状态机 AI</b><span>随时可修改 AI 建议</span></button>
+    <button className={matchMode==="vs_ai"?"active":""} disabled={commandMode==="command_delay"}
+     title={commandMode==="command_delay"?"命令延迟模式下每个编队由自己的 LLM 代理指挥，不提供状态机对手":undefined}
+     onClick={()=>chooseMode("vs_ai")}><b>状态机 AI</b><span>{commandMode==="command_delay"?"命令延迟模式不可用":"随时可修改 AI 建议"}</span></button>
     <button className={matchMode==="llm"?"active":""} onClick={()=>chooseMode("llm")}><b>多模态 LLM</b><span>自行提供模型接口</span></button>
    </div></section>
    <section className="setup-panel"><h2>2. 选择战场与指挥方式</h2><div className="scenario-picks">{scenarios.map(([id,title,detail])=><button key={id} className={scenario===id?"active":""} onClick={()=>selectScenario(id)}><b>{title}</b><span>{detail}</span></button>)}

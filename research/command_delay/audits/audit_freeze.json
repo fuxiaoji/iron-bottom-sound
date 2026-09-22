@@ -1,5 +1,5 @@
 {
- "diffstat": " 87 files changed, 21860 insertions(+), 2 deletions(-)",
+ "diffstat": " 102 files changed, 27909 insertions(+), 19 deletions(-)",
  "envelope_keys_added": {
   "events[].payload.options.command_delay_mode": 7,
   "events[].payload.order_batch.formation_movement[].movement_style": 4,

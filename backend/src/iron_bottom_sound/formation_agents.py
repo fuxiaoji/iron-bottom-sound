@@ -89,6 +89,8 @@ class FormationDecision(BaseModel):
     report_actions: list[str] = Field(default_factory=list)
     acknowledgement: bool = False
     rationale_summary: str = ""
+    # The agent's message to its own next turn, stored verbatim in its memory.
+    memory_note: str = ""
     # Audit only: what was rejected and why.
     audit: dict[str, Any] = Field(default_factory=dict)
 
@@ -107,6 +109,9 @@ class FormationPolicy(Protocol):
         legal_action_mask: list[dict[str, Any]],
         target_priority_space: list[dict[str, Any]],
         contract_state: dict[str, Any] | None = None,
+        *,
+        memory_text: str | None = None,
+        order_text: str | None = None,
     ) -> FormationDecision:
         ...
 
@@ -124,8 +129,11 @@ class DeterministicFormationAgent:
         legal_action_mask: list[dict[str, Any]] | None = None,
         target_priority_space: list[dict[str, Any]] | None = None,
         contract_state: dict[str, Any] | None = None,
+        *,
+        memory_text: str | None = None,
+        order_text: str | None = None,
     ) -> FormationDecision:
-        del contract_state  # CD-6 research hook; unused by the baseline policy
+        del contract_state, memory_text  # CD-6 hook and memory: unused by the baseline policy
         legal = list(legal_action_mask if legal_action_mask is not None
                      else local_observation.legal_formation_actions)
         space = list(target_priority_space if target_priority_space is not None
@@ -173,7 +181,10 @@ class DeterministicFormationAgent:
             target_priority_adjustments=adjustments,
             report_actions=reports,
             acknowledgement=acknowledgement,
-            rationale_summary=_rationale(local_observation, branch, chosen, contacts, comm),
+            rationale_summary=(
+                _rationale(local_observation, branch, chosen, contacts, comm)
+                + (f" | 上级命令：{order_text}" if order_text else " | 未收到上级命令")
+            ),
             audit={**audit, "active_branches": active,
                    "hull_fraction": round(hull_fraction, 3), "withdraw": withdraw,
                    "order_received": order_received},

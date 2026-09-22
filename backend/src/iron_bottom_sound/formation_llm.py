@@ -37,6 +37,7 @@ reproducible without calling a model again — which is what acceptance criterio
 from __future__ import annotations
 
 import json
+import os
 from typing import Any, Protocol
 
 from pydantic import BaseModel, Field
@@ -52,11 +53,13 @@ from .formation_agents import (
     FormationDecision,
     TargetPriorityAdjustment,
 )
+from .formation_memory import MAX_NOTE_CHARS
 from .models import ContingencyBranch, MissionOrder, Phase
 
 # The exact JSON shape the model must produce.  It is published to the model as
 # part of the prompt so the contract is explicit rather than inferred.
 RESPONSE_SCHEMA: dict[str, Any] = {
+    "memory_note": "可选：一句写给自己下一回合的备忘（≤240 字）",
     "selected_movement_action_id": "one id from legal_formation_actions, or null to hold",
     "selected_contingency_branch": "one of the active contingency branches, or null",
     "target_priority_adjustments": [
@@ -68,10 +71,11 @@ RESPONSE_SCHEMA: dict[str, Any] = {
 }
 
 INSTRUCTION = (
-    "你是编队指挥官。只依据给出的本地情报决策。"
+    "你是编队指挥官。只依据给出的本地情报与你的记忆决策。"
     "机动只能从 legal_formation_actions 里选一个 action_id，不得自创航路。"
     "火力只能通过 target_priority_adjustments 给可见目标附加 -0.5..0.5 的优先级权重；"
     "炮位分配、射界、修正与命中由引擎选择器完成，你不得输出任何炮击命令、炮位、射击解或命中计算。"
+    "你可以在 memory_note 里写一句给下一回合自己的备忘（会原样保留并再次给你看）。"
     "输出必须是严格的 JSON，字段见 response_schema。"
 )
 
@@ -102,8 +106,15 @@ def build_prompt(
     mission_order: MissionOrder | None = None,
     *,
     contract_state: dict[str, Any] | None = None,
+    memory_text: str | None = None,
+    order_text: str | None = None,
 ) -> dict[str, Any]:
-    """Assemble the plan §12 input list.  Nothing from engine state enters here."""
+    """Assemble the plan §12 input list plus this formation's own memory.
+
+    ``memory_text``/``order_text`` are this formation's own history and the order it
+    was sent — both already local to it, so including them adds no information the
+    formation is not entitled to.
+    """
     payload = observation.model_dump(mode="json")
     return {
         "role": "formation_commander",
@@ -121,6 +132,10 @@ def build_prompt(
         "active_mission_order": (
             mission_order.model_dump(mode="json") if mission_order is not None else None
         ),
+        # 舰队总指挥用自然语言下达的命令原文（若已送达）。
+        "order_text": order_text,
+        # 你自己的记忆：当前生效命令、备忘、见过的接触、之前的决策与发出的报告。
+        "your_memory": memory_text or "",
         "received_messages": payload["received_messages"],
         "comm_state": payload["comm_state"],
         "stale_external_reports": payload["stale_external_reports"],
@@ -205,6 +220,9 @@ def parse_response(
             reason=str(raw.get("reason") or "model adjustment")[:200],
         ))
 
+    note = data.get("memory_note")
+    if note is not None and not isinstance(note, str):
+        errors.append("memory_note must be a string")
     reports = data.get("report_actions") or []
     if not isinstance(reports, list):
         errors.append("report_actions must be a list")
@@ -225,6 +243,7 @@ def parse_response(
         report_actions=sorted(set(reports)),
         acknowledgement=bool(data.get("acknowledgement")),
         rationale_summary=str(data.get("rationale_summary") or "")[:500],
+        memory_note=str(note or "")[:MAX_NOTE_CHARS],
         audit={"parsed": True, "legal_actions": len(legal_actions)},
     ), []
 
@@ -254,9 +273,17 @@ class FormationLLMAgent:
         legal_action_mask: list[dict[str, Any]] | None = None,
         target_priority_space: list[dict[str, Any]] | None = None,
         contract_state: dict[str, Any] | None = None,
+        *,
+        memory_text: str | None = None,
+        order_text: str | None = None,
     ) -> FormationDecision:
         del comm_state, legal_action_mask, target_priority_space  # carried by the observation
-        prompt = build_prompt(local_observation, mission_order, contract_state=contract_state)
+        prompt = build_prompt(
+            local_observation, mission_order,
+            contract_state=contract_state,
+            memory_text=memory_text,
+            order_text=order_text,
+        )
         last_errors: list[str] = []
         for attempt in range(1, self.max_retries + 2):
             retry_prompt = prompt
@@ -324,3 +351,134 @@ def record_response(
 ) -> dict[tuple[str, int], str]:
     records[(decision.formation_id, decision.turn)] = raw
     return records
+
+
+# --------------------------------------------------------------------------- provider
+
+class ProviderPolicy:
+    """A real model call, OpenAI-compatible, with the transcript kept.
+
+    Deliberately the same transport the rest of the project uses (``httpx`` POST to
+    ``{endpoint}/chat/completions`` with a bearer key), so a formation agent needs
+    no new dependency.  The key is held only in the process and never written to
+    the game state: ``CommandDelayState.policy_labels`` records what ran, not how to
+    reach it.
+    """
+
+    def __init__(
+        self,
+        *,
+        endpoint: str,
+        model: str,
+        api_key: str,
+        timeout: float = 45.0,
+        max_tokens: int = 900,
+        supports_thinking: bool = False,
+        client: Any = None,
+    ) -> None:
+        self.endpoint = endpoint.rstrip("/")
+        self.model = model
+        self.api_key = api_key
+        self.timeout = timeout
+        self.max_tokens = max_tokens
+        self.supports_thinking = supports_thinking
+        self.client = client
+        self.label = f"llm:{model}"
+
+    def _payload(self, prompt: dict[str, Any]) -> dict[str, Any]:
+        schema = json.dumps(RESPONSE_SCHEMA, ensure_ascii=False)
+        memory = str(prompt.get("your_memory") or "")
+        order = prompt.get("order_text")
+        user = json.dumps(
+            {
+                "instruction": prompt.get("instruction") or INSTRUCTION,
+                "response_schema": RESPONSE_SCHEMA,
+                "formation": prompt.get("formation_id"),
+                "turn": prompt.get("turn"),
+                "phase": prompt.get("phase"),
+                "order_text": order,
+                "your_memory": memory,
+                "formation_state": prompt.get("formation_state"),
+                "local_contacts": prompt.get("local_contacts"),
+                "legal_formation_actions": prompt.get("legal_formation_actions"),
+                "legal_target_priority_options": prompt.get("legal_target_priority_options"),
+                "report_actions": prompt.get("report_actions"),
+                "priority_weight_limit": prompt.get("priority_weight_limit"),
+            },
+            ensure_ascii=False,
+        )
+        payload: dict[str, Any] = {
+            "model": self.model,
+            "max_tokens": self.max_tokens,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": (
+                        "你是二战海战兵棋中的编队指挥官，只输出严格 JSON：" + schema
+                    ),
+                },
+                {"role": "user", "content": user},
+            ],
+        }
+        if self.supports_thinking:
+            payload["thinking"] = {"type": "disabled"}
+        return payload
+
+    def __call__(self, prompt: dict[str, Any]) -> str:
+        import httpx
+
+        client = self.client or httpx.Client(timeout=self.timeout)
+        try:
+            response = client.post(
+                f"{self.endpoint}/chat/completions",
+                headers={"Authorization": f"Bearer {self.api_key}"},
+                json=self._payload(prompt),
+            )
+            response.raise_for_status()
+            body = response.json()
+            choice = body["choices"][0]["message"]
+            content = choice.get("content") or ""
+            reasoning = choice.get("reasoning_content") or ""
+            self.last_meta = {
+                "model": self.model,
+                "request_id": body.get("id"),
+                "usage": body.get("usage") or {},
+                "reasoning_content": reasoning,
+                "finish_reason": body["choices"][0].get("finish_reason"),
+            }
+            if not content and reasoning:
+                raise ValueError(
+                    "provider returned reasoning only (finish_reason="
+                    f"{self.last_meta['finish_reason']}); no JSON to parse"
+                )
+            return content.strip()
+        finally:
+            if self.client is None:
+                client.close()
+
+
+def make_policy(
+    *, provider: str, model: str | None = None, api_key: str | None = None,
+    timeout: float = 45.0, max_tokens: int = 900, client: Any = None,
+) -> tuple[ProviderPolicy | None, str]:
+    """Build a formation policy from the provider profile, or explain why not.
+
+    Returns ``(policy, reason)``.  A policy of ``None`` is not an error: it means
+    this side's formations have no model available, and the caller must say so
+    rather than pretend an LLM decided.
+    """
+    from .llm_providers import provider_runtime
+
+    runtime = provider_runtime(provider, model)  # type: ignore[arg-type]
+    key = api_key or os.environ.get(runtime.api_key_env, "")
+    if not key:
+        return None, f"no API key for {runtime.provider} (env {runtime.api_key_env})"
+    return ProviderPolicy(
+        endpoint=runtime.endpoint,
+        model=runtime.model,
+        api_key=key,
+        timeout=timeout,
+        max_tokens=max_tokens,
+        supports_thinking=runtime.supports_thinking,
+        client=client,
+    ), f"llm:{runtime.provider}/{runtime.model}"

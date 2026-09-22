@@ -66,6 +66,7 @@ def mission_order_template(
     task: str,
     coordination: list[str] | None = None,
     priority_classes: tuple[str, ...] = DEFAULT_FIRE_PRIORITY,
+    roe: list[str] | None = None,
     operating_area: str | None = None,
     waypoint: HexCoord | None = None,
     deadline_turn: int | None = None,
@@ -104,7 +105,7 @@ def mission_order_template(
             )
             for index, ship_class in enumerate(priority_classes)
         ],
-        roe=[
+        roe=roe or [
             "engage only targets the engine's selector can legally bear on",
             "no fire into the flagship formation's sector",
         ],

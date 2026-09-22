@@ -211,6 +211,30 @@ def realistic_command_rules() -> PlainTextResponse:
     )
 
 
+def _register_formation_policies(state, api_key: str | None, config: "LLMConnectionConfig | None") -> dict:
+    """Point the mode's formation agents at a model, or record why they are not.
+
+    The key is used from process memory only.  Registering it for both sides is
+    deliberate: in this mode *every* formation is commanded by an agent, and the
+    player commands fleets by writing orders, so both sides' formations run the same
+    kind of policy.  With no key the formations still fight, on doctrine, and the
+    label says so — no output is ever presented as a model's when it is not.
+    """
+    from .command_delay import set_side_policy
+    from .formation_llm import make_policy
+    from .models import Side
+
+    key = api_key
+    provider = "deepseek"
+    model = None
+    if config is not None:
+        provider, model = config.provider, config.model
+    policy, label = make_policy(provider=provider, model=model, api_key=key)
+    for side in Side:
+        set_side_policy(side, policy, label)
+    return {"policy": label, "sides": [side.value for side in Side]}
+
+
 def side_from_header(value: str | None) -> Side:
     if value is None:
         raise HTTPException(400, "X-Player-Side is required")
@@ -278,6 +302,8 @@ def create_game(request: CreateGame, background_tasks: BackgroundTasks):
         _user_llm_keys[state.game_id] = request.llm_api_key  # 仅内存，绝不落盘
     if request.llm_config:
         _user_llm_configs[state.game_id] = request.llm_config
+    if state.options.command_delay_mode:
+        _register_formation_policies(state, request.llm_api_key, request.llm_config)
     consent = request.research_consent
     if consent is not None:
         try:
@@ -717,6 +743,113 @@ def command_delay_formation_view(
         raise HTTPException(404, f"Unknown formation {formation_id}")
     from .command_observation import formation_observation
     return formation_observation(engine, state, side, formation_id)
+
+
+class CommandDelayOrderRequest(BaseModel):
+    """舰队总指挥用自然语言写的一道命令。"""
+    formation_id: str
+    text: str = Field(min_length=1, max_length=400)
+    priority_classes: list[str] = Field(default_factory=list, max_length=6)
+    roe: list[str] = Field(default_factory=list, max_length=6)
+    deadline_turn: int | None = Field(default=None, ge=1, le=200)
+
+
+@app.post("/games/{game_id}/command-delay/order")
+def command_delay_order(
+    game_id: str, request: CommandDelayOrderRequest,
+    x_player_side: Annotated[str | None, Header()] = None,
+):
+    """下达一道自然语言命令：它是一项信号，会按通信链路延迟或丢失。"""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.command_delay_mode:
+        raise HTTPException(409, "Orders by signal are available only in command delay mode")
+    from .command_delay import draft_natural_order
+
+    try:
+        message = draft_natural_order(
+            engine, state, side=side, formation_id=request.formation_id,
+            text=request.text, priority_classes=request.priority_classes,
+            roe=request.roe, deadline_turn=request.deadline_turn,
+        )
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    repository.save(state)
+    return {
+        "message_id": message.message_id,
+        "medium": message.medium.value,
+        "handling_delay": message.handling_delay,
+        "relay_hops": message.relay_hops,
+        "expected_delivery_turn": message.issued_turn + message.handling_delay,
+        "route_reason": message.reason,
+        "issued_turn": message.issued_turn,
+    }
+
+
+@app.get("/games/{game_id}/command-delay/formation-orders")
+def command_delay_formation_orders(
+    game_id: str, x_player_side: Annotated[str | None, Header()] = None,
+):
+    """本侧各编队代理本回合选定的机动方案（提交前给玩家过目）。"""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.command_delay_mode:
+        raise HTTPException(409, "Formation orders are available only in command delay mode")
+    from .command_delay import formation_orders
+
+    orders = formation_orders(state, side)
+    return {
+        "phase": state.phase.value,
+        "turn": state.turn,
+        "orders": [order.model_dump(mode="json") for order in orders],
+    }
+
+
+@app.get("/games/{game_id}/command-delay/agent-log")
+def command_delay_agent_log(
+    game_id: str, formation_id: str | None = None, limit: int = 12,
+    x_player_side: Annotated[str | None, Header()] = None,
+):
+    """调试视图：本侧各编队代理的提示词、原始回复、解析结果与记忆。
+
+    只能读自己一侧；对方的提示词与记忆属于其指挥链。
+    """
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.command_delay_mode:
+        raise HTTPException(409, "The agent log is available only in command delay mode")
+    mode = state.command_delay
+    if mode is None:
+        raise HTTPException(409, "The agent log is available only in command delay mode")
+    known = {
+        formation.id for formation in state.formations.values() if formation.side == side
+    }
+    entries = [
+        record for record in mode.agent_log
+        if record.get("side") == side.value
+        and (formation_id is None or record.get("formation_id") == formation_id)
+    ]
+    payload = []
+    for record in entries[-max(1, min(limit, 48)):]:
+        formation = state.formations.get(record.get("formation_id") or "")
+        payload.append({
+            **record,
+            "own_formation": (record.get("formation_id") in known),
+            "formation_status": formation.status if formation else None,
+        })
+    memories = {}
+    for fid in sorted(known):
+        memory = mode.memories.get(fid)
+        if memory is not None:
+            from .formation_memory import memory_payload
+
+            memories[fid] = memory_payload(memory)
+    return {
+        "policy_labels": dict(mode.policy_labels),
+        "formations": sorted(known),
+        "memories": memories,
+        "entries": payload,
+    }
 
 
 @app.post("/games/{game_id}/formation-preview")

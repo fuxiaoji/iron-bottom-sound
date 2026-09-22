@@ -55,6 +55,7 @@ from .models import (
     CommandDelayState,
     FormationCommandState,
     FormationGeometryKind,
+    FormationMovementOrder,
     FormationState,
     GameOptions,
     GameState,
@@ -75,6 +76,9 @@ if TYPE_CHECKING:
 
 RULE_AUTHORITY = "IBS-R-CD-02"
 RULE_COMMS = "IBS-R-CD-03"
+
+# Model policies live in process memory, keyed by side, never in the game state.
+_SIDE_POLICIES: dict[str, tuple[Any, str]] = {}
 
 
 def enabled(state: GameState) -> bool:
@@ -549,6 +553,7 @@ def _apply_delivery(
         return
     if message.kind in (MessageKind.MISSION_ORDER, MessageKind.AMENDMENT):
         order_id = message.payload.get("order_id")
+        order_text = message.payload.get("order_text")
         order = next(
             (item for item in mode.mission_orders if item.order_id == order_id), None
         )
@@ -573,6 +578,16 @@ def _apply_delivery(
             return
         order.confirmed_turn = message.delivered_turn
         entry.active_order_id = order.order_id
+        # The formation now knows the order; record it in *its* memory so the next
+        # agent call reads the words the fleet actually sent.
+        from .formation_memory import set_active_order
+
+        set_active_order(
+            state, order.formation_id,
+            text=str(order_text or order.mission),
+            turn=int(message.delivered_turn or message.issued_turn),
+            order_id=order.order_id,
+        )
         return
     if message.kind == MessageKind.ACKNOWLEDGEMENT:
         return
@@ -677,6 +692,95 @@ def link_summary(state: GameState, side: Side | None = None) -> dict[str, Any]:
     }
 
 
+def draft_natural_order(
+    engine: "IronBottomEngine", state: GameState, *, side: Side, formation_id: str,
+    text: str, priority_classes: list[str] | None = None,
+    roe: list[str] | None = None, deadline_turn: int | None = None,
+) -> CommandMessage:
+    """Send the fleet commander's own words to one formation.
+
+    This is the mode's input channel: the human writes an order in natural
+    language, it is drafted into a signal like any other and it is subject to the
+    same routing, queue and TTL.  It can therefore arrive late, or not at all —
+    which is the point.
+
+    The directive fields are optional and stay bounded: a priority class list only
+    produces FleetOrder weights, so nothing here can name a mount or a solution.
+    """
+    mode = state_for(state)
+    authority = mode.authorities.get(side.value)
+    fleet_formation = (
+        state.formations.get(authority.fleet_formation_id) if authority else None
+    )
+    formation = state.formations.get(formation_id)
+    if formation is None or formation.side is not side:
+        raise ValueError(f"unknown formation {formation_id} for side {side.value}")
+    cleaned = " ".join((text or "").split())
+    if not cleaned:
+        raise ValueError("an order needs text")
+    order = delegation.mission_order_template(
+        order_id=f"{side.value}-nl-{state.turn}-{formation_id}",
+        formation_id=formation_id,
+        side=side,
+        turn=state.turn,
+        issued_by=(
+            authority.fleet_commander_ship_id or fleet_formation.flagship_id
+            if authority and fleet_formation else "fleet"
+        ),
+        mission=cleaned,
+        intent=cleaned,
+        task=cleaned,
+        priority_classes=tuple(priority_classes) if priority_classes else delegation.DEFAULT_FIRE_PRIORITY,
+        roe=list(roe) if roe else None,
+        deadline_turn=deadline_turn,
+    )
+    mode.mission_orders.append(order)
+    decision = (
+        route(engine, state, fleet_formation, formation)
+        if fleet_formation is not None
+        else RouteDecision(CommunicationMedium.BLACKOUT, 0, "no fleet formation afloat")
+    )
+    kind = MessageKind.MISSION_ORDER
+    return send(engine, state, CommandMessage(
+        message_id="",
+        side=side,
+        origin=order.issued_by,
+        destination=formation_id,
+        kind=kind,
+        precedence=MessagePrecedence.OPERATIONAL,
+        medium=decision.medium,
+        issued_turn=state.turn,
+        issued_phase=state.phase,
+        handling_delay=delay_for(decision.medium, kind, decision.relay_hops),
+        relay_hops=decision.relay_hops,
+        reason=decision.reason,
+        payload={"order_id": order.order_id, "order_text": cleaned},
+    ))
+
+
+def formation_orders(state: GameState, side: Side) -> list[FormationMovementOrder]:
+    """Movement orders for a side, produced by its formations' own agents.
+
+    In this mode a player is the fleet commander, not a per-ship plotter: the
+    formations execute what their agents decided, and the player's lever is the
+    order they were sent.  The batch still goes through the engine's validation, so
+    an agent that chose an illegal plan fails loudly instead of being corrected
+    silently.
+    """
+    order_by_formation: dict[str, FormationMovementOrder] = {}
+    for record in state.command_delay.decisions if state.command_delay else []:
+        if record.get("turn") != state.turn:
+            continue
+        formation_id = record.get("formation_id")
+        plan = record.get("selected_movement_plan")
+        if not formation_id or not plan:
+            continue
+        order_by_formation[formation_id] = FormationMovementOrder(
+            formation_id=formation_id, leader_plan=plan,
+        )
+    return [order_by_formation[key] for key in sorted(order_by_formation)]
+
+
 def gunnery_batch(state: GameState, side: Side) -> OrderBatch:
     """The GUNNERY-phase batch a Command Delay commander may submit.
 
@@ -694,38 +798,93 @@ def gunnery_batch(state: GameState, side: Side) -> OrderBatch:
     return OrderBatch(side=side, phase=state.phase, target_priorities=directives)
 
 
-def run_formation_agents(engine: "IronBottomEngine", state: GameState) -> list[dict[str, Any]]:
-    """Run every formation's local agent for the current turn and record it.
+def set_side_policy(side: Side, policy: Any, label: str) -> None:
+    """Register the model policy a side's formations run under (process memory only).
 
-    Each agent sees only its own ``FormationObservation``.  Its decision is stored
-    for audit, its movement plan is offered to the commander, and its bounded
-    priority adjustments are collected for the gunnery selector — nothing else.
-    The decision is stored as a dump because the ledger is an audit record, not a
-    live object graph.
+    The key itself never enters the game state, and a policy registered here is
+    deliberately *not* persisted: a reloaded save falls back to the deterministic
+    agent until a key is supplied again, which is the honest behaviour for a secret.
+    """
+    _SIDE_POLICIES[side.value] = (policy, label)
+
+
+def clear_side_policies() -> None:
+    _SIDE_POLICIES.clear()
+
+
+def side_policy(side: Side) -> tuple[Any, str]:
+    return _SIDE_POLICIES.get(side.value, (None, "deterministic-formation-v1"))
+
+
+def side_agent(side: Side):
+    """The agent a side's formations use: a model when available, doctrine otherwise."""
+    from .formation_agents import DeterministicFormationAgent
+    from .formation_llm import FormationLLMAgent
+
+    policy, label = side_policy(side)
+    if policy is None:
+        return DeterministicFormationAgent(), label
+    return FormationLLMAgent(policy, name=label, max_retries=2), label
+
+
+def run_formation_agents(engine: "IronBottomEngine", state: GameState) -> list[dict[str, Any]]:
+    """Run every formation's own agent for this turn, with its own memory.
+
+    Each agent sees only its own ``FormationObservation`` plus *its own* memory and
+    the order text it was sent.  Its decision is stored for audit, its movement plan
+    is offered to the commander, and its bounded priority adjustments are collected
+    for the gunnery selector — nothing else.
+
+    A side with no model configured still fights: its formations run the
+    deterministic doctrine and the label on the decision says so, so a reader can
+    never mistake doctrine output for a model's.
     """
     from .command_observation import formation_observation
-    from .formation_agents import DeterministicFormationAgent
+    from .formation_memory import memory_for, remember, render_for_prompt, write_note
 
     mode = state_for(state)
-    agent = DeterministicFormationAgent()
     decisions: list[dict[str, Any]] = []
     mode.local_directives = []
     for side in Side:
+        agent, label = side_agent(side)
+        mode.policy_labels[side.value] = label
         for formation in active_formations(state, side):
             observation = formation_observation(engine, state, side, formation.id)
             order = active_mission_order(state, formation.id)
+            memory = memory_for(state, formation.id)
+            order_text = memory.active_order_text
+            if order is not None and order_text is None:
+                # A structured order from the fleet is in force; render it as the
+                # text the formation is acting on so the agent reads one thing.
+                order_text = (
+                    f"{order.mission}；意图：{order.commander_intent}；"
+                    f"任务：{order.task_to_formation}"
+                )
+            attempts_before = len(getattr(agent, "attempts", []))
             decision = agent.act(
                 observation,
                 mission_order=order,
                 comm_state=observation.comm_state,
                 legal_action_mask=observation.legal_formation_actions,
                 target_priority_space=observation.legal_target_priority_options,
+                memory_text=render_for_prompt(memory),
+                order_text=order_text,
             )
+            decision.audit = {**decision.audit, "agent": label, "policy": label}
             mode.decisions.append(decision.model_dump(mode="json"))
             decisions.append(decision)
             mode.local_directives.extend(
                 adjustment.as_directive(decision.formation_id)
                 for adjustment in decision.target_priority_adjustments
+            )
+            _record_memory(
+                state, formation, decision, observation,
+                memory_for=memory_for, remember=remember, write_note=write_note,
+            )
+            _record_agent_log(
+                state, formation, side, observation, order, decision, label,
+                order_text=order_text, memory=memory,
+                attempts=getattr(agent, "attempts", [])[attempts_before:],
             )
             engine._event(
                 state, "formation_agent_decision",
@@ -733,7 +892,7 @@ def run_formation_agents(engine: "IronBottomEngine", state: GameState) -> list[d
                 payload={
                     "secret_side": side.value,
                     "formation_id": formation.id,
-                    "agent": agent.name,
+                    "agent": label,
                     "turn": state.turn,
                     "selected_movement_action_id": decision.selected_movement_action_id,
                     "selected_movement_plan": decision.selected_movement_plan,
@@ -744,11 +903,100 @@ def run_formation_agents(engine: "IronBottomEngine", state: GameState) -> list[d
                         for item in decision.target_priority_adjustments
                     ],
                     "acknowledgement": decision.acknowledgement,
+                    "memory_note": decision.memory_note,
                     "audit": decision.audit,
                 },
                 rule=engine._rule("IBS-R-CD-02", None, "命令延迟：编队本地代理"),
             )
     return decisions
+
+
+def _record_memory(
+    state: GameState, formation, decision, observation, *, memory_for, remember, write_note,
+) -> None:
+    """Write this turn's experience into the formation's own memory."""
+    memory = memory_for(state, formation.id)
+    for contact in observation.local_contacts:
+        # ``local_contacts`` is the payload form (a dict per contact).
+        text = (
+            f"见到 {contact.get('name')}（{contact.get('ship_type')}）"
+            f"距离 {contact.get('range')}"
+        )
+        signature = f"{contact.get('ship_id')}@{contact.get('position')}"
+        if memory.last_contact_signature == signature:
+            continue  # the same sighting as last turn: do not pad the log
+        remember(
+            state, formation.id, kind="contact_seen", text=text,
+            turn=state.turn, phase=state.phase.value,
+            meta={"ship_id": contact.get("ship_id"), "range": contact.get("range")},
+        )
+        memory.last_contact_signature = signature
+    remember(
+        state, formation.id, kind="decision",
+        text=(
+            f"{decision.selected_movement_plan or '保持'} / "
+            f"{decision.selected_contingency_branch or '无分支'}："
+            f"{decision.rationale_summary}"
+        ),
+        turn=state.turn, phase=state.phase.value,
+        meta={"plan": decision.selected_movement_plan},
+    )
+    active = observation.active_mission_order
+    if active is not None:
+        remember(
+            state, formation.id, kind="contingency",
+            text=f"命令 {active.order_id} 生效中",
+            turn=state.turn, phase=state.phase.value,
+        )
+    if decision.report_actions:
+        remember(
+            state, formation.id, kind="report_sent",
+            text="发出：" + "、".join(decision.report_actions),
+            turn=state.turn, phase=state.phase.value,
+        )
+        memory.last_report_turn = state.turn
+    if decision.memory_note:
+        write_note(state, formation.id, text=decision.memory_note, turn=state.turn)
+
+
+def _record_agent_log(
+    state: GameState, formation, side: Side, observation, order, decision, label,
+    *, order_text, memory, attempts,
+) -> None:
+    """Keep the raw transcript for the debug view and for replay without the model."""
+    from .formation_memory import memory_payload, render_for_prompt
+    from .formation_llm import build_prompt
+
+    mode = state_for(state)
+    mode.agent_log.append({
+        "turn": state.turn,
+        "phase": state.phase.value,
+        "side": side.value,
+        "formation_id": formation.id,
+        "formation_name": formation.name,
+        "agent": label,
+        "order_text": order_text,
+        "memory_text": render_for_prompt(memory),
+        "memory": memory_payload(memory),
+        "prompt": build_prompt(
+            observation, order, memory_text=render_for_prompt(memory),
+            order_text=order_text,
+        ),
+        "attempts": [
+            {
+                "attempt": item.attempt,
+                "raw_response": item.raw_response,
+                "errors": list(item.errors),
+                "accepted": item.accepted,
+                "fallback": item.fallback,
+            }
+            for item in attempts
+        ],
+        "decision": decision.model_dump(mode="json"),
+    })
+    keep = 600
+    if len(mode.agent_log) > keep:
+        mode.agent_log = mode.agent_log[-keep:]
 
 
 def formation_plan(state: GameState, formation_id: str) -> str | None:

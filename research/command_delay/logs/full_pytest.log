@@ -1,12 +1,12 @@
 ......................................F................................. [ 11%]
-.....................................s.................................. [ 22%]
-................s....................................................... [ 33%]
+..................................F..s.................................. [ 22%]
+.................s...................................................... [ 33%]
 ........................................................................ [ 44%]
 ........................................................................ [ 55%]
 ........................................................................ [ 67%]
 ........................................................................ [ 78%]
 ........................................................................ [ 89%]
-.......................F...........F...............................      [100%]
+........................F...........F...............................     [100%]
 =================================== FAILURES ===================================
 ______ test_tutorial_api_reaches_second_turn_and_serves_canonical_counter ______
 
@@ -24,6 +24,65 @@ E         - 918196c7a6450f13aed798a47f48dd90f659611c49f6677d343878c871714eb6
 E         + 5c54f8aa1e0de32074b42a1751c077d4efe417b18e29b28e740835e26de0d17e
 
 tests/test_api_llm_storage.py:73: AssertionError
+_____________ test_communication_pipeline_is_hash_seed_independent _____________
+
+    def test_communication_pipeline_is_hash_seed_independent() -> None:
+        def outcome(hashseed: str):
+            import json
+            env = dict(os.environ, PYTHONHASHSEED=hashseed,
+                       PYTHONPATH=str(REPO_ROOT / "backend" / "src"))
+            proc = subprocess.run(
+                [sys.executable, "-c", HASH_SCRIPT, str(REPO_ROOT / "backend" / "src")],
+                cwd=str(REPO_ROOT), env=env, capture_output=True, text=True, timeout=600,
+            )
+            assert proc.returncode == 0, proc.stderr[-2000:]
+            return json.loads(proc.stdout)
+    
+>       assert outcome("0") == outcome("1") == outcome("5")
+               ^^^^^^^^^^^^
+
+tests/test_command_delay_communications.py:554: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+hashseed = '0'
+
+    def outcome(hashseed: str):
+        import json
+        env = dict(os.environ, PYTHONHASHSEED=hashseed,
+                   PYTHONPATH=str(REPO_ROOT / "backend" / "src"))
+        proc = subprocess.run(
+            [sys.executable, "-c", HASH_SCRIPT, str(REPO_ROOT / "backend" / "src")],
+            cwd=str(REPO_ROOT), env=env, capture_output=True, text=True, timeout=600,
+        )
+>       assert proc.returncode == 0, proc.stderr[-2000:]
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 25, in <module>
+E             engine.advance(state.game_id)
+E             ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+E           File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/backend/src/iron_bottom_sound/engine.py", line 1848, in advance
+E             on_phase_advanced(self, state)
+E             ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+E           File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/backend/src/iron_bottom_sound/command_delay.py", line 620, in on_phase_advanced
+E             run_formation_agents(engine, state)
+E             ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+E           File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/backend/src/iron_bottom_sound/command_delay.py", line 879, in run_formation_agents
+E             _record_memory(
+E             ~~~~~~~~~~~~~~^
+E                 state, formation, decision, observation, order_text=order_text,
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                 remember=remember, write_note=write_note,
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             )
+E             ^
+E           File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/backend/src/iron_bottom_sound/command_delay.py", line 918, in _record_memory
+E             text = f"见到 {contact.name}（{contact.ship_type}）距离 {contact.range}"
+E                            ^^^^^^^^^^^^
+E         AttributeError: 'dict' object has no attribute 'name'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/bin/python', '-c', '\nimport json, ...pe}）距离 {contact.range}"\n                   ^^^^^^^^^^^^\nAttributeError: \'dict\' object has no attribute \'name\'\n').returncode
+
+tests/test_command_delay_communications.py:551: AssertionError
 _________ test_collision_resolution_is_deterministic_across_hash_seeds _________
 
     def test_collision_resolution_is_deterministic_across_hash_seeds() -> None:
@@ -115,6 +174,8 @@ E        +  where 1 = CompletedProcess(args=['/Users/Zhuanz1/Desktop/code/seawar
 tests/test_tactical_ai.py:1114: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter
+FAILED tests/test_command_delay_communications.py::test_communication_pipeline_is_hash_seed_independent
 FAILED tests/test_tactical_ai.py::test_collision_resolution_is_deterministic_across_hash_seeds
 FAILED tests/test_tactical_ai.py::test_ai_orders_deterministic_across_hash_seeds
 PYTEST_EXIT=1
+ALL_DONE

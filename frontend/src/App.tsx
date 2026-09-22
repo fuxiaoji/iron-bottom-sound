@@ -18,6 +18,7 @@ import {
   suggestedOrders,
   tutorialOpponent,
   fleetView,
+  formationOrders,
   viewGame,
 } from "./api";
 import type { LLMConnectionConfig, SavedGameSummary } from "./api";
@@ -30,6 +31,7 @@ import { HexMoveEditor } from "./HexMoveEditor";
 import { PlanSheet } from "./PlanSheet";
 import { RealisticRulesModal } from "./RealisticRulesModal";
 import { CommandDelayPanel } from "./CommandDelayPanel";
+import { CommandDelayOrders } from "./CommandDelayOrders";
 import { ReplayModal } from "./ReplayModal";
 import { ShipStatusCard } from "./ShipStatusCard";
 import { TutorialPanel } from "./TutorialPanel";
@@ -711,10 +713,15 @@ export default function App() {
     profile = "balanced",
     realisticOverride?: boolean,
     tutorialScript?: "classic_night" | "erma_grand_fleet",
+    commandDelayRequested = false,
   ) => {
     try {
-      if (nextMode === "llm" && !llmModel.trim())
+      // 命令延迟模式下每个编队都由自己的 LLM 代理指挥，因此必须给出模型与密钥，
+      // 否则各编队会退回确定性教条（这本身是合法状态，但必须由此处明确告知）。
+      if ((nextMode === "llm" || commandDelayRequested) && !llmModel.trim())
         throw new Error("请先填写模型名称");
+      if (commandDelayRequested && !llmKey.trim())
+        throw new Error("命令延迟模式需要 LLM 密钥：每个编队都将由自己的 LLM 代理指挥");
       const g = await createGame(
         scenario_id,
         1,
@@ -723,9 +730,10 @@ export default function App() {
         recordReport,
         llmKey || null,
         { allow: researchAllow, handle: researchHandle || null },
-        nextMode === "llm" ? llmConfig : null,
+        nextMode === "llm" || commandDelayRequested ? llmConfig : null,
         realisticOverride,
         tutorialScript,
+        commandDelayRequested,
       );
       setGame(g.game_id);
       setMode(nextMode);
@@ -846,6 +854,17 @@ export default function App() {
       /* 草稿非 JSON 时不写回 */
     }
     setMoveEditorShip(null);
+  };
+  const submitAgentOrders = async () => {
+    if (!game || !view) throw new Error("没有进行中的对局");
+    const { orders } = await formationOrders(game, side);
+    if (orders.length === 0) throw new Error("本侧编队代理尚未给出方案");
+    await submitOrders(game, side, {
+      side,
+      phase: view.phase,
+      formation_movement: orders,
+    });
+    return `已提交 ${orders.length} 个编队的代理方案（仍由引擎逐单校验）。`;
   };
   const changeGuide = async (profile: string) => {
     setGuideProfiles((prev) => ({ ...prev, [side]: profile }));
@@ -1213,6 +1232,16 @@ export default function App() {
         </button>
         <aside>
           {mode === "tutorial" && <TutorialPanel view={view} />}
+          {commandDelay && (
+            <CommandDelayOrders
+              game={game}
+              side={side}
+              turn={view.turn}
+              phase={view.phase}
+              debug={debug}
+              onSubmitAgentOrders={submitAgentOrders}
+            />
+          )}
           {commandDelay && (
             <CommandDelayPanel
               game={game}

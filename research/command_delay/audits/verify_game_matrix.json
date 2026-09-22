@@ -30,7 +30,7 @@
    "steps": 46,
    "tick": 46,
    "turns": 7,
-   "wall_seconds": 25.1,
+   "wall_seconds": 40.2,
    "winner": "allies"
   },
   {
@@ -44,7 +44,7 @@
    "seed": 3,
    "steps": 46,
    "turns": 7,
-   "wall_seconds": 14.8,
+   "wall_seconds": 21.7,
    "winner": "allies"
   },
   {
@@ -70,7 +70,7 @@
    "steps": 46,
    "tick": 46,
    "turns": 7,
-   "wall_seconds": 24.0,
+   "wall_seconds": 35.4,
    "winner": "allies"
   },
   {
@@ -84,7 +84,7 @@
    "seed": 20270830,
    "steps": 46,
    "turns": 7,
-   "wall_seconds": 26.8,
+   "wall_seconds": 39.8,
    "winner": "allies"
   },
   {
@@ -110,7 +110,7 @@
    "steps": 46,
    "tick": 46,
    "turns": 7,
-   "wall_seconds": 27.6,
+   "wall_seconds": 38.4,
    "winner": null
   },
   {
@@ -124,7 +124,7 @@
    "seed": 20270829,
    "steps": 46,
    "turns": 7,
-   "wall_seconds": 2.2,
+   "wall_seconds": 3.1,
    "winner": "allies"
   },
   {
@@ -148,7 +148,7 @@
    "steps": 29,
    "tick": 29,
    "turns": 4,
-   "wall_seconds": 4.0,
+   "wall_seconds": 5.7,
    "winner": "axis"
   },
   {
@@ -162,7 +162,7 @@
    "seed": 3,
    "steps": 29,
    "turns": 4,
-   "wall_seconds": 2.4,
+   "wall_seconds": 3.5,
    "winner": "allies"
   },
   {
@@ -186,7 +186,7 @@
    "steps": 29,
    "tick": 29,
    "turns": 4,
-   "wall_seconds": 4.2,
+   "wall_seconds": 5.7,
    "winner": "axis"
   },
   {
@@ -200,7 +200,7 @@
    "seed": 20270830,
    "steps": 29,
    "turns": 4,
-   "wall_seconds": 7.6,
+   "wall_seconds": 10.8,
    "winner": "allies"
   },
   {
@@ -224,7 +224,7 @@
    "steps": 29,
    "tick": 29,
    "turns": 4,
-   "wall_seconds": 4.2,
+   "wall_seconds": 6.0,
    "winner": "axis"
   },
   {
@@ -238,7 +238,7 @@
    "seed": 20270829,
    "steps": 29,
    "turns": 4,
-   "wall_seconds": 1.2,
+   "wall_seconds": 1.7,
    "winner": "axis"
   },
   {
@@ -264,7 +264,7 @@
    "steps": 81,
    "tick": 81,
    "turns": 12,
-   "wall_seconds": 53.1,
+   "wall_seconds": 74.0,
    "winner": null
   },
   {
@@ -278,7 +278,7 @@
    "seed": 3,
    "steps": 81,
    "turns": 12,
-   "wall_seconds": 28.8,
+   "wall_seconds": 40.5,
    "winner": null
   },
   {
@@ -304,7 +304,7 @@
    "steps": 81,
    "tick": 81,
    "turns": 12,
-   "wall_seconds": 68.8,
+   "wall_seconds": 96.7,
    "winner": null
   },
   {
@@ -318,7 +318,7 @@
    "seed": 20270830,
    "steps": 81,
    "turns": 12,
-   "wall_seconds": 24.8,
+   "wall_seconds": 34.4,
    "winner": null
   },
   {
@@ -343,7 +343,7 @@
    "steps": 81,
    "tick": 81,
    "turns": 12,
-   "wall_seconds": 62.9,
+   "wall_seconds": 90.7,
    "winner": null
   },
   {
@@ -357,7 +357,7 @@
    "seed": 20270829,
    "steps": 81,
    "turns": 12,
-   "wall_seconds": 17.1,
+   "wall_seconds": 23.4,
    "winner": null
   }
  ],

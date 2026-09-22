@@ -489,3 +489,38 @@ button.editor-modal-close:hover{color:#ffe9b0}
 .command-entries{display:flex;gap:6px;flex-wrap:wrap}
 .command-entries button{padding:.5rem .8rem;font-size:.72rem}
 .command-entries button.on{border-color:#d4ad53;background:#604a26;color:#f3e6c4;font-weight:700}
+
+/* 命令延迟 · 下达命令（CommandDelayOrders.tsx）。只描述引擎下发的状态。 */
+.cd-orders{margin:14px 0;padding:14px;border:1px solid #6d5a2f;background:#141f20;text-align:left}
+.cd-orders header{display:block;margin-bottom:10px}
+.cd-orders h2{margin:0 0 4px;font:1.05rem Georgia,serif;color:#e8d8ad}
+.cd-orders header .muted{font-size:.72rem;line-height:1.5;color:#9eaaa6}
+.cd-order-form{display:grid;gap:10px}
+.cd-order-form label{display:grid;gap:5px;color:#c8d2ce;font-size:.74rem}
+.cd-order-form select,.cd-order-form textarea,.cd-order-form input{width:100%;box-sizing:border-box;padding:.5rem .55rem;border:1px solid #52615f;background:#0d181a;color:#e9e2d0;font:inherit;font-size:.76rem}
+.cd-order-form textarea{resize:vertical;line-height:1.6;font-family:inherit}
+.cd-order-actions{display:flex;gap:8px;flex-wrap:wrap}
+.cd-order-actions button{padding:.55rem .9rem;font-size:.76rem}
+.cd-order-actions button:not(.quiet){border-color:#d4b061;background:#4a3a1e;color:#f3e6c4;font-weight:700}
+.cd-order-actions button[disabled]{opacity:.5;cursor:not-allowed}
+.cd-dispatch{margin:10px 0 0;padding:8px;border:1px solid #4d7a5a;background:#15251c;color:#a8d6ae;font-size:.74rem;line-height:1.55}
+.cd-log{margin-top:12px;padding:10px;border:1px solid #3b5350;background:#101d1f}
+.cd-log summary{cursor:pointer;color:#c3b78f;font-size:.76rem}
+.cd-policy{margin:8px 0;font-size:.72rem;line-height:1.55;color:#c8d2ce}
+.cd-policy b{color:#e0bc63}
+.cd-policy em{display:block;margin-top:4px;color:#d9b968;font-style:normal;font-size:.7rem}
+.cd-log-entry{margin:10px 0;padding:9px;border:1px solid #304441;background:#0e191b}
+.cd-log-entry>b{color:#e8d8ad;font-size:.78rem}
+.cd-log-entry>span{display:block;margin:2px 0 6px;font-size:.7rem}
+.cd-log-entry p{margin:0 0 5px;font-size:.72rem;line-height:1.55;color:#c8d2ce}
+.cd-attempt{margin:6px 0;padding:6px 8px;border-left:3px solid #52615f;background:#0b1517}
+.cd-attempt.ok{border-left-color:#4d7a5a}
+.cd-attempt.bad{border-left-color:#8a4a45}
+.cd-attempt.fallback{border-left-color:#8a6a3a}
+.cd-attempt>span{display:block;font-size:.7rem;color:#9eaaa6}
+.cd-attempt>em{display:block;margin:3px 0;color:#e8c58a;font-size:.7rem;font-style:normal}
+.cd-attempt pre{margin:4px 0 0;padding:6px;max-height:170px;overflow:auto;border:1px solid #223230;background:#0a1113;color:#a8c0bb;font-size:.68rem;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.cd-decision{color:#c3b78f!important;font-size:.7rem!important}
+.cd-memory{margin:10px 0;padding:9px;border:1px solid #40504e;background:#132022}
+.cd-memory>b{color:#e0bc63;font-size:.76rem}
+.cd-memory ul{margin:6px 0 0;padding-left:16px;font-size:.7rem;line-height:1.6;color:#c8d2ce}
