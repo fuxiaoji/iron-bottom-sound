@@ -2,7 +2,7 @@
 
 命令延迟模式 v2.2 的测试清单与运行方式。
 
-## 1. 新增测试文件（114 项）
+## 1. 新增测试文件（130 项）
 
 | 文件 | 项数 | 覆盖 |
 |---|---|---|
@@ -12,9 +12,10 @@
 | `tests/test_command_delay_formation_agent.py` | 18 | 决策模型无炮击字段、结构守卫、引擎拒绝原始炮击、指令只重排合法目标（含炮位一致性与真实翻转）、不可见目标回退、本地权重上界、教条的静默性、代理只在枚举动作内移动、纯函数、本地接触来源、失联分支、记账、端到端、跨哈希种子 |
 | `tests/test_command_delay_formation_llm.py` | 16 | 提示词严格等于 §12 清单、不含规则公式、七类拒绝情形、重试、回退并保留审计、逐次尝试记录、录播重放、协议一致性 |
 | `tests/test_command_delay_research_hooks.py` | 13 | 张量块宽度对齐 `TENSOR_SPEC`、策略观察无对方舰、`to_numpy` 形状、两种导出的 `POLICY_SAFE` 标记、文件往返、契约未确认不生效、权重不得凭空声明、账本不改决策、序列化往返 |
+| `tests/test_command_delay_agents_and_memory.py` | 16 | **CD-10**：每编队独立记忆（有界、只含本地材料、渲染时自旧向新裁剪）、自然语言命令经链路发电并落入收件编队记忆、命令正文即代理所读、编队订单来自代理、ProviderPolicy 的请求与解析（stub 客户端，无网络）、无密钥时如实标注教条、每条决策都有可审记录、agent-log 端点不跨阵营 |
 | `tests/test_command_delay_live_surface.py` | 6 | **交付评审补测**：API `/view` 逐次等于 `engine.observe(side)`（整局）、事件端点不返回对方私有事件、中立战报不含指挥链、被搭载编队恒为 DIRECT、`STALE` 即 `LOCAL_AUTONOMY`、链路被切断的编队仍自主打完一局 |
 
-合计 **114** 项，全部 PASS。
+合计 **130** 项，全部 PASS。
 
 ## 2. 运行
 

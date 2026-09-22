@@ -43,6 +43,7 @@ DOCS = (
 )
 
 TEST_FILES = (
+    "test_command_delay_agents_and_memory.py",
     "test_command_delay_live_surface.py",
     "test_command_delay_movement_style.py",
     "test_command_delay_mode_shell.py",
@@ -98,7 +99,8 @@ def main() -> int:
 
     # Evidence that is small and load-bearing: the golden index and the commit list.
     copy(HERE / "golden" / "GOLDEN_INDEX.json", STAGE / "logs" / "GOLDEN_INDEX.json")
-    for extra in ("verify_live.log", "post_fix_tests.log", "post_fix_audits.log"):
+    for extra in ("verify_live.log", "post_fix_tests.log", "post_fix_audits.log",
+                  "cd10_tests.log", "post_cd10_audits.log"):
         source = HERE / "logs" / extra
         if source.exists():
             copy(source, logs / extra)
