@@ -160,6 +160,9 @@ class GameOptions(BaseModel):
     battle_report: bool = False
     # 项目扩展：编队指挥链。默认关闭，保证旧存档和经典模式逐位兼容。
     realistic_command: bool = False
+    # 命令延迟模式（新增模式，不改变 realistic_command 语义；见 command_delay.py）。
+    # 三个互斥入口：Classic(F,F) / Realistic(T,F) / Command Delay(T,T)。
+    command_delay_mode: bool = False
     # 教学脚本只负责可审计的预置/固定事件；所有玩家命令仍走正式引擎。
     tutorial_script: Literal["classic_night", "erma_grand_fleet"] | None = None
 
@@ -632,6 +635,200 @@ class MarkerState(BaseModel):
     contact_truth: Literal["real", "decoy"] | None = None
 
 
+class AuthorityLevel(StrEnum):
+    """Who currently governs a formation's execution (IBS-R-CD-02)."""
+
+    FLEET_DIRECTED = "fleet_directed"
+    DELEGATED = "delegated"
+    LOCAL_AUTONOMY = "local_autonomy"
+
+
+class LinkStatus(StrEnum):
+    """Quality of the command link between fleet and a formation.
+
+    ``DIRECT`` is a same-turn short tactical signal, ``RELAYED`` is a signal that
+    needed a relay or re-encipherment stage, ``STALE`` means only reports older
+    than the current turn are available, and ``BLACKOUT`` means nothing has been
+    delivered.  The turn cost of each stage is an explicit simulation
+    abstraction, never a claimed historical measurement (see
+    ``communications/models.py``).
+    """
+
+    DIRECT = "direct"
+    RELAYED = "relayed"
+    STALE = "stale"
+    BLACKOUT = "blackout"
+
+
+class CommandAuthority(BaseModel):
+    """Fleet-level authority for one side."""
+
+    side: Side
+    level: AuthorityLevel = AuthorityLevel.DELEGATED
+    fleet_commander_ship_id: str | None = None
+    fleet_formation_id: str | None = None
+
+
+class FormationCommandState(BaseModel):
+    """Per-formation slice of the command-delay state machine."""
+
+    formation_id: str
+    commander_ship_id: str | None = None
+    authority: AuthorityLevel = AuthorityLevel.DELEGATED
+    link_status: LinkStatus = LinkStatus.DIRECT
+    # The fleet's knowledge of this formation, as last *reported*.  Filled from
+    # delivered messages; never read from the live formation during an
+    # observation, which is what stops remote exact state leaking upward.
+    reported_turn: int | None = None
+    reported_position: HexCoord | None = None
+    reported_heading: int | None = Field(default=None, ge=1, le=6)
+    reported_speed: int | None = Field(default=None, ge=0, le=8)
+    reported_ship_count: int | None = Field(default=None, ge=0)
+    reported_geometry_kind: FormationGeometryKind | None = None
+    active_order_id: str | None = None
+    last_report_turn: int | None = None
+
+
+class CommandDelayState(BaseModel):
+    """Whole-game state for the Command Delay mode (option-gated, default off)."""
+
+    tick: int = 0
+    authorities: dict[str, CommandAuthority] = Field(default_factory=dict)
+    formations: dict[str, FormationCommandState] = Field(default_factory=dict)
+    # CD-3 fills these; declared here so the data model is one review.
+    messages: list[CommandMessage] = Field(default_factory=list)
+    mission_orders: list[MissionOrder] = Field(default_factory=list)
+    next_sequence: int = 1
+
+
+class MessagePrecedence(StrEnum):
+    """Deterministic queue class for the command circuit (IBS-R-CD-05)."""
+
+    URGENT = "urgent"
+    OPERATIONAL = "operational"
+    ROUTINE = "routine"
+
+
+class CommunicationMedium(StrEnum):
+    """How a signal travels.
+
+    The turn cost of each medium is a *simulation abstraction* constrained by
+    history, not a measured average: same-navy tactical traffic is a handling /
+    encoding / relay / queue problem, never electromagnetic propagation at this
+    time scale.
+    """
+
+    TBS_SHORT = "tbs_short"
+    BLINKER = "blinker"
+    WT_CODED = "wt_coded"
+    WT_REENCIPHER_RELAY = "wt_reencipher_relay"
+    MULTI_HOP = "multi_hop"
+    BLACKOUT = "blackout"
+
+
+class MessageKind(StrEnum):
+    MISSION_ORDER = "mission_order"
+    AMENDMENT = "amendment"
+    SITREP = "sitrep"
+    CONTACT_REPORT = "contact_report"
+    ACKNOWLEDGEMENT = "acknowledgement"
+    CLARIFICATION = "clarification"
+    DEVIATION_REPORT = "deviation_report"
+
+
+class MessageStatus(StrEnum):
+    QUEUED = "queued"
+    DELIVERED = "delivered"
+    DROPPED = "dropped"
+    SUPERSEDED = "superseded"
+
+
+class CommandMessage(BaseModel):
+    """One signal, with issued / delivered / observed turns kept separate."""
+
+    message_id: str
+    side: Side
+    origin: str                      # ship or formation id that drafted it
+    destination: str                 # formation id (fleet traffic is addressed)
+    kind: MessageKind
+    precedence: MessagePrecedence = MessagePrecedence.OPERATIONAL
+    medium: CommunicationMedium = CommunicationMedium.TBS_SHORT
+    issued_turn: int
+    issued_phase: Phase
+    # Abstracted handling budget, in turns, as declared by the medium profile.
+    handling_delay: int = 0
+    relay_hops: int = 0
+    delivered_turn: int | None = None
+    delivered_phase: Phase | None = None
+    observed_turn: int | None = None
+    acknowledged_turn: int | None = None
+    status: MessageStatus = MessageStatus.QUEUED
+    reason: str | None = None
+    payload: dict[str, Any] = Field(default_factory=dict)
+    superseded_by: str | None = None
+
+
+class ContingencyBranch(StrEnum):
+    EXPLICIT_SIGNAL_BRANCH = "explicit_signal_branch"
+    LOCAL_CONDITION_BRANCH = "local_condition_branch"
+    LOSS_OF_COMM_BRANCH = "loss_of_comm_branch"
+
+
+class TargetPriorityDirective(BaseModel):
+    """A bounded priority weight. It can never make an illegal shot legal."""
+
+    formation_id: str
+    source: Literal["FLEET_ORDER", "LOCAL_AGENT", "DOCTRINE"]
+    target_id: str | None = None
+    target_class: str | None = None
+    objective_tag: str | None = None
+    weight: float = Field(default=0.0, ge=-1.0, le=1.0)
+    expires_turn: int | None = None
+    hard_restriction: bool = False
+
+
+class Contingency(BaseModel):
+    """A pre-briefed branch: three kinds only, never an arbitrary if/else."""
+
+    branch: ContingencyBranch
+    description: str = ""
+    trigger_condition: str | None = None
+    trigger_message_kind: MessageKind | None = None
+    requires_local_check: bool = False
+    fallback_task: str | None = None
+
+
+class MissionOrder(BaseModel):
+    """Mission Command order (IBS-R-CD-04), following the battle-plan structure."""
+
+    order_id: str
+    formation_id: str
+    side: Side
+    issued_turn: int
+    issued_by: str
+    mission: str
+    assumptions: list[str] = Field(default_factory=list)
+    trigger_conditions: list[str] = Field(default_factory=list)
+    commander_intent: str = ""
+    task_to_formation: str = ""
+    coordination_measures: list[str] = Field(default_factory=list)
+    operating_area: str | None = None
+    waypoint: HexCoord | None = None
+    deadline_turn: int | None = None
+    target_priority_directives: list[TargetPriorityDirective] = Field(default_factory=list)
+    roe: list[str] = Field(default_factory=list)
+    risk_constraints: list[str] = Field(default_factory=list)
+    report_requirements: list[str] = Field(default_factory=list)
+    communications_plan: list[str] = Field(default_factory=list)
+    commander_location: str | None = None
+    rendezvous: str | None = None
+    loss_of_comm_plan: list[str] = Field(default_factory=list)
+    contingencies: list[Contingency] = Field(default_factory=list)
+    valid_from_turn: int | None = None
+    expiry_turn: int | None = None
+    confirmed_turn: int | None = None
+
+
 class GameState(BaseModel):
     game_id: str
     scenario_id: str
@@ -683,6 +880,9 @@ class GameState(BaseModel):
     )
     winner: Side | None = None
     victory_reason: str | None = None
+    # Command Delay mode state; ``None`` for Classic and Realistic, so those
+    # modes carry no extra state and their replays are unaffected.
+    command_delay: CommandDelayState | None = None
 
 
 class PublicShip(BaseModel):

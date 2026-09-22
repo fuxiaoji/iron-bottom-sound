@@ -1813,6 +1813,13 @@ class IronBottomEngine:
                                     payload={"ship_id": ship.id, "launcher_id": launcher.id},
                                     rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
                                 )
+        if state.options.command_delay_mode:
+            # Command Delay's single per-transition hook: authority refresh, link
+            # status, communication delivery and fleet reports.  Guarded by the
+            # new option, so Classic and Realistic never enter this branch and
+            # their replays are unchanged (CD-0 golden baseline).
+            from .command_delay import on_phase_advanced
+            on_phase_advanced(self, state)
         self._event(state, "phase_changed", f"阶段：{state.phase.value}", rule=self._rule("IBS-R-05", 6, "5.0"))
         return state.events[before:]
 

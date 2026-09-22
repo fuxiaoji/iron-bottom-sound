@@ -245,4 +245,10 @@ def build_initial_state(game_id: str, scenario_id: str, seed: int, options: Game
             raise ValueError(f"Realistic command is not available for scenario {scenario_id}")
         state.formation_resume_phase = state.phase
         state.phase = Phase.FORMATION_SETUP
+    if options.command_delay_mode:
+        # Command Delay is a separate mode built on the Realistic formation core;
+        # it never repurposes realistic_command, and an inconsistent request fails
+        # closed instead of being silently coerced.
+        from .command_delay import validate_mode_options
+        validate_mode_options(options, scenario_id)
     return state

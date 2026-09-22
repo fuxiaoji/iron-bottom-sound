@@ -343,6 +343,7 @@ def import_game(bundle: dict):
         "ai_profile": imported.options.ai_profile,
         "battle_report": imported.options.battle_report,
         "realistic_command": imported.options.realistic_command,
+        "command_delay_mode": imported.options.command_delay_mode,
     }
 
 
@@ -674,6 +675,48 @@ def movement_preview(game_id: str, request: MovementPreviewRequest, x_player_sid
         plan=request.plan,
         hexes=request.hexes or None,
     )
+
+
+@app.get("/rules/command-delay", response_class=PlainTextResponse)
+def command_delay_rules() -> PlainTextResponse:
+    """Serve the Command Delay player rules from their single repository source."""
+    path = ROOT / "docs" / "rules" / "command-delay.md"
+    if not path.exists():
+        raise HTTPException(404, "Command Delay rules are not bundled")
+    return PlainTextResponse(path.read_text(encoding="utf-8"), media_type="text/markdown")
+
+
+@app.get("/games/{game_id}/command-delay/fleet-view")
+def command_delay_fleet_view(
+    game_id: str, x_player_side: Annotated[str | None, Header()] = None,
+):
+    """The fleet commander's plot: exact only for the formation it is embarked in.
+
+    Every other own-side formation is returned as a *report* with its age, and no
+    opposing formation appears at all.  Available only in Command Delay mode.
+    """
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.command_delay_mode:
+        raise HTTPException(409, "Fleet view is available only in command delay mode")
+    from .command_observation import fleet_observation
+    return fleet_observation(engine, state, side)
+
+
+@app.get("/games/{game_id}/command-delay/formation-view/{formation_id}")
+def command_delay_formation_view(
+    game_id: str, formation_id: str, x_player_side: Annotated[str | None, Header()] = None,
+):
+    """One formation's local view for its own agent: local contacts only."""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.command_delay_mode:
+        raise HTTPException(409, "Formation view is available only in command delay mode")
+    formation = state.formations.get(formation_id)
+    if formation is None or formation.side != side:
+        raise HTTPException(404, f"Unknown formation {formation_id}")
+    from .command_observation import formation_observation
+    return formation_observation(engine, state, side, formation_id)
 
 
 @app.post("/games/{game_id}/formation-preview")
