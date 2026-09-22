@@ -534,6 +534,10 @@ class OrderBatch(BaseModel):
     formation_setup: list[FormationSetupOrder] = Field(default_factory=list)
     formation_movement: list[FormationMovementOrder] = Field(default_factory=list)
     formation_speed_decisions: list[FormationSpeedDecision] = Field(default_factory=list)
+    # Command Delay: the only gunnery input a formation agent or a fleet order may
+    # supply.  The engine's selector still generates every GunneryOrder, mount
+    # allocation and firing solution (IBS-R-CD-06).
+    target_priorities: list[TargetPriorityDirective] = Field(default_factory=list)
     confirmation: PhaseConfirmation = Field(default_factory=PhaseConfirmation)
 
     @field_validator("smoke_ships")
@@ -702,6 +706,11 @@ class CommandDelayState(BaseModel):
     # CD-3 fills these; declared here so the data model is one review.
     messages: list[CommandMessage] = Field(default_factory=list)
     mission_orders: list[MissionOrder] = Field(default_factory=list)
+    # Local-agent output, kept for audit and for the gunnery selector.
+    local_directives: list[TargetPriorityDirective] = Field(default_factory=list)
+    # Stored as dumps, not as the agent's own type: this is an audit ledger, and
+    # keeping it schema-free avoids a data-model -> agent import cycle.
+    decisions: list[dict[str, Any]] = Field(default_factory=list)
     next_sequence: int = 1
 
 

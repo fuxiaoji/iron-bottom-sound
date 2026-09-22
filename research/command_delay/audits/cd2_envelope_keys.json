@@ -1,0 +1,68 @@
+{
+ "command_delay_mode": {
+  "occurrences": 7,
+  "paths": [
+   "events[].payload.options.command_delay_mode"
+  ]
+ },
+ "movement_style": {
+  "occurrences": 54,
+  "paths": [
+   "events[].payload.order_batch.formation_movement[].movement_style",
+   "orders.10:movement_planning.allies.formation_movement[].movement_style",
+   "orders.10:movement_planning.axis.formation_movement[].movement_style",
+   "orders.11:movement_planning.allies.formation_movement[].movement_style",
+   "orders.11:movement_planning.axis.formation_movement[].movement_style",
+   "orders.12:movement_planning.allies.formation_movement[].movement_style",
+   "orders.12:movement_planning.axis.formation_movement[].movement_style",
+   "orders.1:movement_planning.allies.formation_movement[].movement_style",
+   "orders.1:movement_planning.axis.formation_movement[].movement_style",
+   "orders.2:movement_planning.allies.formation_movement[].movement_style",
+   "orders.2:movement_planning.axis.formation_movement[].movement_style",
+   "orders.3:movement_planning.allies.formation_movement[].movement_style",
+   "orders.3:movement_planning.axis.formation_movement[].movement_style",
+   "orders.4:movement_planning.allies.formation_movement[].movement_style",
+   "orders.4:movement_planning.axis.formation_movement[].movement_style",
+   "orders.5:movement_planning.allies.formation_movement[].movement_style",
+   "orders.5:movement_planning.axis.formation_movement[].movement_style",
+   "orders.6:movement_planning.allies.formation_movement[].movement_style",
+   "orders.6:movement_planning.axis.formation_movement[].movement_style",
+   "orders.7:movement_planning.allies.formation_movement[].movement_style",
+   "orders.7:movement_planning.axis.formation_movement[].movement_style",
+   "orders.8:movement_planning.allies.formation_movement[].movement_style",
+   "orders.8:movement_planning.axis.formation_movement[].movement_style",
+   "orders.9:movement_planning.allies.formation_movement[].movement_style",
+   "orders.9:movement_planning.axis.formation_movement[].movement_style"
+  ]
+ },
+ "reform_column": {
+  "occurrences": 54,
+  "paths": [
+   "events[].payload.order_batch.formation_movement[].reform_column",
+   "orders.10:movement_planning.allies.formation_movement[].reform_column",
+   "orders.10:movement_planning.axis.formation_movement[].reform_column",
+   "orders.11:movement_planning.allies.formation_movement[].reform_column",
+   "orders.11:movement_planning.axis.formation_movement[].reform_column",
+   "orders.12:movement_planning.allies.formation_movement[].reform_column",
+   "orders.12:movement_planning.axis.formation_movement[].reform_column",
+   "orders.1:movement_planning.allies.formation_movement[].reform_column",
+   "orders.1:movement_planning.axis.formation_movement[].reform_column",
+   "orders.2:movement_planning.allies.formation_movement[].reform_column",
+   "orders.2:movement_planning.axis.formation_movement[].reform_column",
+   "orders.3:movement_planning.allies.formation_movement[].reform_column",
+   "orders.3:movement_planning.axis.formation_movement[].reform_column",
+   "orders.4:movement_planning.allies.formation_movement[].reform_column",
+   "orders.4:movement_planning.axis.formation_movement[].reform_column",
+   "orders.5:movement_planning.allies.formation_movement[].reform_column",
+   "orders.5:movement_planning.axis.formation_movement[].reform_column",
+   "orders.6:movement_planning.allies.formation_movement[].reform_column",
+   "orders.6:movement_planning.axis.formation_movement[].reform_column",
+   "orders.7:movement_planning.allies.formation_movement[].reform_column",
+   "orders.7:movement_planning.axis.formation_movement[].reform_column",
+   "orders.8:movement_planning.allies.formation_movement[].reform_column",
+   "orders.8:movement_planning.axis.formation_movement[].reform_column",
+   "orders.9:movement_planning.allies.formation_movement[].reform_column",
+   "orders.9:movement_planning.axis.formation_movement[].reform_column"
+  ]
+ }
+}

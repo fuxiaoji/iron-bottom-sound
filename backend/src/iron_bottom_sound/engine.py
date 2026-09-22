@@ -1436,6 +1436,22 @@ class IronBottomEngine:
     def validate_orders(self, game_id: str, batch: OrderBatch, _prepared: bool = False) -> ValidationResult:
         state = self.get(game_id)
         errors: list[str] = []
+        if state.options.command_delay_mode and state.phase == Phase.GUNNERY and not _prepared:
+            # Command Delay: the fleet and its formation agents may only publish
+            # target priorities; the engine's own selector builds every gunnery
+            # order.  A raw gunnery order in this mode is refused rather than
+            # ignored, so a formation agent cannot smuggle one through.
+            from .target_priority import auto_gunnery
+            if batch.gunnery:
+                return ValidationResult(valid=False, errors=[
+                    "Command Delay generates gunnery through the engine selector; "
+                    "submit target priority directives instead of gunnery orders"
+                ])
+            return self.validate_orders(
+                game_id,
+                batch.model_copy(update={"gunnery": auto_gunnery(self, state, batch.side)}, deep=True),
+                _prepared=True,
+            )
         if state.options.realistic_command and not _prepared:
             from .realistic_command import expand_movement_orders, prepare_gunnery
             if state.phase == Phase.MOVEMENT_PLANNING:
@@ -1684,13 +1700,23 @@ class IronBottomEngine:
         state = self.get(game_id)
         prepared = batch
         detach_ids: list[str] = []
+        if state.options.command_delay_mode and state.phase == Phase.GUNNERY:
+            from .target_priority import auto_gunnery
+            if batch.gunnery:
+                return ValidationResult(valid=False, errors=[
+                    "Command Delay generates gunnery through the engine selector; "
+                    "submit target priority directives instead of gunnery orders"
+                ])
+            prepared = batch.model_copy(
+                update={"gunnery": auto_gunnery(self, state, batch.side)}, deep=True,
+            )
         if state.options.realistic_command:
             from .realistic_command import expand_movement_orders, prepare_gunnery
             if state.phase == Phase.MOVEMENT_PLANNING:
                 prepared, errors, detach_ids = expand_movement_orders(self, state, batch)
                 if errors:
                     return ValidationResult(valid=False, errors=errors)
-            elif state.phase == Phase.GUNNERY:
+            elif state.phase == Phase.GUNNERY and not state.options.command_delay_mode:
                 prepared = prepare_gunnery(self, state, batch)
         validation = self.validate_orders(game_id, prepared, _prepared=True)
         if not validation.valid:

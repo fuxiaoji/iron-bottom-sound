@@ -821,6 +821,26 @@ class RealisticCommander:
             batch = OrderBatch(side=side, phase=state.phase, torpedoes=torpedoes)
             intents = {order.ship_id: "编队舰执行近距鱼雷齐射" for order in torpedoes}
             return self.tactical._finalize(engine, state, side, batch, intents)
+        if state.options.command_delay_mode and state.phase == Phase.GUNNERY:
+            # Command Delay CD-4: a commander on this mode does not submit gunnery
+            # orders at all.  It publishes target priorities and the engine's own
+            # selector generates every order, mount allocation and firing solution.
+            from .command_delay import gunnery_batch
+            batch = gunnery_batch(state, side)
+            plan = AIPlanSheet(
+                turn=state.turn, phase=state.phase,
+                situation_summary="按任务式命令公布目标优先级，炮位分配交由引擎选择器。",
+                phase_goal="在不越过授权边界的前提下影响火力分配。",
+                unit_intents={
+                    directive.target_id or directive.target_class or "priority": (
+                        f"{directive.source} 优先级 {directive.weight:+.2f}"
+                    )
+                    for directive in batch.target_priorities
+                },
+                orders=batch.model_dump(mode="json"),
+                contingency=["重点目标不可见/不可射时由选择器回退到其余合法目标"],
+            )
+            return plan, batch, []
         if state.phase != Phase.MOVEMENT_PLANNING:
             plan, batch, audits = self.tactical.choose_plan(engine, game_id, side)
             return plan, batch, audits
@@ -894,6 +914,15 @@ class RealisticCommander:
             leader_plan = by_ship.get(leader.id, MovementOrder(ship_id=leader.id, plan="0")).plan
             if search_target is not None:
                 leader_plan = self._search_plan(engine, state, leader, search_target)
+            if state.options.command_delay_mode:
+                # Command Delay CD-4: the plan is whatever this formation's local
+                # agent selected from the engine's enumerated actions.  It is not
+                # re-derived here, and the engine still validates it below, so a
+                # bad agent choice fails loudly instead of being silently fixed.
+                from .command_delay import formation_plan
+                agent_plan = formation_plan(state, formation.id)
+                if agent_plan:
+                    leader_plan = agent_plan
             leader_commands = engine.movement_commands(MovementOrder(ship_id=leader.id, plan=leader_plan))
             if any(command.endswith("120") for command in leader_commands):
                 # A 120-degree in-place impulse cannot propagate down a spaced

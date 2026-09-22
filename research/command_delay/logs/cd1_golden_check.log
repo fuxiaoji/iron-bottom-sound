@@ -1,0 +1,61 @@
+[check] classic_s01          OK  (envelope keys added: 0)
+[check] classic_s03          OK  (envelope keys added: 0)
+[check] classic_em01         OK  (envelope keys added: 0)
+[check] realistic_s01        OK  (envelope keys added: 26)
+[check] realistic_s03        OK  (envelope keys added: 18)
+[check] realistic_em01       OK  (envelope keys added: 46)
+[check] realistic_s03_seed9  OK  (envelope keys added: 18)
+
+ENVELOPE_KEYS_ADDED (additive only, not drift):
+  events[].payload.order_batch.formation_movement[].movement_style  x4
+  events[].payload.order_batch.formation_movement[].reform_column  x4
+  orders.10:movement_planning.allies.formation_movement[].movement_style  x1
+  orders.10:movement_planning.allies.formation_movement[].reform_column  x1
+  orders.10:movement_planning.axis.formation_movement[].movement_style  x1
+  orders.10:movement_planning.axis.formation_movement[].reform_column  x1
+  orders.11:movement_planning.allies.formation_movement[].movement_style  x1
+  orders.11:movement_planning.allies.formation_movement[].reform_column  x1
+  orders.11:movement_planning.axis.formation_movement[].movement_style  x1
+  orders.11:movement_planning.axis.formation_movement[].reform_column  x1
+  orders.12:movement_planning.allies.formation_movement[].movement_style  x1
+  orders.12:movement_planning.allies.formation_movement[].reform_column  x1
+  orders.12:movement_planning.axis.formation_movement[].movement_style  x1
+  orders.12:movement_planning.axis.formation_movement[].reform_column  x1
+  orders.1:movement_planning.allies.formation_movement[].movement_style  x2
+  orders.1:movement_planning.allies.formation_movement[].reform_column  x2
+  orders.1:movement_planning.axis.formation_movement[].movement_style  x2
+  orders.1:movement_planning.axis.formation_movement[].reform_column  x2
+  orders.2:movement_planning.allies.formation_movement[].movement_style  x4
+  orders.2:movement_planning.allies.formation_movement[].reform_column  x4
+  orders.2:movement_planning.axis.formation_movement[].movement_style  x4
+  orders.2:movement_planning.axis.formation_movement[].reform_column  x4
+  orders.3:movement_planning.allies.formation_movement[].movement_style  x4
+  orders.3:movement_planning.allies.formation_movement[].reform_column  x4
+  orders.3:movement_planning.axis.formation_movement[].movement_style  x4
+  orders.3:movement_planning.axis.formation_movement[].reform_column  x4
+  orders.4:movement_planning.allies.formation_movement[].movement_style  x4
+  orders.4:movement_planning.allies.formation_movement[].reform_column  x4
+  orders.4:movement_planning.axis.formation_movement[].movement_style  x4
+  orders.4:movement_planning.axis.formation_movement[].reform_column  x4
+  orders.5:movement_planning.allies.formation_movement[].movement_style  x2
+  orders.5:movement_planning.allies.formation_movement[].reform_column  x2
+  orders.5:movement_planning.axis.formation_movement[].movement_style  x2
+  orders.5:movement_planning.axis.formation_movement[].reform_column  x2
+  orders.6:movement_planning.allies.formation_movement[].movement_style  x2
+  orders.6:movement_planning.allies.formation_movement[].reform_column  x2
+  orders.6:movement_planning.axis.formation_movement[].movement_style  x2
+  orders.6:movement_planning.axis.formation_movement[].reform_column  x2
+  orders.7:movement_planning.allies.formation_movement[].movement_style  x2
+  orders.7:movement_planning.allies.formation_movement[].reform_column  x2
+  orders.7:movement_planning.axis.formation_movement[].movement_style  x2
+  orders.7:movement_planning.axis.formation_movement[].reform_column  x2
+  orders.8:movement_planning.allies.formation_movement[].movement_style  x1
+  orders.8:movement_planning.allies.formation_movement[].reform_column  x1
+  orders.8:movement_planning.axis.formation_movement[].movement_style  x1
+  orders.8:movement_planning.axis.formation_movement[].reform_column  x1
+  orders.9:movement_planning.allies.formation_movement[].movement_style  x1
+  orders.9:movement_planning.allies.formation_movement[].reform_column  x1
+  orders.9:movement_planning.axis.formation_movement[].movement_style  x1
+  orders.9:movement_planning.axis.formation_movement[].reform_column  x1
+
+GOLDEN_REPLAY = PASS

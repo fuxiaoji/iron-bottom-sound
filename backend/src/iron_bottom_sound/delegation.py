@@ -134,6 +134,28 @@ def mission_order_template(
     )
 
 
+def standing_plan(
+    *, formation_id: str, side: Side, turn: int, issued_by: str = "",
+) -> MissionOrder:
+    """The pre-briefed plan a commander executes before any order arrives.
+
+    Doctrine step 2 is "latest valid order"; with none, the fallback is the
+    pre-briefed loss-of-communication plan, not a licence to improvise.  The
+    returned order is deliberately complete so the same structural validation and
+    the same contingency evaluator apply as to a real order.
+    """
+    return mission_order_template(
+        order_id=f"standing-{formation_id}",
+        formation_id=formation_id,
+        side=side,
+        turn=turn,
+        issued_by=issued_by,
+        mission="尚无上级命令：继续当前任务并按预令行动",
+        intent="在收到命令前不进行决定性交战，保持与主力相对位置",
+        task="维持队形、保持通信、报告接触",
+    )
+
+
 def default_contingencies() -> list[Contingency]:
     """The three branch kinds, one each, as the template's standing set."""
     return [

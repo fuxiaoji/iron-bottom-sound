@@ -1,0 +1,22 @@
+{
+ "command_delay_mode": {
+  "example": "events[].payload.options.command_delay_mode",
+  "n_paths": 1,
+  "occurrences": 7
+ },
+ "movement_style": {
+  "example": "events[].payload.order_batch.formation_movement[].movement_style",
+  "n_paths": 25,
+  "occurrences": 54
+ },
+ "reform_column": {
+  "example": "events[].payload.order_batch.formation_movement[].reform_column",
+  "n_paths": 25,
+  "occurrences": 54
+ },
+ "target_priorities": {
+  "example": "events[].payload.order_batch.target_priorities",
+  "n_paths": 99,
+  "occurrences": 391
+ }
+}

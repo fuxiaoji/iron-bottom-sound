@@ -62,8 +62,10 @@ from .models import (
     LinkStatus,
     MessageStatus,
     MissionOrder,
+    OrderBatch,
     Phase,
     Side,
+    TargetPriorityDirective,
 )
 from .communications.queue import PHASE_RANK
 from .realistic_command import MAX_FORMATIONS_PER_SIDE, SUPPORTED_SCENARIOS
@@ -582,6 +584,10 @@ def on_phase_advanced(engine: "IronBottomEngine", state: GameState) -> None:
         # formation that does not already hold one.
         for side in Side:
             issue_mission_orders(engine, state, side)
+    if state.phase == Phase.MOVEMENT_PLANNING:
+        # Every formation's local agent decides for this turn, from its own local
+        # view only.  The gunnery phase later consumes only the priority part.
+        run_formation_agents(engine, state)
     refresh_link_status(state)
     _prune_messages(state)
     if state.phase == Phase.REINFORCEMENT:
@@ -653,6 +659,92 @@ def link_summary(state: GameState, side: Side | None = None) -> dict[str, Any]:
             if formation_id in own
         },
     }
+
+
+def gunnery_batch(state: GameState, side: Side) -> OrderBatch:
+    """The GUNNERY-phase batch a Command Delay commander may submit.
+
+    Carries **only** target priority directives — the fleet's from its mission
+    orders plus the local agents' bounded adjustments.  The engine's selector
+    turns them into final gunnery orders in ``submit_orders``; nothing on this
+    path can name a mount or a firing solution.
+    """
+    mode = state_for(state)
+    directives: list[TargetPriorityDirective] = []
+    for order in mode.mission_orders:
+        if order.side is side and order.confirmed_turn is not None:
+            directives.extend(order.target_priority_directives)
+    directives.extend(mode.local_directives)
+    return OrderBatch(side=side, phase=state.phase, target_priorities=directives)
+
+
+def run_formation_agents(engine: "IronBottomEngine", state: GameState) -> list[dict[str, Any]]:
+    """Run every formation's local agent for the current turn and record it.
+
+    Each agent sees only its own ``FormationObservation``.  Its decision is stored
+    for audit, its movement plan is offered to the commander, and its bounded
+    priority adjustments are collected for the gunnery selector — nothing else.
+    The decision is stored as a dump because the ledger is an audit record, not a
+    live object graph.
+    """
+    from .command_observation import formation_observation
+    from .formation_agents import DeterministicFormationAgent
+
+    mode = state_for(state)
+    agent = DeterministicFormationAgent()
+    decisions: list[dict[str, Any]] = []
+    mode.local_directives = []
+    for side in Side:
+        for formation in active_formations(state, side):
+            observation = formation_observation(engine, state, side, formation.id)
+            order = active_mission_order(state, formation.id)
+            decision = agent.act(
+                observation,
+                mission_order=order,
+                comm_state=observation.comm_state,
+                legal_action_mask=observation.legal_formation_actions,
+                target_priority_space=observation.legal_target_priority_options,
+            )
+            mode.decisions.append(decision.model_dump(mode="json"))
+            decisions.append(decision)
+            mode.local_directives.extend(
+                adjustment.as_directive(decision.formation_id)
+                for adjustment in decision.target_priority_adjustments
+            )
+            engine._event(
+                state, "formation_agent_decision",
+                f"{formation.name} 本地代理决策：{decision.rationale_summary}",
+                payload={
+                    "secret_side": side.value,
+                    "formation_id": formation.id,
+                    "agent": agent.name,
+                    "turn": state.turn,
+                    "selected_movement_action_id": decision.selected_movement_action_id,
+                    "selected_movement_plan": decision.selected_movement_plan,
+                    "selected_contingency_branch": decision.selected_contingency_branch,
+                    "report_actions": decision.report_actions,
+                    "adjustments": [
+                        item.model_dump(mode="json")
+                        for item in decision.target_priority_adjustments
+                    ],
+                    "acknowledgement": decision.acknowledgement,
+                    "audit": decision.audit,
+                },
+                rule=engine._rule("IBS-R-CD-02", None, "命令延迟：编队本地代理"),
+            )
+    return decisions
+
+
+def formation_plan(state: GameState, formation_id: str) -> str | None:
+    """The plan the formation's local agent selected for the current turn."""
+    mode = state_for(state)
+    for record in reversed(mode.decisions):
+        if record.get("formation_id") != formation_id:
+            continue
+        if record.get("turn") != state.turn:
+            continue
+        return record.get("selected_movement_plan")
+    return None
 
 
 def authority_for(state: GameState, side: Side) -> CommandAuthority | None:
