@@ -36,24 +36,43 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from . import communications, delegation
+from .communications import (
+    ChannelQueue,
+    CommandMessage,  # noqa: F401  (re-exported for callers of this module)
+    CommunicationMedium,
+    MessageKind,
+    MessagePrecedence,
+    RouteDecision,
+    delay_for,
+    drain,
+    schedule,
+    select_medium,
+)
 from .models import (
     AuthorityLevel,
     CommandAuthority,
     CommandDelayState,
     FormationCommandState,
+    FormationGeometryKind,
     FormationState,
     GameOptions,
     GameState,
+    HexCoord,
     LinkStatus,
+    MessageStatus,
+    MissionOrder,
     Phase,
     Side,
 )
+from .communications.queue import PHASE_RANK
 from .realistic_command import MAX_FORMATIONS_PER_SIDE, SUPPORTED_SCENARIOS
 
 if TYPE_CHECKING:
     from .engine import IronBottomEngine
 
 RULE_AUTHORITY = "IBS-R-CD-02"
+RULE_COMMS = "IBS-R-CD-03"
 
 
 def enabled(state: GameState) -> bool:
@@ -183,6 +202,25 @@ def _write_report(state: GameState, formation: FormationState) -> FormationComma
     if entry is None:
         entry = FormationCommandState(formation_id=formation.id)
         mode.formations[formation.id] = entry
+    snapshot = report_snapshot(state, formation)
+    entry.reported_turn = state.turn
+    entry.last_report_turn = state.turn
+    entry.reported_position = snapshot["guide_position"]
+    entry.reported_heading = snapshot["guide_heading"]
+    entry.reported_speed = snapshot["guide_speed"]
+    entry.reported_ship_count = snapshot["ship_count"]
+    entry.reported_geometry_kind = snapshot["geometry_kind"]
+    entry.commander_ship_id = formation.flagship_id
+    return entry
+
+
+def report_snapshot(state: GameState, formation: FormationState) -> dict[str, Any]:
+    """The exact content a sitrep may carry — taken at *drafting* time.
+
+    A delayed report must describe the world as it was when it was written, so
+    the snapshot is captured here and travels inside the message payload; the
+    fleet's copy is never refreshed from live state on delivery.
+    """
     members = [
         state.ships[ship_id] for ship_id in formation.ship_ids
         if ship_id in state.ships
@@ -193,47 +231,343 @@ def _write_report(state: GameState, formation: FormationState) -> FormationComma
     guide = state.ships.get(formation.leader_id)
     if guide is None or guide.position is None or guide.sunk:
         guide = members[0] if members else None
-    entry.reported_turn = state.turn
-    entry.last_report_turn = state.turn
-    entry.reported_position = guide.position if guide is not None else None
-    entry.reported_heading = guide.heading if guide is not None else None
-    entry.reported_speed = guide.current_speed if guide is not None else None
-    entry.reported_ship_count = len(members)
-    entry.reported_geometry_kind = formation.geometry_kind
-    entry.commander_ship_id = formation.flagship_id
-    return entry
+    return {
+        "formation_id": formation.id,
+        "guide_position": guide.position if guide is not None else None,
+        "guide_heading": guide.heading if guide is not None else None,
+        "guide_speed": guide.current_speed if guide is not None else None,
+        "ship_count": len(members),
+        "geometry_kind": formation.geometry_kind,
+        "hull_fraction": round(delegation.own_hull_fraction(None, state, formation), 3),
+        "contacts": 0,
+    }
 
 
 def refresh_link_status(state: GameState) -> None:
-    """Recompute each formation's link status.
+    """Derive each formation's link status from the delivered traffic ledger.
 
-    CD-2 declares every link ``DIRECT``: the mode shell deliberately models no
-    delay yet, and CD-3 is the only stage allowed to make this depend on the
-    communication ledger.  Keeping the assignment behind a single function is
-    what lets the CD-2 and CD-3 behaviour be compared directly.
+    The status is a function of how old the fleet's newest *delivered* report
+    from that formation is, so it can only improve by actually receiving
+    traffic:
+
+    ``DIRECT``    a report delivered this turn;
+    ``RELAYED``   the newest report is one turn old (it needed a relay stage);
+    ``STALE``     two or more turns old;
+    ``BLACKOUT``  nothing has ever been delivered.
     """
     mode = state_for(state)
     for formation_id in sorted(mode.formations):
         entry = mode.formations[formation_id]
-        entry.link_status = LinkStatus.DIRECT
         formation = state.formations.get(formation_id)
         if formation is None or formation.status == "dissolved":
             entry.link_status = LinkStatus.BLACKOUT
             continue
+        age = (
+            None if entry.reported_turn is None
+            else max(0, state.turn - entry.reported_turn)
+        )
+        if age is None:
+            entry.link_status = LinkStatus.BLACKOUT
+        elif age == 0:
+            entry.link_status = LinkStatus.DIRECT
+        elif age == 1:
+            entry.link_status = LinkStatus.RELAYED
+        else:
+            entry.link_status = LinkStatus.STALE
         authority = mode.authorities.get(formation.side.value)
         embarked = authority is not None and authority.fleet_formation_id == formation_id
-        entry.authority = (
-            AuthorityLevel.FLEET_DIRECTED if embarked else AuthorityLevel.DELEGATED
+        base = AuthorityLevel.FLEET_DIRECTED if embarked else AuthorityLevel.DELEGATED
+        if entry.link_status == LinkStatus.BLACKOUT and not embarked:
+            # A formation the fleet can no longer reach falls back to the
+            # pre-briefed loss-of-communication plan and runs on local autonomy.
+            base = AuthorityLevel.LOCAL_AUTONOMY
+        entry.authority = base
+
+
+# --------------------------------------------------------------------------- messages
+
+def _queues(state: GameState) -> dict[CommunicationMedium, ChannelQueue]:
+    """Fresh per-turn channel slots, one queue per medium."""
+    return {medium: schedule(medium) for medium in CommunicationMedium}
+
+
+def send(
+    engine: "IronBottomEngine", state: GameState, message: CommandMessage,
+) -> CommandMessage:
+    """Route one drafted message and place it in the queue.
+
+    Routing picks the medium from the link picture (distance and line of sight);
+    the handling delay then comes from the medium profile.  Nothing here invents
+    a probability: a message is delivered when its turn budget and a channel slot
+    are both available, or dropped when its TTL expires.
+    """
+    mode = state_for(state)
+    message.message_id = message.message_id or f"MSG-{mode.next_sequence:05d}"
+    mode.next_sequence += 1
+    mode.messages.append(message)
+    engine._event(
+        state, "command_message_queued",
+        f"{message.medium.value} 报文 {message.message_id}（{message.kind.value}）已发出",
+        payload={
+            "secret_side": message.side.value,
+            "message_id": message.message_id,
+            "kind": message.kind.value,
+            "precedence": message.precedence.value,
+            "medium": message.medium.value,
+            "origin": message.origin,
+            "destination": message.destination,
+            "handling_delay": message.handling_delay,
+            "relay_hops": message.relay_hops,
+            "issued_turn": message.issued_turn,
+            "issued_phase": message.issued_phase.value,
+        },
+        rule=engine._rule(RULE_COMMS, None, "命令延迟：通信处理链"),
+    )
+    return message
+
+
+def route(
+    engine: "IronBottomEngine", state: GameState, origin: FormationState, destination: FormationState,
+) -> RouteDecision:
+    """Select a medium between two formations from the scenario's own horizon.
+
+    The direct-signal horizon reuses the scenario's optical visibility rather
+    than inventing a second range constant: the scenario already declares how far
+    its lookouts see, and a direct tactical circuit is bounded by the same
+    horizon.  Line of sight between guides is the engine's own visibility rule.
+    """
+    origin_guide = state.ships.get(origin.leader_id)
+    destination_guide = state.ships.get(destination.leader_id)
+    if (
+        origin_guide is None or destination_guide is None
+        or origin_guide.position is None or destination_guide.position is None
+    ):
+        return RouteDecision(CommunicationMedium.BLACKOUT, 0, "a formation has no guide afloat")
+    distance = origin_guide.position.distance(destination_guide.position)
+    line_of_sight = engine._can_see(state, destination_guide, origin_guide)
+    same_command = origin.id == destination.id
+    return select_medium(
+        distance=distance,
+        tactical_range=int(state.visibility[origin.side.value]),
+        line_of_sight=line_of_sight,
+        coded_available=True,
+        relay_available=not same_command,
+    )
+
+
+def draft_reports(
+    engine: "IronBottomEngine", state: GameState,
+) -> list[CommandMessage]:
+    """Every active formation drafts its own sitrep for the fleet.
+
+    Drafted once per phase boundary; the snapshot inside the payload is the
+    world at drafting time.  A formation with local contacts drafts a contact
+    report at urgent precedence instead, which is why precedence matters to the
+    queue.
+    """
+    mode = state_for(state)
+    drafted: list[CommandMessage] = []
+    for side in Side:
+        authority = mode.authorities.get(side.value)
+        fleet_id = authority.fleet_formation_id if authority else None
+        fleet_formation = state.formations.get(fleet_id) if fleet_id else None
+        if fleet_formation is None:
+            continue
+        for formation in active_formations(state, side):
+            if formation.id == fleet_id:
+                continue  # the commander is embarked; no report is needed
+            decision = route(engine, state, formation, fleet_formation)
+            snapshot = report_snapshot(state, formation)
+            contacts = _formation_contact_count(engine, state, formation)
+            snapshot["contacts"] = contacts
+            kind = MessageKind.CONTACT_REPORT if contacts else MessageKind.SITREP
+            precedence = (
+                MessagePrecedence.URGENT if contacts else MessagePrecedence.ROUTINE
+            )
+            drafted.append(send(engine, state, CommandMessage(
+                message_id="",
+                side=side,
+                origin=formation.flagship_id,
+                destination=formation.id,
+                kind=kind,
+                precedence=precedence,
+                medium=decision.medium,
+                issued_turn=state.turn,
+                issued_phase=state.phase,
+                handling_delay=delay_for(
+                    decision.medium, kind, decision.relay_hops
+                ),
+                relay_hops=decision.relay_hops,
+                reason=decision.reason,
+                payload={"report": _encode_snapshot(snapshot)},
+            )))
+    return drafted
+
+
+def _encode_snapshot(snapshot: dict[str, Any]) -> dict[str, Any]:
+    """JSON-safe form of a report snapshot (a HexCoord becomes its label)."""
+    encoded = dict(snapshot)
+    position = encoded.get("guide_position")
+    if position is not None:
+        encoded["guide_position"] = {
+            "label": position.label, "q": position.q, "r": position.r
+        }
+    geometry = encoded.get("geometry_kind")
+    if geometry is not None:
+        encoded["geometry_kind"] = geometry.value
+    return encoded
+
+
+def _decode_snapshot(payload: dict[str, Any]) -> dict[str, Any]:
+    snapshot = dict(payload.get("report") or {})
+    position = snapshot.get("guide_position")
+    if isinstance(position, dict):
+        snapshot["guide_position"] = HexCoord(q=position["q"], r=position["r"])
+    geometry = snapshot.get("geometry_kind")
+    if isinstance(geometry, str):
+        snapshot["geometry_kind"] = FormationGeometryKind(geometry)
+    return snapshot
+
+
+def _formation_contact_count(
+    engine: "IronBottomEngine", state: GameState, formation: FormationState,
+) -> int:
+    """Contacts this formation's own ships can see (never the side's)."""
+    from .command_observation import visible_enemies
+
+    positions = [
+        state.ships[ship_id].position for ship_id in formation.ship_ids
+        if ship_id in state.ships and state.ships[ship_id].position is not None
+        and state.ships[ship_id].command_status == "attached"
+        and not state.ships[ship_id].sunk
+    ]
+    if not positions:
+        return 0
+    return len(visible_enemies(engine, state, formation.side, positions))
+
+
+def deliver_due(engine: "IronBottomEngine", state: GameState) -> dict[str, list[str]]:
+    """Drain the channels for this (turn, phase) and apply every delivery."""
+    mode = state_for(state)
+    outcome = drain(
+        mode.messages, turn=state.turn, phase=state.phase, queues=_queues(state),
+    )
+    applied = {"delivered": [], "waiting": [], "dropped": [], "superseded": []}
+    for message in outcome.delivered:
+        applied["delivered"].append(message.message_id)
+        _apply_delivery(engine, state, message)
+        engine._event(
+            state, "command_message_delivered",
+            f"报文 {message.message_id}（{message.kind.value}）送达 {message.destination}",
+            payload={
+                "secret_side": message.side.value,
+                "message_id": message.message_id,
+                "kind": message.kind.value,
+                "medium": message.medium.value,
+                "origin": message.origin,
+                "destination": message.destination,
+                "issued_turn": message.issued_turn,
+                "issued_phase": message.issued_phase.value,
+                "delivered_turn": message.delivered_turn,
+                "delivered_phase": (
+                    message.delivered_phase.value if message.delivered_phase else None
+                ),
+                "observed_turn": message.observed_turn,
+            },
+            rule=engine._rule(RULE_COMMS, None, "命令延迟：通信处理链"),
         )
+    for message in outcome.waiting:
+        applied["waiting"].append(message.message_id)
+    for message in outcome.dropped:
+        applied["dropped"].append(message.message_id)
+        engine._event(
+            state, "command_message_dropped",
+            f"报文 {message.message_id} 因 {message.reason} 丢弃",
+            payload={
+                "secret_side": message.side.value,
+                "message_id": message.message_id,
+                "reason": message.reason,
+                "issued_turn": message.issued_turn,
+            },
+            rule=engine._rule(RULE_COMMS, None, "命令延迟：通信拥塞"),
+        )
+    return applied
+
+
+def _apply_delivery(
+    engine: "IronBottomEngine", state: GameState, message: CommandMessage,
+) -> None:
+    """Fold one delivered message into the fleet's knowledge or the order book."""
+    mode = state_for(state)
+    if message.kind in (MessageKind.SITREP, MessageKind.CONTACT_REPORT):
+        entry = mode.formations.get(message.destination)
+        if entry is None:
+            entry = FormationCommandState(formation_id=message.destination)
+            mode.formations[message.destination] = entry
+        # Flights can cross: a same-turn TBS report overtakes a coded one sent
+        # earlier.  Arrival order is therefore not freshness order, and a report
+        # must never overwrite knowledge that is newer *by issue time* — the same
+        # rule the order book applies.  Phase rank breaks ties inside one turn,
+        # because a later phase is drawn from a later world.
+        if entry.reported_turn is not None and (
+            message.issued_turn, PHASE_RANK.get(message.issued_phase, 0)
+        ) < (
+            entry.reported_turn, PHASE_RANK.get(entry.reported_phase, 0)
+        ):
+            message.status = MessageStatus.SUPERSEDED
+            message.reason = (
+                f"overtaken by a newer report already held from turn {entry.reported_turn}"
+            )
+            return
+        snapshot = _decode_snapshot(message.payload)
+        entry.reported_turn = message.issued_turn
+        entry.reported_phase = message.issued_phase
+        entry.last_report_turn = message.delivered_turn
+        entry.reported_position = snapshot.get("guide_position")
+        entry.reported_heading = snapshot.get("guide_heading")
+        entry.reported_speed = snapshot.get("guide_speed")
+        entry.reported_ship_count = snapshot.get("ship_count")
+        entry.reported_geometry_kind = snapshot.get("geometry_kind")
+        return
+    if message.kind in (MessageKind.MISSION_ORDER, MessageKind.AMENDMENT):
+        order_id = message.payload.get("order_id")
+        order = next(
+            (item for item in mode.mission_orders if item.order_id == order_id), None
+        )
+        if order is None:
+            return
+        entry = mode.formations.get(order.formation_id)
+        if entry is None:
+            entry = FormationCommandState(formation_id=order.formation_id)
+            mode.formations[order.formation_id] = entry
+        # A late order may not overwrite a newer acknowledged one: compare issue
+        # order, not arrival order, and record the refusal.
+        current = next(
+            (item for item in mode.mission_orders if item.order_id == entry.active_order_id),
+            None,
+        )
+        if current is not None and current.issued_turn > order.issued_turn:
+            message.status = MessageStatus.SUPERSEDED
+            message.reason = (
+                f"superseded by {current.order_id} issued on turn {current.issued_turn}"
+            )
+            message.superseded_by = current.order_id
+            return
+        order.confirmed_turn = message.delivered_turn
+        entry.active_order_id = order.order_id
+        return
+    if message.kind == MessageKind.ACKNOWLEDGEMENT:
+        return
 
 
 def on_phase_advanced(engine: "IronBottomEngine", state: GameState) -> None:
     """The single per-phase hook; inert unless the mode is on.
 
     Called at the end of every ``engine.advance`` transition, which covers phase
-    boundaries and the turn rollover in one place.  It both lazily initialises
-    (so a game saved before the option existed still boots) and refreshes
-    authority, link status and reports.
+    boundaries and the turn rollover in one place.  Order of operations is the
+    communication pipeline itself: deliver whatever the channels are carrying,
+    let every formation draft its own report, then re-derive link status from the
+    delivered ledger — so a link can only improve by receiving traffic.
     """
     if not enabled(state):
         return
@@ -241,10 +575,15 @@ def on_phase_advanced(engine: "IronBottomEngine", state: GameState) -> None:
     if not mode.formations:
         initialise(engine, state)
     mode.tick += 1
+    deliver_due(engine, state)
+    draft_reports(engine, state)
+    if state.phase == Phase.REINFORCEMENT:
+        # The fleet's staff work for the new turn: one standing mission order per
+        # formation that does not already hold one.
+        for side in Side:
+            issue_mission_orders(engine, state, side)
     refresh_link_status(state)
-    for side in Side:
-        for formation in active_formations(state, side):
-            _write_report(state, formation)
+    _prune_messages(state)
     if state.phase == Phase.REINFORCEMENT:
         # Emitted per side with ``secret_side`` set: the authority table names
         # formations, links and commanders, and the engine filters events by
@@ -262,6 +601,21 @@ def on_phase_advanced(engine: "IronBottomEngine", state: GameState) -> None:
                 },
                 rule=engine._rule(RULE_AUTHORITY, None, "命令延迟：权限状态"),
             )
+
+
+def _prune_messages(state: GameState, keep: int = 400) -> None:
+    """Bound the ledger so a long game cannot grow without limit.
+
+    Delivered and dropped messages are the audit trail, so the most recent
+    ``keep`` are retained; nothing that is still queued is ever pruned.
+    """
+    mode = state_for(state)
+    if len(mode.messages) <= keep:
+        return
+    pending = [item for item in mode.messages if item.status == MessageStatus.QUEUED]
+    settled = [item for item in mode.messages if item.status != MessageStatus.QUEUED]
+    keep_settled = max(0, keep - len(pending))
+    mode.messages = settled[-keep_settled:] + pending if keep_settled else pending
 
 
 def link_summary(state: GameState, side: Side | None = None) -> dict[str, Any]:
@@ -303,6 +657,96 @@ def link_summary(state: GameState, side: Side | None = None) -> dict[str, Any]:
 
 def authority_for(state: GameState, side: Side) -> CommandAuthority | None:
     return state_for(state).authorities.get(side.value)
+
+
+def issue_mission_orders(
+    engine: "IronBottomEngine", state: GameState, side: Side,
+) -> list[MissionOrder]:
+    """Draft one MissionOrder per active formation, excluding the fleet's own.
+
+    Deterministic and structural: the fleet commander states the task, the intent
+    and the coordination measures; the *how* is left to the formation.  The order
+    is sent as a message, so it is subject to the same routing and queue as
+    everything else — a formation the fleet cannot reach never receives it.
+    """
+    mode = state_for(state)
+    authority = mode.authorities.get(side.value)
+    if authority is None or authority.fleet_formation_id is None:
+        return []
+    fleet_formation = state.formations[authority.fleet_formation_id]
+    issued: list[MissionOrder] = []
+    for formation in active_formations(state, side):
+        if formation.id == fleet_formation.id:
+            continue
+        if any(
+            order.formation_id == formation.id and order.expiry_turn is None
+            for order in mode.mission_orders
+        ):
+            continue  # a standing order is already in force for this formation
+        order = delegation.mission_order_template(
+            order_id=f"{side.value}-order-{state.turn}-{formation.id}",
+            formation_id=formation.id,
+            side=side,
+            turn=state.turn,
+            issued_by=authority.fleet_commander_ship_id or fleet_formation.flagship_id,
+            mission=(
+                f"维持与主力相对位置，并在第 {state.turn} 回合内拦截进入责任区的敌舰"
+            ),
+            intent="阻止敌方巡洋舰群抵达炮击区",
+            task=f"{formation.name} 保持与主力相对位置；发现敌轻型兵力时可脱离编队侧面接敌",
+        )
+        errors = delegation.validate_mission_order(order)
+        if errors:
+            engine._event(
+                state, "mission_order_rejected",
+                f"{formation.name} 的作战命令不完整，未发出",
+                payload={
+                    "secret_side": side.value,
+                    "formation_id": formation.id,
+                    "errors": errors,
+                },
+                rule=engine._rule("IBS-R-CD-04", None, "命令延迟：任务式命令"),
+            )
+            continue
+        mode.mission_orders.append(order)
+        decision = route(engine, state, fleet_formation, formation)
+        kind = MessageKind.MISSION_ORDER
+        send(engine, state, CommandMessage(
+            message_id="",
+            side=side,
+            origin=order.issued_by,
+            destination=formation.id,
+            kind=kind,
+            precedence=MessagePrecedence.OPERATIONAL,
+            medium=decision.medium,
+            issued_turn=state.turn,
+            issued_phase=state.phase,
+            handling_delay=delay_for(decision.medium, kind, decision.relay_hops),
+            relay_hops=decision.relay_hops,
+            reason=decision.reason,
+            payload={"order_id": order.order_id},
+        ))
+        issued.append(order)
+    return issued
+
+
+def active_mission_order(state: GameState, formation_id: str) -> MissionOrder | None:
+    """The newest confirmed order for one formation, if any."""
+    mode = state_for(state)
+    entry = mode.formations.get(formation_id)
+    orders = [
+        order for order in mode.mission_orders
+        if order.formation_id == formation_id and order.confirmed_turn is not None
+    ]
+    if not orders:
+        return None
+    if entry is not None and entry.active_order_id is not None:
+        match = next(
+            (item for item in orders if item.order_id == entry.active_order_id), None
+        )
+        if match is not None:
+            return match
+    return sorted(orders, key=lambda item: (item.issued_turn, item.order_id))[-1]
 
 
 def formation_command(state: GameState, formation_id: str) -> FormationCommandState | None:

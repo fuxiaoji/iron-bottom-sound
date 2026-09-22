@@ -685,6 +685,10 @@ class FormationCommandState(BaseModel):
     reported_speed: int | None = Field(default=None, ge=0, le=8)
     reported_ship_count: int | None = Field(default=None, ge=0)
     reported_geometry_kind: FormationGeometryKind | None = None
+    # Phase the newest held report was drawn from: a later phase in the same turn
+    # is newer knowledge than an earlier one, which matters when two reports of
+    # one turn arrive out of order.
+    reported_phase: Phase | None = None
     active_order_id: str | None = None
     last_report_turn: int | None = None
 

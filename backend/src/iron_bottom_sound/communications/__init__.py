@@ -16,7 +16,8 @@ zero at any map distance; the delay that matters is human and procedural.
 clarification, and every number in it is labelled as a simulation abstraction.
 """
 from .models import CommunicationMedium, CommandMessage, MessageKind, MessagePrecedence, MessageStatus
-from .processing import MEDIUM_PROFILES, MediumProfile, profile_for, abstraction_note
+from .processing import (MEDIUM_PROFILES, MediumProfile, abstraction_note, delay_for,
+                         profile_for)
 from .queue import ChannelQueue, drain, schedule
 from .routing import RouteDecision, select_medium
 from .integrity import IntegrityPolicy, apply_integrity
@@ -31,6 +32,7 @@ __all__ = [
     "MediumProfile",
     "profile_for",
     "abstraction_note",
+    "delay_for",
     "ChannelQueue",
     "drain",
     "schedule",
