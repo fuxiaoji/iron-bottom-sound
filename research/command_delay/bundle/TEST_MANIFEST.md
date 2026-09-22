@@ -2,7 +2,7 @@
 
 命令延迟模式 v2.2 的测试清单与运行方式。
 
-## 1. 新增测试文件（130 项）
+## 1. 新增测试文件（131 项收集 / 129 通过 / 2 跳过 / 0 失败）
 
 | 文件 | 项数 | 覆盖 |
 |---|---|---|
@@ -15,7 +15,25 @@
 | `tests/test_command_delay_agents_and_memory.py` | 16 | **CD-10**：每编队独立记忆（有界、只含本地材料、渲染时自旧向新裁剪）、自然语言命令经链路发电并落入收件编队记忆、命令正文即代理所读、编队订单来自代理、ProviderPolicy 的请求与解析（stub 客户端，无网络）、无密钥时如实标注教条、每条决策都有可审记录、agent-log 端点不跨阵营 |
 | `tests/test_command_delay_live_surface.py` | 6 | **交付评审补测**：API `/view` 逐次等于 `engine.observe(side)`（整局）、事件端点不返回对方私有事件、中立战报不含指挥链、被搭载编队恒为 DIRECT、`STALE` 即 `LOCAL_AUTONOMY`、链路被切断的编队仍自主打完一局 |
 
-合计 **130** 项，全部 PASS。
+合计 **131** 项：**129 通过、2 跳过、0 失败**（逐文件实测，见下表）。两个跳过都是**场景前提不成立**，不是缺陷：
+
+| 跳过项 | 位置 | 原因 |
+|---|---|---|
+| `test_formation_view_records_stale_external_reports_for_other_formations` | `mode_shell` | 想定 3 每方只有一个编队，没有"其他编队的外部报告"可测（该断言在 S-01 的多编队用例里由另一项覆盖） |
+| `test_the_structural_guard_refuses_gunnery_machinery` 同文件的当前阶段用例 | `formation_agent` | 该 GUNNERY 阶段没有任何合法目标可提交原始炮击订单 |
+
+逐文件实测（不带 `-q`，因为项目 `addopts` 已含 `-q`，再加 `-q` 会把汇总行一并压掉）：
+
+| 文件 | 结果 |
+|---|---|
+| `test_command_delay_movement_style.py` | 20 passed |
+| `test_command_delay_mode_shell.py` | 15 passed, 1 skipped |
+| `test_command_delay_communications.py` | 25 passed |
+| `test_command_delay_formation_llm.py` | 16 passed |
+| `test_command_delay_research_hooks.py` | 13 passed |
+| `test_command_delay_formation_agent.py` | 17 passed, 1 skipped |
+| `test_command_delay_agents_and_memory.py` | 16 passed |
+| `test_command_delay_live_surface.py` | 7 passed |
 
 ## 2. 运行
 
