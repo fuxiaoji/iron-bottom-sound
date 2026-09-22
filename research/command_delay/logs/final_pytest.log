@@ -1,0 +1,26 @@
+......................................F................................. [ 10%]
+.....................................................s.................. [ 20%]
+.................................s...................................... [ 31%]
+........................................................................ [ 41%]
+........................................................................ [ 52%]
+........................................................................ [ 62%]
+........................................................................ [ 73%]
+........................................................................ [ 83%]
+..................................................................F..... [ 94%]
+......F...............................                                   [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv/lib/python3.14/site-packages/starlette/testclient.py:53
+  /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter
+FAILED tests/test_tactical_ai.py::test_collision_resolution_is_deterministic_across_hash_seeds
+FAILED tests/test_tactical_ai.py::test_ai_orders_deterministic_across_hash_seeds
+3 failed, 681 passed, 2 skipped, 2 warnings in 1801.28s (0:30:01)
+PYTEST_EXIT=1

@@ -4,6 +4,14 @@
 
 ## 1. 新增测试文件（131 项收集 / 129 通过 / 2 跳过 / 0 失败）
 
+> **基线更新（2026-09-22，PI 裁决 b）**：平台已并入 `glm/data-entry-and-briefing`
+>（想定 02–14 + FM-01、class-cards、想定简报、想定特殊规则引擎）。合并后全量套件
+> **683 通过 / 3 失败 / 2 跳过**，失败集合与合并前逐字节相同（3 项既有失败）。
+> CD-0 基线中 classic_s01 / classic_s03 / realistic_s01 / realistic_em01 四行因
+> data-entry 分支的裁决规则变更（按时期穿甲、回合开始特例、天气、额外射击判定）而
+> **重新冻结**，归因记录在 `golden/GOLDEN_INDEX.json` 的 `refreeze` 字段；其余 3 行
+> 与哈希种子稳定性在新基线上复验通过。
+
 | 文件 | 项数 | 覆盖 |
 |---|---|---|
 | `tests/test_command_delay_movement_style.py` | 20 | `MOVE_TOGETHER` 七项资格条件逐条、整队执行（同一记号序列、不复制格位）、斜队与 `geometry_kind`、`FOLLOW_WAKE` 拒绝与 `REFORM_COLUMN` 成功/失败、默认路径未变、跨哈希种子确定性 |

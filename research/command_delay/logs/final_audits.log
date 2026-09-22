@@ -1,0 +1,11 @@
+freeze         PASS
+movement       PASS
+communication  PASS
+mission_order  PASS
+leakage        PASS
+gunnery        PASS
+replay         PASS
+data_model     PASS
+
+AUDITS = PASS
+AUDITS_EXIT=0

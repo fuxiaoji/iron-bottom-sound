@@ -970,3 +970,11 @@
 - **实现边界（登记 IBS-Q-020）**：离场/返场机制（S-02 R1、S-04 R3、S-05 R3、S-10 R4/R12/R14/R22、S-11 R1、S-14 R2/R5 的离场部分）、假目标算子（S-14 R4-R6）、飞机照明弹/预写照明弹（S-10 R11、S-11 R2、S-14 R3）、秘密格逐回合 2d6 增援（S-13 R2、S-10 R20 的掷骰部分）暂无引擎机制，仍以简报文本由玩家执行；结构化增援只表达引擎可表达的确定性部分。
 - **测试**：新增 tests/test_scenario_special_rules.py 18 用例（限制/修正/编制/移动/警戒/能见度/暴雨/胜利判定）；全量 pytest 通过（仅既有 LFS 指针环境用例失败）。
 - **AI 自战统计**：scripts/sim_scenarios.py 双 tactical RealisticCommander（balanced）自战全部 16 想定 × 10 局（seeds 1-10，6 并行，共 160 局 0 失败），ai_stats（轴心/盟军/平局胜场、平均回合、场均击沉、说明"仅供平衡参考"）写回各想定 YAML，简报端点与简报弹窗新增「AI 自战平衡参考」栏。抽查：S-03 轴 10-0、S-13 轴1/盟1/平8、S-14 轴3/盟6/平1、EM-01 轴3/盟0/平7、FM-01 盟军 10-0（91 舰巨局盟军占优，平衡参考用）。
+
+### 追加：PI 裁决 (b) —— 并入 data-entry 分支作为平台基线
+
+- `git merge trial/merge-data-entry`（含 glm/data-entry-and-briefing 全部内容）：16 想定可玩、想定简报、class-cards、想定特殊规则引擎（按时期穿甲/回合开始特例/天气/额外射击判定）。
+- **基线重新冻结（归因在案）**：classic_s01/classic_s03/realistic_s01/realistic_em01 四行因该分支裁决变更而漂移（单独测该分支漂移行完全相同 → 合并无自有漂移）；`GOLDEN_INDEX.json` 增 `refreeze` 字段记录授权、原因与前后摘要。重冻结后 7/7 PASS、哈希种子稳定 PASS。
+- **合并暴露并修复**：S-08/S-09 默认编队建议自相交（引擎正确拒批）→ `default_setup_orders` 增加去冲突（编队顺序航向 DFS；先转后队，领舰锚点被前队穿过时转前队）。16/16 想定产出可提交初设；基线三想定不受影响（黄金回放未再冻结即 PASS）。另修 `run_audits` data_model 把"空信封"误判失败的过期前提。
+- **最终状态**：全量 **683 通过 / 3 失败 / 2 跳过**，失败集合与合并前逐字节相同（3 项既有）；8/8 审计 PASS；18 局实机矩阵 PASS（9/9 命令延迟 + 9/9 真实对照全部 COMPLETE）；131 项命令延迟测试 129 过/2 跳过。
+- 包更新：sha256 `7d2e3ff9…` 之后重建（见最终输出）。裁决输入存档：`research/command_delay/MERGE_DECISION_INPUT.md`。
