@@ -15,33 +15,33 @@
  ],
  "records": [
   {
-   "digest_trees": "f5ec21e082b979619fe60d277ab4056e6e74181064386f390f4fec3879d5702e",
+   "digest_trees": "99144f7ccd802cc816bb9aa451d6ab4e7a0ebbe0959e9b503867b41350982cd7",
    "final_phase": "complete",
    "final_turn": 7,
-   "n_events": 586,
+   "n_events": 528,
    "n_order_batches": 50,
    "passed": true,
    "realistic_command": false,
-   "rng_counter": 282,
+   "rng_counter": 244,
    "scenario": "IBS-S-01",
    "seed": 20270830,
    "tag": "classic_s01"
   },
   {
-   "digest_trees": "c46300d8375f1a3154972dcea72fb6aa700345760c13d16707912568e7550759",
+   "digest_trees": "e62cf8f68e0889dad8887e0885327c0e4f52313849983f1ad223f3b7327a0d29",
    "final_phase": "complete",
    "final_turn": 4,
    "n_events": 213,
    "n_order_batches": 32,
    "passed": true,
    "realistic_command": false,
-   "rng_counter": 47,
+   "rng_counter": 50,
    "scenario": "IBS-S-03",
    "seed": 3,
    "tag": "classic_s03"
   },
   {
-   "digest_trees": "002f779200c98f6fd79720f638dff98d5df3e2e9c1ebc52e62bb7efa8c74c0f0",
+   "digest_trees": "fdad07cf14fc81eaddecadc0b79eb422280bbb60f70e1cb52048d92c23ab2514",
    "final_phase": "complete",
    "final_turn": 12,
    "n_events": 774,
@@ -54,20 +54,20 @@
    "tag": "classic_em01"
   },
   {
-   "digest_trees": "917114fbb1dd6c842d53bee7baff2dd1a2327e15c8a5adb102db99517ef3f78e",
+   "digest_trees": "cd163a422e995436a3b1e8d0d678292303a48270f5fbe4d651972ee16760da99",
    "final_phase": "complete",
    "final_turn": 7,
-   "n_events": 486,
+   "n_events": 528,
    "n_order_batches": 52,
    "passed": true,
    "realistic_command": true,
-   "rng_counter": 179,
+   "rng_counter": 220,
    "scenario": "IBS-S-01",
    "seed": 20270830,
    "tag": "realistic_s01"
   },
   {
-   "digest_trees": "6839300ceb1a9055ab6887ef6b11066c913d85b77f6f91ed47b94dac39aaebfb",
+   "digest_trees": "7bf2990ba5d0b5bad403d160710d24baaeb43031c0addab74947d859d30a3a35",
    "final_phase": "complete",
    "final_turn": 4,
    "n_events": 268,
@@ -80,7 +80,7 @@
    "tag": "realistic_s03"
   },
   {
-   "digest_trees": "4b746b4a5c4a32c535f84c0cedca2a082fdc43e4a970bb9af22a500d92e92038",
+   "digest_trees": "ec7b620379a119b2acd1ada1e3b6d8424f42186c5c85d0991bcc591b63850811",
    "final_phase": "complete",
    "final_turn": 12,
    "n_events": 1545,
@@ -93,7 +93,7 @@
    "tag": "realistic_em01"
   },
   {
-   "digest_trees": "3ff17dd387e8dd78c5c18d21f339081127df4a724a0cc609ba1a968fba838f35",
+   "digest_trees": "c8ba60c03a2e80fbf119b6cc3e2456ca1188d46ed692d0f168671cf512a52480",
    "final_phase": "complete",
    "final_turn": 4,
    "n_events": 212,
@@ -106,6 +106,19 @@
    "tag": "realistic_s03_seed9"
   }
  ],
+ "refreeze": {
+  "authorized_by": "PI decision (b): adopt glm/data-entry-and-briefing as the platform baseline",
+  "date": "2026-09-22",
+  "previous_digest_changes": {
+   "classic_s01": "528a9649... -> 99144f7c...",
+   "classic_s03": "b1b5e498... -> e62cf8f6...",
+   "realistic_em01": "4b746b4a... -> ec7b6203...",
+   "realistic_s01": "917114fb... -> cd163a42...",
+   "unchanged_meaning": "classic_em01/realistic_s03/realistic_s03_seed9 kept their meaning under the new rules"
+  },
+  "previous_frozen_commit": "d432a975151651fa7d6746b2f92e66b1e09d8d4a",
+  "reason": "The data-entry lineage changes adjudication (period-dependent penetration, turn-start scenario rules, weather blocking, extra fire determination), which shifts 4 of the 7 original rows. Drift was attributed by measuring that lineage alone against the same baseline: identical 4 rows. The command-delay work introduced no drift of its own."
+ },
  "scalars": [
   "passed",
   "final_turn",

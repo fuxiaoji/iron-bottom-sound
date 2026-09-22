@@ -82,6 +82,82 @@ def _group_key(ship) -> str:
     return "active-heavy" if ship.ship_type in {"BB", "BC", "CB", "CA", "CL", "AV"} else "active-light"
 
 
+def _layout_hexes(state: GameState, order: FormationSetupOrder, heading: int) -> list[str] | None:
+    """The layout labels for one order under an alternative heading, or ``None`` if
+    the column would leave the map or touch land."""
+    try:
+        trial = order.model_copy(update={"heading": heading})
+        layout = _layout_for_order(state, trial)
+    except ValueError:
+        return None
+    if len(layout) != len([s for s in order.ship_ids if _source_position(state, s) is not None]):
+        return None
+    labels: list[str] = []
+    for position in layout.values():
+        if position.label in state.land_hexes:
+            return None
+        labels.append(position.label)
+    return labels
+
+
+def _deconflict_setups(state: GameState, orders: list[FormationSetupOrder]) -> None:
+    """Adjust formation headings so the proposed columns do not overlap.
+
+    ``default_setup_orders`` anchors every column at its leader's scenario position
+    without looking at the other columns; on some imported scenarios two columns
+    cross, and the engine correctly refuses the whole batch.  The proposal, not the
+    player, should fix that.
+
+    Rotating the *later* formation is tried first, but it cannot always work: a
+    leader's first hex is its scenario anchor, so when an earlier column runs
+    through it, the earlier formation must turn instead.  A depth-first search over
+    headings (formations in list order, each prefix required collision-free, current
+    heading preferred then ascending) finds the first clean assignment; formations
+    whose leader anchor is impassable keep their layout.  Only fires on an actual
+    collision, so scenarios whose defaults are already clean are untouched.
+    """
+    plans: list[dict[int, list[str]] | None] = [None for _ in orders]
+    viable: list[list[int]] = []
+    for order in orders:
+        headings = [order.heading] + [h for h in range(1, 7) if h != order.heading]
+        options: list[tuple[int, list[str]]] = []
+        for heading in headings:
+            if heading is None:
+                continue
+            labels = _layout_hexes(state, order, heading)
+            if labels is not None:
+                options.append((heading, labels))
+        viable.append(options)
+
+    def search(index: int, placed: set[str]) -> bool:
+        if index == len(orders):
+            return True
+        for heading, labels in viable[index]:
+            if set(labels) & placed:
+                continue
+            previous = orders[index].heading
+            orders[index].heading = heading
+            plans[index] = labels
+            if search(index + 1, placed | set(labels)):
+                return True
+            orders[index].heading = previous
+            plans[index] = None
+        return False
+
+    # Fast path: only search when the as-proposed layouts actually collide.
+    all_labels: list[set[str]] = []
+    dirty = False
+    seen: set[str] = set()
+    for order in orders:
+        layout = _layout_for_order(state, order)
+        labels = {position.label for position in layout.values()} if layout else set()
+        dirty = dirty or bool(labels & seen)
+        seen |= labels
+        all_labels.append(labels)
+    if not dirty:
+        return
+    search(0, set())
+
 def default_setup_orders(state: GameState, side: Side) -> list[FormationSetupOrder]:
     """Return a deterministic, editable setup proposal for UI and state-machine AI."""
     scenario = load_scenario(state.scenario_id)
@@ -137,6 +213,10 @@ def default_setup_orders(state: GameState, side: Side) -> list[FormationSetupOrd
             spacing=1,
             heading=heading,
         ))
+    # Imported scenarios can have crossing columns; the proposal de-conflicts itself
+    # so the player starts from a submittable batch (collision-conditional, so clean
+    # scenarios are untouched).
+    _deconflict_setups(state, result)
     return result
 
 

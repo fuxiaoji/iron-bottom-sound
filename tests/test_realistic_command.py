@@ -541,3 +541,31 @@ def test_realistic_s01_reinforcement_formations_remain_commanded(
         and event.payload.get("attacker_side") == event.payload.get("target_side")
         for event in state.events
     )
+
+
+@pytest.mark.parametrize("scenario_id", ["IBS-S-08", "IBS-S-09"])
+def test_default_setup_orders_deconflicts_crossing_columns(scenario_id: str) -> None:
+    """Imported scenarios whose anchors make two columns cross still get a
+    submittable proposal: the generator rotates the offending formations instead of
+    handing the player a batch the engine must refuse.
+
+    Collision-conditional by construction — the golden-baseline scenarios' headings
+    are unchanged (their golden rows still pass, which is the proof)."""
+    from iron_bottom_sound.realistic_command import _layout_for_order, validate_setup
+
+    engine = IronBottomEngine()
+    state = engine.reset(scenario_id, 1, GameOptions(realistic_command=True))
+    for side in Side:
+        orders = default_setup_orders(state, side)
+        batch = OrderBatch(
+            side=side, phase=Phase.FORMATION_SETUP, formation_setup=orders
+        )
+        errors = validate_setup(engine, state, batch)
+        assert not errors, f"{side.value}: {errors[:3]}"
+        # And the layouts really are disjoint across formations of the same side.
+        seen: set[str] = set()
+        for order in orders:
+            layout = _layout_for_order(state, order)
+            labels = {position.label for position in layout.values()}
+            assert not (labels & seen), f"{order.formation_id} overlaps an earlier column"
+            seen |= labels
