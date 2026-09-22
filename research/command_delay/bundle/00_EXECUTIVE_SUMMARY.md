@@ -55,6 +55,18 @@ PI_REVIEW_REQUIRED               = YES
 
 前三项见 `BUG_AND_RERUN_LOG.md` 的完整时间线。
 
+## 全量回归
+
+`.venv/bin/python -m pytest -q`：**637** 项收集（其中本阶段新增 108 项），跑完 100%，失败集合与**改动前基线逐字节相同**（3 项既有失败）：
+
+| 既有失败 | 性质 |
+|---|---|
+| `test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter` | 计数器素材 sha256 与硬编码期望不符（素材问题） |
+| `test_tactical_ai.py::test_collision_resolution_is_deterministic_across_hash_seeds` | 测试夹具未传 `PYTHONPATH`，比较阶段从未执行（CD0-F2） |
+| `test_tactical_ai.py::test_ai_orders_deterministic_across_hash_seeds` | 同上 |
+
+即：**没有引入任何新失败**（`diff` 两份 `FAILED` 列表为空输出）。
+
 ## 未越界的事项
 
 - **未**开始任何科研实验；**未**实现 RL/GNN/Transformer；**未**调用任何付费 LLM（CD-5 全部用 stub/录播策略）。

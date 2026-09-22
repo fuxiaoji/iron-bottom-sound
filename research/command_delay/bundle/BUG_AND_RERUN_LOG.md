@@ -186,6 +186,23 @@ assert 1 == 0
 
 ---
 
+## CD7-F1..F4 · 全量测试后的自审修正（新代码缺陷，已修）
+
+**发现方式**：全量套件（637 项）跑完后逐模块自审，共 4 处：函数签名残留未用参数、死分支、地平线取错方、张量规格与实测不符。
+
+1. `delegation.own_hull_fraction` 保留了一个未使用的 `engine` 参数，调用方传 `None` —— 删参并改调用。
+2. `target_priority.priority_bonus` 的 `if not directives: return 0.0` 是死分支（空集本来就合成 0.0）—— 删除，并把"无指令 = 基础期望命中选择、教条只能叠加在已声明偏好之上"写进 docstring。
+3. **`command_observation._optical_range` 返回的是双方视距的较小值**，于是某一方视图的地平线可能取自对手的视距 —— 改为按请求方自身视距（与引擎 `_visible_to` 同一值），无方参数时保留保守回退并写明。
+4. `research_hooks` 的目标块把"声明备选方案数"命名为 `active_branches`（哪一条**激活**是代理的决策，不属于观察数据）；接触块的 `bearing_sin/bearing_cos` 实际是 `sin/cos(0,0)` 占位值 —— 改名为 `declared_contingencies`，并把方位改为在**引擎同一轴向格**上算出的真实绝对罗经方位（六个方向逐一单测校验）。
+
+第 3 条是真正有行为影响的：地平线从"min(双方)"变为"本方自身"，方向正确但此前在双方视距不同的想定上会给错半径。
+
+修正后重跑：108 项命令延迟测试全过、8 项审计全过、黄金回放仍 0 漂移。
+
+**证据**：提交 `e1ddd050`；`audits/audit_*.json`（修正后重新生成）。
+
+---
+
 ## 无缺陷但需记录的两次测量
 
 - **`test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter`**：计数器素材实测 sha256 `5c54f8aa…` ≠ 测试硬编码的 `918196c7…`。属素材内容问题，与引擎无关，**改动前即失败**，未处置。
