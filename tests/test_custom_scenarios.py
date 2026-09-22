@@ -125,7 +125,8 @@ def test_builtin_scenarios_expose_editable_templates(tmp_path, monkeypatch):
     s03 = client.get("/builtin-scenarios/IBS-S-03/template")
     assert s03.status_code == 200, s03.text
     assert all(len(orders) == 1 for orders in s03.json()["formations"].values())
-    missing = client.get("/builtin-scenarios/IBS-S-02/template")
+    # 全部内置想定现均已可玩（IBS-S-02 已录入）；不存在编号仍应 404。
+    missing = client.get("/builtin-scenarios/IBS-S-99/template")
     assert missing.status_code == 404
 
 
@@ -156,9 +157,9 @@ def test_ship_catalog_dedupes_catalog_aliases_and_binds_locked_ship_art(tmp_path
     assert by_id["IBS-U-USN-FLETCHER"]["complete"]
     assert "IBS-U-IJN-YAMATO" not in by_id                  # 大和（目录）→ 二马大和记录
     assert by_id["IBS-U-IJN-ERMA-YAMATO"]["complete"]
-    # 真·无档案船保持锁定（complete False），但棋子图已绑定 → asset 非空。
+    # 舰级卡扩展（class-cards.yaml）解锁后：北卡罗来纳经 BB北卡罗来纳级卡建档，complete 且有棋子图。
     north_carolina = by_id["IBS-U-USN-UNNAMED-T01-R03"]
-    assert not north_carolina["complete"] and north_carolina["asset"]
+    assert north_carolina["complete"] and north_carolina["asset"]
     # 没有对应棋子图的锁定船仍无 asset。
     south_dakota = by_id["IBS-U-USN-UNNAMED-T01-R05"]
     assert not south_dakota["complete"] and not south_dakota["asset"]

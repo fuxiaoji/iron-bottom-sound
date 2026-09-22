@@ -628,7 +628,7 @@ class WreckState(BaseModel):
 
 class MarkerState(BaseModel):
     id: str
-    kind: Literal["fire", "smoke", "star_shell", "searchlight", "squall", "contact", "torpedo_hit", "sunk"]
+    kind: Literal["fire", "smoke", "star_shell", "searchlight", "squall", "storm", "contact", "torpedo_hit", "sunk"]
     position: HexCoord | None = None
     ship_id: str | None = None
     target_ship_id: str | None = None
@@ -945,6 +945,9 @@ class GameState(BaseModel):
     hull_damage_taken: dict[str, int] = Field(
         default_factory=lambda: {Side.AXIS.value: 0, Side.ALLIES.value: 0}
     )
+    # 想定特例的运行期容器（警戒状态、鱼雷消耗计分等）；键结构由各想定的
+    # special_rule_kinds 定义，引擎不在此处复制规则常量。
+    scenario_state: dict[str, Any] = Field(default_factory=dict)
     winner: Side | None = None
     victory_reason: str | None = None
     # Command Delay mode state; ``None`` for Classic and Realistic, so those
@@ -973,6 +976,11 @@ class PublicShip(BaseModel):
     min_legal_speed: int | None = None
     max_legal_speed: int | None = None
     torpedo_type: str | None = None
+    # 装甲（英寸，静态舰级数据，双方可见；穿透判定用）
+    primary_armor: float = 0
+    secondary_armor: float = 0
+    belt_armor: float = 0
+    bridge_armor: float = 0
     gun_mounts: list[GunMountState] = Field(default_factory=list)
     torpedo_launchers: list[TorpedoLauncherState] = Field(default_factory=list)
     turn_limit_degrees: int | None = None

@@ -1,0 +1,160 @@
+{"scenario": "IBS-S-01", "seed": 1, "completed": true, "winner": "draw", "reason": "平局：胜利点差小于4", "turns": 7, "sunk": {"axis": 3, "allies": 1}, "elapsed_s": 8.9}
+{"scenario": "IBS-S-01", "seed": 7, "completed": true, "winner": "allies", "reason": "想定1胜利点领先 9 分", "turns": 7, "sunk": {"axis": 4, "allies": 0}, "elapsed_s": 4.9}
+{"scenario": "IBS-S-01", "seed": 6, "completed": true, "winner": "allies", "reason": "想定1胜利点领先 4 分", "turns": 7, "sunk": {"axis": 3, "allies": 2}, "elapsed_s": 22.6}
+{"scenario": "IBS-S-01", "seed": 3, "completed": true, "winner": "allies", "reason": "想定1胜利点领先 8 分", "turns": 7, "sunk": {"axis": 4, "allies": 2}, "elapsed_s": 22.9}
+{"scenario": "IBS-S-01", "seed": 4, "completed": true, "winner": "draw", "reason": "平局：胜利点差小于4", "turns": 7, "sunk": {"axis": 3, "allies": 1}, "elapsed_s": 23.8}
+{"scenario": "IBS-S-01", "seed": 2, "completed": true, "winner": "allies", "reason": "想定1胜利点领先 6 分", "turns": 7, "sunk": {"axis": 2, "allies": 1}, "elapsed_s": 27.8}
+{"scenario": "IBS-S-02", "seed": 1, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 9, "sunk": {"axis": 3, "allies": 2}, "elapsed_s": 4.7}
+{"scenario": "IBS-S-01", "seed": 5, "completed": true, "winner": "draw", "reason": "平局：胜利点差小于4", "turns": 7, "sunk": {"axis": 3, "allies": 2}, "elapsed_s": 28.8}
+{"scenario": "IBS-S-02", "seed": 2, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 9, "sunk": {"axis": 3, "allies": 1}, "elapsed_s": 4.7}
+{"scenario": "IBS-S-02", "seed": 3, "completed": true, "winner": "axis", "reason": "想定结束时胜利点领先", "turns": 9, "sunk": {"axis": 1, "allies": 2}, "elapsed_s": 4.1}
+{"scenario": "IBS-S-01", "seed": 10, "completed": true, "winner": "draw", "reason": "平局：胜利点差小于4", "turns": 7, "sunk": {"axis": 4, "allies": 2}, "elapsed_s": 10.2}
+{"scenario": "IBS-S-02", "seed": 6, "completed": true, "winner": "draw", "reason": null, "turns": 2, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 1.8}
+{"scenario": "IBS-S-02", "seed": 7, "completed": true, "winner": "draw", "reason": null, "turns": 8, "sunk": {"axis": 0, "allies": 2}, "elapsed_s": 5.4}
+{"scenario": "IBS-S-02", "seed": 8, "completed": true, "winner": "draw", "reason": "平局", "turns": 9, "sunk": {"axis": 3, "allies": 2}, "elapsed_s": 4.2}
+{"scenario": "IBS-S-01", "seed": 8, "completed": true, "winner": "draw", "reason": "平局：胜利点差小于4", "turns": 7, "sunk": {"axis": 2, "allies": 1}, "elapsed_s": 26.9}
+{"scenario": "IBS-S-02", "seed": 5, "completed": true, "winner": "axis", "reason": "想定结束时胜利点领先", "turns": 9, "sunk": {"axis": 1, "allies": 2}, "elapsed_s": 8.3}
+{"scenario": "IBS-S-02", "seed": 10, "completed": true, "winner": "axis", "reason": "想定结束时胜利点领先", "turns": 9, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 3.4}
+{"scenario": "IBS-S-03", "seed": 1, "completed": true, "winner": "axis", "reason": "德军战术胜利：无德舰被击沉或减速至2-2-2", "turns": 4, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 1.4}
+{"scenario": "IBS-S-02", "seed": 9, "completed": true, "winner": "axis", "reason": "想定结束时胜利点领先", "turns": 9, "sunk": {"axis": 1, "allies": 1}, "elapsed_s": 3.9}
+{"scenario": "IBS-S-03", "seed": 2, "completed": true, "winner": "allies", "reason": "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2", "turns": 4, "sunk": {"axis": 2, "allies": 1}, "elapsed_s": 2.0}
+{"scenario": "IBS-S-02", "seed": 4, "completed": true, "winner": "axis", "reason": "想定结束时胜利点领先", "turns": 9, "sunk": {"axis": 0, "allies": 1}, "elapsed_s": 15.3}
+{"scenario": "IBS-S-03", "seed": 5, "completed": true, "winner": "axis", "reason": "德军战术胜利：无德舰被击沉或减速至2-2-2", "turns": 4, "sunk": {"axis": 0, "allies": 1}, "elapsed_s": 2.0}
+{"scenario": "IBS-S-03", "seed": 6, "completed": true, "winner": "allies", "reason": "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2", "turns": 4, "sunk": {"axis": 2, "allies": 0}, "elapsed_s": 1.9}
+{"scenario": "IBS-S-03", "seed": 3, "completed": true, "winner": "allies", "reason": "英军战略胜利：多艘德军驱逐舰被击沉或减速至2-2-2", "turns": 4, "sunk": {"axis": 2, "allies": 2}, "elapsed_s": 3.6}
+{"scenario": "IBS-S-03", "seed": 7, "completed": true, "winner": "axis", "reason": "德军战术胜利：无德舰被击沉或减速至2-2-2", "turns": 4, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 1.6}
+{"scenario": "IBS-S-03", "seed": 8, "completed": true, "winner": "axis", "reason": "德军战术胜利：无德舰被击沉或减速至2-2-2", "turns": 4, "sunk": {"axis": 0, "allies": 1}, "elapsed_s": 1.7}
+{"scenario": "IBS-S-03", "seed": 10, "completed": true, "winner": "axis", "reason": "德军战术胜利：无德舰被击沉或减速至2-2-2", "turns": 4, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 1.5}
+{"scenario": "IBS-S-04", "seed": 2, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 6, "sunk": {"axis": 3, "allies": 1}, "elapsed_s": 6.8}
+{"scenario": "IBS-S-04", "seed": 3, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 6, "sunk": {"axis": 1, "allies": 1}, "elapsed_s": 7.8}
+{"scenario": "IBS-S-01", "seed": 9, "completed": true, "winner": "draw", "reason": "平局：胜利点差小于4", "turns": 7, "sunk": {"axis": 1, "allies": 1}, "elapsed_s": 33.1}
+{"scenario": "IBS-S-03", "seed": 9, "completed": true, "winner": "allies", "reason": "英军战术胜利：一艘德军驱逐舰被击沉或减速至2-2-2", "turns": 4, "sunk": {"axis": 1, "allies": 0}, "elapsed_s": 11.2}
+{"scenario": "IBS-S-04", "seed": 1, "completed": true, "winner": "axis", "reason": "想定结束时胜利点领先", "turns": 6, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 12.4}
+{"scenario": "IBS-S-03", "seed": 4, "completed": true, "winner": "axis", "reason": "德军战术胜利：无德舰被击沉或减速至2-2-2", "turns": 4, "sunk": {"axis": 0, "allies": 1}, "elapsed_s": 16.4}
+{"scenario": "IBS-S-04", "seed": 7, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 6, "sunk": {"axis": 2, "allies": 2}, "elapsed_s": 7.3}
+{"scenario": "IBS-S-04", "seed": 9, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 6, "sunk": {"axis": 2, "allies": 0}, "elapsed_s": 7.5}
+{"scenario": "IBS-S-05", "seed": 1, "completed": true, "winner": "draw", "reason": "平局", "turns": 10, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 4.4}
+{"scenario": "IBS-S-04", "seed": 4, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 6, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 17.6}
+{"scenario": "IBS-S-05", "seed": 2, "completed": true, "winner": "draw", "reason": "平局", "turns": 10, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 2.7}
+{"scenario": "IBS-S-05", "seed": 3, "completed": true, "winner": "draw", "reason": "平局", "turns": 10, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 2.7}
+{"scenario": "IBS-S-05", "seed": 4, "completed": true, "winner": "draw", "reason": "平局", "turns": 10, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 1.6}
+{"scenario": "IBS-S-05", "seed": 5, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 2.3}
+{"scenario": "IBS-S-05", "seed": 6, "completed": true, "winner": "draw", "reason": "平局", "turns": 10, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 1.7}
+{"scenario": "IBS-S-05", "seed": 7, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 2, "allies": 0}, "elapsed_s": 2.4}
+{"scenario": "IBS-S-05", "seed": 8, "completed": true, "winner": "axis", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 2.1}
+{"scenario": "IBS-S-04", "seed": 5, "completed": true, "winner": "axis", "reason": "想定结束时胜利点领先", "turns": 6, "sunk": {"axis": 1, "allies": 2}, "elapsed_s": 24.9}
+{"scenario": "IBS-S-05", "seed": 9, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 2.1}
+{"scenario": "IBS-S-05", "seed": 10, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 2, "allies": 0}, "elapsed_s": 1.9}
+{"scenario": "IBS-S-04", "seed": 10, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 6, "sunk": {"axis": 1, "allies": 1}, "elapsed_s": 24.5}
+{"scenario": "IBS-S-06", "seed": 3, "completed": true, "winner": "axis", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 0, "allies": 3}, "elapsed_s": 7.7}
+{"scenario": "IBS-S-04", "seed": 8, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 6, "sunk": {"axis": 2, "allies": 1}, "elapsed_s": 30.5}
+{"scenario": "IBS-S-06", "seed": 2, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 2, "allies": 2}, "elapsed_s": 9.6}
+{"scenario": "IBS-S-06", "seed": 1, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 3, "allies": 3}, "elapsed_s": 10.1}
+{"scenario": "IBS-S-04", "seed": 6, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 6, "sunk": {"axis": 4, "allies": 0}, "elapsed_s": 40.0}
+{"scenario": "IBS-S-06", "seed": 5, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 1, "allies": 0}, "elapsed_s": 8.8}
+{"scenario": "IBS-S-06", "seed": 7, "completed": true, "winner": "axis", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 8.5}
+{"scenario": "IBS-S-06", "seed": 8, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 3, "allies": 4}, "elapsed_s": 9.8}
+{"scenario": "IBS-S-06", "seed": 4, "completed": true, "winner": "axis", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 0, "allies": 2}, "elapsed_s": 14.5}
+{"scenario": "IBS-S-06", "seed": 9, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 6.7}
+{"scenario": "IBS-S-06", "seed": 6, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 1, "allies": 2}, "elapsed_s": 15.4}
+{"scenario": "IBS-S-06", "seed": 10, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 10, "sunk": {"axis": 3, "allies": 4}, "elapsed_s": 10.5}
+{"scenario": "IBS-S-07", "seed": 4, "completed": true, "winner": "draw", "reason": "平局：未同时满足分差门槛与击沉战巡优势", "turns": 7, "sunk": {"axis": 1, "allies": 4}, "elapsed_s": 8.9}
+{"scenario": "IBS-S-07", "seed": 5, "completed": true, "winner": "draw", "reason": "平局：未同时满足分差门槛与击沉战巡优势", "turns": 7, "sunk": {"axis": 0, "allies": 4}, "elapsed_s": 8.3}
+{"scenario": "IBS-S-07", "seed": 2, "completed": true, "winner": "draw", "reason": "平局：未同时满足分差门槛与击沉战巡优势", "turns": 7, "sunk": {"axis": 5, "allies": 1}, "elapsed_s": 14.0}
+{"scenario": "IBS-S-07", "seed": 8, "completed": true, "winner": "draw", "reason": "平局：未同时满足分差门槛与击沉战巡优势", "turns": 7, "sunk": {"axis": 0, "allies": 7}, "elapsed_s": 8.9}
+{"scenario": "IBS-S-07", "seed": 1, "completed": true, "winner": "draw", "reason": "平局：未同时满足分差门槛与击沉战巡优势", "turns": 7, "sunk": {"axis": 1, "allies": 2}, "elapsed_s": 28.4}
+{"scenario": "IBS-S-08", "seed": 1, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.9}
+{"scenario": "IBS-S-08", "seed": 2, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.9}
+{"scenario": "IBS-S-08", "seed": 3, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.9}
+{"scenario": "IBS-S-08", "seed": 4, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.9}
+{"scenario": "IBS-S-08", "seed": 5, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-07", "seed": 3, "completed": true, "winner": "draw", "reason": "平局：未同时满足分差门槛与击沉战巡优势", "turns": 7, "sunk": {"axis": 3, "allies": 3}, "elapsed_s": 29.1}
+{"scenario": "IBS-S-08", "seed": 6, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-08", "seed": 7, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-08", "seed": 8, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-08", "seed": 9, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-08", "seed": 10, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.9}
+{"scenario": "IBS-S-09", "seed": 1, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-09", "seed": 2, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-09", "seed": 3, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-09", "seed": 4, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-09", "seed": 5, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-09", "seed": 6, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-09", "seed": 7, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-09", "seed": 8, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-09", "seed": 9, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-09", "seed": 10, "completed": true, "winner": "draw", "reason": null, "turns": 1, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 0.8}
+{"scenario": "IBS-S-10", "seed": 1, "completed": true, "winner": "draw", "reason": null, "turns": 4, "sunk": {"axis": 0, "allies": 1}, "elapsed_s": 4.9}
+{"scenario": "IBS-S-07", "seed": 6, "completed": true, "winner": "allies", "reason": "胜利点领先 22 分且击沉战巡 1 比 0", "turns": 7, "sunk": {"axis": 4, "allies": 6}, "elapsed_s": 35.6}
+{"scenario": "IBS-S-10", "seed": 4, "completed": true, "winner": "draw", "reason": null, "turns": 2, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 1.2}
+{"scenario": "IBS-S-10", "seed": 3, "completed": true, "winner": "axis", "reason": "日军决定性胜利：领先 63 分", "turns": 30, "sunk": {"axis": 1, "allies": 5}, "elapsed_s": 6.4}
+{"scenario": "IBS-S-10", "seed": 2, "completed": true, "winner": "axis", "reason": "日军决定性胜利：领先 93 分", "turns": 30, "sunk": {"axis": 1, "allies": 6}, "elapsed_s": 11.7}
+{"scenario": "IBS-S-10", "seed": 6, "completed": true, "winner": "draw", "reason": null, "turns": 2, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 1.2}
+{"scenario": "IBS-S-10", "seed": 7, "completed": true, "winner": "draw", "reason": null, "turns": 2, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 1.2}
+{"scenario": "IBS-S-07", "seed": 7, "completed": true, "winner": "draw", "reason": "平局：未同时满足分差门槛与击沉战巡优势", "turns": 7, "sunk": {"axis": 0, "allies": 4}, "elapsed_s": 40.4}
+{"scenario": "IBS-S-07", "seed": 9, "completed": true, "winner": "draw", "reason": "平局：未同时满足分差门槛与击沉战巡优势", "turns": 7, "sunk": {"axis": 6, "allies": 0}, "elapsed_s": 40.0}
+{"scenario": "IBS-S-10", "seed": 5, "completed": true, "winner": "axis", "reason": "日军战术胜利：领先 34 分", "turns": 30, "sunk": {"axis": 2, "allies": 3}, "elapsed_s": 9.7}
+{"scenario": "IBS-S-10", "seed": 10, "completed": true, "winner": "draw", "reason": null, "turns": 4, "sunk": {"axis": 0, "allies": 1}, "elapsed_s": 2.5}
+{"scenario": "IBS-S-10", "seed": 8, "completed": true, "winner": "draw", "reason": null, "turns": 13, "sunk": {"axis": 1, "allies": 4}, "elapsed_s": 16.1}
+{"scenario": "IBS-S-10", "seed": 9, "completed": true, "winner": "axis", "reason": "日军决定性胜利：领先 66 分", "turns": 30, "sunk": {"axis": 0, "allies": 4}, "elapsed_s": 17.7}
+{"scenario": "IBS-S-11", "seed": 1, "completed": true, "winner": "allies", "reason": "想定结束胜利点领先 15 分", "turns": 9, "sunk": {"axis": 3, "allies": 3}, "elapsed_s": 16.4}
+{"scenario": "IBS-S-11", "seed": 3, "completed": true, "winner": "allies", "reason": "决定性胜利：领先 70 分（门槛 20）", "turns": 9, "sunk": {"axis": 6, "allies": 1}, "elapsed_s": 20.3}
+{"scenario": "IBS-S-11", "seed": 6, "completed": true, "winner": "axis", "reason": "决定性胜利：领先 43 分（门槛 20）", "turns": 9, "sunk": {"axis": 0, "allies": 7}, "elapsed_s": 9.8}
+{"scenario": "IBS-S-11", "seed": 2, "completed": true, "winner": "allies", "reason": "决定性胜利：领先 30 分（门槛 20）", "turns": 9, "sunk": {"axis": 3, "allies": 0}, "elapsed_s": 32.2}
+{"scenario": "IBS-S-11", "seed": 7, "completed": true, "winner": "allies", "reason": "决定性胜利：领先 22 分（门槛 20）", "turns": 9, "sunk": {"axis": 2, "allies": 1}, "elapsed_s": 11.8}
+{"scenario": "IBS-S-11", "seed": 5, "completed": true, "winner": "draw", "reason": "平局：胜利点差小于4", "turns": 9, "sunk": {"axis": 1, "allies": 3}, "elapsed_s": 20.3}
+{"scenario": "IBS-S-07", "seed": 10, "completed": true, "winner": "draw", "reason": "平局：未同时满足分差门槛与击沉战巡优势", "turns": 7, "sunk": {"axis": 0, "allies": 1}, "elapsed_s": 67.9}
+{"scenario": "IBS-S-12", "seed": 1, "completed": true, "winner": "draw", "reason": "平局：胜利点差小于4", "turns": 9, "sunk": {"axis": 2, "allies": 2}, "elapsed_s": 3.7}
+{"scenario": "IBS-S-11", "seed": 8, "completed": true, "winner": "allies", "reason": "想定结束胜利点领先 4 分", "turns": 9, "sunk": {"axis": 2, "allies": 2}, "elapsed_s": 12.5}
+{"scenario": "IBS-S-12", "seed": 3, "completed": true, "winner": "allies", "reason": "想定结束胜利点领先 21 分", "turns": 9, "sunk": {"axis": 3, "allies": 1}, "elapsed_s": 4.3}
+{"scenario": "IBS-S-11", "seed": 4, "completed": true, "winner": "allies", "reason": "想定结束胜利点领先 15 分", "turns": 9, "sunk": {"axis": 3, "allies": 3}, "elapsed_s": 31.3}
+{"scenario": "IBS-S-12", "seed": 2, "completed": true, "winner": "allies", "reason": "想定结束胜利点领先 10 分", "turns": 9, "sunk": {"axis": 2, "allies": 0}, "elapsed_s": 8.9}
+{"scenario": "IBS-S-11", "seed": 9, "completed": true, "winner": "allies", "reason": "想定结束胜利点领先 17 分", "turns": 9, "sunk": {"axis": 1, "allies": 2}, "elapsed_s": 12.6}
+{"scenario": "IBS-S-12", "seed": 4, "completed": true, "winner": "draw", "reason": "平局：胜利点差小于4", "turns": 9, "sunk": {"axis": 0, "allies": 1}, "elapsed_s": 7.6}
+{"scenario": "IBS-S-12", "seed": 7, "completed": true, "winner": "allies", "reason": "想定结束胜利点领先 6 分", "turns": 9, "sunk": {"axis": 1, "allies": 1}, "elapsed_s": 4.1}
+{"scenario": "IBS-S-12", "seed": 8, "completed": true, "winner": "draw", "reason": "平局：胜利点差小于4", "turns": 9, "sunk": {"axis": 0, "allies": 1}, "elapsed_s": 4.1}
+{"scenario": "IBS-S-11", "seed": 10, "completed": true, "winner": "allies", "reason": "决定性胜利：领先 52 分（门槛 20）", "turns": 9, "sunk": {"axis": 6, "allies": 0}, "elapsed_s": 18.6}
+{"scenario": "IBS-S-12", "seed": 9, "completed": true, "winner": "axis", "reason": "想定结束胜利点领先 9 分", "turns": 9, "sunk": {"axis": 0, "allies": 1}, "elapsed_s": 5.8}
+{"scenario": "IBS-S-12", "seed": 10, "completed": true, "winner": "axis", "reason": "决定性胜利：敌方损失 1 艘战列舰而己方战列舰无损", "turns": 9, "sunk": {"axis": 0, "allies": 3}, "elapsed_s": 4.7}
+{"scenario": "IBS-S-12", "seed": 5, "completed": true, "winner": "draw", "reason": "平局：胜利点差小于4", "turns": 9, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 11.7}
+{"scenario": "IBS-S-12", "seed": 6, "completed": true, "winner": "allies", "reason": "想定结束胜利点领先 18 分", "turns": 9, "sunk": {"axis": 3, "allies": 0}, "elapsed_s": 11.7}
+{"scenario": "IBS-S-13", "seed": 3, "completed": true, "winner": "draw", "reason": "平局：未达成任何一方的战役级胜利条件", "turns": 11, "sunk": {"axis": 1, "allies": 3}, "elapsed_s": 6.4}
+{"scenario": "IBS-S-13", "seed": 6, "completed": true, "winner": "draw", "reason": "平局：未达成任何一方的战役级胜利条件", "turns": 11, "sunk": {"axis": 2, "allies": 5}, "elapsed_s": 6.6}
+{"scenario": "IBS-S-13", "seed": 1, "completed": true, "winner": "draw", "reason": "平局：未达成任何一方的战役级胜利条件", "turns": 11, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 12.2}
+{"scenario": "IBS-S-13", "seed": 5, "completed": true, "winner": "draw", "reason": "平局：未达成任何一方的战役级胜利条件", "turns": 11, "sunk": {"axis": 3, "allies": 3}, "elapsed_s": 16.6}
+{"scenario": "IBS-S-13", "seed": 9, "completed": true, "winner": "draw", "reason": "平局：未达成任何一方的战役级胜利条件", "turns": 11, "sunk": {"axis": 1, "allies": 3}, "elapsed_s": 9.4}
+{"scenario": "IBS-S-13", "seed": 2, "completed": true, "winner": "allies", "reason": "盟军战役级胜利：击沉 3 艘日军DD，仅损失 0 艘", "turns": 11, "sunk": {"axis": 3, "allies": 0}, "elapsed_s": 20.4}
+{"scenario": "IBS-S-13", "seed": 4, "completed": true, "winner": "draw", "reason": "平局：未达成任何一方的战役级胜利条件", "turns": 11, "sunk": {"axis": 5, "allies": 3}, "elapsed_s": 20.3}
+{"scenario": "IBS-S-14", "seed": 2, "completed": true, "winner": "allies", "reason": "战役级胜利：领先 16 分", "turns": 12, "sunk": {"axis": 2, "allies": 0}, "elapsed_s": 3.8}
+{"scenario": "IBS-S-14", "seed": 1, "completed": true, "winner": "allies", "reason": "战役级胜利：领先 13 分", "turns": 12, "sunk": {"axis": 1, "allies": 0}, "elapsed_s": 5.7}
+{"scenario": "IBS-S-14", "seed": 3, "completed": true, "winner": "axis", "reason": "战役级胜利：领先 31 分", "turns": 12, "sunk": {"axis": 0, "allies": 4}, "elapsed_s": 4.4}
+{"scenario": "IBS-S-14", "seed": 4, "completed": true, "winner": "draw", "reason": "平局：分数差不足 3 分", "turns": 12, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 4.3}
+{"scenario": "IBS-S-14", "seed": 5, "completed": true, "winner": "axis", "reason": "战役级胜利：领先 18 分", "turns": 12, "sunk": {"axis": 1, "allies": 4}, "elapsed_s": 4.4}
+{"scenario": "IBS-S-14", "seed": 6, "completed": true, "winner": "allies", "reason": "战役级胜利：领先 10 分", "turns": 12, "sunk": {"axis": 2, "allies": 0}, "elapsed_s": 5.0}
+{"scenario": "IBS-S-13", "seed": 8, "completed": true, "winner": "draw", "reason": "平局：未达成任何一方的战役级胜利条件", "turns": 11, "sunk": {"axis": 3, "allies": 2}, "elapsed_s": 21.6}
+{"scenario": "IBS-S-14", "seed": 7, "completed": true, "winner": "allies", "reason": "战役级胜利：领先 28 分", "turns": 12, "sunk": {"axis": 3, "allies": 0}, "elapsed_s": 3.6}
+{"scenario": "IBS-S-13", "seed": 7, "completed": true, "winner": "axis", "reason": "日军战役级胜利：击沉 4 艘盟军DD，己方DD无损", "turns": 11, "sunk": {"axis": 0, "allies": 4}, "elapsed_s": 26.3}
+{"scenario": "IBS-S-14", "seed": 9, "completed": true, "winner": "allies", "reason": "战役级胜利：领先 35 分", "turns": 12, "sunk": {"axis": 4, "allies": 0}, "elapsed_s": 2.5}
+{"scenario": "IBS-S-14", "seed": 8, "completed": true, "winner": "axis", "reason": "战术胜利：领先 4 分", "turns": 12, "sunk": {"axis": 2, "allies": 3}, "elapsed_s": 4.7}
+{"scenario": "IBS-S-13", "seed": 10, "completed": true, "winner": "draw", "reason": "平局：未达成任何一方的战役级胜利条件", "turns": 11, "sunk": {"axis": 1, "allies": 2}, "elapsed_s": 16.3}
+{"scenario": "IBS-S-14", "seed": 10, "completed": true, "winner": "allies", "reason": "战役级胜利：领先 23 分", "turns": 12, "sunk": {"axis": 2, "allies": 0}, "elapsed_s": 4.1}
+{"scenario": "IBS-S-EM-01", "seed": 5, "completed": true, "winner": "draw", "reason": "平局：损伤分差 18，未达到 25 分", "turns": 12, "sunk": {"axis": 4, "allies": 1}, "elapsed_s": 22.7}
+{"scenario": "IBS-S-EM-01", "seed": 4, "completed": true, "winner": "draw", "reason": "平局：损伤分差 2，未达到 25 分", "turns": 12, "sunk": {"axis": 6, "allies": 4}, "elapsed_s": 29.6}
+{"scenario": "IBS-S-EM-01", "seed": 6, "completed": true, "winner": "axis", "reason": "二马想定损伤分领先 41 分（门槛 25）", "turns": 12, "sunk": {"axis": 5, "allies": 5}, "elapsed_s": 33.0}
+{"scenario": "IBS-S-EM-01", "seed": 3, "completed": true, "winner": "draw", "reason": "平局：损伤分差 2，未达到 25 分", "turns": 12, "sunk": {"axis": 5, "allies": 0}, "elapsed_s": 37.9}
+{"scenario": "IBS-S-EM-01", "seed": 2, "completed": true, "winner": "axis", "reason": "二马想定损伤分领先 32 分（门槛 25）", "turns": 12, "sunk": {"axis": 4, "allies": 5}, "elapsed_s": 39.6}
+{"scenario": "IBS-S-EM-01", "seed": 1, "completed": true, "winner": "draw", "reason": "平局：损伤分差 0，未达到 25 分", "turns": 12, "sunk": {"axis": 4, "allies": 5}, "elapsed_s": 48.5}
+{"scenario": "IBS-S-EM-01", "seed": 7, "completed": true, "winner": "axis", "reason": "二马想定损伤分领先 29 分（门槛 25）", "turns": 12, "sunk": {"axis": 4, "allies": 5}, "elapsed_s": 33.8}
+{"scenario": "IBS-S-EM-01", "seed": 9, "completed": true, "winner": "draw", "reason": "平局：损伤分差 1，未达到 25 分", "turns": 12, "sunk": {"axis": 6, "allies": 6}, "elapsed_s": 34.3}
+{"scenario": "IBS-S-EM-01", "seed": 10, "completed": true, "winner": "draw", "reason": "平局：损伤分差 9，未达到 25 分", "turns": 12, "sunk": {"axis": 4, "allies": 5}, "elapsed_s": 34.4}
+{"scenario": "IBS-S-EM-01", "seed": 8, "completed": true, "winner": "draw", "reason": "平局：损伤分差 24，未达到 25 分", "turns": 12, "sunk": {"axis": 4, "allies": 4}, "elapsed_s": 44.1}
+{"scenario": "IBS-S-FM-01", "seed": 6, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 14, "sunk": {"axis": 8, "allies": 2}, "elapsed_s": 197.8}
+{"scenario": "IBS-S-FM-01", "seed": 2, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 14, "sunk": {"axis": 5, "allies": 0}, "elapsed_s": 233.4}
+{"scenario": "IBS-S-FM-01", "seed": 3, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 14, "sunk": {"axis": 13, "allies": 0}, "elapsed_s": 250.9}
+{"scenario": "IBS-S-FM-01", "seed": 1, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 14, "sunk": {"axis": 1, "allies": 2}, "elapsed_s": 294.2}
+{"scenario": "IBS-S-FM-01", "seed": 5, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 14, "sunk": {"axis": 7, "allies": 0}, "elapsed_s": 278.0}
+{"scenario": "IBS-S-FM-01", "seed": 4, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 14, "sunk": {"axis": 8, "allies": 0}, "elapsed_s": 355.4}
+{"scenario": "IBS-S-FM-01", "seed": 7, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 14, "sunk": {"axis": 0, "allies": 0}, "elapsed_s": 287.4}
+{"scenario": "IBS-S-FM-01", "seed": 8, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 14, "sunk": {"axis": 3, "allies": 0}, "elapsed_s": 317.9}
+{"scenario": "IBS-S-FM-01", "seed": 10, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 14, "sunk": {"axis": 3, "allies": 2}, "elapsed_s": 280.5}
+{"scenario": "IBS-S-FM-01", "seed": 9, "completed": true, "winner": "allies", "reason": "想定结束时胜利点领先", "turns": 14, "sunk": {"axis": 4, "allies": 2}, "elapsed_s": 511.5}

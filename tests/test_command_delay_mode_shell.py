@@ -111,9 +111,17 @@ def test_command_delay_rejects_unsupported_scenarios() -> None:
     reached through ``engine.reset`` without a new playable scenario; it is
     tested directly, which is the same function ``build_initial_state`` calls.
     """
+    # Derived from the live set rather than hardcoded: another lineage may support
+    # more scenarios, and a hardcoded example turns that into a false failure.
+    from iron_bottom_sound.realistic_command import SUPPORTED_SCENARIOS
+
+    unsupported = next(
+        candidate for candidate in ("IBS-S-99", "IBS-S-15", "IBS-S-02")
+        if candidate not in SUPPORTED_SCENARIOS
+    )
     with pytest.raises(ValueError, match="not available for scenario"):
         command_delay.validate_mode_options(
-            GameOptions(realistic_command=True, command_delay_mode=True), "IBS-S-02"
+            GameOptions(realistic_command=True, command_delay_mode=True), unsupported
         )
     command_delay.validate_mode_options(
         GameOptions(realistic_command=True, command_delay_mode=True), "IBS-S-03"
