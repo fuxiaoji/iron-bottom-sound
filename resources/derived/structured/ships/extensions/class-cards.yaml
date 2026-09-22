@@ -1,0 +1,4114 @@
+schema_version: 1
+source:
+  document: assets/ship-classes（船表 舰级通用卡 38 张，SHA-256 与 manifest 一致）
+  transcription_key: 符号映射经 二马船表 与 extensions/erma.yaml 已录入记录逐格校准
+  status: verified_source
+status: structured
+note: 舰级卡为同一舰级共用数据（代表舰标注在卡面，source_page=1 指卡正面）；仅用于解锁目录中无独立舰卡记录的舰，同名同型已有记录的目录行视为替身不重复登记，记录手册优先。卡面上 0 火力的高炮位（无水面火力）不录入引擎。绫波级（夕雾）无独立舰级卡保持未建档；巴格莱级/本汉姆级/波特级/利安德级/爪哇级/德·鲁伊特/哈津斯级无舰级卡。
+families:
+  jp-mutsuki-apd:
+    ship_type: APD
+    displacement_band: A
+    hull_rows:
+    - 2
+    - 1
+    - 1
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 1
+      caliber: 4.7
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: stern
+      firepower: 2
+      caliber: 4.7
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT1
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 2
+      reloads: 0
+    - id: TT2
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    torpedo_type: jp-24-type8
+    fire_control: true
+  jp-kamikaze-apd:
+    ship_type: APD
+    displacement_band: A
+    hull_rows:
+    - 2
+    - 1
+    - 1
+    speed_damage_track:
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 1
+      caliber: 4.7
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: midships
+      firepower: 1
+      caliber: 4.7
+      arcs:
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 2
+      caliber: 4.7
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT1
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    - id: TT2
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    torpedo_type: jp-21
+    fire_control: true
+  us-north-carolina-bb:
+    ship_type: BB
+    displacement_band: F
+    hull_rows:
+    - 6
+    - 6
+    - 5
+    - 5
+    - 5
+    speed_damage_track:
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 4
+      - 3
+      - 2
+      - 1
+    - - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 36
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 36
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 36
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S-P1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-P2
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-P3
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-S1
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S-S2
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S-S3
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    armour:
+      primary: 16
+      secondary: 2
+      belt: 12
+      bridge: 15
+    fire_control: true
+    radar: true
+    aircraft: true
+  us-south-dakota-bb:
+    ship_type: BB
+    displacement_band: G
+    hull_rows:
+    - 6
+    - 6
+    - 5
+    - 5
+    - 5
+    speed_damage_track:
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 4
+      - 3
+      - 2
+      - 1
+    - - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 36
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 36
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 36
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S-P1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-P2
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-P3
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-S1
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S-S2
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S-S3
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    armour:
+      primary: 18
+      secondary: 2
+      belt: 12
+      bridge: 16
+    fire_control: true
+    radar: true
+    aircraft: true
+  jp-yamato-bb:
+    ship_type: BB
+    displacement_band: I
+    hull_rows:
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+    speed_damage_track:
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 4
+      - 3
+      - 2
+      - 1
+    - - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 31
+      caliber: 18
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 31
+      caliber: 18
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 31
+      caliber: 18
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S1
+      kind: secondary
+      position: bow
+      firepower: 6
+      caliber: 6.1
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: S2
+      kind: secondary
+      position: port
+      firepower: 6
+      caliber: 6.1
+      arcs:
+      - port
+    - id: S3
+      kind: secondary
+      position: starboard
+      firepower: 6
+      caliber: 6.1
+      arcs:
+      - starboard
+    - id: S4
+      kind: secondary
+      position: stern
+      firepower: 6
+      caliber: 6.1
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: T1
+      kind: tertiary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: T2
+      kind: tertiary
+      position: port
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+    - id: T3
+      kind: tertiary
+      position: port
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+    - id: T4
+      kind: tertiary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: T5
+      kind: tertiary
+      position: starboard
+      firepower: 2
+      caliber: 5
+      arcs:
+      - starboard
+    - id: T6
+      kind: tertiary
+      position: starboard
+      firepower: 2
+      caliber: 5
+      arcs:
+      - starboard
+    armour:
+      primary: 24
+      secondary: 6
+      belt: 15
+      bridge: 18
+    fire_control: true
+  us-colorado-bb:
+    ship_type: BB
+    displacement_band: F
+    hull_rows:
+    - 4
+    - 4
+    - 3
+    - 3
+    - 3
+    speed_damage_track:
+    - - 4
+      - 3
+      - 2
+      - 1
+    - - 3
+      - 2
+      - 1
+    - - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 14
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 14
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 14
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 14
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S-P1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-P2
+      kind: secondary
+      position: port
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+    - id: S-P3
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-S1
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S-S2
+      kind: secondary
+      position: starboard
+      firepower: 2
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S-S3
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    torpedo_launchers:
+    - id: TT-P1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 1
+    - id: TT-S1
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 1
+    torpedo_type: us-21-mk11-model3-1928
+    armour:
+      primary: 18
+      belt: 13
+      bridge: 16
+    fire_control: true
+    aircraft: true
+  jp-kongo-bb:
+    ship_type: BB
+    displacement_band: F
+    hull_rows:
+    - 4
+    - 4
+    - 4
+    - 4
+    - 4
+    speed_damage_track:
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 13
+      caliber: 14
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 13
+      caliber: 14
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 13
+      caliber: 14
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 13
+      caliber: 14
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 6
+      arcs:
+      - port
+    - id: S2
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 6
+      arcs:
+      - port
+    - id: S3
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 6
+      arcs:
+      - port
+    - id: S4
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 6
+      arcs:
+      - starboard
+    - id: S5
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 6
+      arcs:
+      - starboard
+    - id: S6
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 6
+      arcs:
+      - starboard
+    - id: T1
+      kind: tertiary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: T2
+      kind: tertiary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    armour:
+      primary: 9
+      secondary: 6
+      belt: 8
+      bridge: 9
+    fire_control: true
+  jp-nagato-bb:
+    ship_type: BB
+    displacement_band: F
+    hull_rows:
+    - 4
+    - 4
+    - 4
+    - 3
+    - 3
+    speed_damage_track:
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 4
+      - 3
+      - 2
+      - 1
+    - - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 14
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 14
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 14
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 14
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - port
+    - id: S2
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - port
+    - id: S3
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - port
+    - id: S4
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - starboard
+    - id: S5
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - starboard
+    - id: S6
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - starboard
+    torpedo_launchers:
+    - id: TT1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 1
+    - id: TT2
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 1
+    - id: TT3
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 1
+    - id: TT4
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 1
+    torpedo_type: jp-24-type90
+    armour:
+      primary: 11
+      belt: 11
+      bridge: 11
+    fire_control: true
+    aircraft: true
+  us-lexington-bc:
+    ship_type: BC
+    displacement_band: F
+    hull_rows:
+    - 4
+    - 4
+    - 4
+    - 4
+    - 3
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 14
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 14
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 14
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 14
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S-P1
+      kind: secondary
+      position: port
+      firepower: 4
+      caliber: 6
+      arcs:
+      - port
+    - id: S-P2
+      kind: secondary
+      position: port
+      firepower: 4
+      caliber: 6
+      arcs:
+      - port
+    - id: S-P3
+      kind: secondary
+      position: port
+      firepower: 4
+      caliber: 6
+      arcs:
+      - port
+    - id: S-S1
+      kind: secondary
+      position: starboard
+      firepower: 4
+      caliber: 6
+      arcs:
+      - starboard
+    - id: S-S2
+      kind: secondary
+      position: starboard
+      firepower: 4
+      caliber: 6
+      arcs:
+      - starboard
+    - id: S-S3
+      kind: secondary
+      position: starboard
+      firepower: 4
+      caliber: 6
+      arcs:
+      - starboard
+    torpedo_launchers:
+    - id: TT-P1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 0
+    - id: TT-S1
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    torpedo_type: us-21-mk11-model3-1928
+    armour:
+      primary: 14
+      belt: 7
+      bridge: 16
+    fire_control: true
+    aircraft: true
+  jp-kii-bc:
+    ship_type: BC
+    displacement_band: F
+    hull_rows:
+    - 4
+    - 4
+    - 4
+    - 4
+    - 3
+    speed_damage_track:
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 13
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 13
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: midships
+      firepower: 12
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 13
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P5
+      kind: primary
+      position: stern
+      firepower: 13
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S1
+      kind: secondary
+      position: port
+      firepower: 4
+      caliber: 5.5
+      arcs:
+      - port
+    - id: S2
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - port
+    - id: S3
+      kind: secondary
+      position: port
+      firepower: 4
+      caliber: 5.5
+      arcs:
+      - port
+    - id: S4
+      kind: secondary
+      position: starboard
+      firepower: 4
+      caliber: 5.5
+      arcs:
+      - starboard
+    - id: S5
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - starboard
+    - id: S6
+      kind: secondary
+      position: starboard
+      firepower: 4
+      caliber: 5.5
+      arcs:
+      - starboard
+    torpedo_launchers:
+    - id: TT1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 1
+    - id: TT2
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 1
+    torpedo_type: jp-24-type90
+    armour:
+      primary: 10
+      belt: 10
+      bridge: 13
+    fire_control: true
+    aircraft: true
+  jp-amagi-bc:
+    ship_type: BC
+    displacement_band: F
+    hull_rows:
+    - 4
+    - 4
+    - 4
+    - 4
+    - 3
+    speed_damage_track:
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 13
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 13
+      caliber: 16
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: midships
+      firepower: 12
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 13
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P5
+      kind: primary
+      position: stern
+      firepower: 13
+      caliber: 16
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - port
+    - id: S2
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - port
+    - id: S3
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - port
+    - id: S4
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - starboard
+    - id: S5
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - starboard
+    - id: S6
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5.5
+      arcs:
+      - starboard
+    torpedo_launchers:
+    - id: TT1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 1
+    - id: TT2
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 1
+    torpedo_type: jp-24-type90
+    armour:
+      primary: 10
+      belt: 9
+      bridge: 13
+    fire_control: true
+    aircraft: true
+  us-northampton-ca:
+    ship_type: CA
+    displacement_band: C
+    hull_rows:
+    - 4
+    - 4
+    - 4
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 7
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 7
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 8
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S-P1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-P2
+      kind: secondary
+      position: port
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+    - id: S-S1
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S-S2
+      kind: secondary
+      position: starboard
+      firepower: 2
+      caliber: 5
+      arcs:
+      - starboard
+    armour:
+      primary: 2
+      belt: 4
+      bridge: 1
+    fire_control: true
+  jp-furutaka-ca:
+    ship_type: CA
+    displacement_band: C
+    hull_rows:
+    - 3
+    - 3
+    - 3
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 2
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 1
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: midships
+      firepower: 1
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+    - id: P4
+      kind: primary
+      position: midships
+      firepower: 1
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+    - id: P5
+      kind: primary
+      position: stern
+      firepower: 1
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P6
+      kind: primary
+      position: stern
+      firepower: 2
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 1
+    - id: TT2
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 1
+    - id: TT3
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 1
+    - id: TT4
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 1
+    torpedo_type: jp-24-type90
+    armour:
+      primary: 1
+      belt: 3
+      bridge: 0
+    fire_control: true
+    aircraft: true
+  jp-furutaka-aoba-ca:
+    ship_type: CA
+    displacement_band: C
+    hull_rows:
+    - 4
+    - 4
+    - 3
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 6
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 5
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 5
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S1
+      kind: secondary
+      position: port
+      firepower: 1
+      caliber: 4.7
+      arcs:
+      - port
+    - id: S2
+      kind: secondary
+      position: port
+      firepower: 1
+      caliber: 4.7
+      arcs:
+      - port
+    - id: S3
+      kind: secondary
+      position: starboard
+      firepower: 1
+      caliber: 4.7
+      arcs:
+      - starboard
+    - id: S4
+      kind: secondary
+      position: starboard
+      firepower: 1
+      caliber: 4.7
+      arcs:
+      - starboard
+    torpedo_launchers:
+    - id: TT1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 1
+    - id: TT2
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 1
+    torpedo_type: jp-24-type90
+    armour:
+      primary: 1
+      belt: 3
+    fire_control: true
+    aircraft: true
+  jp-myoko-ca:
+    ship_type: CA
+    displacement_band: C
+    hull_rows:
+    - 5
+    - 4
+    - 4
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 6
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 5
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: midships
+      firepower: 5
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 5
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P5
+      kind: primary
+      position: stern
+      firepower: 6
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S2
+      kind: secondary
+      position: port
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+    - id: S3
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S4
+      kind: secondary
+      position: starboard
+      firepower: 2
+      caliber: 5
+      arcs:
+      - starboard
+    torpedo_launchers:
+    - id: TT1
+      position: port
+      arcs:
+      - port
+      torpedoes: 2
+      reloads: 2
+    - id: TT2
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 2
+      reloads: 2
+    torpedo_type: jp-24-type90
+    armour:
+      primary: 1
+      belt: 4
+    fire_control: true
+  us-pensacola-ca:
+    ship_type: CA
+    displacement_band: C
+    hull_rows:
+    - 4
+    - 4
+    - 4
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 7
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 5
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 5
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 7
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S-P1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-P2
+      kind: secondary
+      position: port
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+    - id: S-S1
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S-S2
+      kind: secondary
+      position: starboard
+      firepower: 2
+      caliber: 5
+      arcs:
+      - starboard
+    armour:
+      primary: 2
+      belt: 3
+      bridge: 1
+    fire_control: true
+  us-new-orleans-ca:
+    ship_type: CA
+    displacement_band: C
+    hull_rows:
+    - 4
+    - 4
+    - 4
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 7
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 7
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 8
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S-P1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-P2
+      kind: secondary
+      position: port
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+    - id: S-S1
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S-S2
+      kind: secondary
+      position: starboard
+      firepower: 2
+      caliber: 5
+      arcs:
+      - starboard
+    armour:
+      primary: 8
+      belt: 5
+      bridge: 3
+    fire_control: true
+  us-portland-ca:
+    ship_type: CA
+    displacement_band: C
+    hull_rows:
+    - 4
+    - 4
+    - 4
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 7
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 7
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 8
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S-P1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-P2
+      kind: secondary
+      position: port
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+    - id: S-S1
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S-S2
+      kind: secondary
+      position: starboard
+      firepower: 2
+      caliber: 5
+      arcs:
+      - starboard
+    armour:
+      primary: 2
+      belt: 2
+      bridge: 1
+    fire_control: true
+    radar: true
+  jp-takao-ca:
+    ship_type: CA
+    displacement_band: C
+    hull_rows:
+    - 5
+    - 4
+    - 4
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 6
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 5
+      caliber: 8
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: midships
+      firepower: 5
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 5
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P5
+      kind: primary
+      position: stern
+      firepower: 6
+      caliber: 8
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S2
+      kind: secondary
+      position: port
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+    - id: S3
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S4
+      kind: secondary
+      position: starboard
+      firepower: 2
+      caliber: 5
+      arcs:
+      - starboard
+    torpedo_launchers:
+    - id: TT1
+      position: port
+      arcs:
+      - port
+      torpedoes: 2
+      reloads: 2
+    - id: TT2
+      position: port
+      arcs:
+      - port
+      torpedoes: 2
+      reloads: 2
+    - id: TT3
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 2
+      reloads: 2
+    - id: TT4
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 2
+      reloads: 2
+    torpedo_type: jp-24-type90
+    armour:
+      primary: 1
+      belt: 4
+      bridge: 1
+    fire_control: true
+  us-atlanta-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows:
+    - 4
+    - 3
+    - 3
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 3
+      caliber: 5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 3
+      caliber: 5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P5
+      kind: primary
+      position: stern
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT-P1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 0
+    - id: TT-S1
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    torpedo_type: us-21-mk15-1942
+    armour:
+      primary: 1
+      secondary: 1
+      belt: 3
+      bridge: 2
+    fire_control: true
+  us-cleveland-cl:
+    ship_type: CL
+    displacement_band: D
+    hull_rows:
+    - 5
+    - 4
+    - 4
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 7
+      caliber: 6
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 6
+      caliber: 6
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 6
+      caliber: 6
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 7
+      caliber: 6
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S-P1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-P2
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-P3
+      kind: secondary
+      position: port
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+    - id: S-S1
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S-S2
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S-S3
+      kind: secondary
+      position: starboard
+      firepower: 2
+      caliber: 5
+      arcs:
+      - starboard
+    armour:
+      primary: 6
+      secondary: 1
+      belt: 5
+      bridge: 5
+    fire_control: true
+    radar: true
+  jp-yubari-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows:
+    - 3
+    - 2
+    - 2
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 1
+      caliber: 5.5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 2
+      caliber: 5.5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 2
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 1
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S1
+      kind: secondary
+      position: port
+      firepower: 1
+      caliber: 3
+      arcs:
+      - port
+    - id: S2
+      kind: secondary
+      position: starboard
+      firepower: 1
+      caliber: 3
+      arcs:
+      - starboard
+    torpedo_launchers:
+    - id: TT1
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 2
+      reloads: 0
+    torpedo_type: jp-24-type90
+    armour:
+      primary: 1
+      belt: 2
+    fire_control: true
+  jp-tenryu-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows:
+    - 3
+    - 2
+    - 2
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 2
+      caliber: 5.5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: midships
+      firepower: 1
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: midships
+      firepower: 1
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 1
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S1
+      kind: secondary
+      position: midships
+      firepower: 1
+      caliber: 3
+      arcs:
+      - port
+      - starboard
+    torpedo_launchers:
+    - id: TT1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 0
+    - id: TT2
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    torpedo_type: jp-21
+    armour:
+      primary: 1
+      belt: 2
+      bridge: 2
+    fire_control: true
+  jp-tenryu-1928-cl:
+    ship_type: CL
+    displacement_band: A
+    hull_rows:
+    - 2
+    - 2
+    - 2
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 1
+      caliber: 5.5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: midships
+      firepower: 2
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: midships
+      firepower: 2
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 1
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT1
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 2
+      reloads: 0
+    torpedo_type: jp-21
+    armour:
+      belt: 2
+    fire_control: true
+  us-omaha-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows:
+    - 3
+    - 3
+    - 2
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 3
+      caliber: 6
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: midships
+      firepower: 3
+      caliber: 6
+      arcs:
+      - port
+    - id: P3
+      kind: primary
+      position: midships
+      firepower: 3
+      caliber: 6
+      arcs:
+      - starboard
+    - id: P4
+      kind: primary
+      position: midships
+      firepower: 3
+      caliber: 6
+      arcs:
+      - port
+      - starboard
+    - id: P5
+      kind: primary
+      position: stern
+      firepower: 3
+      caliber: 6
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S-P1
+      kind: secondary
+      position: port
+      firepower: 1
+      caliber: 3
+      arcs:
+      - port
+    - id: S-S1
+      kind: secondary
+      position: starboard
+      firepower: 1
+      caliber: 3
+      arcs:
+      - starboard
+    torpedo_launchers:
+    - id: TT-P1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 0
+    - id: TT-S1
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    torpedo_type: us-21-mk11-model3-1928
+    armour:
+      primary: 2
+      belt: 3
+    fire_control: true
+    aircraft: true
+  jp-sendai-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows:
+    - 3
+    - 2
+    - 2
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 2
+      caliber: 5.5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: port
+      firepower: 1
+      caliber: 5.5
+      arcs:
+      - port
+    - id: P3
+      kind: primary
+      position: starboard
+      firepower: 1
+      caliber: 5.5
+      arcs:
+      - starboard
+    - id: P4
+      kind: primary
+      position: midships
+      firepower: 1
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+    - id: P5
+      kind: primary
+      position: midships
+      firepower: 1
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+    - id: P6
+      kind: primary
+      position: midships
+      firepower: 2
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+    - id: P7
+      kind: primary
+      position: stern
+      firepower: 2
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT1
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    - id: TT2
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    torpedo_type: jp-24-type90
+    armour:
+      primary: 1
+      belt: 2
+      bridge: 2
+    fire_control: true
+    aircraft: true
+  us-brooklyn-cl:
+    ship_type: CL
+    displacement_band: C
+    hull_rows:
+    - 5
+    - 4
+    - 4
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 7
+      caliber: 6
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 6
+      caliber: 6
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: midships
+      firepower: 6
+      caliber: 6
+      arcs:
+      - port
+      - starboard
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 6
+      caliber: 6
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P5
+      kind: primary
+      position: stern
+      firepower: 7
+      caliber: 6
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S-P1
+      kind: secondary
+      position: port
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+    - id: S-P2
+      kind: secondary
+      position: port
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+    - id: S-S1
+      kind: secondary
+      position: starboard
+      firepower: 3
+      caliber: 5
+      arcs:
+      - starboard
+    - id: S-S2
+      kind: secondary
+      position: starboard
+      firepower: 2
+      caliber: 5
+      arcs:
+      - starboard
+    armour:
+      primary: 6
+      belt: 5
+      bridge: 5
+    fire_control: true
+    radar: true
+  jp-nagara-sendai-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows:
+    - 3
+    - 3
+    - 2
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 2
+      caliber: 5.5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: midships
+      firepower: 1
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: port
+      firepower: 2
+      caliber: 5.5
+      arcs:
+      - port
+    - id: P4
+      kind: primary
+      position: starboard
+      firepower: 2
+      caliber: 5.5
+      arcs:
+      - starboard
+    - id: P5
+      kind: primary
+      position: midships
+      firepower: 1
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+    - id: P6
+      kind: primary
+      position: midships
+      firepower: 2
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+    - id: P7
+      kind: primary
+      position: stern
+      firepower: 2
+      caliber: 5.5
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S1
+      kind: secondary
+      position: port
+      firepower: 1
+      caliber: 5
+      arcs:
+      - port
+    - id: S2
+      kind: secondary
+      position: starboard
+      firepower: 1
+      caliber: 5
+      arcs:
+      - starboard
+    torpedo_launchers:
+    - id: TT1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 1
+    - id: TT2
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 1
+    - id: TT3
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 1
+    - id: TT4
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 1
+    torpedo_type: jp-24-type90
+    armour:
+      primary: 1
+      belt: 2
+    fire_control: true
+  jp-agano-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows:
+    - 3
+    - 3
+    - 3
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 3
+      caliber: 6
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 3
+      caliber: 6
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 3
+      caliber: 6
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: S1
+      kind: secondary
+      position: port
+      firepower: 1
+      caliber: 3
+      arcs:
+      - port
+    - id: S2
+      kind: secondary
+      position: starboard
+      firepower: 1
+      caliber: 3
+      arcs:
+      - starboard
+    torpedo_launchers:
+    - id: TT1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 1
+    - id: TT2
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 1
+    torpedo_type: jp-24-type90
+    armour:
+      primary: 1
+      belt: 2
+      bridge: 2
+    fire_control: true
+  us-clemson-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows:
+    - 2
+    - 1
+    - 1
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 1
+      caliber: 4
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: midships
+      firepower: 1
+      caliber: 4
+      arcs:
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 1
+      caliber: 4
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT-P1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 0
+    - id: TT-S1
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    torpedo_type: us-21-mk11-model3-1928
+    fire_control: true
+  jp-hatsuharu-ariake-shiratsuyu-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows:
+    - 2
+    - 2
+    - 1
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 3
+      caliber: 5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: midships
+      firepower: 1
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT1
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 2
+      reloads: 2
+    - id: TT2
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 2
+      reloads: 2
+    torpedo_type: jp-24-type90
+    fire_control: true
+  jp-fubuki-akatsuki-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows:
+    - 2
+    - 2
+    - 1
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 3
+      caliber: 5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: stern
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT1
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 2
+      reloads: 0
+    - id: TT2
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 2
+      reloads: 0
+    torpedo_type: jp-24-type90
+    fire_control: true
+  jp-asashio-kagero-yugumo-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows:
+    - 2
+    - 2
+    - 2
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 3
+      caliber: 5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: stern
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 3
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT1
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 2
+      reloads: 2
+    - id: TT2
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 2
+      reloads: 2
+    torpedo_type: jp-24-type90
+    fire_control: true
+  us-gridley-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows:
+    - 2
+    - 2
+    - 1
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 2
+      caliber: 5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 1
+      caliber: 5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 1
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT-P1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 0
+    - id: TT-P2
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 0
+    - id: TT-S1
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    - id: TT-S2
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    torpedo_type: us-21-mk15-1942
+    fire_control: true
+  jp-kamikaze-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows:
+    - 1
+    - 1
+    - 1
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 1
+      caliber: 4.7
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: midships
+      firepower: 2
+      caliber: 4.7
+      arcs:
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 1
+      caliber: 4.7
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT1
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 2
+      reloads: 0
+    torpedo_type: jp-21
+    fire_control: true
+  jp-akizuki-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows:
+    - 3
+    - 2
+    - 2
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 3
+      caliber: 3.9
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 2
+      caliber: 3.9
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: stern
+      firepower: 2
+      caliber: 3.9
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 3
+      caliber: 3.9
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT1
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 2
+      reloads: 2
+    torpedo_type: jp-24-type90
+    fire_control: true
+  us-sims-benson-gleaves-fletcher-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows:
+    - 2
+    - 2
+    - 1
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 2
+      caliber: 5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 1
+      caliber: 5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: midships
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 1
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P5
+      kind: primary
+      position: stern
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT1
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 2
+      reloads: 0
+    - id: TT2
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    torpedo_type: us-21-mk15-1942
+    fire_control: true
+  us-mahan-dd:
+    ship_type: DD
+    displacement_band: A
+    hull_rows:
+    - 2
+    - 2
+    - 1
+    speed_damage_track:
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    - - 5
+      - 4
+      - 3
+      - 2
+      - 1
+    guns:
+    - id: P1
+      kind: primary
+      position: bow
+      firepower: 2
+      caliber: 5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P2
+      kind: primary
+      position: bow
+      firepower: 1
+      caliber: 5
+      arcs:
+      - bow
+      - port
+      - starboard
+    - id: P3
+      kind: primary
+      position: midships
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+    - id: P4
+      kind: primary
+      position: stern
+      firepower: 1
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    - id: P5
+      kind: primary
+      position: stern
+      firepower: 2
+      caliber: 5
+      arcs:
+      - port
+      - starboard
+      - stern
+    torpedo_launchers:
+    - id: TT1
+      position: midships
+      arcs:
+      - port
+      - starboard
+      torpedoes: 2
+      reloads: 0
+    - id: TT-P1
+      position: port
+      arcs:
+      - port
+      torpedoes: 1
+      reloads: 0
+    - id: TT-S1
+      position: starboard
+      arcs:
+      - starboard
+      torpedoes: 1
+      reloads: 0
+    torpedo_type: us-21-mk15-1942
+    fire_control: true
+class_card_index:
+- card: APD睦月级.png
+  side: japan
+  representative: 长月
+  vp: 3
+  families:
+  - jp-mutsuki-apd
+- card: APD神风级.png
+  side: japan
+  representative: 夕凪
+  vp: 3
+  families:
+  - jp-kamikaze-apd
+- card: BB北卡罗来纳级.png
+  side: usa
+  representative: 华盛顿
+  vp: 37
+  families:
+  - us-north-carolina-bb
+- card: BB南达科塔级.png
+  side: usa
+  representative: 南达科塔
+  vp: 36
+  families:
+  - us-south-dakota-bb
+- card: BB大和级.png
+  side: japan
+  representative: 大和
+  vp: 45
+  families:
+  - jp-yamato-bb
+- card: BB科罗拉多级.png
+  side: usa
+  representative: 科罗拉多
+  vp: 31
+  families:
+  - us-colorado-bb
+- card: BB金刚级.png
+  side: japan
+  representative: 雾岛
+  vp: 33
+  families:
+  - jp-kongo-bb
+- card: BB长门级.png
+  side: japan
+  representative: 长门
+  vp: 33
+  families:
+  - jp-nagato-bb
+- card: BC列克星敦级.png
+  side: usa
+  representative: 列克星敦
+  vp: 31
+  families:
+  - us-lexington-bc
+- card: BC纪伊级.png
+  side: japan
+  representative: 尾张
+  vp: 33
+  families:
+  - jp-kii-bc
+- card: BC赤城级.png
+  side: japan
+  representative: 赤城
+  vp: 32
+  families:
+  - jp-amagi-bc
+- card: CA北安普顿级.png
+  side: usa
+  representative: 北安普敦
+  vp: 10
+  families:
+  - us-northampton-ca
+- card: CA古鹰级1928.png
+  side: japan
+  representative: 加古
+  vp: 9
+  families:
+  - jp-furutaka-ca
+- card: CA古鹰青叶级.png
+  side: japan
+  representative: 古鹰
+  vp: 11
+  families:
+  - jp-furutaka-aoba-ca
+- card: CA妙高级.png
+  side: japan
+  representative: 妙高
+  vp: 16
+  families:
+  - jp-myoko-ca
+- card: CA彭萨科拉级.png
+  side: usa
+  representative: 盐湖城
+  vp: 10
+  families:
+  - us-pensacola-ca
+- card: CA新奥尔良级.png
+  side: usa
+  representative: 旧金山
+  vp: 11
+  families:
+  - us-new-orleans-ca
+- card: CA波特兰级.png
+  side: usa
+  representative: 波特兰
+  vp: 10
+  families:
+  - us-portland-ca
+- card: CA高雄级.png
+  side: japan
+  representative: 高雄
+  vp: 15
+  families:
+  - jp-takao-ca
+- card: CL亚特兰大级.png
+  side: usa
+  representative: 亚特兰大
+  vp: 8
+  families:
+  - us-atlanta-cl
+- card: CL克利夫兰级.png
+  side: usa
+  representative: 克利夫兰
+  vp: 11
+  families:
+  - us-cleveland-cl
+- card: CL夕张级_实际无副炮.png
+  side: japan
+  representative: 夕张
+  vp: 5
+  families:
+  - jp-yubari-cl
+- card: CL天龙级.png
+  side: japan
+  representative: 天龙
+  vp: 5
+  families:
+  - jp-tenryu-cl
+- card: CL天龙级1928.png
+  side: japan
+  representative: 龙田
+  vp: 4
+  families:
+  - jp-tenryu-1928-cl
+- card: CL奥马哈级1928.png
+  side: usa
+  representative: 孟菲斯
+  vp: 6
+  families:
+  - us-omaha-cl
+- card: CL川内级1928.png
+  side: japan
+  representative: 神通
+  vp: 5
+  families:
+  - jp-sendai-cl
+- card: CL布鲁林克级.png
+  side: usa
+  representative: 博伊西
+  vp: 11
+  families:
+  - us-brooklyn-cl
+- card: CL长良川内级.png
+  side: japan
+  representative: 川内
+  vp: 7
+  families:
+  - jp-nagara-sendai-cl
+- card: CL阿贺野级.png
+  side: japan
+  representative: 阿贺野
+  vp: 8
+  families:
+  - jp-agano-cl
+- card: DD克莱姆森级1928.png
+  side: usa
+  representative: 班布里奇
+  vp: 2
+  families:
+  - us-clemson-dd
+- card: DD初春&有明&白露级.png
+  side: japan
+  representative: 凉风
+  vp: 3
+  families:
+  - jp-hatsuharu-ariake-shiratsuyu-dd
+- card: DD吹雪&晓级.png
+  side: japan
+  representative: 吹雪
+  vp: 3
+  families:
+  - jp-fubuki-akatsuki-dd
+- card: DD朝潮&阳炎&夕云级.png
+  side: japan
+  representative: 谷风
+  vp: 4
+  families:
+  - jp-asashio-kagero-yugumo-dd
+- card: DD格里德利级.png
+  side: usa
+  representative: 莫里
+  vp: 2
+  families:
+  - us-gridley-dd
+- card: DD神风级1928.png
+  side: japan
+  representative: 神风
+  vp: 2
+  families:
+  - jp-kamikaze-dd
+- card: DD秋月级.png
+  side: japan
+  representative: 照月
+  vp: 5
+  families:
+  - jp-akizuki-dd
+- card: DD西姆斯&本森&格里维斯&弗莱彻级.png
+  side: usa
+  representative: 法伦霍尔特
+  vp: 2
+  families:
+  - us-sims-benson-gleaves-fletcher-dd
+- card: DD马汉级.png
+  side: usa
+  representative: 戴森
+  vp: 2
+  families:
+  - us-mahan-dd
+records:
+  IBS-U-IJN-HIEI:
+    family: jp-kongo-bb
+    name: 比叡
+    vp: 33
+    source_card: BB金刚级.png
+    source_page: 1
+  IBS-U-IJN-KIRISHIMA:
+    family: jp-kongo-bb
+    name: 雾岛
+    vp: 33
+    source_card: BB金刚级.png
+    source_page: 1
+  IBS-U-IJN-AMAGI:
+    family: jp-amagi-bc
+    name: 天城
+    vp: 32
+    source_card: BC赤城级.png
+    source_page: 1
+  IBS-U-IJN-AKAGI:
+    family: jp-amagi-bc
+    name: 赤城
+    vp: 32
+    source_card: BC赤城级.png
+    source_page: 1
+  IBS-U-IJN-OWARI:
+    family: jp-kii-bc
+    name: 尾张
+    vp: 33
+    source_card: BC纪伊级.png
+    source_page: 1
+  IBS-U-IJN-NACHI:
+    family: jp-myoko-ca
+    name: 那智
+    vp: 16
+    source_card: CA妙高级.png
+    source_page: 1
+  IBS-U-IJN-TAKAO:
+    family: jp-takao-ca
+    name: 高雄
+    vp: 15
+    source_card: CA高雄级.png
+    source_page: 1
+  IBS-U-IJN-ATAGO:
+    family: jp-takao-ca
+    name: 爱宕
+    vp: 15
+    source_card: CA高雄级.png
+    source_page: 1
+  IBS-U-IJN-JINTSU-2:
+    family: jp-nagara-sendai-cl
+    name: 神通Ⅱ
+    vp: 7
+    source_card: CL长良川内级.png
+    source_page: 1
+  IBS-U-IJN-NAGARA:
+    family: jp-nagara-sendai-cl
+    name: 长良
+    vp: 7
+    source_card: CL长良川内级.png
+    source_page: 1
+  IBS-U-IJN-SHIRATSUYU:
+    family: jp-hatsuharu-ariake-shiratsuyu-dd
+    name: 白露
+    vp: 3
+    source_card: DD初春&有明&白露级.png
+    source_page: 1
+  IBS-U-IJN-ARASHI:
+    family: jp-asashio-kagero-yugumo-dd
+    name: 岚
+    vp: 4
+    source_card: DD朝潮&阳炎&夕云级.png
+    source_page: 1
+  IBS-U-IJN-HAGIKAZE:
+    family: jp-asashio-kagero-yugumo-dd
+    name: 萩风
+    vp: 4
+    source_card: DD朝潮&阳炎&夕云级.png
+    source_page: 1
+  IBS-U-IJN-ONAMI:
+    family: jp-asashio-kagero-yugumo-dd
+    name: 大波
+    vp: 4
+    source_card: DD朝潮&阳炎&夕云级.png
+    source_page: 1
+  IBS-U-IJN-UZUKI-2:
+    family: jp-mutsuki-apd
+    name: 卯月
+    vp: 3
+    source_card: APD睦月级.png
+    source_page: 1
+  IBS-U-IJN-NAGATSUKI:
+    family: jp-mutsuki-apd
+    name: 长月
+    vp: 3
+    source_card: APD睦月级.png
+    source_page: 1
+  IBS-U-IJN-MONCHIZUKI:
+    family: jp-mutsuki-apd
+    name: 望月
+    vp: 3
+    source_card: APD睦月级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R03:
+    family: us-north-carolina-bb
+    name: 北卡罗来纳
+    vp: 37
+    source_card: BB北卡罗来纳级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R06:
+    family: us-lexington-bc
+    name: 列克星敦
+    vp: 31
+    source_card: BC列克星敦级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R07:
+    family: us-lexington-bc
+    name: 合众国
+    vp: 31
+    source_card: BC列克星敦级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R08:
+    family: us-lexington-bc
+    name: 宪法
+    vp: 31
+    source_card: BC列克星敦级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R12:
+    family: us-northampton-ca
+    name: 芝加哥
+    vp: 10
+    source_card: CA北安普顿级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R13:
+    family: us-northampton-ca
+    name: 休斯顿
+    vp: 10
+    source_card: CA北安普顿级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R20:
+    family: us-portland-ca
+    name: 波特兰
+    vp: 10
+    source_card: CA波特兰级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R22:
+    family: us-omaha-cl
+    name: 孟菲斯
+    vp: 6
+    source_card: CL奥马哈级1928.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R23:
+    family: us-atlanta-cl
+    name: 亚特兰大
+    vp: 8
+    source_card: CL亚特兰大级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R24:
+    family: us-atlanta-cl
+    name: 朱诺
+    vp: 8
+    source_card: CL亚特兰大级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R25:
+    family: us-atlanta-cl
+    name: 圣胡安
+    vp: 8
+    source_card: CL亚特兰大级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R26:
+    family: us-cleveland-cl
+    name: 克利夫兰
+    vp: 11
+    source_card: CL克利夫兰级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R27:
+    family: us-cleveland-cl
+    name: 哥伦比亚
+    vp: 11
+    source_card: CL克利夫兰级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R28:
+    family: us-cleveland-cl
+    name: 蒙彼利埃
+    vp: 11
+    source_card: CL克利夫兰级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R29:
+    family: us-cleveland-cl
+    name: 丹弗
+    vp: 11
+    source_card: CL克利夫兰级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R51:
+    family: us-mahan-dd
+    name: 邓拉普
+    vp: 2
+    source_card: DD马汉级.png
+    source_page: 1
+  IBS-U-USN-UNNAMED-T01-R52:
+    family: us-gridley-dd
+    name: 格里德利
+    vp: 2
+    source_card: DD格里德利级.png
+    source_page: 1
