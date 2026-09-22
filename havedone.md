@@ -924,3 +924,19 @@
 - **B**：正对照 PASS（61×/46×）；正式采集在不可变标签表上完成。`B_NONTRIVIAL_BOUNDARY=FAIL`（转移线 0.24%/1.2% vs ≥20%；真实边 3/20 条）→ `B_KILL_FOR_MAINLINE`。sampling 上 structured=随机 5 倍、generic 7.6 倍（K=100）——仪器对了，但边界几乎不存在。
 - **C**：C0 冻结网格 28 设定 × 100 配对全低于 10% 带（balance 最高 6.9%、sampling 0%）；均值位移诊断证明故障已应用 → `C_GENERATOR_FEASIBILITY_FAIL`（两任务）。cap 外证据表明去掉上限也不够。
 - 注册器对账 **12931 = 8972 + 3957 + 2** 通过。包 `PHASE_A3_BC_DECISIVE_BUNDLE.zip` sha256 `e97f220b93f4ac68…`。未进入 Phase B；不选主线。
+
+
+## 2026-09-22 — 命令延迟模式 v2.2 实施（CD-0…CD-7）：Classic/Realistic 冻结、MOVE_TOGETHER 可选、新模式与本地代理接口
+
+- **冻结**：tag `realistic-command-v1-frozen` = `d432a975151651fa7d6746b2f92e66b1e09d8d4a`；7 行黄金回放基线（Classic/Realistic × S01/S03/EM01 + seed9）三面冻结（事件流 / 封存订单 / 终局舰船与编队）。harness 每行在**固定 `PYTHONHASHSEED` 的子进程**中运行，因此基线可复现；比较用**冻结投影**（只忽略冻结时不存在的 dict 键），把"语义漂移"与"信封增长"分开报告。
+- **CD0-F1（既有缺陷，已修）**：`engine.py:3124` 遍历 `set[frozenset[str]]`，事件顺序随字符串哈希变化（`realistic_s01` 在 HS∈{0,1,2,8} 下 2 种结果）。用同函数 20 行外已有的同一规范排序键修复；修复后该行摘要 `917114fbb1dd` **与修复前逐字节相同**（0 个冻结值变化），7 行全部稳定。
+- **CD0-F2（既有夹具缺陷，未修）**：`tests/test_tactical_ai.py` 两项哈希种子测试未给子进程传 `PYTHONPATH` → 比较阶段从未执行。改用 `golden_replay.py --probe-hash-seeds` 作为该契约的有效验证；列 PI 裁决项。
+- **CD-1 `MOVE_TOGETHER`**：新增 `formation_maneuver.py`（IBS-R-RC-08）。七项资格条件逐条失败即拒绝；整队执行共用同一记号序列、不复制领舰格位；`geometry_kind` 为**声明状态**（否则 `FOLLOW_WAKE` 编队转向中会被误判非纵队）；`REFORM_COLUMN` 是可检验的成功/失败转换。默认仍 `FOLLOW_WAKE`，黄金回放 0 漂移。
+- **CD-2 模式外壳**：`GameOptions.command_delay_mode`（新，默认关）；三入口互斥且不一致请求**fail closed**；`command_delay.py` 权限状态（仅被搭载编队 `FLEET_DIRECTED`）+ `command_observation.py` 舰队/编队视图。
+- **CD-3 通信与命令**：`communications/`（媒介配置 / 路由 / 队列 / 完整性接缝）+ `delegation.py`。传播延迟**固定 0 并写明**；距离只选媒介；无任何丢包/错码概率，且带概率但无来源的策略被拒绝执行；队列确定性、优先级有序、TTL 丢弃；发出/送达/观察到三字段分离。**CD3-F1**：到达顺序 ≠ 新鲜度顺序，旧报告曾可覆盖更新认知 → 报告与订单统一按发出时间判定。**CD2-F1**：初始化事件曾含双方指挥链 → 改为每方一条带 `secret_side`。
+- **CD-4 权限边界**：`target_priority.py` + `formation_agents.py`。编队代理**不能**产生炮击命令（决策类型无该字段 / 结构守卫 / 引擎拒绝原始炮击批次 / 数据层只有有界权重四道闸门）；54 条封存炮击命令对**当回合**候选集 0 条非法。**CD5-F2（我的审计缺陷）**：初版用终局棋盘判历史订单，54 条全部"非法"——已改为在各 GUNNERY 阶段当场判定。
+- **CD-5 LLM 适配器**：提示词严格等于 v2.2 §12 本地清单且**不含任何规则公式**；七类越界响应被逐项拒绝；重试后回退确定性教条并保留全部尝试记录；录播策略使 LLM 对局可零成本重放。**零付费调用**。
+- **CD-6 研究接口**：契约状态 + 激励账本 + 张量 + 回合导出。策略安全形态（`POLICY_SAFE: true`）与研究回放形态（`POLICY_SAFE: false` + 警告）分离；契约权重保持 0.0 直到研究者声明；`implemented_learning = False`。
+- **CD-7 自审修正**（4 处）：含一处有行为影响的修正——`_optical_range` 原取双方视距较小值，改为按请求方自身视距。
+- **回归**：108 项新增测试全过；`tests/test_realistic_command.py` + `test_realistic_rules_preview.py` 38 项全过；全量 637 项跑完，**失败集合与改动前基线逐字节相同**（3 项既有失败）；8 项审计全 PASS；黄金回放 0 漂移。
+- 包 `COMMAND_DELAY_MODE_V2_2_IMPLEMENTATION_BUNDLE.zip` sha256 `2f32aa3f396f1c6c…`（53 文件）。**未开始任何科研实验；未实现 RL/GNN/Transformer；未选主线。**
