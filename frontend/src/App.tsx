@@ -17,6 +17,7 @@ import {
   submitOrders,
   suggestedOrders,
   tutorialOpponent,
+  fleetView,
   viewGame,
 } from "./api";
 import type { LLMConnectionConfig, SavedGameSummary } from "./api";
@@ -28,6 +29,7 @@ import { HexMap } from "./HexMap";
 import { HexMoveEditor } from "./HexMoveEditor";
 import { PlanSheet } from "./PlanSheet";
 import { RealisticRulesModal } from "./RealisticRulesModal";
+import { CommandDelayPanel } from "./CommandDelayPanel";
 import { ReplayModal } from "./ReplayModal";
 import { ShipStatusCard } from "./ShipStatusCard";
 import { TutorialPanel } from "./TutorialPanel";
@@ -333,6 +335,9 @@ export default function App() {
   });
   const [realisticCommand, setRealisticCommand] = useState(false);
   const [realisticRulesOpen, setRealisticRulesOpen] = useState(false);
+  const [commandDelay, setCommandDelay] = useState(false);
+  const [commandDelayRulesOpen, setCommandDelayRulesOpen] = useState(false);
+  const [commandPanelCollapsed, setCommandPanelCollapsed] = useState(false);
   const [fleetPanelCollapsed, setFleetPanelCollapsed] = useState(false);
   const [ordersPanelCollapsed, setOrdersPanelCollapsed] = useState(false);
   const [replayOpen, setReplayOpen] = useState(false);
@@ -359,6 +364,7 @@ export default function App() {
     config?: LLMConnectionConfig | null,
     realisticOverride?: boolean,
     tutorialScript?: "classic_night" | "erma_grand_fleet",
+    commandDelayRequested = commandDelay,
   ) =>
     createGameApi(
       scenarioId,
@@ -371,7 +377,28 @@ export default function App() {
       config,
       realisticOverride ?? realisticCommand,
       tutorialScript,
+      commandDelayRequested,
     );
+  // 命令延迟模式从"这一局本身"判定：深链和读档都不过开始界面，本地开关不可信。
+  // 舰队视图只在命令延迟模式下可用，因此它是否 200 就是权威答案。
+  useEffect(() => {
+    if (!game) {
+      setCommandDelay(false);
+      return;
+    }
+    let active = true;
+    fleetView(game, side)
+      .then(() => {
+        if (active) setCommandDelay(true);
+      })
+      .catch(() => {
+        if (active) setCommandDelay(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [game, side]);
+
   // URL 深链：?game=&side=&debug=&report=1 直接进入某局（报告视图供战报截图驱动）。
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -730,6 +757,7 @@ export default function App() {
       setAiProfile(item.ai_profile ?? "balanced");
       setSide(playerSide);
       setRealisticCommand(item.realistic_command);
+      setCommandDelay(Boolean(item.command_delay_mode)); // 随后由上方的权威探测覆盖
       setReportEnabled(item.battle_report);
       setLocked(false);
       setReplayOpen(false);
@@ -922,10 +950,16 @@ export default function App() {
           onResume={resume}
           onImport={importSave}
           onPreviewRealisticRules={() => setRealisticRulesOpen(true)}
+          onPreviewCommandDelayRules={() => setCommandDelayRulesOpen(true)}
+          commandDelay={commandDelay}
+          setCommandDelay={setCommandDelay}
           error={error}
         />
         {realisticRulesOpen && (
           <RealisticRulesModal onClose={() => setRealisticRulesOpen(false)} />
+        )}
+        {commandDelayRulesOpen && (
+          <RealisticRulesModal source="command-delay" onClose={() => setCommandDelayRulesOpen(false)} />
         )}
       </>
     );
@@ -1179,6 +1213,16 @@ export default function App() {
         </button>
         <aside>
           {mode === "tutorial" && <TutorialPanel view={view} />}
+          {commandDelay && (
+            <CommandDelayPanel
+              game={game}
+              side={side}
+              turn={view.turn}
+              phase={view.phase}
+              collapsed={commandPanelCollapsed}
+              onToggle={() => setCommandPanelCollapsed((value) => !value)}
+            />
+          )}
           <ShipStatusCard ship={selected} />
           {orderPhases.has(view.phase) && (
             <section className="order-editor">

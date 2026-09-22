@@ -73,6 +73,9 @@ class FormationReport(BaseModel):
     commander_ship_id: str | None = None
     active_order_id: str | None = None
     guide_position: HexCoord | None = None
+    # The map label players actually read on the board ("R14"), so a view never
+    # has to show raw axial coordinates next to a labelled one.
+    guide_label: str | None = None
     guide_heading: int | None = None
     guide_speed: int | None = None
     ship_count: int | None = None
@@ -237,7 +240,12 @@ def fleet_observation(engine: "IronBottomEngine", state: GameState, side: Side) 
             embarked = {
                 "formation_id": formation.id,
                 "name": formation.name,
-                "ship_ids": list(formation.ship_ids),
+                # ``ship_ids`` is the roster *afloat* — the same set ``ships``
+                # describes — because that is what every consumer means by
+                # "strength".  The declared roster (which keeps sunk ships) is
+                # published separately so nothing has to infer the difference.
+                "ship_ids": list(members),
+                "declared_ship_ids": list(formation.ship_ids),
                 "leader_id": formation.leader_id,
                 "flagship_id": formation.flagship_id,
                 "spacing": formation.spacing,
@@ -266,6 +274,9 @@ def fleet_observation(engine: "IronBottomEngine", state: GameState, side: Side) 
             commander_ship_id=entry.commander_ship_id if entry else formation.flagship_id,
             active_order_id=entry.active_order_id if entry else None,
             guide_position=entry.reported_position if entry else None,
+            guide_label=(
+                entry.reported_position.label if entry and entry.reported_position else None
+            ),
             guide_heading=entry.reported_heading if entry else None,
             guide_speed=entry.reported_speed if entry else None,
             ship_count=entry.reported_ship_count if entry else None,
@@ -464,6 +475,9 @@ def _external_reports(state: GameState, side: Side, formation_id: str) -> list[F
             authority=entry.authority,
             commander_ship_id=entry.commander_ship_id,
             guide_position=entry.reported_position,
+            guide_label=(
+                entry.reported_position.label if entry.reported_position else None
+            ),
             guide_heading=entry.reported_heading,
             guide_speed=entry.reported_speed,
             ship_count=entry.reported_ship_count,

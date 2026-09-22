@@ -443,3 +443,49 @@ button.editor-modal-close:hover{color:#ffe9b0}
 .editor-modal>.muted{margin:0}
 .editor-modal .editor-card h3{display:flex;align-items:center;gap:.5rem}
 .editor-modal .import-source-num{font-style:normal;display:inline-flex;align-items:center;justify-content:center;min-width:1.35rem;height:1.35rem;border-radius:50%;border:1px solid var(--gold);color:var(--gold);font-size:.74rem;line-height:1}
+
+/* 命令延迟模式面板（CommandDelayPanel.tsx）。只描述引擎下发的状态，不含自己的规则。 */
+.cd-panel{margin:14px 0;padding:14px;border:1px solid #6d5a2f;background:#141f20;text-align:left}
+.cd-panel.collapsed{padding:0;border:0;background:transparent}
+.cd-toggle{width:100%;padding:9px;border:1px solid #6d5a2f;background:#1d2419;color:#e0bc63;font-size:.78rem;cursor:pointer}
+.cd-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.cd-head span{color:#9eaaa6;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase}
+.cd-head h3{margin:2px 0 0;font:1.05rem Georgia,serif;color:#e8d8ad}
+.cd-head-actions{display:flex;gap:6px}
+.cd-head-actions button{padding:.35rem .6rem;font-size:.72rem}
+.cd-error{margin:6px 0;padding:8px;border:1px solid #9b5449;background:#482723;color:#ffd1c9;font-size:.74rem}
+.cd-embarked{margin-bottom:10px;padding:10px;border:1px solid #58706b;background:#0f1c1e}
+.cd-embarked b{color:#e0bc63}
+.cd-embarked span{display:block;margin-top:4px;color:#9eaaa6;font-size:.72rem;line-height:1.5}
+.cd-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.cd-chips em{padding:2px 7px;border:1px solid #40504e;background:#172527;color:#c8d2ce;font-size:.7rem;font-style:normal}
+.cd-reports{width:100%;border-collapse:collapse;font-size:.72rem}
+.cd-reports th{text-align:left;padding:5px 6px;border-bottom:1px solid #40504e;color:#9eaaa6;font-weight:400}
+.cd-reports td{padding:5px 6px;border-bottom:1px solid #263a38;color:#c8d2ce;cursor:pointer}
+.cd-reports tr.exact td{background:#1b2a24}
+.cd-reports tr:hover td{background:#1c2b2c}
+.cd-exact{margin-left:6px;padding:1px 5px;border:1px solid #6d5a2f;color:#e0bc63;font-size:.66rem;font-style:normal}
+.cd-link{padding:2px 6px;border:1px solid #40504e;font-size:.7rem}
+.cd-link-direct,.cd-link-delivered{border-color:#4d7a5a;color:#a8d6ae}
+.cd-link-relayed,.cd-link-queued{border-color:#7a7040;color:#e0d29a}
+.cd-link-stale{border-color:#8a6a3a;color:#e8c58a}
+.cd-link-blackout,.cd-link-dropped,.cd-link-superseded{border-color:#8a4a45;color:#e8a8a0}
+.cd-local{margin-top:12px;padding:10px;border:1px solid #3b5350;background:#101d1f}
+.cd-local-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.cd-local-head b{color:#e0bc63}
+.cd-local-head span{color:#9eaaa6;font-size:.72rem}
+.cd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:10px}
+.cd-grid h4{margin:0 0 6px;color:#c3b78f;font-size:.76rem;font-weight:600}
+.cd-grid ul{list-style:none;margin:0 0 10px;padding:0;font-size:.72rem;line-height:1.6;color:#c8d2ce}
+.cd-grid li{padding:2px 0;border-bottom:1px solid #223230}
+.cd-grid p{margin:0 0 8px;font-size:.72rem;line-height:1.6;color:#c8d2ce}
+.cd-order{margin-bottom:10px;padding:8px;border:1px solid #40504e;background:#172527}
+.cd-order b{display:block;color:#e8d8ad;font-size:.76rem;margin-bottom:4px}
+.cd-order p{margin:0 0 4px;font-size:.7rem;line-height:1.55;color:#aeb9b5}
+.cd-note{margin:10px 0 0;color:#d9b968;font-size:.7rem;line-height:1.55}
+.cd-messages{margin-top:12px}
+.cd-messages h4{margin:0 0 6px;color:#c3b78f;font-size:.76rem}
+.cd-messages ul{list-style:none;margin:0;padding:0;font-size:.7rem;line-height:1.7;color:#aeb9b5}
+.command-entries{display:flex;gap:6px;flex-wrap:wrap}
+.command-entries button{padding:.5rem .8rem;font-size:.72rem}
+.command-entries button.on{border-color:#d4ad53;background:#604a26;color:#f3e6c4;font-weight:700}

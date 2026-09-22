@@ -7,14 +7,18 @@ import {bodyRealisticCapable} from "./editor/scenario";
 
 type Mode="hotseat"|"tutorial"|"vs_ai"|"llm";
 type Journey="learn"|"play";
+// 三个互斥入口。经典/真实与既有行为完全一致；命令延迟必须建立在真实编队核心之上，
+// 因此选中它时同时发送 realistic_command=true 与 command_delay_mode=true。
+export type CommandMode="classic"|"realistic"|"command_delay";
 type Props={
  realistic:boolean;setRealistic:(value:boolean)=>void;recordReport:boolean;setRecordReport:(value:boolean)=>void;
  researchAllow:boolean;setResearchAllow:(value:boolean)=>void;researchHandle:string;setResearchHandle:(value:string)=>void;
  llmProvider:"deepseek"|"zhipu";setLlmProvider:(value:"deepseek"|"zhipu")=>void;llmModel:string;setLlmModel:(value:string)=>void;
  llmKey:string;setLlmKey:(value:string)=>void;llmVision:boolean;setLlmVision:(value:boolean)=>void;
- onStart:(scenario:string,mode?:Mode,side?:Side,profile?:string,realisticOverride?:boolean,tutorialScript?:"classic_night"|"erma_grand_fleet")=>void;
+ onStart:(scenario:string,mode?:Mode,side?:Side,profile?:string,realisticOverride?:boolean,tutorialScript?:"classic_night"|"erma_grand_fleet",commandDelay?:boolean)=>void;
  onResume:(game:SavedGameSummary,side:Side)=>void;onImport:(bundle:unknown,side:Side)=>Promise<void>;
- error:string;onPreviewRealisticRules:()=>void;
+ error:string;onPreviewRealisticRules:()=>void;onPreviewCommandDelayRules:()=>void;
+ commandDelay:boolean;setCommandDelay:(value:boolean)=>void;
 };
 const scenarios=[
  ["IBS-S-03","通道行动","驱逐舰夜战 · 4 回合"],
@@ -38,11 +42,29 @@ export function StartScreen(props:Props){
  useEffect(()=>{customScenarios().then(list=>setCustoms(list)).catch(()=>setCustoms([]));savedGames().then(list=>setSaves(list)).catch(()=>setSaves([]))},[]);
  const importSave=async(file:File|undefined)=>{if(!file)return;setImportBusy(true);setImportError("");try{const text=await file.text();await props.onImport(JSON.parse(text),side)}catch(error){setImportError(String(error))}finally{setImportBusy(false);if(saveInput.current)saveInput.current.value=""}};
  const startLabel=matchMode==="hotseat"?"建立同机对战":matchMode==="vs_ai"?"开始人机对战":"连接并开始 LLM 对战";
+
  // 自定义剧本：能力门控（不够真实编队资格的剧强制经典）+ 推荐玩法默认对手。
  const builtinScenario=scenarios.find(item=>item[0]===scenario);
  const activeCustom=customs.find(item=>item.id===scenario);
  const activeCapable=activeCustom?bodyRealisticCapable(activeCustom):null;
  const customLocked=activeCustom!==undefined&&activeCapable===false;
+ // 命令延迟模式只对真实模式支持的三份想定开放（后端同样会拒绝其它想定）。
+ const commandDelayCapable=!customLocked&&scenario!=="0"&&!scenario.startsWith("IBS-CUSTOM");
+ // 命令延迟只对三份受支持想定开放（后端亦会拒绝），切换剧本后不得停留在该入口。
+ useEffect(()=>{
+   if(!commandDelayCapable&&props.commandDelay){props.setCommandDelay(false);props.setRealistic(true)}
+ },[commandDelayCapable,props.commandDelay]);
+ const commandMode:CommandMode=props.commandDelay?"command_delay":props.realistic?"realistic":"classic";
+ const chooseCommandMode=(value:CommandMode)=>{
+   props.setCommandDelay(value==="command_delay");
+   props.setRealistic(value!=="classic");
+ };
+ const commandModeLabel=commandMode==="command_delay"?"命令延迟模式：任务式命令 + 通信延迟":commandMode==="realistic"?"真实模式：编队指挥":"经典模式：逐舰下令";
+ const commandModeDetail=commandMode==="command_delay"
+   ?"舰队总指挥下达任务式命令，编队按本地情报自主执行；报文经 TBS/视觉/编码电文分层投递，链路会随距离退化。炮位分配仍由引擎选择器完成。"
+   :commandMode==="realistic"
+   ?"只为领舰规划航路，后舰沿共享航迹；包含共同航速、指挥链和脱队撤离。"
+   :"逐艘舰船填写移动、炮击与鱼雷订单。";
  const effectiveRealistic=customLocked?false:props.realistic;
  const chosenTitle=builtinScenario?.[1]??activeCustom?.title??"自定义剧本";
  const selectScenario=(id:string)=>{
@@ -103,8 +125,22 @@ export function StartScreen(props:Props){
     {customs.length>0&&<div className="scenario-divider" role="separator">你的自定义剧本</div>}
     {customs.map(item=><button key={item.id} className={"custom-scenario"+(scenario===item.id?" active":"")} onClick={()=>selectScenario(item.id!)}><b>{item.title}</b><span>{item.turns}回合 · {item.ships.length}艘{item.recommended_mode?` · 推荐${item.recommended_mode==="pvp"?"PvP":"PvE"}`:""}</span></button>)}
    </div>
-    <div className={`command-choice ${effectiveRealistic?"on":""}`}><div><b>{effectiveRealistic?"真实模式：编队指挥":"经典模式：逐舰下令"}</b><p>{effectiveRealistic?"只为领舰规划航路，后舰沿共享航迹；包含共同航速、指挥链和脱队撤离。":"逐艘舰船填写移动、炮击与鱼雷订单。"}</p></div><div><button disabled={customLocked} onClick={()=>props.setRealistic(!effectiveRealistic)}>{effectiveRealistic?"切换为经典":"切换为真实"}</button><button className="quiet" onClick={props.onPreviewRealisticRules}>查看真实模式规则</button></div></div>
-    {customLocked&&<p className="scenario-lock-hint">这个自定义剧本还达不到真实编队资格（某侧不足 2 艘或还有散舰），将按经典逐舰模式开局；可在「剧本工坊」里编好纵队后再次保存。</p>}
+    <div className={`command-choice ${commandMode!=="classic"?"on":""}`}>
+     <div><b>{commandModeLabel}</b><p>{commandModeDetail}</p></div>
+     <div>
+      <div className="command-entries" role="radiogroup" aria-label="指挥方式">
+       {([["classic","经典"],["realistic","真实"],["command_delay","命令延迟"]] as const).map(([value,label])=>
+        <button key={value} role="radio" aria-checked={commandMode===value} className={commandMode===value?"on":""}
+         disabled={(customLocked&&value!=="classic")||(value==="command_delay"&&!commandDelayCapable)}
+         title={value==="command_delay"&&!commandDelayCapable?"命令延迟模式只在想定 1、想定 3 与第二次马里亚纳海战开放":undefined}
+         onClick={()=>chooseCommandMode(value)}>{label}</button>)}
+      </div>
+      <button className="quiet" onClick={commandMode==="command_delay"?props.onPreviewCommandDelayRules:props.onPreviewRealisticRules}>
+       {commandMode==="command_delay"?"查看命令延迟规则":"查看真实模式规则"}</button>
+     </div>
+    </div>
+    {!customLocked&&!commandDelayCapable&&<p className="scenario-lock-hint">命令延迟模式只在想定 1、想定 3 与第二次马里亚纳海战开放；本剧本将按真实（或经典）模式开局。</p>}
+   {customLocked&&<p className="scenario-lock-hint">这个自定义剧本还达不到真实编队资格（某侧不足 2 艘或还有散舰），将按经典逐舰模式开局；可在「剧本工坊」里编好纵队后再次保存。</p>}
    </section>
    <section className="setup-panel final"><h2>3. 确认你的席位</h2><div className="final-grid">
     <label>我方阵营<select value={side} onChange={event=>setSide(event.target.value as Side)}><option value="axis">轴心 / 日德方</option><option value="allies">同盟 / 美英方</option></select></label>
@@ -114,7 +150,7 @@ export function StartScreen(props:Props){
     <label>接口供应商<select value={props.llmProvider} onChange={event=>{const provider=event.target.value as "deepseek"|"zhipu";props.setLlmProvider(provider);props.setLlmModel(provider==="zhipu"?"glm-5.2":"deepseek-v4-flash");props.setLlmVision(false)}}><option value="zhipu">智谱 BigModel</option><option value="deepseek">DeepSeek</option></select></label>
     <label>模型<input list="llm-models" value={props.llmModel} onChange={event=>{props.setLlmModel(event.target.value);props.setLlmVision(false)}}/><datalist id="llm-models">{props.llmProvider==="zhipu"?<><option value="glm-5.2"/><option value="glm-5.3-flash"/><option value="glm-5v-turbo"/></>:<option value="deepseek-v4-flash"/>}</datalist></label>
    </div><label className="llm-key">API 密钥（仅在本次会话内存中）<input type="password" value={props.llmKey} autoComplete="new-password" onChange={event=>props.setLlmKey(event.target.value)}/></label><label className="vision-toggle"><input type="checkbox" checked={props.llmVision} disabled={!props.llmModel.toLowerCase().startsWith("glm-5v")} onChange={event=>props.setLlmVision(event.target.checked)}/>每阶段发送本方可见地图</label></section>}
-   <div className="launch-summary"><div><b>{chosenTitle}</b><span>{effectiveRealistic?"真实编队指挥":"经典逐舰指挥"} · {side==="axis"?"轴心席位":"同盟席位"}</span></div><button className="launch" onClick={()=>props.onStart(scenario,matchMode,side,profile,effectiveRealistic)}>{startLabel} →</button></div>
+   <div className="launch-summary"><div><b>{chosenTitle}</b><span>{commandMode==="command_delay"?"命令延迟（真实编队核心）":effectiveRealistic?"真实编队指挥":"经典逐舰指挥"} · {side==="axis"?"轴心席位":"同盟席位"}</span></div><button className="launch" onClick={()=>props.onStart(scenario,matchMode,side,profile,effectiveRealistic,undefined,commandMode==="command_delay")}>{startLabel} →</button></div>
    </section>
    <details className="start-options"><summary>战报、科研授权与其他选项</summary><label><input type="checkbox" checked={props.recordReport} onChange={event=>props.setRecordReport(event.target.checked)}/>自动记录战报</label><label><input type="checkbox" checked={props.researchAllow} onChange={event=>props.setResearchAllow(event.target.checked)}/>允许匿名对战记录用于科研</label>{props.researchAllow&&<input value={props.researchHandle} maxLength={40} placeholder="称呼（可选）" onChange={event=>props.setResearchHandle(event.target.value)}/>}</details>
    <button className="text-action" onClick={()=>setJourney("learn")}>返回新手教学路线</button>

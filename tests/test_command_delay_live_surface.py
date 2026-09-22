@@ -273,3 +273,50 @@ def test_a_formation_with_its_link_cut_still_fights_the_whole_scenario() -> None
         event.type == "collision" and event.payload.get("friendly")
         for event in state.events
     )
+
+
+# --------------------------------------------------------------------------- 5. UI payload
+
+def test_the_fleet_and_local_views_agree_on_a_formation_strength() -> None:
+    """The two halves of the command-delay panel must not disagree.
+
+    The fleet view and the local view are rendered side by side, so any difference
+    in "how many ships does this formation have" is visible to the player as a
+    contradiction.  ``ship_ids`` is therefore the roster *afloat* (the same set the
+    per-ship cards describe), and the declared roster — which keeps sunk ships — is
+    published separately as ``declared_ship_ids``.
+    """
+    from iron_bottom_sound.command_observation import (
+        fleet_observation, formation_observation,
+    )
+
+    engine, state = start()
+    comparisons = 0
+    sessions = {side: LLMPlayerSession(side, RealisticCommander()) for side in Side}
+    steps = 0
+    while state.phase != Phase.COMPLETE and steps < 400:
+        steps += 1
+        if state.phase in ORDER_PHASES:
+            for side in Side:
+                if side.value in state.submitted_orders:
+                    continue
+                assert engine.submit_orders(
+                    state.game_id, sessions[side].choose_orders(engine, state.game_id)
+                ).valid
+        engine.advance(state.game_id)
+        fleet = fleet_observation(engine, state, Side.AXIS)
+        if not fleet.embarked:
+            continue  # the admiral's formation is gone; nothing to compare
+        local = formation_observation(
+            engine, state, Side.AXIS, fleet.embarked_formation_id
+        )
+        afloat = len(fleet.embarked["ship_ids"])
+        declared = len(fleet.embarked["declared_ship_ids"])
+        cards = len(fleet.embarked["ships"])
+        assert afloat == cards == len(local.formation_state["ships"]), (
+            f"t{state.turn} {state.phase.value}: fleet says {afloat}/{cards}, local says "
+            f"{len(local.formation_state['ships'])}"
+        )
+        assert declared >= afloat, "the declared roster cannot be smaller than the afloat one"
+        comparisons += 1
+    assert comparisons >= 5, "the comparison must run across several phases"

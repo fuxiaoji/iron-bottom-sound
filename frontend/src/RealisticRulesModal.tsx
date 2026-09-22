@@ -1,8 +1,8 @@
 import {Fragment,useEffect,useMemo,useState} from "react";
 import type {ReactNode} from "react";
-import {realisticCommandRules} from "./api";
+import {commandDelayRules,realisticCommandRules} from "./api";
 
-type Props={onClose:()=>void};
+type Props={onClose:()=>void;source?:"realistic"|"command-delay"};
 
 function inline(text:string):ReactNode[]{
  return text.split(/(`[^`]+`)/g).filter(Boolean).map((part,index)=>
@@ -27,13 +27,14 @@ function renderMarkdown(source:string){
  return nodes;
 }
 
-export function RealisticRulesModal({onClose}:Props){
+export function RealisticRulesModal({onClose,source:doc="realistic"}:Props){
  const [source,setSource]=useState("");const [error,setError]=useState("");
- useEffect(()=>{let active=true;realisticCommandRules().then(text=>{if(active)setSource(text)}).catch(reason=>{if(active)setError(String(reason))});return()=>{active=false}},[]);
+ const commandDelay=doc==="command-delay";
+ useEffect(()=>{let active=true;(commandDelay?commandDelayRules():realisticCommandRules()).then(text=>{if(active)setSource(text)}).catch(reason=>{if(active)setError(String(reason))});return()=>{active=false}},[commandDelay]);
  useEffect(()=>{const close=(event:KeyboardEvent)=>{if(event.key==="Escape")onClose()};window.addEventListener("keydown",close);return()=>window.removeEventListener("keydown",close)},[onClose]);
  const headings=useMemo(()=>source.split(/\r?\n/).map((line,index)=>({match:line.match(/^##\s+(.+)$/),index})).filter(item=>item.match).map(item=>({title:item.match![1],id:slug(item.match![1],item.index)})),[source]);
  return <div className="rules-modal-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)onClose()}}><section className="rules-modal" role="dialog" aria-modal="true" aria-labelledby="realistic-rules-title">
-  <header><div><span>IBS-R-RC · 玩家规则书</span><h2 id="realistic-rules-title">真实模式完整规则</h2></div><div className="rules-modal-actions"><button type="button" onClick={()=>window.print()}>打印</button><button type="button" onClick={onClose} aria-label="关闭规则预览">关闭</button></div></header>
+  <header><div><span>{commandDelay?"IBS-R-CD · 玩家规则书":"IBS-R-RC · 玩家规则书"}</span><h2 id="realistic-rules-title">{commandDelay?"命令延迟模式完整规则":"真实模式完整规则"}</h2></div><div className="rules-modal-actions"><button type="button" onClick={()=>window.print()}>打印</button><button type="button" onClick={onClose} aria-label="关闭规则预览">关闭</button></div></header>
   <div className="rules-modal-layout"><nav aria-label="规则目录"><b>目录</b>{headings.map(item=><a key={item.id} href={`#${item.id}`}>{item.title}</a>)}</nav><article className="rules-markdown">{error?<p className="rules-load-error">规则加载失败：{error}</p>:source?renderMarkdown(source):<p>正在载入经过审计的规则正文……</p>}</article></div>
  </section></div>;
 }
