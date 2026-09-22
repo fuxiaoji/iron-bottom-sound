@@ -348,6 +348,40 @@ class FormationMovementOrder(BaseModel):
     leader_plan: str = "0"
     spacing: Literal[1, 2] | None = None
     speed_decision: FormationSpeedDecision | None = None
+    # ``None`` keeps the formation's declared style, which defaults to
+    # FOLLOW_WAKE, so an order written before this field existed still expands
+    # into the exact frozen follower behaviour.
+    movement_style: FormationMovementStyle | None = None
+    # Explicit IBS-R-RC-08 transition: move as a body this turn and return to
+    # FOLLOW_WAKE only if the formation ends the turn genuinely column-aligned.
+    reform_column: bool = False
+
+
+class FormationMovementStyle(StrEnum):
+    """How a formation moves as a body (project extension, IBS-R-RC-02/08).
+
+    ``FOLLOW_WAKE`` is the existing successive / follow-the-leader movement and
+    stays the default for every formation, so Realistic semantics are unchanged
+    unless a player explicitly selects the other style.
+    """
+
+    FOLLOW_WAKE = "follow_wake"
+    MOVE_TOGETHER = "move_together"
+
+
+class FormationGeometryKind(StrEnum):
+    """Declared geometry of a formation's ship line.
+
+    A ``COLUMN`` is line-ahead: the line axis is the leader's stern direction, so
+    the guide trail is a legal wake.  ``STRAIGHT_LINE`` means the ships are still
+    on one hex line with uniform spacing, but the axis is no longer parallel to
+    the bow-stern direction (line-abreast or oblique).  A simultaneous turn
+    rotates headings without rotating the axis, so ``MOVE_TOGETHER`` can leave a
+    formation oblique; it must not keep being treated as a column.
+    """
+
+    COLUMN = "column"
+    STRAIGHT_LINE = "straight_line"
 
 
 class FormationState(BaseModel):
@@ -367,6 +401,12 @@ class FormationState(BaseModel):
     locked_heading: int | None = Field(default=None, ge=1, le=6)
     locked_speed: int | None = Field(default=None, ge=0, le=8)
     guide_trail: list[HexCoord] = Field(default_factory=list)
+    # Command Delay extension (CD-1).  Defaults reproduce the frozen Realistic
+    # behaviour exactly; these fields are declared state, not live measurements,
+    # and only change through an explicit MOVE_TOGETHER / REFORM_COLUMN action.
+    movement_style: FormationMovementStyle = FormationMovementStyle.FOLLOW_WAKE
+    geometry_kind: FormationGeometryKind = FormationGeometryKind.COLUMN
+    line_axis: int | None = Field(default=None, ge=1, le=6)
 
 
 class CommandSuccession(BaseModel):

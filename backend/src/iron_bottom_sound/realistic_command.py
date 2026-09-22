@@ -12,12 +12,18 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 from .data import load_scenario
+from .formation_maneuver import (
+    commit_sealed_style_transitions,
+    expand_move_together,
+    follow_wake_allowed,
+)
 from .scenario_guidance import public_search_target
 from .models import (
     AIPlanSheet,
     CommandSuccession,
     ContactMovementOrder,
     FormationMovementOrder,
+    FormationMovementStyle,
     FormationSpeedDecision,
     FormationSetupOrder,
     FormationState,
@@ -486,6 +492,22 @@ def expand_movement_orders(
                 plan, engine.movement_commands(MovementOrder(ship_id=leader.id, plan=plan))
             )
             plan = str(min(forced_speed, engine._legal_speed_range(leader, state.turn)[1]))
+        # Command Delay CD-1: the one dispatch into the additive body-movement
+        # style.  Inert under the default FOLLOW_WAKE (and for any formation whose
+        # declared geometry is still a column), so the frozen path below is
+        # unchanged; the CD-0 golden replay is the proof.
+        style = order.movement_style or formation.movement_style
+        if style == FormationMovementStyle.MOVE_TOGETHER or order.reform_column:
+            body_orders, body_errors = expand_move_together(engine, state, formation, plan, members)
+            if body_errors:
+                errors.append(f"{formation.id}: " + "; ".join(body_errors))
+                continue
+            generated.extend(body_orders)
+            continue
+        allowed, refusal = follow_wake_allowed(formation)
+        if not allowed:
+            errors.append(f"{formation.id}: {refusal}")
+            continue
         leader_cost = engine.movement_cost(plan, engine.movement_commands(MovementOrder(ship_id=leader.id, plan=plan)))
         forced_incompatible = next(
             (ship for ship in members if ship.forced_circle_turns), None
@@ -716,6 +738,11 @@ def refresh_command_chain(engine: "IronBottomEngine", state: GameState) -> None:
 
 
 def after_movement(engine: "IronBottomEngine", state: GameState) -> None:
+    # Command Delay CD-1: commit the declared geometry of any formation that
+    # moved as a body this turn.  Returns without touching state when no sealed
+    # order asked for MOVE_TOGETHER / REFORM_COLUMN, so the frozen Realistic
+    # replay is unaffected.
+    commit_sealed_style_transitions(engine, state)
     for formation in state.formations.values():
         active = [state.ships[ship_id] for ship_id in formation.ship_ids if state.ships[ship_id].position and not state.ships[ship_id].sunk and state.ships[ship_id].command_status == "attached"]
         pending = [
