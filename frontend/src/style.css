@@ -524,3 +524,7 @@ button.editor-modal-close:hover{color:#ffe9b0}
 .cd-memory{margin:10px 0;padding:9px;border:1px solid #40504e;background:#132022}
 .cd-memory>b{color:#e0bc63;font-size:.76rem}
 .cd-memory ul{margin:6px 0 0;padding-left:16px;font-size:.7rem;line-height:1.6;color:#c8d2ce}
+
+/* 编队机动方式控件（FormationPanels.tsx）。可用性原因由引擎下发，前端只展示。 */
+.cd-inline{display:flex!important;flex-direction:row!important;align-items:center;gap:8px;font-size:.74rem;color:#c8d2ce}
+.cd-inline input{width:auto}

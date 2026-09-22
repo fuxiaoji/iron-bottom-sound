@@ -864,6 +864,28 @@ def formation_preview(game_id: str, request: FormationPreviewRequest, x_player_s
     return {"valid": not errors, "errors": errors}
 
 
+@app.get("/games/{game_id}/movement-style-options")
+def movement_style_options(
+    game_id: str, x_player_side: Annotated[str | None, Header()] = None,
+):
+    """每种机动方式的当前可用性，附引擎给出的原因（真实模式与命令延迟模式通用）。
+
+    此处返回的原因与展开器稍后执行的是同一次判定，因此界面显示的就是将会被执行的。
+    """
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.realistic_command:
+        raise HTTPException(409, "Movement styles are available only in realistic or command delay mode")
+    from .formation_maneuver import movement_style_options as options
+
+    return {
+        "phase": state.phase.value,
+        "turn": state.turn,
+        "styles": ["follow_wake", "move_together"],
+        "formations": options(engine, state, side),
+    }
+
+
 @app.post("/games/{game_id}/formation-movement-preview")
 def formation_movement_preview(game_id: str, request: FormationMovementPreviewRequest, x_player_side: Annotated[str | None, Header()] = None):
     """Expand leader orders to private per-ship trajectories without saving them."""

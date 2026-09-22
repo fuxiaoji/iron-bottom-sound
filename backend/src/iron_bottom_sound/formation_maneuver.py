@@ -391,3 +391,77 @@ def follow_wake_allowed(formation: FormationState) -> tuple[bool, str]:
         "formation is not column-aligned after MOVE_TOGETHER; "
         "issue REFORM_COLUMN before FOLLOW_WAKE"
     )
+
+
+def movement_style_options(
+    engine: "IronBottomEngine", state: GameState, side: Side,
+) -> list[dict[str, Any]]:
+    """Per-formation state of the movement-style choice, for the UI.
+
+    The point of this function is that the interface shows the *engine's own*
+    reasons rather than a re-implementation of them: eligibility is the same
+    ``eligibility`` call the expander makes, on the same measured geometry, so what
+    the player reads is exactly what will be enforced a moment later.
+    """
+    from .models import MovementOrder
+
+    rows: list[dict[str, Any]] = []
+    for formation in sorted(
+        (item for item in state.formations.values() if item.side == side),
+        key=lambda item: item.id,
+    ):
+        if formation.status == "dissolved":
+            continue
+        members = attached_members(state, formation)
+        geometry = measure_line(state, formation)
+        interval = common_speed_interval(engine, state, members)
+        # The plan the formation is most likely to use: its own current speed, straight.
+        probe_plan = str(formation.speed or 0)
+        reasons = (
+            eligibility(engine, state, formation, probe_plan, members)
+            if members else ["no attached members"]
+        )
+        follower_allowed, follower_refusal = follow_wake_allowed(formation)
+        leader = state.ships.get(formation.leader_id)
+        rows.append({
+            "formation_id": formation.id,
+            "name": formation.name,
+            "movement_style": formation.movement_style.value,
+            "geometry_kind": formation.geometry_kind.value,
+            "line_axis": formation.line_axis,
+            "ship_count": len(members),
+            "measured": geometry.as_payload(),
+            "common_speed_interval": list(interval) if interval else None,
+            # MOVE_TOGETHER needs a straight, evenly spaced line of same-heading ships
+            # with a legal shared programme; the reasons are the engine's own errors.
+            "move_together_eligible": bool(members) and not _geometry_only_reasons(reasons),
+            "move_together_reasons": _geometry_only_reasons(reasons),
+            "probe_plan": probe_plan,
+            "follow_wake_allowed": follower_allowed,
+            "follow_wake_refusal": follower_refusal,
+            "column_aligned": column_aligned(state, formation),
+            "leader_heading": leader.heading if leader else None,
+            "leader_cost_now": (
+                engine.movement_cost(
+                    probe_plan,
+                    engine.movement_commands(
+                        MovementOrder(ship_id=formation.leader_id, plan=probe_plan)
+                    ),
+                ) if members else 0
+            ),
+        })
+    return rows
+
+
+def _geometry_only_reasons(reasons: list[str]) -> list[str]:
+    """The eligibility reasons a player can act on before choosing a plan.
+
+    A trial plan of the formation's current speed can fail for reasons that belong to
+    the *plan* rather than to the formation's geometry (no common speed for that
+    particular cost, a member that cannot commit it).  Those are reported but do not
+    make the style unavailable in principle, so the interface can distinguish "your
+    line is not straight" from "this speed does not work".
+    """
+    actionable = ("hex line", "even spacing", "share one heading", "disruption",
+                  "at least two attached members")
+    return [reason for reason in reasons if any(token in reason for token in actionable)]

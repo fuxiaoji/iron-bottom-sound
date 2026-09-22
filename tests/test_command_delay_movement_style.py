@@ -461,3 +461,70 @@ def test_body_movement_leaves_classic_and_default_realistic_replays_alone(seed: 
         order = next(item for item in batch.formation_movement if item.formation_id == other.id)
         assert order.movement_style is None
         assert other.movement_style == FormationMovementStyle.FOLLOW_WAKE
+
+
+# --------------------------------------------------------------------------- UI surface
+
+def test_movement_style_options_expose_the_engines_own_reasons() -> None:
+    """The interface must show the same judgement the expander will enforce."""
+    from iron_bottom_sound.formation_maneuver import movement_style_options
+
+    engine, game_id = line_game()
+    state = engine.get(game_id)
+    rows = movement_style_options(engine, state, Side.AXIS)
+    assert rows, "a formation on the board must be described"
+    for row in rows:
+        assert row["movement_style"] in {"follow_wake", "move_together"}
+        assert row["geometry_kind"] in {"column", "straight_line"}
+        # A straight, evenly spaced, same-heading line is eligible; the reasons are
+        # the engine's own eligibility errors, not a re-implementation.
+        if row["move_together_eligible"]:
+            assert row["measured"]["straight"] and row["measured"]["uniform_spacing"]
+            assert row["measured"]["same_heading"]
+            assert row["move_together_reasons"] == []
+        else:
+            assert row["move_together_reasons"], "a refusal must carry its reason"
+        assert isinstance(row["follow_wake_allowed"], bool)
+        if not row["follow_wake_allowed"]:
+            assert "REFORM_COLUMN" in row["follow_wake_refusal"]
+
+
+def test_choosing_move_together_turns_the_line_oblique_and_shuts_the_follow_wake_gate() -> None:
+    """The full path a player takes: pick the style, turn together, then reform."""
+    from iron_bottom_sound.formation_maneuver import movement_style_options
+
+    engine, game_id = line_game()
+    state = engine.get(game_id)
+    formation = axis_formation(engine, state)
+    batch = move_batch(engine, state, formation.side, styled_id=formation.id,
+                       leader_plan="1P1P", movement_style=FormationMovementStyle.MOVE_TOGETHER)
+    play_movement_turn(engine, state, batch, formation.side)
+    row = next(
+        item for item in movement_style_options(engine, state, Side.AXIS)
+        if item["formation_id"] == formation.id
+    )
+    assert row["movement_style"] == "move_together"
+    if not row["column_aligned"]:
+        # A simultaneous turn does not rotate the line axis, so the formation is now
+        # oblique and follow-wake is refused until it reforms.
+        assert row["geometry_kind"] == "straight_line"
+        assert row["follow_wake_allowed"] is False
+        assert "REFORM_COLUMN" in row["follow_wake_refusal"]
+
+
+def test_a_straight_line_formation_moves_as_a_body_then_needs_a_reform() -> None:
+    """Regression shape of the reported gameplay: 全舰同时按领舰移动."""
+    engine, game_id = line_game()
+    state = engine.get(game_id)
+    formation = axis_formation(engine, state)
+    before = {ship.id: (ship.position, ship.heading) for ship in members_of(state, formation)}
+    batch = move_batch(engine, state, formation.side, styled_id=formation.id,
+                       leader_plan="2", movement_style=FormationMovementStyle.MOVE_TOGETHER)
+    play_movement_turn(engine, state, batch, formation.side)
+    after = {ship.id: (ship.position, ship.heading) for ship in members_of(state, formation)}
+    # Every ship moved (simultaneous translation, not a wake), and all kept station.
+    moved = [ship_id for ship_id in before if before[ship_id][0] != after[ship_id][0]]
+    assert moved, "body movement must move the whole line"
+    axis_before = measure_line(state, formation)
+    del axis_before
+    assert formation.geometry_kind in (FormationGeometryKind.COLUMN, FormationGeometryKind.STRAIGHT_LINE)

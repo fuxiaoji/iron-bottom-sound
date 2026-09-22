@@ -44,6 +44,14 @@ export async function importGame(bundle:unknown):Promise<ImportedGame>{const r=a
 export function gameSaveUrl(id:string){return `${API}/games/${encodeURIComponent(id)}/save`}
 export async function replayCheckpoints(id:string):Promise<ReplayCheckpoint[]>{const r=await fetch(`${API}/games/${encodeURIComponent(id)}/replay/checkpoints`);if(!r.ok)throw new Error(await r.text());return r.json()}
 export async function replayView(id:string,side:Side,sequence:number):Promise<{checkpoint_sequence:number;view:Observation}>{const r=await fetch(`${API}/games/${encodeURIComponent(id)}/replay?sequence=${sequence}`,{headers:headers(side)});if(!r.ok)throw new Error(await r.text());return r.json()}
+export interface FormationStyleOption{
+ formation_id:string;name:string;movement_style:"follow_wake"|"move_together";
+ geometry_kind:"column"|"straight_line";line_axis:number|null;ship_count:number;
+ measured:{straight:boolean;uniform_spacing:boolean;same_heading:boolean;axis:number|null;spacing:number|null;reasons:string[]};
+ common_speed_interval:[number,number]|null;move_together_eligible:boolean;
+ move_together_reasons:string[];probe_plan:string;follow_wake_allowed:boolean;
+ follow_wake_refusal:string;column_aligned:boolean;leader_heading:number|null;leader_cost_now:number}
+export async function movementStyleOptions(id:string,side:Side):Promise<{phase:Phase;turn:number;styles:string[];formations:FormationStyleOption[]}>{const r=await fetch(`${API}/games/${encodeURIComponent(id)}/movement-style-options`,{headers:headers(side)});if(!r.ok)throw new Error(await r.text());return r.json()}
 export async function formationPreview(id:string,side:Side,formations:unknown[]){const r=await fetch(`${API}/games/${id}/formation-preview`,{method:"POST",headers:headers(side),body:JSON.stringify({formations})});if(!r.ok)throw new Error(await r.text());return r.json()}
 export async function formationMovementPreview(id:string,side:Side,formations:unknown[]){const r=await fetch(`${API}/games/${id}/formation-movement-preview`,{method:"POST",headers:headers(side),body:JSON.stringify({formations})});if(!r.ok)throw new Error(await r.text());return r.json()}
 export async function viewGame(id:string,side:Side,debug=false):Promise<Observation>{const r=await fetch(`${API}/games/${id}/view${debug?"?debug=true":""}`,{headers:headers(side)});if(!r.ok)throw new Error(await r.text());return r.json()}
