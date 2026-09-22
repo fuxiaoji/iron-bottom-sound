@@ -940,3 +940,17 @@
 - **CD-7 自审修正**（4 处）：含一处有行为影响的修正——`_optical_range` 原取双方视距较小值，改为按请求方自身视距。
 - **回归**：108 项新增测试全过；`tests/test_realistic_command.py` + `test_realistic_rules_preview.py` 38 项全过；全量 637 项跑完，**失败集合与改动前基线逐字节相同**（3 项既有失败）；8 项审计全 PASS；黄金回放 0 漂移。
 - 包 `COMMAND_DELAY_MODE_V2_2_IMPLEMENTATION_BUNDLE.zip` sha256 `2f32aa3f396f1c6c…`（53 文件）。**未开始任何科研实验；未实现 RL/GNN/Transformer；未选主线。**
+
+### 追加：交付评审（"完整打过几局 / 有泄露吗 / 子 agent 能独立执行吗 / 试过 API 吗 / 有战报吗"）
+
+评审问题暴露了四处真实空白，全部补测、修复并固化为测试：
+
+- **对局矩阵**：此前只跑过 2 个 (想定, seed) 组合。现 `verify_live.py` 跑 **18 局**（3 想定 × 3 seed × {命令延迟, 真实对照}），**全部 COMPLETE**，0 友军碰撞 / 0 友军鱼雷命中。
+- **API 泄漏**：此前**从未**调用过 HTTP 接口。现用 FastAPI `TestClient` 打完一整局，并逐次断言 `GET /games/{id}/view == engine.observe(game_id, side)` → **58/58 完全一致**（API 不改写引擎迷雾）；`/advance`、`/events` 不返回对方私有事件；模式门控 409/404 正确。
+- **CD8-F1（已修）**：中立战报的事件规则是"至少一侧可见的并集"，而命令延迟事件各自只属一方 → 战报里能读到**双方**指挥链、代理决策与激活分支。按前缀排除整个事件族（`PRIVATE_EVENT_PREFIXES`）；`formation_reformed*` 补 `secret_side`。既有 22 项战报测试全过。
+- **子 agent 独立执行**：切断某编队**全部**双向通信后，该编队仍 19/19 次自主决策、每次选出合法方案、整局打完，期间为 `LOCAL_AUTONOMY`；舰队只持有其过期报告。
+- **CD8-F3（已修）**：`LOCAL_AUTONOMY` 稳态下几乎不可达（只有 `BLACKOUT` 降级，而活跃编队的 `BLACKOUT` 意味着"从未收到任何报告"）；`STALE` 当时仍标 `DELEGATED`，与 agent 实际执行的失联预案矛盾。现 `STALE` 同样降级。
+- **CD8-F4（已修）**：舰队总指挥**所在**编队的链路被按报告年龄算成 `STALE`（它不给自己发报告）。现恒为 `DIRECT` + `FLEET_DIRECTED`。
+- **CD8-F5（我的审计缺陷，已修两轮）**：API 泄漏检查先把正常发现的接触判为泄露，又把沉没后合法留在残骸/公开事件里的舰只判为泄露；最终改为可判定问题（API 是否比 `engine.observe` 更宽）。
+- 回归：114 项命令延迟测试 + 22 项战报测试全过；8/8 审计 PASS；黄金回放 0 漂移；全量 637 项失败集合与改动前**逐字节相同**。
+- 包重建：`COMMAND_DELAY_MODE_V2_2_IMPLEMENTATION_BUNDLE.zip` sha256 `ecf370590cb114c2…`（61 文件）。新增裁决项 CD8-Q1（Realistic 模式下 `formation_created`/`movement_plan_resolved` 同样会被中立战报收录，属既有同类问题）。
