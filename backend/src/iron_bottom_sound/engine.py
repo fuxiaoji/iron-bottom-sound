@@ -3121,7 +3121,13 @@ class IronBottomEngine:
                 # is granted per side, not per whole hex group: when an enemy
                 # shares the contested hex, the friendly pair must still be
                 # stopped rather than rolling a die-rolled friendly ram.
-                for collision_set in collision_sets:
+                # Iterated in the same canonical order as the die-rolled loop
+                # below: ``collision_sets`` is a set of frozensets and its
+                # iteration order is string-hash dependent, so an unordered walk
+                # emits these events in a different sequence per
+                # PYTHONHASHSEED (CD0-F1: the realistic row of the CD-0 golden
+                # replay diverged across hash seeds on exactly this loop).
+                for collision_set in sorted(collision_sets, key=lambda group: sorted(group)):
                     ids = sorted(collision_set)
                     by_side: dict[Side, list[str]] = {}
                     for ship_id in ids:

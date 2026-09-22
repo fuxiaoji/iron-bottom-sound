@@ -1,0 +1,7 @@
+[golden] classic_s01          events=586   passed=True digest=f5ec21e082b97961
+[golden] classic_s03          events=213   passed=True digest=c46300d8375f1a31
+[golden] classic_em01         events=774   passed=True digest=002f779200c98f6f
+[golden] realistic_s01        events=486   passed=True digest=917114fbb1dd6c84
+[golden] realistic_s03        events=268   passed=True digest=6839300ceb1a9055
+[golden] realistic_em01       events=1545  passed=True digest=4b746b4a5c4a32c5
+[golden] realistic_s03_seed9  events=212   passed=True digest=3ff17dd387e8dd78

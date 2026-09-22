@@ -1,0 +1,9 @@
+[check] classic_s01          OK
+[check] classic_s03          OK
+[check] classic_em01         OK
+[check] realistic_s01        OK
+[check] realistic_s03        OK
+[check] realistic_em01       OK
+[check] realistic_s03_seed9  OK
+
+GOLDEN_REPLAY = PASS

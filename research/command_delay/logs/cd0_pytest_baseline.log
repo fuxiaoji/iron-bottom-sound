@@ -1,0 +1,25 @@
+        )
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 3, in <module>
+E             from iron_bottom_sound.engine import IronBottomEngine, ORDER_PHASES
+E         ModuleNotFoundError: No module named 'iron_bottom_sound'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/bin/python', '-c', "import json, sy...ttom_sound.engine import IronBottomEngine, ORDER_PHASES\nModuleNotFoundError: No module named \'iron_bottom_sound\'\n').returncode
+
+tests/test_tactical_ai.py:1114: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv/lib/python3.14/site-packages/starlette/testclient.py:53
+  /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter
+FAILED tests/test_tactical_ai.py::test_collision_resolution_is_deterministic_across_hash_seeds
+FAILED tests/test_tactical_ai.py::test_ai_orders_deterministic_across_hash_seeds

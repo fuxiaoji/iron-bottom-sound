@@ -1,0 +1,117 @@
+{
+ "comparison": "frozen-projection (added dict keys ignored and reported)",
+ "frozen_commit": "d432a975151651fa7d6746b2f92e66b1e09d8d4a",
+ "frozen_tag": "realistic-command-v1-frozen",
+ "hash_seed_pinned": "0",
+ "known_defect": "CD0-F1: engine.py:3124 iterates set[frozenset[str]] in hash order; see --probe-hash-seeds",
+ "matrix": [
+  "classic_s01",
+  "classic_s03",
+  "classic_em01",
+  "realistic_s01",
+  "realistic_s03",
+  "realistic_em01",
+  "realistic_s03_seed9"
+ ],
+ "records": [
+  {
+   "digest_trees": "f5ec21e082b979619fe60d277ab4056e6e74181064386f390f4fec3879d5702e",
+   "final_phase": "complete",
+   "final_turn": 7,
+   "n_events": 586,
+   "n_order_batches": 50,
+   "passed": true,
+   "realistic_command": false,
+   "rng_counter": 282,
+   "scenario": "IBS-S-01",
+   "seed": 20270830,
+   "tag": "classic_s01"
+  },
+  {
+   "digest_trees": "c46300d8375f1a3154972dcea72fb6aa700345760c13d16707912568e7550759",
+   "final_phase": "complete",
+   "final_turn": 4,
+   "n_events": 213,
+   "n_order_batches": 32,
+   "passed": true,
+   "realistic_command": false,
+   "rng_counter": 47,
+   "scenario": "IBS-S-03",
+   "seed": 3,
+   "tag": "classic_s03"
+  },
+  {
+   "digest_trees": "002f779200c98f6fd79720f638dff98d5df3e2e9c1ebc52e62bb7efa8c74c0f0",
+   "final_phase": "complete",
+   "final_turn": 12,
+   "n_events": 774,
+   "n_order_batches": 90,
+   "passed": true,
+   "realistic_command": false,
+   "rng_counter": 68,
+   "scenario": "IBS-S-EM-01",
+   "seed": 20270829,
+   "tag": "classic_em01"
+  },
+  {
+   "digest_trees": "917114fbb1dd6c842d53bee7baff2dd1a2327e15c8a5adb102db99517ef3f78e",
+   "final_phase": "complete",
+   "final_turn": 7,
+   "n_events": 486,
+   "n_order_batches": 52,
+   "passed": true,
+   "realistic_command": true,
+   "rng_counter": 179,
+   "scenario": "IBS-S-01",
+   "seed": 20270830,
+   "tag": "realistic_s01"
+  },
+  {
+   "digest_trees": "6839300ceb1a9055ab6887ef6b11066c913d85b77f6f91ed47b94dac39aaebfb",
+   "final_phase": "complete",
+   "final_turn": 4,
+   "n_events": 268,
+   "n_order_batches": 34,
+   "passed": true,
+   "realistic_command": true,
+   "rng_counter": 95,
+   "scenario": "IBS-S-03",
+   "seed": 3,
+   "tag": "realistic_s03"
+  },
+  {
+   "digest_trees": "4b746b4a5c4a32c535f84c0cedca2a082fdc43e4a970bb9af22a500d92e92038",
+   "final_phase": "complete",
+   "final_turn": 12,
+   "n_events": 1545,
+   "n_order_batches": 92,
+   "passed": true,
+   "realistic_command": true,
+   "rng_counter": 823,
+   "scenario": "IBS-S-EM-01",
+   "seed": 20270829,
+   "tag": "realistic_em01"
+  },
+  {
+   "digest_trees": "3ff17dd387e8dd78c5c18d21f339081127df4a724a0cc609ba1a968fba838f35",
+   "final_phase": "complete",
+   "final_turn": 4,
+   "n_events": 212,
+   "n_order_batches": 34,
+   "passed": true,
+   "realistic_command": true,
+   "rng_counter": 54,
+   "scenario": "IBS-S-03",
+   "seed": 9,
+   "tag": "realistic_s03_seed9"
+  }
+ ],
+ "scalars": [
+  "passed",
+  "final_turn",
+  "final_phase",
+  "rng_counter",
+  "n_events",
+  "n_order_batches"
+ ]
+}
