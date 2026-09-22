@@ -59,12 +59,39 @@ index 7403e9cf..878bfb6f 100644
  @app.post("/games/{game_id}/formation-preview")
  def formation_preview(game_id: str, request: FormationPreviewRequest, x_player_side: Annotated[str | None, Header()] = None):
      """Validate an editable formation setup without mutating or exposing the opponent."""
+diff --git a/backend/src/iron_bottom_sound/battle_report.py b/backend/src/iron_bottom_sound/battle_report.py
+index daa6a564..0ce860b8 100644
+--- a/backend/src/iron_bottom_sound/battle_report.py
++++ b/backend/src/iron_bottom_sound/battle_report.py
+@@ -273,6 +273,13 @@ def render_map_image(state: GameState, engine: IronBottomEngine, side: Side) ->
+ # ---------------------------------------------------------------------------
+ EXCLUDED_EVENT_TYPES = {"orders_submitted", "phase_changed", "game_created"}
+ 
++# Command Delay traffic is per-side private: a mission order, an agent decision
++# (with its activated contingency branch), a message, a link state.  The battle
++# report is a neutral document that either player may open, so these must not
++# enter it — the same reason orders_submitted is excluded above.  Matched by
++# prefix so a new event in the family cannot silently reintroduce the leak.
++PRIVATE_EVENT_PREFIXES = ("command_delay_", "command_message_", "formation_agent_", "mission_order")
++
+ PHASE_ORDER = [
+     "contact_setup", "reinforcement", "movement_planning", "torpedo_planning",
+     "movement_resolution", "gunnery", "torpedo_effects", "fire_end",
+@@ -334,6 +341,8 @@ def public_events_for_turn(
+     for event in state.events:
+         if event.turn != turn or event.type in EXCLUDED_EVENT_TYPES:
+             continue
++        if event.type.startswith(PRIVATE_EVENT_PREFIXES):
++            continue
+         if any(engine.event_visible_to(state, event, side) for side in Side):
+             result.append(event)
+     return result
 diff --git a/backend/src/iron_bottom_sound/command_delay.py b/backend/src/iron_bottom_sound/command_delay.py
 new file mode 100644
-index 00000000..c0b2a952
+index 00000000..c6099a50
 --- /dev/null
 +++ b/backend/src/iron_bottom_sound/command_delay.py
-@@ -0,0 +1,855 @@
+@@ -0,0 +1,872 @@
 +"""Command Delay mode shell (CD-2): mode isolation, authority state, per-turn tick.
 +
 +Mode isolation
@@ -306,7 +333,7 @@ index 00000000..c0b2a952
 +        "guide_speed": guide.current_speed if guide is not None else None,
 +        "ship_count": len(members),
 +        "geometry_kind": formation.geometry_kind,
-+        "hull_fraction": round(delegation.own_hull_fraction(None, state, formation), 3),
++        "hull_fraction": round(delegation.own_hull_fraction(state, formation), 3),
 +        "contacts": 0,
 +    }
 +
@@ -328,7 +355,20 @@ index 00000000..c0b2a952
 +        entry = mode.formations[formation_id]
 +        formation = state.formations.get(formation_id)
 +        if formation is None or formation.status == "dissolved":
++            # The command entity is gone -- no ships left to be in touch with.  The
++            # last authority is kept as history; live formations are the ones the
++            # DIRECT / RELAYED / STALE / LOCAL_AUTONOMY rules below describe.
 +            entry.link_status = LinkStatus.BLACKOUT
++            continue
++        authority = mode.authorities.get(formation.side.value)
++        embarked = authority is not None and authority.fleet_formation_id == formation_id
++        if embarked:
++            # The fleet commander is embarked in this formation: the command link
++            # is physical, needs no traffic, and cannot go stale.  Deriving it from
++            # sitrep age (there is no sitrep to itself) would have shown a link
++            # degrading in the very formation the admiral is standing on.
++            entry.link_status = LinkStatus.DIRECT
++            entry.authority = AuthorityLevel.FLEET_DIRECTED
 +            continue
 +        age = (
 +            None if entry.reported_turn is None
@@ -342,12 +382,16 @@ index 00000000..c0b2a952
 +            entry.link_status = LinkStatus.RELAYED
 +        else:
 +            entry.link_status = LinkStatus.STALE
-+        authority = mode.authorities.get(formation.side.value)
-+        embarked = authority is not None and authority.fleet_formation_id == formation_id
-+        base = AuthorityLevel.FLEET_DIRECTED if embarked else AuthorityLevel.DELEGATED
-+        if entry.link_status == LinkStatus.BLACKOUT and not embarked:
-+            # A formation the fleet can no longer reach falls back to the
-+            # pre-briefed loss-of-communication plan and runs on local autonomy.
++        base = AuthorityLevel.DELEGATED
++        if not embarked and entry.link_status in (LinkStatus.STALE, LinkStatus.BLACKOUT):
++            # The link has failed, so the formation is on its pre-briefed plan and
++            # runs on local autonomy.  STALE counts, not just BLACKOUT: the
++            # contingency evaluator already treats "stale or blacked out" as loss
++            # of communication (LOSS_OF_COMM_BRANCH), and a label reading
++            # DELEGATED while the agent is demonstrably executing the loss-of-comm
++            # plan would contradict the mode's own rule.  BLACKOUT alone was
++            # reachable only before a formation's first report ever arrived, so the
++            # label was in practice almost never set.
 +            base = AuthorityLevel.LOCAL_AUTONOMY
 +        entry.authority = base
 +
@@ -922,10 +966,10 @@ index 00000000..c0b2a952
 +    return MAX_FORMATIONS_PER_SIDE
 diff --git a/backend/src/iron_bottom_sound/command_observation.py b/backend/src/iron_bottom_sound/command_observation.py
 new file mode 100644
-index 00000000..bf94338a
+index 00000000..02546846
 --- /dev/null
 +++ b/backend/src/iron_bottom_sound/command_observation.py
-@@ -0,0 +1,524 @@
+@@ -0,0 +1,539 @@
 +"""Observation views for Command Delay (CD-2): fleet plot vs formation-local.
 +
 +Two views, deliberately asymmetric
@@ -1095,7 +1139,8 @@ index 00000000..bf94338a
 +
 +
 +def local_map_hexes(
-+    engine: "IronBottomEngine", state: GameState, positions: list[HexCoord], contact_labels: set[str],
++    engine: "IronBottomEngine", state: GameState, positions: list[HexCoord],
++    contact_labels: set[str], side: Side,
 +) -> list[dict[str, Any]]:
 +    """Hexes within the formation's own optical range, with terrain and contacts.
 +
@@ -1103,7 +1148,7 @@ index 00000000..bf94338a
 +    constructed: ``HexCoord`` rejects a negative column, so an off-map
 +    neighbourhood is skipped rather than built and caught.
 +    """
-+    radius = _optical_range(state)
++    radius = _optical_range(state, side)
 +    cells: list[dict[str, Any]] = []
 +    for position in positions:
 +        for dq in range(-radius, radius + 1):
@@ -1133,8 +1178,19 @@ index 00000000..bf94338a
 +    return [deduped[label] for label in sorted(deduped)]
 +
 +
-+def _optical_range(state: GameState) -> int:
-+    return int(min(state.visibility.values())) if state.visibility else 0
++def _optical_range(state: GameState, side: Side | None = None) -> int:
++    """The horizon a view is granted.
++
++    With ``side`` given this is that side's own optical visibility, the same value
++    the engine uses for sighting; without it, the narrower of the two sides', so
++    a side-agnostic caller can never be handed a wider horizon than the stricter
++    side has.
++    """
++    if not state.visibility:
++        return 0
++    if side is not None:
++        return int(state.visibility[side.value])
++    return int(min(state.visibility.values()))
 +
 +
 +def fleet_observation(engine: "IronBottomEngine", state: GameState, side: Side) -> FleetObservation:
@@ -1207,7 +1263,7 @@ index 00000000..bf94338a
 +        side=side,
 +        turn=state.turn,
 +        phase=state.phase,
-+        visibility=_optical_range(state),
++        visibility=_optical_range(state, side),
 +        map_columns=state.map_columns,
 +        map_rows=state.map_rows,
 +        embarked_formation_id=embarked_id,
@@ -1274,7 +1330,7 @@ index 00000000..bf94338a
 +        formation_name=formation.name,
 +        turn=state.turn,
 +        phase=state.phase,
-+        visibility=_optical_range(state),
++        visibility=_optical_range(state, side),
 +        map_columns=state.map_columns,
 +        map_rows=state.map_rows,
 +        authority=entry.authority if entry else AuthorityLevel.DELEGATED,
@@ -1293,7 +1349,10 @@ index 00000000..bf94338a
 +            "line_axis": formation.line_axis,
 +            "ships": [_ship_card(state, state.ships[ship_id]) for ship_id in members],
 +        },
-+        local_map=local_map_hexes(engine, state, positions, contact_labels) if positions else [],
++        local_map=(
++            local_map_hexes(engine, state, positions, contact_labels, side)
++            if positions else []
++        ),
 +        local_contacts=[
 +            {
 +                "ship_id": enemy.id,
@@ -2133,10 +2192,10 @@ index 21ee642b..9ae90402 100644
      return state
 diff --git a/backend/src/iron_bottom_sound/delegation.py b/backend/src/iron_bottom_sound/delegation.py
 new file mode 100644
-index 00000000..bf83e4f1
+index 00000000..acdc2797
 --- /dev/null
 +++ b/backend/src/iron_bottom_sound/delegation.py
-@@ -0,0 +1,371 @@
+@@ -0,0 +1,369 @@
 +"""Mission Command: MissionOrder, contingencies and delegated autonomy (IBS-R-CD-04).
 +
 +Structure follows the WWII U.S. Navy battle-plan layout the v2.2 plan prescribes:
@@ -2465,9 +2524,7 @@ index 00000000..bf83e4f1
 +    return None
 +
 +
-+def own_hull_fraction(
-+    engine: "IronBottomEngine", state: GameState, formation: FormationState,
-+) -> float:
++def own_hull_fraction(state: GameState, formation: FormationState) -> float:
 +    """Fraction of the formation's hull boxes still afloat."""
 +    total = 0
 +    current = 0
@@ -3348,10 +3405,10 @@ index 00000000..91476022
 +    return records
 diff --git a/backend/src/iron_bottom_sound/formation_maneuver.py b/backend/src/iron_bottom_sound/formation_maneuver.py
 new file mode 100644
-index 00000000..8bcbfe41
+index 00000000..aefb8de7
 --- /dev/null
 +++ b/backend/src/iron_bottom_sound/formation_maneuver.py
-@@ -0,0 +1,388 @@
+@@ -0,0 +1,393 @@
 +"""Command Delay CD-1: the additive formation movement style ``MOVE_TOGETHER``.
 +
 +Why a separate module
@@ -3709,6 +3766,10 @@ index 00000000..8bcbfe41
 +                    state, "formation_reformed",
 +                    f"{formation.name} 恢复纵队队形，可继续尾随领舰",
 +                    payload={
++                        # One side's formation geometry: private, exactly like
++                        # formation_created.  Without this the neutral battle report
++                        # would carry it.
++                        "secret_side": formation.side.value,
 +                        "formation_id": formation.id,
 +                        "line_axis": formation.line_axis,
 +                        "spacing": geometry.spacing,
@@ -3720,6 +3781,7 @@ index 00000000..8bcbfe41
 +                    state, "formation_reform_rejected",
 +                    f"{formation.name} 尚未与纵队轴线对齐，整队机动继续",
 +                    payload={
++                        "secret_side": formation.side.value,
 +                        "formation_id": formation.id,
 +                        **measure_line(state, formation).as_payload(),
 +                    },
@@ -4186,10 +4248,10 @@ index 6f398848..39fcabf8 100644
                  # A 120-degree in-place impulse cannot propagate down a spaced
 diff --git a/backend/src/iron_bottom_sound/research_hooks.py b/backend/src/iron_bottom_sound/research_hooks.py
 new file mode 100644
-index 00000000..366dc17a
+index 00000000..99d9b5a6
 --- /dev/null
 +++ b/backend/src/iron_bottom_sound/research_hooks.py
-@@ -0,0 +1,313 @@
+@@ -0,0 +1,379 @@
 +"""CD-6 research hooks: ML observation tensors and episode export.
 +
 +Interfaces only
@@ -4239,12 +4301,14 @@ index 00000000..366dc17a
 +                                    "heading_cos", "speed", "is_leader"]},
 +    "ships": {"width": 5, "fields": ["hull_fraction", "max_hull", "heading_sin",
 +                                     "heading_cos", "speed"], "per": "own ship"},
-+    "contacts": {"width": 5, "fields": ["distance", "bearing_sin", "bearing_cos",
-+                                        "is_priority_class", "class_rank"],
++    "contacts": {"width": 5, "fields": ["distance", "absolute_bearing_sin",
++                                        "absolute_bearing_cos", "is_priority_class",
++                                        "class_rank"],
 +                 "per": "local contact"},
 +    "comm": {"width": 4, "fields": ["link_rank", "authority_rank", "messages_received",
 +                                    "reports_age"]},
-+    "objective": {"width": 3, "fields": ["has_waypoint", "has_order", "active_branches"]},
++    "objective": {"width": 3, "fields": ["has_waypoint", "has_order",
++                                        "declared_contingencies"]},
 +}
 +LINK_RANK = {"direct": 1.0, "relayed": 0.75, "stale": 0.4, "blackout": 0.0}
 +AUTHORITY_RANK = {"fleet_directed": 1.0, "delegated": 0.6, "local_autonomy": 0.2}
@@ -4258,6 +4322,66 @@ index 00000000..366dc17a
 +
 +    angle = math.radians((heading - 1) * 60)
 +    return round(math.sin(angle), 6), round(math.cos(angle), 6)
++
++
++# Axial deltas of the six IBS compass directions, indexed by heading 1..6.
++_AXIAL_DELTA = {1: (1, -1), 2: (1, 0), 3: (0, 1), 4: (-1, 1), 5: (-1, 0), 6: (0, -1)}
++
++
++def _axial_of(observation: dict, label: str | None) -> tuple[int, int] | None:
++    """Axial coordinates of a hex label, resolved through the local map."""
++    if not label:
++        return None
++    for cell in observation.get("local_map", []):
++        if cell["hex"] == label:
++            return (int(cell["q"]), int(cell["r"]))
++    return None
++
++
++def _guide_axial(observation) -> tuple[int, int] | None:
++    """The formation guide's own hex, taken from the local formation state."""
++    ships = {
++        ship["ship_id"]: ship for ship in observation.formation_state.get("ships", [])
++    }
++    leader = ships.get(observation.formation_state.get("leader_id"))
++    if leader is None and observation.formation_state.get("ships"):
++        leader = observation.formation_state["ships"][0]
++    payload = observation.model_dump(mode="json")
++    return _axial_of(payload, leader.get("position") if leader else None)
++
++
++def _contact_axial(observation, label: str | None) -> tuple[int, int] | None:
++    return _axial_of(observation.model_dump(mode="json"), label)
++
++
++def _bearing_direction(
++    origin: tuple[int, int] | None, target: tuple[int, int] | None,
++) -> int | None:
++    """Absolute compass direction 1..6 from origin to target, or ``None``.
++
++    Uses the same axial lattice the engine moves on, so the number is a real
++    direction.  It is deliberately **absolute**, not relative to the observer's
++    heading: the observer's own heading is already in the ``self`` block, so a
++    policy can derive the engine's relative aspect (0 = bow, as in
++    ``IronBottomEngine._relative_aspect``) itself without this module re-inventing
++    a second convention.
++    """
++    if origin is None or target is None:
++        return None
++    dq = target[0] - origin[0]
++    dr = target[1] - origin[1]
++    if (dq, dr) == (0, 0):
++        return None
++    for direction, (step_q, step_r) in sorted(_AXIAL_DELTA.items()):
++        for sign in (1, -1):
++            if (step_q * sign, step_r * sign) == (dq, dr):
++                return direction if sign == 1 else ((direction + 2) % 6) + 1
++    # Not on an exact lattice line: nearest of the six directions.
++    return min(
++        _AXIAL_DELTA,
++        key=lambda direction: abs(dq - _AXIAL_DELTA[direction][0])
++        + abs(dr - _AXIAL_DELTA[direction][1]),
++    )
 +
 +
 +def policy_observation(
@@ -4304,12 +4428,15 @@ index 00000000..366dc17a
 +        ]
 +        for ship in sorted(ships, key=lambda item: str(item.get("ship_id")))
 +    ]
++    guide_axial = _guide_axial(observation)
 +    contact_rows = []
 +    for contact in sorted(observation.local_contacts, key=lambda item: item["ship_id"]):
 +        target_class = contact.get("ship_type")
++        contact_axial = _contact_axial(observation, contact.get("position"))
++        bearing = _bearing_direction(guide_axial, contact_axial)
 +        contact_rows.append([
 +            float(contact.get("range") if contact.get("range") is not None else -1),
-+            *_heading_sin_cos(None),
++            *_heading_sin_cos(bearing),
 +            1.0 if target_class in priority_classes else 0.0,
 +            float(CLASS_RANK.get(target_class or "", 0)),
 +        ])
@@ -4325,8 +4452,9 @@ index 00000000..366dc17a
 +    objective_block = [
 +        1.0 if objective is not None and objective.waypoint is not None else 0.0,
 +        1.0 if objective is not None else 0.0,
-+        float(len(observation.active_mission_order.contingencies)
-+              if observation.active_mission_order else 0),
++        # Declared, not activated: which branch is active is the agent's own
++        # decision and belongs in the decision record, not in the observation.
++        float(len(objective.contingencies) if objective is not None else 0),
 +    ]
 +    return {
 +        "tensor_version": TENSOR_VERSION,
@@ -4505,10 +4633,10 @@ index 00000000..366dc17a
 +    }
 diff --git a/backend/src/iron_bottom_sound/target_priority.py b/backend/src/iron_bottom_sound/target_priority.py
 new file mode 100644
-index 00000000..eade7e52
+index 00000000..c15cca09
 --- /dev/null
 +++ b/backend/src/iron_bottom_sound/target_priority.py
-@@ -0,0 +1,252 @@
+@@ -0,0 +1,255 @@
 +"""Target priority / ROE adapter into the engine fire selector (IBS-R-CD-06).
 +
 +Authority boundary
@@ -4585,7 +4713,12 @@ index 00000000..eade7e52
 +    turn: int,
 +    local_limit: float | None = None,
 +) -> float:
-+    """Compose the bonus for one target from fleet, local and doctrine terms."""
++    """Compose the bonus for one target from fleet, local and doctrine terms.
++
++    An empty directive set composes to exactly ``0.0``, so "no directive" means
++    "the raw expected-hit objective decides" — doctrine only ever adds on top of
++    a declared preference.
++    """
 +    total = 0.0
 +    for directive in directives:
 +        if directive.expires_turn is not None and directive.expires_turn < turn:
@@ -4607,8 +4740,6 @@ index 00000000..eade7e52
 +        else:
 +            limit = local_limit if local_limit is not None else 1.0
 +            total += clamp_local(weight, limit)
-+    if not directives:
-+        return 0.0
 +    return total
 +
 +
@@ -5449,10 +5580,10 @@ index 00000000..e3a8cc73
 +    assert outcome("0") == outcome("1") == outcome("5")
 diff --git a/tests/test_command_delay_formation_agent.py b/tests/test_command_delay_formation_agent.py
 new file mode 100644
-index 00000000..b632df6f
+index 00000000..e6bbe5f9
 --- /dev/null
 +++ b/tests/test_command_delay_formation_agent.py
-@@ -0,0 +1,500 @@
+@@ -0,0 +1,501 @@
 +"""CD-4: the deterministic formation agent and the gunnery authority boundary.
 +
 +Two properties are load-bearing here and are tested adversarially:
@@ -5927,8 +6058,9 @@ index 00000000..b632df6f
 +    engine.advance(state.game_id)
 +mode = state.command_delay
 +print(json.dumps({
-+    "decisions": sorted((d["formation_id"], d["selected_movement_plan"],
-+                         d["selected_contingency_branch"],
++    # None-safe: a decision may legitimately have no branch and no action.
++    "decisions": sorted((d["formation_id"], d["selected_movement_plan"] or "",
++                         d["selected_contingency_branch"] or "",
 +                         sorted(d["report_actions"])) for d in mode.decisions),
 +    "gunnery": sorted((key, side, len(batch.gunnery), len(batch.target_priorities))
 +                      for key, sealed in state.sealed_orders.items()

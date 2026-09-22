@@ -472,8 +472,9 @@ while state.phase != Phase.COMPLETE and steps < 400:
     engine.advance(state.game_id)
 mode = state.command_delay
 print(json.dumps({
-    "decisions": sorted((d["formation_id"], d["selected_movement_plan"],
-                         d["selected_contingency_branch"],
+    # None-safe: a decision may legitimately have no branch and no action.
+    "decisions": sorted((d["formation_id"], d["selected_movement_plan"] or "",
+                         d["selected_contingency_branch"] or "",
                          sorted(d["report_actions"])) for d in mode.decisions),
     "gunnery": sorted((key, side, len(batch.gunnery), len(batch.target_priorities))
                       for key, sealed in state.sealed_orders.items()

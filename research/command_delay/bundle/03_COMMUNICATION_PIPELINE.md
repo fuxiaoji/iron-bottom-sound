@@ -67,7 +67,7 @@
 "statuses": {"delivered": 65, "queued": 12},
 "mediums": {"tbs_short": 65, "wt_reencipher_relay": 11, "blackout": 1},
 "handling_delays": {"0": 64, "1": 2, "2": 11},
-"link_statuses": {"blackout": 2, "relayed": 1, "stale": 1},
+"link_statuses": {"blackout": 2, "direct": 1, "relayed": 1},
 "report_ages": [1, 2, 6, 6],
 "issued_delivered_observed_all_set": true,
 "delivered_never_before_issued": true
@@ -77,7 +77,7 @@
 
 - 信道确实按媒介分层：TBS 同回合送达、转报需要 2 回合（11 条）、1 条因无通路（BLACKOUT）从未发出。
 - **发出/送达/观察到三个回合字段齐备**，且 `delivered ≥ issued`（验收标准 8）。
-- 报告年龄 `[1, 2, 6, 6]`：舰队对远端编队的认知确实在退化；链路状态出现 `relayed`/`stale`/`blackout`，说明报告管线真的在跑而不是恒为 DIRECT。
+- 报告年龄 `[1, 2, 6, 6]`：舰队对远端编队的认知确实在退化；链路状态出现 `relayed` 与 `blackout`（`direct` 是被搭载编队的物理链路），说明报告管线真的在跑。
 - `link_status` 是**投递台账的函数**：只有真正收到更新的报告才会改善（`refresh_link_status` 只读 `reported_turn`）。
 
 ## 6. 两个在实现中修掉的缺陷

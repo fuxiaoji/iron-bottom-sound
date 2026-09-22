@@ -1,0 +1,23 @@
+{
+ "completed": true,
+ "findings": [],
+ "game_id": "ca0faa11-9dc1-4a7f-9588-531846a2ba11",
+ "gating": {
+  "fleet_view_in_realistic": 409,
+  "formation_view_in_realistic": 409,
+  "rules_doc": 200
+ },
+ "status_codes": {
+  "advance": 200,
+  "fleet-view": 200,
+  "formation-view-enemy": 404,
+  "formation-view-own": 200,
+  "orders-allies": 200,
+  "orders-axis": 200,
+  "view-allies": 200,
+  "view-axis": 200
+ },
+ "steps": 29,
+ "turn": 4,
+ "verdict": "PASS"
+}

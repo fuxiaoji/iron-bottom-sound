@@ -36,3 +36,14 @@ git apply       code_patch/research_harness.patch
 3. CD0-F1 确定性修复：`collision_set` 遍历改为规范排序键（−1 行 +1 行；修复前后 7 行冻结摘要逐字节不变）。
 
 **`models.py`（+297 / −0）**：纯新增枚举/模型/带默认值字段，见 `../DATA_MODEL_DIFF.md`。
+
+## 交付评审修正（CD-8）
+
+补测实机面时发现并修复的问题也会出现在上面的补丁里，其中两处**触及既有文件**：
+
+| 位置 | 改动 | 为什么必须动它 |
+|---|---|---|
+| `battle_report.py` | 新增 `PRIVATE_EVENT_PREFIXES`，在 `public_events_for_turn` 中排除命令延迟事件族 | 该函数是决定"什么能进中立战报"的唯一位置；不改它就无法阻止双方指挥链进入战报 |
+| `formation_maneuver.py` | `formation_reformed` / `formation_reform_rejected` 载荷加 `secret_side` | 载荷含本编队成分；不加标记则中立战报仍会收录 |
+
+`battle_report.py` 不在最初的冻结面清单里（冻结面是 `realistic_command.py` 的语义、`GameOptions.realistic_command` 与 FORMATION_SETUP 流程），但它是既有文件：改动是**新增一个可选过滤常量 + 一个 continue**，既有 22 项战报测试全部通过，且 `formation_created` / `movement_plan_resolved` 的既有行为**未变**（那属于需 PI 裁决的同类既有问题，见 `../05_OBSERVATION_LEAKAGE_AUDIT.md` §7）。

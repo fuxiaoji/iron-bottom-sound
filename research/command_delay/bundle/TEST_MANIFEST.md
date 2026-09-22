@@ -2,7 +2,7 @@
 
 命令延迟模式 v2.2 的测试清单与运行方式。
 
-## 1. 新增测试文件（108 项）
+## 1. 新增测试文件（114 项）
 
 | 文件 | 项数 | 覆盖 |
 |---|---|---|
@@ -12,8 +12,9 @@
 | `tests/test_command_delay_formation_agent.py` | 18 | 决策模型无炮击字段、结构守卫、引擎拒绝原始炮击、指令只重排合法目标（含炮位一致性与真实翻转）、不可见目标回退、本地权重上界、教条的静默性、代理只在枚举动作内移动、纯函数、本地接触来源、失联分支、记账、端到端、跨哈希种子 |
 | `tests/test_command_delay_formation_llm.py` | 16 | 提示词严格等于 §12 清单、不含规则公式、七类拒绝情形、重试、回退并保留审计、逐次尝试记录、录播重放、协议一致性 |
 | `tests/test_command_delay_research_hooks.py` | 13 | 张量块宽度对齐 `TENSOR_SPEC`、策略观察无对方舰、`to_numpy` 形状、两种导出的 `POLICY_SAFE` 标记、文件往返、契约未确认不生效、权重不得凭空声明、账本不改决策、序列化往返 |
+| `tests/test_command_delay_live_surface.py` | 6 | **交付评审补测**：API `/view` 逐次等于 `engine.observe(side)`（整局）、事件端点不返回对方私有事件、中立战报不含指挥链、被搭载编队恒为 DIRECT、`STALE` 即 `LOCAL_AUTONOMY`、链路被切断的编队仍自主打完一局 |
 
-合计 **108** 项，全部 PASS。
+合计 **114** 项，全部 PASS。
 
 ## 2. 运行
 
@@ -38,6 +39,7 @@ cd iron-bottom-sound
 | `.venv/bin/python research/command_delay/golden_replay.py --check` | 7 行冻结回放 + 信封增长报告 | `GOLDEN_REPLAY = PASS`，0 漂移 |
 | `... --probe-hash-seeds 0,1,2,8` | 冻结面的哈希种子稳定性 | `HASH_SEED_STABILITY = PASS`，0 行不稳定 |
 | `.venv/bin/python research/command_delay/run_audits.py` | 8 项审计（冻结/机动/通信/命令/泄漏/炮击权限/重放/数据模型） | `AUDITS = PASS` |
+| `.venv/bin/python research/command_delay/verify_live.py` | 实机验证：18 局完整对局矩阵、HTTP API 全流程、链路切断自主性、战报管线 | `LIVE_VERIFICATION = PASS` |
 
 `run_audits.py` 的退出码非零即表示某项审计 FAIL，因此它同时是 bundle 的完整性闸门。
 

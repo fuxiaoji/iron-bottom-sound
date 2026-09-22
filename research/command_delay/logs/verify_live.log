@@ -1,0 +1,40 @@
+/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+=== 1. complete-game matrix (command delay vs realistic) ===
+[OK ] IBS-S-01       seed=3         command_delay  turns=7   events=922     25.1s decisions=26 msgs=121
+[OK ] IBS-S-01       seed=3         realistic      turns=7   events=731     14.8s
+[OK ] IBS-S-01       seed=20270830  command_delay  turns=7   events=701     24.0s decisions=19 msgs=77
+[OK ] IBS-S-01       seed=20270830  realistic      turns=7   events=486     26.8s
+[OK ] IBS-S-01       seed=20270829  command_delay  turns=7   events=684     27.6s decisions=19 msgs=63
+[OK ] IBS-S-01       seed=20270829  realistic      turns=7   events=526      2.2s
+[OK ] IBS-S-03       seed=3         command_delay  turns=4   events=172      4.0s decisions=8 msgs=0
+[OK ] IBS-S-03       seed=3         realistic      turns=4   events=268      2.4s
+[OK ] IBS-S-03       seed=20270830  command_delay  turns=4   events=177      4.2s decisions=8 msgs=0
+[OK ] IBS-S-03       seed=20270830  realistic      turns=4   events=182      7.6s
+[OK ] IBS-S-03       seed=20270829  command_delay  turns=4   events=178      4.2s decisions=8 msgs=0
+[OK ] IBS-S-03       seed=20270829  realistic      turns=4   events=158      1.2s
+[OK ] IBS-S-EM-01    seed=3         command_delay  turns=12  events=1931    53.1s decisions=49 msgs=207
+[OK ] IBS-S-EM-01    seed=3         realistic      turns=12  events=1178    28.8s
+[OK ] IBS-S-EM-01    seed=20270830  command_delay  turns=12  events=1889    68.8s decisions=50 msgs=214
+[OK ] IBS-S-EM-01    seed=20270830  realistic      turns=12  events=1110    24.8s
+[OK ] IBS-S-EM-01    seed=20270829  command_delay  turns=12  events=1669    62.9s decisions=43 msgs=157
+[OK ] IBS-S-EM-01    seed=20270829  realistic      turns=12  events=1545    17.1s
+    9/9 command-delay games and 9/9 realistic games reached COMPLETE
+
+=== 2+3. HTTP API game and leakage ===
+    completed=True findings=[]
+
+=== 4. formation autonomy with no order at all ===
+    {"completed": true, "turns": 7, "confirmed_mission_orders": 0, "agent_decisions": 19, "decisions_without_an_order": 19, "decisions_without_an_order_that_chose_a_plan": 19, "formations_in_local_autonomy_at_end": 1, "formations_in_local_autonomy_during_play": ["allies-active-heavy"], "formations_in_blackout_at_end": 2, "formations_in_blackout_during_play": ["axis-active-heavy", "axis-active-light"], "fleet_reports_still_age": [2, 6, 6, 6], "cut_formation": "allies-active-heavy", "cut_formation_end_link": "stale", "cut_formation_end_authority": "local_autonomy", "gunnery_orders_generated": 54, "friendly_collisions": 0}
+
+=== 5. battle report with the mode on ===
+    {"game_id": "verify-battle-report", "completed": true, "turns": 4, "captured_entries": 87, "report_built": true, "markdown_chars": 6045600, "findings": [], "verdict": "PASS"}
+
+{
+ "game_matrix": "PASS",
+ "api_game": "PASS",
+ "autonomy": "PASS",
+ "battle_report": "PASS"
+}
+LIVE_VERIFICATION = PASS
+VERIFY_EXIT=0

@@ -71,10 +71,30 @@ stale_external_reports, turn, visibility
 
 即两种旧模式的玩家观察中**不存在** `command_delay` 字段：模式状态既不进 `PlayerObservation`，也不进任何旧模式载荷。舰队/编队视图是独立的、由 `command_delay_mode` 门控的接口（`/games/{id}/command-delay/fleet-view`、`.../formation-view/{id}`，且编队必须属于请求方）。
 
-## 6. 判定
+## 6. HTTP API 层的透明性（交付评审补测）
+
+引擎层干净不代表传输层干净：API 可能把引擎过滤掉的东西加回来。判定方式不是"看有没有出现敌舰"（被发现的敌舰本来就该出现），而是**逐次比对**：
 
 ```
-INFO_LEAKAGE = PASS      (findings = [])
+GET /games/{id}/view  ==  engine.observe(game_id, side)   ?
+```
+
+用 FastAPI `TestClient` 跑完整一局（IBS-S-03 + 命令延迟模式），**双方各比一次、共 58 次比较，0 处不一致**。即 API 既不增也不减引擎自己的迷雾视图。
+
+同时对 `/games/{id}/advance` 与 `/games/{id}/events` 逐条检查事件的 `secret_side`：到达轴心玩家的每一条命令延迟事件都属于轴心（或为公开事件），未出现任何发给对方的条目。
+
+## 7. 中立战报的私有信息（交付评审发现并修复）
+
+战报是**双方都能打开的中立文档**，其事件规则是"至少一侧可见的并集"（`public_events_for_turn`），而命令延迟事件各自只属于一方。实测该并集把 `command_delay_initialised`（2 条）、`command_delay_turn_state`（8 条）、`formation_agent_decision`（8 条）**全部**带进了战报——等于把双方的指挥链、代理决策与激活的备选分支印在同一份文档里。
+
+修复：`battle_report.PRIVATE_EVENT_PREFIXES` 按前缀排除整个命令延迟事件族（与既有 `orders_submitted` 的排除理由相同）。修复后该检查 0 项发现，且既有 22 项战报测试全部通过。
+
+**同类既有问题（非本轮引入，需 PI 裁决）**：Realistic 模式下的 `formation_created` 与 `movement_plan_resolved` 同样带 `secret_side` 却会被并集收进中立战报（实测 2 + 27 条）。规则文档明说"己方编队关系、旗舰和继承顺序是秘密信息"，因此这两类事件在战报中出现是同一类缺陷；但修它会改变既有战报内容，故未擅动，列为裁决项 CD8-Q1。
+
+## 8. 判定
+
+```
+INFO_LEAKAGE = PASS      (引擎层 findings = []；API 层 58/58 与引擎视图一致；战报 0 项私有事件)
 ```
 
 0 项发现。审计在收紧过程中先失败三次（检查过宽会漏、过严会误报），最终形态是：**允许"自己看到的东西"，禁止一切"没看到却知道的东西"**。

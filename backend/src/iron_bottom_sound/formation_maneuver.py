@@ -355,6 +355,10 @@ def commit_sealed_style_transitions(engine: "IronBottomEngine", state: GameState
                     state, "formation_reformed",
                     f"{formation.name} 恢复纵队队形，可继续尾随领舰",
                     payload={
+                        # One side's formation geometry: private, exactly like
+                        # formation_created.  Without this the neutral battle report
+                        # would carry it.
+                        "secret_side": formation.side.value,
                         "formation_id": formation.id,
                         "line_axis": formation.line_axis,
                         "spacing": geometry.spacing,
@@ -366,6 +370,7 @@ def commit_sealed_style_transitions(engine: "IronBottomEngine", state: GameState
                     state, "formation_reform_rejected",
                     f"{formation.name} 尚未与纵队轴线对齐，整队机动继续",
                     payload={
+                        "secret_side": formation.side.value,
                         "formation_id": formation.id,
                         **measure_line(state, formation).as_payload(),
                     },

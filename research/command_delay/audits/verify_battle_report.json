@@ -1,0 +1,10 @@
+{
+ "captured_entries": 87,
+ "completed": true,
+ "findings": [],
+ "game_id": "verify-battle-report",
+ "markdown_chars": 6045600,
+ "report_built": true,
+ "turns": 4,
+ "verdict": "PASS"
+}

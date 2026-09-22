@@ -62,6 +62,21 @@ cd iron-bottom-sound
 | `replay` | 一局完整对局在 4 个哈希种子下的摘要一致 |
 | `data_model` | 新模型/枚举/字段、信封叶子键 |
 
+## 3b. 实机验证（对局矩阵 / API / 自主性 / 战报）
+
+```bash
+.venv/bin/python research/command_delay/verify_live.py
+```
+
+四个部分，退出码非零即失败：
+
+1. **完整对局矩阵** —— 3 想定 × 3 seed × {命令延迟, 真实对照} = 18 局，全部要求到达 `COMPLETE`；
+2. **HTTP API** —— 用 FastAPI `TestClient` 打完一整局，并逐次断言 `GET /view == engine.observe(side)`、模式门控 409/404、事件不越界；
+3. **自主性** —— 完全切断某一个编队的链路（双向含报告），要求该编队仍自主决策、选出合法方案、整局打完；
+4. **战报** —— 命令延迟模式下战报管线可用，且中立战报不含任何一方的指挥链。
+
+对应固化测试：`.venv/bin/python -m pytest tests/test_command_delay_live_surface.py -q`
+
 ## 4. 手工检查点（不必跑，用于快速确认模式确实存在）
 
 ```bash

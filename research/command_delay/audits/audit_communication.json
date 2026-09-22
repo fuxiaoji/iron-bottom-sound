@@ -28,8 +28,8 @@
   "issued_delivered_observed_all_set": true,
   "link_statuses": {
    "blackout": 2,
-   "relayed": 1,
-   "stale": 1
+   "direct": 1,
+   "relayed": 1
   },
   "mediums": {
    "blackout": 1,

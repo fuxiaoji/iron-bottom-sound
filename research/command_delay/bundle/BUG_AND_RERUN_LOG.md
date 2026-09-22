@@ -203,6 +203,59 @@ assert 1 == 0
 
 ---
 
+## CD8-F1 · 中立战报携带双方指挥链（新代码缺陷，已修）
+
+**发现方式**：交付评审问"有战报吗"。此前**从未**在命令延迟模式下启用过战报，于是补测：`battle_report=True` + 命令延迟模式跑完整一局，然后扫描战报 JSON 与 Markdown。
+
+**现象**：`public_events_for_turn` 的规则是"至少一侧可见的公开事件并集"，而命令延迟事件各自只属于一方 —— 并集因此把双方的私有指挥信息全收进来：`command_delay_initialised`（2）、`command_delay_turn_state`（8）、`formation_agent_decision`（8，含激活的备选分支与本地权重调整）。即中立战报里能读到对方的指挥链状态与代理决策。
+
+**修复**：`battle_report.PRIVATE_EVENT_PREFIXES` 按前缀排除整个命令延迟事件族（`command_delay_` / `command_message_` / `formation_agent_` / `mission_order`），理由与既有 `orders_submitted` 排除一致：战报是对双方开放的中立文档。按前缀而非逐个类型名，是为了让该族将来新增的事件不能悄悄重新引入泄漏。
+
+**同时**：`formation_reformed` / `formation_reform_rejected` 原先不带 `secret_side`，而载荷含本编队成分配置（`measure_line().as_payload()`）——改为与 `formation_created` 一致地标记为私有。
+
+**验证**：修复后该检查 0 项发现；既有 22 项战报测试全过。
+
+---
+
+## CD8-F2 · 交付评审的三个问题暴露了两处真实空白（方法缺陷，已补）
+
+**发现方式**：用户问"完整打过几局 / 用测试 api 试过吗 / 有战报吗"。
+
+**事实**：此前只跑过 2 个 (想定, seed) 组合；**从未**调用过 HTTP API；**从未**在本模式启用战报。这些都是真实空白，不是"已覆盖但没写下来"。
+
+**处置**：新增 `research/command_delay/verify_live.py`，四部分：18 局完整对局矩阵（3 想定 × 3 seed × {命令延迟, 真实} 对照）、HTTP API 全流程一局、切断单编队链路的自主性探针、战报管线。另把四项固化为 `tests/test_command_delay_live_surface.py`（6 项）。
+
+---
+
+## CD8-F3 · `LOCAL_AUTONOMY` 在实际对局中几乎不可达（新代码缺陷，已修）
+
+**发现方式**：自主性探针报告 `formations_in_local_autonomy: []`，而同一局里 agent 明明在按失联预案行动。
+
+**根因**：权限标签只在 `BLACKOUT` 时降级，而 `BLACKOUT` 对"在编且未搭载"的编队意味着 `reported_turn is None` —— 即**从未收到过任何报告**。稳态下的失联是 `STALE`（报告年龄 ≥ 2），而 `STALE` 当时仍标 `DELEGATED`。于是标签与行为自相矛盾：`delegation.activate_branches` 早已把 "stale or blacked out" 都算作失联并激活 `LOSS_OF_COMM_BRANCH`，我自己的测试也这么断言。
+
+**修复**：`STALE` 与 `BLACKOUT` 同样降级为 `LOCAL_AUTONOMY`（未搭载且仍在编时）。这与模式自身的规则一致，而不是新增规则。
+
+---
+
+## CD8-F4 · 被搭载编队的链路被算成 STALE（新代码缺陷，已修）
+
+**发现方式**：逐回合打印链路状态时看到 `allies-active-light: stal/fleet_/r1` 从第 2 回合起一直不变 —— 而这正是**舰队总指挥所在**的编队。
+
+**根因**：`draft_reports` 不给自己编队发报文（总指挥不需要向自己报告），于是该编队的 `reported_turn` 永不刷新，`refresh_link_status` 便按年龄把它算成逐级退化，最终 `STALE`。登录在旗舰上的总指挥，其指挥链是**物理的**，不需要任何通信。
+
+**修复**：被搭载编队的链路恒为 `DIRECT` 且权限恒为 `FLEET_DIRECTED`（不再由报文年龄推导）。顺带把"编队已解散 → BLACKOUT 且保留历史权限"写成显式注释，避免与上述规则混淆。
+
+---
+
+## CD8-F5 · 我的 API 泄漏检查两次判错（审计缺陷，已修两轮）
+
+**第一轮（过宽）**：把"响应里出现任何对方舰 id"当泄漏，于是把 S-03 开局就处于目视距离内的 5 艘盟军驱逐舰判为泄漏——那是正常的发现接触。
+**第二轮（仍过宽）**：改成"与当前可见集比对"后，仍然误报：一艘在目视下沉没的舰会从可见集消失，却合法地留在 `wrecks` 与公开事件里。
+
+**最终形态**：不再猜"哪些敌舰该出现"，而是问一个可判定的问题——**API 是否比引擎自己的过滤视图更宽**：逐次断言 `GET /view == engine.observe(side)`。58 次比较 0 处不一致。这比"扫描敌舰 id"既严格又不会误报。
+
+---
+
 ## 无缺陷但需记录的两次测量
 
 - **`test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter`**：计数器素材实测 sha256 `5c54f8aa…` ≠ 测试硬编码的 `918196c7…`。属素材内容问题，与引擎无关，**改动前即失败**，未处置。

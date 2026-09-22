@@ -261,7 +261,20 @@ def refresh_link_status(state: GameState) -> None:
         entry = mode.formations[formation_id]
         formation = state.formations.get(formation_id)
         if formation is None or formation.status == "dissolved":
+            # The command entity is gone -- no ships left to be in touch with.  The
+            # last authority is kept as history; live formations are the ones the
+            # DIRECT / RELAYED / STALE / LOCAL_AUTONOMY rules below describe.
             entry.link_status = LinkStatus.BLACKOUT
+            continue
+        authority = mode.authorities.get(formation.side.value)
+        embarked = authority is not None and authority.fleet_formation_id == formation_id
+        if embarked:
+            # The fleet commander is embarked in this formation: the command link
+            # is physical, needs no traffic, and cannot go stale.  Deriving it from
+            # sitrep age (there is no sitrep to itself) would have shown a link
+            # degrading in the very formation the admiral is standing on.
+            entry.link_status = LinkStatus.DIRECT
+            entry.authority = AuthorityLevel.FLEET_DIRECTED
             continue
         age = (
             None if entry.reported_turn is None
@@ -275,12 +288,16 @@ def refresh_link_status(state: GameState) -> None:
             entry.link_status = LinkStatus.RELAYED
         else:
             entry.link_status = LinkStatus.STALE
-        authority = mode.authorities.get(formation.side.value)
-        embarked = authority is not None and authority.fleet_formation_id == formation_id
-        base = AuthorityLevel.FLEET_DIRECTED if embarked else AuthorityLevel.DELEGATED
-        if entry.link_status == LinkStatus.BLACKOUT and not embarked:
-            # A formation the fleet can no longer reach falls back to the
-            # pre-briefed loss-of-communication plan and runs on local autonomy.
+        base = AuthorityLevel.DELEGATED
+        if not embarked and entry.link_status in (LinkStatus.STALE, LinkStatus.BLACKOUT):
+            # The link has failed, so the formation is on its pre-briefed plan and
+            # runs on local autonomy.  STALE counts, not just BLACKOUT: the
+            # contingency evaluator already treats "stale or blacked out" as loss
+            # of communication (LOSS_OF_COMM_BRANCH), and a label reading
+            # DELEGATED while the agent is demonstrably executing the loss-of-comm
+            # plan would contradict the mode's own rule.  BLACKOUT alone was
+            # reachable only before a formation's first report ever arrived, so the
+            # label was in practice almost never set.
             base = AuthorityLevel.LOCAL_AUTONOMY
         entry.authority = base
 

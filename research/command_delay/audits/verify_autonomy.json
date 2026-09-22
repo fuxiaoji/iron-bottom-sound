@@ -1,0 +1,29 @@
+{
+ "agent_decisions": 19,
+ "completed": true,
+ "confirmed_mission_orders": 0,
+ "cut_formation": "allies-active-heavy",
+ "cut_formation_end_authority": "local_autonomy",
+ "cut_formation_end_link": "stale",
+ "decisions_without_an_order": 19,
+ "decisions_without_an_order_that_chose_a_plan": 19,
+ "fleet_reports_still_age": [
+  2,
+  6,
+  6,
+  6
+ ],
+ "formations_in_blackout_at_end": 2,
+ "formations_in_blackout_during_play": [
+  "axis-active-heavy",
+  "axis-active-light"
+ ],
+ "formations_in_local_autonomy_at_end": 1,
+ "formations_in_local_autonomy_during_play": [
+  "allies-active-heavy"
+ ],
+ "friendly_collisions": 0,
+ "gunnery_orders_generated": 54,
+ "turns": 7,
+ "verdict": "PASS"
+}

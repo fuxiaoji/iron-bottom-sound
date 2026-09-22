@@ -43,6 +43,7 @@ DOCS = (
 )
 
 TEST_FILES = (
+    "test_command_delay_live_surface.py",
     "test_command_delay_movement_style.py",
     "test_command_delay_mode_shell.py",
     "test_command_delay_communications.py",
@@ -97,6 +98,10 @@ def main() -> int:
 
     # Evidence that is small and load-bearing: the golden index and the commit list.
     copy(HERE / "golden" / "GOLDEN_INDEX.json", STAGE / "logs" / "GOLDEN_INDEX.json")
+    for extra in ("verify_live.log", "post_fix_tests.log", "post_fix_audits.log"):
+        source = HERE / "logs" / extra
+        if source.exists():
+            copy(source, logs / extra)
     commits = subprocess.run(
         ["git", "log", "--oneline", "realistic-command-v1-frozen..HEAD"],
         cwd=str(ROOT), capture_output=True, text=True, timeout=120,
