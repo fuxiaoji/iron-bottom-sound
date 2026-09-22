@@ -697,6 +697,45 @@ class FormationCommandState(BaseModel):
     last_report_turn: int | None = None
 
 
+class ContractTerm(BaseModel):
+    """One agreed term between the fleet and a formation (CD-6 research hook)."""
+
+    term_id: str
+    description: str
+    obligor: str
+    beneficiary: str
+    measurable: str = ""
+    weight: float = 0.0
+
+
+class ContractState(BaseModel):
+    """A standing agreement a future incentive-aware policy would read.
+
+    Empty by default: a game with no declared contract carries an empty contract,
+    which is what keeps this stage an interface rather than a mechanic.
+    """
+
+    side: Side
+    formation_id: str
+    order_id: str | None = None
+    terms: list[ContractTerm] = Field(default_factory=list)
+    agreed_turn: int | None = None
+
+
+class LedgerEntry(BaseModel):
+    """One observable event a future reward could be derived from."""
+
+    turn: int
+    phase: str
+    formation_id: str
+    kind: str
+    value: float = 0.0
+    reason: str = ""
+    source_message_id: str | None = None
+    order_id: str | None = None
+    detail: dict[str, Any] = Field(default_factory=dict)
+
+
 class CommandDelayState(BaseModel):
     """Whole-game state for the Command Delay mode (option-gated, default off)."""
 
@@ -711,6 +750,11 @@ class CommandDelayState(BaseModel):
     # Stored as dumps, not as the agent's own type: this is an audit ledger, and
     # keeping it schema-free avoids a data-model -> agent import cycle.
     decisions: list[dict[str, Any]] = Field(default_factory=list)
+    # CD-6 research hooks: declared contracts and the incentive ledger.  Both stay
+    # empty until a researcher declares them; nothing in the runtime reads them
+    # back into a decision.
+    contracts: list[ContractState] = Field(default_factory=list)
+    ledger: list[LedgerEntry] = Field(default_factory=list)
     next_sequence: int = 1
 
 
