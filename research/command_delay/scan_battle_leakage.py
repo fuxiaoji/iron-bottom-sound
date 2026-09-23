@@ -16,8 +16,11 @@ sys.path.insert(0, str(ROOT / "backend" / "src"))
 
 from iron_bottom_sound.engine import IronBottomEngine, ORDER_PHASES  # noqa: E402
 from iron_bottom_sound.llm import LLMPlayerSession  # noqa: E402
-from iron_bottom_sound.models import GameOptions, Phase, Side  # noqa: E402
-from iron_bottom_sound.realistic_command import default_setup_orders  # noqa: E402
+from iron_bottom_sound.models import GameOptions, OrderBatch, Phase, Side  # noqa: E402
+from iron_bottom_sound.realistic_command import (  # noqa: E402
+    RealisticCommander,
+    default_setup_orders,
+)
 
 BATTLE = Path(__file__).resolve().parent / "battle"
 

@@ -483,3 +483,32 @@ def test_the_order_endpoint_and_formation_orders_round_trip() -> None:
         if body is not None:
             kwargs["json"] = body
         assert call(f"/games/{realistic}{path}", **kwargs).status_code == 409
+
+
+def test_formation_orders_and_gunnery_priorities_never_cross_sides() -> None:
+    """CD12-F2 regression: each side's batch must carry only its own material.
+
+    The live battle caught both: movement batches containing the opponent's
+    formations (engine refused, driver silently fell back to doctrine), and
+    gunnery priorities from the other side's agents reaching this side's selector.
+    """
+    engine, state = start()
+    play(engine, state)
+    for side in Side:
+        own = {
+            formation.id for formation in state.formations.values()
+            if formation.side is side
+        }
+        for order in command_delay.formation_orders(state, side):
+            assert order.formation_id in own
+        mode = state.command_delay
+        for order in mode.mission_orders:
+            if order.side is side and order.confirmed_turn is not None:
+                for directive in order.target_priority_directives:
+                    assert directive.formation_id in own
+        for directive in mode.local_directives:
+            assert directive.formation_id in own, (
+                f"allies directive {directive.formation_id} reached the axis selector"
+                if side is Side.AXIS else
+                f"axis directive {directive.formation_id} reached the allies selector"
+            )

@@ -767,9 +767,14 @@ def formation_orders(state: GameState, side: Side) -> list[FormationMovementOrde
     an agent that chose an illegal plan fails loudly instead of being corrected
     silently.
     """
+    own = {
+        formation.id for formation in state.formations.values()
+        if formation.side is side
+    }
     order_by_formation: dict[str, FormationMovementOrder] = {}
     for record in state.command_delay.decisions if state.command_delay else []:
-        if record.get("turn") != state.turn:
+        if record.get("turn") != state.turn or record.get("formation_id") not in own:
+            # 另一侧编队的代理决策属于对方的指挥链，绝不进入本侧订单。
             continue
         formation_id = record.get("formation_id")
         plan = record.get("selected_movement_plan")
@@ -790,11 +795,19 @@ def gunnery_batch(state: GameState, side: Side) -> OrderBatch:
     path can name a mount or a firing solution.
     """
     mode = state_for(state)
+    own = {
+        formation.id for formation in state.formations.values()
+        if formation.side is side
+    }
     directives: list[TargetPriorityDirective] = []
     for order in mode.mission_orders:
         if order.side is side and order.confirmed_turn is not None:
             directives.extend(order.target_priority_directives)
-    directives.extend(mode.local_directives)
+    # 本地代理的调整同样按阵营取：另一侧代理的权重绝不能影响本侧选择器。
+    directives.extend(
+        directive for directive in mode.local_directives
+        if directive.formation_id in own
+    )
     return OrderBatch(side=side, phase=state.phase, target_priorities=directives)
 
 

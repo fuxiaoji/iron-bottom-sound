@@ -300,6 +300,7 @@ def main() -> int:
             if event.type == "collision" and event.payload.get("friendly")
         ),
     }
+    battle["turns"] = [turn_records[key] for key in sorted(turn_records)]
     battle["messages"] = [message.model_dump(mode="json") for message in mode.messages]
     battle["decisions"] = mode.decisions
     battle["policy_labels"] = dict(mode.policy_labels)
