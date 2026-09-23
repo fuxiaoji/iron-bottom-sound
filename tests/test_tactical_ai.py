@@ -773,7 +773,8 @@ def test_collision_resolution_is_deterministic_across_hash_seeds() -> None:
     排序迭代，任意哈希种子下事件序列与战果必须一致。
     """
     def outcome(hashseed: str):
-        env = dict(os.environ, PYTHONHASHSEED=hashseed)
+        env = dict(os.environ, PYTHONHASHSEED=hashseed,
+                   PYTHONPATH=str(_REPO_ROOT / "backend" / "src"))
         proc = subprocess.run(
             [sys.executable, "-c", _SUBPROCESS_DETERMINISM_SCRIPT],
             cwd=_REPO_ROOT, env=env, capture_output=True,
@@ -1105,7 +1106,8 @@ def test_ai_orders_deterministic_across_hash_seeds() -> None:
     本测试跨 PYTHONHASHSEED=2/8 跑完整 MOVEMENT+GUNNERY 轴心订单序列并比对一致。
     """
     def outcome(hashseed: str):
-        env = dict(os.environ, PYTHONHASHSEED=hashseed)
+        env = dict(os.environ, PYTHONHASHSEED=hashseed,
+                   PYTHONPATH=str(_REPO_ROOT / "backend" / "src"))
         proc = subprocess.run(
             [sys.executable, "-c", _SUBPROCESS_AI_DETERMINISM_SCRIPT],
             cwd=_REPO_ROOT, env=env, capture_output=True,

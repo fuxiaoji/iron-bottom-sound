@@ -314,3 +314,23 @@ assert 1 == 0
 68 条接触报告全部由 `draft_reports` 在阶段边界自动起草。**下级上报目前是引擎的自动参谋作业**，
 代理不能决定何时、向谁、报告什么。这不是 bug 修复而是新机制（让代理的报告意图驱动
 `draft_reports` 的输入），建议单列一批。
+
+### CD12-F6 · 两个哈希种子确定性测试从未真正运行（已修）
+
+`tests/test_tactical_ai.py` 的两个跨 `PYTHONHASHSEED` 测试
+（`test_collision_resolution_is_deterministic_across_hash_seeds`、
+`test_ai_orders_deterministic_across_hash_seeds`）用 `subprocess.run([sys.executable, "-c", ...])`
+起子进程，只传了 `cwd` 而**没传 `PYTHONPATH`**；包在 `backend/src` 下，子进程
+`from iron_bottom_sound.engine import ...` 直接 `ModuleNotFoundError`，断言
+`assert proc.returncode == 0` 失败。
+
+**后果不是"两个测试红了"，而是"碰撞解算与 AI 订单的跨哈希种子确定性从未被检验过"**——
+这正是 CD0-F1 那一类缺陷的哨兵，而它在报告失败的同时并没有去验证被测对象。修法沿用仓库既有
+惯用法（`PYTHONPATH=str(_REPO_ROOT / "backend" / "src")`，见三个命令延迟测试文件），
+两处齐改。修后两个测试**真实执行并通过**（22.5 秒），即：
+
+- 碰撞组解算在 `PYTHONHASHSEED=2/8` 下产出同一战果与同一事件序列；
+- 轴心 MOVEMENT+GUNNERY 订单序列（移动 plan、炮击目标+炮位）跨哈希种子逐字节一致。
+
+**教训与 CD12-F5 同源**：一个"环境性失败"可以长期掩盖一项从未执行的检查。判据是
+"这个测试有没有真的测到它声称测的东西"，而不是"它红还是绿"。
