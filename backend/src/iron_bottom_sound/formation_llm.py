@@ -346,7 +346,20 @@ class FormationLLMAgent:
                     "previous_response_rejected": last_errors,
                     "instruction": INSTRUCTION + " 上一次回复被拒绝：" + "；".join(last_errors),
                 }
-            raw = self.policy(retry_prompt)
+            try:
+                raw = self.policy(retry_prompt)
+            except Exception as error:  # noqa: BLE001 - a transport failure is an attempt
+                # A network error must cost this formation one decision (it falls back
+                # to doctrine, and the record says why), not the whole battle.
+                self.attempts.append(LLMAttempt(
+                    formation_id=local_observation.formation_id,
+                    turn=local_observation.turn, phase=local_observation.phase,
+                    attempt=attempt, prompt=retry_prompt,
+                    errors=[f"transport: {type(error).__name__}: {error}"],
+                    accepted=False,
+                ))
+                last_errors = [f"模型调用失败：{type(error).__name__}"]
+                continue
             meta = getattr(self.policy, "last_meta", None) or {}
             decision, errors = parse_response(raw, local_observation)
             self.attempts.append(LLMAttempt(
@@ -436,6 +449,29 @@ def chat_completion(
 
     if trust_env is None:
         trust_env = _trust_env_proxies()
+    try:
+        return _post_once(
+            endpoint=endpoint, api_key=api_key, model=model, payload=payload,
+            timeout=timeout, client=client, trust_env=trust_env,
+        )
+    except httpx.TransportError:
+        if client is not None or os.environ.get("IBS_LLM_TRUST_ENV") is not None:
+            raise  # the caller injected a client, or pinned the proxy policy
+        # Here the direct route and the environment's proxy fail in different ways
+        # (TLS reset vs 503), so one failure is not evidence the call cannot be made.
+        # Try the other route exactly once; if it fails too, the error is real.
+        return _post_once(
+            endpoint=endpoint, api_key=api_key, model=model, payload=payload,
+            timeout=timeout, client=client, trust_env=not trust_env,
+        )
+
+
+def _post_once(
+    *, endpoint: str, api_key: str, model: str, payload: dict[str, Any],
+    timeout: float, client: Any, trust_env: bool,
+) -> tuple[str, dict[str, Any]]:
+    import httpx
+
     active = client or httpx.Client(timeout=timeout, trust_env=trust_env)
     try:
         response = active.post(
@@ -542,7 +578,8 @@ class ProviderPolicy:
         if not content and self.last_meta.get("reasoning_content"):
             raise ValueError(
                 "provider returned reasoning only (finish_reason="
-                f"{self.last_meta['finish_reason']}); no JSON to parse"
+                f"{self.last_meta['finish_reason']}, max_tokens={self.max_tokens}); "
+                "raise the output budget so reasoning and JSON both fit"
             )
         return _strip_fence(content)
 

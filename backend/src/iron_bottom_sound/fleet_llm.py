@@ -305,7 +305,17 @@ class FleetLLMAgent:
                     "previous_response_rejected": last_errors,
                     "instruction": FLEET_INSTRUCTION + " 上一次回复被拒绝：" + "；".join(last_errors),
                 }
-            raw = self.policy(retry_prompt)
+            try:
+                raw = self.policy(retry_prompt)
+            except Exception as error:  # noqa: BLE001 - see the formation agent
+                self.attempts.append({
+                    "attempt": attempt, "prompt": retry_prompt, "raw_response": "",
+                    "thinking": "", "usage": {}, "request_id": None,
+                    "finish_reason": None, "accepted": False,
+                    "errors": [f"transport: {type(error).__name__}: {error}"],
+                })
+                last_errors = [f"模型调用失败：{type(error).__name__}"]
+                continue
             meta = getattr(self.policy, "last_meta", None) or {}
             decision, errors = parse_fleet_response(
                 raw, side=side, turn=turn, phase=phase, addressable_ids=addressable_ids,
