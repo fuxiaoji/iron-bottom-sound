@@ -334,3 +334,21 @@ assert 1 == 0
 
 **教训与 CD12-F5 同源**：一个"环境性失败"可以长期掩盖一项从未执行的检查。判据是
 "这个测试有没有真的测到它声称测的东西"，而不是"它红还是绿"。
+
+### CD12-F7 · 火力权限审计数得清条数，却问不出归属（审计缺陷，已修）
+
+`audit_gunnery_authority` 的 `directives_that_reached_the_selector` 只统计进入选择器的优先权
+**条数**，从不检查**签发了这些优先权的是哪一方**。CD12-F2b 那个版本因此呈现一种极其反直觉的
+景象：**计数更高（222 条）、审计却 PASS**——多出来的 91 条正是对手签发的优先权。
+
+**新增不变量**：某一方封存批次里的每条 `TargetPriorityDirective`，其 `formation_id` 必须属于
+该批次所属阵营；否则把违规样例写进 `directives_from_the_other_side` 并 FAIL。
+
+**正对照（用真实的历史代码，不是构造样例）**：把改进后的审计拿到 `f2ad751f`（F2b 修复前）的
+工作树上运行 → `carried=222`、`cross_side=91`、**verdict=FAIL**，样例显示
+`batch_side=axis` 的批次里装着 `allies-active-heavy` 签发的、目标为 `IBS-U-IJN-AOBA` 等 IJN 舰的
+优先权；在当前 HEAD 上 → `carried=131`、`cross_side=0`、PASS。8/8 审计仍全 PASS。
+
+**教训**：审计一个"数量"很容易，审计一个"归属"才难；而跨阵营污染恰恰只在归属维度可见。
+这与 CD12-F5（判据不可失败）、CD12-F6（检查从未执行）同属一类——**审计的失败模式不在被测
+系统里，而在审计自己身上**。

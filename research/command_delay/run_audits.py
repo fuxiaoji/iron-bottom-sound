@@ -830,6 +830,28 @@ def audit_gunnery_authority() -> dict:
         for key, sealed in state.sealed_orders.items() if key.endswith("gunnery")
         for batch in sealed.values()
     )
+    # Whose directives are these?  Counting what reached the selector is not enough:
+    # the CD12-F2b defect shipped a build whose count was *higher* and whose audit
+    # still passed, because the count never asked whether a directive sitting in one
+    # side's batch had been authored by that side.  91 opponent directives were
+    # reaching the selector unnoticed (222 before the fix, 131 after).
+    cross_side: list[dict] = []
+    for key, sealed in state.sealed_orders.items():
+        if not key.endswith("gunnery"):
+            continue
+        for batch in sealed.values():
+            for directive in batch.target_priorities:
+                formation = state.formations.get(directive.formation_id)
+                if formation is None or formation.side is not batch.side:
+                    cross_side.append({
+                        "key": key,
+                        "batch_side": batch.side.value,
+                        "directive_formation": directive.formation_id,
+                        "directive_formation_side": (
+                            formation.side.value if formation is not None else None
+                        ),
+                        "target_id": directive.target_id,
+                    })
     payload = {
         "decision_fields": decision_fields,
         "forbidden_fields_on_decision": forbidden_present,
@@ -840,6 +862,8 @@ def audit_gunnery_authority() -> dict:
         "illegal_examples": illegal[:5],
         "invisible_target_fallback_legal": bool(fallback_legal),
         "directives_that_reached_the_selector": carried,
+        "directives_from_the_other_side_count": len(cross_side),
+        "directives_from_the_other_side": cross_side[:5],
         "agent_decisions_scanned": len(mode.decisions),
         "agent_decisions_with_gunnery_fields": decision_scan,
         "local_weight_limit": LOCAL_PRIORITY_WEIGHT_LIMIT,
@@ -863,6 +887,7 @@ def audit_gunnery_authority() -> dict:
             and payload["local_weights_within_limit"]
             and payload["policy_observation_has_no_gunnery"]
             and carried > 0
+            and not cross_side
         )
         else "FAIL"
     )
