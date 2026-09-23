@@ -1000,3 +1000,12 @@
   唯一失败仍是既有环境项 `test_api_llm_storage`（素材为未拉取的 Git LFS 指针，`5c54f8aa…` ≠ 硬编码 `918196c7…`）；
   改前该套件的失败集合为 {两个哈希种子项, LFS 项}，前两项即本次遮蔽项。全量日志 `research/command_delay/logs/full_pytest_cd12.log`。
 - **包更新**：`COMMAND_DELAY_MODE_V2_2_IMPLEMENTATION_BUNDLE.zip` sha256 `679c0a297d6a915c…`（70 文件）；新增 `09_LIVE_BATTLE_AND_LEAKAGE_AUDIT.md`，`BUG_AND_RERUN_LOG.md` 追加 CD12-F1/F2a/F2b/F5 与未修的 F3/F4，`code_patch/research_harness.patch` 重生成（含对战驱动与战报/泄漏工具，不含 24 MB 对战数据）。
+
+## 2026-09-23：推送 GitHub（含历史清理，已脚本化）
+
+- **事实**：仓库 `fuxiaoji/iron-bottom-sound` 为 **public**；本地工作分支 `research/m2-2-compiler-fidelity`（HEAD `9e0ba020`）领先 `origin/codex/v14-budgeted-replanning`（`5572b73b`）**81 个提交**，含 M0/M1/M1.5/M2.0–M2.2 研究线与 CD-0…CD-12 命令延迟全部工作。
+- **直接推送必被拒**：待推范围里有两个历史包袱——`.venv_phase_a/`（**616 MB / 20645 文件**，由 `acfbb4f9` 误提交；单文件 `libtorch_cpu.dylib` 就 **203.4 MB**）与 `research/m1_5/metrics/e2_t1_decisions.json`（**124 MB 与 83 MB** 两版）。GitHub 单文件硬上限 100 MB。已确证这些对象不在服务端（`origin/main` 无 `.venv_phase_a`、`acfbb4f9` 不被任何已推分支包含）。
+- **处理**：在**临时克隆**里 `filter-branch` 摘除上述路径后推送；**本地仓库零修改**（不重写本地 refs、不动工作区，`.venv_phase_a` 673 MB 与那份 metrics 仍在本机）。
+- **结果**：`refs/heads/research/m2-2-compiler-fidelity`（新建）与 `refs/heads/codex/v14-budgeted-replanning`（`5572b73b..eeba97c8`，纯快进）同指 `eeba97c8`；远端树含 CD-12 全部产物（`research/command_delay/battle/` 300 个文件条目、184 张图），**不含** `.venv_phase_a`。
+- **代价与后续注意**：远端那 79 个提交的 SHA 与本地**不同**（本地是权威历史，含被排除的重型文件）。因此本地后续提交不能直接推；推送改走 **`scripts/push_to_github.sh`**——同一 DROP 列表 + 同一 `filter-branch` 对已发布内容确定性重建，只增量上传新提交；`--dry-run` 先报体积与超限检查（本次实测 197 MB / 2606 新对象）。
+- **仅存在于本机**（未上 GitHub）：`.venv_phase_a/`、`research/m1_5/metrics/e2_t1_decisions.json`（两版）。若要上库，需装 git-lfs 或先瘦身。
