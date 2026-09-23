@@ -991,4 +991,10 @@
 - **代理自主性如实披露（写入战报）**：12 个「回合×阵营」机动批次中 **5 个被引擎整批驳回**并回退确定性指挥官（驳回原因：`cannot follow guide trail before advancing`、`speed 3 is outside member limits`、`cannot reverse 180 degrees`、`forced movement prevents formation following`），只有 7 个执行的是代理方案；另有 4 次首次回复因格式/非法分支名被拒后带错误原因重发并获采纳。**代理方案执行率因此为 7/12，不能按 25 次调用全额记功。**
 - **命令延迟实证**：舰队总指挥（子代理）T3 拟制的两条自然语言命令经 TBS 各 +1 回合，**T4 才被编队读到**；引擎 T2 的初始委派同为 +1 回合；编队自身的接触报告走 TBS 时 +0（同回合）、被排到再加密转报队列时 +2。全 72 条报文中 55 条同回合送达、13 条跨回合、4 条停战时仍在队列。
 - **验证**：8/8 审计 PASS（`run_audits.py` 退出码 0）；定向 pytest：4 个命令延迟测试文件 **71 通过 / 1 跳过**、`test_battle_report.py` **22 通过**；`REPORT.md` 28 张图链接 0 断链、锚点 0 悬空（脚本核对）。未改引擎代码（本次提交不含 `backend/`、`frontend/` 任何改动）。
+- **CD12-F6（已修，测试层）**：`tests/test_tactical_ai.py` 两个跨 `PYTHONHASHSEED` 的确定性测试
+  用 `subprocess.run([sys.executable, "-c", ...])` 起子进程却**未传 `PYTHONPATH`**，子进程
+  `ModuleNotFoundError: No module named 'iron_bottom_sound'`，断言 `proc.returncode == 0` 失败——
+  **后果不是"两个测试红了"，而是碰撞解算与 AI 订单的跨哈希种子确定性从未被检验过**（CD0-F1 那类缺陷的哨兵一直在盲跑）。
+  按仓库既有惯用法补 `PYTHONPATH=backend/src` 后两测试真实执行并**通过**（22.5 s）：碰撞组跨种子同战果同事件序列；
+  轴心 MOVEMENT+GUNNERY 订单序列跨种子逐字节一致。改前全量 683 通过/3 失败/2 跳过，其中 2 项即此遮蔽项。
 - **包更新**：`COMMAND_DELAY_MODE_V2_2_IMPLEMENTATION_BUNDLE.zip` sha256 `10c87fb193656614…`（70 文件）；新增 `09_LIVE_BATTLE_AND_LEAKAGE_AUDIT.md`，`BUG_AND_RERUN_LOG.md` 追加 CD12-F1/F2a/F2b/F5 与未修的 F3/F4，`code_patch/research_harness.patch` 重生成（含对战驱动与战报/泄漏工具，不含 24 MB 对战数据）。
