@@ -1,0 +1,21 @@
+{
+  "name": "ibs-battle-documentary",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Remotion composition for the IBS command-delay battle documentary",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render Documentary ../out/documentary.mp4",
+    "still": "remotion still Documentary"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.527",
+    "remotion": "4.0.527",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "typescript": "5.6.3"
+  }
+}

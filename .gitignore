@@ -43,3 +43,11 @@ texput.log
 *.synctex.gz
 research/**/runs/**/*.npz
 research/final_v13/**/cache/
+
+# Battle documentary: generated, reproducible from the record (see research/battle_video)
+research/battle_video/frames/
+research/battle_video/out/
+research/battle_video/audio/vo/
+research/battle_video/remotion/node_modules/
+research/battle_video/remotion/out/
+research/battle_video/data/render_props_test.json

@@ -1,0 +1,35 @@
+{
+ "engine": "chattts",
+ "lines": [
+  {
+   "id": "sample_a",
+   "text": "一九四四年六月十九日，内南洋。两支舰队在雷达与目视之间彼此搜寻，谁先看清对方，谁就先决定了这一夜的胜负。",
+   "path": "audio/audition/sample_a.wav",
+   "seconds": 10.327,
+   "synth_seconds": 15.98,
+   "sample_rate": 24000,
+   "engine": "ChatTTS",
+   "rms": 0.1859
+  },
+  {
+   "id": "sample_b",
+   "text": "舰队总指挥没有看到敌人的舰队。他看到的，是十几分钟前发出的报告，和报告里那些已经不再准确的位置。",
+   "path": "audio/audition/sample_b.wav",
+   "seconds": 9.284,
+   "synth_seconds": 15.2,
+   "sample_rate": 24000,
+   "engine": "ChatTTS",
+   "rms": 0.0974
+  },
+  {
+   "id": "sample_c",
+   "text": "第二战队请求脱离编队，单舰追击驱逐舰。这个决定不符合命令，但在他的位置上，这是唯一的活路。",
+   "path": "audio/audition/sample_c.wav",
+   "seconds": 8.627,
+   "synth_seconds": 12.69,
+   "sample_rate": 24000,
+   "engine": "ChatTTS",
+   "rms": 0.1239
+  }
+ ]
+}
