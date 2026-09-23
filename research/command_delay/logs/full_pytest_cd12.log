@@ -1,0 +1,30 @@
+......................................F................................. [ 10%]
+......................................................s................. [ 20%]
+..................................s..................................... [ 31%]
+........................................................................ [ 41%]
+........................................................................ [ 52%]
+........................................................................ [ 62%]
+........................................................................ [ 73%]
+........................................................................ [ 83%]
+........................................................................ [ 94%]
+.......................................                                  [100%]
+=================================== FAILURES ===================================
+______ test_tutorial_api_reaches_second_turn_and_serves_canonical_counter ______
+
+    def test_tutorial_api_reaches_second_turn_and_serves_canonical_counter() -> None:
+        client = TestClient(app)
+        asset = client.get(f"/assets/counters/{quote('德国-DD-卡尔加尔斯特.png')}")
+        assert asset.status_code == 200
+        assert asset.headers["content-type"] == "image/png"
+>       assert hashlib.sha256(asset.content).hexdigest() == (
+            "918196c7a6450f13aed798a47f48dd90f659611c49f6677d343878c871714eb6"
+        )
+E       AssertionError: assert '5c54f8aa1e0d...835e26de0d17e' == '918196c7a645...878c871714eb6'
+E         
+E         - 918196c7a6450f13aed798a47f48dd90f659611c49f6677d343878c871714eb6
+E         + 5c54f8aa1e0de32074b42a1751c077d4efe417b18e29b28e740835e26de0d17e
+
+tests/test_api_llm_storage.py:73: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter
+pytest_exit=1

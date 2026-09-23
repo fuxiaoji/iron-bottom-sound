@@ -939,7 +939,7 @@
 - **CD-6 研究接口**：契约状态 + 激励账本 + 张量 + 回合导出。策略安全形态（`POLICY_SAFE: true`）与研究回放形态（`POLICY_SAFE: false` + 警告）分离；契约权重保持 0.0 直到研究者声明；`implemented_learning = False`。
 - **CD-7 自审修正**（4 处）：含一处有行为影响的修正——`_optical_range` 原取双方视距较小值，改为按请求方自身视距。
 - **回归**：108 项新增测试全过；`tests/test_realistic_command.py` + `test_realistic_rules_preview.py` 38 项全过；全量 637 项跑完，**失败集合与改动前基线逐字节相同**（3 项既有失败）；8 项审计全 PASS；黄金回放 0 漂移。
-- 包 `COMMAND_DELAY_MODE_V2_2_IMPLEMENTATION_BUNDLE.zip` sha256 `2f32aa3f396f1c6c…`（53 文件）。**未开始任何科研实验；未实现 RL/GNN/Transformer；未选主线。**
+- 包 `COMMAND_DELAY_MODE_V2_2_IMPLEMENTATION_BUNDLE.zip` sha256 `679c0a297d6a915c…`（53 文件）。**未开始任何科研实验；未实现 RL/GNN/Transformer；未选主线。**
 
 ### 追加：交付评审（"完整打过几局 / 有泄露吗 / 子 agent 能独立执行吗 / 试过 API 吗 / 有战报吗"）
 
@@ -953,7 +953,7 @@
 - **CD8-F4（已修）**：舰队总指挥**所在**编队的链路被按报告年龄算成 `STALE`（它不给自己发报告）。现恒为 `DIRECT` + `FLEET_DIRECTED`。
 - **CD8-F5（我的审计缺陷，已修两轮）**：API 泄漏检查先把正常发现的接触判为泄露，又把沉没后合法留在残骸/公开事件里的舰只判为泄露；最终改为可判定问题（API 是否比 `engine.observe` 更宽）。
 - 回归：114 项命令延迟测试 + 22 项战报测试全过；8/8 审计 PASS；黄金回放 0 漂移；全量 637 项失败集合与改动前**逐字节相同**。
-- 包重建：`COMMAND_DELAY_MODE_V2_2_IMPLEMENTATION_BUNDLE.zip` sha256 `ecf370590cb114c2…`（61 文件）。新增裁决项 CD8-Q1（Realistic 模式下 `formation_created`/`movement_plan_resolved` 同样会被中立战报收录，属既有同类问题）。
+- 包重建：`COMMAND_DELAY_MODE_V2_2_IMPLEMENTATION_BUNDLE.zip` sha256 `679c0a297d6a915c…`（61 文件）。新增裁决项 CD8-Q1（Realistic 模式下 `formation_created`/`movement_plan_resolved` 同样会被中立战报收录，属既有同类问题）。
 ## 2026-09-10：想定手册全量录入 + 舰级卡建档 + 剧本简报 + 虚构大决战（分支 glm/data-entry-and-briefing）
 
 - **想定录入**：想定手册 PDF（SHA-256 与 manifest 一致）第 2–15 页逐页视觉转录，新录入 IBS-S-02、04–14 共 12 个想定（萨沃岛跨两页：PDF 第 10–11 页，盟军编制与增援骰表从第二页照录）；S-02/04/05/06/08 增援按引擎单次 1d6 模型表达（页面必达项以 1d6∈[1..6] 表达），S-13 多回合 2d6 重掷机制超出引擎表达范围，按治理只结构化“第 8 回合自动进场”并保留原文规则，S-10 盟军递进增援以原文 R20–R22 登记不建结构化块；全部 15 个想定（含 FM-01）一般模式 build_initial_state 通过。
@@ -996,5 +996,7 @@
   `ModuleNotFoundError: No module named 'iron_bottom_sound'`，断言 `proc.returncode == 0` 失败——
   **后果不是"两个测试红了"，而是碰撞解算与 AI 订单的跨哈希种子确定性从未被检验过**（CD0-F1 那类缺陷的哨兵一直在盲跑）。
   按仓库既有惯用法补 `PYTHONPATH=backend/src` 后两测试真实执行并**通过**（22.5 s）：碰撞组跨种子同战果同事件序列；
-  轴心 MOVEMENT+GUNNERY 订单序列跨种子逐字节一致。改前全量 683 通过/3 失败/2 跳过，其中 2 项即此遮蔽项。
-- **包更新**：`COMMAND_DELAY_MODE_V2_2_IMPLEMENTATION_BUNDLE.zip` sha256 `10c87fb193656614…`（70 文件）；新增 `09_LIVE_BATTLE_AND_LEAKAGE_AUDIT.md`，`BUG_AND_RERUN_LOG.md` 追加 CD12-F1/F2a/F2b/F5 与未修的 F3/F4，`code_patch/research_harness.patch` 重生成（含对战驱动与战报/泄漏工具，不含 24 MB 对战数据）。
+  轴心 MOVEMENT+GUNNERY 订单序列跨种子逐字节一致。**全量重跑（修正后）：收集 687 项 → 684 通过 / 1 失败 / 2 跳过**，
+  唯一失败仍是既有环境项 `test_api_llm_storage`（素材为未拉取的 Git LFS 指针，`5c54f8aa…` ≠ 硬编码 `918196c7…`）；
+  改前该套件的失败集合为 {两个哈希种子项, LFS 项}，前两项即本次遮蔽项。全量日志 `research/command_delay/logs/full_pytest_cd12.log`。
+- **包更新**：`COMMAND_DELAY_MODE_V2_2_IMPLEMENTATION_BUNDLE.zip` sha256 `679c0a297d6a915c…`（70 文件）；新增 `09_LIVE_BATTLE_AND_LEAKAGE_AUDIT.md`，`BUG_AND_RERUN_LOG.md` 追加 CD12-F1/F2a/F2b/F5 与未修的 F3/F4，`code_patch/research_harness.patch` 重生成（含对战驱动与战报/泄漏工具，不含 24 MB 对战数据）。
