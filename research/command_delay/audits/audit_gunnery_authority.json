@@ -9,6 +9,7 @@
   "phase",
   "rationale_summary",
   "report_actions",
+  "report_text",
   "selected_contingency_branch",
   "selected_movement_action_id",
   "selected_movement_plan",

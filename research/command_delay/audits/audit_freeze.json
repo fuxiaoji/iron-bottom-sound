@@ -1,5 +1,5 @@
 {
- "diffstat": " 459 files changed, 69593 insertions(+), 314 deletions(-)",
+ "diffstat": " 460 files changed, 70407 insertions(+), 314 deletions(-)",
  "envelope_keys_added": {},
  "freeze_tag": "realistic-command-v1-frozen",
  "frozen_commit": "d432a975151651fa7d6746b2f92e66b1e09d8d4a",
@@ -8,7 +8,7 @@
   "backend/src/iron_bottom_sound/realistic_command.py"
  ],
  "n_drift": 0,
- "n_rows": 7,
+ "n_rows": 8,
  "rows": [
   {
    "result": "OK",
@@ -37,6 +37,10 @@
   {
    "result": "OK",
    "tag": "realistic_s03_seed9"
+  },
+  {
+   "result": "OK",
+   "tag": "cd_s01"
   }
  ],
  "verdict": "PASS"

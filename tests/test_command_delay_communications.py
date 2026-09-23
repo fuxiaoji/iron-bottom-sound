@@ -453,15 +453,23 @@ def test_coded_reports_arrive_after_they_were_drafted(monkeypatch) -> None:
     def freshness(item: CommandMessage) -> tuple[int, int]:
         return (item.issued_turn, rank.get(item.issued_phase, 0))
 
+    # Reports are addressed *to the fleet* and name their author in the payload (CD-13),
+    # so the knowledge the delivery updates is keyed by the reporting formation - the
+    # fleet's picture of a formation is what that formation last told it.
     newest: dict[str, CommandMessage] = {}
     for item in coded:
         assert item.handling_delay >= 1
         assert item.delivered_turn > item.issued_turn, (
             "a coded report must be delivered strictly later than it was drafted"
         )
-        current = newest.get(item.destination)
+        snapshot = command_delay._decode_snapshot(item.payload)
+        reporter = snapshot.get("reporting_formation_id") or item.destination
+        assert reporter != item.destination or item.destination in mode.formations, (
+            "a report must name who wrote it"
+        )
+        current = newest.get(reporter)
         if current is None or freshness(item) > freshness(current):
-            newest[item.destination] = item
+            newest[reporter] = item
     for destination, item in sorted(newest.items()):
         snapshot = command_delay._decode_snapshot(item.payload)
         entry = mode.formations[destination]

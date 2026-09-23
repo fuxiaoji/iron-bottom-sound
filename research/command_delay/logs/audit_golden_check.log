@@ -5,5 +5,6 @@
 [check] realistic_s03        OK  (envelope keys added: 0)
 [check] realistic_em01       OK  (envelope keys added: 0)
 [check] realistic_s03_seed9  OK  (envelope keys added: 0)
+[check] cd_s01               OK  (envelope keys added: 0)
 
 GOLDEN_REPLAY = PASS

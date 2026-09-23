@@ -403,6 +403,35 @@ def audit_mission_order() -> dict:
     return payload
 
 
+def _formation_sightings(engine, state, side) -> dict[str, set[str]]:
+    """What each of this side's formations can see *right now*, by formation id.
+
+    Used as the bound for reports written by an agent: a commander may tell the fleet
+    about a ship its own lookouts found, and about nothing else.  The bound is per
+    formation (not per side) because that is the whole point of the reporting chain -
+    the fleet's picture is assembled from what each formation separately saw.
+    """
+    result: dict[str, set[str]] = {}
+    for formation in state.formations.values():
+        if formation.side is not side or formation.status == "dissolved":
+            continue
+        positions = [
+            state.ships[ship_id].position for ship_id in formation.ship_ids
+            if ship_id in state.ships
+            and state.ships[ship_id].position is not None
+            and not state.ships[ship_id].sunk
+            and state.ships[ship_id].command_status == "attached"
+        ]
+        seen: set[str] = set()
+        if positions:
+            for ship in state.ships.values():
+                if ship.side is not side and ship.position is not None and not ship.sunk:
+                    if engine._visible_to(state, ship, side, positions):
+                        seen.add(ship.id)
+        result[formation.id] = seen
+    return result
+
+
 def audit_leakage() -> dict:
     """Fleet view, formation view, both modes, both sides.
 
@@ -436,9 +465,15 @@ def audit_leakage() -> dict:
     fleet_rows: list[dict] = []
     formation_rows: list[dict] = []
     sampled_turns: set[int] = set()
+    # Cumulative per-formation sightings: a report may legitimately mention a ship the
+    # formation saw earlier, so the bound is everything it had ever seen by then.
+    ever_seen: dict[str, set[str]] = {}
     steps = 0
     while state.phase != Phase.COMPLETE and steps < 400:
         steps += 1
+        for side_now in Side:
+            for formation_id, seen in _formation_sightings(engine, state, side_now).items():
+                ever_seen.setdefault(formation_id, set()).update(seen)
         # Sample while both sides still have formations afloat.
         if (
             state.phase == Phase.GUNNERY
@@ -458,8 +493,37 @@ def audit_leakage() -> dict:
                 # separately (against the engine's own visibility rule) rather than
                 # counted as leakage.  Everywhere else, no opposing ship may appear
                 # at all.
-                without_contacts = {key: value for key, value in view.items()
-                                    if key != "contacts"}
+                # ``reports[*].reported_text`` is the formation's own prose, and it is
+                # allowed to name enemy ships - but only ones that formation had itself
+                # sighted by then.  It is checked here against that tighter bound and
+                # therefore excluded from the blanket id scan below.
+                body_mentions: dict[str, set[str]] = {}
+                for row in view["reports"]:
+                    if row["is_source_of_truth"]:
+                        continue
+                    body = row.get("reported_text") or ""
+                    if not body:
+                        continue
+                    named = {ship_id for ship_id in opponents if ship_id in body}
+                    named |= {
+                        ship.id for ship in state.ships.values()
+                        if ship.side is not side and ship.name and ship.name in body
+                    }
+                    body_mentions[row["formation_id"]] = named
+                    stray = named - ever_seen.get(row["formation_id"], set())
+                    if stray:
+                        findings.append(
+                            f"t{state.turn} report body from {row['formation_id']} names "
+                            f"{sorted(stray)} which it had never sighted"
+                        )
+                reported_texts = {
+                    row["formation_id"]: row.get("reported_text") or ""
+                    for row in view["reports"]
+                }
+                without_contacts = {
+                    key: value for key, value in view.items()
+                    if key != "contacts" and key != "reports"
+                }
                 leaked_ships = contains_any(without_contacts, opponents)
                 leaked_formations = contains_any(view, opposing_formations)
                 if leaked_ships:

@@ -63,7 +63,7 @@ export function CommandDelayOrders({game,side,turn,phase,debug,onSubmitAgentOrde
      </option>)}
     </select></label>
    <label>命令正文（自然语言）
-    <textarea rows={3} value={text} maxLength={400}
+    <textarea rows={3} value={text} maxLength={1000}
      placeholder="例：敌轻巡已出现在西北，你部向东拉开距离保持接触，不要进入主力火线前方；优先打掉对方的驱逐舰。"
      onChange={event=>setText(event.target.value)}/></label>
    <label>火力优先级舰级（逗号分隔，只给权重）

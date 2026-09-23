@@ -11,7 +11,8 @@
   "realistic_s01",
   "realistic_s03",
   "realistic_em01",
-  "realistic_s03_seed9"
+  "realistic_s03_seed9",
+  "cd_s01"
  ],
  "records": [
   {
@@ -104,21 +105,21 @@
    "scenario": "IBS-S-03",
    "seed": 9,
    "tag": "realistic_s03_seed9"
+  },
+  {
+   "digest_trees": "8445973cb14e64eb9a70f7ae8e2a379d033ca41d3e8d1096958a6082ba83dde5",
+   "final_phase": "complete",
+   "final_turn": 7,
+   "n_events": 714,
+   "n_order_batches": 52,
+   "passed": true,
+   "realistic_command": true,
+   "rng_counter": 228,
+   "scenario": "IBS-S-01",
+   "seed": 20270830,
+   "tag": "cd_s01"
   }
  ],
- "refreeze": {
-  "authorized_by": "PI decision (b): adopt glm/data-entry-and-briefing as the platform baseline",
-  "date": "2026-09-22",
-  "previous_digest_changes": {
-   "classic_s01": "528a9649... -> 99144f7c...",
-   "classic_s03": "b1b5e498... -> e62cf8f6...",
-   "realistic_em01": "4b746b4a... -> ec7b6203...",
-   "realistic_s01": "917114fb... -> cd163a42...",
-   "unchanged_meaning": "classic_em01/realistic_s03/realistic_s03_seed9 kept their meaning under the new rules"
-  },
-  "previous_frozen_commit": "d432a975151651fa7d6746b2f92e66b1e09d8d4a",
-  "reason": "The data-entry lineage changes adjudication (period-dependent penetration, turn-start scenario rules, weather blocking, extra fire determination), which shifts 4 of the 7 original rows. Drift was attributed by measuring that lineage alone against the same baseline: identical 4 rows. The command-delay work introduced no drift of its own."
- },
  "scalars": [
   "passed",
   "final_turn",

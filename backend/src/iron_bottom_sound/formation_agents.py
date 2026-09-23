@@ -87,6 +87,9 @@ class FormationDecision(BaseModel):
     selected_contingency_branch: str | None = None
     target_priority_adjustments: list[TargetPriorityAdjustment] = Field(default_factory=list)
     report_actions: list[str] = Field(default_factory=list)
+    # The formation's own words to the fleet commander, sent with its routine
+    # report.  Capped at 300 chars: it travels as a message, not as a document.
+    report_text: str = ""
     acknowledgement: bool = False
     rationale_summary: str = ""
     # The agent's message to its own next turn, stored verbatim in its memory.

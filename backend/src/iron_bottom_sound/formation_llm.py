@@ -58,6 +58,27 @@ from .models import ContingencyBranch, MissionOrder, Phase
 
 # The exact JSON shape the model must produce.  It is published to the model as
 # part of the prompt so the contract is explicit rather than inferred.
+def _strip_fence(text: str) -> str:
+    """Unwrap a ```json fence if the model added one, then strip.
+
+    The decision parser only accepts a bare JSON object, and the transport must not
+    decide a reply is illegal because the model formatted it as a code block.  The
+    research bridge already unwrapped fences for fleet replies; this is the same
+    treatment on the provider path, where glm-4-flash does wrap its JSON when the
+    prompt is casual (observed in the CD-13 provider probe).
+    """
+    stripped = (text or "").strip()
+    if not stripped.startswith("```"):
+        return stripped
+    body = stripped.split("```")
+    inner = body[1] if len(body) > 1 else stripped
+    if "\n" in inner:
+        first, rest = inner.split("\n", 1)
+        if first.strip().lower() in ("json", "javascript", "js", ""):
+            inner = rest
+    return inner.rsplit("```", 1)[0].strip()
+
+
 RESPONSE_SCHEMA: dict[str, Any] = {
     "memory_note": "可选：一句写给自己下一回合的备忘（≤240 字）",
     "selected_movement_action_id": "one id from legal_formation_actions, or null to hold",
@@ -66,6 +87,7 @@ RESPONSE_SCHEMA: dict[str, Any] = {
         {"target_id": "a locally sighted contact", "weight": "-0.5..0.5", "reason": "short text"}
     ],
     "report_actions": "subset of the allowed report actions",
+    "report_text": "可选：一句话向舰队总指挥汇报你看到的战况与你的判断（≤200 字）",
     "acknowledgement": "true to acknowledge the mission order",
     "rationale_summary": "one sentence, audit only",
 }
@@ -76,6 +98,7 @@ INSTRUCTION = (
     "火力只能通过 target_priority_adjustments 给可见目标附加 -0.5..0.5 的优先级权重；"
     "炮位分配、射界、修正与命中由引擎选择器完成，你不得输出任何炮击命令、炮位、射击解或命中计算。"
     "你可以在 memory_note 里写一句给下一回合自己的备忘（会原样保留并再次给你看）。"
+    "你可以用 report_text 写一句话向舰队总指挥汇报战况：写你亲眼看到的接触、你的处境、你是否偏离了命令；这段文字会随你的报告经电报发回总指挥（因此只写你自己目视到的敌情）。"
     "输出必须是严格的 JSON，字段见 response_schema。"
 )
 
@@ -96,6 +119,10 @@ class LLMAttempt(BaseModel):
     attempt: int
     prompt: dict[str, Any]
     raw_response: str = ""
+    # The model's own reasoning, when it produces one.  Kept because a commander's
+    # stated reasoning is the thing a reader (or a documentary) actually wants:
+    # the decision alone hides the hesitation.
+    thinking: str = ""
     errors: list[str] = Field(default_factory=list)
     accepted: bool = False
     fallback: bool = False
@@ -251,6 +278,10 @@ def parse_response(
     unknown_reports = sorted(set(reports) - set(REPORT_ACTIONS))
     if unknown_reports:
         errors.append("unknown report actions: " + ", ".join(unknown_reports))
+    report_text = data.get("report_text")
+    if report_text is not None and not isinstance(report_text, str):
+        errors.append("report_text must be a string")
+        report_text = None
     if errors:
         return None, errors
     return FormationDecision(
@@ -262,6 +293,7 @@ def parse_response(
         selected_contingency_branch=branch or None,
         target_priority_adjustments=adjustments,
         report_actions=sorted(set(reports)),
+        report_text=str(report_text or "")[:300],
         acknowledgement=bool(data.get("acknowledgement")),
         rationale_summary=str(data.get("rationale_summary") or "")[:500],
         memory_note=str(note or "")[:MAX_NOTE_CHARS],
@@ -315,6 +347,7 @@ class FormationLLMAgent:
                     "instruction": INSTRUCTION + " 上一次回复被拒绝：" + "；".join(last_errors),
                 }
             raw = self.policy(retry_prompt)
+            meta = getattr(self.policy, "last_meta", None) or {}
             decision, errors = parse_response(raw, local_observation)
             self.attempts.append(LLMAttempt(
                 formation_id=local_observation.formation_id,
@@ -323,6 +356,7 @@ class FormationLLMAgent:
                 attempt=attempt,
                 prompt=retry_prompt,
                 raw_response=raw if isinstance(raw, str) else repr(raw),
+                thinking=str(meta.get("reasoning_content") or ""),
                 errors=list(errors),
                 accepted=decision is not None,
             ))
@@ -376,6 +410,56 @@ def record_response(
 
 # --------------------------------------------------------------------------- provider
 
+def _trust_env_proxies() -> bool:
+    """Whether to honour HTTP(S)_PROXY-style environment variables for model calls.
+
+    Default: no.  On the machine this was developed on, a transparent proxy answers
+    ``ProxyError: 503`` in bursts while the direct connection to the provider works,
+    so a research run that silently inherited it would report "the model refused"
+    when the network path was at fault.  ``IBS_LLM_TRUST_ENV=1`` restores the
+    standard library behaviour for anyone behind a proxy that is actually required.
+    """
+    return os.environ.get("IBS_LLM_TRUST_ENV", "0").strip().lower() in {"1", "true", "yes"}
+
+
+def chat_completion(
+    *, endpoint: str, api_key: str, model: str, payload: dict[str, Any],
+    timeout: float = 90.0, client: Any = None, trust_env: bool | None = None,
+) -> tuple[str, dict[str, Any]]:
+    """One OpenAI-compatible round trip: returns ``(content, meta)``.
+
+    Shared by the formation policy and the fleet policy, because they differ only in
+    the prompt they build - the transport, the reasoning capture and the failure
+    semantics must not drift apart between the two levels of command.
+    """
+    import httpx
+
+    if trust_env is None:
+        trust_env = _trust_env_proxies()
+    active = client or httpx.Client(timeout=timeout, trust_env=trust_env)
+    try:
+        response = active.post(
+            f"{endpoint.rstrip('/')}/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}"},
+            json=payload,
+        )
+        response.raise_for_status()
+        body = response.json()
+        choice = body["choices"][0]
+        message = choice.get("message") or {}
+        meta = {
+            "model": model,
+            "request_id": body.get("id"),
+            "usage": body.get("usage") or {},
+            "reasoning_content": message.get("reasoning_content") or "",
+            "finish_reason": choice.get("finish_reason"),
+        }
+        return (message.get("content") or ""), meta
+    finally:
+        if client is None:
+            active.close()
+
+
 class ProviderPolicy:
     """A real model call, OpenAI-compatible, with the transcript kept.
 
@@ -392,9 +476,10 @@ class ProviderPolicy:
         endpoint: str,
         model: str,
         api_key: str,
-        timeout: float = 45.0,
-        max_tokens: int = 900,
+        timeout: float = 90.0,
+        max_tokens: int = 2000,
         supports_thinking: bool = False,
+        thinking_enabled: bool = False,
         client: Any = None,
     ) -> None:
         self.endpoint = endpoint.rstrip("/")
@@ -403,6 +488,7 @@ class ProviderPolicy:
         self.timeout = timeout
         self.max_tokens = max_tokens
         self.supports_thinking = supports_thinking
+        self.thinking_enabled = thinking_enabled
         self.client = client
         self.label = f"llm:{model}"
 
@@ -427,6 +513,7 @@ class ProviderPolicy:
                 "priority_weight_limit": prompt.get("priority_weight_limit"),
             },
             ensure_ascii=False,
+            default=str,
         )
         payload: dict[str, Any] = {
             "model": self.model,
@@ -442,45 +529,28 @@ class ProviderPolicy:
             ],
         }
         if self.supports_thinking:
-            payload["thinking"] = {"type": "disabled"}
+            payload["thinking"] = {
+                "type": "enabled" if self.thinking_enabled else "disabled"
+            }
         return payload
 
     def __call__(self, prompt: dict[str, Any]) -> str:
-        import httpx
-
-        client = self.client or httpx.Client(timeout=self.timeout)
-        try:
-            response = client.post(
-                f"{self.endpoint}/chat/completions",
-                headers={"Authorization": f"Bearer {self.api_key}"},
-                json=self._payload(prompt),
+        content, self.last_meta = chat_completion(
+            endpoint=self.endpoint, api_key=self.api_key, model=self.model,
+            payload=self._payload(prompt), timeout=self.timeout, client=self.client,
+        )
+        if not content and self.last_meta.get("reasoning_content"):
+            raise ValueError(
+                "provider returned reasoning only (finish_reason="
+                f"{self.last_meta['finish_reason']}); no JSON to parse"
             )
-            response.raise_for_status()
-            body = response.json()
-            choice = body["choices"][0]["message"]
-            content = choice.get("content") or ""
-            reasoning = choice.get("reasoning_content") or ""
-            self.last_meta = {
-                "model": self.model,
-                "request_id": body.get("id"),
-                "usage": body.get("usage") or {},
-                "reasoning_content": reasoning,
-                "finish_reason": body["choices"][0].get("finish_reason"),
-            }
-            if not content and reasoning:
-                raise ValueError(
-                    "provider returned reasoning only (finish_reason="
-                    f"{self.last_meta['finish_reason']}); no JSON to parse"
-                )
-            return content.strip()
-        finally:
-            if self.client is None:
-                client.close()
+        return _strip_fence(content)
 
 
 def make_policy(
     *, provider: str, model: str | None = None, api_key: str | None = None,
-    timeout: float = 45.0, max_tokens: int = 900, client: Any = None,
+    timeout: float = 90.0, max_tokens: int = 2000, client: Any = None,
+    thinking: bool = False,
 ) -> tuple[ProviderPolicy | None, str]:
     """Build a formation policy from the provider profile, or explain why not.
 
@@ -501,5 +571,6 @@ def make_policy(
         timeout=timeout,
         max_tokens=max_tokens,
         supports_thinking=runtime.supports_thinking,
+        thinking_enabled=thinking,
         client=client,
     ), f"llm:{runtime.provider}/{runtime.model}"

@@ -695,6 +695,12 @@ class FormationCommandState(BaseModel):
     reported_phase: Phase | None = None
     active_order_id: str | None = None
     last_report_turn: int | None = None
+    # When this formation last acknowledged an order (CD-13): the mode used to
+    # drop acknowledgements entirely, so the ledger could not tell a formation
+    # that had confirmed from one that had merely been sent the order.
+    last_ack_turn: int | None = None
+    # The formation's own words in its newest delivered report (CD-13).
+    reported_text: str | None = None
 
 
 class ContractTerm(BaseModel):

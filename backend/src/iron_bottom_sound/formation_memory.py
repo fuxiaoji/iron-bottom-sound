@@ -32,13 +32,18 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-# Bounds.  Declared, not tuned: enough for a 12-turn scenario, small enough that the
-# prompt stays cheap and a replay stays readable.
-MAX_ENTRIES_PER_KIND = 24
-MAX_SCRATCHPAD_NOTES = 12
-MAX_NOTE_CHARS = 240
-MAX_TEXT_CHARS = 400
-MAX_PROMPT_CHARS = 4000
+# Bounds.  Declared, not tuned.
+#
+# Doubled in CD-13 (2026-09-23) after measuring the recorded battles: ``contact_seen``
+# was **saturating at 24 entries for both formations** in both runs of a 7-turn
+# battle, i.e. the earliest sightings were already being evicted while the rendered
+# block stayed at 1.3-2.0 KB against a 4000-char budget.  The cap that was binding
+# was the wrong one, so the per-kind cap doubled and the render budget tripled.
+MAX_ENTRIES_PER_KIND = 48
+MAX_SCRATCHPAD_NOTES = 24
+MAX_NOTE_CHARS = 400
+MAX_TEXT_CHARS = 600
+MAX_PROMPT_CHARS = 12000
 
 # Memory kinds.  Fixed vocabulary so a consumer can filter without guessing.
 MEMORY_KINDS = (
@@ -152,6 +157,13 @@ def render_for_prompt(memory: FormationMemory, *, max_chars: int = MAX_PROMPT_CH
 
     Rendered as plain text rather than JSON because it is read as a narrative:
     newest first within each section, with the current order quoted verbatim.
+
+    Trimming keeps the **head**, because the head is what the agent must not lose:
+    the order in force, then its own notes, then the newest entries of each section.
+    (Until CD-13 this sliced ``text[-max_chars:]``, which on an over-budget memory
+    dropped exactly the current order and the scratchpad and kept the oldest history -
+    the opposite of what the docstring, the comment and the test all claimed.  The
+    test passed only because its fixture never exceeded ``max_chars``.)
     """
     lines: list[str] = []
     if memory.active_order_text:
@@ -176,9 +188,7 @@ def render_for_prompt(memory: FormationMemory, *, max_chars: int = MAX_PROMPT_CH
         lines.append("")
     text = "\n".join(lines).strip()
     if len(text) > max_chars:
-        # Keep the tail: the current order and the newest facts are at the top,
-        # the oldest history is at the bottom.
-        text = "…（较早的记忆已省略）\n" + text[-max_chars:]
+        text = text[:max_chars].rstrip() + "\n…（较早的记忆已省略）"
     return text
 
 

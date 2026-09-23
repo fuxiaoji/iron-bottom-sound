@@ -80,6 +80,13 @@ MATRIX: tuple[dict, ...] = (
     {"tag": "realistic_s03", "scenario": "IBS-S-03", "seed": 3, "realistic": True},
     {"tag": "realistic_em01", "scenario": "IBS-S-EM-01", "seed": 20270829, "realistic": True},
     {"tag": "realistic_s03_seed9", "scenario": "IBS-S-03", "seed": 9, "realistic": True},
+    # CD-13: command delay mode as its own frozen row.  The seven rows above all run
+    # with the mode off, so the whole command chain - orders, deliveries, reports,
+    # acknowledgements and the memory the agents carry - was outside any baseline.
+    # This row freezes it, deterministically and without a model: no fleet or
+    # formation policy is registered here, so every commander is doctrine.
+    {"tag": "cd_s01", "scenario": "IBS-S-01", "seed": 20270830, "realistic": True,
+     "command_delay": True},
 )
 
 # Scalars compared for exact equality on top of the projected trees.
@@ -190,13 +197,77 @@ from iron_bottom_sound.match import run_match
 from iron_bottom_sound.models import GameOptions
 
 spec = json.loads(sys.argv[2])
-options = GameOptions(realistic_command=bool(spec["realistic"]))
-report, engine, _sessions = run_match(
-    spec["scenario"], axis="tactical", allies="tactical", seed=spec["seed"],
-    options=options, request_limit=256,
-)
-state = engine.get(report.game_id)
-game_id = report.game_id
+if spec.get("command_delay"):
+    # The mode owns the movement and gunnery phases (formations are commanded by their
+    # own agents, not by a per-ship planner), so this row drives those phases the way
+    # the mode's research driver does.
+    from iron_bottom_sound import command_delay
+    from iron_bottom_sound.engine import ORDER_PHASES, IronBottomEngine
+    from iron_bottom_sound.llm import LLMPlayerSession
+    from iron_bottom_sound.models import OrderBatch, Phase, Side
+    from iron_bottom_sound.realistic_command import (
+        RealisticCommander, default_setup_orders,
+    )
+
+    engine = IronBottomEngine()
+    state = engine.reset(spec["scenario"], spec["seed"], GameOptions(
+        realistic_command=True, command_delay_mode=True,
+    ))
+    for side in Side:
+        engine.submit_orders(state.game_id, OrderBatch(
+            side=side, phase=Phase.FORMATION_SETUP,
+            formation_setup=default_setup_orders(state, side),
+        ))
+    engine.advance(state.game_id)
+    sessions = {item: LLMPlayerSession(item, RealisticCommander()) for item in Side}
+    substitutions: list[dict] = []
+    steps = 0
+    while state.phase != Phase.COMPLETE and steps < 400:
+        steps += 1
+        if state.phase in ORDER_PHASES:
+            for side in Side:
+                if side.value in state.submitted_orders:
+                    continue
+                if state.phase == Phase.MOVEMENT_PLANNING:
+                    batch = OrderBatch(
+                        side=side, phase=state.phase,
+                        formation_movement=command_delay.formation_orders(state, side),
+                    )
+                elif state.phase == Phase.GUNNERY:
+                    batch = command_delay.gunnery_batch(state, side)
+                else:
+                    batch = sessions[side].choose_orders(engine, state.game_id)
+                result = engine.submit_orders(state.game_id, batch)
+                if not result.valid and state.phase == Phase.MOVEMENT_PLANNING:
+                    # Doctrine can propose a formation plan the engine refuses (a member
+                    # speed limit, a wake the followers cannot hold).  The mode's research
+                    # driver answers that the same way: record the substitution and let
+                    # the deterministic commander move the side this turn.  Silently
+                    # pretending the plan was executed is what this record exists to
+                    # prevent.
+                    substitutions.append(
+                        {"turn": state.turn, "side": side.value, "errors": result.errors[:3]}
+                    )
+                    _, fallback, _ = RealisticCommander().choose_plan(
+                        engine, state.game_id, side,
+                    )
+                    result = engine.submit_orders(state.game_id, fallback)
+                if not result.valid:
+                    raise SystemExit("rejected: " + repr(result.errors[:2]))
+        engine.advance(state.game_id)
+    game_id = state.game_id
+    report_passed = state.phase == Phase.COMPLETE
+    failure_reason = None
+else:
+    options = GameOptions(realistic_command=bool(spec["realistic"]))
+    report, engine, _sessions = run_match(
+        spec["scenario"], axis="tactical", allies="tactical", seed=spec["seed"],
+        options=options, request_limit=256,
+    )
+    state = engine.get(report.game_id)
+    game_id = report.game_id
+    report_passed = report.passed
+    failure_reason = report.failure_reason
 
 
 def mask(value):
@@ -244,21 +315,70 @@ formations = {
     }
     for f in state.formations.values()
 }
+trees = {"events": events, "orders": orders, "ships": ships,
+         "formations": formations}
+if spec.get("command_delay"):
+    # Freeze the command chain itself: who was told what, when it arrived, what came
+    # back up, and how much the commanders remembered.
+    from iron_bottom_sound.formation_memory import MEMORY_KINDS
+
+    mode = state.command_delay
+    trees["command_delay"] = {
+        "messages": [
+            {
+                "message_id": item.message_id,
+                "kind": item.kind.value,
+                "medium": item.medium.value,
+                "precedence": item.precedence.value,
+                "origin": item.origin,
+                "destination": item.destination,
+                "issued_turn": item.issued_turn,
+                "issued_phase": item.issued_phase.value,
+                "handling_delay": item.handling_delay,
+                "delivered_turn": item.delivered_turn,
+                "status": item.status.value,
+                "acknowledged_turn": item.acknowledged_turn,
+                "reason": item.reason,
+                "reporting_formation_id": (
+                    (item.payload.get("report") or {}).get("reporting_formation_id")
+                ),
+                "in_person": bool(item.payload.get("delivered_in_person")),
+                "has_report_text": bool(item.payload.get("report_text")),
+            }
+            for item in mode.messages
+        ],
+        "decisions": [
+            {
+                "formation_id": row["formation_id"],
+                "turn": row["turn"],
+                "plan": row.get("selected_movement_plan"),
+                "report_actions": sorted(row.get("report_actions") or []),
+                "acknowledgement": bool(row.get("acknowledgement")),
+            }
+            for row in mode.decisions
+        ],
+        "memories": {
+            formation_id: {kind: len(memory.of_kind(kind)) for kind in MEMORY_KINDS}
+            for formation_id, memory in sorted(mode.memories.items())
+        },
+        "policy_labels": dict(sorted(mode.policy_labels.items())),
+        "substitutions": substitutions,
+    }
+
 json.dump(
     {
         "tag": spec["tag"],
         "scenario": spec["scenario"],
         "seed": spec["seed"],
         "realistic_command": bool(spec["realistic"]),
-        "passed": bool(report.passed),
-        "failure_reason": report.failure_reason,
+        "passed": bool(report_passed),
+        "failure_reason": failure_reason,
         "final_turn": state.turn,
         "final_phase": state.phase.value,
         "rng_counter": state.rng_counter,
         "n_events": len(events),
         "n_order_batches": sum(len(sealed) for sealed in state.sealed_orders.values()),
-        "trees": {"events": events, "orders": orders, "ships": ships,
-                  "formations": formations},
+        "trees": trees,
     },
     sys.stdout,
 )

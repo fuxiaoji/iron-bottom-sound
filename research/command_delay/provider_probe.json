@@ -1,0 +1,43 @@
+{
+ "provider": "zhipu",
+ "results": [
+  {
+   "model": "glm-4-flash",
+   "max_tokens": 700,
+   "thinking_field": true,
+   "attempts": [
+    {
+     "attempt": 1,
+     "http_status": 200
+    }
+   ],
+   "http_status": 200,
+   "latency_s": 5.32,
+   "finish_reason": "stop",
+   "usage": {
+    "completion_tokens": 89,
+    "prompt_tokens": 406,
+    "total_tokens": 495
+   },
+   "request_id": "20260923234158048983dc6eb74a69",
+   "content_chars": 242,
+   "reasoning_chars": 0,
+   "markdown_fenced": false,
+   "strict_json": true,
+   "parsed_keys": [
+    "memory_note",
+    "rationale_summary",
+    "report_actions",
+    "selected_contingency_branch",
+    "selected_movement_action_id",
+    "target_priority_adjustments"
+   ],
+   "playable": true,
+   "provider": "zhipu",
+   "endpoint": "https://open.bigmodel.cn/api/paas/v4"
+  }
+ ],
+ "playable": [
+  "glm-4-flash"
+ ]
+}

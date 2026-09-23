@@ -386,10 +386,18 @@ def draft_reports(
     world at drafting time.  A formation with local contacts drafts a contact
     report at urgent precedence instead, which is why precedence matters to the
     queue.
+
+    This is the **engine floor**: the situation and the sightings go up even when
+    the formation has no agent, so the fleet commander is never blind.  A side whose
+    formations run a model reports through ``_draft_formation_report`` instead - once
+    per turn, in the formation's own words, on top of the same snapshot - so this
+    function skips that side rather than sending the same traffic twice.
     """
     mode = state_for(state)
     drafted: list[CommandMessage] = []
     for side in Side:
+        if side_policy(side)[0] is not None:
+            continue
         authority = mode.authorities.get(side.value)
         fleet_id = authority.fleet_formation_id if authority else None
         fleet_formation = state.formations.get(fleet_id) if fleet_id else None
@@ -402,6 +410,10 @@ def draft_reports(
             snapshot = report_snapshot(state, formation)
             contacts = _formation_contact_count(engine, state, formation)
             snapshot["contacts"] = contacts
+            # Who is reporting, so the fleet's knowledge of that formation is what the
+            # delivery updates.  Addressed *to the fleet*: a report is traffic between
+            # two commands, not a note a formation writes to itself.
+            snapshot["reporting_formation_id"] = formation.id
             kind = MessageKind.CONTACT_REPORT if contacts else MessageKind.SITREP
             precedence = (
                 MessagePrecedence.URGENT if contacts else MessagePrecedence.ROUTINE
@@ -410,7 +422,7 @@ def draft_reports(
                 message_id="",
                 side=side,
                 origin=formation.flagship_id,
-                destination=formation.id,
+                destination=fleet_id,
                 kind=kind,
                 precedence=precedence,
                 medium=decision.medium,
@@ -521,11 +533,21 @@ def _apply_delivery(
 ) -> None:
     """Fold one delivered message into the fleet's knowledge or the order book."""
     mode = state_for(state)
-    if message.kind in (MessageKind.SITREP, MessageKind.CONTACT_REPORT):
-        entry = mode.formations.get(message.destination)
+    if message.kind in (
+        MessageKind.SITREP, MessageKind.CONTACT_REPORT, MessageKind.DEVIATION_REPORT,
+        MessageKind.CLARIFICATION,
+    ):
+        snapshot_for_key = dict(message.payload.get("report") or {})
+        # The fleet's knowledge is about the *reporting* formation, not about whoever
+        # the envelope was addressed to.
+        key = str(
+            snapshot_for_key.get("reporting_formation_id")
+            or message.destination
+        )
+        entry = mode.formations.get(key)
         if entry is None:
-            entry = FormationCommandState(formation_id=message.destination)
-            mode.formations[message.destination] = entry
+            entry = FormationCommandState(formation_id=key)
+            mode.formations[key] = entry
         # Flights can cross: a same-turn TBS report overtakes a coded one sent
         # earlier.  Arrival order is therefore not freshness order, and a report
         # must never overwrite knowledge that is newer *by issue time* — the same
@@ -550,6 +572,11 @@ def _apply_delivery(
         entry.reported_speed = snapshot.get("guide_speed")
         entry.reported_ship_count = snapshot.get("ship_count")
         entry.reported_geometry_kind = snapshot.get("geometry_kind")
+        text = str(message.payload.get("report_text") or "").strip()
+        if text:
+            # The formation's own words, kept as delivered.  This is what the fleet
+            # commander reasons about, so it is stored with the snapshot it came with.
+            entry.reported_text = text[:600]
         return
     if message.kind in (MessageKind.MISSION_ORDER, MessageKind.AMENDMENT):
         order_id = message.payload.get("order_id")
@@ -590,6 +617,30 @@ def _apply_delivery(
         )
         return
     if message.kind == MessageKind.ACKNOWLEDGEMENT:
+        # An acknowledgement is the one message the mode used to drop on the floor
+        # (``CommandMessage.acknowledged_turn`` had no writer anywhere in the tree).
+        # Now it lands where the ledger can be read: on the order it answers, and on
+        # the formation's command state so the fleet's view can say "confirmed".
+        order_id = message.payload.get("order_id")
+        formation_id = str(message.payload.get("acknowledged_by") or "")
+        ack_turn = (
+            message.delivered_turn if message.delivered_turn is not None else state.turn
+        )
+        for item in mode.messages:
+            if item.kind not in (MessageKind.MISSION_ORDER, MessageKind.AMENDMENT):
+                continue
+            if order_id is not None and item.payload.get("order_id") != order_id:
+                continue
+            if formation_id and item.destination != formation_id:
+                continue
+            item.acknowledged_turn = ack_turn
+            break
+        if formation_id:
+            entry = mode.formations.get(formation_id)
+            if entry is None:
+                entry = FormationCommandState(formation_id=formation_id)
+                mode.formations[formation_id] = entry
+            entry.last_ack_turn = ack_turn
         return
 
 
@@ -616,6 +667,9 @@ def on_phase_advanced(engine: "IronBottomEngine", state: GameState) -> None:
         for side in Side:
             issue_mission_orders(engine, state, side)
     if state.phase == Phase.MOVEMENT_PLANNING:
+        # The fleet commander speaks first, so a face-to-face order to its own
+        # formation is already in that formation's hands when its agent decides.
+        run_fleet_agent(engine, state)
         # Every formation's local agent decides for this turn, from its own local
         # view only.  The gunnery phase later consumes only the priority part.
         run_formation_agents(engine, state)
@@ -741,21 +795,61 @@ def draft_natural_order(
         else RouteDecision(CommunicationMedium.BLACKOUT, 0, "no fleet formation afloat")
     )
     kind = MessageKind.MISSION_ORDER
-    return send(engine, state, CommandMessage(
+    # Face to face: the commander sails in this formation, so the order is handed over
+    # in person.  It costs no signal time and it does not wait for a channel slot - but
+    # it is still *logged* as a message, because the ledger is the record of what was
+    # said, not only of what was transmitted.  Orders to any other formation keep the
+    # routing and delay above: that is the whole asymmetry of command at sea.
+    embarked = is_embarked(state, formation)
+    message = send(engine, state, CommandMessage(
         message_id="",
         side=side,
         origin=order.issued_by,
         destination=formation_id,
         kind=kind,
         precedence=MessagePrecedence.OPERATIONAL,
-        medium=decision.medium,
+        medium=CommunicationMedium.TBS_SHORT if embarked else decision.medium,
         issued_turn=state.turn,
         issued_phase=state.phase,
-        handling_delay=delay_for(decision.medium, kind, decision.relay_hops),
-        relay_hops=decision.relay_hops,
-        reason=decision.reason,
-        payload={"order_id": order.order_id, "order_text": cleaned},
+        handling_delay=0 if embarked else delay_for(
+            decision.medium, kind, decision.relay_hops
+        ),
+        relay_hops=0 if embarked else decision.relay_hops,
+        reason=(
+            "同编队当面下令：当面交办，不占用通信链路" if embarked else decision.reason
+        ),
+        payload={
+            "order_id": order.order_id,
+            "order_text": cleaned,
+            "delivered_in_person": embarked,
+        },
     ))
+    if embarked:
+        _apply_delivery(engine, state, message)
+        message.status = MessageStatus.DELIVERED
+        message.delivered_turn = state.turn
+        message.delivered_phase = state.phase
+        message.observed_turn = state.turn
+        engine._event(
+            state, "command_message_delivered",
+            f"报文 {message.message_id}（mission_order）当面交办给 {formation_id}",
+            payload={
+                "secret_side": side.value,
+                "message_id": message.message_id,
+                "kind": kind.value,
+                "medium": CommunicationMedium.TBS_SHORT.value,
+                "origin": order.issued_by,
+                "destination": formation_id,
+                "issued_turn": state.turn,
+                "issued_phase": state.phase.value,
+                "delivered_turn": state.turn,
+                "delivered_phase": state.phase.value,
+                "observed_turn": state.turn,
+                "in_person": True,
+            },
+            rule=engine._rule(RULE_COMMS, None, "命令延迟：通信处理链"),
+        )
+    return message
 
 
 def formation_orders(state: GameState, side: Side) -> list[FormationMovementOrder]:
@@ -809,6 +903,37 @@ def gunnery_batch(state: GameState, side: Side) -> OrderBatch:
         if directive.formation_id in own
     )
     return OrderBatch(side=side, phase=state.phase, target_priorities=directives)
+
+
+_FLEET_POLICIES: dict[str, tuple[Any, str]] = {}
+
+
+def set_fleet_policy(side: Side, policy: Any, label: str) -> None:
+    """Register the model policy the *fleet commander* runs under (process memory only).
+
+    Same bargain as ``set_side_policy``: nothing here is persisted, and an unregistered
+    side keeps its old behaviour exactly - the fleet agent is an addition to the mode,
+    not a change to how a side without one fights.
+    """
+    _FLEET_POLICIES[side.value] = (policy, label)
+
+
+def clear_fleet_policies() -> None:
+    _FLEET_POLICIES.clear()
+
+
+def fleet_policy(side: Side) -> tuple[Any, str]:
+    return _FLEET_POLICIES.get(side.value, (None, "no-fleet-agent"))
+
+
+def fleet_agent(side: Side):
+    """The fleet commander's agent, or ``None`` when the side has no model."""
+    from .fleet_llm import FleetLLMAgent
+
+    policy, label = fleet_policy(side)
+    if policy is None:
+        return None, label
+    return FleetLLMAgent(policy, name=label, max_retries=2), label
 
 
 def set_side_policy(side: Side, policy: Any, label: str) -> None:
@@ -899,6 +1024,13 @@ def run_formation_agents(engine: "IronBottomEngine", state: GameState) -> list[d
                 order_text=order_text, memory=memory,
                 attempts=getattr(agent, "attempts", [])[attempts_before:],
             )
+            if side_policy(side)[0] is not None:
+                # An agent commands this formation, so the report is its report: the
+                # engine's routine drafting is replaced for this side, not duplicated.
+                _draft_formation_report(
+                    engine, state, side=side, formation=formation, decision=decision,
+                    label=label,
+                )
             engine._event(
                 state, "formation_agent_decision",
                 f"{formation.name} 本地代理决策：{decision.rationale_summary}",
@@ -922,6 +1054,294 @@ def run_formation_agents(engine: "IronBottomEngine", state: GameState) -> list[d
                 rule=engine._rule("IBS-R-CD-02", None, "命令延迟：编队本地代理"),
             )
     return decisions
+
+
+def _draft_formation_report(
+    engine: "IronBottomEngine", state: GameState, *, side: Side,
+    formation: FormationState, decision, label: str,
+) -> list[CommandMessage]:
+    """Send the formation's own report up, engine snapshot included.
+
+    Two halves, deliberately kept apart:
+
+    * the **floor** - ``report_snapshot`` plus the contact count, the same material the
+      engine would have drafted on its own, so the fleet commander never goes blind;
+    * the **agent's own words** - ``report_text`` - which is what makes the report a
+      report rather than telemetry, and what the fleet has to weigh against its own
+      stale picture.
+
+    The kind and precedence come from the agent's own ``report_actions`` where it asked
+    for something specific, and from the contacts otherwise.  DEVIATION_REPORT and
+    CLARIFICATION_REQUEST become separate messages, because "I am deviating" and "I did
+    not understand" are different signals from a routine sitrep and should be able to
+    arrive at different times.
+    """
+    mode = state_for(state)
+    authority = mode.authorities.get(side.value)
+    fleet_id = authority.fleet_formation_id if authority else None
+    fleet_formation = state.formations.get(fleet_id) if fleet_id else None
+    if fleet_formation is None or formation.id == fleet_id:
+        return []  # the commander is embarked here; it needs no report from itself
+
+    actions = set(decision.report_actions or [])
+    if not actions:
+        actions = {"NONE"}
+    route_decision = route(engine, state, formation, fleet_formation)
+    snapshot = report_snapshot(state, formation)
+    contacts = _formation_contact_count(engine, state, formation)
+    snapshot["contacts"] = contacts
+    snapshot["reporting_formation_id"] = formation.id
+    wants_contact = "CONTACT_REPORT" in actions or contacts > 0
+    kind = MessageKind.CONTACT_REPORT if wants_contact else MessageKind.SITREP
+    precedence = MessagePrecedence.URGENT if contacts else MessagePrecedence.ROUTINE
+    text = str(getattr(decision, "report_text", "") or "").strip()
+    sent = [send(engine, state, CommandMessage(
+        message_id="",
+        side=side,
+        origin=formation.flagship_id,
+        destination=fleet_id,
+        kind=kind,
+        precedence=precedence,
+        medium=route_decision.medium,
+        issued_turn=state.turn,
+        issued_phase=state.phase,
+        handling_delay=delay_for(route_decision.medium, kind, route_decision.relay_hops),
+        relay_hops=route_decision.relay_hops,
+        reason=route_decision.reason,
+        payload={
+            "report": _encode_snapshot(snapshot),
+            "report_text": text,
+            "agent": label,
+            "actions": sorted(actions),
+        },
+    ))]
+
+    for kind_wanted, action, note in (
+        (MessageKind.DEVIATION_REPORT, "DEVIATION_REPORT", "偏离命令报告"),
+        (MessageKind.CLARIFICATION, "CLARIFICATION_REQUEST", "请求澄清"),
+    ):
+        if action not in actions:
+            continue
+        sent.append(send(engine, state, CommandMessage(
+            message_id="",
+            side=side,
+            origin=formation.flagship_id,
+            destination=fleet_id,
+            kind=kind_wanted,
+            precedence=MessagePrecedence.URGENT,
+            medium=route_decision.medium,
+            issued_turn=state.turn,
+            issued_phase=state.phase,
+            handling_delay=delay_for(
+                route_decision.medium, kind_wanted, route_decision.relay_hops
+            ),
+            relay_hops=route_decision.relay_hops,
+            reason=f"{note}：{route_decision.reason}",
+            payload={
+                "report": _encode_snapshot(snapshot),
+                "report_text": text,
+                "agent": label,
+                "actions": sorted(actions),
+            },
+        )))
+
+    if decision.acknowledgement:
+        order = active_mission_order(state, formation.id)
+        sent.append(send(engine, state, CommandMessage(
+            message_id="",
+            side=side,
+            origin=formation.flagship_id,
+            destination=fleet_id,
+            kind=MessageKind.ACKNOWLEDGEMENT,
+            precedence=MessagePrecedence.ROUTINE,
+            medium=route_decision.medium,
+            issued_turn=state.turn,
+            issued_phase=state.phase,
+            handling_delay=delay_for(
+                route_decision.medium, MessageKind.ACKNOWLEDGEMENT,
+                route_decision.relay_hops,
+            ),
+            relay_hops=route_decision.relay_hops,
+            reason=route_decision.reason,
+            payload={
+                "order_id": order.order_id if order is not None else None,
+                "acknowledged_by": formation.id,
+            },
+        )))
+    return sent
+
+
+def _record_fleet_log(
+    state: GameState, *, side: Side, formation_id: str, formation_name: str,
+    label: str, prompt: dict[str, Any], memory_text: str, attempt_records: list[dict],
+    decision,
+) -> None:
+    """Keep the fleet commander's transcript, chain of thought included.
+
+    The reasoning is stored next to the decision on purpose: a decision alone hides the
+    hesitation, and the hesitation is the interesting part of a commander's turn.
+    """
+    mode = state_for(state)
+    mode.agent_log.append({
+        "turn": state.turn,
+        "phase": state.phase.value,
+        "side": side.value,
+        "role": "fleet_agent",
+        "formation_id": formation_id,
+        "formation_name": formation_name,
+        "agent": label,
+        "order_text": "",
+        "memory_text": memory_text,
+        "prompt": prompt,
+        "attempts": [
+            {
+                "attempt": item.get("attempt"),
+                "raw_response": item.get("raw_response"),
+                "thinking": item.get("thinking") or "",
+                "usage": item.get("usage") or {},
+                "request_id": item.get("request_id"),
+                "finish_reason": item.get("finish_reason"),
+                "errors": item.get("errors") or [],
+                "accepted": bool(item.get("accepted")),
+                "fallback": bool(item.get("fallback")),
+            }
+            for item in attempt_records
+        ],
+        "decision": {
+            "orders": [order.model_dump(mode="json") for order in decision.orders],
+            "acknowledged_formations": list(decision.acknowledged_formations),
+            "no_order": decision.no_order,
+            "rationale_summary": decision.rationale_summary,
+            "memory_note": decision.memory_note,
+        },
+    })
+    keep = 600
+    if len(mode.agent_log) > keep:
+        mode.agent_log = mode.agent_log[-keep:]
+
+
+def run_fleet_agent(engine: "IronBottomEngine", state: GameState) -> list[dict[str, Any]]:
+    """Give every side that has a fleet policy exactly one turn of command.
+
+    Runs **before** the formation agents in the same phase, so an order handed over in
+    person reaches the commander's own formation in the same turn it was written - while
+    every other formation only reads it when the message chain delivers it.
+
+    A side with no fleet policy is skipped entirely: this function adds a commander,
+    it does not change how an existing one fights.
+    """
+    from .command_observation import fleet_observation
+    from .fleet_llm import build_fleet_prompt
+    from .formation_memory import memory_for, remember, render_for_prompt, write_note
+
+    mode = state_for(state)
+    results: list[dict[str, Any]] = []
+    for side in Side:
+        agent, label = fleet_agent(side)
+        if agent is None:
+            continue
+        authority = mode.authorities.get(side.value)
+        fleet_id = authority.fleet_formation_id if authority else None
+        fleet_formation = state.formations.get(fleet_id) if fleet_id else None
+        if fleet_formation is None:
+            continue
+        view = fleet_observation(engine, state, side)
+        # The commander may address *every* formation of its side, including the one it
+        # sails in - that one is handed over in person and takes effect at once, which is
+        # the asymmetry the mode exists to show.  Which formation is which is stated in
+        # the prompt rather than hidden from the model.
+        addressable = [
+            {
+                "formation_id": item.formation_id,
+                "name": item.name,
+                "delivery": (
+                    "当面交办：同编队，即刻生效（不占用通信链路）"
+                    if item.is_source_of_truth else "电报：经通信链路，按媒介与队列延迟送达"
+                ),
+                "is_your_own_formation": bool(item.is_source_of_truth),
+            }
+            for item in view.reports
+        ]
+        addressable_ids = {item["formation_id"] for item in addressable}
+        memory = memory_for(state, fleet_id)
+        memory_text = render_for_prompt(memory)
+        prompt = build_fleet_prompt(
+            state, side, view=view, memory_text=memory_text, addressable=addressable,
+        )
+        attempts_before = len(getattr(agent, "attempts", []))
+        decision = agent.act(
+            prompt, side=side, turn=state.turn, phase=state.phase,
+            addressable_ids=addressable_ids,
+        )
+        attempts_made = getattr(agent, "attempts", [])[attempts_before:]
+        if attempts_made:
+            # Record the prompt that was actually answered, retry correction included,
+            # not the first draft of it.
+            prompt = attempts_made[-1].get("prompt", prompt)
+        _record_fleet_log(
+            state, side=side, formation_id=fleet_id,
+            formation_name=fleet_formation.name, label=label, prompt=prompt,
+            memory_text=memory_text,
+            attempt_records=getattr(agent, "attempts", [])[attempts_before:],
+            decision=decision,
+        )
+        orders_sent: list[dict[str, Any]] = []
+        for order in decision.orders:
+            message = draft_natural_order(
+                engine, state, side=side, formation_id=order.formation_id,
+                text=order.text,
+                priority_classes=order.priority_classes or None,
+                deadline_turn=order.deadline_turn,
+            )
+            orders_sent.append({
+                "formation_id": order.formation_id,
+                "message_id": message.message_id,
+                "medium": message.medium.value,
+                "handling_delay": message.handling_delay,
+                "delivered_turn": message.delivered_turn,
+                "in_person": bool(message.payload.get("delivered_in_person")),
+                "text": order.text,
+            })
+            remember(
+                state, order.formation_id, kind="order_received",
+                text=f"（尚未送达）总指挥命令：{order.text}", turn=state.turn,
+                phase=state.phase.value, meta={"message_id": message.message_id},
+            )
+        for formation_id in decision.acknowledged_formations:
+            remember(
+                state, fleet_id, kind="report_sent",
+                text=f"回复 {formation_id} 的报告：收到", turn=state.turn,
+                phase=state.phase.value,
+            )
+        if decision.memory_note:
+            write_note(state, fleet_id, text=decision.memory_note, turn=state.turn)
+        remember(
+            state, fleet_id, kind="decision",
+            text=f"T{state.turn} 决策：{decision.rationale_summary}",
+            turn=state.turn, phase=state.phase.value,
+            meta={"orders": len(decision.orders), "no_order": decision.no_order},
+        )
+        engine._event(
+            state, "fleet_agent_decision",
+            f"{fleet_formation.name} 舰队总指挥决策：{decision.rationale_summary}",
+            payload={
+                "secret_side": side.value,
+                "role": "fleet_agent",
+                "formation_id": fleet_id,
+                "agent": label,
+                "turn": state.turn,
+                "orders": orders_sent,
+                "acknowledged_formations": list(decision.acknowledged_formations),
+                "no_order": decision.no_order,
+                "rationale_summary": decision.rationale_summary,
+                "memory_note": decision.memory_note,
+                "audit": decision.audit,
+            },
+            rule=engine._rule("IBS-R-CD-09", None, "命令延迟：舰队总指挥代理"),
+        )
+        results.append({"side": side.value, "label": label, "decision": decision,
+                        "orders_sent": orders_sent})
+    return results
 
 
 def _record_memory(
@@ -991,14 +1411,19 @@ def _record_agent_log(
         "order_text": order_text,
         "memory_text": render_for_prompt(memory),
         "memory": memory_payload(memory),
-        "prompt": compact_local_map(build_prompt(
-            observation, order, memory_text=render_for_prompt(memory),
-            order_text=order_text,
-        )),
+        "prompt": compact_local_map(
+            (attempts[-1].prompt if attempts else None) or build_prompt(
+                observation, order, memory_text=render_for_prompt(memory),
+                order_text=order_text,
+            )
+        ),
         "attempts": [
             {
                 "attempt": item.attempt,
                 "raw_response": item.raw_response,
+                # The model's own reasoning, kept with the decision it produced: the
+                # order it gave is one thing, why it thought that was right is another.
+                "thinking": item.thinking,
                 "errors": list(item.errors),
                 "accepted": item.accepted,
                 "fallback": item.fallback,

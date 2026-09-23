@@ -84,6 +84,17 @@
    "n_unique": 1,
    "stable": true,
    "tag": "realistic_s03_seed9"
+  },
+  {
+   "digests": {
+    "0": "8445973cb14e64eb9a70f7ae8e2a379d033ca41d3e8d1096958a6082ba83dde5",
+    "1": "8445973cb14e64eb9a70f7ae8e2a379d033ca41d3e8d1096958a6082ba83dde5",
+    "2": "8445973cb14e64eb9a70f7ae8e2a379d033ca41d3e8d1096958a6082ba83dde5",
+    "8": "8445973cb14e64eb9a70f7ae8e2a379d033ca41d3e8d1096958a6082ba83dde5"
+   },
+   "n_unique": 1,
+   "stable": true,
+   "tag": "cd_s01"
   }
  ]
 }

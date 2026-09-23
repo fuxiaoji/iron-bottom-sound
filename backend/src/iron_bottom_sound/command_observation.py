@@ -80,6 +80,10 @@ class FormationReport(BaseModel):
     guide_speed: int | None = None
     ship_count: int | None = None
     geometry_kind: str | None = None
+    # The formation's own words, as delivered - this is what the fleet commander
+    # actually has to reason about, so it travels with the report (CD-13).
+    reported_text: str | None = None
+    acknowledged_turn: int | None = None
     is_source_of_truth: bool = False
 
 
@@ -284,6 +288,8 @@ def fleet_observation(engine: "IronBottomEngine", state: GameState, side: Side) 
                 entry.reported_geometry_kind.value
                 if entry and entry.reported_geometry_kind else None
             ),
+            reported_text=entry.reported_text if entry else None,
+            acknowledged_turn=entry.last_ack_turn if entry else None,
             is_source_of_truth=is_embarked,
         ))
     contacts = [

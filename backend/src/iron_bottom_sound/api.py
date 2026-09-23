@@ -804,7 +804,7 @@ def command_delay_formation_view(
 class CommandDelayOrderRequest(BaseModel):
     """舰队总指挥用自然语言写的一道命令。"""
     formation_id: str
-    text: str = Field(min_length=1, max_length=400)
+    text: str = Field(min_length=1, max_length=1000)
     priority_classes: list[str] = Field(default_factory=list, max_length=6)
     roe: list[str] = Field(default_factory=list, max_length=6)
     deadline_turn: int | None = Field(default=None, ge=1, le=200)
