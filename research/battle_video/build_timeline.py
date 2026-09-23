@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -77,6 +78,31 @@ def load(battle_dir: Path) -> dict:
 
 
 DEBUG_MARKERS = ("link=", "authority=", "contacts=", "branch=", "plan=")
+
+
+def conclusion_of(thinking: str, limit: int = 26) -> str:
+    """The last *substantive* sentence of a chain of thought.
+
+    The opening of a reasoning trace is process ("让我分析一下当前的情况：1. …") and the
+    end is often serialization chatter ("现在我将按照要求的 JSON 格式输出这些命令：") -
+    neither is a commander's judgement.  This walks backwards for the last sentence that
+    actually says something, and strips the markdown a model leaves in its prose.
+    """
+    text = " ".join(str(thinking or "").split())
+    text = re.sub(r"[*#`>]+", "", text)
+    if not text:
+        return ""
+    chatter = ("json", "格式", "输出", "```", "response_schema", "字段")
+    pieces = [piece.strip() for piece in re.split(r"(?<=[。；!?])", text) if piece.strip()]
+    for piece in reversed(pieces):
+        if len(piece) < 10:
+            continue
+        if any(marker in piece.lower() for marker in chatter):
+            continue
+        if piece.rstrip().endswith(("：", ":")):
+            continue  # a preamble to a list, not a judgement
+        return quote(piece, limit)
+    return quote(pieces[-1], limit) if pieces else ""
 
 
 def speakable(text: str) -> str:
@@ -161,6 +187,8 @@ def beats(data: dict) -> list[dict]:
                     for event in turn.get("events", [])})
     max_turn = max(turns) if turns else int(final["turns"])
     age_map = report_age_map(data)
+    phases_by_turn = available_phases(data)
+    first_phase = pick_phase(phases_by_turn, 1, ["formation_setup", "gunnery", "fire_end"])
     scenario_title = data.get("scenario_title") or "第二次马里亚纳海战 · 内南洋水雷强袭战"
 
     # ---------------------------------------------------------------- opening
@@ -232,7 +260,7 @@ def beats(data: dict) -> list[dict]:
         "id": "oob",
         "chapter": "双方指挥链",
         "visual": {"kind": "oob", "title": "指挥链与编成", "lines": oob_lines,
-                   "turn": 1, "phase": "formation_setup"},
+                   "turn": 1, "phase": first_phase},
         "narration": (
             "两个指挥体系是对称的：一名舰队总指挥，下辖三个编队，总指挥随其中一队行动。"
             "随队的那一队，命令当面交办、立刻生效；另外两队，只能等电报。"
@@ -244,7 +272,7 @@ def beats(data: dict) -> list[dict]:
         "id": "three_views_t1",
         "chapter": "双方指挥链",
         "visual": {"kind": "compare", "title": "同一个回合，三种海图",
-                   "board": {"turn": 1, "phase": "formation_setup"},
+                   "board": {"turn": 1, "phase": first_phase},
                    "labels": ["上帝视角（真值）", "日方所见", "美方所见"]},
         "narration": (
             "这是同一个回合的三张海图。左边是真实态势，中间是日方看到的，右边是美方看到的。"
@@ -287,7 +315,8 @@ def beats(data: dict) -> list[dict]:
         out.append({
             "id": f"quiet_{turns[0]}_{turns[-1]}",
             "chapter": span,
-            "visual": {"kind": "board", "board": {"turn": turns[-1], "phase": "fire_end"},
+            "visual": {"kind": "board", "board": {"turn": turns[-1], "phase": pick_phase(
+                available_phases(data), turns[-1], ["fire_end", "gunnery"])},
                        "viewpoint": "god", "title": f"{span} · 接近"},
             "narration": (
                 f"{span}，两支舰队{movement}，但谁也没有看见谁。"
@@ -321,12 +350,17 @@ def beats(data: dict) -> list[dict]:
         hits = [event for event in events if event["type"] == "gunnery_result"]
         phases = [phase for phase in ("movement_resolution", "gunnery") if phase]
 
-        # A. the truth
+        # The truth-and-gap beat: the god's-eye map next to both commanders' pictures,
+        # with the measured gap in the narration.  (A separate "truth" beat would show the
+        # same god map twice per turn and cost the film four minutes.)
         out.append({
-            "id": f"t{turn}_god",
+            "id": f"t{turn}_compare",
             "chapter": f"第 {turn} 回合",
-            "visual": {"kind": "board", "board": {"turn": turn, "phase": "gunnery"},
-                       "viewpoint": "god", "title": f"第 {turn} 回合 · 真实态势"},
+            "visual": {"kind": "compare", "title": f"第 {turn} 回合 · 真实态势与两种所见",
+                       "board": {"turn": turn, "phase": pick_phase(
+                           phases_by_turn, turn, ["gunnery", "movement_resolution",
+                                                  "torpedo_effects", "fire_end"])},
+                       "labels": ["上帝视角（真值）", "日方所见", "美方所见"]},
             "narration": _truth_narration(turn, hits, sinks, facts, recon),
             "overlays": [{"text": event["message"], "kind": event["type"]}
                          for event in (sinks or hits)[:3]],
@@ -348,7 +382,7 @@ def beats(data: dict) -> list[dict]:
             for order in orders:
                 name = FORMATION_CN.get(order["formation_id"], order["formation_id"])
                 delivery = "当面交办" if _order_was_in_person(data, order["text"]) else "经电报"
-                lines.append(f"总指挥 → {name}（{delivery}）：「{quote(order['text'], 64)}」")
+                lines.append(f"总指挥 → {name}（{delivery}）：「{quote(order['text'], 46)}」")
             sent_reports = [report for report in data["_reports"]
                             if report.get("reporting_formation_id", "").startswith(side)
                             and report.get("issued_turn") == turn]
@@ -358,33 +392,25 @@ def beats(data: dict) -> list[dict]:
                 age_text = "情报新鲜" if age in (0, None) else f"手里的图是 {age} 回合前"
                 plan = row.get("selected_movement_plan") or "保持"
                 lines.append(f"{name}（{age_text}）机动 {plan}："
-                             f"{quote(row.get('rationale_summary'), 54)}")
+                             f"{quote(row.get('rationale_summary'), 40)}")
             for report in sent_reports[:2]:
                 writer = FORMATION_CN.get(report["reporting_formation_id"],
                                           report["reporting_formation_id"])
                 if report.get("report_text"):
-                    lines.append(f"{writer} 上报：「{quote(report['report_text'], 56)}」")
+                    lines.append(f"{writer} 上报：「{quote(report['report_text'], 40)}」")
             out.append({
                 "id": f"t{turn}_{side}",
                 "chapter": f"第 {turn} 回合",
                 "visual": {"kind": "side", "side": side, "title": f"第 {turn} 回合 · {side_name}",
-                           "board": {"turn": turn, "phase": "movement_planning"}},
+                           "board": {"turn": turn, "phase": pick_phase(
+                               phases_by_turn, turn,
+                               ["movement_planning", "gunnery", "torpedo_planning",
+                                "fire_end"])}},
                 "narration": _side_narration(turn, side, thinking, orders, decisions,
                                              data, age_map, recon),
                 "overlays": [{"text": line, "kind": "order"} for line in lines[:5]],
                 "thinking": quote(thinking, 220),
             })
-
-        # C. the comparison
-        out.append({
-            "id": f"t{turn}_compare",
-            "chapter": f"第 {turn} 回合",
-            "visual": {"kind": "compare", "title": f"第 {turn} 回合末 · 三种海图",
-                       "board": {"turn": turn, "phase": "fire_end"},
-                       "labels": ["上帝视角（真值）", "日方所见", "美方所见"]},
-            "narration": _compare_narration(turn, data, age_map, recon),
-            "overlays": [],
-        })
 
     emit_quiet(quiet_run)
 
@@ -403,6 +429,29 @@ def beats(data: dict) -> list[dict]:
             f"整局下来，双方一共发出 {len(data.get('messages', []))} 封报文，"
             f"其中 {late} 封是跨回合送达的。每一条命令、每一封报告，都要在链路里排队。"
             "指挥的速度，成了这一局里最稀缺的东西。"
+        ),
+        "overlays": [],
+    })
+    face_to_face = sum(1 for message in data.get("messages", [])
+                       if (message.get("payload") or {}).get("delivered_in_person"))
+    telegraph = sum(1 for message in data.get("messages", [])
+                    if message.get("kind") == "mission_order") - face_to_face
+    acked = sum(1 for message in data.get("messages", [])
+                if message.get("acknowledged_turn") is not None)
+    out.append({
+        "id": "analysis_reports",
+        "chapter": "复盘",
+        "visual": {"kind": "card", "title": "两条链路：当面与电报",
+                   "lines": [
+                       f"任务命令：当面交办 {face_to_face} 次，经电报 {max(0, telegraph)} 次",
+                       f"上报：{len(data['_reports'])} 封（引擎保底态势 + 代理亲笔判断）",
+                       f"其中跨回合送达 {late} 封",
+                       f"确认回执 {acked} 次——落地回合已经写进台账",
+                   ]},
+        "narration": (
+            f"整局里，任务命令有 {face_to_face} 次是当面交办的，其余 {max(0, telegraph)} 次走电报；"
+            f"分舰队一共上报 {len(data['_reports'])} 封，其中 {late} 封跨回合送达。"
+            "总指挥手里的图，就是这样一封一封拼起来的——每一封都比现实晚一步。"
         ),
         "overlays": [],
     })
@@ -511,6 +560,29 @@ def _order_was_in_person(data: dict, text: str) -> bool:
     return False
 
 
+def available_phases(data: dict) -> dict[int, list[str]]:
+    """Which phases actually exist in the record, per turn.
+
+    The engine's phase order is scenario-dependent - IBS-S-EM-01 opens straight into
+    gunnery, with no movement phase at all - so a beat that names a phase the battle
+    never passed through would point at a frame nobody rendered.  The timeline asks the
+    record instead of assuming.
+    """
+    out: dict[int, list[str]] = {}
+    for view in data.get("three_views", []):
+        out.setdefault(int(view["turn"]), []).append(view["phase"])
+    return out
+
+
+def pick_phase(available: dict[int, list[str]], turn: int, preference: list[str],
+               fallback: str = "gunnery") -> str:
+    phases = available.get(turn) or []
+    for name in preference:
+        if name in phases:
+            return name
+    return phases[-1] if phases else fallback
+
+
 def _formation_rows(data: dict) -> list[dict]:
     """Per-formation identity, from the reconstructed board rather than guessed."""
     rows: list[dict] = []
@@ -541,59 +613,59 @@ def _side_of(data: dict, formation_id: str) -> str:
 
 def _truth_narration(turn: int, hits: list[dict], sinks: list[dict], facts: list[dict],
                      recon: dict) -> str:
-    if turn == 1:
-        return ("第一回合，双方仍在接近。海图上两支舰队隔着十几海里并行，"
-                "没有接触，没有交火，只有航向和速度。")
-    parts = [f"第 {turn} 回合，真实态势。"]
-    if hits:
-        parts.append(f"炮击结果 {len(hits)} 条：{quote(hits[0]['message'], 46)}")
+    """One beat, one idea: what is actually out there, and what each side can see of it.
+
+    Terse on purpose.  The overlays carry the detail - hit lists, orders, plans - and a
+    narration that reads the log aloud would double the film's length and halve its pace.
+    """
+    axis, allies = recon.get("axis") or {}, recon.get("allies") or {}
+    parts = [f"第 {turn} 回合。"]
     if sinks:
-        parts.append("有舰沉没：" + "；".join(quote(event["message"], 30) for event in sinks[:2]))
-    if not hits and not sinks:
-        # "nothing happened" is still a situation, and the situation is what to describe.
-        axis, allies = recon.get("axis"), recon.get("allies")
-        if axis and allies:
-            parts.append(
-                f"这一回合没有新的命中。日方 {axis['own_ships']} 艘在航，"
-                f"美方 {allies['own_ships']} 艘在航，双方仍在抢占阵位。"
-            )
-        else:
-            parts.append("这一回合没有新的命中，双方仍在调整阵位。")
+        parts.append("沉没：" + "；".join(quote(event["message"], 18) for event in sinks[:2]) + "。")
+    elif hits:
+        parts.append(f"炮击命中 {len(hits)} 次，{quote(hits[0]['message'], 24)}。")
+    else:
+        parts.append("没有新的命中。")
+    if axis and allies:
+        parts.append(
+            f"此刻日方看得到 {axis.get('visible_enemies', 0)} 艘，"
+            f"美方 {allies.get('visible_enemies', 0)} 艘。"
+        )
+        nearest = [value for value in
+                   (axis.get("closest_unseen_hexes"), allies.get("closest_unseen_hexes"))
+                   if isinstance(value, int)]
+        if nearest:
+            parts.append(f"最近的敌舰只有 {min(nearest)} 格，还没有被看见。")
     return "".join(parts)
 
 
 def _side_narration(turn: int, side: str, thinking: str, orders: list[dict],
                     decisions: list[dict], data: dict, age_map: dict, recon: dict) -> str:
-    """What this side knew, what it ordered, and what it did not know.
-
-    The last clause is the documentary's point: a commander's own picture is reported
-    next to what was actually out there.
-    """
+    """What this side ordered, and how stale the picture it ordered from was."""
     side_name = SIDE_CN[side]
-    side_recon = recon.get(side) or {}
-    head = f"{side_name}的指挥链，第 {turn} 回合。"
-    if side_recon:
-        head += (f"此刻他们只看得到 {side_recon.get('visible_enemies', 0)} 艘敌舰，"
-                 f"海图上却有 {side_recon.get('total_enemies', 0)} 艘。")
+    parts = [f"{side_name}，第 {turn} 回合。"]
     if orders:
-        head += f"总指挥发出 {len(orders)} 道命令。"
+        parts.append(f"总指挥发出 {len(orders)} 道命令。")
     else:
-        head += "总指挥本回合没有下令。"
+        parts.append("总指挥没有下令。")
     if decisions:
         ages = [age_map.get((row["formation_id"], turn)) for row in decisions]
-        stale = [age for age in ages if isinstance(age, int) and age > 0]
+        stale = [age for age in ages if isinstance(age, int) and age > 1]
         if stale:
-            head += f"下属编队手里最新的一份报告，最久的已经 {max(stale)} 个回合没有更新。"
+            parts.append(f"有编队手里的报告已经 {max(stale)} 个回合没有更新。")
         quoted = next((row.get("rationale_summary") for row in decisions
                        if speakable(row.get("rationale_summary"))), "")
         if quoted:
-            head += "有编队指挥的判断是：" + quote(quoted, 46)
+            parts.append("一个判断是：「" + quote(quoted, 26) + "」")
     if thinking:
-        head += "总指挥自己在想：" + quote(thinking, 44)
-    return head
+        landed = conclusion_of(thinking)
+        if landed:
+            parts.append("总指挥自己在想：「" + landed + "」")
+    return "".join(parts)
 
 
 def _compare_narration(turn: int, data: dict, age_map: dict, recon: dict) -> str:
+    """Kept for the standalone comparison beat if a cut ever needs one."""
     axis, allies = recon.get("axis") or {}, recon.get("allies") or {}
     gap = ""
     if axis and allies:
@@ -644,11 +716,17 @@ def main() -> int:
     if args.audio_manifest.exists():
         payload = json.loads(args.audio_manifest.read_text(encoding="utf-8"))
         manifest = {item["id"]: item for item in payload.get("lines", [])}
+    # A board is read, not just watched: hold it longer than its narration.  This is
+    # pacing, not padding - the alternative was a film that ends before its target length
+    # by cutting the pictures short.
+    hold = {"board": 2.4, "compare": 2.8, "side": 1.8, "card": 2.0, "oob": 2.0,
+            "chart": 2.2, "result": 2.2, "title": 2.6}
     for beat in timeline:
         entry = manifest.get(beat["id"])
         if entry:
+            kind = (beat.get("visual") or {}).get("kind", "board")
             beat["audio"] = entry["path"]
-            beat["seconds"] = round(max(entry["seconds"] + 0.9, 3.5), 2)
+            beat["seconds"] = round(max(entry["seconds"] + hold.get(kind, 1.6), 3.5), 2)
         else:
             beat["audio"] = None
             beat["seconds"] = round(max(len(beat["narration"]) / 4.2 + 0.9, 3.5), 2)

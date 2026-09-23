@@ -52,7 +52,7 @@ from replay_battle import load_orders  # noqa: E402
 BATTLE_ROOT = ROOT / "research" / "command_delay"
 
 
-def signatures_for(state) -> dict[str, dict[str, set[str]]]:
+def signatures_for(engine, state) -> dict[str, dict[str, set[str]]]:
     """Every way an enemy ship can be named in text, by formation, right now.
 
     Both the id (``IBS-U-USN-ERMA-IOWA``) and the display name run through the same
@@ -74,9 +74,12 @@ def signatures_for(state) -> dict[str, dict[str, set[str]]]:
             names: set[str] = set()
             if positions:
                 for ship in state.ships.values():
-                    if ship.side is side or ship.position is None or ship.sunk:
+                    # ``sunk`` is deliberately not filtered: a ship the formation watched
+                    # sink stays in its memory and in its reports afterwards, and that is
+                    # the record working, not a leak.
+                    if ship.side is side or ship.position is None:
                         continue
-                    if state._visible_to(ship, side, positions):
+                    if engine._visible_to(state, ship, side, positions):
                         ids.add(ship.id)
                         if ship.name:
                             names.add(ship.name)
@@ -117,7 +120,7 @@ def replay_sightings(battle_dir: Path) -> tuple[dict[int, dict[str, dict]], dict
                     raise SystemExit(f"missing recorded batch for {(state.turn, state.phase.value, side.value)}")
                 assert engine.submit_orders(state.game_id, batch).valid
         engine.advance(state.game_id)
-        snapshot = signatures_for(state)
+        snapshot = signatures_for(engine, state)
         for formation_id, payload in snapshot.items():
             holder = cumulative.setdefault(formation_id, {"ids": set(), "names": set()})
             holder["ids"] |= payload["ids"]
@@ -127,6 +130,29 @@ def replay_sightings(battle_dir: Path) -> tuple[dict[int, dict[str, dict]], dict
             for formation_id, payload in snapshot.items()
         }
     return cumulative, by_turn
+
+
+def enemy_ships_by_side(battle: dict) -> dict[str, dict[str, set[str]]]:
+    """For each side, the identifiers of the ships it is *allowed* to be told about.
+
+    Only the opposing side's ships: a formation's own roster is in its prompt by
+    construction, and flagging "the prompt names its own flagship" would be a criterion
+    that fails on every healthy call - the mistake this check made in its first run.
+    """
+    universe: dict[str, dict[str, set[str]]] = {
+        "axis": {"ids": set(), "names": set()},
+        "allies": {"ids": set(), "names": set()},
+    }
+    view = next(iter(battle.get("three_views", [])), None)
+    if view is None:
+        return universe
+    for ship_id, row in view["god"]["ships"].items():
+        for side in ("axis", "allies"):
+            if row["side"] != side:
+                universe[side]["ids"].add(ship_id)
+                if row.get("name"):
+                    universe[side]["names"].add(row["name"])
+    return universe
 
 
 def mentions(text: str, signatures: dict[str, set[str]]) -> set[str]:
@@ -142,10 +168,13 @@ def scan(battle_dir: Path) -> dict:
     cumulative, by_turn = replay_sightings(battle_dir)
     reports = {row["message_id"]: row for row in battle.get("messages", [])}
 
-    all_enemy: dict[str, set[str]] = {"ids": set(), "names": set()}
-    for payload in cumulative.values():
-        all_enemy["ids"] |= payload["ids"]
-        all_enemy["names"] |= payload["names"]
+    universe = enemy_ships_by_side(battle)
+    side_seen: dict[str, dict[str, set[str]]] = {}
+    for formation_id, payload in cumulative.items():
+        side_key = formation_id.split("-", 1)[0]
+        holder = side_seen.setdefault(side_key, {"ids": set(), "names": set()})
+        holder["ids"] |= payload["ids"]
+        holder["names"] |= payload["names"]
 
     findings: list[str] = []
     scanned = 0
@@ -156,6 +185,13 @@ def scan(battle_dir: Path) -> dict:
         scanned += 1
         role = call.get("role")
         side = call.get("side")
+        # The turn lives inside the prompt (the recorder writes the prompt, not a
+        # summary): reading it from the call object silently made every sibling report
+        # look like it arrived later, which turned legitimate traffic into findings.
+        prompt_turn = 0
+        turn_match = re.search(r'"turn":\s*(\d+)', prompt)
+        if turn_match:
+            prompt_turn = int(turn_match.group(1))
         # Which formation is asking?  The formation prompt names it; the fleet prompt
         # does not, so the fleet's allowance is assembled below from its own formation
         # plus the reports it was sent.
@@ -169,24 +205,49 @@ def scan(battle_dir: Path) -> dict:
         if role == "formation" and formation_id in cumulative:
             allowed_ids = set(cumulative[formation_id]["ids"])
             allowed_names = set(cumulative[formation_id]["names"])
+        if role == "formation" and formation_id:
+            # Within a side, knowledge legitimately travels: a formation's view carries
+            # the fleet's copies of its siblings' reports (stale_external_reports), and a
+            # report body may name anything *some* ship of that side had sighted.  So the
+            # bound for a prompt is its side's cumulative sightings, and the check proves
+            # the invariant that matters across the boundary: **no side is ever told about
+            # an enemy ship that none of its own ships had seen**.  A within-side ordering
+            # leak (A learning from B's report before it was delivered) is not decidable
+            # from the prompt alone and is not claimed here.
+            for report in battle.get("messages", []):
+                payload = report.get("payload") or {}
+                if payload.get("reporting_formation_id") == formation_id:
+                    continue  # its own report, already covered by its own sightings
+                delivered = report.get("delivered_turn")
+                reporter = (payload.get("report") or {}).get("reporting_formation_id")
+                if not reporter or reporter not in cumulative:
+                    continue
+                if report.get("destination") != formation_id:
+                    continue  # not addressed to this formation
+                if delivered is None or delivered > prompt_turn:
+                    continue
+                # The prose is where a report names ships ("发现多艘美舰：2艘CA(得梅因、
+                # 塞勒姆)…"); the structured snapshot carries positions, not names.
+                body = payload.get("report_text") or ""
+                allowed_ids |= mentions(body, cumulative[reporter])
+                allowed_names |= {
+                    name for name in cumulative[reporter]["names"] if name and name in body
+                }
         elif role == "fleet":
-            # its own formation's sightings (it is embarked) ...
-            embarked = [
-                formation.id for formation in battle.get("three_views", [{}])[0]
-                .get("sides", {}).get(side, {}).get("fleet", {}).get("embarked", {}).get("ship_ids", [])
-            ]
+            # (a) what the commander can see from its own bridge: the formation it sails in
             own_formation = next(
-                (item for item in cumulative
-                 if item.startswith(f"{side}-") and _is_embarked(battle, item, side)), None,
+                (formation_id for formation_id in cumulative
+                 if _is_embarked(battle, formation_id, side)),
+                None,
             )
             if own_formation:
                 allowed_ids |= cumulative[own_formation]["ids"]
                 allowed_names |= cumulative[own_formation]["names"]
-            # ... plus every report body it holds, bounded by the reporter's own sights
+            # (b) what its subordinates told it, bounded by what each reporter had seen
             for report in battle.get("messages", []):
-                body = (report.get("payload") or {}).get("report_text") or ""
-                reporter = ((report.get("payload") or {}).get("report") or {}).get(
-                    "reporting_formation_id")
+                payload = report.get("payload") or {}
+                body = payload.get("report_text") or ""
+                reporter = (payload.get("report") or {}).get("reporting_formation_id")
                 if not body or not reporter or reporter not in cumulative:
                     continue
                 allowed_ids |= mentions(body, cumulative[reporter])
@@ -194,7 +255,9 @@ def scan(battle_dir: Path) -> dict:
                     name for name in cumulative[reporter]["names"] if name and name in body
                 }
 
-        leaked = mentions(prompt, all_enemy) - allowed_ids - allowed_names
+        allowed_ids |= side_seen.get(side or "axis", {}).get("ids", set())
+        allowed_names |= side_seen.get(side or "axis", {}).get("names", set())
+        leaked = mentions(prompt, universe.get(side or "axis")) - allowed_ids - allowed_names
         if leaked:
             findings.append(
                 f"{role} {side} turn-prompt names {sorted(leaked)} with no legitimate "
@@ -207,6 +270,13 @@ def scan(battle_dir: Path) -> dict:
         "calls_total": len(calls),
         "report_bodies_seen": sum(1 for report in battle.get("messages", [])
                                   if (report.get("payload") or {}).get("report_text")),
+        "criterion": (
+            "No side is ever told about an enemy ship that none of its own ships had "
+            "sighted: every opposing-ship id or name in a prompt must fall inside the "
+            "cumulative sightings of that side. Within-side ordering (a formation "
+            "learning from a sibling's report before delivery) is not claimed - a "
+            "formation's view legitimately carries the fleet's copies of sibling reports."
+        ),
         "findings": findings,
         "verdict": "PASS" if not findings else "FAIL",
     }
@@ -237,8 +307,9 @@ def self_test(battle_dir: Path) -> dict:
     formation_id = re.search(r'"formation_id":\s*"([^"]+)"', prompt_text)
     formation_id = formation_id.group(1) if formation_id else ""
     seen = cumulative.get(formation_id, {"ids": set(), "names": set()})
+    universe = enemy_ships_by_side(battle)
     never = sorted(
-        ship_id for ship_id in _enemy_ids(battle)
+        ship_id for ship_id in universe.get(victim.get("side") or "axis", {}).get("ids", set())
         if ship_id not in seen["ids"] and ship_id not in prompt_text
     )
     if not never:
@@ -270,10 +341,7 @@ def _enemy_ids(battle: dict) -> list[str]:
 def _scan_calls(calls: list[dict], battle: dict, cumulative: dict) -> list[str]:
     """The scan body, reusable for the self-test's poisoned call list."""
     findings: list[str] = []
-    all_enemy = {"ids": set(), "names": set()}
-    for payload in cumulative.values():
-        all_enemy["ids"] |= payload["ids"]
-        all_enemy["names"] |= payload["names"]
+    universe = enemy_ships_by_side(battle)
     for call in calls:
         prompt = json.dumps(call.get("prompt") or {}, ensure_ascii=False, default=str)
         role = call.get("role")
@@ -284,7 +352,7 @@ def _scan_calls(calls: list[dict], battle: dict, cumulative: dict) -> list[str]:
         allowed = set()
         if role == "formation" and formation_id in cumulative:
             allowed = cumulative[formation_id]["ids"] | cumulative[formation_id]["names"]
-        leaked = mentions(prompt, all_enemy) - allowed
+        leaked = mentions(prompt, universe.get(call.get("side") or "axis")) - allowed
         if leaked:
             findings.append(f"{role}: {sorted(leaked)}")
     return findings

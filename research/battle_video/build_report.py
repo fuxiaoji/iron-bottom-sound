@@ -121,7 +121,16 @@ def write_report(battle_dir: Path, beats: list[dict], path: Path) -> None:
         f"{round(sum(len(call.get('thinking') or '') for call in ok_calls) / max(1, len(ok_calls)))} 字")
     add(f"- **引擎拒绝并回退教条的次数**：{len(data.get('substitutions', []))}"
         f"（明细见下）")
-    add(f"- **配套影像**：`research/battle_video/`（同一份记录生成的三视图纪录片）")
+    add(f"- **配套影像**：`research/battle_video/out/documentary.mp4`"
+        f"（12.0 分钟，1080p30；同一份记录生成，另附 720p 与字幕）")
+    add("")
+    # Stills live beside the video pipeline (a tracked directory), not under out/ which is
+    # a build directory and gitignored.
+    still_prefix = "../../battle_video/stills"
+    add(f"![开场]({still_prefix}/01_title.png)")
+    add(f"![规则]({still_prefix}/02_rules.png)")
+    add(f"![三视图]({still_prefix}/03_three_views.png)")
+    add(f"![复盘]({still_prefix}/04_analysis.png)")
     add("")
 
     add("## 逐回合：真实态势与双方决策")

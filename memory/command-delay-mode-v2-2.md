@@ -41,3 +41,23 @@ metadata:
 仓库是 **public**；历史里有 `.venv_phase_a/`（616 MB，`acfbb4f9` 误提交，含 203 MB 的 libtorch dylib）与 `research/m1_5/metrics/e2_t1_decisions.json`（124/83 MB），**直接 `git push` 必被 GitHub 拒**。
 
 推送一律走 `scripts/push_to_github.sh`：临时克隆 + `filter-branch` 摘掉这两个路径再推，本地仓库不动。**远端那 79 个提交的 SHA 与本地不同**——所以别再指望 `git push` 本地分支能成功，也别拿本地 SHA 去 GitHub 上对；要对齐就用脚本的 `--dry-run` 看体积，或看脚本头部的说明。要真正把那两个大文件上库，得装 git-lfs（当前 `git lfs` 未安装）。
+
+## CD-13：舰队级 agent、上报链路、预算翻倍与纪录片（2026-09-24）
+
+**指挥链现在是两级**：舰队总指挥是独立 agent（`fleet_llm.py`，自己的提示词/解析器/记忆/思维链），
+在 `on_phase_advanced` 里**先于**编队 agent 运行（`run_fleet_agent`），所以给本队的命令当面交办、
+同一回合即生效；给其他编队的走电报（README 的延迟表不变）。分舰队每回合上报：引擎保底态势+目击，
+外加 agent 亲笔的 `report_text`；上报按 **`reporting_formation_id`** 记账（信封写给舰队，
+知识归给上报者）。确认/偏离/澄清都是真实报文。
+
+**实现坑（都不是能从代码一眼看出的）**：
+
+1. **舰队 agent 的提示词必须自己序列化**：`FleetProviderPolicy` 不能复用 `ProviderPolicy._payload`（它按编队白名单裁字段，会把舰队提示词裁成空壳）。另外 `build_fleet_prompt` 里的 pydantic 模型要让 `json.dumps` 能处理（`model_dump(mode="json")`），否则在**发请求时**才炸。
+2. **总指挥必须能对自己所在编队下令**——我第一版把"本队"从 `addressable_formations` 里排除了，于是当面交办规则永远不可能触发（单元测试反而先过）。现在本队在名单里并标注"当面交办：即刻生效"。
+3. **确认的匹配不能用 origin==destination**：报文 origin 是舰 id，destination 是编队 id；确认要按 `payload.order_id`（+ `acknowledged_by`）回写 `acknowledged_turn`。
+4. **思考模型要留足输出预算**：glm-4.5-flash 在 `max_tokens=2000` 时会用推理吃光预算、返回 `content=""` + `finish_reason=length`，被解析器判为"只有推理"而重试——**约 19% 的调用这样浪费掉**。开到 4000 后本局零发生。
+5. **传输失败必须是一次尝试，不是一场对局的结束**：网络错误曾让驱动直接崩掉整局。现在 agent 捕获异常记为失败尝试（回退教条），recorder 还会在**直连与环境代理之间交替重试一次**（本机 `open.bigmodel.cn` 解析到 198.18.0.0/15，透明代理会成片返回 503，约 30% 的调用中招但都可重试成功）。
+6. **记忆截断方向曾经是反的**：`render_for_prompt` 超限时保留的是尾部，也就是把"当前命令 + 备忘"丢掉、留下最旧的历史——与它自己的注释和测试声称的相反（测试只是因为样本不够大才通过）。现在保头，测试也改成真的断言超限时命令与备忘仍在。
+7. **黄金基线只覆盖了模式关闭的行**：既有 7 行全是 `command_delay_mode:false`，所以 CD-13 的改动零漂移；新语义另开一行 `cd_s01` 冻结（含报文台账、上报作者、记忆条数、as-substitutions）。**判据的可失败性**又一次成为要点（见 CD12-F5/F6/F7）。
+
+**纪录片是"从记录生成"的**，不是剪出来的：`replay_battle.py` 先用 `orders.jsonl` 重演并核验（本局 90 个批次、24 舰、0 不一致），出三视角静帧；`build_timeline.py` 把解说词、屏显、节奏**全部由记录推导**（含每回合"看得见几艘 vs 海图上几艘"的信息差）；`tts_speak.py` 用固定音色的 ChatTTS 配音；Remotion 只负责包装层。**节奏按事件而非回合数**（安静回合合并成蒙太奇），否则同样一份记录会拍成 24 分钟。

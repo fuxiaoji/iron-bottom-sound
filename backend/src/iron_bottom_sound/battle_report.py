@@ -208,13 +208,16 @@ def _draw_ships(
 
 def _draw_annotations(
     draw: ImageDraw.ImageDraw, state: GameState, observation: Any,
-    legend_parts: list[str],
+    legend_parts: list[str], *, viewpoint: str | None = None,
 ) -> None:
     width, legend_top, _height = _map_geometry(state.map_columns, state.map_rows)
     title_font = _cjk_font(16)
     label_font = _cjk_font(12)
     legend_font = _cjk_font(14)
-    draw.text((ORIGIN_X, 20), f"{state.scenario_title} · {observation.side.value} 视角",
+    view_label = {
+        "god": "上帝视角（双方真值）",
+    }.get(viewpoint or "", f"{observation.side.value} 视角")
+    draw.text((ORIGIN_X, 20), f"{state.scenario_title} · {view_label}",
               fill=TEXT_COLOR, font=title_font, anchor="lm")
     columns = _column_labels(state.map_columns)
     for q, label in enumerate(columns):
@@ -252,9 +255,44 @@ def _wrap_text(draw: ImageDraw.ImageDraw, text: str, font, max_width: int) -> li
     return lines
 
 
-def render_map_image(state: GameState, engine: IronBottomEngine, side: Side) -> Image.Image:
-    """单侧扩展海图截图。只画该侧观察可见集 + 公开地形。尺寸随局声明（默认 46×39 与既有一致）。"""
-    observation = engine.observe(state.game_id, side)
+def god_observation(engine: IronBottomEngine, state: GameState):
+    """双方可见集的并集：上帝视角。
+
+    并集就是真值：每艘舰在自己一侧的观察里都是精确的（对方看到的才对它隐藏损伤），
+    因此合并两侧观察得到的舰舰状态逐项为真，不需要另开一条读取真值的旁路。
+    记录片的三视图（上帝 / 日方 / 美方）用的就是这个和两侧各自的观察。
+    """
+    axis = engine.observe(state.game_id, Side.AXIS)
+    allies = engine.observe(state.game_id, Side.ALLIES)
+    ships = {ship.id: ship for side_obs in (allies, axis) for ship in side_obs.ships}
+    torpedoes = {track.id: track for side_obs in (allies, axis) for track in side_obs.torpedo_tracks}
+    markers = {marker.id: marker for side_obs in (allies, axis) for marker in side_obs.markers}
+    wrecks = {wreck.id: wreck for side_obs in (allies, axis) for wreck in side_obs.wrecks}
+    merged = axis.model_copy(deep=True)
+    merged.ships = list(ships.values())
+    merged.torpedo_tracks = list(torpedoes.values())
+    merged.markers = list(markers.values())
+    merged.wrecks = list(wrecks.values())
+    return merged
+
+
+def render_map_image(
+    state: GameState, engine: IronBottomEngine, side: Side, *,
+    viewpoint: str | None = None,
+) -> Image.Image:
+    """扩展海图截图，可按视角取图。
+
+    ``viewpoint`` 缺省时与该侧观察一致（既有行为）；``"god"`` 画双方并集（上帝视角）。
+    单侧视角只画该侧可见集 + 公开地形，尺寸随局声明（默认 46×39 与既有一致）。
+    """
+    view = viewpoint or side.value
+    # The viewpoint *is* the observation: asking for the allies' picture while passing
+    # ``side=Side.AXIS`` used to draw the axis picture and label it "allies", which is a
+    # caption that lies about the thing a documentary is made of.
+    observation = (
+        god_observation(engine, state) if view == "god"
+        else engine.observe(state.game_id, Side(view))
+    )
     width, _legend_top, height = _map_geometry(state.map_columns, state.map_rows)
     image = Image.new("RGB", (width, height), OCEAN)
     draw = ImageDraw.Draw(image)
@@ -264,7 +302,7 @@ def render_map_image(state: GameState, engine: IronBottomEngine, side: Side) -> 
     _draw_wrecks(draw, observation)
     _, legend_parts, ship_index = _board_cells(state, engine, side)
     _draw_ships(draw, observation, ship_index)
-    _draw_annotations(draw, state, observation, legend_parts)
+    _draw_annotations(draw, state, observation, legend_parts, viewpoint=view)
     return image
 
 

@@ -40,8 +40,10 @@ VIEWS = ("god", "axis", "allies")
 
 # The phases worth a still: the ones where the map changed or a decision landed.
 RENDER_PHASES = (
-    Phase.MOVEMENT_PLANNING, Phase.MOVEMENT_RESOLUTION, Phase.GUNNERY,
-    Phase.TORPEDO_EFFECTS, Phase.FIRE_END,
+    # FORMATION_SETUP is the opening board - the film's first map, and the only frame in
+    # which the battle line is intact.
+    Phase.FORMATION_SETUP, Phase.MOVEMENT_PLANNING, Phase.MOVEMENT_RESOLUTION,
+    Phase.GUNNERY, Phase.TORPEDO_EFFECTS, Phase.FIRE_END,
 )
 
 
@@ -58,9 +60,17 @@ def load_orders(battle_dir: Path) -> dict[tuple[int, str, str], OrderBatch]:
 
 
 def replay(battle_dir: Path, frame_dir: Path | None = None, *,
-           viewpoints: tuple[str, ...] = VIEWS, crop: bool = True) -> dict:
+           viewpoints: tuple[str, ...] = VIEWS, crop: bool = True,
+           model_traffic: bool = True) -> dict:
     battle = json.loads((battle_dir / "battle_data.json").read_text(encoding="utf-8"))
     orders = load_orders(battle_dir)
+    policy_counts = {"formation": 0, "fleet": 0}
+    if model_traffic:
+        # Re-serve the models' own replies: the message traffic they authored is part of
+        # the battle, and without it the replay fights a different one.
+        from recorded_policies import provider_policies_from_record
+
+        policy_counts, _ = provider_policies_from_record(battle)
     scenario = battle.get("scenario", "IBS-S-EM-01")
     seed = int(battle["seed"])
 
@@ -73,28 +83,80 @@ def replay(battle_dir: Path, frame_dir: Path | None = None, *,
             side=side, phase=Phase.FORMATION_SETUP,
             formation_setup=default_setup_orders(state, side),
         )).valid
-    engine.advance(state.game_id)
-
     used: set[tuple[int, str, str]] = set()
     missing: list[str] = []
     rendered = 0
     frames: list[dict] = []
+    phase_mismatches: list[str] = []
+    phases_compared = 0
+    views = {}
+    for path in sorted((battle_dir / "views").glob("*.json")):
+        snapshot = json.loads(path.read_text(encoding="utf-8"))
+        views[(snapshot["turn"], snapshot["phase"])] = snapshot
 
-    def render_phase() -> None:
+    def compare_phase() -> None:
+        """The replay must reproduce every recorded snapshot, not just the last one.
+
+        Comparing only the end state hides a divergence that later events paper over,
+        and comparing against a mid-turn snapshot while the replay has run on past it
+        reports a difference that is only the extra final phase.
+        """
+        nonlocal phases_compared
+        snapshot = views.get((state.turn, state.phase.value))
+        if snapshot is None:
+            return
+        phases_compared += 1
+        recorded = snapshot["god"]["ships"]
+        for ship in state.ships.values():
+            row = recorded.get(ship.id)
+            if row is None:
+                continue
+            mine = {
+                "position": ship.position.label if ship.position else None,
+                "heading": ship.heading, "speed": ship.current_speed,
+                "hull": ship.hull, "sunk": bool(ship.sunk),
+                "command_status": ship.command_status,
+            }
+            for field_name, value in mine.items():
+                if field_name == "sunk":
+                    expected = bool(row["sunk"])
+                else:
+                    expected = row[field_name]
+                if value != expected:
+                    phase_mismatches.append(
+                        f"T{state.turn} {state.phase.value} {ship.id}: "
+                        f"{field_name} {value!r} != recorded {expected!r}"
+                    )
+
+    def render_phase(out_opening: tuple[int, str] | None = None) -> None:
         nonlocal rendered
         if frame_dir is None:
             return
+        turn, phase_name = (out_opening or (state.turn, state.phase.value))
         for viewpoint in viewpoints:
             image = battle_report.render_map_image(
                 state, engine, Side.AXIS, viewpoint=viewpoint,
             )
-            name = f"t{state.turn:02d}-{state.phase.value}-{viewpoint}.png"
+            name = f"t{turn:02d}-{phase_name}-{viewpoint}.png"
             image.save(frame_dir / name, optimize=True)
             rendered += 1
-            frames.append({"file": name, "turn": state.turn,
-                           "phase": state.phase.value, "viewpoint": viewpoint})
+            frames.append({"file": name, "turn": turn,
+                           "phase": phase_name, "viewpoint": viewpoint})
             if crop:
                 _crop(frame_dir / name, frame_dir / f"crop-{name}")
+
+    # The opening board is a real state - formation_setup - and it is the only frame that
+    # shows the battle line before anything has moved.  It has to be drawn here, after the
+    # render helper exists and before the first advance leaves the phase: the loop can only
+    # observe phases it has advanced into, so "render it in the loop" is impossible.
+    render_phase(out_opening=(state.turn, state.phase.value))
+    engine.advance(state.game_id)
+    compare_phase()
+    # The opening advance lands on a real phase (EM-01 opens straight into gunnery); the
+    # loop only renders after *its own* advances, so without this the first phase after
+    # setup would be skipped and a beat referencing it would have no frame.
+    if state.phase in RENDER_PHASES:
+        render_phase()
 
     steps = 0
     while state.phase is not Phase.COMPLETE and steps < 2000:
@@ -113,6 +175,7 @@ def replay(battle_dir: Path, frame_dir: Path | None = None, *,
                 if not result.valid:
                     raise SystemExit(f"recorded batch refused at {key}: {result.errors[:3]}")
         engine.advance(state.game_id)
+        compare_phase()
         if state.phase in RENDER_PHASES:
             render_phase()
 
@@ -126,27 +189,20 @@ def replay(battle_dir: Path, frame_dir: Path | None = None, *,
             for ship in state.ships.values()
         },
     }
-    recorded_views = _recorded_ships(battle_dir)
-    mismatches: list[str] = []
+    mismatches = phase_mismatches[:12]
     if final.get("turns") and final["turns"] != actual["turn"]:
         mismatches.append(f"final turn {actual['turn']} != recorded {final['turns']}")
-    for ship_id, snapshot in recorded_views.items():
-        mine = actual["ships"].get(ship_id)
-        if mine is None:
-            mismatches.append(f"{ship_id} missing from the replay")
-            continue
-        if snapshot["sunk"] != mine["sunk"]:
-            mismatches.append(f"{ship_id} sunk {mine['sunk']} != recorded {snapshot['sunk']}")
-        if not snapshot["sunk"] and snapshot["hull"] != mine["hull"]:
-            mismatches.append(f"{ship_id} hull {mine['hull']} != recorded {snapshot['hull']}")
 
     verdict = {
         "battle": str(battle_dir.relative_to(ROOT)),
+        "model_traffic_replayed": bool(model_traffic),
+        "recorded_policies_registered": policy_counts,
         "orders_used": len(used),
         "orders_recorded": len(orders),
         "orders_missing_for_a_phase": missing[:5],
-        "final": {"turn": actual["turn"], "phase": actual["phase"],
-                  "ships_compared": len(recorded_views)},
+        "final": {"turn": actual["turn"], "phase": actual["phase"]},
+        "phases_compared": phases_compared,
+        "phase_mismatches": len(phase_mismatches),
         "mismatches": mismatches[:10],
         "verdict": "PASS" if not mismatches and not missing else "FAIL",
         "frames_rendered": rendered,
@@ -185,6 +241,9 @@ def main() -> int:
     parser.add_argument("--out", type=Path,
                         default=Path(__file__).resolve().parent / "frames")
     parser.add_argument("--views", default="god,axis,allies")
+    parser.add_argument("--without-model-traffic", action="store_true",
+                        help="replay order batches only; reproduces movement and fire but "
+                             "NOT the battle (see recorded_policies.py for why)")
     parser.add_argument("--no-crop", action="store_true")
     args = parser.parse_args()
 
@@ -198,6 +257,7 @@ def main() -> int:
         battle_dir, args.out if do_render else None,
         viewpoints=tuple(item.strip() for item in args.views.split(",") if item.strip()),
         crop=not args.no_crop,
+        model_traffic=not args.without_model_traffic,
     )
     report_path = battle_dir / "replay_verification.json"
     report_path.write_text(json.dumps(verdict, ensure_ascii=False, indent=1) + "\n",

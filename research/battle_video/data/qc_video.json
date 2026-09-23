@@ -1,0 +1,23 @@
+{
+ "video": "research/battle_video/out/documentary.mp4",
+ "duration_s": 722.41,
+ "duration_min": 12.04,
+ "beats": 44,
+ "beats_narrated": 44,
+ "resolution": "1920x1080",
+ "audio": {
+  "codec": "aac",
+  "mean_db": -20.7,
+  "peak_db": -2.9
+ },
+ "frames": {
+  "sampled": 12,
+  "std_min": 21.35,
+  "std_mean": 34.42,
+  "blank_frames": []
+ },
+ "subtitles_cues": 44,
+ "size_mb": 212.8,
+ "findings": [],
+ "verdict": "PASS"
+}

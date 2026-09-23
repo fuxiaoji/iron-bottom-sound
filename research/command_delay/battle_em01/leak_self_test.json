@@ -1,0 +1,8 @@
+{
+ "injected_into": "axis-battle-line (axis)",
+ "injected_enemy_id": "IBS-U-USN-ERMA-ALASKA",
+ "baseline_findings": 0,
+ "findings_after_injection": 1,
+ "injection_caught": true,
+ "verdict": "PASS"
+}
