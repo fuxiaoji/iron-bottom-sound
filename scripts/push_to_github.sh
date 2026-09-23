@@ -54,8 +54,20 @@ OVER=$(git rev-list --objects HEAD | git cat-file --batch-check='%(objecttype) %
 if [[ -n "$OVER" ]]; then
   echo "仍存在超限文件，需先加入 DROP 列表："; echo "$OVER"; exit 1
 fi
-git rev-list --objects "$BASE..HEAD" | git cat-file --batch-check='%(objecttype) %(objectsize) %(rest)' \
-  | awk '$1=="blob"{s+=$2; n++} END {printf "本次将上传: %.0f MB / %d 个新对象\n", s/1048576, n}'
+
+# 上传量的**诚实**估计：只算服务端还没有的对象。重写会让本地与远端的 SHA 分叉，
+# 因此“范围里的对象合计”会被严重高估（首推后它仍报约 198 MB，而实际增量只有几 MB）。
+git remote add gh "$REMOTE_URL" 2>/dev/null || git remote set-url gh "$REMOTE_URL"
+if git fetch -q --no-tags gh '+refs/heads/*:refs/remotes/gh/*' 2>/dev/null; then
+  BASE_REFS=(--not --remotes=gh)
+  LABEL="本次将上传（服务端尚无）"
+else
+  BASE_REFS=(--not "$BASE")
+  LABEL="范围内对象合计（含服务端已有，未取到远端 refs）"
+fi
+git rev-list --objects HEAD "${BASE_REFS[@]}" \
+  | git cat-file --batch-check='%(objecttype) %(objectsize) %(rest)' \
+  | awk -v label="$LABEL" '$1=="blob"{s+=$2; n++} END {printf "%s: %.1f MB / %d 个对象\n", label, s/1048576, n}'
 
 if [[ "$DRY_RUN" == 1 ]]; then
   echo "--dry-run：到此为止，未推送。"
