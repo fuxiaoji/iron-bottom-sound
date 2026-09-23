@@ -63,7 +63,7 @@ class CallRecorder:
     """
 
     def __init__(self, inner, sink: Path, *, role: str, side: str, label: str,
-                 attempts: int = 4, backoff: float = 8.0, pause: float = 1.5) -> None:
+                 attempts: int = 5, backoff: float = 6.0, pause: float = 1.5) -> None:
         self.inner = inner
         self.sink = sink
         self.role = role
@@ -171,9 +171,15 @@ def main() -> int:
     parser.add_argument("--model", default="glm-4.5-flash")
     parser.add_argument("--thinking", action="store_true",
                         help="leave the model's reasoning on and record it")
+    parser.add_argument("--max-tokens", type=int, default=0,
+                        help="output budget per call; default 4000 with thinking "
+                             "(reasoning + JSON must both fit) and 2000 without")
     parser.add_argument("--turn-cap", type=int, default=12)
     parser.add_argument("--max-calls", type=int, default=0,
                         help="stop after N model calls (smoke test)")
+    parser.add_argument("--no-model", action="store_true",
+                        help="run the battle with doctrine only (no provider calls): the "
+                             "pipeline's dress rehearsal, and a fallback record")
     parser.add_argument("--capture-images", action="store_true",
                         help="also render the board per turn (off: frames are cut later)")
     args = parser.parse_args()
@@ -191,25 +197,41 @@ def main() -> int:
         realistic_command=True, command_delay_mode=True, battle_report=True,
     ))
 
-    formation_policy, formation_label = make_policy(
-        provider=args.provider, model=args.model, thinking=args.thinking,
-    )
-    fleet_policy, fleet_label = make_fleet_policy(
-        provider=args.provider, model=args.model, thinking=args.thinking,
-    )
-    if formation_policy is None or fleet_policy is None:
-        print(f"cannot run: formation={formation_label} fleet={fleet_label}", file=sys.stderr)
-        return 2
+    # A thinking model spends the same budget on its reasoning and on the JSON that
+    # follows it; at 2000 the reply is regularly "reasoning only" with
+    # finish_reason=length, which is a rejected attempt and a retry.  The budget is
+    # therefore sized for both parts when thinking is on.
+    max_tokens = args.max_tokens or (4000 if args.thinking else 2000)
     recorders: list[CallRecorder] = []
-    for side in Side:
-        recorder = CallRecorder(formation_policy, calls_path, role="formation",
-                                side=side.value, label=formation_label)
-        command_delay.set_side_policy(side, recorder, formation_label)
-        recorders.append(recorder)
-        fleet_recorder = CallRecorder(fleet_policy, calls_path, role="fleet",
-                                      side=side.value, label=fleet_label)
-        command_delay.set_fleet_policy(side, fleet_recorder, fleet_label)
-        recorders.append(fleet_recorder)
+    if args.no_model:
+        # Doctrine on both levels.  Every commander is still a commander - the
+        # deterministic agent - so the *pipeline* (orders, reports, ledger, views) runs
+        # in full and produces a real record; only the model calls are absent.
+        formation_label = "deterministic-formation-v1"
+        fleet_label = "no-fleet-agent"
+        print("running without a model: doctrine on both levels", flush=True)
+    else:
+        formation_policy, formation_label = make_policy(
+            provider=args.provider, model=args.model, thinking=args.thinking,
+            max_tokens=max_tokens,
+        )
+        fleet_policy, fleet_label = make_fleet_policy(
+            provider=args.provider, model=args.model, thinking=args.thinking,
+            max_tokens=max_tokens,
+        )
+        if formation_policy is None or fleet_policy is None:
+            print(f"cannot run: formation={formation_label} fleet={fleet_label}",
+                  file=sys.stderr)
+            return 2
+        for side in Side:
+            recorder = CallRecorder(formation_policy, calls_path, role="formation",
+                                    side=side.value, label=formation_label)
+            command_delay.set_side_policy(side, recorder, formation_label)
+            recorders.append(recorder)
+            fleet_recorder = CallRecorder(fleet_policy, calls_path, role="fleet",
+                                          side=side.value, label=fleet_label)
+            command_delay.set_fleet_policy(side, fleet_recorder, fleet_label)
+            recorders.append(fleet_recorder)
 
     sessions = {side: LLMPlayerSession(side, RealisticCommander()) for side in Side}
     battle: dict = {
@@ -219,6 +241,7 @@ def main() -> int:
         "fleet_policy": fleet_label,
         "formation_policy": formation_label,
         "thinking_enabled": bool(args.thinking),
+        "max_tokens": max_tokens,
         "turns": [],
         "fleet_orders": [],
         "substitutions": [],

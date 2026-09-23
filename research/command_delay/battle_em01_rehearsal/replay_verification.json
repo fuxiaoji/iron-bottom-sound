@@ -1,0 +1,14 @@
+{
+ "battle": "research/command_delay/battle_em01_rehearsal",
+ "orders_used": 90,
+ "orders_recorded": 90,
+ "orders_missing_for_a_phase": [],
+ "final": {
+  "turn": 12,
+  "phase": "complete",
+  "ships_compared": 24
+ },
+ "mismatches": [],
+ "verdict": "PASS",
+ "frames_rendered": 171
+}

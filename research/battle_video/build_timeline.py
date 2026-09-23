@@ -76,6 +76,34 @@ def load(battle_dir: Path) -> dict:
     return data
 
 
+DEBUG_MARKERS = ("link=", "authority=", "contacts=", "branch=", "plan=")
+
+
+def speakable(text: str) -> str:
+    """True when a decision summary can be read aloud.
+
+    The deterministic agent writes its rationale as a status line
+    ("axis-1: link=direct, authority=fleet_delegated, contacts=0").  A model writes a
+    sentence.  Both are records, but only one belongs in a narration, so the status
+    lines are dropped rather than quoted.
+    """
+    text = str(text or "")
+    return bool(text.strip()) and not any(marker in text for marker in DEBUG_MARKERS)
+
+
+def _fleet_gap(data: dict, turn: int) -> int | None:
+    """Closest approach between the two fleets at a turn, in hexes."""
+    view = next((row for row in data.get("three_views", []) if row["turn"] == turn), None)
+    if view is None:
+        return None
+    ships = [row for row in view["god"]["ships"].values() if not row["sunk"]]
+    axis = [row for row in ships if row["side"] == "axis" and row.get("q") is not None]
+    allies = [row for row in ships if row["side"] == "allies" and row.get("q") is not None]
+    if not axis or not allies:
+        return None
+    return min(_hex_distance(a, b) for a in axis for b in allies)
+
+
 def quote(text: str, limit: int = 64) -> str:
     """Trim a quotation at a sentence end where possible, never mid-word."""
     text = " ".join(str(text or "").split())
@@ -226,9 +254,65 @@ def beats(data: dict) -> list[dict]:
     })
 
     # ---------------------------------------------------------------- the battle
+    #
+    # Pacing follows events, not the turn counter: a turn where neither side has a
+    # contact and nothing is hit is one line of narration over a few frames, and
+    # consecutive quiet turns collapse into a single approach montage.  Twelve
+    # identical "still closing" beats would be honest and unwatchable.
+    quiet_run: list[int] = []
+
+    def emit_quiet(turns: list[int]) -> None:
+        if not turns:
+            return
+        span = (f"第 {turns[0]} 回合" if len(turns) == 1
+                else f"第 {turns[0]}–{turns[-1]} 回合")
+        first = turn_recon(data, turns[0])
+        last = turn_recon(data, turns[-1])
+        gap_start = _fleet_gap(data, turns[0])
+        gap_end = _fleet_gap(data, turns[-1])
+        movement = "互相接近"
+        if isinstance(gap_start, int) and isinstance(gap_end, int):
+            if gap_end < gap_start:
+                movement = f"从相距 {gap_start} 格接近到 {gap_end} 格"
+            elif gap_end > gap_start:
+                movement = f"从相距 {gap_start} 格拉开到 {gap_end} 格"
+            else:
+                movement = f"仍在相距 {gap_end} 格上相持"
+        closing = ""
+        if last.get("axis") and last.get("allies"):
+            closing = (
+                f"到这一段结束时，双方仍然只看得到 {last['axis'].get('visible_enemies', 0)} "
+                f"艘与 {last['allies'].get('visible_enemies', 0)} 艘敌舰。"
+            )
+        out.append({
+            "id": f"quiet_{turns[0]}_{turns[-1]}",
+            "chapter": span,
+            "visual": {"kind": "board", "board": {"turn": turns[-1], "phase": "fire_end"},
+                       "viewpoint": "god", "title": f"{span} · 接近"},
+            "narration": (
+                f"{span}，两支舰队{movement}，但谁也没有看见谁。"
+                f"{closing}"
+                "舰队总指挥手里的图，来自各编队上一回合发出的报告；"
+                "而在海面上，两支舰队的距离正在以每小时二十多海里的速度缩短。"
+            ),
+            "overlays": [],
+        })
+
     for turn in range(1, max_turn + 1):
         turn_record = next((row for row in data.get("turns", []) if row["turn"] == turn), None)
         events = turn_record["events"] if turn_record else []
+        recon = turn_recon(data, turn)
+        if turn > 1:
+            contact = any((row or {}).get("visible_enemies", 0) > 0 for row in recon.values())
+            damage = any(event["type"] in {
+                "gunnery_hit", "gunnery_result", "torpedo_hit", "ship_sunk", "collision",
+                "ship_withdrawn",
+            } for event in events)
+            if not contact and not damage:
+                quiet_run.append(turn)
+                continue
+            emit_quiet(quiet_run)
+            quiet_run = []
         facts = [event for event in events if event["type"] in {
             "gunnery_hit", "gunnery_result", "torpedo_hit", "ship_sunk", "collision",
             "ship_withdrawn", "formation_emergency_stop",
@@ -243,7 +327,7 @@ def beats(data: dict) -> list[dict]:
             "chapter": f"第 {turn} 回合",
             "visual": {"kind": "board", "board": {"turn": turn, "phase": "gunnery"},
                        "viewpoint": "god", "title": f"第 {turn} 回合 · 真实态势"},
-            "narration": _truth_narration(turn, hits, sinks, facts),
+            "narration": _truth_narration(turn, hits, sinks, facts, recon),
             "overlays": [{"text": event["message"], "kind": event["type"]}
                          for event in (sinks or hits)[:3]],
         })
@@ -263,19 +347,30 @@ def beats(data: dict) -> list[dict]:
             lines = []
             for order in orders:
                 name = FORMATION_CN.get(order["formation_id"], order["formation_id"])
-                lines.append(f"→ {name}：「{quote(order['text'], 70)}」")
+                delivery = "当面交办" if _order_was_in_person(data, order["text"]) else "经电报"
+                lines.append(f"总指挥 → {name}（{delivery}）：「{quote(order['text'], 64)}」")
+            sent_reports = [report for report in data["_reports"]
+                            if report.get("reporting_formation_id", "").startswith(side)
+                            and report.get("issued_turn") == turn]
             for row in decisions:
                 name = FORMATION_CN.get(row["formation_id"], row["formation_id"])
                 age = age_map.get((row["formation_id"], turn))
-                age_text = "情报新鲜" if age in (0, None) else f"手里的图是 {age} 回合前的"
-                lines.append(f"{name}（{age_text}）：{quote(row.get('rationale_summary'), 60)}")
+                age_text = "情报新鲜" if age in (0, None) else f"手里的图是 {age} 回合前"
+                plan = row.get("selected_movement_plan") or "保持"
+                lines.append(f"{name}（{age_text}）机动 {plan}："
+                             f"{quote(row.get('rationale_summary'), 54)}")
+            for report in sent_reports[:2]:
+                writer = FORMATION_CN.get(report["reporting_formation_id"],
+                                          report["reporting_formation_id"])
+                if report.get("report_text"):
+                    lines.append(f"{writer} 上报：「{quote(report['report_text'], 56)}」")
             out.append({
                 "id": f"t{turn}_{side}",
                 "chapter": f"第 {turn} 回合",
                 "visual": {"kind": "side", "side": side, "title": f"第 {turn} 回合 · {side_name}",
                            "board": {"turn": turn, "phase": "movement_planning"}},
                 "narration": _side_narration(turn, side, thinking, orders, decisions,
-                                             data, age_map),
+                                             data, age_map, recon),
                 "overlays": [{"text": line, "kind": "order"} for line in lines[:5]],
                 "thinking": quote(thinking, 220),
             })
@@ -287,9 +382,11 @@ def beats(data: dict) -> list[dict]:
             "visual": {"kind": "compare", "title": f"第 {turn} 回合末 · 三种海图",
                        "board": {"turn": turn, "phase": "fire_end"},
                        "labels": ["上帝视角（真值）", "日方所见", "美方所见"]},
-            "narration": _compare_narration(turn, data, age_map),
+            "narration": _compare_narration(turn, data, age_map, recon),
             "overlays": [],
         })
+
+    emit_quiet(quiet_run)
 
     # ---------------------------------------------------------------- analysis
     substitution_count = len(data.get("substitutions", []))
@@ -360,6 +457,60 @@ def beats(data: dict) -> list[dict]:
     return out
 
 
+
+def _hex_distance(a: dict, b: dict) -> int:
+    """Distance in hexes between two recorded positions (axial coordinates)."""
+    dq = int(a["q"]) - int(b["q"])
+    dr = int(a["r"]) - int(b["r"])
+    return int((abs(dq) + abs(dr) + abs(dq + dr)) / 2)
+
+
+def turn_recon(data: dict, turn: int) -> dict:
+    """Per side, per turn: what it sees, and how close the unseen enemy is.
+
+    This is the measurement the documentary is built on.  "The commander sees two ships"
+    is a fact; "the enemy's main body is three hexes from his van and he cannot see it" is
+    the fact that makes the information game visible.
+    """
+    view = next((row for row in data.get("three_views", []) if row["turn"] == turn), None)
+    if view is None:
+        return {}
+    god = view["god"]["ships"]
+    out: dict[str, dict] = {}
+    for side in ("axis", "allies"):
+        own = [row for row in god.values() if row["side"] == side and not row["sunk"]]
+        foes = [row for row in god.values() if row["side"] != side and not row["sunk"]]
+        seen_ids: set[str] = set()
+        for observation in view["sides"].get(side, {}).get("formations", {}).values():
+            for contact in observation.get("local_contacts") or []:
+                if contact.get("ship_id"):
+                    seen_ids.add(contact["ship_id"])
+        unseen = [row for row in foes if row.get("ship_id", "") not in seen_ids]
+        closest_unseen = None
+        if own and unseen:
+            distances = [
+                _hex_distance(ship, foe)
+                for ship in own if ship.get("q") is not None
+                for foe in unseen if foe.get("q") is not None
+            ]
+            closest_unseen = min(distances) if distances else None
+        out[side] = {
+            "own_ships": len(own),
+            "visible_enemies": len([row for row in foes if row.get("ship_id") in seen_ids]) or len(seen_ids),
+            "total_enemies": len(foes),
+            "closest_unseen_hexes": closest_unseen,
+        }
+    return out
+
+
+def _order_was_in_person(data: dict, text: str) -> bool:
+    for message in data.get("messages", []):
+        payload = message.get("payload") or {}
+        if payload.get("order_text") == text:
+            return bool(payload.get("delivered_in_person"))
+    return False
+
+
 def _formation_rows(data: dict) -> list[dict]:
     """Per-formation identity, from the reconstructed board rather than guessed."""
     rows: list[dict] = []
@@ -388,24 +539,42 @@ def _side_of(data: dict, formation_id: str) -> str:
     return "axis" if formation_id.startswith("axis") else "allies"
 
 
-def _truth_narration(turn: int, hits: list[dict], sinks: list[dict], facts: list[dict]) -> str:
+def _truth_narration(turn: int, hits: list[dict], sinks: list[dict], facts: list[dict],
+                     recon: dict) -> str:
     if turn == 1:
         return ("第一回合，双方仍在接近。海图上两支舰队隔着十几海里并行，"
                 "没有接触，没有交火，只有航向和速度。")
-    parts = [f"第 {turn} 回合，真实态势。" ]
+    parts = [f"第 {turn} 回合，真实态势。"]
     if hits:
         parts.append(f"炮击结果 {len(hits)} 条：{quote(hits[0]['message'], 46)}")
     if sinks:
         parts.append("有舰沉没：" + "；".join(quote(event["message"], 30) for event in sinks[:2]))
     if not hits and not sinks:
-        parts.append("这一回合没有新的命中，双方仍在调整阵位。")
+        # "nothing happened" is still a situation, and the situation is what to describe.
+        axis, allies = recon.get("axis"), recon.get("allies")
+        if axis and allies:
+            parts.append(
+                f"这一回合没有新的命中。日方 {axis['own_ships']} 艘在航，"
+                f"美方 {allies['own_ships']} 艘在航，双方仍在抢占阵位。"
+            )
+        else:
+            parts.append("这一回合没有新的命中，双方仍在调整阵位。")
     return "".join(parts)
 
 
 def _side_narration(turn: int, side: str, thinking: str, orders: list[dict],
-                    decisions: list[dict], data: dict, age_map: dict) -> str:
+                    decisions: list[dict], data: dict, age_map: dict, recon: dict) -> str:
+    """What this side knew, what it ordered, and what it did not know.
+
+    The last clause is the documentary's point: a commander's own picture is reported
+    next to what was actually out there.
+    """
     side_name = SIDE_CN[side]
+    side_recon = recon.get(side) or {}
     head = f"{side_name}的指挥链，第 {turn} 回合。"
+    if side_recon:
+        head += (f"此刻他们只看得到 {side_recon.get('visible_enemies', 0)} 艘敌舰，"
+                 f"海图上却有 {side_recon.get('total_enemies', 0)} 艘。")
     if orders:
         head += f"总指挥发出 {len(orders)} 道命令。"
     else:
@@ -415,16 +584,29 @@ def _side_narration(turn: int, side: str, thinking: str, orders: list[dict],
         stale = [age for age in ages if isinstance(age, int) and age > 0]
         if stale:
             head += f"下属编队手里最新的一份报告，最久的已经 {max(stale)} 个回合没有更新。"
-        head += f"这些编队各自做了 {len(decisions)} 个决定。"
+        quoted = next((row.get("rationale_summary") for row in decisions
+                       if speakable(row.get("rationale_summary"))), "")
+        if quoted:
+            head += "有编队指挥的判断是：" + quote(quoted, 46)
     if thinking:
-        head += "总指挥的判断是：" + quote(thinking, 90)
+        head += "总指挥自己在想：" + quote(thinking, 44)
     return head
 
 
-def _compare_narration(turn: int, data: dict, age_map: dict) -> str:
-    return (f"第 {turn} 回合结束时，三张海图摆在一起。左边是真实的位置；"
-            "中间和右边，是两位总指挥此刻各自相信的位置。"
-            "差距就是这一局真正的战场——不是船与船之间，而是图与图之间。")
+def _compare_narration(turn: int, data: dict, age_map: dict, recon: dict) -> str:
+    axis, allies = recon.get("axis") or {}, recon.get("allies") or {}
+    gap = ""
+    if axis and allies:
+        gap = (f"日方看得到 {axis.get('visible_enemies', 0)} 艘，"
+               f"美方看得到 {allies.get('visible_enemies', 0)} 艘；")
+        nearest = [value for value in
+                   (axis.get("closest_unseen_hexes"), allies.get("closest_unseen_hexes"))
+                   if isinstance(value, int)]
+        if nearest:
+            gap += f"而距离他们最近的、还没被看见的敌舰只有 {min(nearest)} 格。"
+    return (f"第 {turn} 回合结束时，三张海图摆在一起。{gap}"
+            "左边是真实的位置，中间和右边是两位总指挥此刻各自相信的位置。"
+            "这一局真正的战场不在船与船之间，而在图与图之间。")
 
 
 def _delay_bars(data: dict) -> list[dict]:

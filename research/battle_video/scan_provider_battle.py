@@ -1,0 +1,309 @@
+"""Leakage scan for a *provider-run* battle: every prompt against what it was entitled to.
+
+The earlier battle was served by a file bridge, so its record was a directory of request
+files.  This one calls the provider directly, so its record is ``calls.jsonl`` - one line
+per model round trip with the prompt, the reply and the reasoning.  The check is the same
+question asked of a different shape:
+
+    a model may be told only what its own command could legitimately know
+
+Concretely, for this battle's two prompt shapes:
+
+* a **formation** prompt may name an enemy ship only if that formation's own ships had
+  sighted it (cumulatively, by that turn) - it is the formation's own observation and
+  nothing else;
+* a **fleet** prompt may name an enemy ship only if (a) the ship was sighted by the
+  formation the commander sails in, or (b) it was named in a *report body* written by a
+  formation that had sighted it.  That second clause is the reporting chain doing its
+  job, and it is exactly where a leak would hide: "reporting up" must not become
+  "leaking up".
+
+The sighting bound is reconstructed by replaying the battle from ``orders.jsonl``, which
+is faithful because the record keeps every order batch the engine accepted (see
+``replay_battle.py --verify``).
+
+Positive control: the same scanner is run with an enemy id injected into a real prompt
+that had never sighted it, and it must report it.  A check that cannot fail is not
+evidence - that lesson is why this file exists in this shape.
+
+Usage::
+
+    .venv/bin/python research/battle_video/scan_provider_battle.py --battle battle_em01
+    .venv/bin/python research/battle_video/scan_provider_battle.py --battle battle_em01 --self-test
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT / "backend" / "src"))
+sys.path.insert(0, str(HERE))
+
+from iron_bottom_sound.engine import ORDER_PHASES, IronBottomEngine  # noqa: E402
+from iron_bottom_sound.models import GameOptions, OrderBatch, Phase, Side  # noqa: E402
+from iron_bottom_sound.realistic_command import default_setup_orders  # noqa: E402
+from replay_battle import load_orders  # noqa: E402
+
+BATTLE_ROOT = ROOT / "research" / "command_delay"
+
+
+def signatures_for(state) -> dict[str, dict[str, set[str]]]:
+    """Every way an enemy ship can be named in text, by formation, right now.
+
+    Both the id (``IBS-U-USN-ERMA-IOWA``) and the display name run through the same
+    bound: a model that writes "衣阿华" has leaked exactly as much as one that writes
+    the id.
+    """
+    out: dict[str, dict[str, set[str]]] = {}
+    for side in Side:
+        for formation in state.formations.values():
+            if formation.side is not side or formation.status == "dissolved":
+                continue
+            positions = [
+                state.ships[ship_id].position for ship_id in formation.ship_ids
+                if ship_id in state.ships and state.ships[ship_id].position is not None
+                and not state.ships[ship_id].sunk
+                and state.ships[ship_id].command_status == "attached"
+            ]
+            ids: set[str] = set()
+            names: set[str] = set()
+            if positions:
+                for ship in state.ships.values():
+                    if ship.side is side or ship.position is None or ship.sunk:
+                        continue
+                    if state._visible_to(ship, side, positions):
+                        ids.add(ship.id)
+                        if ship.name:
+                            names.add(ship.name)
+            out[formation.id] = {"ids": ids, "names": names}
+    return out
+
+
+def replay_sightings(battle_dir: Path) -> tuple[dict[int, dict[str, dict]], dict[int, list[dict]]]:
+    """Replay the battle and record, per turn, how each formation saw the enemy.
+
+    Returns ``(cumulative, turn_snapshots)``: what each formation had ever sighted by
+    that turn, and - per turn - the report bodies that were in flight.
+    """
+    battle = json.loads((battle_dir / "battle_data.json").read_text(encoding="utf-8"))
+    orders = load_orders(battle_dir)
+    engine = IronBottomEngine()
+    state = engine.reset(battle.get("scenario", "IBS-S-EM-01"), int(battle["seed"]), GameOptions(
+        realistic_command=True, command_delay_mode=True,
+    ))
+    for side in Side:
+        engine.submit_orders(state.game_id, OrderBatch(
+            side=side, phase=Phase.FORMATION_SETUP,
+            formation_setup=default_setup_orders(state, side),
+        ))
+    engine.advance(state.game_id)
+
+    cumulative: dict[str, dict[str, set[str]]] = {}
+    by_turn: dict[int, dict[str, dict]] = {}
+    steps = 0
+    while state.phase is not Phase.COMPLETE and steps < 2000:
+        steps += 1
+        if state.phase in ORDER_PHASES:
+            for side in Side:
+                if side.value in state.submitted_orders:
+                    continue
+                batch = orders.get((state.turn, state.phase.value, side.value))
+                if batch is None:
+                    raise SystemExit(f"missing recorded batch for {(state.turn, state.phase.value, side.value)}")
+                assert engine.submit_orders(state.game_id, batch).valid
+        engine.advance(state.game_id)
+        snapshot = signatures_for(state)
+        for formation_id, payload in snapshot.items():
+            holder = cumulative.setdefault(formation_id, {"ids": set(), "names": set()})
+            holder["ids"] |= payload["ids"]
+            holder["names"] |= payload["names"]
+        by_turn[state.turn] = {
+            formation_id: {"ids": set(payload["ids"]), "names": set(payload["names"])}
+            for formation_id, payload in snapshot.items()
+        }
+    return cumulative, by_turn
+
+
+def mentions(text: str, signatures: dict[str, set[str]]) -> set[str]:
+    found = {ship_id for ship_id in signatures["ids"] if ship_id in text}
+    found |= {name for name in signatures["names"] if name and name in text}
+    return found
+
+
+def scan(battle_dir: Path) -> dict:
+    battle = json.loads((battle_dir / "battle_data.json").read_text(encoding="utf-8"))
+    calls = [json.loads(line) for line in (battle_dir / "calls.jsonl").read_text(
+        encoding="utf-8").splitlines() if line.strip()]
+    cumulative, by_turn = replay_sightings(battle_dir)
+    reports = {row["message_id"]: row for row in battle.get("messages", [])}
+
+    all_enemy: dict[str, set[str]] = {"ids": set(), "names": set()}
+    for payload in cumulative.values():
+        all_enemy["ids"] |= payload["ids"]
+        all_enemy["names"] |= payload["names"]
+
+    findings: list[str] = []
+    scanned = 0
+    for call in calls:
+        if call.get("transport_error"):
+            continue
+        prompt = json.dumps(call.get("prompt") or {}, ensure_ascii=False, default=str)
+        scanned += 1
+        role = call.get("role")
+        side = call.get("side")
+        # Which formation is asking?  The formation prompt names it; the fleet prompt
+        # does not, so the fleet's allowance is assembled below from its own formation
+        # plus the reports it was sent.
+        formation_id = None
+        match = re.search(r'"formation_id":\s*"([^"]+)"', prompt)
+        if role == "formation" and match:
+            formation_id = match.group(1)
+
+        allowed_ids: set[str] = set()
+        allowed_names: set[str] = set()
+        if role == "formation" and formation_id in cumulative:
+            allowed_ids = set(cumulative[formation_id]["ids"])
+            allowed_names = set(cumulative[formation_id]["names"])
+        elif role == "fleet":
+            # its own formation's sightings (it is embarked) ...
+            embarked = [
+                formation.id for formation in battle.get("three_views", [{}])[0]
+                .get("sides", {}).get(side, {}).get("fleet", {}).get("embarked", {}).get("ship_ids", [])
+            ]
+            own_formation = next(
+                (item for item in cumulative
+                 if item.startswith(f"{side}-") and _is_embarked(battle, item, side)), None,
+            )
+            if own_formation:
+                allowed_ids |= cumulative[own_formation]["ids"]
+                allowed_names |= cumulative[own_formation]["names"]
+            # ... plus every report body it holds, bounded by the reporter's own sights
+            for report in battle.get("messages", []):
+                body = (report.get("payload") or {}).get("report_text") or ""
+                reporter = ((report.get("payload") or {}).get("report") or {}).get(
+                    "reporting_formation_id")
+                if not body or not reporter or reporter not in cumulative:
+                    continue
+                allowed_ids |= mentions(body, cumulative[reporter])
+                allowed_names |= {
+                    name for name in cumulative[reporter]["names"] if name and name in body
+                }
+
+        leaked = mentions(prompt, all_enemy) - allowed_ids - allowed_names
+        if leaked:
+            findings.append(
+                f"{role} {side} turn-prompt names {sorted(leaked)} with no legitimate "
+                f"source (formation={formation_id})"
+            )
+
+    payload = {
+        "battle": str(battle_dir.relative_to(ROOT)),
+        "calls_scanned": scanned,
+        "calls_total": len(calls),
+        "report_bodies_seen": sum(1 for report in battle.get("messages", [])
+                                  if (report.get("payload") or {}).get("report_text")),
+        "findings": findings,
+        "verdict": "PASS" if not findings else "FAIL",
+    }
+    return payload
+
+
+def _is_embarked(battle: dict, formation_id: str, side: str) -> bool:
+    for view in battle.get("three_views", []):
+        payload = view.get("sides", {}).get(side, {})
+        fleet = payload.get("fleet", {})
+        if fleet.get("embarked_formation_id") == formation_id:
+            return True
+    return False
+
+
+def self_test(battle_dir: Path) -> dict:
+    """Inject an enemy identifier a real prompt was never entitled to, and catch it."""
+    battle = json.loads((battle_dir / "battle_data.json").read_text(encoding="utf-8"))
+    calls = [json.loads(line) for line in (battle_dir / "calls.jsonl").read_text(
+        encoding="utf-8").splitlines() if line.strip()]
+    cumulative, _ = replay_sightings(battle_dir)
+    victim = next((call for call in calls
+                   if call.get("role") == "formation" and not call.get("transport_error")), None)
+    if victim is None:
+        return {"verdict": "FAIL", "reason": "no formation call to inject into"}
+
+    prompt_text = json.dumps(victim.get("prompt") or {}, ensure_ascii=False, default=str)
+    formation_id = re.search(r'"formation_id":\s*"([^"]+)"', prompt_text)
+    formation_id = formation_id.group(1) if formation_id else ""
+    seen = cumulative.get(formation_id, {"ids": set(), "names": set()})
+    never = sorted(
+        ship_id for ship_id in _enemy_ids(battle)
+        if ship_id not in seen["ids"] and ship_id not in prompt_text
+    )
+    if not never:
+        return {"verdict": "FAIL", "reason": "every enemy id is already visible to this formation"}
+
+    injected = never[0]
+    poisoned = dict(victim)
+    poisoned["prompt"] = {**(victim.get("prompt") or {}), "order_text": f"侦察发现 {injected}"}
+    baseline = _scan_calls([victim], battle, cumulative)
+    after = _scan_calls([poisoned], battle, cumulative)
+    caught = any(injected in finding for finding in after)
+    return {
+        "injected_into": f"{formation_id} ({victim.get('side')})",
+        "injected_enemy_id": injected,
+        "baseline_findings": len(baseline),
+        "findings_after_injection": len(after),
+        "injection_caught": caught,
+        "verdict": "PASS" if caught and not baseline else "FAIL",
+    }
+
+
+def _enemy_ids(battle: dict) -> list[str]:
+    ships = {}
+    for view in battle.get("three_views", [])[:1]:
+        ships.update(view["god"]["ships"])
+    return [ship_id for ship_id, row in ships.items()]
+
+
+def _scan_calls(calls: list[dict], battle: dict, cumulative: dict) -> list[str]:
+    """The scan body, reusable for the self-test's poisoned call list."""
+    findings: list[str] = []
+    all_enemy = {"ids": set(), "names": set()}
+    for payload in cumulative.values():
+        all_enemy["ids"] |= payload["ids"]
+        all_enemy["names"] |= payload["names"]
+    for call in calls:
+        prompt = json.dumps(call.get("prompt") or {}, ensure_ascii=False, default=str)
+        role = call.get("role")
+        formation_id = None
+        match = re.search(r'"formation_id":\s*"([^"]+)"', prompt)
+        if role == "formation" and match:
+            formation_id = match.group(1)
+        allowed = set()
+        if role == "formation" and formation_id in cumulative:
+            allowed = cumulative[formation_id]["ids"] | cumulative[formation_id]["names"]
+        leaked = mentions(prompt, all_enemy) - allowed
+        if leaked:
+            findings.append(f"{role}: {sorted(leaked)}")
+    return findings
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--battle", default="battle_em01")
+    parser.add_argument("--self-test", action="store_true")
+    args = parser.parse_args()
+    battle_dir = args.battle if Path(args.battle).is_absolute() else BATTLE_ROOT / args.battle
+
+    payload = self_test(battle_dir) if args.self_test else scan(battle_dir)
+    name = "leak_self_test.json" if args.self_test else "leak_scan.json"
+    (battle_dir / name).write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n",
+                                   encoding="utf-8")
+    print(json.dumps(payload, ensure_ascii=False, indent=1))
+    return 0 if payload["verdict"] == "PASS" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
