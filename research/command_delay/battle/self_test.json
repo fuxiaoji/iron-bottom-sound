@@ -1,0 +1,19 @@
+{
+ "baseline_findings": 0,
+ "enemy_fleet_order": {
+  "injected": "你部自T14向西接敌 勿离阵单追驱逐舰 吹雪在R16—R17 我编队据2回合前位置V12向西北压上夹击 火力优先敌巡洋舰",
+  "caught": true,
+  "findings": 6
+ },
+ "enemy_decision_prose": {
+  "injected": "1S4S转向北占据其航路前方北侧 下回合保持航向6右舷集火青叶 仅发SITREP通报转向以防与友邻第2编队航路混淆 以整",
+  "caught": true,
+  "findings": 13
+ },
+ "enemy_message_ledger_entry": {
+  "injected": "MSG-00002",
+  "caught": true,
+  "findings": 2
+ },
+ "verdict": "PASS"
+}

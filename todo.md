@@ -8,13 +8,23 @@
 > - `havedone.md` = **只追加**的完成记录（含测试、证据、提交哈希）。
 > **规则**：任务完成后**不在此处保留长期历史** —— 把证据写入 `havedone.md` 与 `PROGRESS.md`，然后从活动区移走。
 
-**最后更新**：2026-09-18
+**最后更新**：2026-09-22
 
 ---
 
 ## 活动任务
 
-当前**无进行中任务**；下一批工作见下方「待办」，但其中多条被槽位阻塞（见 T-4）。
+**CD-12（命令延迟模式 LLM 对 LLM 实机对战 + 战报）：已完成**，证据见 `havedone.md` 2026-09-22 条与
+`research/command_delay/battle/REPORT.md`（1082 行、28 配图）。
+
+**待 PI 裁决的两项新发现**（本轮只登记未改，因改动会使冻结模式的黄金基线漂移）：
+
+| 编号 | 内容 | 建议 |
+|---|---|---|
+| T-18 | **CD12-F3**：代理确认不进报文台账（`MessageKind.ACKNOWLEDGEMENT` 分支直接 return，`CommandMessage.acknowledged_turn` 全仓库无写入点）；`MissionOrder.confirmed_turn` 把"送达"当"确认" | 若要修：在代理回复带 `acknowledgement=True` 时回写台账确认回合 + 发事件，需重冻结命令延迟模式的黄金基线并在 `GOLDEN_INDEX.json` 记录归因 |
+| T-19 | **CD12-F4**：代理的 `report_actions` 不接线，不生成/不改变任何报文；68 条接触报告全部由 `draft_reports` 自动起草 | 若要修：把代理报告动作接成 `draft_reports` 的输入（何时/向谁/报告什么），属新机制而非修 bug，建议单列一批 |
+
+其余待办仍按下方流水线顺序，多条被槽位阻塞（见 T-4）。
 
 ## 待办（按流水线强制顺序）
 

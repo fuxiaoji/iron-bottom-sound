@@ -1,5 +1,46 @@
 {
- "agent_prompts_scanned": 22,
+ "battle": "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/research/command_delay/battle",
+ "request_files_scanned": 25,
+ "provenance_strings": {
+  "decisions": 19,
+  "fleet_orders": 2
+ },
+ "content_provenance": {
+  "findings": [],
+  "tokens_examined": 4760,
+  "tokens_with_provenance": 452
+ },
+ "message_ledger": {
+  "findings": []
+ },
+ "field_ownership": {
+  "findings": []
+ },
+ "identity": {
+  "findings": [],
+  "first_sighting_turn": {
+   "axis": {
+    "IBS-U-USN-BOISE": 1,
+    "IBS-U-USN-BUCHANAN": 1,
+    "IBS-U-USN-DUNCAN": 1,
+    "IBS-U-USN-FARENHOLT": 1,
+    "IBS-U-USN-HELENA": 1,
+    "IBS-U-USN-LAFFEY": 1,
+    "IBS-U-USN-MCCALLA": 1,
+    "IBS-U-USN-SALT-LAKE-CITY": 1,
+    "IBS-U-USN-SAN-FRANCISCO": 1
+   },
+   "allies": {
+    "IBS-U-IJN-AOBA": 1,
+    "IBS-U-IJN-FUBUKI": 1,
+    "IBS-U-IJN-FURUTAKA": 1,
+    "IBS-U-IJN-HATSUYUKI": 1,
+    "IBS-U-IJN-KINUGASA": 1
+   }
+  },
+  "vacuous_in_this_scenario": true,
+  "note": "Every enemy hull is inside optical range from turn 1, so this test cannot fail on this scenario; it is reported for completeness, not as evidence. The content-provenance check is the one with teeth here."
+ },
  "findings": [],
  "verdict": "PASS"
 }

@@ -22,3 +22,16 @@ metadata:
 5. **命令延迟类事件必须带 `secret_side`**：初始化事件曾一次性泄漏双方指挥链。
 6. **`engine.py` 里 `set[frozenset]` 的遍历是既有雷区**（CD0-F1）：同函数内骰点路径已修、友舰解冲突路径曾漏修。新增任何碰撞/分组逻辑都要用规范排序键。
 7. 本地视图的接触必须来自**本编队自身舰只**的可见性；地平线取请求方自身视距（曾误取双方较小值）。
+
+## CD-12：LLM 对 LLM 实机对战（2026-09-22）
+
+- **可运行入口**：`research/command_delay/llm_vs_llm.py`（桥接驱动，`--battle DIR`）+ `.zcode/workflow-drafts/命令延迟模式-LLM-对战.dwf.ts`（ZCode 子代理服务循环）。战报：`research/command_delay/generate_battle_md.py`（→ `battle/REPORT.md`）；配图裁剪：`crop_battle_images.py`；泄露核验：`scan_battle_leakage.py`（`--self-test` 跑正对照）。
+- **实机结论**：25 次子代理调用 0 超时；平局（axis 8 / allies 5）；**代理机动方案执行率 7/12**——5 个阵营回合的批次被引擎整批驳回后回退确定性指挥官（`cannot follow guide trail before advancing` / `speed N is outside member limits` / `cannot reverse 180 degrees` / `forced movement prevents formation following`）。**引用本局"多智能体协作"结论时必须带上这个折扣。**
+- **命令延迟实证**：舰队总指挥 T3 写的命令经 TBS +1 回合，编队 T4 才读到；72 条报文里 55 条同回合、13 条跨回合、4 条停战时仍在队列。
+
+**为什么这些坑要记住**：
+
+1. **"不可能失败的检查"不是证据。** 旧泄漏判据是"提示词是否含未见过的敌方舰名"——IBS-S-01 双方自 T1 起全在光学距离内（轴心可见 9/9 美舰、同盟可见 5/5 日舰），该检查永不可能 FAIL；更糟的是它扫的 `agent_log` 里**没有 `prompt` 字段**，实际在扫空字典，却报了 PASS。**任何 PASS 都要先问"它在什么情况下会 FAIL"，并跑一次注入本局真实字符串的正对照。**
+2. **文本泄露要看出处，不是身份。** 可判定的判据是：提示词里每个特征串都必须对读者有合法出处（自己编队更早回合 / 已投递给它的舰队命令）；敌方文字、友邻编队决策文字、任何晚于当时的回合文字都非法（第三条同时抓"敌方计划泄露"与"预知未来"）。
+3. **跨阵营缺陷有两层**：命令批次层（`formation_orders` 未按阵营过滤 → 引擎每回合拒收，静默回退，代理方案从未执行）与优先级层（`gunnery_batch` 未过滤 `local_directives` → 一方火力权重进对手选择器）。**"引擎拒收"会把真正的 bug 伪装成"代理不听话"**——所以驱动必须把 rejection 记成 substitution 并在战报里披露执行率。
+4. **两种"没接线"**（CD12-F3 确认不入台账、CD12-F4 报告动作不生成报文）都属于**改冻结模式语义**，会使黄金回放漂移，按纪律只登记待 PI 裁决，不自行改。

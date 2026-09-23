@@ -978,3 +978,16 @@
 - **合并暴露并修复**：S-08/S-09 默认编队建议自相交（引擎正确拒批）→ `default_setup_orders` 增加去冲突（编队顺序航向 DFS；先转后队，领舰锚点被前队穿过时转前队）。16/16 想定产出可提交初设；基线三想定不受影响（黄金回放未再冻结即 PASS）。另修 `run_audits` data_model 把"空信封"误判失败的过期前提。
 - **最终状态**：全量 **683 通过 / 3 失败 / 2 跳过**，失败集合与合并前逐字节相同（3 项既有）；8/8 审计 PASS；18 局实机矩阵 PASS（9/9 命令延迟 + 9/9 真实对照全部 COMPLETE）；131 项命令延迟测试 129 过/2 跳过。
 - 包更新：sha256 `7d2e3ff9…` 之后重建（见最终输出）。裁决输入存档：`research/command_delay/MERGE_DECISION_INPUT.md`。
+
+## 2026-09-22：命令延迟模式 LLM 对 LLM 实机对战 + 战报（分支 codex/v14-budgeted-replanning）
+
+- **需求（用户）**：「都修复好了用llm对战一把，用延迟模式，观察对局中多agent指挥协作，命令的延迟，子agent对远方命令与当前战局的平衡，一边打一边修，给我一份完整的对战战报，记录agent之间通信细节，战局态势，日志，要md格式，要有配图，测试api用我们当前zcode的子agent系统，注意不要信息泄露」。
+- **对局**：想定 IBS-S-01、seed 20270830、命令延迟模式。双方每个编队各由一个 **ZCode 子代理**指挥（带本地记忆），舰队总指挥也用子代理按自然语言下达任务命令；驱动 `research/command_delay/llm_vs_llm.py` 经请求/响应文件桥接，服务循环是 `.zcode/workflow-drafts/命令延迟模式-LLM-对战.dwf.ts`。**25 次子代理调用、0 超时**，7 回合打完，平局（轴心 8 / 同盟 5 胜利点，胜利点差 <4），友军碰撞 0 次，3 艘沉没。
+- **交付物**：`research/command_delay/battle/REPORT.md`（1082 行，28 张嵌入配图）由 `generate_battle_md.py` 从 `battle_data.json` 生成；同目录含 `requests/`+`responses/`（每次调用的原文与回执）、`images/<game_id>/`（92 张棋盘截图 + 92 张裁剪版）、`driver.log`、`leakage_scan.json`、`self_test.json`。
+- **CD12-F1/F2a/F2b（本局边打边修，已修）**：驱动从未把各回合记录写回 `battle["turns"]`；`command_delay.formation_orders()` 未按阵营过滤，导致**每回合引擎都拒收机动批次**、静默回退确定性指挥官（代理方案全程未执行）；`gunnery_batch()` 未过滤 `local_directives`，使**一方火力优先级进入对手选择器**。修复 commit `91e2f7db`，回归用例 `test_formation_orders_and_gunnery_priorities_never_cross_sides`。污染运行留档 `research/command_delay/battle_contaminated_run1/`（12 条跨阵营 rejection 记录）。
+- **泄漏核验（重写，含方法论订正）**：旧版 `scan_battle_leakage.py` 的判据是「提示词是否含未见过的敌方舰名」——**在本想定上是空转的**：双方自 T1 起就在光学距离内（轴心可见全部 9 艘美舰、同盟可见全部 5 艘日舰），该检查永不可能失败；且它扫的 `agent_log` 里根本没有 `prompt` 字段，实际扫的是空字典。已重写为**内容出处判据**（提示词里每个特征串必须对读者有合法出处；敌方文字、友邻编队决策文字、任何晚于当时的回合文字均非法，同时覆盖跨阵营泄露与"预知未来"）+ **报文台账精确检查**（`received_messages[*].message_id` 必须存在、同阵营、收件人正确，不需重放）。结果：25 条传输记录、4760 个特征串、其中 452 个有出处可溯、**0 违规 PASS**。**正对照**：把本局真实存在的敌方舰队命令原文、敌方决策理由原文、敌方台账条目分别注入一份真实轴心请求 → 三项全部被抓（`--self-test`）。
+- **CD12-F3（新发现，未修，待 PI 决定）**：`MessageKind.ACKNOWLEDGEMENT` 在 `_apply_delivery` 里直接 `return`，`CommandMessage.acknowledged_turn`（`models.py`）**全仓库无任何写入点** → 台账 0 条确认记录，尽管代理 5 次决策明确确认、2 次选择发出 ACKNOWLEDGEMENT；且 `MissionOrder.confirmed_turn` 在送达时即写成送达回合，把"送达"与"确认"合并。改动会动冻结模式语义、使黄金回放基线漂移，故按纪律只登记不改。
+- **CD12-F4（新发现，未修）**：代理逐次选择的 `report_actions`（SITREP/CONTACT_REPORT/ACKNOWLEDGEMENT）只落到本地记忆 `report_sent` 条目与决策记录，**不生成也不改变任何报文**；台账里 68 条接触报告全部由 `draft_reports` 在阶段边界自动起草。即下级上报目前是引擎自动参谋作业，代理还不能决定何时/向谁/报告什么。
+- **代理自主性如实披露（写入战报）**：12 个「回合×阵营」机动批次中 **5 个被引擎整批驳回**并回退确定性指挥官（驳回原因：`cannot follow guide trail before advancing`、`speed 3 is outside member limits`、`cannot reverse 180 degrees`、`forced movement prevents formation following`），只有 7 个执行的是代理方案；另有 4 次首次回复因格式/非法分支名被拒后带错误原因重发并获采纳。**代理方案执行率因此为 7/12，不能按 25 次调用全额记功。**
+- **命令延迟实证**：舰队总指挥（子代理）T3 拟制的两条自然语言命令经 TBS 各 +1 回合，**T4 才被编队读到**；引擎 T2 的初始委派同为 +1 回合；编队自身的接触报告走 TBS 时 +0（同回合）、被排到再加密转报队列时 +2。全 72 条报文中 55 条同回合送达、13 条跨回合、4 条停战时仍在队列。
+- **验证**：8/8 审计 PASS（`run_audits.py` 退出码 0）；全量 pytest 见下条；`REPORT.md` 28 张图链接 0 断链、锚点 0 悬空（脚本核对）。
