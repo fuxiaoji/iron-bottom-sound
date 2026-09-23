@@ -260,3 +260,57 @@ assert 1 == 0
 
 - **`test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter`**：计数器素材实测 sha256 `5c54f8aa…` ≠ 测试硬编码的 `918196c7…`。属素材内容问题，与引擎无关，**改动前即失败**，未处置。
 - **`test_command_delay_mode_shell.py::test_command_delay_rejects_unsupported_scenarios`**：当前可玩想定恰好只有 `SUPPORTED_SCENARIOS` 三个（S-02/S-04 等已编目但不可玩），因此该闸门无法经 `engine.reset` 触发。测试改为直接调用 `command_delay.validate_mode_options`——即 `build_initial_state` 调用的同一函数——并在文档中说明原因，而不是造一个假想定来"跑通"。
+
+---
+
+## CD-12 · 实机 LLM 对 LLM 对战暴露的一批缺陷（2026-09-22）
+
+### CD12-F1 · 驱动从不写回回合记录（已修）
+
+`llm_vs_llm.py` 收集了 `turn_records` 但从未赋值给 `battle["turns"]`，战报的逐回合部分是空的。
+修后每回合的事件、阶段与截图按回合归位。
+
+### CD12-F2a · 编队命令批次不按阵营过滤（已修，最严重）
+
+`command_delay.formation_orders()` 返回该阵营**全部**编队的机动方案……包括对手的。引擎如期
+拒收整批（`Formation movement must cover active formations; extra=['allies-active-heavy', ...]`），
+驱动于是**每个回合、每方**都回退确定性指挥官——**代理方案从头到尾一次都没执行**。
+
+这个缺陷的形状极具欺骗性：表面上"游戏能打、有事件流、有战报"，实际是引擎的合法性闸门
+在替一个越权批次把关，而失败被静默吞成回退。**教训：拒绝必须被记录成 substitution 并在
+战报里披露执行率**，否则"多智能体对战"会以 100% 自主性的姿态呈现，而真实数字是 7/12。
+
+证据留档：`battle_contaminated_run1/battle_data.json` 的 12 条跨阵营 rejection 记录。
+
+### CD12-F2b · 火力优先级不按阵营过滤（已修）
+
+`command_delay.gunnery_batch()` 未过滤 `local_directives`，使**一方的优先级权重进入对手的
+选择器**——这是真正的信息泄露（跨阵营），且会实际改变射击结果。
+
+回归：`tests/test_command_delay_agents_and_memory.py::test_formation_orders_and_gunnery_priorities_never_cross_sides`。
+
+### CD12-F5 · 我的泄漏扫描是空转的（审计缺陷，已重写）
+
+见 `09_LIVE_BATTLE_AND_LEAKAGE_AUDIT.md` §4：旧判据（"是否提到未见过的敌方舰名"）在本想定上
+**不可能 FAIL**，且它遍历的 `agent_log` 条目没有 `prompt` 字段，实际扫的是空字典。已重写为
+内容出处判据 + 报文台账精确检查，并配了用本局真实字符串做的三项注入正对照。
+
+**这是本项目第三次泄漏检查判错**（CD8-F5 过宽 → 过窄 → CD12-F5 不可失败）。前两次是判据
+宽窄问题，这次是**判据的可失败性**问题，性质更严重：一个不可能失败的检查会伪装成证据。
+
+### CD12-F3 · 代理确认不进报文台账（未修，待 PI 裁决）
+
+`MessageKind.ACKNOWLEDGEMENT` 在 `_apply_delivery` 里直接 `return`；
+`CommandMessage.acknowledged_turn`（`models.py`）**全仓库无任何写入点**；且
+`MissionOrder.confirmed_turn` 在送达时即写成送达回合——"送达"与"确认"在台账里被合并。
+本局 0 条确认记录，尽管代理 5 次决策明确确认、2 次选择发出 `ACKNOWLEDGEMENT`。
+
+**未修的原因**：改动会使命令延迟模式的黄金回放基线漂移（确定性代理在有未确认命令时也会
+置 `acknowledgement=True`，因而黄金行会真的漂）。需先在 `GOLDEN_INDEX.json` 记录归因并重冻结。
+
+### CD12-F4 · 代理的报告动作不接线（未修，属新机制）
+
+代理逐次选择 `report_actions`，但只落到本地记忆 `report_sent` 与决策记录；台账里的
+68 条接触报告全部由 `draft_reports` 在阶段边界自动起草。**下级上报目前是引擎的自动参谋作业**，
+代理不能决定何时、向谁、报告什么。这不是 bug 修复而是新机制（让代理的报告意图驱动
+`draft_reports` 的输入），建议单列一批。

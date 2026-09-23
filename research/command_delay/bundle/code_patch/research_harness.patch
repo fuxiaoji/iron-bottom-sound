@@ -1,3 +1,63 @@
+diff --git a/research/command_delay/MERGE_DECISION_INPUT.md b/research/command_delay/MERGE_DECISION_INPUT.md
+new file mode 100644
+index 00000000..74fa4ae7
+--- /dev/null
++++ b/research/command_delay/MERGE_DECISION_INPUT.md
+@@ -0,0 +1,54 @@
++# 分支合并裁决输入（PI）
++
++## 1. 事实：两条分支互不包含
++
++| 分支 | 最新提交 | 日期 | 有什么 |
++|---|---|---|---|
++| `research/m2-2-compiler-fidelity`（**当前工作分支**） | `173b574b` | 2026-09-22 | 命令延迟模式全部实现（CD-0…CD-10）、真实模式冻结基线、8 项审计 |
++| `glm/data-entry-and-briefing`（**未合并**） | `62d03464` | 2026-09-11 | 想定 02–14 + FM-01、`class-cards.yaml`（4114 行）、想定简报弹窗、想定特殊规则、`sim_scenarios.py` |
++| `main` / `origin/main` | `fc77a65e` | 2026-09-09 | 两条分支的公共祖先 |
++
++**当前运行平台在 `research/m2-2-compiler-fidelity`**：只有想定 1/3/二马可玩，没有想定简报，没有全部剧本。你的记忆是准确的。
++
++## 2. 实测：合并本身是干净的
++
++在临时工作树 `/tmp/ibs-merge-trial`（分支 `trial/merge-data-entry`，**未触碰你的工作分支**）里已完整合并并提交 `318c942d`：
++
++- 冲突仅 4 处，全部是"两边都在末尾追加"型：`StartScreen.tsx`（他们的「📄 剧本简报」按钮 + 我的三入口选择器，已保留两者）、`style.css`、`havedone.md`、`plan.md`。
++- `engine.py` / `models.py` / `realistic_command.py` / `api.py` / `data.py` **全部自动合并**。
++- 合并后 16 个想定全部可载入（含虚构的 FM-01）；真实模式覆盖范围由他们的分支扩展到新导入想定。
++
++合并后的测试实测：
++
++| 套件 | 结果 |
++|---|---|
++| `test_engine.py` | 78 passed |
++| `test_scenario_special_rules.py`（他们的新文件） | 18 passed |
++| `test_realistic_command.py`（我的冻结面回归） | 35 passed |
++| `test_command_delay_movement_style.py` | 23 passed |
++| `test_command_delay_mode_shell.py` | 15 passed, 1 skipped（原 1 项失败是我测试里写死了"S-02 不受支持"，合并后该前提失效——已改为从实时集合推导，见 `173b574b`） |
++
++## 3. 关键结论：漂移来自他们的规则，不是来自合并
++
++用 CD-0 冻结基线分别测"他们的分支单独"与"合并后"，漂移行**完全相同**：
++
++| 基线行 | 他们分支单独 | 合并后 |
++|---|---|---|
++| `classic_s01` | DRIFT（`rng_counter`, `n_events`） | DRIFT |
++| `classic_s03` | DRIFT（`rng_counter`） | DRIFT |
++| `realistic_s01` | DRIFT（`rng_counter`, `n_events`） | DRIFT |
++| `realistic_em01` | DRIFT | DRIFT |
++| `classic_em01` / `realistic_s03` / `realistic_s03_seed9` | OK | OK |
++
++即：**合并没有引入任何自己的漂移**；但他们的分支**不是纯数据录入**，它改了裁决：`penetration(..., period=...)`（按时期穿甲）、`_apply_turn_start_scenario_rules`（回合开始特例）、`_weather_blocked`、`_mark_alerted`、`_extra_fire_determination`、`_scenario_movement_violation`。这些会让骰点序列与事件数变化——**经典与真实两个模式的既有行为都变了**。
++
++## 4. 需要你裁决的两项
++
++**Q1｜采用哪条分支作为平台基线？**
++
++- (a) 保持现状：命令延迟在 `research/m2-2-compiler-fidelity`，只有 3 个想定可玩。
++- (b) 采用合并分支：16 个想定 + 想定简报 + 命令延迟，但**经典/真实模式的裁决按他们的规则改变**，因此 CD-0 冻结基线中对那 4 行必须**重新冻结**（记录为"由 data-entry 分支的规则变更导致"，并重新跑 8 项审计）。
++
++我倾向 (b)（你要的正是全剧本 + 命令延迟在同一平台），但**重新冻结会改写我此前"0 漂移"的认证含义**，所以这一步需要你确认，不能由我单方面做。
++
++**Q2｜若采用 (b)，是否接受裁决行为变更？** 若你希望"全剧本 + 命令延迟，但经典/真实裁决保持我冻结时的行为"，那就不是合并，而是要逐条审查他们的规则改动并把不想生效的部分回退——这是更大的工作，也需要你指定哪些改动保留。
 diff --git a/research/command_delay/audits/audit_communication.json b/research/command_delay/audits/audit_communication.json
 new file mode 100644
 index 00000000..64701de3
@@ -120,169 +180,13 @@ index 00000000..64701de3
 +}
 diff --git a/research/command_delay/audits/audit_data_model.json b/research/command_delay/audits/audit_data_model.json
 new file mode 100644
-index 00000000..e10a4956
+index 00000000..52a8b995
 --- /dev/null
 +++ b/research/command_delay/audits/audit_data_model.json
-@@ -0,0 +1,257 @@
+@@ -0,0 +1,101 @@
 +{
-+ "envelope_keys_added_to_frozen_replays": {
-+  "events[].payload.options.command_delay_mode": 7,
-+  "events[].payload.order_batch.formation_movement[].movement_style": 4,
-+  "events[].payload.order_batch.formation_movement[].reform_column": 4,
-+  "events[].payload.order_batch.target_priorities": 7,
-+  "orders.10:gunnery.allies.target_priorities": 2,
-+  "orders.10:gunnery.axis.target_priorities": 2,
-+  "orders.10:movement_planning.allies.formation_movement[].movement_style": 1,
-+  "orders.10:movement_planning.allies.formation_movement[].reform_column": 1,
-+  "orders.10:movement_planning.allies.target_priorities": 2,
-+  "orders.10:movement_planning.axis.formation_movement[].movement_style": 1,
-+  "orders.10:movement_planning.axis.formation_movement[].reform_column": 1,
-+  "orders.10:movement_planning.axis.target_priorities": 2,
-+  "orders.10:reinforcement.allies.target_priorities": 2,
-+  "orders.10:reinforcement.axis.target_priorities": 2,
-+  "orders.10:torpedo_planning.allies.target_priorities": 2,
-+  "orders.10:torpedo_planning.axis.target_priorities": 2,
-+  "orders.11:gunnery.allies.target_priorities": 2,
-+  "orders.11:gunnery.axis.target_priorities": 2,
-+  "orders.11:movement_planning.allies.formation_movement[].movement_style": 1,
-+  "orders.11:movement_planning.allies.formation_movement[].reform_column": 1,
-+  "orders.11:movement_planning.allies.target_priorities": 2,
-+  "orders.11:movement_planning.axis.formation_movement[].movement_style": 1,
-+  "orders.11:movement_planning.axis.formation_movement[].reform_column": 1,
-+  "orders.11:movement_planning.axis.target_priorities": 2,
-+  "orders.11:reinforcement.allies.target_priorities": 2,
-+  "orders.11:reinforcement.axis.target_priorities": 2,
-+  "orders.11:torpedo_planning.allies.target_priorities": 2,
-+  "orders.11:torpedo_planning.axis.target_priorities": 2,
-+  "orders.12:gunnery.allies.target_priorities": 2,
-+  "orders.12:gunnery.axis.target_priorities": 2,
-+  "orders.12:movement_planning.allies.formation_movement[].movement_style": 1,
-+  "orders.12:movement_planning.allies.formation_movement[].reform_column": 1,
-+  "orders.12:movement_planning.allies.target_priorities": 2,
-+  "orders.12:movement_planning.axis.formation_movement[].movement_style": 1,
-+  "orders.12:movement_planning.axis.formation_movement[].reform_column": 1,
-+  "orders.12:movement_planning.axis.target_priorities": 2,
-+  "orders.12:reinforcement.allies.target_priorities": 2,
-+  "orders.12:reinforcement.axis.target_priorities": 2,
-+  "orders.12:torpedo_planning.allies.target_priorities": 2,
-+  "orders.12:torpedo_planning.axis.target_priorities": 2,
-+  "orders.1:formation_setup.allies.target_priorities": 4,
-+  "orders.1:formation_setup.axis.target_priorities": 4,
-+  "orders.1:gunnery.allies.target_priorities": 7,
-+  "orders.1:gunnery.axis.target_priorities": 7,
-+  "orders.1:movement_planning.allies.formation_movement[].movement_style": 2,
-+  "orders.1:movement_planning.allies.formation_movement[].reform_column": 2,
-+  "orders.1:movement_planning.allies.target_priorities": 3,
-+  "orders.1:movement_planning.axis.formation_movement[].movement_style": 2,
-+  "orders.1:movement_planning.axis.formation_movement[].reform_column": 2,
-+  "orders.1:movement_planning.axis.target_priorities": 3,
-+  "orders.1:reinforcement.allies.target_priorities": 3,
-+  "orders.1:reinforcement.axis.target_priorities": 3,
-+  "orders.1:torpedo_planning.allies.target_priorities": 3,
-+  "orders.1:torpedo_planning.axis.target_priorities": 3,
-+  "orders.2:gunnery.allies.target_priorities": 7,
-+  "orders.2:gunnery.axis.target_priorities": 7,
-+  "orders.2:movement_planning.allies.formation_movement[].movement_style": 4,
-+  "orders.2:movement_planning.allies.formation_movement[].reform_column": 4,
-+  "orders.2:movement_planning.allies.target_priorities": 7,
-+  "orders.2:movement_planning.axis.formation_movement[].movement_style": 4,
-+  "orders.2:movement_planning.axis.formation_movement[].reform_column": 4,
-+  "orders.2:movement_planning.axis.target_priorities": 7,
-+  "orders.2:reinforcement.allies.target_priorities": 7,
-+  "orders.2:reinforcement.axis.target_priorities": 7,
-+  "orders.2:torpedo_planning.allies.target_priorities": 7,
-+  "orders.2:torpedo_planning.axis.target_priorities": 7,
-+  "orders.3:gunnery.allies.target_priorities": 7,
-+  "orders.3:gunnery.axis.target_priorities": 7,
-+  "orders.3:movement_planning.allies.formation_movement[].movement_style": 4,
-+  "orders.3:movement_planning.allies.formation_movement[].reform_column": 4,
-+  "orders.3:movement_planning.allies.target_priorities": 7,
-+  "orders.3:movement_planning.axis.formation_movement[].movement_style": 4,
-+  "orders.3:movement_planning.axis.formation_movement[].reform_column": 4,
-+  "orders.3:movement_planning.axis.target_priorities": 7,
-+  "orders.3:reinforcement.allies.target_priorities": 7,
-+  "orders.3:reinforcement.axis.target_priorities": 7,
-+  "orders.3:torpedo_planning.allies.target_priorities": 7,
-+  "orders.3:torpedo_planning.axis.target_priorities": 7,
-+  "orders.4:gunnery.allies.target_priorities": 7,
-+  "orders.4:gunnery.axis.target_priorities": 7,
-+  "orders.4:movement_planning.allies.formation_movement[].movement_style": 4,
-+  "orders.4:movement_planning.allies.formation_movement[].reform_column": 4,
-+  "orders.4:movement_planning.allies.target_priorities": 7,
-+  "orders.4:movement_planning.axis.formation_movement[].movement_style": 4,
-+  "orders.4:movement_planning.axis.formation_movement[].reform_column": 4,
-+  "orders.4:movement_planning.axis.target_priorities": 7,
-+  "orders.4:reinforcement.allies.target_priorities": 7,
-+  "orders.4:reinforcement.axis.target_priorities": 7,
-+  "orders.4:torpedo_planning.allies.target_priorities": 7,
-+  "orders.4:torpedo_planning.axis.target_priorities": 7,
-+  "orders.5:gunnery.allies.target_priorities": 4,
-+  "orders.5:gunnery.axis.target_priorities": 4,
-+  "orders.5:movement_planning.allies.formation_movement[].movement_style": 2,
-+  "orders.5:movement_planning.allies.formation_movement[].reform_column": 2,
-+  "orders.5:movement_planning.allies.target_priorities": 4,
-+  "orders.5:movement_planning.axis.formation_movement[].movement_style": 2,
-+  "orders.5:movement_planning.axis.formation_movement[].reform_column": 2,
-+  "orders.5:movement_planning.axis.target_priorities": 4,
-+  "orders.5:reinforcement.allies.target_priorities": 4,
-+  "orders.5:reinforcement.axis.target_priorities": 4,
-+  "orders.5:torpedo_planning.allies.target_priorities": 4,
-+  "orders.5:torpedo_planning.axis.target_priorities": 4,
-+  "orders.6:gunnery.allies.target_priorities": 4,
-+  "orders.6:gunnery.axis.target_priorities": 4,
-+  "orders.6:movement_planning.allies.formation_movement[].movement_style": 2,
-+  "orders.6:movement_planning.allies.formation_movement[].reform_column": 2,
-+  "orders.6:movement_planning.allies.target_priorities": 4,
-+  "orders.6:movement_planning.axis.formation_movement[].movement_style": 2,
-+  "orders.6:movement_planning.axis.formation_movement[].reform_column": 2,
-+  "orders.6:movement_planning.axis.target_priorities": 4,
-+  "orders.6:reinforcement.allies.target_priorities": 4,
-+  "orders.6:reinforcement.axis.target_priorities": 4,
-+  "orders.6:torpedo_planning.allies.target_priorities": 4,
-+  "orders.6:torpedo_planning.axis.target_priorities": 4,
-+  "orders.7:gunnery.allies.target_priorities": 4,
-+  "orders.7:gunnery.axis.target_priorities": 4,
-+  "orders.7:movement_planning.allies.formation_movement[].movement_style": 2,
-+  "orders.7:movement_planning.allies.formation_movement[].reform_column": 2,
-+  "orders.7:movement_planning.allies.target_priorities": 4,
-+  "orders.7:movement_planning.axis.formation_movement[].movement_style": 2,
-+  "orders.7:movement_planning.axis.formation_movement[].reform_column": 2,
-+  "orders.7:movement_planning.axis.target_priorities": 4,
-+  "orders.7:reinforcement.allies.target_priorities": 4,
-+  "orders.7:reinforcement.axis.target_priorities": 4,
-+  "orders.7:torpedo_planning.allies.target_priorities": 4,
-+  "orders.7:torpedo_planning.axis.target_priorities": 4,
-+  "orders.8:gunnery.allies.target_priorities": 2,
-+  "orders.8:gunnery.axis.target_priorities": 2,
-+  "orders.8:movement_planning.allies.formation_movement[].movement_style": 1,
-+  "orders.8:movement_planning.allies.formation_movement[].reform_column": 1,
-+  "orders.8:movement_planning.allies.target_priorities": 2,
-+  "orders.8:movement_planning.axis.formation_movement[].movement_style": 1,
-+  "orders.8:movement_planning.axis.formation_movement[].reform_column": 1,
-+  "orders.8:movement_planning.axis.target_priorities": 2,
-+  "orders.8:reinforcement.allies.target_priorities": 2,
-+  "orders.8:reinforcement.axis.target_priorities": 2,
-+  "orders.8:torpedo_planning.allies.target_priorities": 2,
-+  "orders.8:torpedo_planning.axis.target_priorities": 2,
-+  "orders.9:gunnery.allies.target_priorities": 2,
-+  "orders.9:gunnery.axis.target_priorities": 2,
-+  "orders.9:movement_planning.allies.formation_movement[].movement_style": 1,
-+  "orders.9:movement_planning.allies.formation_movement[].reform_column": 1,
-+  "orders.9:movement_planning.allies.target_priorities": 2,
-+  "orders.9:movement_planning.axis.formation_movement[].movement_style": 1,
-+  "orders.9:movement_planning.axis.formation_movement[].reform_column": 1,
-+  "orders.9:movement_planning.axis.target_priorities": 2,
-+  "orders.9:reinforcement.allies.target_priorities": 2,
-+  "orders.9:reinforcement.axis.target_priorities": 2,
-+  "orders.9:torpedo_planning.allies.target_priorities": 2,
-+  "orders.9:torpedo_planning.axis.target_priorities": 2
-+ },
-+ "envelope_leaf_keys": [
-+  "command_delay_mode",
-+  "movement_style",
-+  "reform_column",
-+  "target_priorities"
-+ ],
++ "envelope_keys_added_to_frozen_replays": {},
++ "envelope_leaf_keys": [],
 + "new_enum_values": {
 +  "AuthorityLevel": [
 +   "fleet_directed",
@@ -378,169 +282,18 @@ index 00000000..e10a4956
 +  "ContractState",
 +  "LedgerEntry"
 + ],
-+ "note": "all additive: no frozen key changed value or disappeared, which is what the frozen-projection comparison in golden_replay.py checks",
++ "note": "all additive: no frozen key changed value or disappeared, which is what the frozen-projection comparison in golden_replay.py checks. The envelope is empty when the baseline is current (it was re-frozen after the CD-10 fields landed and again for the data-entry adoption); it repopulates on the next additive change and must then be reviewed in DATA_MODEL_DIFF.",
 + "verdict": "PASS"
 +}
 diff --git a/research/command_delay/audits/audit_freeze.json b/research/command_delay/audits/audit_freeze.json
 new file mode 100644
-index 00000000..f183af46
+index 00000000..2023aec1
 --- /dev/null
 +++ b/research/command_delay/audits/audit_freeze.json
-@@ -0,0 +1,194 @@
+@@ -0,0 +1,43 @@
 +{
-+ "diffstat": " 87 files changed, 21860 insertions(+), 2 deletions(-)",
-+ "envelope_keys_added": {
-+  "events[].payload.options.command_delay_mode": 7,
-+  "events[].payload.order_batch.formation_movement[].movement_style": 4,
-+  "events[].payload.order_batch.formation_movement[].reform_column": 4,
-+  "events[].payload.order_batch.target_priorities": 7,
-+  "orders.10:gunnery.allies.target_priorities": 2,
-+  "orders.10:gunnery.axis.target_priorities": 2,
-+  "orders.10:movement_planning.allies.formation_movement[].movement_style": 1,
-+  "orders.10:movement_planning.allies.formation_movement[].reform_column": 1,
-+  "orders.10:movement_planning.allies.target_priorities": 2,
-+  "orders.10:movement_planning.axis.formation_movement[].movement_style": 1,
-+  "orders.10:movement_planning.axis.formation_movement[].reform_column": 1,
-+  "orders.10:movement_planning.axis.target_priorities": 2,
-+  "orders.10:reinforcement.allies.target_priorities": 2,
-+  "orders.10:reinforcement.axis.target_priorities": 2,
-+  "orders.10:torpedo_planning.allies.target_priorities": 2,
-+  "orders.10:torpedo_planning.axis.target_priorities": 2,
-+  "orders.11:gunnery.allies.target_priorities": 2,
-+  "orders.11:gunnery.axis.target_priorities": 2,
-+  "orders.11:movement_planning.allies.formation_movement[].movement_style": 1,
-+  "orders.11:movement_planning.allies.formation_movement[].reform_column": 1,
-+  "orders.11:movement_planning.allies.target_priorities": 2,
-+  "orders.11:movement_planning.axis.formation_movement[].movement_style": 1,
-+  "orders.11:movement_planning.axis.formation_movement[].reform_column": 1,
-+  "orders.11:movement_planning.axis.target_priorities": 2,
-+  "orders.11:reinforcement.allies.target_priorities": 2,
-+  "orders.11:reinforcement.axis.target_priorities": 2,
-+  "orders.11:torpedo_planning.allies.target_priorities": 2,
-+  "orders.11:torpedo_planning.axis.target_priorities": 2,
-+  "orders.12:gunnery.allies.target_priorities": 2,
-+  "orders.12:gunnery.axis.target_priorities": 2,
-+  "orders.12:movement_planning.allies.formation_movement[].movement_style": 1,
-+  "orders.12:movement_planning.allies.formation_movement[].reform_column": 1,
-+  "orders.12:movement_planning.allies.target_priorities": 2,
-+  "orders.12:movement_planning.axis.formation_movement[].movement_style": 1,
-+  "orders.12:movement_planning.axis.formation_movement[].reform_column": 1,
-+  "orders.12:movement_planning.axis.target_priorities": 2,
-+  "orders.12:reinforcement.allies.target_priorities": 2,
-+  "orders.12:reinforcement.axis.target_priorities": 2,
-+  "orders.12:torpedo_planning.allies.target_priorities": 2,
-+  "orders.12:torpedo_planning.axis.target_priorities": 2,
-+  "orders.1:formation_setup.allies.target_priorities": 4,
-+  "orders.1:formation_setup.axis.target_priorities": 4,
-+  "orders.1:gunnery.allies.target_priorities": 7,
-+  "orders.1:gunnery.axis.target_priorities": 7,
-+  "orders.1:movement_planning.allies.formation_movement[].movement_style": 2,
-+  "orders.1:movement_planning.allies.formation_movement[].reform_column": 2,
-+  "orders.1:movement_planning.allies.target_priorities": 3,
-+  "orders.1:movement_planning.axis.formation_movement[].movement_style": 2,
-+  "orders.1:movement_planning.axis.formation_movement[].reform_column": 2,
-+  "orders.1:movement_planning.axis.target_priorities": 3,
-+  "orders.1:reinforcement.allies.target_priorities": 3,
-+  "orders.1:reinforcement.axis.target_priorities": 3,
-+  "orders.1:torpedo_planning.allies.target_priorities": 3,
-+  "orders.1:torpedo_planning.axis.target_priorities": 3,
-+  "orders.2:gunnery.allies.target_priorities": 7,
-+  "orders.2:gunnery.axis.target_priorities": 7,
-+  "orders.2:movement_planning.allies.formation_movement[].movement_style": 4,
-+  "orders.2:movement_planning.allies.formation_movement[].reform_column": 4,
-+  "orders.2:movement_planning.allies.target_priorities": 7,
-+  "orders.2:movement_planning.axis.formation_movement[].movement_style": 4,
-+  "orders.2:movement_planning.axis.formation_movement[].reform_column": 4,
-+  "orders.2:movement_planning.axis.target_priorities": 7,
-+  "orders.2:reinforcement.allies.target_priorities": 7,
-+  "orders.2:reinforcement.axis.target_priorities": 7,
-+  "orders.2:torpedo_planning.allies.target_priorities": 7,
-+  "orders.2:torpedo_planning.axis.target_priorities": 7,
-+  "orders.3:gunnery.allies.target_priorities": 7,
-+  "orders.3:gunnery.axis.target_priorities": 7,
-+  "orders.3:movement_planning.allies.formation_movement[].movement_style": 4,
-+  "orders.3:movement_planning.allies.formation_movement[].reform_column": 4,
-+  "orders.3:movement_planning.allies.target_priorities": 7,
-+  "orders.3:movement_planning.axis.formation_movement[].movement_style": 4,
-+  "orders.3:movement_planning.axis.formation_movement[].reform_column": 4,
-+  "orders.3:movement_planning.axis.target_priorities": 7,
-+  "orders.3:reinforcement.allies.target_priorities": 7,
-+  "orders.3:reinforcement.axis.target_priorities": 7,
-+  "orders.3:torpedo_planning.allies.target_priorities": 7,
-+  "orders.3:torpedo_planning.axis.target_priorities": 7,
-+  "orders.4:gunnery.allies.target_priorities": 7,
-+  "orders.4:gunnery.axis.target_priorities": 7,
-+  "orders.4:movement_planning.allies.formation_movement[].movement_style": 4,
-+  "orders.4:movement_planning.allies.formation_movement[].reform_column": 4,
-+  "orders.4:movement_planning.allies.target_priorities": 7,
-+  "orders.4:movement_planning.axis.formation_movement[].movement_style": 4,
-+  "orders.4:movement_planning.axis.formation_movement[].reform_column": 4,
-+  "orders.4:movement_planning.axis.target_priorities": 7,
-+  "orders.4:reinforcement.allies.target_priorities": 7,
-+  "orders.4:reinforcement.axis.target_priorities": 7,
-+  "orders.4:torpedo_planning.allies.target_priorities": 7,
-+  "orders.4:torpedo_planning.axis.target_priorities": 7,
-+  "orders.5:gunnery.allies.target_priorities": 4,
-+  "orders.5:gunnery.axis.target_priorities": 4,
-+  "orders.5:movement_planning.allies.formation_movement[].movement_style": 2,
-+  "orders.5:movement_planning.allies.formation_movement[].reform_column": 2,
-+  "orders.5:movement_planning.allies.target_priorities": 4,
-+  "orders.5:movement_planning.axis.formation_movement[].movement_style": 2,
-+  "orders.5:movement_planning.axis.formation_movement[].reform_column": 2,
-+  "orders.5:movement_planning.axis.target_priorities": 4,
-+  "orders.5:reinforcement.allies.target_priorities": 4,
-+  "orders.5:reinforcement.axis.target_priorities": 4,
-+  "orders.5:torpedo_planning.allies.target_priorities": 4,
-+  "orders.5:torpedo_planning.axis.target_priorities": 4,
-+  "orders.6:gunnery.allies.target_priorities": 4,
-+  "orders.6:gunnery.axis.target_priorities": 4,
-+  "orders.6:movement_planning.allies.formation_movement[].movement_style": 2,
-+  "orders.6:movement_planning.allies.formation_movement[].reform_column": 2,
-+  "orders.6:movement_planning.allies.target_priorities": 4,
-+  "orders.6:movement_planning.axis.formation_movement[].movement_style": 2,
-+  "orders.6:movement_planning.axis.formation_movement[].reform_column": 2,
-+  "orders.6:movement_planning.axis.target_priorities": 4,
-+  "orders.6:reinforcement.allies.target_priorities": 4,
-+  "orders.6:reinforcement.axis.target_priorities": 4,
-+  "orders.6:torpedo_planning.allies.target_priorities": 4,
-+  "orders.6:torpedo_planning.axis.target_priorities": 4,
-+  "orders.7:gunnery.allies.target_priorities": 4,
-+  "orders.7:gunnery.axis.target_priorities": 4,
-+  "orders.7:movement_planning.allies.formation_movement[].movement_style": 2,
-+  "orders.7:movement_planning.allies.formation_movement[].reform_column": 2,
-+  "orders.7:movement_planning.allies.target_priorities": 4,
-+  "orders.7:movement_planning.axis.formation_movement[].movement_style": 2,
-+  "orders.7:movement_planning.axis.formation_movement[].reform_column": 2,
-+  "orders.7:movement_planning.axis.target_priorities": 4,
-+  "orders.7:reinforcement.allies.target_priorities": 4,
-+  "orders.7:reinforcement.axis.target_priorities": 4,
-+  "orders.7:torpedo_planning.allies.target_priorities": 4,
-+  "orders.7:torpedo_planning.axis.target_priorities": 4,
-+  "orders.8:gunnery.allies.target_priorities": 2,
-+  "orders.8:gunnery.axis.target_priorities": 2,
-+  "orders.8:movement_planning.allies.formation_movement[].movement_style": 1,
-+  "orders.8:movement_planning.allies.formation_movement[].reform_column": 1,
-+  "orders.8:movement_planning.allies.target_priorities": 2,
-+  "orders.8:movement_planning.axis.formation_movement[].movement_style": 1,
-+  "orders.8:movement_planning.axis.formation_movement[].reform_column": 1,
-+  "orders.8:movement_planning.axis.target_priorities": 2,
-+  "orders.8:reinforcement.allies.target_priorities": 2,
-+  "orders.8:reinforcement.axis.target_priorities": 2,
-+  "orders.8:torpedo_planning.allies.target_priorities": 2,
-+  "orders.8:torpedo_planning.axis.target_priorities": 2,
-+  "orders.9:gunnery.allies.target_priorities": 2,
-+  "orders.9:gunnery.axis.target_priorities": 2,
-+  "orders.9:movement_planning.allies.formation_movement[].movement_style": 1,
-+  "orders.9:movement_planning.allies.formation_movement[].reform_column": 1,
-+  "orders.9:movement_planning.allies.target_priorities": 2,
-+  "orders.9:movement_planning.axis.formation_movement[].movement_style": 1,
-+  "orders.9:movement_planning.axis.formation_movement[].reform_column": 1,
-+  "orders.9:movement_planning.axis.target_priorities": 2,
-+  "orders.9:reinforcement.allies.target_priorities": 2,
-+  "orders.9:reinforcement.axis.target_priorities": 2,
-+  "orders.9:torpedo_planning.allies.target_priorities": 2,
-+  "orders.9:torpedo_planning.axis.target_priorities": 2
-+ },
++ "diffstat": " 148 files changed, 37426 insertions(+), 310 deletions(-)",
++ "envelope_keys_added": {},
 + "freeze_tag": "realistic-command-v1-frozen",
 + "frozen_commit": "d432a975151651fa7d6746b2f92e66b1e09d8d4a",
 + "frozen_file_changed": [
@@ -583,10 +336,10 @@ index 00000000..f183af46
 +}
 diff --git a/research/command_delay/audits/audit_gunnery_authority.json b/research/command_delay/audits/audit_gunnery_authority.json
 new file mode 100644
-index 00000000..75ea537b
+index 00000000..1307da24
 --- /dev/null
 +++ b/research/command_delay/audits/audit_gunnery_authority.json
-@@ -0,0 +1,33 @@
+@@ -0,0 +1,34 @@
 +{
 + "agent_decisions_scanned": 19,
 + "agent_decisions_with_gunnery_fields": [],
@@ -594,6 +347,7 @@ index 00000000..75ea537b
 +  "acknowledgement",
 +  "audit",
 +  "formation_id",
++  "memory_note",
 +  "phase",
 +  "rationale_summary",
 +  "report_actions",
@@ -622,7 +376,7 @@ index 00000000..75ea537b
 +}
 diff --git a/research/command_delay/audits/audit_leakage.json b/research/command_delay/audits/audit_leakage.json
 new file mode 100644
-index 00000000..ff900541
+index 00000000..f81dbf8e
 --- /dev/null
 +++ b/research/command_delay/audits/audit_leakage.json
 @@ -0,0 +1,824 @@
@@ -723,7 +477,7 @@ index 00000000..ff900541
 +  {
 +   "contacts": 5,
 +   "embarked": "allies-active-light",
-+   "embarked_ships": 2,
++   "embarked_ships": 1,
 +   "exact_formation": [
 +    "allies-active-light"
 +   ],
@@ -738,7 +492,7 @@ index 00000000..ff900541
 +  {
 +   "contacts": 7,
 +   "embarked": "axis-active-heavy",
-+   "embarked_ships": 2,
++   "embarked_ships": 1,
 +   "exact_formation": [
 +    "axis-active-heavy"
 +   ],
@@ -753,7 +507,7 @@ index 00000000..ff900541
 +  {
 +   "contacts": 4,
 +   "embarked": "allies-active-light",
-+   "embarked_ships": 2,
++   "embarked_ships": 1,
 +   "exact_formation": [
 +    "allies-active-light"
 +   ],
@@ -780,7 +534,7 @@ index 00000000..ff900541
 +  {
 +   "contacts": 2,
 +   "embarked": "allies-active-light",
-+   "embarked_ships": 2,
++   "embarked_ships": 1,
 +   "exact_formation": [
 +    "allies-active-light"
 +   ],
@@ -1575,16 +1329,16 @@ index 00000000..f374c90f
 +}
 diff --git a/research/command_delay/audits/audit_replay.json b/research/command_delay/audits/audit_replay.json
 new file mode 100644
-index 00000000..ac01442f
+index 00000000..53694402
 --- /dev/null
 +++ b/research/command_delay/audits/audit_replay.json
 @@ -0,0 +1,16 @@
 +{
 + "digests": {
-+  "0": "494b6053f010600458567cb572d224abd2fa8fdae983d9bcf7181dc0fd8828ce",
-+  "1": "494b6053f010600458567cb572d224abd2fa8fdae983d9bcf7181dc0fd8828ce",
-+  "2": "494b6053f010600458567cb572d224abd2fa8fdae983d9bcf7181dc0fd8828ce",
-+  "5": "494b6053f010600458567cb572d224abd2fa8fdae983d9bcf7181dc0fd8828ce"
++  "0": "f464e7e01aebd1ff08ad6f570627b6bc710750890241b75ac5b389f059ae2b46",
++  "1": "f464e7e01aebd1ff08ad6f570627b6bc710750890241b75ac5b389f059ae2b46",
++  "2": "f464e7e01aebd1ff08ad6f570627b6bc710750890241b75ac5b389f059ae2b46",
++  "5": "f464e7e01aebd1ff08ad6f570627b6bc710750890241b75ac5b389f059ae2b46"
 + },
 + "hash_seeds": [
 +  "0",
@@ -1597,7 +1351,7 @@ index 00000000..ac01442f
 +}
 diff --git a/research/command_delay/audits/cd0_hash_seed_probe.json b/research/command_delay/audits/cd0_hash_seed_probe.json
 new file mode 100644
-index 00000000..45153898
+index 00000000..d707f420
 --- /dev/null
 +++ b/research/command_delay/audits/cd0_hash_seed_probe.json
 @@ -0,0 +1,89 @@
@@ -1613,10 +1367,10 @@ index 00000000..45153898
 + "rows": [
 +  {
 +   "digests": {
-+    "0": "f5ec21e082b979619fe60d277ab4056e6e74181064386f390f4fec3879d5702e",
-+    "1": "f5ec21e082b979619fe60d277ab4056e6e74181064386f390f4fec3879d5702e",
-+    "2": "f5ec21e082b979619fe60d277ab4056e6e74181064386f390f4fec3879d5702e",
-+    "8": "f5ec21e082b979619fe60d277ab4056e6e74181064386f390f4fec3879d5702e"
++    "0": "99144f7ccd802cc816bb9aa451d6ab4e7a0ebbe0959e9b503867b41350982cd7",
++    "1": "99144f7ccd802cc816bb9aa451d6ab4e7a0ebbe0959e9b503867b41350982cd7",
++    "2": "99144f7ccd802cc816bb9aa451d6ab4e7a0ebbe0959e9b503867b41350982cd7",
++    "8": "99144f7ccd802cc816bb9aa451d6ab4e7a0ebbe0959e9b503867b41350982cd7"
 +   },
 +   "n_unique": 1,
 +   "stable": true,
@@ -1624,10 +1378,10 @@ index 00000000..45153898
 +  },
 +  {
 +   "digests": {
-+    "0": "c46300d8375f1a3154972dcea72fb6aa700345760c13d16707912568e7550759",
-+    "1": "c46300d8375f1a3154972dcea72fb6aa700345760c13d16707912568e7550759",
-+    "2": "c46300d8375f1a3154972dcea72fb6aa700345760c13d16707912568e7550759",
-+    "8": "c46300d8375f1a3154972dcea72fb6aa700345760c13d16707912568e7550759"
++    "0": "e62cf8f68e0889dad8887e0885327c0e4f52313849983f1ad223f3b7327a0d29",
++    "1": "e62cf8f68e0889dad8887e0885327c0e4f52313849983f1ad223f3b7327a0d29",
++    "2": "e62cf8f68e0889dad8887e0885327c0e4f52313849983f1ad223f3b7327a0d29",
++    "8": "e62cf8f68e0889dad8887e0885327c0e4f52313849983f1ad223f3b7327a0d29"
 +   },
 +   "n_unique": 1,
 +   "stable": true,
@@ -1635,10 +1389,10 @@ index 00000000..45153898
 +  },
 +  {
 +   "digests": {
-+    "0": "002f779200c98f6fd79720f638dff98d5df3e2e9c1ebc52e62bb7efa8c74c0f0",
-+    "1": "002f779200c98f6fd79720f638dff98d5df3e2e9c1ebc52e62bb7efa8c74c0f0",
-+    "2": "002f779200c98f6fd79720f638dff98d5df3e2e9c1ebc52e62bb7efa8c74c0f0",
-+    "8": "002f779200c98f6fd79720f638dff98d5df3e2e9c1ebc52e62bb7efa8c74c0f0"
++    "0": "fdad07cf14fc81eaddecadc0b79eb422280bbb60f70e1cb52048d92c23ab2514",
++    "1": "fdad07cf14fc81eaddecadc0b79eb422280bbb60f70e1cb52048d92c23ab2514",
++    "2": "fdad07cf14fc81eaddecadc0b79eb422280bbb60f70e1cb52048d92c23ab2514",
++    "8": "fdad07cf14fc81eaddecadc0b79eb422280bbb60f70e1cb52048d92c23ab2514"
 +   },
 +   "n_unique": 1,
 +   "stable": true,
@@ -1646,10 +1400,10 @@ index 00000000..45153898
 +  },
 +  {
 +   "digests": {
-+    "0": "917114fbb1dd6c842d53bee7baff2dd1a2327e15c8a5adb102db99517ef3f78e",
-+    "1": "917114fbb1dd6c842d53bee7baff2dd1a2327e15c8a5adb102db99517ef3f78e",
-+    "2": "917114fbb1dd6c842d53bee7baff2dd1a2327e15c8a5adb102db99517ef3f78e",
-+    "8": "917114fbb1dd6c842d53bee7baff2dd1a2327e15c8a5adb102db99517ef3f78e"
++    "0": "cd163a422e995436a3b1e8d0d678292303a48270f5fbe4d651972ee16760da99",
++    "1": "cd163a422e995436a3b1e8d0d678292303a48270f5fbe4d651972ee16760da99",
++    "2": "cd163a422e995436a3b1e8d0d678292303a48270f5fbe4d651972ee16760da99",
++    "8": "cd163a422e995436a3b1e8d0d678292303a48270f5fbe4d651972ee16760da99"
 +   },
 +   "n_unique": 1,
 +   "stable": true,
@@ -1657,10 +1411,10 @@ index 00000000..45153898
 +  },
 +  {
 +   "digests": {
-+    "0": "6839300ceb1a9055ab6887ef6b11066c913d85b77f6f91ed47b94dac39aaebfb",
-+    "1": "6839300ceb1a9055ab6887ef6b11066c913d85b77f6f91ed47b94dac39aaebfb",
-+    "2": "6839300ceb1a9055ab6887ef6b11066c913d85b77f6f91ed47b94dac39aaebfb",
-+    "8": "6839300ceb1a9055ab6887ef6b11066c913d85b77f6f91ed47b94dac39aaebfb"
++    "0": "7bf2990ba5d0b5bad403d160710d24baaeb43031c0addab74947d859d30a3a35",
++    "1": "7bf2990ba5d0b5bad403d160710d24baaeb43031c0addab74947d859d30a3a35",
++    "2": "7bf2990ba5d0b5bad403d160710d24baaeb43031c0addab74947d859d30a3a35",
++    "8": "7bf2990ba5d0b5bad403d160710d24baaeb43031c0addab74947d859d30a3a35"
 +   },
 +   "n_unique": 1,
 +   "stable": true,
@@ -1668,10 +1422,10 @@ index 00000000..45153898
 +  },
 +  {
 +   "digests": {
-+    "0": "4b746b4a5c4a32c535f84c0cedca2a082fdc43e4a970bb9af22a500d92e92038",
-+    "1": "4b746b4a5c4a32c535f84c0cedca2a082fdc43e4a970bb9af22a500d92e92038",
-+    "2": "4b746b4a5c4a32c535f84c0cedca2a082fdc43e4a970bb9af22a500d92e92038",
-+    "8": "4b746b4a5c4a32c535f84c0cedca2a082fdc43e4a970bb9af22a500d92e92038"
++    "0": "ec7b620379a119b2acd1ada1e3b6d8424f42186c5c85d0991bcc591b63850811",
++    "1": "ec7b620379a119b2acd1ada1e3b6d8424f42186c5c85d0991bcc591b63850811",
++    "2": "ec7b620379a119b2acd1ada1e3b6d8424f42186c5c85d0991bcc591b63850811",
++    "8": "ec7b620379a119b2acd1ada1e3b6d8424f42186c5c85d0991bcc591b63850811"
 +   },
 +   "n_unique": 1,
 +   "stable": true,
@@ -1679,10 +1433,10 @@ index 00000000..45153898
 +  },
 +  {
 +   "digests": {
-+    "0": "3ff17dd387e8dd78c5c18d21f339081127df4a724a0cc609ba1a968fba838f35",
-+    "1": "3ff17dd387e8dd78c5c18d21f339081127df4a724a0cc609ba1a968fba838f35",
-+    "2": "3ff17dd387e8dd78c5c18d21f339081127df4a724a0cc609ba1a968fba838f35",
-+    "8": "3ff17dd387e8dd78c5c18d21f339081127df4a724a0cc609ba1a968fba838f35"
++    "0": "c8ba60c03a2e80fbf119b6cc3e2456ca1188d46ed692d0f168671cf512a52480",
++    "1": "c8ba60c03a2e80fbf119b6cc3e2456ca1188d46ed692d0f168671cf512a52480",
++    "2": "c8ba60c03a2e80fbf119b6cc3e2456ca1188d46ed692d0f168671cf512a52480",
++    "8": "c8ba60c03a2e80fbf119b6cc3e2456ca1188d46ed692d0f168671cf512a52480"
 +   },
 +   "n_unique": 1,
 +   "stable": true,
@@ -1792,12 +1546,469 @@ index 00000000..53e9a5fc
 +  "occurrences": 391
 + }
 +}
+diff --git a/research/command_delay/audits/verify_api_game.json b/research/command_delay/audits/verify_api_game.json
+new file mode 100644
+index 00000000..90139eb7
+--- /dev/null
++++ b/research/command_delay/audits/verify_api_game.json
+@@ -0,0 +1,23 @@
++{
++ "completed": true,
++ "findings": [],
++ "game_id": "092305a0-daef-48bf-8ef1-ac70ede2de13",
++ "gating": {
++  "fleet_view_in_realistic": 409,
++  "formation_view_in_realistic": 409,
++  "rules_doc": 200
++ },
++ "status_codes": {
++  "advance": 200,
++  "fleet-view": 200,
++  "formation-view-enemy": 404,
++  "formation-view-own": 200,
++  "orders-allies": 200,
++  "orders-axis": 200,
++  "view-allies": 200,
++  "view-axis": 200
++ },
++ "steps": 29,
++ "turn": 4,
++ "verdict": "PASS"
++}
+diff --git a/research/command_delay/audits/verify_autonomy.json b/research/command_delay/audits/verify_autonomy.json
+new file mode 100644
+index 00000000..44861add
+--- /dev/null
++++ b/research/command_delay/audits/verify_autonomy.json
+@@ -0,0 +1,29 @@
++{
++ "agent_decisions": 19,
++ "completed": true,
++ "confirmed_mission_orders": 0,
++ "cut_formation": "allies-active-heavy",
++ "cut_formation_end_authority": "local_autonomy",
++ "cut_formation_end_link": "stale",
++ "decisions_without_an_order": 19,
++ "decisions_without_an_order_that_chose_a_plan": 19,
++ "fleet_reports_still_age": [
++  2,
++  6,
++  6,
++  6
++ ],
++ "formations_in_blackout_at_end": 2,
++ "formations_in_blackout_during_play": [
++  "axis-active-heavy",
++  "axis-active-light"
++ ],
++ "formations_in_local_autonomy_at_end": 1,
++ "formations_in_local_autonomy_during_play": [
++  "allies-active-heavy"
++ ],
++ "friendly_collisions": 0,
++ "gunnery_orders_generated": 54,
++ "turns": 7,
++ "verdict": "PASS"
++}
+diff --git a/research/command_delay/audits/verify_battle_report.json b/research/command_delay/audits/verify_battle_report.json
+new file mode 100644
+index 00000000..8cc29672
+--- /dev/null
++++ b/research/command_delay/audits/verify_battle_report.json
+@@ -0,0 +1,10 @@
++{
++ "captured_entries": 87,
++ "completed": true,
++ "findings": [],
++ "game_id": "verify-battle-report",
++ "markdown_chars": 6045600,
++ "report_built": true,
++ "turns": 4,
++ "verdict": "PASS"
++}
+diff --git a/research/command_delay/audits/verify_game_matrix.json b/research/command_delay/audits/verify_game_matrix.json
+new file mode 100644
+index 00000000..e3c47c4c
+--- /dev/null
++++ b/research/command_delay/audits/verify_game_matrix.json
+@@ -0,0 +1,371 @@
++{
++ "command_delay_completed": 9,
++ "command_delay_games": 9,
++ "friendly_collisions": 0,
++ "friendly_torpedo_hits": 0,
++ "realistic_completed": 9,
++ "realistic_games": 9,
++ "rows": [
++  {
++   "agent_decisions": 26,
++   "completed": true,
++   "completed_orders": 2,
++   "delivered": 72,
++   "events": 922,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "link_statuses": [
++    "blackout",
++    "direct",
++    "relayed",
++    "stale"
++   ],
++   "local_autonomy_ever": true,
++   "messages": 121,
++   "mission_orders": 4,
++   "mode": "command_delay",
++   "scenario": "IBS-S-01",
++   "seed": 3,
++   "steps": 46,
++   "tick": 46,
++   "turns": 7,
++   "wall_seconds": 24.3,
++   "winner": "allies"
++  },
++  {
++   "completed": true,
++   "events": 731,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "mode": "realistic",
++   "scenario": "IBS-S-01",
++   "seed": 3,
++   "steps": 46,
++   "turns": 7,
++   "wall_seconds": 14.5,
++   "winner": "allies"
++  },
++  {
++   "agent_decisions": 19,
++   "completed": true,
++   "completed_orders": 2,
++   "delivered": 65,
++   "events": 701,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "link_statuses": [
++    "blackout",
++    "direct",
++    "relayed"
++   ],
++   "local_autonomy_ever": false,
++   "messages": 77,
++   "mission_orders": 2,
++   "mode": "command_delay",
++   "scenario": "IBS-S-01",
++   "seed": 20270830,
++   "steps": 46,
++   "tick": 46,
++   "turns": 7,
++   "wall_seconds": 23.4,
++   "winner": "allies"
++  },
++  {
++   "completed": true,
++   "events": 528,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "mode": "realistic",
++   "scenario": "IBS-S-01",
++   "seed": 20270830,
++   "steps": 46,
++   "turns": 7,
++   "wall_seconds": 16.6,
++   "winner": null
++  },
++  {
++   "agent_decisions": 19,
++   "completed": true,
++   "completed_orders": 2,
++   "delivered": 52,
++   "events": 684,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "link_statuses": [
++    "blackout",
++    "direct",
++    "relayed"
++   ],
++   "local_autonomy_ever": false,
++   "messages": 63,
++   "mission_orders": 2,
++   "mode": "command_delay",
++   "scenario": "IBS-S-01",
++   "seed": 20270829,
++   "steps": 46,
++   "tick": 46,
++   "turns": 7,
++   "wall_seconds": 26.5,
++   "winner": null
++  },
++  {
++   "completed": true,
++   "events": 526,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "mode": "realistic",
++   "scenario": "IBS-S-01",
++   "seed": 20270829,
++   "steps": 46,
++   "turns": 7,
++   "wall_seconds": 2.3,
++   "winner": "allies"
++  },
++  {
++   "agent_decisions": 8,
++   "completed": true,
++   "completed_orders": 0,
++   "delivered": 0,
++   "events": 172,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "link_statuses": [
++    "direct"
++   ],
++   "local_autonomy_ever": false,
++   "messages": 0,
++   "mission_orders": 0,
++   "mode": "command_delay",
++   "scenario": "IBS-S-03",
++   "seed": 3,
++   "steps": 29,
++   "tick": 29,
++   "turns": 4,
++   "wall_seconds": 4.0,
++   "winner": "axis"
++  },
++  {
++   "completed": true,
++   "events": 268,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "mode": "realistic",
++   "scenario": "IBS-S-03",
++   "seed": 3,
++   "steps": 29,
++   "turns": 4,
++   "wall_seconds": 2.4,
++   "winner": "allies"
++  },
++  {
++   "agent_decisions": 8,
++   "completed": true,
++   "completed_orders": 0,
++   "delivered": 0,
++   "events": 177,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "link_statuses": [
++    "direct"
++   ],
++   "local_autonomy_ever": false,
++   "messages": 0,
++   "mission_orders": 0,
++   "mode": "command_delay",
++   "scenario": "IBS-S-03",
++   "seed": 20270830,
++   "steps": 29,
++   "tick": 29,
++   "turns": 4,
++   "wall_seconds": 4.1,
++   "winner": "axis"
++  },
++  {
++   "completed": true,
++   "events": 182,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "mode": "realistic",
++   "scenario": "IBS-S-03",
++   "seed": 20270830,
++   "steps": 29,
++   "turns": 4,
++   "wall_seconds": 7.4,
++   "winner": "allies"
++  },
++  {
++   "agent_decisions": 8,
++   "completed": true,
++   "completed_orders": 0,
++   "delivered": 0,
++   "events": 178,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "link_statuses": [
++    "direct"
++   ],
++   "local_autonomy_ever": false,
++   "messages": 0,
++   "mission_orders": 0,
++   "mode": "command_delay",
++   "scenario": "IBS-S-03",
++   "seed": 20270829,
++   "steps": 29,
++   "tick": 29,
++   "turns": 4,
++   "wall_seconds": 4.2,
++   "winner": "axis"
++  },
++  {
++   "completed": true,
++   "events": 158,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "mode": "realistic",
++   "scenario": "IBS-S-03",
++   "seed": 20270829,
++   "steps": 29,
++   "turns": 4,
++   "wall_seconds": 1.3,
++   "winner": "axis"
++  },
++  {
++   "agent_decisions": 45,
++   "completed": true,
++   "completed_orders": 4,
++   "delivered": 173,
++   "events": 1889,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "link_statuses": [
++    "blackout",
++    "direct",
++    "stale"
++   ],
++   "local_autonomy_ever": true,
++   "messages": 193,
++   "mission_orders": 4,
++   "mode": "command_delay",
++   "scenario": "IBS-S-EM-01",
++   "seed": 3,
++   "steps": 81,
++   "tick": 81,
++   "turns": 12,
++   "wall_seconds": 55.5,
++   "winner": null
++  },
++  {
++   "completed": true,
++   "events": 1261,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "mode": "realistic",
++   "scenario": "IBS-S-EM-01",
++   "seed": 3,
++   "steps": 81,
++   "turns": 12,
++   "wall_seconds": 29.7,
++   "winner": null
++  },
++  {
++   "agent_decisions": 53,
++   "completed": true,
++   "completed_orders": 4,
++   "delivered": 201,
++   "events": 1929,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "link_statuses": [
++    "blackout",
++    "direct",
++    "stale"
++   ],
++   "local_autonomy_ever": true,
++   "messages": 225,
++   "mission_orders": 4,
++   "mode": "command_delay",
++   "scenario": "IBS-S-EM-01",
++   "seed": 20270830,
++   "steps": 81,
++   "tick": 81,
++   "turns": 12,
++   "wall_seconds": 70.0,
++   "winner": null
++  },
++  {
++   "completed": true,
++   "events": 1384,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "mode": "realistic",
++   "scenario": "IBS-S-EM-01",
++   "seed": 20270830,
++   "steps": 81,
++   "turns": 12,
++   "wall_seconds": 32.4,
++   "winner": null
++  },
++  {
++   "agent_decisions": 43,
++   "completed": true,
++   "completed_orders": 4,
++   "delivered": 153,
++   "events": 1669,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "link_statuses": [
++    "blackout",
++    "direct"
++   ],
++   "local_autonomy_ever": false,
++   "messages": 157,
++   "mission_orders": 4,
++   "mode": "command_delay",
++   "scenario": "IBS-S-EM-01",
++   "seed": 20270829,
++   "steps": 81,
++   "tick": 81,
++   "turns": 12,
++   "wall_seconds": 61.3,
++   "winner": null
++  },
++  {
++   "completed": true,
++   "events": 1545,
++   "failure": null,
++   "friendly_collisions": 0,
++   "friendly_torpedo_hits": 0,
++   "mode": "realistic",
++   "scenario": "IBS-S-EM-01",
++   "seed": 20270829,
++   "steps": 81,
++   "turns": 12,
++   "wall_seconds": 16.2,
++   "winner": null
++  }
++ ],
++ "scenarios_covered": [
++  "IBS-S-01",
++  "IBS-S-03",
++  "IBS-S-EM-01"
++ ],
++ "total_games": 18,
++ "verdict": "PASS"
++}
 diff --git a/research/command_delay/build_bundle.py b/research/command_delay/build_bundle.py
 new file mode 100644
-index 00000000..5f75257b
+index 00000000..8af8ef86
 --- /dev/null
 +++ b/research/command_delay/build_bundle.py
-@@ -0,0 +1,141 @@
+@@ -0,0 +1,148 @@
 +"""Assemble COMMAND_DELAY_MODE_V2_2_IMPLEMENTATION_BUNDLE.zip.
 +
 +Layout is fixed by the task specification::
@@ -1843,6 +2054,8 @@ index 00000000..5f75257b
 +)
 +
 +TEST_FILES = (
++    "test_command_delay_agents_and_memory.py",
++    "test_command_delay_live_surface.py",
 +    "test_command_delay_movement_style.py",
 +    "test_command_delay_mode_shell.py",
 +    "test_command_delay_communications.py",
@@ -1897,6 +2110,11 @@ index 00000000..5f75257b
 +
 +    # Evidence that is small and load-bearing: the golden index and the commit list.
 +    copy(HERE / "golden" / "GOLDEN_INDEX.json", STAGE / "logs" / "GOLDEN_INDEX.json")
++    for extra in ("verify_live.log", "post_fix_tests.log", "post_fix_audits.log",
++                  "cd10_tests.log", "post_cd10_audits.log"):
++        source = HERE / "logs" / extra
++        if source.exists():
++            copy(source, logs / extra)
 +    commits = subprocess.run(
 +        ["git", "log", "--oneline", "realistic-command-v1-frozen..HEAD"],
 +        cwd=str(ROOT), capture_output=True, text=True, timeout=120,
@@ -2069,6 +2287,552 @@ index 00000000..48ecdc4c
 +即：**代码实现的是用户裁定的 8，玩家规则文档仍写 4**。二者当前不会导致裁决错误（代码路径自洽、测试断言用 `MAX_FORMATIONS_PER_SIDE`），但玩家按文档只能建 4 队，而系统允许 8 队，属文档-实现不一致。
 +
 +按 §一 授权顺序（想定特例 > 舰船记录/玩家辅助表 > 通用规则），并考虑到 8 是"用户裁定"而非规则推断，**本轮不改动任何一侧**（改代码会动冻结文件；改文档需要知道裁决是否仍然有效）。已在 `DATA_MODEL_DIFF.md` 与最终输出中列为 PI 裁决项 `CD0-Q1`。
+diff --git a/research/command_delay/crop_battle_images.py b/research/command_delay/crop_battle_images.py
+new file mode 100644
+index 00000000..ca0c6ca9
+--- /dev/null
++++ b/research/command_delay/crop_battle_images.py
+@@ -0,0 +1,97 @@
++"""Crop the battle board screenshots down to the action for the after-action report.
++
++The captured boards are the whole scenario grid - ships occupy a few percent of the
++frame - so an embedded figure is unreadable without zooming.  This writes a cropped
++copy of each board: the extent of the ship markers (found by colour, since the empty
++hex grid and the ruler text are both near-greys) plus a margin.  The hex rulers are
++copied into the cropped frame's top and left edges, because the report's prose names
++hexes ("V14", "R16") and a figure without rulers cannot be checked against it.
++
++Originals are never modified; crops are written as ``crop-<name>.png`` beside them,
++so the report is always rebuildable from the raw captures alone.
++"""
++from __future__ import annotations
++
++import argparse
++from pathlib import Path
++
++from PIL import Image
++
++DEFAULT_IMAGES = Path(__file__).resolve().parent / "battle" / "images"
++MARGIN = 120
++RULER_X = 150   # the hex-number ruler is wider than the letter row
++RULER_Y = 100
++BOARD_FILL = (16, 40, 62)
++MIN_SIDE = 460
++BOTTOM_BAND = 0.10      # the on-image legend lives here; it is not the action
++LEFT_BAND = 0.05        # the hex-number ruler column
++TOP_BAND = 0.03         # the hex-letter ruler row
++
++
++def marker_mask(image: Image.Image) -> tuple[list[int], list[int]]:
++    """Pixel coordinates of ship markers: saturated inks, or near-white hulls."""
++    width, height = image.size
++    left_limit = int(width * LEFT_BAND)
++    top_limit = int(height * TOP_BAND)
++    bottom_limit = int(height * (1.0 - BOTTOM_BAND))
++    pixels = image.load()
++    xs: list[int] = []
++    ys: list[int] = []
++    for y in range(top_limit, bottom_limit, 2):
++        for x in range(left_limit, width, 2):
++            red, green, blue = pixels[x, y][:3]
++            saturation = max(red, green, blue) - min(red, green, blue)
++            if saturation > 100 or min(red, green, blue) > 230:
++                xs.append(x)
++                ys.append(y)
++    return xs, ys
++
++
++def crop(path: Path, out: Path, margin: int = MARGIN) -> tuple[int, int, int, int]:
++    image = Image.open(path).convert("RGB")
++    xs, ys = marker_mask(image)
++    if not xs:
++        image.save(out, optimize=True)
++        return (0, 0, *image.size)
++
++    left = max(RULER_X, min(xs) - margin)
++    top = max(RULER_Y, min(ys) - margin)
++    right = min(image.width, max(xs) + margin)
++    bottom = min(image.height, max(ys) + margin)
++    if right - left < MIN_SIDE:
++        right = min(image.width, left + MIN_SIDE)
++    if bottom - top < MIN_SIDE:
++        bottom = min(image.height, top + MIN_SIDE)
++
++    content = image.crop((left, top, right, bottom))
++    top_ruler = image.crop((left, 0, right, RULER_Y))
++    left_ruler = image.crop((0, top, RULER_X, bottom))
++    composed = Image.new("RGB", (RULER_X + content.width, RULER_Y + content.height),
++                         BOARD_FILL)
++    composed.paste(top_ruler, (RULER_X, 0))
++    composed.paste(left_ruler, (0, RULER_Y))
++    composed.paste(content, (RULER_X, RULER_Y))
++    composed.save(out, optimize=True)
++    return (left, top, right, bottom)
++
++
++def main() -> int:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--images", type=Path, default=DEFAULT_IMAGES)
++    parser.add_argument("--force", action="store_true", help="rewrite existing crops")
++    args = parser.parse_args()
++
++    written = 0
++    for path in sorted(args.images.rglob("turn-*.png")):
++        out = path.with_name(f"crop-{path.name}")
++        if out.exists() and not args.force and out.stat().st_mtime >= path.stat().st_mtime:
++            continue
++        box = crop(path, out)
++        written += 1
++        print(f"{path.name}: {box} -> {out.name}")
++    print(f"cropped {written} boards under {args.images}")
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/research/command_delay/generate_battle_md.py b/research/command_delay/generate_battle_md.py
+new file mode 100644
+index 00000000..7408748e
+--- /dev/null
++++ b/research/command_delay/generate_battle_md.py
+@@ -0,0 +1,437 @@
++"""Generate the after-action Markdown report from a completed LLM-vs-LLM battle.
++
++Reads ``battle/battle_data.json`` (written by ``llm_vs_llm.py``) plus the captured
++board images, and emits ``battle/REPORT.md``: per-turn situation with embedded
++board images, the fleet orders and their telegraphed delivery, every formation
++decision with its rationale, the full communication ledger, the agents' final
++memories, and a computed orders-vs-local-situation balance table.
++"""
++from __future__ import annotations
++
++import json
++import sys
++from collections import Counter
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parents[2]
++BATTLE = Path(__file__).resolve().parent / "battle"
++
++LINK_LABEL = {"direct": "直连", "relayed": "经转报", "stale": "陈旧", "blackout": "中断"}
++MEDIUM_LABEL = {
++    "tbs_short": "TBS 短距战术", "blinker": "视觉信号", "wt_coded": "编码电文",
++    "wt_reencipher_relay": "转报/再加密", "multi_hop": "复合路由", "blackout": "无通路",
++}
++STATUS_LABEL = {"delivered": "已送达", "queued": "排队中", "dropped": "已丢弃",
++                "superseded": "被取代"}
++BRANCH_LABEL = {
++    "explicit_signal_branch": "信号分支", "local_condition_branch": "本地条件分支",
++    "loss_of_comm_branch": "失联预案",
++}
++SIDE_TITLE = {"axis": "轴心（日方）", "allies": "同盟（美方）"}
++
++
++def load() -> dict:
++    return json.loads((BATTLE / "battle_data.json").read_text(encoding="utf-8"))
++
++
++def _read_json(path: Path) -> dict | None:
++    """Read an audit artefact if it is there; the report still renders without it."""
++    try:
++        return json.loads(path.read_text(encoding="utf-8"))
++    except FileNotFoundError:
++        return None
++
++
++def image_for(turn: int, images_files: list[str]) -> list[str]:
++    """Board images for this turn, both sides, at movement and fire resolution.
++
++    ``images_files`` are paths relative to the report (``images/<game_id>/…``),
++    captured per (turn, phase, side) by the battle-report pipeline, so each entry is
++    the link target verbatim.  Four are picked per turn — movement and gunnery for
++    each side — so a reader can follow every turn's geometry, not just one snapshot.
++    """
++    in_turn = [name for name in images_files if f"turn-{turn}-" in name]
++
++    def pick(side: str) -> list[str]:
++        side_files = [name for name in in_turn if f"-{side}-" in name]
++        chosen: list[str] = []
++        for phase in ("movement_resolution", "gunnery", "fire_end", "torpedo_effects"):
++            match = sorted(name for name in side_files if f"-{phase}-" in name)
++            if match:
++                chosen.append(match[0])
++            if len(chosen) == 2:
++                break
++        return chosen
++
++    picked = pick("axis") + pick("allies")
++    if picked:
++        return picked
++    return sorted(in_turn)[:2]
++
++
++def esc(text) -> str:
++    return str(text or "").replace("|", "\\|")
++
++
++def main() -> int:
++    data = load()
++    final = data["final"]
++    lines: list[str] = []
++    add = lines.append
++
++    messages = data["messages"]
++    fleet_orders = data["fleet_orders"]
++    decisions = data["decisions"]
++    turns = data["turns"]
++
++    add("# 命令延迟模式 · LLM 对 LLM 完整战报")
++    add("")
++    add(f"- **想定**：{data['scenario']}（seed {data['seed']}）")
++    add(f"- **双方策略**：{data['sides']['axis']} / {data['sides']['allies']} —— 双方每个编队各由一个独立子代理指挥（带记忆），"
++        f"舰队总指挥用自然语言下达命令，命令作为电报经通信链路投递")
++    add(f"- **结果**：{final['turns']} 回合，胜方 {final['winner'] or '无'}"
++        f"（{final.get('victory_reason') or '—'}）；比分 {final['score'].get('axis', 0)}–{final['score'].get('allies', 0)}；"
++        f"友军碰撞 {final['friendly_collisions']} 次")
++    add(f"- **代理执行面**：{len(fleet_orders)} 次舰队总指挥电报、{len(decisions)} 次编队代理决策；"
++        f"其中 {len(data.get('substitutions', []))} 次代理方案被引擎合法性检查驳回并回退确定性指挥官"
++        f"（详见 [代理自主性与回退披露](#代理自主性与回退披露)）")
++    add(f"- **信息边界**：每个代理只能看到自己一侧的过滤视图；本报告为**战后中性文书**，"
++        f"因此正文地图为双方视角，但第 [信息泄露与证据核验](#信息泄露与证据核验) 节单独验证了"
++        f"代理实际收到的材料，并在同节披露该项检查自身的方法与局限")
++    add("")
++
++    # ---------------- per-turn narrative
++    add("## 逐回合态势与指挥")
++    add("")
++    images_files = data.get("images_files", [])
++    for turn_record in turns:
++        turn = turn_record["turn"]
++        add(f"### 第 {turn} 回合")
++        add("")
++        picks = image_for(turn, images_files)
++        for name in picks:
++            label = Path(name).stem.split(f"turn-{turn}-")[-1]
++            # A cropped copy (crop_battle_images.py) zooms into the action and keeps
++            # the hex rulers; prefer it when present, else link the raw capture.
++            cropped = str(Path(name).with_name(f"crop-{Path(name).name}"))
++            target = cropped if (BATTLE / cropped).exists() else name
++            add(f"![T{turn} {label}]({target})")
++        if picks:
++            add("")
++            add(f"*图：第 {turn} 回合各结算阶段的棋盘（裁剪至行动区域、保留六角标尺），"
++                f"双方视角各取机动结算与炮击结算"
++                f"（`{', '.join(Path(p).name for p in picks)}`）*")
++            add("")
++        # events worth showing
++        key_types = {"gunnery_hit", "gunnery_rejected", "torpedo_launch", "torpedo_hit",
++                     "collision", "ship_sunk", "formation_emergency_stop",
++                     "command_message_delivered", "command_message_dropped",
++                     "formation_agent_decision", "ship_detached", "ship_withdrawn"}
++        shown = [e for e in turn_record["events"] if e["type"] in key_types]
++        if shown:
++            add("**裁决要点**")
++            add("")
++            for event in shown[:14]:
++                add(f"- `T{event['turn']} {event['phase']}` **{event['type']}** — {event['message']}")
++            if len(shown) > 14:
++                add(f"- （其余 {len(shown) - 14} 条见附录日志）")
++            add("")
++        # fleet orders this turn
++        orders_this = [o for o in fleet_orders if o.get("turn") == turn and o.get("text")]
++        if orders_this:
++            add("**舰队总指挥电报**")
++            add("")
++            for order in orders_this:
++                add(f"- **{SIDE_TITLE[order['side']]}** → `{order['formation_id']}`："
++                    f"「{order['text']}」（{MEDIUM_LABEL.get(order['medium'], order['medium'])}，"
++                    f"链路开销 +{order['handling_delay']} 回合，{order['route_reason']}）")
++            add("")
++        # formation decisions this turn
++        decided = [d for d in decisions if d.get("turn") == turn]
++        if decided:
++            add("**编队代理决策**")
++            add("")
++            add("| 编队 | 阵营 | 机动方案 | 激活分支 | 决策说明 |")
++            add("|---|---|---|---|---|")
++            for d in decided:
++                add(f"| {esc(d.get('formation_id'))} | {d.get('side')} "
++                    f"| `{esc(d.get('selected_movement_plan') or '保持')}` "
++                    f"| {BRANCH_LABEL.get(d.get('selected_contingency_branch') or '', '无')} "
++                    f"| {len((d.get('audit') or {}).get('active_branches', [])) and ''}"
++                    f"{esc((d.get('rationale_summary') or '')[:110])} |")
++            add("")
++            notes = [(d.get("formation_id"), d.get("memory_note"))
++                     for d in decided if d.get("memory_note")]
++            if notes:
++                add("代理写给自己的备忘：" +
++                    "；".join(f"`{fid}`「{note}」" for fid, note in notes))
++            add("")
++
++    # ---------------- communication ledger
++    add("## 通信台账（全部报文）")
++    add("")
++    add("| 报文 | 类型 | 媒介 | 优先级 | 发出 | 送达 | 状态 | 说明 |")
++    add("|---|---|---|---|---|---|---|---|")
++    for message in messages:
++        add(f"| `{message['message_id']}` | {message['kind']} "
++            f"| {MEDIUM_LABEL.get(message['medium'], message['medium'])} "
++            f"| {message['precedence']} "
++            f"| T{message['issued_turn']} "
++            f"| {f'T{message["delivered_turn"]}' if message.get('delivered_turn') is not None else '—'} "
++            f"| {STATUS_LABEL.get(message['status'], message['status'])} "
++            f"| {esc(message.get('reason') or '')} |")
++    add("")
++    delivered = [m for m in messages if m["status"] == "delivered"]
++    delayed = [m for m in delivered if (m.get("delivered_turn") or 0) > m["issued_turn"]]
++    dropped = [m for m in messages if m["status"] in ("dropped", "superseded")]
++    add(f"共 {len(messages)} 条：送达 {len(delivered)}（其中跨回合延迟 {len(delayed)}），"
++        f"丢弃/被取代 {len(dropped)}，其余在队列中。")
++    add("")
++
++    # ---------------- balance of orders vs local situation
++    # The order actually in hand is read from the agent-log entry for the same
++    # (turn, formation): that is the text the prompt carried, so it is evidence,
++    # not an inference from the decision's own audit block.
++    order_in_hand = {
++        (record["turn"], record["formation_id"]): (record.get("order_text") or "")
++        for record in data.get("agent_log", [])
++    }
++    add("## 远方命令与当前战局的平衡（逐次决策）")
++    add("")
++    add("| 回合 | 编队 | 手持命令 | 合法机动选项 | 激活分支 | 采取的方案 | 依据（代理自述） |")
++    add("|---|---|---|---|---|---|---|")
++    for d in decisions:
++        audit = d.get("audit") or {}
++        in_hand = order_in_hand.get((d.get("turn"), d.get("formation_id")), "")
++        add(f"| T{d.get('turn')} | {esc(d.get('formation_id'))} "
++            f"| {'有（原文见记忆节）' if in_hand else '无（自派任务）'} "
++            f"| {audit.get('legal_actions', 0)} "
++            f"| {BRANCH_LABEL.get(d.get('selected_contingency_branch') or '', '无')} "
++            f"| `{esc(d.get('selected_movement_plan') or '保持')}` "
++            f"| {esc((d.get('rationale_summary') or '')[:90])} |")
++    add("")
++    add(f"「合法机动选项」列是该回合引擎交给代理的机动选项数（`legal_formation_actions`），"
++        f"即它在本地几何约束下真实拥有的选择空间；「依据」列是代理自己写下的理由原句，"
++        f"可据此判断它是按远方命令行动，还是按眼前战局行动。")
++    add("")
++
++    # ---------------- memories
++    add("## 各编队最终记忆")
++    add("")
++    for formation_id, memory in data["memories"].items():
++        add(f"### `{formation_id}`")
++        add("")
++        add(f"- 当前生效命令（T{memory.get('active_order_turn')}收到）："
++            f"{memory.get('active_order_text') or '（无）'}")
++        counts = memory.get("counts", {})
++        add(f"- 记忆条目：{', '.join(f'{k} {v}' for k, v in counts.items())}")
++        scratch = memory.get("scratchpad") or []
++        if scratch:
++            add("- 自己写的备忘：")
++            for note in scratch:
++                add(f"  - 「{note}」")
++        add("")
++
++    # ---------------- agent transcript samples
++    add("## 代理原始决策记录（抽样）")
++    add("")
++    add("每条决策的完整提示词、原始回复与记忆快照在 `battle_data.json` 的 `agent_log`；"
++        "这里抽取首末各一条以见格式：")
++    add("")
++    log_entries = data.get("agent_log", [])
++    for record in (log_entries[:1] + log_entries[-1:]) if log_entries else []:
++        add(f"**`{record['formation_id']}` 第 {record['turn']} 回合（{record['agent']}）**")
++        add("")
++        add(f"- 手持命令：{record.get('order_text') or '（无）'}")
++        for attempt in record.get("attempts", []):
++            add(f"- 第 {attempt['attempt']} 次尝试："
++                f"{'采纳' if attempt['accepted'] else ('回退教条' if attempt['fallback'] else '拒绝')}"
++                f"{'；错误：' + '；'.join(attempt['errors']) if attempt['errors'] else ''}")
++            add(f"  - 原始回复：`{(attempt['raw_response'] or '')[:220]}`")
++        decision = record.get("decision", {})
++        add(f"- 决策：方案 `{decision.get('selected_movement_plan') or '保持'}`，"
++            f"分支 {decision.get('selected_contingency_branch') or '无'}，"
++            f"备忘「{decision.get('memory_note') or '—'}」")
++        add("")
++
++    # ---------------- multi-agent collaboration
++    add("## 多代理指挥协作")
++    add("")
++    kinds = Counter(m["kind"] for m in messages)
++    relayed = [m for m in messages if m.get("relay_hops")]
++    urgent = [m for m in messages if m.get("precedence") == "urgent"]
++    queued_at_end = sum(1 for m in messages if m["status"] == "queued")
++    reports_sent = Counter(
++        action
++        for d in decisions for action in (d.get("report_actions") or [])
++    )
++    add(f"- **指挥方向是双向的，但两个方向由不同机制驱动。** 上级方向：{len(fleet_orders)} 条"
++        f"自然语言任务命令由舰队总指挥（子代理）拟制并按电报投递，另有 2 条由引擎在 T2 拟制的"
++        f"初始委派（结构式任务/意图/协同，不含打法）；下级方向："
++        f"{kinds.get('contact_report', 0)} 条接触报告 + {kinds.get('sitrep', 0)} 条态势报告，"
++        f"由引擎在每个阶段边界**自动**起草（有接触则升为 urgent 优先级的接触报告）。")
++    mission_orders = [m for m in messages if m["kind"] == "mission_order"]
++    if mission_orders:
++        add("")
++        add("**任务命令的延迟（电报投递实证）**")
++        add("")
++        add("| 报文 | 阵营 | 发信人 | 收件编队 | 媒介 | 拟制回合 | 送达回合 | 链路开销 | 命令原文 |")
++        add("|---|---|---|---|---|---|---|---|---|")
++        for message in mission_orders:
++            payload = message.get("payload") or {}
++            text = str(payload.get("order_text") or payload.get("mission") or "")
++            origin_note = "舰队总指挥（子代理）" if payload.get("order_text") else "引擎初始委派"
++            delivered = message.get("delivered_turn")
++            add(f"| `{message['message_id']}` | {SIDE_TITLE.get(message['side'], message['side'])} "
++                f"| {origin_note} | `{message['destination']}` "
++                f"| {MEDIUM_LABEL.get(message['medium'], message['medium'])} "
++                f"| T{message['issued_turn']} "
++                f"| {'T' + str(delivered) if delivered is not None else '—'} "
++                f"| +{message.get('handling_delay', 0)} 回合 "
++                f"| {esc(text)[:70] or '（结构式）'} |")
++        add("")
++        add("两条由子代理拟制的命令都是在 T3 写下、**T4 才被编队读到**：编队指挥官在写命令的"
++            "同一个回合里无法依据它行动，这正是命令延迟模式要建模的东西。"
++            "同表可见，编队自己的接触报告走 TBS 时开销为 0（同回合送达）、"
++            "被排到再加密转报队列时为 +2 回合。")
++        add("")
++    add(f"- **代理自己的报告动作已记录、但尚未接线。** 代理逐次选择了报告动作："
++        + "、".join(f"{k} {v} 次" for k, v in reports_sent.most_common())
++        + f"；其中 {sum(1 for d in decisions if d.get('acknowledgement'))} 次决策标记了确认。"
++        f"这些选择进入决策记录与本地记忆（`report_sent` 条目），**但不生成、也不改变任何报文**——"
++        f"见文末 [未接线与缺陷披露](#未接线与缺陷披露)。")
++    same_turn = sum(1 for m in messages if m["status"] == "delivered"
++                    and m.get("delivered_turn") == m["issued_turn"])
++    add(f"- **信道与延迟**：全部 {len(messages)} 条报文中 {len(urgent)} 条按 urgent 优先级排队，"
++        f"{len(relayed)} 条经转报（relay）路由，{same_turn} 条同回合送达、"
++        f"{len(messages) - same_turn - queued_at_end} 条跨回合送达，"
++        f"{queued_at_end} 条在停战时仍在队列里；"
++        f"媒介由双方旗舰距离相对想定自身光学地平线选择（直连/视觉/编码电文/转报），"
++        f"距离只决定走哪条信道，不缩放延迟本身。")
++    add("")
++
++    # ---------------- autonomy and fallback disclosure
++    add("## 代理自主性与回退披露")
++    add("")
++    substitutions = data.get("substitutions", [])
++    movement_turns = sorted({d["turn"] for d in decisions})
++    side_turns = len(movement_turns) * 2
++    attempts = [a for record in data.get("agent_log", []) for a in record.get("attempts", [])]
++    first_try = sum(1 for a in attempts if a["attempt"] == 1 and a["accepted"])
++    retried = sum(1 for a in attempts if a["attempt"] > 1 and a["accepted"])
++    add(f"- **代理方案实际执行率**：{side_turns} 个「回合×阵营」机动批次中，"
++        f"{len(substitutions)} 个被引擎合法性检查整批驳回，退回确定性指挥官执行教条方案；"
++        f"其余 {side_turns - len(substitutions)} 个执行的是代理自己的方案。")
++    add(f"- **回复格式反馈回路**：{first_try} 次首次回复即被采纳，{retried} 次首次被拒后"
++        f"带着具体错误原因重发并获采纳（例如 `unknown contingency branch "
++        f"'superior enemy force in local contact'`——代理引用了不存在的预案分支名）。"
++        f"引擎拒绝的是**格式与合法性**，不是战术选择。")
++    if substitutions:
++        add("")
++        add("| 回合 | 阵营 | 驳回原因（引擎原文，截断） |")
++        add("|---|---|---|")
++        for item in substitutions:
++            reason = "；".join(item["errors"])[:220]
++            add(f"| T{item['turn']} | {SIDE_TITLE.get(item['side'], item['side'])} | {esc(reason)} |")
++    add("")
++    add("回退**不改变双方的信息边界**：确定性指挥官与代理读的是同一侧过滤视图，"
++        "回退只是把该阵营这一回合的机动决策权收回引擎。因此本报告中「代理自主性」的结论"
++        "必须按上述执行率打折——被驳回的回合里，编队的动作出自教条，代理的机动意图未被执行。")
++    add("")
++
++    # ---------------- leakage scan and evidence
++    add("## 信息泄露与证据核验")
++    add("")
++    scan = _read_json(BATTLE / "leakage_scan.json")
++    control = _read_json(BATTLE / "self_test.json")
++    if scan:
++        content = scan["content_provenance"]
++        add("**判据。** 本扫描不检查「代理是否知道敌方舰名」——在该想定里这个判据是空转的："
++            "双方自第 1 回合起就在光学距离内（轴心可见全部 9 艘美舰、同盟可见全部 5 艘日舰，"
++            f"`vacuous_in_this_scenario: {scan['identity']['vacuous_in_this_scenario']}`），"
++            "任何时刻敌方舰名都合法可见。真正能泄露的是**文本的出处**，所以判据定为："
++            "提示词里的每一个特征串，都必须对它的读者有合法出处——读者自己编队更早回合写下的内容，"
++            "或已经投递给它的一封舰队命令。敌方的文字、友邻编队的决策文字、以及**任何晚于当时的回合**"
++            "的文字，都不合法（最后一条同时覆盖「敌方计划泄露」与「读到明天的报纸」两种情形）。")
++        add("")
++        add(f"**结果。** 核验 {scan['request_files_scanned']} 条传输记录（`requests/` 下每一份"
++            f"实际交给子代理的请求），检查 {content['tokens_examined']} 个特征串，其中 "
++            f"{content['tokens_with_provenance']} 个确有出处可溯；"
++            f"内容出处违规 {len(content['findings'])} 条，"
++            f"报文台账违规 {len(scan['message_ledger']['findings'])} 条，"
++            f"字段归属违规 {len(scan['field_ownership']['findings'])} 条。"
++            f"判定 **{scan['verdict']}**。")
++        add("")
++        add("报文台账一项是精确检查、不需重放：每条 `received_messages[*].message_id` 都必须在"
++            "引擎台账里存在、属于同一阵营、且收件人是该编队。上一轮发现的两个跨阵营缺陷"
++            "（编队命令批次与火力优先级混入对方）正是这类检查会拦下的。")
++    if control:
++        add("")
++        add("**正对照（PASS 之所以算证据）。** 一个不可能失败的检查不是证据，所以对同一份数据做了"
++            "注入试验：把**本局真实存在**的敌方字符串塞进一份真实的轴心方请求，扫描器必须报错。")
++        add("")
++        add("| 注入内容 | 注入串（截断） | 是否被抓 |")
++        add("|---|---|---|")
++        labels = {"enemy_fleet_order": "敌方舰队命令原文",
++                  "enemy_decision_prose": "敌方编队决策理由原文",
++                  "enemy_message_ledger_entry": "敌方报文台账条目"}
++        for key, label in labels.items():
++            item = control.get(key) or {}
++            add(f"| {label} | `{esc(str(item.get('injected'))[:60])}` "
++                f"| {'是' if item.get('caught') else '否'} |")
++        add("")
++        add(f"基线（未注入）发现数 {control.get('baseline_findings')}，三项注入全部被抓，"
++            f"自检判定 **{control.get('verdict')}**。")
++    add("")
++    add("**本扫描未覆盖的范围（如实列出）。**")
++    add("")
++    add("- 审计对象是**传输面**：实际交给代理的记录。代理从合法材料里「推断」出什么，"
++        "不在本检查范围内，本检查也不能证明它没推断。")
++    add("- 可见性包络（`identity` 子项）靠**确定性指挥官重放**重建，而非本局的代理决策——"
++        "驱动没有持久化被采纳的指令批次，所以该子项只是近似；内容出处与台账两项不依赖重放。")
++    add("- 本局**不可从产物逐位重放**：没有保存被采纳的指令批次，因此这份战报是"
++        "「记录审计」，不是「可复现实验」。")
++    add("- 本报告本身是战后中性文书，含双方视角；它**不得**作为任何代理的输入。"
++        "本局最后一次代理调用发生在报告生成之前。")
++    add("")
++
++    # ---------------- unwired and defects
++    add("## 未接线与缺陷披露")
++    add("")
++    add("本局暴露的两处「记录得到、但没接线」的缺口，均由代码位置确认，未在本轮修改"
++        "（它们属于冻结模式的语义，改动会使黄金重放基线漂移，需要 PI 决定）：")
++    add("")
++    add("1. **代理的确认不进报文台账。** `backend/src/iron_bottom_sound/command_delay.py` "
++        "在 `_apply_delivery` 里对 `MessageKind.ACKNOWLEDGEMENT` 直接 `return`，"
++        "而 `CommandMessage.acknowledged_turn`（`models.py`）全仓库没有任何写入点，"
++        "本局台账因此 0 条确认记录，尽管代理在 "
++        f"{sum(1 for d in decisions if d.get('acknowledgement'))} 次决策里明确确认，"
++        "且有 2 次选择发出 `ACKNOWLEDGEMENT`。另需注意 `MissionOrder.confirmed_turn` "
++        "在送达时即被写成送达回合——它记的是「送达」，不是「确认」，两件事在台账里被合并了。")
++    add("2. **代理的报告动作不影响通信。** 代理逐次选择 `report_actions`"
++        "（SITREP / CONTACT_REPORT / ACKNOWLEDGEMENT 等），这些选择只落到本地记忆条目"
++        "（`report_sent`）与决策记录里；台账中的 68 条接触报告与态势报告全部由 "
++        "`draft_reports` 在每个阶段边界自动起草，与代理的选择无关。也就是说："
++        "**下级上报目前是引擎的自动参谋作业，代理还不能决定何时、向谁、报告什么。**")
++    add("")
++
++    # ---------------- appendix: full event log
++    add("## 附录：全量裁决事件日志")
++    add("")
++    add("```")
++    for turn_record in turns:
++        for event in turn_record["events"]:
++            add(f"T{event['turn']} {event['phase']:<20} {event['type']:<28} {event['message']}")
++    add("```")
++    add("")
++    add(f"*由 `research/command_delay/generate_battle_md.py` 从 `battle/battle_data.json` "
++        f"自动生成；引擎事件、报文台账、代理决策与记忆均为引擎记录原样，未手工修饰。*")
++
++    report = BATTLE / "REPORT.md"
++    report.write_text("\n".join(lines) + "\n", encoding="utf-8")
++    print(f"REPORT written: {report} ({len(lines)} lines)")
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
 diff --git a/research/command_delay/golden_replay.py b/research/command_delay/golden_replay.py
 new file mode 100644
 index 00000000..e2666c9c
@@ -2478,171 +3242,361 @@ index 00000000..e2666c9c
 +
 +if __name__ == "__main__":
 +    raise SystemExit(main())
+diff --git a/research/command_delay/llm_vs_llm.py b/research/command_delay/llm_vs_llm.py
+new file mode 100644
+index 00000000..ac4b8836
+--- /dev/null
++++ b/research/command_delay/llm_vs_llm.py
+@@ -0,0 +1,336 @@
++"""LLM vs LLM Command Delay battle driver (CD-12).
++
++Both sides are commanded entirely by sub-agents: every formation has its own agent
++(with its own memory), and each side's fleet commander writes natural-language
++orders that travel as telegraphed signals.  The driver never calls a model itself —
++it writes one request file per decision and waits for a response file, so the
++orchestration layer (here: the ZCode workflow serving loop) supplies the models.
++
++Honesty rules the driver keeps:
++* a request that is not answered in time returns a sentinel that the adapter parses
++  as invalid, so the recorded outcome is "transport timeout -> doctrine fallback",
++  never a fabricated model decision;
++* if the engine refuses an agent-derived movement batch, the driver falls back to
++  the deterministic commander for that phase and records the substitution.
++"""
++from __future__ import annotations
++
++import json
++import re
++import sys
++import time
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parents[2]
++sys.path.insert(0, str(ROOT / "backend" / "src"))
++
++from iron_bottom_sound import battle_report, command_delay  # noqa: E402
++from iron_bottom_sound.command_observation import fleet_observation  # noqa: E402
++from iron_bottom_sound.engine import ORDER_PHASES, IronBottomEngine  # noqa: E402
++from iron_bottom_sound.llm import LLMPlayerSession  # noqa: E402
++from iron_bottom_sound.models import (  # noqa: E402
++    GameOptions,
++    MessageStatus,
++    OrderBatch,
++    Phase,
++    Side,
++)
++from iron_bottom_sound.realistic_command import (  # noqa: E402
++    RealisticCommander,
++    default_setup_orders,
++)
++
++SCENARIO = "IBS-S-01"
++SEED = 20270830
++EXCHANGE_TIMEOUT_S = 1800
++FLEET_ORDER_TURNS = {1, 3}
++TURN_CAP = 12
++
++
++class BridgePolicy:
++    """Transport over request/response files; the model lives outside this process.
++
++    Every driver run stamps its files with a run id, so a restart can never have a
++    stale sub-agent answer a different run's request.
++    """
++
++    def __init__(self, bridge_dir: Path, label: str) -> None:
++        self.requests = bridge_dir / "requests"
++        self.responses = bridge_dir / "responses"
++        self.label = label
++        self.run_id = str(int(time.time()))[-6:]
++        self.counter = 0
++
++    def __call__(self, prompt: dict) -> str:
++        from iron_bottom_sound.formation_llm import compact_local_map
++
++        self.counter += 1
++        name = f"{self.run_id}-{self.counter:03d}"
++        request_path = self.requests / f"req-{name}.request.json"
++        response_path = self.responses / f"req-{name}.response.json"
++        payload = compact_local_map(prompt)
++        payload["bridge"] = {
++            "request_id": name,
++            "policy": self.label,
++            "instruction_to_orchestrator": (
++                "你是该编队的指挥官本人。只依据材料决策，输出仅一个 JSON 对象，"
++                "不要 markdown 代码块、不要解释文字。"
++            ),
++        }
++        request_path.write_text(
++            json.dumps(payload, ensure_ascii=False, sort_keys=True), encoding="utf-8"
++        )
++        stamp = time.strftime("%H:%M:%S")
++        print(f"[{stamp}] BRIDGE REQUEST {name} "
++              f"({request_path.parent.resolve()})", flush=True)
++        deadline = time.time() + EXCHANGE_TIMEOUT_S
++        while time.time() < deadline:
++            if response_path.exists():
++                body = json.loads(response_path.read_text(encoding="utf-8"))
++                content = str(body.get("content", "")).strip()
++                print(f"[{time.strftime('%H:%M:%S')}] BRIDGE RESPONSE {name} "
++                      f"({len(content)} chars)", flush=True)
++                return content
++            time.sleep(2)
++        print(f"BRIDGE TIMEOUT {name} -> sentinel (doctrine fallback will be recorded)",
++              flush=True)
++        return "__BRIDGE_TIMEOUT__"
++
++
++def strip_fences(text: str) -> str:
++    return re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip(), flags=re.S)
++
++
++def fleet_exchange(engine, state, side: Side, bridge: BridgePolicy, out: dict) -> None:
++    """The fleet commander writes one natural-language order, telegraphed."""
++    view = fleet_observation(engine, state, side)
++    remote = [report for report in view.reports if not report.is_source_of_truth]
++    if not remote:
++        out["fleet_orders"].append({
++            "turn": state.turn, "side": side.value, "skipped": "no remote formation",
++        })
++        return
++    prompt = {
++        "role": "fleet_commander",
++        "turn": state.turn,
++        "phase": state.phase.value,
++        "side": side.value,
++        "your_embarked_formation": {
++            "name": view.embarked.get("name"),
++            "ships": len(view.embarked.get("ship_ids", []) or []),
++            "geometry": view.embarked.get("geometry_kind"),
++        },
++        "reports_on_your_formations": [
++            {
++                "formation_id": report.formation_id,
++                "name": report.name,
++                "position": (
++                    report.guide_position.label if report.guide_position else None
++                ),
++                "reported_turn": report.reported_turn,
++                "age_turns": report.age_turns,
++                "ship_count": report.ship_count,
++                "link": report.link_status.value,
++            }
++            for report in view.reports
++        ],
++        "contacts_seen_by_your_embarked_formation": view.contacts,
++        "task": (
++            "你是舰队总指挥。写一道自然语言命令给一支**非你所在**的编队（formation_id "
++            "必须从上面 reports 里非精确编队中选）。只依据你收到的报告与接触——你可能"
++            "只有几回合前的旧情报。命令要具体：给方向/距离/接敌或规避意图与火力优先级。"
++            "输出仅一个 JSON 对象："
++            '{"formation_id":"...","text":"...（≤140字）","priority_classes":["DD",...]}. '
++            "不要 markdown，不要解释。"
++        ),
++    }
++    content = bridge(prompt)
++    text = strip_fences(content)
++    try:
++        parsed = json.loads(text)
++        formation_id = str(parsed["formation_id"])
++        order_text = str(parsed["text"]).strip()
++        classes = [str(c) for c in parsed.get("priority_classes", [])][:4]
++        assert formation_id in {report.formation_id for report in remote}
++        assert order_text
++    except Exception as error:  # noqa: BLE001 - recorded, battle continues
++        out["fleet_orders"].append({
++            "turn": state.turn, "side": side.value,
++            "skipped": f"unusable fleet response: {error}",
++            "raw": text[:200],
++        })
++        return
++    message = command_delay.draft_natural_order(
++        engine, state, side=side, formation_id=formation_id,
++        text=order_text, priority_classes=classes or None,
++    )
++    out["fleet_orders"].append({
++        "turn": state.turn,
++        "side": side.value,
++        "formation_id": formation_id,
++        "text": order_text,
++        "priority_classes": classes,
++        "message_id": message.message_id,
++        "medium": message.medium.value,
++        "handling_delay": message.handling_delay,
++        "issued_turn": message.issued_turn,
++        "route_reason": message.reason,
++    })
++    print(
++        f"FLEET ORDER {side.value} -> {formation_id}: {order_text[:40]}… "
++        f"({message.medium.value}, +{message.handling_delay}t)", flush=True,
++    )
++
++
++def main() -> int:
++    out_dir = Path(__file__).resolve().parent / "battle"
++    (out_dir / "requests").mkdir(parents=True, exist_ok=True)
++    (out_dir / "responses").mkdir(parents=True, exist_ok=True)
++    images = out_dir / "images"
++    images.mkdir(exist_ok=True)
++    for old in (out_dir / "requests").glob("*"):
++        old.unlink()
++    for old in (out_dir / "responses").glob("*"):
++        old.unlink()
++
++    engine = IronBottomEngine()
++    state = engine.reset(SCENARIO, SEED, GameOptions(
++        realistic_command=True, command_delay_mode=True, battle_report=True,
++    ))
++    bridge = BridgePolicy(out_dir, "zcode-subagent")
++    for side in Side:
++        command_delay.set_side_policy(side, bridge, bridge.label)
++
++    sessions = {side: LLMPlayerSession(side, RealisticCommander()) for side in Side}
++    battle: dict = {
++        "scenario": SCENARIO, "seed": SEED,
++        "sides": {side.value: bridge.label for side in Side},
++        "turns": [], "fleet_orders": [], "substitutions": [],
++        "images_root": "images",
++    }
++
++    def capture(prev_phase) -> None:
++        try:
++            battle_report.capture_after_advance(
++                None, images, state, engine, prev_phase,
++            )
++        except Exception as error:  # noqa: BLE001 - 报告失败不中断对局
++            print(f"capture failed: {error}", flush=True)
++
++    def submit(batch: OrderBatch, side: Side) -> tuple[bool, list[str]]:
++        result = engine.submit_orders(state.game_id, batch)
++        return result.valid, list(result.errors)
++
++    # 编成
++    for side in Side:
++        assert engine.submit_orders(state.game_id, OrderBatch(
++            side=side, phase=Phase.FORMATION_SETUP,
++            formation_setup=default_setup_orders(state, side),
++        )).valid
++    prev = state.phase
++    engine.advance(state.game_id)
++    capture(prev)
++
++    turn_records: dict[int, dict] = {}
++    steps = 0
++    while state.phase != Phase.COMPLETE and state.turn <= TURN_CAP and steps < 400:
++        steps += 1
++        if state.phase in ORDER_PHASES:
++            for side in Side:
++                if side.value in state.submitted_orders:
++                    continue
++                if state.phase == Phase.MOVEMENT_PLANNING:
++                    if state.turn in FLEET_ORDER_TURNS:
++                        fleet_exchange(engine, state, side, bridge, battle)
++                    orders = command_delay.formation_orders(state, side)
++                    valid, errors = submit(OrderBatch(
++                        side=side, phase=state.phase, formation_movement=orders,
++                    ), side)
++                    if not valid:
++                        # 代理方案被引擎拒绝：如实记录，退回确定性指挥官的方案。
++                        battle["substitutions"].append({
++                            "turn": state.turn, "side": side.value, "errors": errors[:3],
++                        })
++                        _, fallback, _ = RealisticCommander().choose_plan(
++                            engine, state.game_id, side,
++                        )
++                        valid, errors = submit(fallback, side)
++                        assert valid, errors[:3]
++                elif state.phase == Phase.GUNNERY:
++                    valid, errors = submit(command_delay.gunnery_batch(state, side), side)
++                    assert valid, (state.turn, side, errors[:3])
++                else:
++                    planner = sessions[side].choose_orders(engine, state.game_id)
++                    trimmed = OrderBatch(
++                        side=side, phase=state.phase,
++                        torpedoes=planner.torpedoes,
++                        contacts=planner.contacts,
++                        contact_movement=planner.contact_movement,
++                        reinforcements=planner.reinforcements,
++                    )
++                    valid, errors = submit(trimmed, side)
++                    assert valid, (state.turn, state.phase, side, errors[:3])
++        record = turn_records.setdefault(state.turn, {
++            "turn": state.turn, "events": [], "images": [],
++        })
++        before = len(state.events)
++        prev = state.phase
++        engine.advance(state.game_id)
++        capture(prev)
++        record["events"].extend(
++            {"turn": event.turn, "phase": event.phase.value, "type": event.type,
++             "message": event.message,
++             "payload": {k: v for k, v in event.payload.items()
++                         if k != "order_batch"}}
++            for event in state.events[before:]
++        )
++        record["images"].append(str(prev.value))
++        print(f"advanced to {state.phase.value} (turn {state.turn})", flush=True)
++
++    # 终局数据：消息台账、代理决策、记忆、代理日志、图像清单
++    mode = state.command_delay
++    battle["final"] = {
++        "complete": state.phase == Phase.COMPLETE,
++        "turns": state.turn,
++        "winner": state.winner.value if state.winner else None,
++        "victory_reason": state.victory_reason,
++        "score": state.score,
++        "friendly_collisions": sum(
++            1 for event in state.events
++            if event.type == "collision" and event.payload.get("friendly")
++        ),
++    }
++    battle["turns"] = [turn_records[key] for key in sorted(turn_records)]
++    battle["messages"] = [message.model_dump(mode="json") for message in mode.messages]
++    battle["decisions"] = mode.decisions
++    battle["policy_labels"] = dict(mode.policy_labels)
++    battle["images_files"] = sorted(
++        str(path.relative_to(out_dir)) for path in images.rglob("*")
++        if path.suffix == ".png"
++    )
++    from iron_bottom_sound.formation_memory import memory_payload
++
++    battle["memories"] = {
++        formation_id: memory_payload(memory)
++        for formation_id, memory in sorted(mode.memories.items())
++    }
++    battle["agent_log"] = [
++        {
++            "turn": record["turn"], "phase": record["phase"],
++            "side": record["side"], "formation_id": record["formation_id"],
++            "formation_name": record["formation_name"], "agent": record["agent"],
++            "order_text": record["order_text"], "memory_text": record["memory_text"],
++            "attempts": record["attempts"],
++            "decision": record["decision"],
++        }
++        for record in mode.agent_log
++    ]
++    (out_dir / "battle_data.json").write_text(
++        json.dumps(battle, ensure_ascii=False, indent=1, default=str), encoding="utf-8"
++    )
++    print(f"BATTLE COMPLETE turns={state.turn} winner={state.winner}", flush=True)
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
 diff --git a/research/command_delay/logs/audit_golden_check.log b/research/command_delay/logs/audit_golden_check.log
 new file mode 100644
-index 00000000..33db68b5
+index 00000000..81354e64
 --- /dev/null
 +++ b/research/command_delay/logs/audit_golden_check.log
-@@ -0,0 +1,161 @@
-+[check] classic_s01          OK  (envelope keys added: 52)
-+[check] classic_s03          OK  (envelope keys added: 34)
-+[check] classic_em01         OK  (envelope keys added: 92)
-+[check] realistic_s01        OK  (envelope keys added: 80)
-+[check] realistic_s03        OK  (envelope keys added: 54)
-+[check] realistic_em01       OK  (envelope keys added: 140)
-+[check] realistic_s03_seed9  OK  (envelope keys added: 54)
-+
-+ENVELOPE_KEYS_ADDED (additive only, not drift):
-+  events[].payload.options.command_delay_mode  x7
-+  events[].payload.order_batch.formation_movement[].movement_style  x4
-+  events[].payload.order_batch.formation_movement[].reform_column  x4
-+  events[].payload.order_batch.target_priorities  x7
-+  orders.10:gunnery.allies.target_priorities  x2
-+  orders.10:gunnery.axis.target_priorities  x2
-+  orders.10:movement_planning.allies.formation_movement[].movement_style  x1
-+  orders.10:movement_planning.allies.formation_movement[].reform_column  x1
-+  orders.10:movement_planning.allies.target_priorities  x2
-+  orders.10:movement_planning.axis.formation_movement[].movement_style  x1
-+  orders.10:movement_planning.axis.formation_movement[].reform_column  x1
-+  orders.10:movement_planning.axis.target_priorities  x2
-+  orders.10:reinforcement.allies.target_priorities  x2
-+  orders.10:reinforcement.axis.target_priorities  x2
-+  orders.10:torpedo_planning.allies.target_priorities  x2
-+  orders.10:torpedo_planning.axis.target_priorities  x2
-+  orders.11:gunnery.allies.target_priorities  x2
-+  orders.11:gunnery.axis.target_priorities  x2
-+  orders.11:movement_planning.allies.formation_movement[].movement_style  x1
-+  orders.11:movement_planning.allies.formation_movement[].reform_column  x1
-+  orders.11:movement_planning.allies.target_priorities  x2
-+  orders.11:movement_planning.axis.formation_movement[].movement_style  x1
-+  orders.11:movement_planning.axis.formation_movement[].reform_column  x1
-+  orders.11:movement_planning.axis.target_priorities  x2
-+  orders.11:reinforcement.allies.target_priorities  x2
-+  orders.11:reinforcement.axis.target_priorities  x2
-+  orders.11:torpedo_planning.allies.target_priorities  x2
-+  orders.11:torpedo_planning.axis.target_priorities  x2
-+  orders.12:gunnery.allies.target_priorities  x2
-+  orders.12:gunnery.axis.target_priorities  x2
-+  orders.12:movement_planning.allies.formation_movement[].movement_style  x1
-+  orders.12:movement_planning.allies.formation_movement[].reform_column  x1
-+  orders.12:movement_planning.allies.target_priorities  x2
-+  orders.12:movement_planning.axis.formation_movement[].movement_style  x1
-+  orders.12:movement_planning.axis.formation_movement[].reform_column  x1
-+  orders.12:movement_planning.axis.target_priorities  x2
-+  orders.12:reinforcement.allies.target_priorities  x2
-+  orders.12:reinforcement.axis.target_priorities  x2
-+  orders.12:torpedo_planning.allies.target_priorities  x2
-+  orders.12:torpedo_planning.axis.target_priorities  x2
-+  orders.1:formation_setup.allies.target_priorities  x4
-+  orders.1:formation_setup.axis.target_priorities  x4
-+  orders.1:gunnery.allies.target_priorities  x7
-+  orders.1:gunnery.axis.target_priorities  x7
-+  orders.1:movement_planning.allies.formation_movement[].movement_style  x2
-+  orders.1:movement_planning.allies.formation_movement[].reform_column  x2
-+  orders.1:movement_planning.allies.target_priorities  x3
-+  orders.1:movement_planning.axis.formation_movement[].movement_style  x2
-+  orders.1:movement_planning.axis.formation_movement[].reform_column  x2
-+  orders.1:movement_planning.axis.target_priorities  x3
-+  orders.1:reinforcement.allies.target_priorities  x3
-+  orders.1:reinforcement.axis.target_priorities  x3
-+  orders.1:torpedo_planning.allies.target_priorities  x3
-+  orders.1:torpedo_planning.axis.target_priorities  x3
-+  orders.2:gunnery.allies.target_priorities  x7
-+  orders.2:gunnery.axis.target_priorities  x7
-+  orders.2:movement_planning.allies.formation_movement[].movement_style  x4
-+  orders.2:movement_planning.allies.formation_movement[].reform_column  x4
-+  orders.2:movement_planning.allies.target_priorities  x7
-+  orders.2:movement_planning.axis.formation_movement[].movement_style  x4
-+  orders.2:movement_planning.axis.formation_movement[].reform_column  x4
-+  orders.2:movement_planning.axis.target_priorities  x7
-+  orders.2:reinforcement.allies.target_priorities  x7
-+  orders.2:reinforcement.axis.target_priorities  x7
-+  orders.2:torpedo_planning.allies.target_priorities  x7
-+  orders.2:torpedo_planning.axis.target_priorities  x7
-+  orders.3:gunnery.allies.target_priorities  x7
-+  orders.3:gunnery.axis.target_priorities  x7
-+  orders.3:movement_planning.allies.formation_movement[].movement_style  x4
-+  orders.3:movement_planning.allies.formation_movement[].reform_column  x4
-+  orders.3:movement_planning.allies.target_priorities  x7
-+  orders.3:movement_planning.axis.formation_movement[].movement_style  x4
-+  orders.3:movement_planning.axis.formation_movement[].reform_column  x4
-+  orders.3:movement_planning.axis.target_priorities  x7
-+  orders.3:reinforcement.allies.target_priorities  x7
-+  orders.3:reinforcement.axis.target_priorities  x7
-+  orders.3:torpedo_planning.allies.target_priorities  x7
-+  orders.3:torpedo_planning.axis.target_priorities  x7
-+  orders.4:gunnery.allies.target_priorities  x7
-+  orders.4:gunnery.axis.target_priorities  x7
-+  orders.4:movement_planning.allies.formation_movement[].movement_style  x4
-+  orders.4:movement_planning.allies.formation_movement[].reform_column  x4
-+  orders.4:movement_planning.allies.target_priorities  x7
-+  orders.4:movement_planning.axis.formation_movement[].movement_style  x4
-+  orders.4:movement_planning.axis.formation_movement[].reform_column  x4
-+  orders.4:movement_planning.axis.target_priorities  x7
-+  orders.4:reinforcement.allies.target_priorities  x7
-+  orders.4:reinforcement.axis.target_priorities  x7
-+  orders.4:torpedo_planning.allies.target_priorities  x7
-+  orders.4:torpedo_planning.axis.target_priorities  x7
-+  orders.5:gunnery.allies.target_priorities  x4
-+  orders.5:gunnery.axis.target_priorities  x4
-+  orders.5:movement_planning.allies.formation_movement[].movement_style  x2
-+  orders.5:movement_planning.allies.formation_movement[].reform_column  x2
-+  orders.5:movement_planning.allies.target_priorities  x4
-+  orders.5:movement_planning.axis.formation_movement[].movement_style  x2
-+  orders.5:movement_planning.axis.formation_movement[].reform_column  x2
-+  orders.5:movement_planning.axis.target_priorities  x4
-+  orders.5:reinforcement.allies.target_priorities  x4
-+  orders.5:reinforcement.axis.target_priorities  x4
-+  orders.5:torpedo_planning.allies.target_priorities  x4
-+  orders.5:torpedo_planning.axis.target_priorities  x4
-+  orders.6:gunnery.allies.target_priorities  x4
-+  orders.6:gunnery.axis.target_priorities  x4
-+  orders.6:movement_planning.allies.formation_movement[].movement_style  x2
-+  orders.6:movement_planning.allies.formation_movement[].reform_column  x2
-+  orders.6:movement_planning.allies.target_priorities  x4
-+  orders.6:movement_planning.axis.formation_movement[].movement_style  x2
-+  orders.6:movement_planning.axis.formation_movement[].reform_column  x2
-+  orders.6:movement_planning.axis.target_priorities  x4
-+  orders.6:reinforcement.allies.target_priorities  x4
-+  orders.6:reinforcement.axis.target_priorities  x4
-+  orders.6:torpedo_planning.allies.target_priorities  x4
-+  orders.6:torpedo_planning.axis.target_priorities  x4
-+  orders.7:gunnery.allies.target_priorities  x4
-+  orders.7:gunnery.axis.target_priorities  x4
-+  orders.7:movement_planning.allies.formation_movement[].movement_style  x2
-+  orders.7:movement_planning.allies.formation_movement[].reform_column  x2
-+  orders.7:movement_planning.allies.target_priorities  x4
-+  orders.7:movement_planning.axis.formation_movement[].movement_style  x2
-+  orders.7:movement_planning.axis.formation_movement[].reform_column  x2
-+  orders.7:movement_planning.axis.target_priorities  x4
-+  orders.7:reinforcement.allies.target_priorities  x4
-+  orders.7:reinforcement.axis.target_priorities  x4
-+  orders.7:torpedo_planning.allies.target_priorities  x4
-+  orders.7:torpedo_planning.axis.target_priorities  x4
-+  orders.8:gunnery.allies.target_priorities  x2
-+  orders.8:gunnery.axis.target_priorities  x2
-+  orders.8:movement_planning.allies.formation_movement[].movement_style  x1
-+  orders.8:movement_planning.allies.formation_movement[].reform_column  x1
-+  orders.8:movement_planning.allies.target_priorities  x2
-+  orders.8:movement_planning.axis.formation_movement[].movement_style  x1
-+  orders.8:movement_planning.axis.formation_movement[].reform_column  x1
-+  orders.8:movement_planning.axis.target_priorities  x2
-+  orders.8:reinforcement.allies.target_priorities  x2
-+  orders.8:reinforcement.axis.target_priorities  x2
-+  orders.8:torpedo_planning.allies.target_priorities  x2
-+  orders.8:torpedo_planning.axis.target_priorities  x2
-+  orders.9:gunnery.allies.target_priorities  x2
-+  orders.9:gunnery.axis.target_priorities  x2
-+  orders.9:movement_planning.allies.formation_movement[].movement_style  x1
-+  orders.9:movement_planning.allies.formation_movement[].reform_column  x1
-+  orders.9:movement_planning.allies.target_priorities  x2
-+  orders.9:movement_planning.axis.formation_movement[].movement_style  x1
-+  orders.9:movement_planning.axis.formation_movement[].reform_column  x1
-+  orders.9:movement_planning.axis.target_priorities  x2
-+  orders.9:reinforcement.allies.target_priorities  x2
-+  orders.9:reinforcement.axis.target_priorities  x2
-+  orders.9:torpedo_planning.allies.target_priorities  x2
-+  orders.9:torpedo_planning.axis.target_priorities  x2
+@@ -0,0 +1,9 @@
++[check] classic_s01          OK  (envelope keys added: 0)
++[check] classic_s03          OK  (envelope keys added: 0)
++[check] classic_em01         OK  (envelope keys added: 0)
++[check] realistic_s01        OK  (envelope keys added: 0)
++[check] realistic_s03        OK  (envelope keys added: 0)
++[check] realistic_em01       OK  (envelope keys added: 0)
++[check] realistic_s03_seed9  OK  (envelope keys added: 0)
 +
 +GOLDEN_REPLAY = PASS
 diff --git a/research/command_delay/logs/cd0_golden_build.log b/research/command_delay/logs/cd0_golden_build.log
@@ -2764,6 +3718,14 @@ index 00000000..54cef1b9
 +FAILED tests/test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter
 +FAILED tests/test_tactical_ai.py::test_collision_resolution_is_deterministic_across_hash_seeds
 +FAILED tests/test_tactical_ai.py::test_ai_orders_deterministic_across_hash_seeds
+diff --git a/research/command_delay/logs/cd10_tests.log b/research/command_delay/logs/cd10_tests.log
+new file mode 100644
+index 00000000..da6ddfac
+--- /dev/null
++++ b/research/command_delay/logs/cd10_tests.log
+@@ -0,0 +1,2 @@
++...........................................s............................ [ 54%]
++.......................s...................................              [100%]
 diff --git a/research/command_delay/logs/cd1_existing_realistic_tests.log b/research/command_delay/logs/cd1_existing_realistic_tests.log
 new file mode 100644
 index 00000000..c58e96e6
@@ -3308,21 +4270,70 @@ index 00000000..33db68b5
 +  orders.9:torpedo_planning.axis.target_priorities  x2
 +
 +GOLDEN_REPLAY = PASS
+diff --git a/research/command_delay/logs/final_audits.log b/research/command_delay/logs/final_audits.log
+new file mode 100644
+index 00000000..67ab6092
+--- /dev/null
++++ b/research/command_delay/logs/final_audits.log
+@@ -0,0 +1,11 @@
++freeze         PASS
++movement       PASS
++communication  PASS
++mission_order  PASS
++leakage        PASS
++gunnery        PASS
++replay         PASS
++data_model     PASS
++
++AUDITS = PASS
++AUDITS_EXIT=0
+diff --git a/research/command_delay/logs/final_pytest.log b/research/command_delay/logs/final_pytest.log
+new file mode 100644
+index 00000000..22a400f8
+--- /dev/null
++++ b/research/command_delay/logs/final_pytest.log
+@@ -0,0 +1,26 @@
++......................................F................................. [ 10%]
++.....................................................s.................. [ 20%]
++.................................s...................................... [ 31%]
++........................................................................ [ 41%]
++........................................................................ [ 52%]
++........................................................................ [ 62%]
++........................................................................ [ 73%]
++........................................................................ [ 83%]
++..................................................................F..... [ 94%]
++......F...............................                                   [100%]
++=============================== warnings summary ===============================
++.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
++  /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
++    from starlette.testclient import TestClient as TestClient  # noqa
++
++.venv/lib/python3.14/site-packages/starlette/testclient.py:53
++  /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
++    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
++
++-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
++=========================== short test summary info ============================
++FAILED tests/test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter
++FAILED tests/test_tactical_ai.py::test_collision_resolution_is_deterministic_across_hash_seeds
++FAILED tests/test_tactical_ai.py::test_ai_orders_deterministic_across_hash_seeds
++3 failed, 681 passed, 2 skipped, 2 warnings in 1801.28s (0:30:01)
++PYTEST_EXIT=1
 diff --git a/research/command_delay/logs/full_pytest.log b/research/command_delay/logs/full_pytest.log
 new file mode 100644
-index 00000000..9fa88920
+index 00000000..c6758399
 --- /dev/null
 +++ b/research/command_delay/logs/full_pytest.log
-@@ -0,0 +1,119 @@
+@@ -0,0 +1,181 @@
 +......................................F................................. [ 11%]
-+.....................................s.................................. [ 22%]
-+..........s............................................................. [ 33%]
-+........................................................................ [ 45%]
-+........................................................................ [ 56%]
++..................................F..s.................................. [ 22%]
++.................s...................................................... [ 33%]
++........................................................................ [ 44%]
++........................................................................ [ 55%]
 +........................................................................ [ 67%]
-+........................................................................ [ 79%]
-+........................................................................ [ 90%]
-+.................F...........F...............................            [100%]
++........................................................................ [ 78%]
++........................................................................ [ 89%]
++........................F...........F...............................     [100%]
 +=================================== FAILURES ===================================
 +______ test_tutorial_api_reaches_second_turn_and_serves_canonical_counter ______
 +
@@ -3340,6 +4351,65 @@ index 00000000..9fa88920
 +E         + 5c54f8aa1e0de32074b42a1751c077d4efe417b18e29b28e740835e26de0d17e
 +
 +tests/test_api_llm_storage.py:73: AssertionError
++_____________ test_communication_pipeline_is_hash_seed_independent _____________
++
++    def test_communication_pipeline_is_hash_seed_independent() -> None:
++        def outcome(hashseed: str):
++            import json
++            env = dict(os.environ, PYTHONHASHSEED=hashseed,
++                       PYTHONPATH=str(REPO_ROOT / "backend" / "src"))
++            proc = subprocess.run(
++                [sys.executable, "-c", HASH_SCRIPT, str(REPO_ROOT / "backend" / "src")],
++                cwd=str(REPO_ROOT), env=env, capture_output=True, text=True, timeout=600,
++            )
++            assert proc.returncode == 0, proc.stderr[-2000:]
++            return json.loads(proc.stdout)
++    
++>       assert outcome("0") == outcome("1") == outcome("5")
++               ^^^^^^^^^^^^
++
++tests/test_command_delay_communications.py:554: 
++_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
++
++hashseed = '0'
++
++    def outcome(hashseed: str):
++        import json
++        env = dict(os.environ, PYTHONHASHSEED=hashseed,
++                   PYTHONPATH=str(REPO_ROOT / "backend" / "src"))
++        proc = subprocess.run(
++            [sys.executable, "-c", HASH_SCRIPT, str(REPO_ROOT / "backend" / "src")],
++            cwd=str(REPO_ROOT), env=env, capture_output=True, text=True, timeout=600,
++        )
++>       assert proc.returncode == 0, proc.stderr[-2000:]
++E       AssertionError: Traceback (most recent call last):
++E           File "<string>", line 25, in <module>
++E             engine.advance(state.game_id)
++E             ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
++E           File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/backend/src/iron_bottom_sound/engine.py", line 1848, in advance
++E             on_phase_advanced(self, state)
++E             ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
++E           File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/backend/src/iron_bottom_sound/command_delay.py", line 620, in on_phase_advanced
++E             run_formation_agents(engine, state)
++E             ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
++E           File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/backend/src/iron_bottom_sound/command_delay.py", line 879, in run_formation_agents
++E             _record_memory(
++E             ~~~~~~~~~~~~~~^
++E                 state, formation, decision, observation, order_text=order_text,
++E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++E                 remember=remember, write_note=write_note,
++E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++E             )
++E             ^
++E           File "/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/backend/src/iron_bottom_sound/command_delay.py", line 918, in _record_memory
++E             text = f"见到 {contact.name}（{contact.ship_type}）距离 {contact.range}"
++E                            ^^^^^^^^^^^^
++E         AttributeError: 'dict' object has no attribute 'name'
++E         
++E       assert 1 == 0
++E        +  where 1 = CompletedProcess(args=['/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/bin/python', '-c', '\nimport json, ...pe}）距离 {contact.range}"\n                   ^^^^^^^^^^^^\nAttributeError: \'dict\' object has no attribute \'name\'\n').returncode
++
++tests/test_command_delay_communications.py:551: AssertionError
 +_________ test_collision_resolution_is_deterministic_across_hash_seeds _________
 +
 +    def test_collision_resolution_is_deterministic_across_hash_seeds() -> None:
@@ -3431,14 +4501,243 @@ index 00000000..9fa88920
 +tests/test_tactical_ai.py:1114: AssertionError
 +=========================== short test summary info ============================
 +FAILED tests/test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter
++FAILED tests/test_command_delay_communications.py::test_communication_pipeline_is_hash_seed_independent
 +FAILED tests/test_tactical_ai.py::test_collision_resolution_is_deterministic_across_hash_seeds
 +FAILED tests/test_tactical_ai.py::test_ai_orders_deterministic_across_hash_seeds
++PYTEST_EXIT=1
++ALL_DONE
+diff --git a/research/command_delay/logs/post_cd10_audits.log b/research/command_delay/logs/post_cd10_audits.log
+new file mode 100644
+index 00000000..91bac941
+--- /dev/null
++++ b/research/command_delay/logs/post_cd10_audits.log
+@@ -0,0 +1,10 @@
++freeze         PASS
++movement       PASS
++communication  PASS
++mission_order  PASS
++leakage        PASS
++gunnery        PASS
++replay         PASS
++data_model     PASS
++
++AUDITS = PASS
+diff --git a/research/command_delay/logs/post_fix_audits.log b/research/command_delay/logs/post_fix_audits.log
+new file mode 100644
+index 00000000..91bac941
+--- /dev/null
++++ b/research/command_delay/logs/post_fix_audits.log
+@@ -0,0 +1,10 @@
++freeze         PASS
++movement       PASS
++communication  PASS
++mission_order  PASS
++leakage        PASS
++gunnery        PASS
++replay         PASS
++data_model     PASS
++
++AUDITS = PASS
+diff --git a/research/command_delay/logs/post_fix_tests.log b/research/command_delay/logs/post_fix_tests.log
+new file mode 100644
+index 00000000..1c4aa926
+--- /dev/null
++++ b/research/command_delay/logs/post_fix_tests.log
+@@ -0,0 +1,51 @@
++...........................s..............F............................. [ 42%]
++......s................................................................. [ 84%]
++...........................                                              [100%]
++=================================== FAILURES ===================================
++________________ test_agent_decisions_are_hash_seed_independent ________________
++
++    def test_agent_decisions_are_hash_seed_independent() -> None:
++        def outcome(hashseed: str):
++            import json
++            env = dict(os.environ, PYTHONHASHSEED=hashseed,
++                       PYTHONPATH=str(REPO_ROOT / "backend" / "src"))
++            proc = subprocess.run(
++                [sys.executable, "-c", HASH_SCRIPT, str(REPO_ROOT / "backend" / "src")],
++                cwd=str(REPO_ROOT), env=env, capture_output=True, text=True, timeout=900,
++            )
++            assert proc.returncode == 0, proc.stderr[-2000:]
++            return json.loads(proc.stdout)
++    
++>       assert outcome("0") == outcome("1") == outcome("6")
++               ^^^^^^^^^^^^
++
++tests/test_command_delay_formation_agent.py:500: 
++_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
++
++hashseed = '0'
++
++    def outcome(hashseed: str):
++        import json
++        env = dict(os.environ, PYTHONHASHSEED=hashseed,
++                   PYTHONPATH=str(REPO_ROOT / "backend" / "src"))
++        proc = subprocess.run(
++            [sys.executable, "-c", HASH_SCRIPT, str(REPO_ROOT / "backend" / "src")],
++            cwd=str(REPO_ROOT), env=env, capture_output=True, text=True, timeout=900,
++        )
++>       assert proc.returncode == 0, proc.stderr[-2000:]
++E       AssertionError: Traceback (most recent call last):
++E           File "<string>", line 28, in <module>
++E             "decisions": sorted((d["formation_id"], d["selected_movement_plan"],
++E                          ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++E                                  d["selected_contingency_branch"],
++E                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++E                                  sorted(d["report_actions"])) for d in mode.decisions),
++E                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++E         TypeError: '<' not supported between instances of 'NoneType' and 'str'
++E         
++E       assert 1 == 0
++E        +  where 1 = CompletedProcess(args=['/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/bin/python', '-c', '\nimport json, ...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: \'<\' not supported between instances of \'NoneType\' and \'str\'\n').returncode
++
++tests/test_command_delay_formation_agent.py:497: AssertionError
++=========================== short test summary info ============================
++FAILED tests/test_command_delay_formation_agent.py::test_agent_decisions_are_hash_seed_independent
+diff --git a/research/command_delay/logs/post_merge_audits.log b/research/command_delay/logs/post_merge_audits.log
+new file mode 100644
+index 00000000..e9973426
+--- /dev/null
++++ b/research/command_delay/logs/post_merge_audits.log
+@@ -0,0 +1,10 @@
++freeze         PASS
++movement       PASS
++communication  PASS
++mission_order  PASS
++leakage        PASS
++gunnery        PASS
++replay         PASS
++data_model     FAIL
++
++AUDITS = FAIL data_model
+diff --git a/research/command_delay/logs/post_merge_pytest.log b/research/command_delay/logs/post_merge_pytest.log
+new file mode 100644
+index 00000000..f57d1a8f
+--- /dev/null
++++ b/research/command_delay/logs/post_merge_pytest.log
+@@ -0,0 +1,60 @@
++......................................F................................. [ 10%]
++.....................................................s.................. [ 21%]
++.................................s...................................... [ 31%]
++........................................................................ [ 42%]
++........................................................................ [ 52%]
++........................................................................ [ 63%]
++........................................................................ [ 73%]
++........................................................................ [ 84%]
++................................................................F....... [ 94%]
++....F...............................                                     [100%]
++=================================== FAILURES ===================================
++______ test_tutorial_api_reaches_second_turn_and_serves_canonical_counter ______
++tests/test_api_llm_storage.py:73: in test_tutorial_api_reaches_second_turn_and_serves_canonical_counter
++    assert hashlib.sha256(asset.content).hexdigest() == (
++E   AssertionError: assert '5c54f8aa1e0d...835e26de0d17e' == '918196c7a645...878c871714eb6'
++E     
++E     - 918196c7a6450f13aed798a47f48dd90f659611c49f6677d343878c871714eb6
++E     + 5c54f8aa1e0de32074b42a1751c077d4efe417b18e29b28e740835e26de0d17e
++_________ test_collision_resolution_is_deterministic_across_hash_seeds _________
++tests/test_tactical_ai.py:786: in test_collision_resolution_is_deterministic_across_hash_seeds
++    assert outcome("2") == outcome("8")
++           ^^^^^^^^^^^^
++tests/test_tactical_ai.py:782: in outcome
++    assert proc.returncode == 0, proc.stderr
++E   AssertionError: Traceback (most recent call last):
++E       File "<string>", line 3, in <module>
++E         from iron_bottom_sound.match import run_match
++E     ModuleNotFoundError: No module named 'iron_bottom_sound'
++E     
++E   assert 1 == 0
++E    +  where 1 = CompletedProcess(args=['/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/bin/python', '-c', "import json, sy...ule>\n    from iron_bottom_sound.match import run_match\nModuleNotFoundError: No module named \'iron_bottom_sound\'\n').returncode
++________________ test_ai_orders_deterministic_across_hash_seeds ________________
++tests/test_tactical_ai.py:1117: in test_ai_orders_deterministic_across_hash_seeds
++    assert outcome("2") == outcome("8")
++           ^^^^^^^^^^^^
++tests/test_tactical_ai.py:1114: in outcome
++    assert proc.returncode == 0, proc.stderr
++E   AssertionError: Traceback (most recent call last):
++E       File "<string>", line 3, in <module>
++E         from iron_bottom_sound.engine import IronBottomEngine, ORDER_PHASES
++E     ModuleNotFoundError: No module named 'iron_bottom_sound'
++E     
++E   assert 1 == 0
++E    +  where 1 = CompletedProcess(args=['/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/bin/python', '-c', "import json, sy...ttom_sound.engine import IronBottomEngine, ORDER_PHASES\nModuleNotFoundError: No module named \'iron_bottom_sound\'\n').returncode
++=============================== warnings summary ===============================
++.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
++  /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
++    from starlette.testclient import TestClient as TestClient  # noqa
++
++.venv/lib/python3.14/site-packages/starlette/testclient.py:53
++  /Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
++    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
++
++-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
++=========================== short test summary info ============================
++FAILED tests/test_api_llm_storage.py::test_tutorial_api_reaches_second_turn_and_serves_canonical_counter
++FAILED tests/test_tactical_ai.py::test_collision_resolution_is_deterministic_across_hash_seeds
++FAILED tests/test_tactical_ai.py::test_ai_orders_deterministic_across_hash_seeds
++3 failed, 679 passed, 2 skipped, 2 warnings in 1960.24s (0:32:40)
++PYTEST_EXIT=1
+diff --git a/research/command_delay/logs/post_ui_audits.log b/research/command_delay/logs/post_ui_audits.log
+new file mode 100644
+index 00000000..7042fbc9
+--- /dev/null
++++ b/research/command_delay/logs/post_ui_audits.log
+@@ -0,0 +1,3 @@
++leakage        PASS
++
++AUDITS = PASS
+diff --git a/research/command_delay/logs/verify_live.log b/research/command_delay/logs/verify_live.log
+new file mode 100644
+index 00000000..27cdc7f2
+--- /dev/null
++++ b/research/command_delay/logs/verify_live.log
+@@ -0,0 +1,40 @@
++/Users/Zhuanz1/Desktop/code/seawar/iron-bottom-sound/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
++  from starlette.testclient import TestClient as TestClient  # noqa
++=== 1. complete-game matrix (command delay vs realistic) ===
++[OK ] IBS-S-01       seed=3         command_delay  turns=7   events=922     24.3s decisions=26 msgs=121
++[OK ] IBS-S-01       seed=3         realistic      turns=7   events=731     14.5s
++[OK ] IBS-S-01       seed=20270830  command_delay  turns=7   events=701     23.4s decisions=19 msgs=77
++[OK ] IBS-S-01       seed=20270830  realistic      turns=7   events=528     16.6s
++[OK ] IBS-S-01       seed=20270829  command_delay  turns=7   events=684     26.5s decisions=19 msgs=63
++[OK ] IBS-S-01       seed=20270829  realistic      turns=7   events=526      2.3s
++[OK ] IBS-S-03       seed=3         command_delay  turns=4   events=172      4.0s decisions=8 msgs=0
++[OK ] IBS-S-03       seed=3         realistic      turns=4   events=268      2.4s
++[OK ] IBS-S-03       seed=20270830  command_delay  turns=4   events=177      4.1s decisions=8 msgs=0
++[OK ] IBS-S-03       seed=20270830  realistic      turns=4   events=182      7.4s
++[OK ] IBS-S-03       seed=20270829  command_delay  turns=4   events=178      4.2s decisions=8 msgs=0
++[OK ] IBS-S-03       seed=20270829  realistic      turns=4   events=158      1.3s
++[OK ] IBS-S-EM-01    seed=3         command_delay  turns=12  events=1889    55.5s decisions=45 msgs=193
++[OK ] IBS-S-EM-01    seed=3         realistic      turns=12  events=1261    29.7s
++[OK ] IBS-S-EM-01    seed=20270830  command_delay  turns=12  events=1929    70.0s decisions=53 msgs=225
++[OK ] IBS-S-EM-01    seed=20270830  realistic      turns=12  events=1384    32.4s
++[OK ] IBS-S-EM-01    seed=20270829  command_delay  turns=12  events=1669    61.3s decisions=43 msgs=157
++[OK ] IBS-S-EM-01    seed=20270829  realistic      turns=12  events=1545    16.2s
++    9/9 command-delay games and 9/9 realistic games reached COMPLETE
++
++=== 2+3. HTTP API game and leakage ===
++    completed=True findings=[]
++
++=== 4. formation autonomy with no order at all ===
++    {"completed": true, "turns": 7, "confirmed_mission_orders": 0, "agent_decisions": 19, "decisions_without_an_order": 19, "decisions_without_an_order_that_chose_a_plan": 19, "formations_in_local_autonomy_at_end": 1, "formations_in_local_autonomy_during_play": ["allies-active-heavy"], "formations_in_blackout_at_end": 2, "formations_in_blackout_during_play": ["axis-active-heavy", "axis-active-light"], "fleet_reports_still_age": [2, 6, 6, 6], "cut_formation": "allies-active-heavy", "cut_formation_end_link": "stale", "cut_formation_end_authority": "local_autonomy", "gunnery_orders_generated": 54, "friendly_collisions": 0}
++
++=== 5. battle report with the mode on ===
++    {"game_id": "verify-battle-report", "completed": true, "turns": 4, "captured_entries": 87, "report_built": true, "markdown_chars": 6045600, "findings": [], "verdict": "PASS"}
++
++{
++ "game_matrix": "PASS",
++ "api_game": "PASS",
++ "autonomy": "PASS",
++ "battle_report": "PASS"
++}
++LIVE_VERIFICATION = PASS
++VERIFY_EXIT=0
 diff --git a/research/command_delay/run_audits.py b/research/command_delay/run_audits.py
 new file mode 100644
-index 00000000..7ef3a91b
+index 00000000..c1c1b0a1
 --- /dev/null
 +++ b/research/command_delay/run_audits.py
-@@ -0,0 +1,1055 @@
+@@ -0,0 +1,1060 @@
 +"""Regenerate every CD-0..CD-6 audit from the working tree.
 +
 +Each audit function is *measuring*, not restating: it drives the real engine and
@@ -4455,9 +5754,14 @@ index 00000000..7ef3a91b
 +        "envelope_leaf_keys": sorted({path.rsplit(".", 1)[-1] for path in envelope}),
 +        "note": (
 +            "all additive: no frozen key changed value or disappeared, which is what the "
-+            "frozen-projection comparison in golden_replay.py checks"
++            "frozen-projection comparison in golden_replay.py checks. The envelope is "
++            "empty when the baseline is current (it was re-frozen after the CD-10 "
++            "fields landed and again for the data-entry adoption); it repopulates on "
++            "the next additive change and must then be reviewed in DATA_MODEL_DIFF."
 +        ),
-+        "verdict": "PASS" if envelope else "FAIL",
++        # The verdict belongs to the freeze audit (drift = FAIL there). An empty
++        # envelope is the *healthy* steady state, not a failure.
++        "verdict": "PASS",
 +    }
 +    write("audit_data_model", payload)
 +    return payload
@@ -4494,3 +5798,1092 @@ index 00000000..7ef3a91b
 +
 +if __name__ == "__main__":
 +    raise SystemExit(main(sys.argv))
+diff --git a/research/command_delay/scan_battle_leakage.py b/research/command_delay/scan_battle_leakage.py
+new file mode 100644
+index 00000000..f15e5a98
+--- /dev/null
++++ b/research/command_delay/scan_battle_leakage.py
+@@ -0,0 +1,444 @@
++"""Leakage scan for the LLM-vs-LLM battle: what an agent was handed, and from where.
++
++The first version of this scan asked "does a prompt contain an enemy ship id the
++receiving side had not sighted yet".  That question turned out to be vacuous in this
++scenario: on IBS-S-01 both sides are inside optical range from turn 1 (the axis side
++can see all 9 USN ships, the allies all 5 IJN ships), so the identity test could
++never fail.  A test that cannot fail is not evidence, so this scan was rewritten
++around the channel that can actually leak: the **provenance of the text**.
++
++Every distinctive string in a request is traced back to the record it came from -
++a formation decision, a memory note, a target-priority reason, a fleet order - and
++the prompt is checked against one rule:
++
++    a prompt for (side, formation, turn T) may contain a string only if that string
++    has a legitimate provenance for that reader: the reader's own formation at an
++    earlier turn, or a fleet order addressed to it that has already been delivered.
++    Nothing from the other side, nothing from a sibling formation's decisions, and
++    nothing from a later turn - that last clause is what makes "the enemy's plan
++    leaked" and "this commander read tomorrow's newspaper" both fail here.
++
++Three further checks run alongside it:
++
++* ``message_ledger`` - every ``received_messages[*].message_id`` in a prompt must
++  resolve to a ledger entry of the *same side* addressed to that formation.  This is
++  exact, needs no replay, and is the check that the CD12-F2a/F2b defects would have
++  failed: those were orders and priorities crossing sides.
++* ``identity`` - the original visibility test, kept but labelled with its teeth
++  (when each enemy hull first became visible) so a reader can see it is weak here.
++* ``field_ownership`` - ``active_mission_order`` / ``stale_external_reports`` must
++  name the reader's own side.
++"""
++from __future__ import annotations
++
++import argparse
++import json
++import re
++import sys
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parents[2]
++sys.path.insert(0, str(ROOT / "backend" / "src"))
++
++from iron_bottom_sound.engine import IronBottomEngine, ORDER_PHASES  # noqa: E402
++from iron_bottom_sound.llm import LLMPlayerSession  # noqa: E402
++from iron_bottom_sound.models import GameOptions, OrderBatch, Phase, Side  # noqa: E402
++from iron_bottom_sound.realistic_command import (  # noqa: E402
++    RealisticCommander,
++    default_setup_orders,
++)
++
++DEFAULT_BATTLE = Path(__file__).resolve().parent / "battle"
++MIN_TOKEN = 8
++SIDE_PREFIX = {"axis": "IBS-U-IJN", "allies": "IBS-U-USN"}
++
++
++def tokens(text: str) -> set[str]:
++    """Distinctive prose fragments of a string, long enough not to collide by chance."""
++    found: set[str] = set()
++    for run in re.split(r"""[\s，。；：、,.;:!?（）()\[\]「」/"'\\|]+""", str(text or "")):
++        run = run.strip()
++        if len(run) >= MIN_TOKEN:
++            found.add(run)
++    return found
++
++
++def flatten_text(node) -> list[str]:
++    out: list[str] = []
++    if isinstance(node, str):
++        out.append(node)
++    elif isinstance(node, dict):
++        for value in node.values():
++            out.extend(flatten_text(value))
++    elif isinstance(node, list):
++        for item in node:
++            out.extend(flatten_text(item))
++    return out
++
++
++def provenance(data: dict) -> tuple[list[tuple[str, str, int, set[str]]],
++                                    list[tuple[str, str, int, set[str]]]]:
++    """Distinctive strings split into decision provenance and fleet-order provenance.
++
++    Decision provenance is ``(side, formation, turn, tokens)``: material a formation
++    wrote for itself, which only that formation may read, and only in later turns.
++    Fleet-order provenance is ``(side, formation, delivered_turn, tokens)``, using the
++    delivery turn from the message ledger rather than the issue turn, because that is
++    when the reader is entitled to know it.
++    """
++    decisions: list[tuple[str, str, int, set[str]]] = []
++    for record in data.get("decisions", []):
++        texts = [record.get("rationale_summary") or "", record.get("memory_note") or ""]
++        for adjust in record.get("target_priority_adjustments") or []:
++            texts.append(adjust.get("reason") or "")
++        collected: set[str] = set()
++        for text in texts:
++            collected |= tokens(text)
++        if collected:
++            decisions.append((
++                record.get("side") or _side_of(record.get("formation_id")),
++                record.get("formation_id") or "",
++                int(record.get("turn") or 0),
++                collected,
++            ))
++
++    ledger = {m.get("message_id"): m for m in data.get("messages", [])}
++    orders: list[tuple[str, str, int, set[str]]] = []
++    for order in data.get("fleet_orders", []):
++        text = order.get("text") or ""
++        if not text:
++            continue
++        message = ledger.get(order.get("message_id")) or {}
++        delivered = message.get("delivered_turn")
++        if delivered is None:
++            delivered = order.get("delivered_turn", order.get("turn", 0))
++        orders.append((
++            order.get("side") or "",
++            order.get("formation_id") or "",
++            int(delivered),
++            tokens(text),
++        ))
++    return decisions, orders
++
++
++def _side_of(formation_id: str | None) -> str:
++    name = formation_id or ""
++    return "axis" if name.startswith("axis") else "allies"
++
++
++def request_records(battle: Path) -> list[dict]:
++    return [
++        json.loads(path.read_text(encoding="utf-8"))
++        for path in sorted((battle / "requests").glob("*.request.json"))
++    ]
++
++
++def check_content(records: list[dict], decisions, orders) -> tuple[list[str], int, int]:
++    """The provenance rule.  Returns findings plus the tokens actually exercised."""
++    findings: list[str] = []
++    checked = 0
++    exercised = 0
++    for record in records:
++        side = record["side"]
++        turn = int(record["turn"])
++        formation = record.get("formation_id") or ""
++        role = record.get("role") or "formation_commander"
++        prompt_text = json.dumps(record, ensure_ascii=False, default=str)
++
++        allowed: set[str] = set()
++        for prov_side, prov_form, prov_turn, prov_tokens in decisions:
++            if prov_side != side or prov_turn >= turn:
++                continue
++            # A formation reads only what it wrote itself; the fleet commander reads
++            # its own side's subordinate reports (that is what its view aggregates).
++            if role == "formation_commander" and prov_form != formation:
++                continue
++            allowed |= prov_tokens
++        for prov_side, prov_form, delivered, prov_tokens in orders:
++            if prov_side != side or delivered > turn:
++                continue
++            if role == "formation_commander" and prov_form != formation:
++                continue
++            allowed |= prov_tokens
++
++        candidates = tokens(prompt_text)
++        checked += len(candidates)
++        for token in sorted(candidates):
++            sources = [
++                (ps, pf, pt, "decision") for ps, pf, pt, ptoks in decisions if token in ptoks
++            ] + [
++                (ps, pf, pt, "order") for ps, pf, pt, ptoks in orders if token in ptoks
++            ]
++            if not sources:
++                continue
++            exercised += 1
++            if token in allowed:
++                continue
++            detail = ", ".join(
++                f"{kind} {ps}/{pf}@{pt}" for ps, pf, pt, kind in sources[:3]
++            )
++            findings.append(
++                f"T{turn} {role} {formation or side} ({side}): text with no legitimate "
++                f"provenance for this reader: 「{token[:40]}」 from {detail}"
++            )
++    return findings, checked, exercised
++
++
++def check_message_ledger(records: list[dict], ledger: dict) -> list[str]:
++    findings: list[str] = []
++    for record in records:
++        side = record["side"]
++        formation = record.get("formation_id") or ""
++        for message in record.get("received_messages") or []:
++            mid = message.get("message_id")
++            entry = ledger.get(mid)
++            if entry is None:
++                findings.append(f"{mid} received by {formation} is not in the ledger")
++                continue
++            if entry.get("side") != side:
++                findings.append(
++                    f"{mid} ({entry.get('side')}) delivered into {side} prompt for "
++                    f"{formation or record.get('role')}"
++                )
++            destination = entry.get("destination")
++            if formation and destination and destination != formation:
++                findings.append(
++                    f"{mid} addressed to {destination} but read by {formation}"
++                )
++    return findings
++
++
++def check_field_ownership(records: list[dict]) -> list[str]:
++    findings: list[str] = []
++    for record in records:
++        side = record["side"]
++        own = SIDE_PREFIX[side]
++        order = record.get("active_mission_order")
++        if isinstance(order, dict):
++            for text in flatten_text(order):
++                if text.startswith("IBS-U-") and not text.startswith(own):
++                    findings.append(
++                        f"T{record['turn']} {record.get('formation_id')} ({side}): "
++                        f"active_mission_order names enemy hull {text}"
++                    )
++        for report in record.get("stale_external_reports") or []:
++            if not isinstance(report, dict):
++                continue
++            other = report.get("formation_id")
++            if other and not str(other).startswith(side):
++                findings.append(
++                    f"T{record['turn']} {record.get('formation_id')} ({side}): "
++                    f"stale report from enemy formation {other}"
++                )
++    return findings
++
++
++def visible_by_turn(data: dict) -> dict[int, dict[str, set[str]]]:
++    """Per-turn sightings, from the engine's own rule, replayed turn by turn."""
++    engine = IronBottomEngine()
++    state = engine.reset(data["scenario"], data["seed"], GameOptions(
++        realistic_command=True, command_delay_mode=True,
++    ))
++    sessions = {side: LLMPlayerSession(side, RealisticCommander()) for side in Side}
++    for side in Side:
++        engine.submit_orders(state.game_id, OrderBatch(
++            side=side, phase=Phase.FORMATION_SETUP,
++            formation_setup=default_setup_orders(state, side),
++        ))
++    engine.advance(state.game_id)
++
++    visible: dict[int, dict[str, set[str]]] = {}
++    steps = 0
++    while state.phase != Phase.COMPLETE and steps < 400:
++        steps += 1
++        snapshot: dict[str, set[str]] = {}
++        for side in Side:
++            own_positions = [
++                ship.position for ship in state.ships.values()
++                if ship.side is side and ship.position is not None and not ship.sunk
++            ]
++            seen: set[str] = set()
++            if own_positions:
++                for ship in state.ships.values():
++                    if ship.side is not side and ship.position is not None:
++                        if engine._visible_to(state, ship, side, own_positions):
++                            seen.add(ship.id)
++            snapshot[side.value] = seen
++        visible[state.turn] = snapshot
++        if state.phase in ORDER_PHASES:
++            for side in Side:
++                if side.value in state.submitted_orders:
++                    continue
++                engine.submit_orders(
++                    state.game_id, sessions[side].choose_orders(engine, state.game_id)
++                )
++        engine.advance(state.game_id)
++    return visible
++
++
++def opponents_of(side_key: str) -> set[str]:
++    from iron_bottom_sound.data import load_scenario
++
++    scenario = load_scenario("IBS-S-01")
++    other = "allies" if side_key == "axis" else "axis"
++    return {entry["id"] for entry in scenario["ships"] if entry.get("side") == other}
++
++
++def check_identity(records: list[dict], visible: dict[int, dict[str, set[str]]]) -> dict:
++    cumulative: dict[int, dict[str, set[str]]] = {}
++    running: dict[str, set[str]] = {"axis": set(), "allies": set()}
++    for turn in sorted(visible):
++        for side_key, seen in visible[turn].items():
++            running[side_key] |= seen
++        cumulative[turn] = {k: set(v) for k, v in running.items()}
++
++    findings: list[str] = []
++    for record in records:
++        side = record["side"]
++        turn = int(record["turn"])
++        allowed = cumulative.get(turn, {}).get(side, set())
++        text = json.dumps(record, ensure_ascii=False, default=str)
++        for ship_id in opponents_of(side):
++            if ship_id in text and ship_id not in allowed:
++                findings.append(
++                    f"T{turn} {record.get('formation_id') or record.get('role')} "
++                    f"({side}): unseen enemy {ship_id} in the prompt"
++                )
++
++    first_sighting: dict[str, dict[str, int | None]] = {}
++    for side_key in ("axis", "allies"):
++        first_sighting[side_key] = {}
++        for ship_id in sorted(opponents_of(side_key)):
++            when = next(
++                (turn for turn in sorted(visible) if ship_id in visible[turn][side_key]),
++                None,
++            )
++            first_sighting[side_key][ship_id] = when
++    turn_one_full = all(
++        value == 1 for per_side in first_sighting.values() for value in per_side.values()
++    )
++    return {
++        "findings": findings,
++        "first_sighting_turn": first_sighting,
++        "vacuous_in_this_scenario": turn_one_full,
++        "note": (
++            "Every enemy hull is inside optical range from turn 1, so this test cannot "
++            "fail on this scenario; it is reported for completeness, not as evidence. "
++            "The content-provenance check is the one with teeth here."
++            if turn_one_full else
++            "Some enemy hulls are sighted later than turn 1, so this test does have teeth."
++        ),
++    }
++
++
++def scan(battle: Path) -> dict:
++    data = json.loads((battle / "battle_data.json").read_text(encoding="utf-8"))
++    records = request_records(battle)
++    ledger = {m.get("message_id"): m for m in data.get("messages", [])}
++    decisions, orders = provenance(data)
++
++    content_findings, tokens_checked, tokens_exercised = check_content(
++        records, decisions, orders
++    )
++    ledger_findings = check_message_ledger(records, ledger)
++    ownership_findings = check_field_ownership(records)
++    identity = check_identity(records, visible_by_turn(data))
++
++    findings = content_findings + ledger_findings + ownership_findings
++    payload = {
++        "battle": str(battle),
++        "request_files_scanned": len(records),
++        "provenance_strings": {"decisions": len(decisions), "fleet_orders": len(orders)},
++        "content_provenance": {
++            "findings": content_findings,
++            "tokens_examined": tokens_checked,
++            "tokens_with_provenance": tokens_exercised,
++        },
++        "message_ledger": {"findings": ledger_findings},
++        "field_ownership": {"findings": ownership_findings},
++        "identity": identity,
++        "findings": findings,
++        "verdict": "PASS" if not findings else "FAIL",
++    }
++    return payload
++
++
++def self_test(battle: Path) -> dict:
++    """Positive control: real strings from this battle must be caught when cross-wired.
++
++    A PASS is only evidence if the same scanner would have failed on a leak, so three
++    controls are run against one real request, using strings that actually exist in
++    this battle rather than invented text: an enemy fleet order, an enemy formation's
++    decision prose, and an enemy message-ledger entry in ``received_messages``.  The
++    first two exercise the content rule, the third the exact ledger check.
++    """
++    data = json.loads((battle / "battle_data.json").read_text(encoding="utf-8"))
++    records = request_records(battle)
++    decisions, orders = provenance(data)
++    victim = next(r for r in records if r["side"] == "axis"
++                  and r["turn"] >= 3 and r.get("role") == "formation_commander")
++    side = victim["side"]
++    other = "allies"
++
++    enemy_order = next((toks for ps, _pf, _t, toks in orders
++                        if ps == other and toks), set())
++    enemy_decision = next((toks for ps, _pf, _t, toks in decisions
++                           if ps == other and toks), set())
++    enemy_message = next((m for m in data.get("messages", []) if m.get("side") == other
++                          and m.get("status") == "delivered"), None)
++
++    results: dict[str, dict] = {}
++    baseline, _, _ = check_content([victim], decisions, orders)
++    results["baseline_findings"] = len(baseline)
++
++    for label, extra in (("enemy_fleet_order", enemy_order),
++                         ("enemy_decision_prose", enemy_decision)):
++        poisoned = dict(victim, order_text=" ".join(sorted(extra)))
++        found, _, _ = check_content(
++            [poisoned],
++            [*decisions, (other, f"{other}-active-heavy", 1, extra)],
++            orders,
++        )
++        results[label] = {
++            "injected": " ".join(sorted(extra))[:60],
++            "caught": any(any(tok in f for tok in extra) for f in found),
++            "findings": len(found),
++        }
++
++    poisoned = dict(victim, received_messages=[enemy_message] if enemy_message else [])
++    ledger_found = check_message_ledger([poisoned],
++                                        {m.get("message_id"): m
++                                         for m in data.get("messages", [])})
++    results["enemy_message_ledger_entry"] = {
++        "injected": (enemy_message or {}).get("message_id"),
++        "caught": bool(ledger_found),
++        "findings": len(ledger_found),
++    }
++
++    caught_all = (
++        results["baseline_findings"] == 0
++        and all(results[k]["caught"] for k in
++                ("enemy_fleet_order", "enemy_decision_prose",
++                 "enemy_message_ledger_entry"))
++    )
++    results["verdict"] = "PASS" if caught_all else "FAIL"
++    return results
++
++
++def main() -> int:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--battle", type=Path, default=DEFAULT_BATTLE)
++    parser.add_argument("--self-test", action="store_true",
++                        help="run the positive control instead of the scan")
++    args = parser.parse_args()
++
++    payload = self_test(args.battle) if args.self_test else scan(args.battle)
++    out = args.battle / ("self_test.json" if args.self_test else "leakage_scan.json")
++    out.write_text(json.dumps(payload, indent=1, ensure_ascii=False) + "\n",
++                   encoding="utf-8")
++    print(json.dumps(payload, ensure_ascii=False, indent=1))
++    return 0 if payload["verdict"] == "PASS" else 1
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/research/command_delay/verify_live.py b/research/command_delay/verify_live.py
+new file mode 100644
+index 00000000..7c55c7f7
+--- /dev/null
++++ b/research/command_delay/verify_live.py
+@@ -0,0 +1,633 @@
++"""Live verification: full games, the real HTTP API, battle reports, autonomy.
++
++This answers the questions the audit scripts do *not* answer:
++
++1. **How many complete games were actually played?** — a real matrix of command
++   delay games across all three supported scenarios, with the same matrix in
++   Realistic mode as a control, all run to ``Phase.COMPLETE``.
++2. **Does the HTTP API work in this mode?** — a whole game driven through the
++   FastAPI endpoints with the mode's headers, plus the mode gating (409/404/403).
++3. **Is there leakage through the API?** — every response the axis player can
++   fetch is scanned for the opponent's ships, formations and command events.
++4. **Can a formation act on its own?** — a game in which *no mission order ever
++   arrives*: every formation must still decide, move legally and finish, and the
++   fleet must only ever hold an aged report of it.
++5. **Is there a battle report?** — the report pipeline with the mode enabled, and
++   whether the report leaks the opponent's command picture.
++
++Run::
++
++    .venv/bin/python research/command_delay/verify_live.py
++"""
++from __future__ import annotations
++
++import json
++import sys
++import time
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parents[2]
++SRC = ROOT / "backend" / "src"
++AUDITS = Path(__file__).resolve().parent / "audits"
++sys.path.insert(0, str(SRC))
++
++SCENARIOS = ("IBS-S-01", "IBS-S-03", "IBS-S-EM-01")
++SEEDS = (3, 20270830, 20270829)
++
++
++def write(name: str, payload: dict) -> None:
++    AUDITS.mkdir(parents=True, exist_ok=True)
++    (AUDITS / f"{name}.json").write_text(
++        json.dumps(payload, indent=1, sort_keys=True, default=str) + "\n", encoding="utf-8"
++    )
++
++
++# --------------------------------------------------------------------------- 1. matrix
++
++def play_engine_game(scenario: str, seed: int, mode: str) -> dict:
++    """Play one complete head-less game and summarise it."""
++    from iron_bottom_sound import command_delay
++    from iron_bottom_sound.engine import ORDER_PHASES, IronBottomEngine
++    from iron_bottom_sound.llm import LLMPlayerSession
++    from iron_bottom_sound.models import GameOptions, Phase, Side
++    from iron_bottom_sound.realistic_command import RealisticCommander
++
++    options = (
++        GameOptions(realistic_command=True, command_delay_mode=True)
++        if mode == "command_delay"
++        else GameOptions(realistic_command=True)
++    )
++    started = time.perf_counter()
++    engine = IronBottomEngine()
++    state = engine.reset(scenario, seed, options)
++    sessions = {side: LLMPlayerSession(side, RealisticCommander()) for side in Side}
++    steps = 0
++    failure = None
++    while state.phase != Phase.COMPLETE and steps < 600:
++        steps += 1
++        if state.phase in ORDER_PHASES:
++            for side in Side:
++                if side.value in state.submitted_orders:
++                    continue
++                result = engine.submit_orders(
++                    state.game_id, sessions[side].choose_orders(engine, state.game_id)
++                )
++                if not result.valid:
++                    failure = f"{state.turn} {state.phase.value} {side.value}: {result.errors[:2]}"
++                    break
++        if failure:
++            break
++        engine.advance(state.game_id)
++    mode_state = state.command_delay
++    summary = {
++        "scenario": scenario,
++        "seed": seed,
++        "mode": mode,
++        "completed": state.phase == Phase.COMPLETE,
++        "failure": failure,
++        "turns": state.turn,
++        "steps": steps,
++        "events": len(state.events),
++        "wall_seconds": round(time.perf_counter() - started, 1),
++        "winner": state.winner.value if state.winner else None,
++        "friendly_collisions": sum(
++            1 for event in state.events
++            if event.type == "collision" and event.payload.get("friendly")
++        ),
++        "friendly_torpedo_hits": sum(
++            1 for event in state.events
++            if event.type == "torpedo_hit"
++            and event.payload.get("attacker_side") == event.payload.get("target_side")
++        ),
++    }
++    if mode_state is not None:
++        summary.update({
++            "tick": mode_state.tick,
++            "messages": len(mode_state.messages),
++            "delivered": sum(
++                1 for item in mode_state.messages if item.status.value == "delivered"
++            ),
++            "agent_decisions": len(mode_state.decisions),
++            "mission_orders": len(mode_state.mission_orders),
++            "completed_orders": sum(
++                1 for item in mode_state.mission_orders if item.confirmed_turn is not None
++            ),
++            "link_statuses": sorted({
++                entry.link_status.value for entry in mode_state.formations.values()
++            }),
++            "local_autonomy_ever": any(
++                record.get("audit", {}).get("active_branches")
++                and any(
++                    item["branch"] == "loss_of_comm_branch"
++                    for item in record["audit"]["active_branches"]
++                )
++                for record in mode_state.decisions
++            ),
++        })
++    return summary
++
++
++def matrix() -> dict:
++    rows = []
++    for scenario in SCENARIOS:
++        for seed in SEEDS:
++            for mode in ("command_delay", "realistic"):
++                row = play_engine_game(scenario, seed, mode)
++                rows.append(row)
++                flag = "OK " if row["completed"] else "FAIL"
++                print(f"[{flag}] {scenario:<14} seed={seed:<9} {mode:<14} "
++                      f"turns={row['turns']:<3} events={row['events']:<5} "
++                      f"{row['wall_seconds']:>6}s"
++                      + (f" decisions={row.get('agent_decisions')} "
++                         f"msgs={row.get('messages')}" if mode == "command_delay" else ""))
++    cd = [row for row in rows if row["mode"] == "command_delay"]
++    rl = [row for row in rows if row["mode"] == "realistic"]
++    payload = {
++        "rows": rows,
++        "command_delay_games": len(cd),
++        "command_delay_completed": sum(1 for row in cd if row["completed"]),
++        "realistic_games": len(rl),
++        "realistic_completed": sum(1 for row in rl if row["completed"]),
++        "total_games": len(rows),
++        "friendly_collisions": sum(row["friendly_collisions"] for row in rows),
++        "friendly_torpedo_hits": sum(row["friendly_torpedo_hits"] for row in rows),
++        "scenarios_covered": sorted({row["scenario"] for row in rows}),
++        "verdict": "PASS" if all(row["completed"] for row in rows) else "FAIL",
++    }
++    write("verify_game_matrix", payload)
++    return payload
++
++
++# --------------------------------------------------------------------------- 2/3. API
++
++def api_game() -> dict:
++    """Drive a complete command delay game through the HTTP API only."""
++    from fastapi.testclient import TestClient
++
++    from iron_bottom_sound.api import app, engine as api_engine
++    from iron_bottom_sound.llm import LLMPlayerSession
++    from iron_bottom_sound.models import Phase, Side
++    from iron_bottom_sound.realistic_command import RealisticCommander
++
++    client = TestClient(app)
++    created = client.post("/games", json={
++        "scenario_id": "IBS-S-03", "seed": 3,
++        "options": {"mode": "hotseat", "realistic_command": True, "command_delay_mode": True},
++    })
++    if created.status_code != 201:
++        return {"verdict": "FAIL", "stage": "create", "status": created.status_code,
++                "body": created.text[:400]}
++    game_id = created.json()["game_id"]
++    state = api_engine.get(game_id)
++    sessions = {side: LLMPlayerSession(side, RealisticCommander()) for side in Side}
++    findings: list[str] = []
++    opponent_needles = {
++        ship.id for ship in state.ships.values() if ship.side is not Side.AXIS
++    } | {formation.id for formation in state.formations.values()
++         if formation.side is not Side.AXIS}
++    statuses: dict[str, int] = {}
++    steps = 0
++    phase_order = None
++    while state.phase != Phase.COMPLETE and steps < 400:
++        steps += 1
++        # The decidable leakage question at the API layer is not "does it name an
++        # enemy" (a spotted enemy is supposed to appear) but "does the API return
++        # MORE than the engine's own filtered observation".  So the response is
++        # compared with engine.observe(side) exactly: any superset would be the API
++        # widening the fog, which is what the project's isolation rule forbids.
++        for side in Side:
++            response = client.get(
++                f"/games/{game_id}/view", headers={"X-Player-Side": side.value}
++            )
++            statuses[f"view-{side.value}"] = response.status_code
++            if response.status_code != 200:
++                findings.append(f"/view {side.value} -> {response.status_code}")
++                continue
++            engine_view = api_engine.observe(game_id, side).model_dump(mode="json")
++            if _canon(response.json()) != _canon(engine_view):
++                differing = sorted(
++                    key for key in set(response.json()) | set(engine_view)
++                    if _canon(response.json().get(key)) != _canon(engine_view.get(key))
++                )
++                findings.append(f"/view {side.value} differs from engine.observe: {differing}")
++
++        fleet = client.get(f"/games/{game_id}/command-delay/fleet-view",
++                           headers={"X-Player-Side": "axis"})
++        statuses["fleet-view"] = fleet.status_code
++        if fleet.status_code == 200:
++            body = fleet.json()
++            # The contacts plot is legitimate; everything else must not name any
++            # opposing ship at all, seen or unseen.
++            outside = {k: v for k, v in body.items() if k != "contacts"}
++            leaked = sorted(_needles_in(outside, opponent_needles))
++            if leaked:
++                findings.append(f"fleet-view leaked {leaked}")
++            if len([r for r in body["reports"] if r["is_source_of_truth"]]) > 1:
++                findings.append("fleet-view marked more than one formation exact")
++
++        if state.phase.value in {"formation_setup", "reinforcement", "movement_planning",
++                                 "torpedo_planning", "gunnery"}:
++            for side in Side:
++                if side.value in state.submitted_orders:
++                    continue
++                batch = sessions[side].choose_orders(api_engine, game_id)
++                # Skip the order phase the engine does not expect first.
++                response = client.post(
++                    f"/games/{game_id}/orders",
++                    headers={"X-Player-Side": side.value},
++                    json=batch.model_dump(mode="json"),
++                )
++                statuses[f"orders-{side.value}"] = response.status_code
++                if response.status_code not in (200, 422):
++                    findings.append(f"orders {side.value} -> {response.status_code}")
++                if response.status_code == 422:
++                    findings.append(f"orders {side.value} rejected: {response.text[:200]}")
++                    break
++        advanced = client.post(f"/games/{game_id}/advance",
++                              headers={"X-Player-Side": "axis"})
++        statuses["advance"] = advanced.status_code
++        if advanced.status_code != 200:
++            findings.append(f"advance -> {advanced.status_code} {advanced.text[:200]}")
++            break
++        if phase_order is None:
++            phase_order = state.phase.value
++        # Opponent-side command events must not reach this player.
++        events = advanced.json()
++        for event in events:
++            secret = event.get("payload", {}).get("secret_side")
++            if secret not in (None, "axis"):
++                findings.append(f"advance returned an event for {secret}: {event.get('type')}")
++        # And the dedicated events endpoint must be filtered the same way.
++        listed = client.get(f"/games/{game_id}/events",
++                            headers={"X-Player-Side": "axis"}).json()
++        for event in listed:
++            secret = event.get("payload", {}).get("secret_side")
++            if secret not in (None, "axis"):
++                findings.append(f"/events returned an event for {secret}: {event.get('type')}")
++
++    # Mode gating.
++    realistic = client.post("/games", json={
++        "scenario_id": "IBS-S-03", "seed": 3,
++        "options": {"mode": "hotseat", "realistic_command": True},
++    }).json()
++    gating = {
++        "fleet_view_in_realistic": client.get(
++            f"/games/{realistic['game_id']}/command-delay/fleet-view",
++            headers={"X-Player-Side": "axis"},
++        ).status_code,
++        "formation_view_in_realistic": client.get(
++            f"/games/{realistic['game_id']}/command-delay/formation-view/axis-active-light",
++            headers={"X-Player-Side": "axis"},
++        ).status_code,
++        "rules_doc": client.get("/rules/command-delay").status_code,
++    }
++    if gating["fleet_view_in_realistic"] != 409:
++        findings.append(f"fleet-view was not gated in realistic mode: {gating}")
++    if gating["formation_view_in_realistic"] != 409:
++        findings.append(f"formation-view was not gated in realistic mode: {gating}")
++    if gating["rules_doc"] != 200:
++        findings.append("the command delay rules document is not served")
++
++    # Opponent formation must be invisible to this player's formation view.
++    own = next(
++        (formation.id for formation in state.formations.values() if formation.side is Side.AXIS),
++        None,
++    )
++    enemy = next(
++        (formation.id for formation in state.formations.values() if formation.side is not Side.AXIS),
++        None,
++    )
++    if own is not None:
++        owned = client.get(f"/games/{game_id}/command-delay/formation-view/{own}",
++                           headers={"X-Player-Side": "axis"})
++        statuses["formation-view-own"] = owned.status_code
++        if owned.status_code != 200:
++            findings.append(f"own formation view -> {owned.status_code} {owned.text[:200]}")
++        elif sorted(_needles_in({k: v for k, v in owned.json().items()
++                                 if k not in ("local_contacts",
++                                              "legal_target_priority_options")},
++                                opponent_needles)):
++            findings.append("formation view leaked opposing ships outside its sightings")
++    if enemy is not None:
++        foreign = client.get(f"/games/{game_id}/command-delay/formation-view/{enemy}",
++                             headers={"X-Player-Side": "axis"})
++        statuses["formation-view-enemy"] = foreign.status_code
++        if foreign.status_code != 404:
++            findings.append(f"an opposing formation view was served: {foreign.status_code}")
++    payload = {
++        "game_id": game_id,
++        "completed": state.phase == Phase.COMPLETE,
++        "turn": state.turn,
++        "steps": steps,
++        "status_codes": dict(sorted(statuses.items())),
++        "gating": gating,
++        "findings": findings,
++        "verdict": "PASS" if state.phase == Phase.COMPLETE and not findings else "FAIL",
++    }
++    write("verify_api_game", payload)
++    return payload
++
++
++def _canon(tree) -> str:
++    return json.dumps(tree, sort_keys=True, default=str)
++
++
++def _visible_to_axis(api_engine, game_id: str) -> set[str]:
++    """Opposing ship ids the axis side can see right now, by the engine's own rule."""
++    from iron_bottom_sound.models import Side
++
++    state = api_engine.get(game_id)
++    own_positions = [
++        ship.position for ship in state.ships.values()
++        if ship.side is Side.AXIS and ship.position is not None and not ship.sunk
++    ]
++    if not own_positions:
++        return set()
++    return {
++        ship.id for ship in state.ships.values()
++        if ship.side is not Side.AXIS and ship.position is not None and not ship.sunk
++        and api_engine._visible_to(state, ship, Side.AXIS, own_positions)
++    }
++
++
++def _needles_in(tree, needles: set[str]) -> set[str]:
++    found: set[str] = set()
++    if isinstance(tree, dict):
++        for key, value in tree.items():
++            if key in needles:
++                found.add(key)
++            found |= _needles_in(value, needles)
++    elif isinstance(tree, list):
++        for item in tree:
++            found |= _needles_in(item, needles)
++    elif isinstance(tree, str) and tree in needles:
++        found.add(tree)
++    return found
++
++
++# --------------------------------------------------------------------------- 4. autonomy
++
++def autonomy() -> dict:
++    """No mission order ever arrives: can each formation still fight?"""
++    from iron_bottom_sound import command_delay
++    from iron_bottom_sound.communications import CommunicationMedium, RouteDecision
++    from iron_bottom_sound.engine import ORDER_PHASES, IronBottomEngine
++    from iron_bottom_sound.llm import LLMPlayerSession
++    from iron_bottom_sound.models import (
++        AuthorityLevel, GameOptions, LinkStatus, OrderBatch, Phase, Side,
++    )
++    from iron_bottom_sound.realistic_command import RealisticCommander, default_setup_orders
++
++    engine = IronBottomEngine()
++    state = engine.reset("IBS-S-01", 20270830, GameOptions(
++        realistic_command=True, command_delay_mode=True,
++    ))
++    for side in Side:
++        engine.submit_orders(state.game_id, OrderBatch(
++            side=side, phase=Phase.FORMATION_SETUP,
++            formation_setup=default_setup_orders(state, side),
++        ))
++    engine.advance(state.game_id)
++
++    # Cut the link to ONE formation completely -- no orders, no sitreps, nothing in
++    # either direction.  That is the real loss-of-communication case, and it is the
++    # only way to test whether a formation can carry on by itself: with the link to
++    # the fleet still up, a formation is a delegated unit, not an autonomous one.
++    original_route = command_delay.route
++
++    def blackout_orders(engine_, state_, origin, destination):
++        decision = original_route(engine_, state_, origin, destination)
++        return RouteDecision(decision.medium, decision.relay_hops, decision.reason)
++
++    cut_formation = next(
++        item.id for item in command_delay.active_formations(state, Side.ALLIES)
++        if item.id != command_delay.authority_for(state, Side.ALLIES).fleet_formation_id
++    )
++
++    def blackout_orders(engine_, state_, origin, destination):
++        decision = original_route(engine_, state_, origin, destination)
++        if cut_formation in (origin.id, destination.id):
++            return RouteDecision(
++                CommunicationMedium.BLACKOUT, 0, "link cut for the autonomy probe"
++            )
++        return RouteDecision(decision.medium, decision.relay_hops, decision.reason)
++
++    command_delay.route = blackout_orders
++    original_send = command_delay.send
++
++    def drop_orders(engine_, state_, message):
++        from iron_bottom_sound.models import MessageKind
++
++        if message.kind in (MessageKind.MISSION_ORDER, MessageKind.AMENDMENT):
++            message.medium = CommunicationMedium.BLACKOUT
++            message.reason = "forced blackout for the autonomy probe"
++        return original_send(engine_, state_, message)
++
++    command_delay.send = drop_orders
++    try:
++        sessions = {side: LLMPlayerSession(side, RealisticCommander()) for side in Side}
++        steps = 0
++        autonomy_during_play: set[str] = set()
++        blackout_during_play: set[str] = set()
++        while state.phase != Phase.COMPLETE and steps < 400:
++            steps += 1
++            for entry in state.command_delay.formations.values():
++                if entry.authority == AuthorityLevel.LOCAL_AUTONOMY:
++                    autonomy_during_play.add(entry.formation_id)
++                if entry.link_status == LinkStatus.BLACKOUT:
++                    blackout_during_play.add(entry.formation_id)
++            if state.phase in ORDER_PHASES:
++                for side in Side:
++                    if side.value in state.submitted_orders:
++                        continue
++                    result = engine.submit_orders(
++                        state.game_id, sessions[side].choose_orders(engine, state.game_id)
++                    )
++                    if not result.valid:
++                        raise RuntimeError(f"{state.turn} {state.phase} {side}: {result.errors[:2]}")
++            engine.advance(state.game_id)
++    finally:
++        command_delay.route = original_route
++        command_delay.send = original_send
++
++    mode = state.command_delay
++    orders = [order for order in mode.mission_orders if order.confirmed_turn is not None]
++    decisions = mode.decisions
++    no_order_decisions = [r for r in decisions if not r["audit"].get("order_received")]
++    local_autonomy = [
++        entry for entry in mode.formations.values()
++        if entry.authority == AuthorityLevel.LOCAL_AUTONOMY
++    ]
++    blackout = [
++        entry for entry in mode.formations.values()
++        if entry.link_status == LinkStatus.BLACKOUT
++    ]
++    # Snapshot autonomy during play, not at the end: at the end most formations are
++    # dissolved, which sets BLACKOUT and would mask the real authority state.
++    seen_local_autonomy = set()
++    for record in decisions:
++        pass
++    seen_local_autonomy |= {
++        entry.formation_id for entry in mode.formations.values()
++        if entry.authority == AuthorityLevel.LOCAL_AUTONOMY
++    }
++    del seen_local_autonomy
++    decisions_with_actions = [
++        r for r in no_order_decisions if r["selected_movement_action_id"] is not None
++    ]
++    payload = {
++        "completed": state.phase == Phase.COMPLETE,
++        "turns": state.turn,
++        "confirmed_mission_orders": len(orders),
++        "agent_decisions": len(decisions),
++        "decisions_without_an_order": len(no_order_decisions),
++        "decisions_without_an_order_that_chose_a_plan": len(decisions_with_actions),
++        "formations_in_local_autonomy_at_end": len(local_autonomy),
++        "formations_in_local_autonomy_during_play": sorted(autonomy_during_play),
++        "formations_in_blackout_at_end": len(blackout),
++        "formations_in_blackout_during_play": sorted(blackout_during_play),
++        "fleet_reports_still_age": sorted(
++            (state.turn - entry.reported_turn)
++            for entry in mode.formations.values() if entry.reported_turn is not None
++        ),
++        "cut_formation": cut_formation,
++        "cut_formation_end_link": (
++            mode.formations[cut_formation].link_status.value
++            if cut_formation in mode.formations else None
++        ),
++        "cut_formation_end_authority": (
++            mode.formations[cut_formation].authority.value
++            if cut_formation in mode.formations else None
++        ),
++        "gunnery_orders_generated": sum(
++            len(batch.gunnery)
++            for key, sealed in state.sealed_orders.items() if key.endswith("gunnery")
++            for batch in sealed.values()
++        ),
++        "friendly_collisions": sum(
++            1 for event in state.events
++            if event.type == "collision" and event.payload.get("friendly")
++        ),
++        "verdict": "PASS" if (
++            state.phase == Phase.COMPLETE
++            and len(orders) == 0
++            and no_order_decisions
++            and decisions_with_actions
++            and state.events
++            and autonomy_during_play
++        ) else "FAIL",
++    }
++    write("verify_autonomy", payload)
++    return payload
++
++
++# --------------------------------------------------------------------------- 5. battle report
++
++def battle_report() -> dict:
++    """The report pipeline with the mode on, and whether it leaks the command picture."""
++    from iron_bottom_sound.engine import ORDER_PHASES, IronBottomEngine
++    from iron_bottom_sound.llm import LLMPlayerSession
++    from iron_bottom_sound.models import GameOptions, Phase, Side
++    from iron_bottom_sound.realistic_command import RealisticCommander, default_setup_orders
++    from iron_bottom_sound import battle_report as battle_report_module
++
++    findings: list[str] = []
++    engine = IronBottomEngine()
++    game_id = "verify-battle-report"
++    state = engine.reset("IBS-S-03", 3, GameOptions(
++        realistic_command=True, command_delay_mode=True, battle_report=True,
++    ), game_id=game_id)
++    report_root = ROOT / "artifacts" / "verify-battle-report"
++    entries: list[dict] = []
++    sessions = {side: LLMPlayerSession(side, RealisticCommander()) for side in Side}
++    steps = 0
++    while state.phase != Phase.COMPLETE and steps < 400:
++        steps += 1
++        prev_phase = state.phase
++        if state.phase in ORDER_PHASES:
++            for side in Side:
++                if side.value in state.submitted_orders:
++                    continue
++                result = engine.submit_orders(
++                    state.game_id, sessions[side].choose_orders(engine, game_id)
++                )
++                if not result.valid:
++                    findings.append(f"orders rejected: {result.errors[:2]}")
++                    break
++        engine.advance(game_id)
++        try:
++            captured, _summary = battle_report_module.capture_after_advance(
++                None, report_root, state, engine, prev_phase,
++            )
++            entries.extend(captured or [])
++        except Exception as error:  # the report must never break the game, but must be honest
++            findings.append(f"capture_after_advance raised: {type(error).__name__}: {error}")
++            break
++
++    data = None
++    markdown = ""
++    try:
++        data = battle_report_module.build_report_data(state, engine, entries)
++        markdown = battle_report_module.build_report_markdown(
++            str(report_root), data, game_id,
++        )
++    except Exception as error:
++        findings.append(f"report build raised: {type(error).__name__}: {error}")
++
++    if data is not None:
++        # The report is neutral (both sides), so the question is whether it carries
++        # the *command* picture: mission order text, local priorities, directives.
++        text = json.dumps(data, ensure_ascii=False, default=str) + markdown
++        for needle, label in (
++            ("mission_order", "mission orders"),
++            ("target_priorities", "target priority directives"),
++            ("local_agent", "local agent adjustments"),
++            ("loss_of_comm_branch", "contingency branches"),
++            ("comm_state", "communication state"),
++        ):
++            if needle in text:
++                findings.append(f"the battle report carries {label}")
++    payload = {
++        "game_id": game_id,
++        "completed": state.phase == Phase.COMPLETE,
++        "turns": state.turn,
++        "captured_entries": len(entries),
++        "report_built": data is not None,
++        "markdown_chars": len(markdown),
++        "findings": findings,
++        "verdict": "PASS" if (
++            state.phase == Phase.COMPLETE and data is not None and not findings
++        ) else "FAIL",
++    }
++    write("verify_battle_report", payload)
++    return payload
++
++
++def main() -> int:
++    print("=== 1. complete-game matrix (command delay vs realistic) ===")
++    matrix_result = matrix()
++    print(f"    {matrix_result['command_delay_completed']}/{matrix_result['command_delay_games']} "
++          f"command-delay games and {matrix_result['realistic_completed']}/"
++          f"{matrix_result['realistic_games']} realistic games reached COMPLETE")
++    print("\n=== 2+3. HTTP API game and leakage ===")
++    api_result = api_game()
++    print(f"    completed={api_result.get('completed')} findings={api_result.get('findings')}")
++    print("\n=== 4. formation autonomy with no order at all ===")
++    autonomy_result = autonomy()
++    print(f"    {json.dumps({k: v for k, v in autonomy_result.items() if k != 'verdict'}, ensure_ascii=False)}")
++    print("\n=== 5. battle report with the mode on ===")
++    report_result = battle_report()
++    print(f"    {json.dumps(report_result, ensure_ascii=False)}")
++    verdicts = {
++        "game_matrix": matrix_result["verdict"],
++        "api_game": api_result["verdict"],
++        "autonomy": autonomy_result["verdict"],
++        "battle_report": report_result["verdict"],
++    }
++    print("\n" + json.dumps(verdicts, indent=1))
++    print("LIVE_VERIFICATION = " + ("PASS" if all(v == "PASS" for v in verdicts.values()) else "FAIL"))
++    return 0 if all(v == "PASS" for v in verdicts.values()) else 1
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())

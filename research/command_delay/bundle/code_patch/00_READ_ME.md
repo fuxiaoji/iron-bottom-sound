@@ -6,7 +6,7 @@
 |---|---|---|
 | `frozen_surface_touched.patch` | 被触及的**既有**文件：`models.py`、`realistic_command.py`、`engine.py` | +353 行（`realistic_command.py` 56、`models.py` 297、`engine.py` 41/−2） |
 | `command_delay_v2_2_source_and_tests.patch` | 新增引擎模块（`backend/src/iron_bottom_sound/`）、玩家规则（`docs/rules/command-delay.md`）、测试（`tests/test_command_delay_*.py`） | 见文件头 |
-| `research_harness.patch` | 研究层 harness：`golden_replay.py`、`run_audits.py`、审计 JSON、日志、CD-0 证据文档（不含 1.9 MB 的基线数据树） | 见文件头 |
+| `research_harness.patch` | 研究层 harness：`golden_replay.py`、`run_audits.py`、实机对战驱动与战报/泄漏核验工具（`llm_vs_llm.py`、`generate_battle_md.py`、`scan_battle_leakage.py`、`crop_battle_images.py`、`verify_live.py`）、审计 JSON、日志、CD-0 证据文档（**不含** 1.9 MB 基线数据树与 24 MB 实机对战数据） | 见文件头 |
 
 应用：
 
