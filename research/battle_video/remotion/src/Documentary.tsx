@@ -332,20 +332,49 @@ const Compare: React.FC<{ visual: Beat["visual"] }> = ({ visual }) => {
   );
 };
 
-const SidePanel: React.FC<{ visual: Beat["visual"]; overlays?: Beat["overlays"] }> = ({
-  visual,
-  overlays,
-}) => {
+const Thinking: React.FC<{ text: string; color: string }> = ({ text, color }) => {
+  // Fades in a beat after the orders, so the frame reads: what was said, then what the
+  // commander was actually thinking when he said it.
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const opacity = interpolate(frame, [fps * 1.2, fps * 2.2], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return (
+    <div
+      style={{
+        opacity,
+        marginTop: 26,
+        paddingLeft: 16,
+        borderLeft: `3px dashed ${color}`,
+      }}
+    >
+      <div style={{ color, fontFamily: FONT, fontSize: 20, letterSpacing: 1, marginBottom: 8 }}>
+        指挥官的思考
+      </div>
+      <div style={{ color: DIM, fontFamily: FONT, fontSize: 23, lineHeight: 1.6 }}>
+        {text}
+      </div>
+    </div>
+  );
+};
+
+const SidePanel: React.FC<{
+  visual: Beat["visual"];
+  overlays?: Beat["overlays"];
+  thinking?: string;
+}> = ({ visual, overlays, thinking }) => {
   const board = visual.board!;
   const side = visual.side || "axis";
   const color = side === "axis" ? AXIS : ALLIES;
   return (
     <AbsoluteFill style={{ background: OCEAN, display: "flex", flexDirection: "row" }}>
-      <div style={{ width: 900, height: "100%", overflow: "hidden" }}>
+      <div style={{ width: 880, height: "100%", overflow: "hidden" }}>
         <KenBurns src={`frames/${frameName(board.turn, board.phase, side)}`} pan={12} />
       </div>
-      <div style={{ flex: 1, padding: "70px 50px", borderLeft: `6px solid ${color}` }}>
-        <div style={{ color, fontFamily: FONT, fontSize: 40, marginBottom: 26 }}>
+      <div style={{ flex: 1, padding: "60px 46px", borderLeft: `6px solid ${color}` }}>
+        <div style={{ color, fontFamily: FONT, fontSize: 38, marginBottom: 24 }}>
           {visual.title}
         </div>
         {(overlays || []).map((item, index) => (
@@ -354,9 +383,9 @@ const SidePanel: React.FC<{ visual: Beat["visual"]; overlays?: Beat["overlays"] 
             style={{
               color: TEXT,
               fontFamily: FONT,
-              fontSize: 25,
-              lineHeight: 1.55,
-              marginBottom: 16,
+              fontSize: 24,
+              lineHeight: 1.5,
+              marginBottom: 14,
               borderLeft: `3px solid ${color}`,
               paddingLeft: 14,
             }}
@@ -364,6 +393,7 @@ const SidePanel: React.FC<{ visual: Beat["visual"]; overlays?: Beat["overlays"] 
             {item.text}
           </div>
         ))}
+        {thinking ? <Thinking text={thinking} color={color} /> : null}
       </div>
     </AbsoluteFill>
   );
@@ -439,7 +469,13 @@ const BeatBody: React.FC<{ beat: Beat }> = ({ beat }) => {
     case "compare":
       return <Compare visual={beat.visual} />;
     case "side":
-      return <SidePanel visual={beat.visual} overlays={beat.overlays} />;
+      return (
+        <SidePanel
+          visual={beat.visual}
+          overlays={beat.overlays}
+          thinking={beat.thinking}
+        />
+      );
     case "chart":
       return <Chart visual={beat.visual} />;
     case "result":
