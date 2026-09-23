@@ -101,6 +101,27 @@ class LLMAttempt(BaseModel):
     fallback: bool = False
 
 
+def compact_local_map(prompt: dict[str, Any]) -> dict[str, Any]:
+    """Slim the prompt for transport: keep only informative map cells.
+
+    A formation's local map can be ~1000 cells of open sea; the decision only needs
+    the cells that mean something (land, coast, contact).  Applied identically to
+    what the model receives and to what the audit log records, so the transcript is
+    always the prompt that was actually sent.
+    """
+    slimmed = dict(prompt)
+    local_map = slimmed.get("local_map")
+    if isinstance(local_map, list):
+        slimmed["local_map"] = [
+            cell for cell in local_map
+            if cell.get("land") or cell.get("coast") or cell.get("contact")
+        ]
+        slimmed["local_map_note"] = (
+            f"仅显示含信息格；本编队光学半径内的开阔海面已省略（原 {len(local_map)} 格）"
+        )
+    return slimmed
+
+
 def build_prompt(
     observation: FormationObservation,
     mission_order: MissionOrder | None = None,

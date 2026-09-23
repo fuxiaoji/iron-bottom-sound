@@ -965,7 +965,7 @@ def _record_agent_log(
 ) -> None:
     """Keep the raw transcript for the debug view and for replay without the model."""
     from .formation_memory import memory_payload, render_for_prompt
-    from .formation_llm import build_prompt
+    from .formation_llm import build_prompt, compact_local_map
 
     mode = state_for(state)
     mode.agent_log.append({
@@ -978,10 +978,10 @@ def _record_agent_log(
         "order_text": order_text,
         "memory_text": render_for_prompt(memory),
         "memory": memory_payload(memory),
-        "prompt": build_prompt(
+        "prompt": compact_local_map(build_prompt(
             observation, order, memory_text=render_for_prompt(memory),
             order_text=order_text,
-        ),
+        )),
         "attempts": [
             {
                 "attempt": item.attempt,
