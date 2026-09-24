@@ -27,6 +27,7 @@ from typing import TYPE_CHECKING, Any
 from pydantic import BaseModel, Field
 
 from . import command_delay
+from .communications.processing import range_units
 from .models import (
     AuthorityLevel,
     CommandMessage,
@@ -401,6 +402,10 @@ def formation_observation(
             local_map_hexes(engine, state, positions, contact_labels, side)
             if positions else []
         ),
+        # v2.3 (IR-6): the engine owns the unit conversion.  Every contact carries
+        # range_hex / range_yards / range_nmi computed here, so a model never converts a
+        # hex distance into miles itself - the v2.2 battle produced a report claiming
+        # "12-15 海里" for what was 12-15 hex (about 3.5-4.4 nmi).
         local_contacts=[
             {
                 "ship_id": enemy.id,
@@ -410,6 +415,10 @@ def formation_observation(
                 "heading": enemy.heading,
                 "speed": enemy.current_speed,
                 "range": (
+                    min(position.distance(enemy.position) for position in positions)
+                    if positions and enemy.position else None
+                ),
+                **range_units(
                     min(position.distance(enemy.position) for position in positions)
                     if positions and enemy.position else None
                 ),

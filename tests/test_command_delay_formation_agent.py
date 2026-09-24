@@ -440,7 +440,13 @@ def test_link_and_authority_degrade_and_recover_from_the_ledger() -> None:
     )
     for entry in mode.formations.values():
         if entry.authority.value == "local_autonomy":
-            assert entry.link_status == LinkStatus.BLACKOUT
+            # CD8-F3: both a stale report trail and a blackout degrade a formation to local
+            # autonomy - a commander that has heard nothing for two turns is on its own,
+            # whether the silence is "never reported" or "nothing recent".  This assertion
+            # used to demand BLACKOUT specifically, which was only satisfiable because
+            # v2.2's chatty reporting never let a link go stale; with event-driven reporting
+            # the STALE case is routine, so the old form was unreachable rather than right.
+            assert entry.link_status in (LinkStatus.STALE, LinkStatus.BLACKOUT)
 
 
 # --------------------------------------------------------------------------- determinism
