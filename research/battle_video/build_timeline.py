@@ -590,11 +590,17 @@ def _formation_rows(data: dict) -> list[dict]:
     for view in data.get("three_views", [])[:1]:
         for side, payload in view["sides"].items():
             for formation_id, observation in payload["formations"].items():
+                # A formation's own observation carries per-ship cards (``ships``); the
+                # id lists live in the *fleet* observation's embarked block.  Counting the
+                # cards is the count of ships afloat in that formation.
+                state = observation.get("formation_state") or {}
+                ships = state.get("ships") or []
+                count = len(ships) or len(state.get("ship_ids") or [])
                 row = seen.setdefault(formation_id, {
                     "formation_id": formation_id,
                     "side": observation["side"],
-                    "ships": len(observation.get("formation_state", {}).get("ship_ids", [])),
-                    "flagship": observation.get("formation_state", {}).get("flagship_id", "—"),
+                    "ships": count,
+                    "flagship": state.get("flagship_id", "—"),
                     "embarked": False,
                 })
                 if observation.get("authority") == "fleet_directed":
