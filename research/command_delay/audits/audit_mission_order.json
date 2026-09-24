@@ -37,7 +37,9 @@
   "trigger_conditions": true
  },
  "structure_fields": [
+  "amends_order_id",
   "assumptions",
+  "cancelled_turn",
   "commander_intent",
   "commander_location",
   "communications_plan",
@@ -52,9 +54,11 @@
   "loss_of_comm_plan",
   "mission",
   "operating_area",
+  "order_event",
   "order_id",
   "rendezvous",
   "report_requirements",
+  "revision",
   "risk_constraints",
   "roe",
   "side",

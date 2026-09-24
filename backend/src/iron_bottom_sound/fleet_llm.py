@@ -39,6 +39,8 @@ FLEET_RESPONSE_SCHEMA: dict[str, Any] = {
             "text": "自然语言命令（≤1000 字）",
             "priority_classes": ["可选：目标类型优先级，如 CA/CL/DD"],
             "deadline_turn": "可选：整数回合数",
+            "order_event": "NEW_ORDER（首次下令）| AMEND_ORDER（修正现行命令）| "
+                           "CANCEL_ORDER（撤销现行命令）",
         }
     ],
     "acknowledged_formations": ["可选：本回合要回复确认的编队 id"],
@@ -50,6 +52,9 @@ FLEET_RESPONSE_SCHEMA: dict[str, Any] = {
 FLEET_INSTRUCTION = (
     "你是舰队总指挥。你只能看到自己所在编队的目视接触，其他编队的情况全部来自它们经电报发回的"
     "报告，而报告会因距离与转译延迟——所以你手里的态势是陈旧的，必须在命令里给下级留出判断余地。"
+    "现行命令会持续有效，不必重复下达：只有战局变化时才发 NEW_ORDER，"
+    "要调整已生效命令时用 AMEND_ORDER，撤销用 CANCEL_ORDER，"
+    "把同一道命令换个说法重发不会生效（引擎判为 NO_NEW_ORDER）。"
     "你用自然语言给编队下令，命令会经电报投递；给本队（你自己所在编队）的命令是当面下达、即刻生效，"
     "给其他编队的命令需要时间。你可以本回合不下令。"
     "你不得指定炮位、射界、射击解或具体命中计算，只能指定目标类型优先级；也不得直接指挥单舰机动。"
@@ -66,6 +71,9 @@ class FleetOrder(BaseModel):
     text: str
     priority_classes: list[str] = Field(default_factory=list)
     deadline_turn: int | None = None
+    # v2.3 (IR-4): what this order does to the order book.  Restating the standing mission
+    # is not a new order - the engine records NO_NEW_ORDER and issues nothing.
+    order_event: str = "NEW_ORDER"
 
 
 class FleetDecision(BaseModel):
@@ -246,10 +254,15 @@ def parse_fleet_response(
         if deadline is not None and not isinstance(deadline, int):
             errors.append("deadline_turn must be an integer")
             deadline = None
+        event = str(item.get("order_event") or "NEW_ORDER").upper()
+        if event not in ("NEW_ORDER", "AMEND_ORDER", "CANCEL_ORDER",
+                         "ACTIVATE_PREBRIEFED_BRANCH"):
+            errors.append(f"unknown order_event {event!r}")
+            continue
         orders.append(FleetOrder(
             formation_id=formation_id, text=text[:1000],
             priority_classes=[str(name)[:8] for name in classes][:6],
-            deadline_turn=deadline,
+            deadline_turn=deadline, order_event=event,
         ))
     seen: set[str] = set()
     duplicates = [order.formation_id for order in orders if

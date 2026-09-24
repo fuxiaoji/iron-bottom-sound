@@ -997,6 +997,17 @@ class MissionOrder(BaseModel):
     valid_from_turn: int | None = None
     expiry_turn: int | None = None
     confirmed_turn: int | None = None
+    # v2.3 (IR-4): an order is a persistent object with a revision lineage, not a per-turn
+    # prompt.  ``order_event`` says what this message does to the order book; the engine
+    # refuses to create a new revision merely because a commander restated the mission.
+    order_event: str = "NEW_ORDER"
+    revision: int = 1
+    amends_order_id: str | None = None
+    cancelled_turn: int | None = None
+
+    @property
+    def is_active(self) -> bool:
+        return self.cancelled_turn is None
 
 
 class GameState(BaseModel):

@@ -75,9 +75,15 @@ def mission_order_template(
     loss_of_comm_plan: list[str] | None = None,
     rendezvous: str | None = None,
     contingencies: list[Contingency] | None = None,
+    order_event: str = "NEW_ORDER",
+    revision: int = 1,
+    amends_order_id: str | None = None,
 ) -> MissionOrder:
     """Build a MissionOrder with the prescribed battle-plan structure filled in."""
     return MissionOrder(
+        order_event=order_event,
+        revision=revision,
+        amends_order_id=amends_order_id,
         order_id=order_id,
         formation_id=formation_id,
         side=side,

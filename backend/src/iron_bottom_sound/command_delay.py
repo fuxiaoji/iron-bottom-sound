@@ -84,6 +84,7 @@ if TYPE_CHECKING:
 
 RULE_AUTHORITY = "IBS-R-CD-02"
 RULE_COMMS = "IBS-R-CD-03"
+RULE_MISSION = "IBS-R-CD-04"
 
 # Model policies live in process memory, keyed by side, never in the game state.
 _SIDE_POLICIES: dict[str, tuple[Any, str]] = {}
@@ -706,6 +707,56 @@ def _apply_delivery(
             )
             message.superseded_by = current.order_id
             return
+        # v2.3 (IR-4): compare revisions inside a lineage, not just issue turns.  An order
+        # that amends the one already in force must be a *later* revision; a late straggler
+        # from the same lineage with an equal or lower revision is refused, whatever its
+        # arrival order.
+        if (current is not None and order.amends_order_id == current.order_id
+                and int(order.revision) <= int(current.revision)):
+            message.status = MessageStatus.SUPERSEDED
+            message.reason = (
+                f"revision {order.revision} cannot supersede revision {current.revision} "
+                f"of {current.order_id}"
+            )
+            message.superseded_by = current.order_id
+            return
+        if order.order_event == "CANCEL_ORDER":
+            order.cancelled_turn = message.delivered_turn
+            # the commander took the mission away: whatever revision was in force is no
+            # longer an active order for this formation
+            previous = next((item for item in mode.mission_orders
+                             if item.order_id == entry.active_order_id), None)
+            if previous is not None:
+                previous.cancelled_turn = message.delivered_turn
+            entry.active_order_id = None
+            message.status = MessageStatus.DELIVERED
+            engine._event(
+                state, "mission_order_cancelled",
+                f"{order.formation_id} 的命令 {order.order_id} 已撤销",
+                payload={"secret_side": message.side.value, "order_id": order.order_id,
+                         "formation_id": order.formation_id,
+                         "delivered_turn": message.delivered_turn},
+                rule=engine._rule(RULE_MISSION, None, "命令延迟：任务式命令"),
+            )
+            return
+        if order.order_event == "ACTIVATE_PREBRIEFED_BRANCH":
+            from .formation_memory import remember
+
+            remember(
+                state, order.formation_id, kind="contingency",
+                text=f"上级激活预案：{order.mission[:80]}",
+                turn=int(message.delivered_turn or message.issued_turn),
+                phase=message.delivered_phase.value if message.delivered_phase else "",
+                meta={"order_id": order.order_id, "activated": True},
+            )
+            engine._event(
+                state, "contingency_branch_activated",
+                f"{order.formation_id} 的预案被激活：{order.mission[:60]}",
+                payload={"secret_side": message.side.value, "order_id": order.order_id,
+                         "formation_id": order.formation_id,
+                         "delivered_turn": message.delivered_turn},
+                rule=engine._rule(RULE_MISSION, None, "命令延迟：任务式命令"),
+            )
         order.confirmed_turn = message.delivered_turn
         entry.active_order_id = order.order_id
         # The formation now knows the order; record it in *its* memory so the next
@@ -853,7 +904,8 @@ def draft_natural_order(
     engine: "IronBottomEngine", state: GameState, *, side: Side, formation_id: str,
     text: str, priority_classes: list[str] | None = None,
     roe: list[str] | None = None, deadline_turn: int | None = None,
-) -> CommandMessage:
+    order_event: str = "NEW_ORDER",
+) -> CommandMessage | None:
     """Send the fleet commander's own words to one formation.
 
     This is the mode's input channel: the human writes an order in natural
@@ -875,10 +927,44 @@ def draft_natural_order(
     cleaned = " ".join((text or "").split())
     if not cleaned:
         raise ValueError("an order needs text")
+
+    # A standing order persists.  A commander who restates the mission it already has is
+    # not issuing a new one: v2.3 records NO_NEW_ORDER instead of manufacturing a revision
+    # (the CD-13 battle issued 63 mission orders over 11 turns, most of them restatements).
+    active = active_mission_order(state, formation_id)
+    if order_event == "NO_NEW_ORDER":
+        return None
+    if active is not None and _normalised(active.mission) == _normalised(cleaned):
+        engine._event(
+            state, "mission_order_restated",
+            f"{formation_id} 的命令与现行命令一致：不新建修订（NO_NEW_ORDER）",
+            payload={"secret_side": side.value, "formation_id": formation_id,
+                     "active_order_id": active.order_id, "turn": state.turn},
+            rule=engine._rule(RULE_MISSION, None, "命令延迟：任务式命令"),
+        )
+        return None
+    if order_event == "CANCEL_ORDER" and active is not None:
+        active.cancelled_turn = state.turn
+    revision = 1
+    amends = None
+    if active is not None:
+        revision = int(active.revision) + 1
+        amends = active.order_id
+        if order_event == "NEW_ORDER":
+            order_event = "AMEND_ORDER"
+    # The id must be unique per revision: two orders drafted in one turn (a mission and an
+    # immediate correction) otherwise collide, and a delivery resolves the id back to the
+    # wrong object.
+    order_id = f"{side.value}-nl-{state.turn}-{formation_id}"
+    if revision > 1:
+        order_id = f"{order_id}-r{revision}"
     order = delegation.mission_order_template(
-        order_id=f"{side.value}-nl-{state.turn}-{formation_id}",
+        order_id=order_id,
         formation_id=formation_id,
         side=side,
+        order_event=order_event,
+        revision=revision,
+        amends_order_id=amends,
         turn=state.turn,
         issued_by=(
             authority.fleet_commander_ship_id or fleet_formation.flagship_id
@@ -925,6 +1011,9 @@ def draft_natural_order(
             "order_id": order.order_id,
             "order_text": cleaned,
             "delivered_in_person": embarked,
+            "order_event": order.order_event,
+            "revision": order.revision,
+            "amends_order_id": order.amends_order_id,
         },
     ))
     if embarked:
@@ -958,6 +1047,12 @@ def draft_natural_order(
             rule=engine._rule(RULE_COMMS, None, "命令延迟：通信处理链"),
         )
     return message
+
+
+def _normalised(text: str | None) -> str:
+    """Whitespace- and punctuation-insensitive form, for "is this the same order?"""
+    drop = set(" \t\n\u3000\uff0c\u3002\uff1b\uff1a\u3001,.!?\uff01\uff1f\u300c\u300d")
+    return "".join(character for character in (text or "") if character not in drop)
 
 
 def formation_orders(state: GameState, side: Side) -> list[FormationMovementOrder]:
@@ -1408,7 +1503,12 @@ def run_fleet_agent(engine: "IronBottomEngine", state: GameState) -> list[dict[s
                 text=order.text,
                 priority_classes=order.priority_classes or None,
                 deadline_turn=order.deadline_turn,
+                order_event=getattr(order, "order_event", "NEW_ORDER"),
             )
+            if message is None:
+                # The commander restated the standing order, or declined to issue one:
+                # nothing is sent and the record says so rather than inventing a revision.
+                continue
             orders_sent.append({
                 "formation_id": order.formation_id,
                 "message_id": message.message_id,
