@@ -478,13 +478,63 @@ def _knowledge_payload(state: GameState, formation_id: str) -> list[dict[str, An
     return knowledge_payload(state, formation_id)
 
 
+# The movement plan shorthand, spelled out.  ``S``/``P`` are the engine's own letters
+# (starboard / port); the degrees are what each command does to the heading.
+MANOEUVRE_TEXT: dict[str, str] = {
+    "advance": "前进",
+    "turn_port_60": "左转 60°",
+    "turn_starboard_60": "右转 60°",
+    "turn_port_120": "左转 120°（原地调头一步）",
+    "turn_starboard_120": "右转 120°（原地调头一步）",
+}
+MANOEUVRE_STEPS: dict[str, int] = {
+    "turn_port_60": -1,
+    "turn_starboard_60": 1,
+    "turn_port_120": -2,
+    "turn_starboard_120": 2,
+}
+
+NOTATION_LEGEND = (
+    "机动记号读法：数字＝沿当前航向直线前进的格数，S＝右转 60°，SS＝右转 120°，"
+    "P＝左转 60°，PP＝左转 120°（例：1SS1S2＝前进 1 格→右转 120°→前进 1 格→右转 60°→前进 2 格）。"
+    "不要自己解析记号：每条合法机动都给了 manoeuvre（中文逐步说明）、ends_heading（该方案结束时的航向）、"
+    "heading_change_steps（净转向，以 60° 为单位，正数＝右转）、keeps_heading（是否保持航向）"
+    "与 jams_spaced_column（是否含原地 120° 转向；为 true 时纵队后舰会在同一脉冲挤进领舰格而被结算为急停，"
+    "除非你真的要调头，否则不要选）。"
+)
+
+
+def manoeuvre_summary(commands: list[str]) -> str:
+    """The plan's commands as one readable line ("前进 2 格 → 右转 120° → 前进 1 格")."""
+    parts: list[str] = []
+    pending = 0
+    for command in commands:
+        if command == "advance":
+            pending += 1
+            continue
+        if pending:
+            parts.append(f"前进 {pending} 格")
+            pending = 0
+        parts.append(MANOEUVRE_TEXT.get(command, command))
+    if pending:
+        parts.append(f"前进 {pending} 格")
+    return " → ".join(parts) or "原地不动"
+
+
+def heading_change_steps(commands: list[str]) -> int:
+    """Net heading change in 60-degree steps (positive = starboard)."""
+    return sum(MANOEUVRE_STEPS.get(command, 0) for command in commands)
+
+
 def legal_formation_actions(
     engine: "IronBottomEngine", state: GameState, formation: FormationState,
 ) -> list[dict[str, Any]]:
     """Enumerated, engine-validated body/leader programmes for this formation.
 
     An action is an identifier plus the engine's own plan shorthand; the agent
-    selects, it never invents a movement program (plan §12/§13).
+    selects, it never invents a movement program (plan §12/§13).  Each action also
+    carries what its plan does in words and to the heading, so a reader (model or
+    player) never has to decode the shorthand itself.
     """
     members = formation_members(state, formation)
     if not members:
@@ -492,6 +542,18 @@ def legal_formation_actions(
     leader = state.ships.get(formation.leader_id)
     if leader is None or leader.position is None or formation.leader_id not in members:
         leader = state.ships[members[0]]
+    # Formation-level feasibility, by the engine's own rule (``validate_orders``: "speed N is
+    # outside member limits; reduce or detach"): a body manoeuvre is only selectable while
+    # its cost lies inside every member's legal speed interval.  Without this the agent can
+    # pick a plan its own formation cannot execute, and the interface used to paper over that
+    # by clamping the plan to the maximum speed - valid on paper, but a movement nobody chose.
+    # When the interval is empty (a damaged ship that cannot keep station with the others)
+    # nothing is filtered: that formation's answer is "reduce or detach", which the mode
+    # already handles elsewhere, and hiding the whole list would leave the agent no answer.
+    intervals = [engine._legal_speed_range(state.ships[ship_id], state.turn) for ship_id in members]
+    minimum = max(low for low, _ in intervals)
+    maximum = min(high for _, high in intervals)
+    speed_interval_exists = minimum <= maximum
     actions: list[dict[str, Any]] = []
     seen: set[str] = set()
     for entry in engine.movement_candidates(state, leader, include_plans=True)["reachable"]:
@@ -507,18 +569,34 @@ def legal_formation_actions(
             preview = engine.movement_preview(state, leader, plan=plan)
             if not preview["commitable"]:
                 continue
+            if speed_interval_exists and not (minimum <= preview["cost"] <= maximum):
+                continue
             seen.add(plan)
+            commands = list(preview["commands"])
             actions.append({
                 "action_id": f"MOVE:{plan}",
                 "plan": plan,
                 "hex": entry["hex"],
                 "label": HexCoord(q=entry["hex"]["q"], r=entry["hex"]["r"]).label,
-                "final_headings": sorted(entry["final_headings"]),
-                "cost": engine.movement_cost(
-                    plan,
-                    engine.movement_commands(
-                        MovementOrder(ship_id=leader.id, plan=plan)
-                    ),
+                "cost": preview["cost"],
+                # v2.4: the plan shorthand is unreadable to anyone who has not been told what
+                # S/P mean, and a commander that misreads it orders a turn while its own note
+                # says "hold course" (measured: EM-01 T2, the agent chose ``1SS1S2`` - a
+                # 180-degree about-face - and wrote "heading 2, continue straight ahead").  So
+                # the engine states the manoeuvre in words and gives the single heading this
+                # plan ends on, instead of the set of headings the *destination hex* admits
+                # (that set reads as "this plan turns" even for a plain ``5``).
+                "manoeuvre": manoeuvre_summary(commands),
+                "heading_now": leader.heading,
+                "ends_heading": preview["current_heading"],
+                "heading_change_steps": heading_change_steps(commands),
+                "keeps_heading": heading_change_steps(commands) == 0,
+                # The engine's own rule for a spaced column: an in-place 120-degree impulse
+                # cannot propagate down it, so followers arrive into the leader's hex in the
+                # same pulse and are emergency-stopped there.  Choosing such a plan is legal
+                # but rarely what "hold course" means, so it is flagged rather than hidden.
+                "jams_spaced_column": any(
+                    command.endswith("120") for command in commands
                 ),
             })
     actions.sort(key=lambda item: (item["label"], item["plan"]))

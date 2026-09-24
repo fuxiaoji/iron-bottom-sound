@@ -19,7 +19,7 @@ import json
 
 import pytest
 
-from iron_bottom_sound import command_delay, formation_llm, formation_memory
+from iron_bottom_sound import command_delay, formation_llm, formation_memory, target_priority
 from iron_bottom_sound.engine import ORDER_PHASES, IronBottomEngine
 from iron_bottom_sound.llm import LLMPlayerSession
 from iron_bottom_sound.models import (
@@ -506,9 +506,20 @@ def test_formation_orders_and_gunnery_priorities_never_cross_sides() -> None:
             if order.side is side and order.confirmed_turn is not None:
                 for directive in order.target_priority_directives:
                     assert directive.formation_id in own
-        for directive in mode.local_directives:
+        # 这本账是全游戏一本（两侧都在里面），真正要守的判据是"**选择器看到的那一份**里
+        # 只有本侧编队的指令"：指令既按 target_id 也按 target_class 匹配，放对方进来就会
+        # 让敌方的偏好改我方选靶（这条泄漏由 test_target_priority_side_filtering 单独钉住）。
+        for directive in target_priority.local_directives_for(state, side):
             assert directive.formation_id in own, (
                 f"allies directive {directive.formation_id} reached the axis selector"
                 if side is Side.AXIS else
                 f"axis directive {directive.formation_id} reached the allies selector"
             )
+        foreign = [
+            directive for directive in mode.local_directives
+            if directive.formation_id not in own
+        ]
+        if foreign:
+            # 两侧同回合都给过偏好时，本侧选择器里绝不能出现它们
+            visible = {item.formation_id for item in target_priority.local_directives_for(state, side)}
+            assert not any(item.formation_id in visible for item in foreign)

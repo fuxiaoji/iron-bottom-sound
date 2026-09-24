@@ -1011,21 +1011,33 @@ class RealisticCommander:
             leader_plan = by_ship.get(leader.id, MovementOrder(ship_id=leader.id, plan="0")).plan
             if search_target is not None:
                 leader_plan = self._search_plan(engine, state, leader, search_target)
+            # Command Delay CD-4: the plan is whatever this formation's local agent
+            # selected from the engine's enumerated actions.  It is not re-derived here,
+            # and the engine still validates it below, so a bad agent choice fails loudly
+            # instead of being silently fixed.
+            #
+            # ``agent_plan_authoritative`` also stops the two convenience rewrites below
+            # from touching it.  That matters for the *interface*: this batch is what the
+            # plan sheet and the map trajectories are drawn from, so a rewritten agent plan
+            # would show the player a movement they are not about to make.  Measured on a
+            # real game (EM-01 T2): the agents chose 1SS1S1 / 1SS1S2 while the sheet showed
+            # 4 / 5, and the sealed (executed) plans were the agents' - the display, not the
+            # engine, was wrong.
+            agent_plan_authoritative = False
             if state.options.command_delay_mode:
-                # Command Delay CD-4: the plan is whatever this formation's local
-                # agent selected from the engine's enumerated actions.  It is not
-                # re-derived here, and the engine still validates it below, so a
-                # bad agent choice fails loudly instead of being silently fixed.
                 from .command_delay import formation_plan
                 agent_plan = formation_plan(state, formation.id)
                 if agent_plan:
                     leader_plan = agent_plan
+                    agent_plan_authoritative = True
             leader_commands = engine.movement_commands(MovementOrder(ship_id=leader.id, plan=leader_plan))
-            if any(command.endswith("120") for command in leader_commands):
-                # A 120-degree in-place impulse cannot propagate down a spaced
-                # column in the same global pulse. The formation AI chooses an
-                # equal-cost straight programme; human previews remain free to
-                # use 120-degree turns when every follower can reach the bend.
+            if any(command.endswith("120") for command in leader_commands) and not agent_plan_authoritative:
+                # A 120-degree in-place impulse cannot propagate down a spaced column in the
+                # same global pulse, so the *state machine* prefers an equal-cost straight
+                # programme.  An agent's own choice is left alone: it is shown, submitted and
+                # adjudicated as chosen (the engine's resolution turns such a column's jam
+                # into emergency stops).  Human previews remain free to use 120-degree turns
+                # when every follower can reach the bend.
                 leader_plan = str(engine.movement_cost(leader_plan, leader_commands))
             minimum = max(engine._legal_speed_range(ship, state.turn)[0] for ship in members)
             maximum = min(engine._legal_speed_range(ship, state.turn)[1] for ship in members)
@@ -1034,7 +1046,7 @@ class RealisticCommander:
                 intents[formation.id] = "指挥中断：按上轮航向和航速直航"
             elif minimum <= maximum:
                 cost = engine.movement_cost(leader_plan, engine.movement_commands(MovementOrder(ship_id=leader.id, plan=leader_plan)))
-                if not minimum <= cost <= maximum:
+                if not minimum <= cost <= maximum and not agent_plan_authoritative:
                     # A straight common-speed order is always simpler and safer than
                     # detaching a healthy ship solely because the tactical scorer chose
                     # a route outside the group intersection.
@@ -1070,6 +1082,16 @@ class RealisticCommander:
                 state.game_id, _prepared, _prepared=True,
             ).errors
         if expansion_errors:
+            # Two formations' plans can still clash even though each one is executable on
+            # its own (one column's trail crossing the other's hexes in the same pulse).
+            # That is an inter-formation adjudication, not a rewrite of one agent's choice:
+            # the engine slows one of the two columns and keeps the other's route.  The
+            # plan sheet follows whatever batch comes out of here, so it still shows what
+            # will be executed; the agents' own choices remain readable in the log.
+            #
+            # (What is *not* done here for Command Delay is the wholesale "everyone sails a
+            # safe common straight programme" rewrite - the enumerator already withholds
+            # individually infeasible plans, so the only remaining trigger is a real clash.)
             # Tactical routes may cross a trailing station. Retry with a
             # common straight programme, selected from the full formation's
             # legal speed intersection. This is still a formation-level

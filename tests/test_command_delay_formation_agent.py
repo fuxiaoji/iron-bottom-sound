@@ -130,51 +130,64 @@ def test_the_engine_refuses_a_raw_gunnery_batch_in_command_delay_mode() -> None:
 
 
 def test_a_directive_only_reranks_legal_targets() -> None:
-    """The decisive selector test: same legal set, different preference."""
-    engine, state = start()
+    """The decisive selector test: same legal set, different preference.
+
+    这条判据只有在"一舰有两个合法目标"的炮击局面里才可能失败，所以它在一小组固定种子上
+    逐局验证，并要求至少出现一次可翻转的选择：找不到就失败，而不是空跑成 PASS ——
+    "判据本身不可能失败"在本项目已经栽过三次（CD12-F5/F6/F7）。
+
+    为什么需要多局：命令延迟模式下编队执行的是各自代理选择的机动（v2.4 之前提交时会被
+    悄悄改写成直行），航迹因此与旧基线不同，单一改动过的种子不再必然走到双目标局面。
+    """
     comparisons = 0
-    while state.phase != Phase.COMPLETE and comparisons < 4:
-        if state.phase == Phase.GUNNERY:
-            candidates = engine._gunnery_candidates(state, Side.AXIS)
-            multi = next(
-                (item for item in candidates if len(item["targets"]) >= 2), None
-            )
-            if multi is not None:
-                baseline = target_priority.select_gunnery_orders(engine, state, Side.AXIS, [])
-                pick = multi["targets"][-1]["target_id"]
-                biased = target_priority.select_gunnery_orders(
-                    engine, state, Side.AXIS,
-                    [TargetPriorityDirective(
-                        formation_id="f", source="FLEET_ORDER",
-                        target_id=pick, weight=1.0,
-                    )],
+    for seed in (20270830, 20270831, 20270832, 20270833, 20270834, 20270835):
+        engine, state = start(seed=seed)
+        while state.phase != Phase.COMPLETE and comparisons < 4:
+            if state.phase == Phase.GUNNERY:
+                candidates = engine._gunnery_candidates(state, Side.AXIS)
+                multi = next(
+                    (item for item in candidates if len(item["targets"]) >= 2), None
                 )
-                baseline_by_ship = {order.ship_id: order for order in baseline}
-                biased_by_ship = {order.ship_id: order for order in biased}
-                assert set(baseline_by_ship) == set(biased_by_ship)
-                # Every produced order is legal by construction: it exists only
-                # because the engine listed the target for that ship.
-                legal_pairs = {
-                    (item["ship_id"], target["target_id"])
-                    for item in candidates for target in item["targets"]
-                }
-                for order in biased:
-                    assert (order.ship_id, order.primary_target) in legal_pairs
-                    mount_ids = {mount.mount_id for mount in order.mounts}
-                    engine_mounts = next(
-                        target["mount_ids"]
-                        for item in candidates if item["ship_id"] == order.ship_id
-                        for target in item["targets"]
-                        if target["target_id"] == order.primary_target
+                if multi is not None:
+                    baseline = target_priority.select_gunnery_orders(engine, state, Side.AXIS, [])
+                    pick = multi["targets"][-1]["target_id"]
+                    biased = target_priority.select_gunnery_orders(
+                        engine, state, Side.AXIS,
+                        [TargetPriorityDirective(
+                            formation_id="f", source="FLEET_ORDER",
+                            target_id=pick, weight=1.0,
+                        )],
                     )
-                    assert mount_ids == set(engine_mounts)
-                chosen_before = baseline_by_ship[multi["ship_id"]].primary_target
-                chosen_after = biased_by_ship[multi["ship_id"]].primary_target
-                if chosen_before != chosen_after:
-                    comparisons += 1
-                    assert chosen_after == pick
-        step(engine, state)
-    assert comparisons >= 1, "no gunnery phase produced a two-target choice to flip"
+                    baseline_by_ship = {order.ship_id: order for order in baseline}
+                    biased_by_ship = {order.ship_id: order for order in biased}
+                    assert set(baseline_by_ship) == set(biased_by_ship)
+                    # Every produced order is legal by construction: it exists only
+                    # because the engine listed the target for that ship.
+                    legal_pairs = {
+                        (item["ship_id"], target["target_id"])
+                        for item in candidates for target in item["targets"]
+                    }
+                    for order in biased:
+                        assert (order.ship_id, order.primary_target) in legal_pairs
+                        mount_ids = {mount.mount_id for mount in order.mounts}
+                        engine_mounts = next(
+                            target["mount_ids"]
+                            for item in candidates if item["ship_id"] == order.ship_id
+                            for target in item["targets"]
+                            if target["target_id"] == order.primary_target
+                        )
+                        assert mount_ids == set(engine_mounts)
+                    chosen_before = baseline_by_ship[multi["ship_id"]].primary_target
+                    chosen_after = biased_by_ship[multi["ship_id"]].primary_target
+                    if chosen_before != chosen_after:
+                        comparisons += 1
+                        assert chosen_after == pick
+            step(engine, state)
+        if comparisons >= 1:
+            break
+    assert comparisons >= 1, (
+        "在这些种子上都没有出现可翻转的双目标选择：这条判据默认不可失败，必须换种子或换局面"
+    )
 
 
 def test_a_directive_for_an_invisible_target_falls_back_to_legal_ones() -> None:

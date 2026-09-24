@@ -218,3 +218,45 @@ def test_5_a_directive_for_an_unseen_target_is_inert() -> None:
     )
     for order in with_unseen:
         assert order.primary_target in visible_targets
+
+
+def test_6_another_sides_local_priority_never_reaches_this_selector() -> None:
+    """本侧选靶只看得到本侧编队的偏好 —— 对方代理的权重不得越界。
+
+    这条是补上的判据：``mode.local_directives`` 是全游戏一本账（两侧的调整都在里面），
+    而优先级既按 target_id 也按 target_class 匹配，所以把对方的条目喂进选择器，等于让敌方
+    指挥官的偏好改我方选靶。原先它没被测出来，只因为两侧很少在同一回合都给偏好。
+
+    对照：同侧编队的同一类指令**必须**进入选择器（否则"过滤"就成了把一切都丢掉）。
+    """
+    engine, state = _game_at_gunnery()
+    side = Side.AXIS
+    candidates = engine._gunnery_candidates(state, side)
+    targets = [row for item in candidates for row in item["targets"]]
+    if not targets:
+        pytest.skip("this side has no legal target right now")
+    target_class = state.ships[targets[0]["target_id"]].ship_type
+
+    before = [(order.ship_id, order.primary_target)
+              for order in target_priority.auto_gunnery(engine, state, side)]
+
+    foreign_formation = next(item.id for item in state.formations.values() if item.side is not side)
+    own_formation = next(item.id for item in state.formations.values() if item.side is side)
+    state.command_delay.local_directives.extend([
+        TargetPriorityDirective(formation_id=foreign_formation, source="LOCAL_AGENT",
+                                target_class=target_class, weight=0.5),
+        TargetPriorityDirective(formation_id=own_formation, source="LOCAL_AGENT",
+                                target_class=target_class, weight=0.5),
+    ])
+
+    visible = {item.formation_id for item in target_priority.local_directives_for(state, side)}
+    assert foreign_formation not in visible, "对方编队的指令进入了本侧选择器"
+    assert own_formation in visible, "本侧编队的指令没有进入选择器（过滤过头了）"
+
+    after = [(order.ship_id, order.primary_target)
+             for order in target_priority.auto_gunnery(engine, state, side)]
+    baseline = [(order.ship_id, order.primary_target)
+                for order in target_priority.select_gunnery_orders(
+                    engine, state, side,
+                    [item for item in target_priority.local_directives_for(state, side)])]
+    assert len(after) == len(before), "只加优先级不该改变参战舰数"

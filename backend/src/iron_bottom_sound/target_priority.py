@@ -208,6 +208,25 @@ def select_gunnery_orders(
     return orders
 
 
+def local_directives_for(state: GameState, side: Side) -> list[TargetPriorityDirective]:
+    """One side's own local (formation-agent) priority adjustments.
+
+    ``mode.local_directives`` is a single book for the whole game, so it holds both sides'
+    adjustments.  A directive is matched by target **class** as well as by id, so handing
+    another side's entry to this selector is a real cross-side leak: the opposing
+    commander's "prefer DD" would re-rank *our* shots at our enemies' destroyers.  Only the
+    side that owns the formation may have its preference applied.
+    """
+    mode = getattr(state, "command_delay", None)
+    if mode is None:
+        return []
+    return [
+        directive for directive in mode.local_directives
+        if (owner := state.formations.get(directive.formation_id)) is not None
+        and owner.side is side
+    ]
+
+
 def auto_gunnery(
     engine: "IronBottomEngine", state: GameState, side: Side,
 ) -> list[GunneryOrder]:
@@ -218,16 +237,13 @@ def auto_gunnery(
     three are read-only here.
     """
     fleet: list[TargetPriorityDirective] = []
-    local: list[TargetPriorityDirective] = []
     mode = getattr(state, "command_delay", None)
     if mode is not None:
         for order in mode.mission_orders:
             if order.side is not side or order.confirmed_turn is None:
                 continue
             fleet.extend(order.target_priority_directives)
-        for directive in mode.local_directives:
-            local.append(directive)
-    return select_gunnery_orders(engine, state, side, fleet + local)
+    return select_gunnery_orders(engine, state, side, fleet + local_directives_for(state, side))
 
 
 def validate_agent_decision_shape(decision: Any) -> list[str]:

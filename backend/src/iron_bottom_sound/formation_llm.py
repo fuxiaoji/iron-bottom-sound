@@ -95,6 +95,13 @@ RESPONSE_SCHEMA: dict[str, Any] = {
 INSTRUCTION = (
     "你是编队指挥官。只依据给出的本地情报与你的记忆决策。"
     "机动只能从 legal_formation_actions 里选一个 action_id，不得自创航路。"
+    "选机动前先看清它做什么：每条方案都带 manoeuvre（中文逐步说明）、ends_heading（结束时航向）、"
+    "heading_change_steps（净转向，60° 为一格，正数＝右转）、keeps_heading 与 jams_spaced_column。"
+    "机动记号本身是：数字＝沿当前航向直线前进的格数，S＝右转 60°，SS＝右转 120°，P＝左转 60°，PP＝左转 120°；"
+    "所以 1SS1S2 不是直行，而是「前进 1 格→右转 120°→前进 1 格→右转 60°→前进 2 格」，"
+    "它会让你掉头——当上级命令要求保持航向或直线前进时，请选 keeps_heading 为 true 的方案。"
+    "jams_spaced_column 为 true 的方案含原地 120° 转向：间距纵队里后舰会在同一脉冲挤进领舰格，"
+    "结算时整队被急停（船基本没走出去），除非你确实要调头，否则不要选。"
     "火力只能通过 target_priority_adjustments 给可见目标附加 -0.5..0.5 的优先级权重；"
     "炮位分配、射界、修正与命中由引擎选择器完成，你不得输出任何炮击命令、炮位、射击解或命中计算。"
     "距离一律使用给你的 range_hex / range_yards / range_nmi 字段，"

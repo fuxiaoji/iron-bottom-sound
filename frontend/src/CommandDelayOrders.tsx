@@ -58,6 +58,27 @@ function deliveryText(preview:CommandPreview|null):{tone:string;headline:string;
  }
 }
 
+// 记号读法（只用于显示）：数字＝直线前进格数，S＝右转60°、P＝左转60°，写两次＝120°。
+// 引擎自己会给 manoeuvre/ends_heading/jams_spaced_column；这里只是让**打补丁之前**写下的
+// 旧决策记录也读得懂，引擎字段存在时一律以引擎为准。
+const decodePlan=(plan:string)=>{
+ const parts:string[]=[];let pending=0;
+ for(const token of plan.match(/\d+|[SP]+/g)??[]){
+  if(/^\d+$/.test(token)){pending+=Number(token);continue}
+  if(pending){parts.push(`前进 ${pending} 格`);pending=0}
+  const side=token[0]==="S"?"右转":"左转";
+  parts.push(token.length>=2?`${side} 120°（原地调头一步）`:`${side} 60°`);
+ }
+ if(pending)parts.push(`前进 ${pending} 格`);
+ return parts.join(" → ");
+};
+const planManoeuvre=(actions:Array<Record<string,unknown>>,plan:string)=>{
+ const chosen=actions.find(item=>String(item.plan)===plan);
+ if(chosen?.manoeuvre)return {text:String(chosen.manoeuvre),jams:Boolean(chosen.jams_spaced_column),engine:true};
+ if(!plan)return {text:"",jams:false,engine:false};
+ return {text:decodePlan(plan),jams:/SS|PP/.test(plan),engine:false};
+};
+
 const ROE_PRESETS=["不要进入主力火线前方","避免夜间鱼雷突击，保持距离","优先保全自身，不追击","保留鱼雷直到 3000 码以内","受击后向主力靠拢"];
 
 const TEMPLATES:[string,string,string][]=[
@@ -280,7 +301,10 @@ export function CommandDelayOrders({game,side,turn,phase,debug,recipient,onRecip
         : "本阶段各编队没有机动方案（可能已过机动阶段，或本侧没有在编编队）。"}</p>
     : <ul>{plans.map(plan=><li key={plan.formation_id}>
       <b>{(fleet?.reports??[]).find(report=>report.formation_id===plan.formation_id)?.name??plan.formation_id}</b>
-      {" "}机动 {plan.leader_plan}{styleLabel(plan.movement_style)?` · ${styleLabel(plan.movement_style)}`:""}
+      {" "}机动 {plan.leader_plan}{(()=>{const decision=decisions.find(entry=>entry.formation_id===plan.formation_id);
+       const actions=(decision?.prompt?.legal_formation_actions??[]) as Array<Record<string,unknown>>;
+       const decoded=planManoeuvre(actions,plan.leader_plan);
+       return decoded.text?`（${decoded.text}${decoded.jams?"，会挤停纵队":""}）`:"";})()}{styleLabel(plan.movement_style)?` · ${styleLabel(plan.movement_style)}`:""}
       {plan.reform_column?" · 本回合重整队形":""}
       {(()=>{const decision=decisions.find(entry=>entry.formation_id===plan.formation_id);
        const payload=(decision?.decision??{}) as Record<string,unknown>;
@@ -303,7 +327,7 @@ export function CommandDelayOrders({game,side,turn,phase,debug,recipient,onRecip
    <h4>交接</h4>
    <div className="cd-order-actions">
     <button disabled={busy} onClick={onAdvance}>{advanceLabel}</button>
-    <span className="muted cd-btn-note">提交本阶段计划并推进裁决；在命令延迟模式下，本侧订单取<b>各编队代理的方案</b>（除非你在「高级」里手改了 JSON）。</span>
+    <span className="muted cd-btn-note">提交本阶段计划并推进裁决；命令延迟模式下提交的就是<b>计划表里那份方案</b>（＝各编队代理的选择，引擎仅在两支编队航迹真冲突时调整一支的航速）。</span>
    </div>
   </div>
 
@@ -325,13 +349,23 @@ export function CommandDelayOrders({game,side,turn,phase,debug,recipient,onRecip
        ?(Array.isArray(payload.orders)&&(payload.orders as unknown[]).length>0
          ?(payload.orders as Array<Record<string,unknown>>).map(order=>`${String(order.formation_id??"")}：${String(order.order_event??"NEW_ORDER")} 「${String(order.text??"")}」`).join("；")
          :"不下新命令（no_order）")
-       :String(payload.selected_movement_plan??"保持")}
-      {payload.selected_contingency_branch?` · ${plainBranch(String(payload.selected_contingency_branch))}`:""}
-      {payload.rationale_summary?` · 理由：${String(payload.rationale_summary)}`:""}</p>
+       :(()=>{const plan=String(payload.selected_movement_plan??"");
+          if(!plan)return "保持";
+          const actions=(entry.prompt?.legal_formation_actions??[]) as Array<Record<string,unknown>>;
+          const chosen=actions.find(item=>String(item.plan)===plan);
+          const decoded=planManoeuvre(actions,plan);
+          return <>{plan}{decoded.text?`（${decoded.text}）`:""}
+           {chosen?.ends_heading!=null&&<> · 结束航向 <b>{String(chosen.ends_heading)}</b>{chosen.keeps_heading?"（保持航向）":"（会转向）"}</>}</>;})()}
+     </p>
      {Array.isArray(payload.target_priority_adjustments)&&(payload.target_priority_adjustments as Array<Record<string,unknown>>).length>0&&
       <p className="cd-note">火力权重：{(payload.target_priority_adjustments as Array<Record<string,unknown>>)
        .map(adjustment=>`${String(adjustment.target_id)} ${Number(adjustment.weight)>0?"+":""}${String(adjustment.weight)}`).join("、")}</p>}
      {String(payload.memory_note??"")&&<p className="cd-note">写给自己的备忘：{String(payload.memory_note)}</p>}
+     {(()=>{const plan=String(payload.selected_movement_plan??"");
+        const actions=(entry.prompt?.legal_formation_actions??[]) as Array<Record<string,unknown>>;
+        if(!planManoeuvre(actions,plan).jams)return null;
+        return <p className="cd-warn">这个方案含原地 120° 转向：间距纵队里后舰会在同一脉冲挤进领舰格，
+         结算时整队急停（基本等于没走出去）。若上级命令要求保持航向，这条方案与命令不符。</p>;})()}
      {debug&&entry.attempts.map(attempt=><div key={attempt.attempt} className={`cd-attempt ${attempt.accepted?"ok":attempt.fallback?"fallback":"bad"}`}>
       <span>第 {attempt.attempt} 次{attempt.accepted?"已采纳":attempt.fallback?"回退教条":"被拒"}
        {attempt.finish_reason?` · finish=${attempt.finish_reason}`:""}

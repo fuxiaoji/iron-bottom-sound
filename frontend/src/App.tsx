@@ -871,16 +871,20 @@ export default function App() {
     });
     return `已提交 ${orders.length} 个编队的代理方案（仍由引擎逐单校验）。`;
   };
-  // 命令延迟模式下的本侧订单：默认取各编队代理自己选定的方案 —— 这个模式里玩家是舰队
-  // 总指挥，不是逐舰填表的人。只有当他亲手改过「高级：手写 OrderBatch」时才以他的为准。
+  // 命令延迟模式下的本侧订单：**就是计划表里那份 JSON**。这不是"绕过代理"——该模式下
+  // /suggested-orders 返回的正是各编队代理选定的方案（引擎只在两支编队的航迹真的冲突时
+  // 调整一支的航速），所以表里显示的、提交的、执行的是同一份东西。玩家亲手改过 JSON 时
+  // 自然也是提交他改的那份。代理的原始选择仍留在「编队代理记录」里可查。
   const commandDelayBatch = async () => {
     if (!game || !view) throw new Error("没有进行中的对局");
-    if (view.phase === "movement_planning" && !cdDraftTouched) {
-      const { orders } = await formationOrders(game, side);
-      if (orders.length === 0) throw new Error("本侧编队代理尚未给出机动方案");
-      return { side, phase: view.phase, formation_movement: orders };
+    const parsed = JSON.parse(draft);
+    if (parsed && Array.isArray(parsed.formation_movement) && parsed.formation_movement.length > 0) {
+      return { ...parsed, side, phase: view.phase };
     }
-    return JSON.parse(draft);
+    // 计划表还没跟上（例如刚切换阶段）：退回直接取代理方案，别让交接卡住。
+    const { orders } = await formationOrders(game, side);
+    if (orders.length === 0) throw new Error("本侧编队代理尚未给出机动方案");
+    return { side, phase: view.phase, formation_movement: orders };
   };
   const changeGuide = async (profile: string) => {
     setGuideProfiles((prev) => ({ ...prev, [side]: profile }));
