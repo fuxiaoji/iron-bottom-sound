@@ -14,7 +14,7 @@
   "realistic_s03_seed9",
   "cd_s01"
  ],
- "rebuilt_at_commit": "f41a252553b0afa38f9efe837c6fe4f67e5b4bab",
+ "rebuilt_at_commit": "10b00ec14f84bcbd7569a0a2efaf68244adc8a91",
  "records": [
   {
    "digest_trees": "99144f7ccd802cc816bb9aa451d6ab4e7a0ebbe0959e9b503867b41350982cd7",
@@ -108,14 +108,14 @@
    "tag": "realistic_s03_seed9"
   },
   {
-   "digest_trees": "20d22d483e792d3f60b10ac2e37c85acbcbd8f7fe2b9ff77dcac875d7f329f26",
+   "digest_trees": "eee065b1824dae60768aa28de9ed2c747df588fbf97a99942f48968ee5f07869",
    "final_phase": "complete",
    "final_turn": 7,
-   "n_events": 714,
+   "n_events": 570,
    "n_order_batches": 52,
    "passed": true,
    "realistic_command": true,
-   "rng_counter": 228,
+   "rng_counter": 226,
    "scenario": "IBS-S-01",
    "seed": 20270830,
    "tag": "cd_s01"
@@ -123,15 +123,15 @@
  ],
  "refreeze": [
   {
-   "authorized_by": "PI ruling \u2014 IBS Command Delay v2.3 Integrity, Historical Routing, and Regression Repair",
+   "authorized_by": "PI ruling \u2014 IBS Command Delay v2.3 (IR-4/IR-5: persistent orders, event-driven reporting)",
    "date": "2026-09-24",
    "note": "Only the Command Delay row may change under this batch: Classic and Realistic semantics stay frozen.  The digests above are the proof that they did.",
-   "previous_frozen_commit": "e3149c4f",
-   "reason": "v2.3 \u8def\u7531\u4fee\u590d\uff1a\u8ddd\u79bb\u53ea\u51b3\u5b9a\u53ef\u8fbe\u6027\u3001\u4e0d\u518d\u4ea7\u751f\u56de\u5408\u5ef6\u8fdf\uff1b\u8f6c\u62a5\u518d\u52a0\u5bc6\u5fc5\u987b\u643a\u5e26\u663e\u5f0f\u4e2d\u7ee7/\u5bc6\u7801\u57df\u51fa\u5904\uff1b'\u957f\u547d\u4ee4 +1' \u5220\u9664\uff0c\u6539\u4e3a\u6709\u9650\u4fe1\u9053\u5bb9\u91cf\u7684\u6392\u961f\u6ea2\u51fa",
+   "previous_frozen_commit": "9f15075d",
+   "reason": "IR-5 \u4e8b\u4ef6\u9a71\u52a8\u4e0a\u62a5\uff1a\u9ed8\u8ba4\u6761\u4ee4\u4e0d\u518d\u8981\u6c42\u9010\u56de\u5408\u6001\u52bf\u62a5\u544a\uff0c\u62a5\u6587 77\u21926\uff1b\u56e0\u706b\u529b\u4f18\u5148\u7ea7\u7531\u5df2\u6295\u9012\u7684\u547d\u4ee4/\u62a5\u544a\u6784\u6210\uff0c\u51cf\u5c11\u4e00\u5904\u70ae\u51fb\u7ed3\u7b97\uff08gunnery_result 102\u2192101\u3001ship_sunk 6\u21925\uff0crng_counter 228\u2192226\uff0c\u4e24\u6b21\u9ab0\u70b9\u5373\u8be5\u6b21\u4ea4\u6218\uff09\uff1b\u51b3\u7b56\u6570 19 \u4e0d\u53d8\u3001\u7ec8\u5c40\u4e0d\u53d8\uff08T7 complete, passed\uff09",
    "row": "cd_s01",
    "trees_digest": {
-    "after": "20d22d483e792d3f60b10ac2e37c85acbcbd8f7fe2b9ff77dcac875d7f329f26",
-    "before": "8445973cb14e64eb"
+    "after": "eee065b1824dae60768aa28de9ed2c747df588fbf97a99942f48968ee5f07869",
+    "before": "20d22d483e792d3f"
    },
    "unchanged_non_cd_rows_sha256": {
     "classic_em01": "3b7d4181b81a548b48cfeca2fe2d4ba3184831621a561e96264081ed7738990a",

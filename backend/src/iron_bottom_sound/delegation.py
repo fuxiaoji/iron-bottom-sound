@@ -71,6 +71,7 @@ def mission_order_template(
     waypoint: HexCoord | None = None,
     deadline_turn: int | None = None,
     report_requirements: list[str] | None = None,
+    report_window_turns: list[int] | None = None,
     communications_plan: list[str] | None = None,
     loss_of_comm_plan: list[str] | None = None,
     rendezvous: str | None = None,
@@ -119,9 +120,13 @@ def mission_order_template(
             f"withdraw from a decisive engagement below {int(MINIMUM_CAPABILITY_HULL_FRACTION * 100)}% hull",
             "preserve at least one flagship-capable ship",
         ],
+        report_window_turns=list(report_window_turns or []),
         report_requirements=report_requirements or [
+            # v2.3 (IR-5): the default doctrine no longer asks for a report every turn.
+            # A standing order that demanded a sitrep each turn is what filled the channel
+            # with "no change" in v2.2; periodic reporting is now something an order must
+            # request explicitly.
             "contact report on first sighting",
-            "sitrep each turn the link supports it",
             "deviation report on resuming communication",
         ],
         communications_plan=communications_plan or [

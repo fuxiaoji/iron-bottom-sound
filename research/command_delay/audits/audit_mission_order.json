@@ -58,6 +58,7 @@
   "order_id",
   "rendezvous",
   "report_requirements",
+  "report_window_turns",
   "revision",
   "risk_constraints",
   "roe",

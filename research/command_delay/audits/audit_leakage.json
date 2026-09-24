@@ -5,7 +5,7 @@
   "realistic_has_command_delay_field": false
  },
  "command_events": {
-  "total": 185,
+  "total": 45,
   "types": [
    "command_delay_initialised",
    "command_delay_turn_state",
@@ -55,7 +55,7 @@
     "axis-active-heavy"
    ],
    "report_ages": [
-    0,
+    1,
     1
    ],
    "reports": 2,
@@ -70,7 +70,7 @@
     "allies-active-light"
    ],
    "report_ages": [
-    0,
+    1,
     1
    ],
    "reports": 2,
@@ -85,7 +85,7 @@
     "axis-active-heavy"
    ],
    "report_ages": [
-    0,
+    1,
     2
    ],
    "reports": 2,
@@ -100,7 +100,7 @@
     "allies-active-light"
    ],
    "report_ages": [
-    0,
+    2,
     2
    ],
    "reports": 2,
@@ -115,7 +115,7 @@
     "axis-active-heavy"
    ],
    "report_ages": [
-    0,
+    2,
     3
    ],
    "reports": 2,
@@ -130,7 +130,7 @@
     "allies-active-light"
    ],
    "report_ages": [
-    0,
+    3,
     3
    ],
    "reports": 2,
@@ -143,7 +143,7 @@
    "embarked_ships": 0,
    "exact_formation": [],
    "report_ages": [
-    0
+    1
    ],
    "reports": 1,
    "side": "axis",
@@ -157,7 +157,7 @@
     "allies-active-light"
    ],
    "report_ages": [
-    0,
+    4,
     4
    ],
    "reports": 2,
@@ -338,7 +338,7 @@
   },
   {
    "formation_id": "axis-active-light",
-   "link_status": "direct",
+   "link_status": "relayed",
    "local_contacts": 9,
    "opposing_ship_ids_outside_own_sightings": [],
    "own_ships": 2,
@@ -372,7 +372,7 @@
   },
   {
    "formation_id": "allies-active-heavy",
-   "link_status": "direct",
+   "link_status": "relayed",
    "local_contacts": 5,
    "opposing_ship_ids_outside_own_sightings": [],
    "own_ships": 4,
@@ -474,7 +474,7 @@
   },
   {
    "formation_id": "axis-active-light",
-   "link_status": "direct",
+   "link_status": "relayed",
    "local_contacts": 8,
    "opposing_ship_ids_outside_own_sightings": [],
    "own_ships": 2,
@@ -508,7 +508,7 @@
   },
   {
    "formation_id": "allies-active-heavy",
-   "link_status": "direct",
+   "link_status": "stale",
    "local_contacts": 5,
    "opposing_ship_ids_outside_own_sightings": [],
    "own_ships": 4,
@@ -610,7 +610,7 @@
   },
   {
    "formation_id": "axis-active-light",
-   "link_status": "direct",
+   "link_status": "stale",
    "local_contacts": 8,
    "opposing_ship_ids_outside_own_sightings": [],
    "own_ships": 1,
@@ -644,7 +644,7 @@
   },
   {
    "formation_id": "allies-active-heavy",
-   "link_status": "direct",
+   "link_status": "stale",
    "local_contacts": 3,
    "opposing_ship_ids_outside_own_sightings": [],
    "own_ships": 1,
@@ -712,8 +712,8 @@
   },
   {
    "formation_id": "axis-active-light",
-   "link_status": "direct",
-   "local_contacts": 4,
+   "link_status": "relayed",
+   "local_contacts": 5,
    "opposing_ship_ids_outside_own_sightings": [],
    "own_ships": 1,
    "side": "axis",
@@ -742,12 +742,12 @@
     "visibility"
    ],
    "turn": 5,
-   "weightable_targets": 4
+   "weightable_targets": 5
   },
   {
    "formation_id": "allies-active-heavy",
-   "link_status": "direct",
-   "local_contacts": 1,
+   "link_status": "stale",
+   "local_contacts": 2,
    "opposing_ship_ids_outside_own_sightings": [],
    "own_ships": 1,
    "side": "allies",
@@ -776,7 +776,7 @@
     "visibility"
    ],
    "turn": 5,
-   "weightable_targets": 1
+   "weightable_targets": 2
   },
   {
    "formation_id": "allies-active-light",

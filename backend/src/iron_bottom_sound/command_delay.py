@@ -460,24 +460,25 @@ def route(
 def draft_reports(
     engine: "IronBottomEngine", state: GameState,
 ) -> list[CommandMessage]:
-    """Every active formation drafts its own sitrep for the fleet.
+    """Draft the reports this phase actually warrants - for either side, once.
 
-    Drafted once per phase boundary; the snapshot inside the payload is the
-    world at drafting time.  A formation with local contacts drafts a contact
-    report at urgent precedence instead, which is why precedence matters to the
-    queue.
+    v2.3 replaced "every formation reports every phase" with triggers (IR-5):
 
-    This is the **engine floor**: the situation and the sightings go up even when
-    the formation has no agent, so the fleet commander is never blind.  A side whose
-    formations run a model reports through ``_draft_formation_report`` instead - once
-    per turn, in the formation's own words, on top of the same snapshot - so this
-    function skips that side rather than sending the same traffic twice.
+    * a new contact, major damage or the loss of the flagship produces a report;
+    * a mission whose deadline has arrived, or an order that asked for periodic traffic,
+      produces a sitrep;
+    * otherwise this formation says nothing, and the silence is recorded rather than
+      turned into another "no change" message that occupies a channel slot.
+
+    The formation's radio policy gates the result, and a blocked report is recorded with
+    its reason.  The formation agent's own words (if it has any) ride along on whatever
+    this pass decides to send; the engine decides *whether*, the agent decides *what*.
     """
+    from .reporting import detect_triggers, policy_allows
+
     mode = state_for(state)
     drafted: list[CommandMessage] = []
     for side in Side:
-        if side_policy(side)[0] is not None:
-            continue
         authority = mode.authorities.get(side.value)
         fleet_id = authority.fleet_formation_id if authority else None
         fleet_formation = state.formations.get(fleet_id) if fleet_id else None
@@ -486,34 +487,77 @@ def draft_reports(
         for formation in active_formations(state, side):
             if formation.id == fleet_id:
                 continue  # the commander is embarked; no report is needed
+            entry = mode.formations.get(formation.id)
+            if entry is None:
+                entry = FormationCommandState(formation_id=formation.id)
+                mode.formations[formation.id] = entry
+            contacts = _formation_contact_count(engine, state, formation)
+            order = active_mission_order(state, formation.id)
+            triggers = detect_triggers(
+                state, formation, contacts=contacts,
+                last_hull=entry.last_reported_hull,
+                last_contacts=entry.last_reported_contacts,
+                order=order,
+            )
+            if not triggers:
+                continue
+            trigger = triggers[0]
+            window_open = bool(
+                order is not None and state.turn in (order.report_window_turns or [])
+            )
+            flagship = state.ships.get(formation.flagship_id)
+            under_attack = bool(
+                (flagship is not None and flagship.sunk)
+                or (entry.last_reported_hull is not None
+                    and hull_fraction(state, formation) < entry.last_reported_hull)
+            )
+            allowed, blocked_reason = policy_allows(
+                entry.radio_policy, trigger, window_open=window_open,
+                under_attack=under_attack,
+            )
+            if not allowed:
+                engine._event(
+                    state, "report_suppressed",
+                    f"{formation.name} 的报告被通信政策拦下：{blocked_reason}",
+                    payload={"secret_side": side.value, "formation_id": formation.id,
+                             "trigger": trigger.kind, "policy": entry.radio_policy.value,
+                             "reason": blocked_reason, "turn": state.turn},
+                    rule=engine._rule(RULE_COMMS, None, "命令延迟：通信政策"),
+                )
+                continue
             decision = route(engine, state, formation, fleet_formation)
             snapshot = report_snapshot(state, formation)
-            contacts = _formation_contact_count(engine, state, formation)
             snapshot["contacts"] = contacts
             # Who is reporting, so the fleet's knowledge of that formation is what the
             # delivery updates.  Addressed *to the fleet*: a report is traffic between
             # two commands, not a note a formation writes to itself.
             snapshot["reporting_formation_id"] = formation.id
-            kind = MessageKind.CONTACT_REPORT if contacts else MessageKind.SITREP
-            precedence = (
-                MessagePrecedence.URGENT if contacts else MessagePrecedence.ROUTINE
-            )
+            text = entry.pending_report_text or ""
+            entry.pending_report_text = ""
+            entry.pending_report_actions = []
+            entry.last_reported_hull = hull_fraction(state, formation)
+            entry.last_reported_contacts = contacts
             drafted.append(send(engine, state, CommandMessage(
                 message_id="",
                 side=side,
                 origin=formation.flagship_id,
                 destination=fleet_id,
-                kind=kind,
-                precedence=precedence,
+                kind=trigger.message_kind,
+                precedence=trigger.precedence,
                 medium=decision.medium,
                 issued_turn=state.turn,
                 issued_phase=state.phase,
                 handling_delay=delay_for(
-                    decision.medium, kind, decision.relay_hops
+                    decision.medium, trigger.message_kind, decision.relay_hops
                 ),
                 relay_hops=decision.relay_hops,
-                reason=decision.reason,
-                payload={"report": _encode_snapshot(snapshot)},
+                reason=f"{decision.reason}；触发：{trigger.detail}",
+                payload={
+                    "report": _encode_snapshot(snapshot),
+                    "report_text": text,
+                    "trigger": trigger.kind,
+                    "policy": entry.radio_policy.value,
+                },
             )))
     return drafted
 
@@ -1049,6 +1093,11 @@ def draft_natural_order(
     return message
 
 
+def hull_fraction(state: GameState, formation) -> float:
+    """This formation's remaining hull, as a fraction (delegation owns the computation)."""
+    return float(delegation.own_hull_fraction(state, formation))
+
+
 def _normalised(text: str | None) -> str:
     """Whitespace- and punctuation-insensitive form, for "is this the same order?"""
     drop = set(" \t\n\u3000\uff0c\u3002\uff1b\uff1a\u3001,.!?\uff01\uff1f\u300c\u300d")
@@ -1302,49 +1351,63 @@ def _draft_formation_report(
     contacts = _formation_contact_count(engine, state, formation)
     snapshot["contacts"] = contacts
     snapshot["reporting_formation_id"] = formation.id
-    wants_contact = "CONTACT_REPORT" in actions or contacts > 0
-    kind = MessageKind.CONTACT_REPORT if wants_contact else MessageKind.SITREP
-    precedence = MessagePrecedence.URGENT if contacts else MessagePrecedence.ROUTINE
     text = str(getattr(decision, "report_text", "") or "").strip()
-    sent = [send(engine, state, CommandMessage(
-        message_id="",
-        side=side,
-        origin=formation.flagship_id,
-        destination=fleet_id,
-        kind=kind,
-        precedence=precedence,
-        medium=route_decision.medium,
-        issued_turn=state.turn,
-        issued_phase=state.phase,
-        handling_delay=delay_for(route_decision.medium, kind, route_decision.relay_hops),
-        relay_hops=route_decision.relay_hops,
-        reason=route_decision.reason,
-        payload={
-            "report": _encode_snapshot(snapshot),
-            "report_text": text,
-            "agent": label,
-            "actions": sorted(actions),
-        },
-    ))]
+    entry = mode.formations.get(formation.id)
+    if entry is None:
+        entry = FormationCommandState(formation_id=formation.id)
+        mode.formations[formation.id] = entry
 
-    for kind_wanted, action, note in (
-        (MessageKind.DEVIATION_REPORT, "DEVIATION_REPORT", "偏离命令报告"),
-        (MessageKind.CLARIFICATION, "CLARIFICATION_REQUEST", "请求澄清"),
+    # v2.3 (IR-5): the routine report is not sent because the agent exists - it is sent
+    # when something happened, by ``draft_reports``' trigger pass, which attaches these
+    # words and applies the radio policy.  The engine decides whether; the agent decides
+    # what.  What the agent *chose* to send as a signal (deviation, clarification) is not
+    # routine and goes now, under the same policy check.
+    entry.pending_report_text = text
+    entry.pending_report_actions = sorted(actions)
+    sent: list[CommandMessage] = []
+
+    from .reporting import policy_allows, Trigger
+
+    for action, kind, precedence, note in (
+        ("DEVIATION_REPORT", MessageKind.DEVIATION_REPORT, MessagePrecedence.URGENT,
+         "偏离命令报告"),
+        ("CLARIFICATION_REQUEST", MessageKind.CLARIFICATION, MessagePrecedence.URGENT,
+         "请求澄清"),
     ):
         if action not in actions:
+            continue
+        allowed, blocked = policy_allows(
+            entry.radio_policy,
+            Trigger(action, kind, precedence, note),
+            window_open=bool(active_mission_order(state, formation.id)
+                            and state.turn in (
+                                active_mission_order(state, formation.id).report_window_turns
+                                or []
+                            )),
+            under_attack=True,   # an explicit signal from a formation is never routine
+        )
+        if not allowed:
+            engine._event(
+                state, "report_suppressed",
+                f"{formation.name} 的{note}被通信政策拦下：{blocked}",
+                payload={"secret_side": side.value, "formation_id": formation.id,
+                         "trigger": action, "policy": entry.radio_policy.value,
+                         "reason": blocked, "turn": state.turn},
+                rule=engine._rule(RULE_COMMS, None, "命令延迟：通信政策"),
+            )
             continue
         sent.append(send(engine, state, CommandMessage(
             message_id="",
             side=side,
             origin=formation.flagship_id,
             destination=fleet_id,
-            kind=kind_wanted,
-            precedence=MessagePrecedence.URGENT,
+            kind=kind,
+            precedence=precedence,
             medium=route_decision.medium,
             issued_turn=state.turn,
             issued_phase=state.phase,
             handling_delay=delay_for(
-                route_decision.medium, kind_wanted, route_decision.relay_hops
+                route_decision.medium, kind, route_decision.relay_hops
             ),
             relay_hops=route_decision.relay_hops,
             reason=f"{note}：{route_decision.reason}",

@@ -16,35 +16,34 @@
  },
  "game": {
   "authorities": {
-   "delegated": 2,
-   "fleet_directed": 2
+   "delegated": 1,
+   "fleet_directed": 2,
+   "local_autonomy": 1
   },
   "delivered_never_before_issued": true,
   "handling_delays": {
-   "0": 67,
-   "1": 10
+   "0": 6
   },
   "issued_delivered_observed_all_set": true,
   "link_statuses": {
    "blackout": 2,
-   "direct": 2
+   "direct": 1,
+   "stale": 1
   },
   "mediums": {
-   "blackout": 1,
-   "tbs_short": 76
+   "tbs_short": 6
   },
-  "messages_total": 77,
+  "messages_total": 6,
   "mission_orders": 2,
   "report_ages": [
-   0,
-   2,
+   3,
+   6,
    6,
    6
   ],
   "scenario": "IBS-S-01",
   "statuses": {
-   "delivered": 75,
-   "queued": 2
+   "delivered": 6
   },
   "tick": 46,
   "turns": 7

@@ -673,6 +673,19 @@ class CommandAuthority(BaseModel):
     fleet_formation_id: str | None = None
 
 
+class RadioPolicy(StrEnum):
+    """How much a formation may transmit (v2.3, IR-5).
+
+    Silence is a decision with consequences, so it is a state the mode enforces when a
+    message is drafted - not a phrase an agent writes into a report while transmitting.
+    """
+
+    NORMAL = "normal"
+    CONTACT_ONLY = "contact_only"
+    SCHEDULED_WINDOW = "scheduled_window"
+    STRICT_SILENCE = "strict_silence"
+
+
 class FormationCommandState(BaseModel):
     """Per-formation slice of the command-delay state machine."""
 
@@ -701,6 +714,15 @@ class FormationCommandState(BaseModel):
     last_ack_turn: int | None = None
     # The formation's own words in its newest delivered report (CD-13).
     reported_text: str | None = None
+    # v2.3: the formation's radio policy and the bookkeeping the report triggers need.
+    radio_policy: RadioPolicy = RadioPolicy.NORMAL
+    last_reported_hull: float | None = None
+    last_reported_contacts: int | None = None
+    # Set by the formation's agent during the movement phase and consumed by the
+    # trigger-driven report pass: the agent decides *what* to say, the engine decides
+    # whether a report is warranted at all (IR-5).
+    pending_report_text: str = ""
+    pending_report_actions: list[str] = Field(default_factory=list)
 
 
 class ContractTerm(BaseModel):
@@ -989,6 +1011,9 @@ class MissionOrder(BaseModel):
     roe: list[str] = Field(default_factory=list)
     risk_constraints: list[str] = Field(default_factory=list)
     report_requirements: list[str] = Field(default_factory=list)
+    # A periodic report happens only if the order asks for one; the window names the turns
+    # ("report at dusk"), which is how a staff cycle is expressed without a probability.
+    report_window_turns: list[int] = Field(default_factory=list)
     communications_plan: list[str] = Field(default_factory=list)
     commander_location: str | None = None
     rendezvous: str | None = None
