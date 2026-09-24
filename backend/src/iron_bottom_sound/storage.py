@@ -113,6 +113,7 @@ class GameRepository:
                     "ai_profile": state.options.ai_profile,
                     "battle_report": state.options.battle_report,
                     "realistic_command": state.options.realistic_command,
+                    "command_delay_mode": state.options.command_delay_mode,
                     "winner": state.winner.value if state.winner else None,
                     "updated_at": row["updated_at"],
                 }

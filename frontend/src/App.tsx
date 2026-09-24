@@ -338,6 +338,10 @@ export default function App() {
   const [realisticCommand, setRealisticCommand] = useState(false);
   const [realisticRulesOpen, setRealisticRulesOpen] = useState(false);
   const [commandDelay, setCommandDelay] = useState(false);
+  // 命令延迟模式：正在写命令的收件编队（指挥链卡片与下达命令面板共用同一个选择），
+  // 以及玩家是否亲手改过「高级：手写 OrderBatch」——改过就以他改的为准。
+  const [cdRecipient, setCdRecipient] = useState<string | null>(null);
+  const [cdDraftTouched, setCdDraftTouched] = useState(false);
   const [commandDelayRulesOpen, setCommandDelayRulesOpen] = useState(false);
   const [commandPanelCollapsed, setCommandPanelCollapsed] = useState(false);
   const [fleetPanelCollapsed, setFleetPanelCollapsed] = useState(false);
@@ -489,6 +493,7 @@ export default function App() {
     setPlanIntent("");
     setActionHints({});
     setMoveEditorShip(null);
+    setCdDraftTouched(false);
     if (reportMode) {
       setDraft("");
       return () => {
@@ -866,6 +871,17 @@ export default function App() {
     });
     return `已提交 ${orders.length} 个编队的代理方案（仍由引擎逐单校验）。`;
   };
+  // 命令延迟模式下的本侧订单：默认取各编队代理自己选定的方案 —— 这个模式里玩家是舰队
+  // 总指挥，不是逐舰填表的人。只有当他亲手改过「高级：手写 OrderBatch」时才以他的为准。
+  const commandDelayBatch = async () => {
+    if (!game || !view) throw new Error("没有进行中的对局");
+    if (view.phase === "movement_planning" && !cdDraftTouched) {
+      const { orders } = await formationOrders(game, side);
+      if (orders.length === 0) throw new Error("本侧编队代理尚未给出机动方案");
+      return { side, phase: view.phase, formation_movement: orders };
+    }
+    return JSON.parse(draft);
+  };
   const changeGuide = async (profile: string) => {
     setGuideProfiles((prev) => ({ ...prev, [side]: profile }));
     if (!game || !view) return;
@@ -886,11 +902,32 @@ export default function App() {
       setError(String(e));
     }
   };
+  // 同一个动作在顶栏和命令延迟面板里必须叫同一个名字，所以文案在一处定义。
+  const advanceLabel =
+    view && orderPhases.has(view.phase)
+      ? commandDelay
+        ? view.phase === "movement_planning"
+          ? "按代理方案提交并交接"
+          : "提交本阶段计划并交接"
+        : mode === "tutorial"
+          ? "检查本课并继续"
+          : mode === "vs_ai"
+            ? "校验并继续"
+            : mode === "llm"
+              ? "提交并让 DeepSeek 接招"
+              : "校验、封存并交接"
+      : "执行引擎裁决";
+  const advanceTitle =
+    commandDelay && view && orderPhases.has(view.phase)
+      ? "提交本侧订单（命令延迟模式下取各编队代理的方案，除非你在高级 JSON 里改过）并推进裁决"
+      : undefined;
   const act = async () => {
     if (!game || !view) return;
     try {
       if (orderPhases.has(view.phase)) {
-        const batch = JSON.parse(draft);
+        const batch = commandDelay
+          ? await commandDelayBatch()
+          : JSON.parse(draft);
         const result = await submitOrders(game, side, batch);
         if (mode === "tutorial") {
           await tutorialOpponent(game, side);
@@ -1120,16 +1157,8 @@ export default function App() {
         {view.phase === "complete" ? (
           <button disabled>对局已结束</button>
         ) : (
-          <button onClick={act} disabled={llmBusy}>
-            {orderPhases.has(view.phase)
-              ? mode === "tutorial"
-                ? "检查本课并继续"
-                : mode === "vs_ai"
-                  ? "校验并继续"
-                  : mode === "llm"
-                    ? "提交并让 DeepSeek 接招"
-                    : "校验、封存并交接"
-              : "执行引擎裁决"}
+          <button onClick={act} disabled={llmBusy} title={advanceTitle}>
+            {advanceLabel}
           </button>
         )}
       </header>
@@ -1239,7 +1268,11 @@ export default function App() {
               turn={view.turn}
               phase={view.phase}
               debug={debug}
+              recipient={cdRecipient}
+              onRecipient={setCdRecipient}
               onSubmitAgentOrders={submitAgentOrders}
+              onAdvance={act}
+              advanceLabel={advanceLabel}
             />
           )}
           {commandDelay && (
@@ -1250,16 +1283,21 @@ export default function App() {
               phase={view.phase}
               collapsed={commandPanelCollapsed}
               onToggle={() => setCommandPanelCollapsed((value) => !value)}
+              recipient={cdRecipient}
+              onRecipient={setCdRecipient}
+              onOpenRules={() => setCommandDelayRulesOpen(true)}
             />
           )}
           <ShipStatusCard ship={selected} />
           {orderPhases.has(view.phase) && (
             <section className="order-editor">
-              <h2>本阶段秘密计划表</h2>
+              <h2>{commandDelay ? "高级：手写完整 OrderBatch（JSON）" : "本阶段秘密计划表"}</h2>
               <p>
-                表格修改会同步到完整 OrderBatch；提交时仍由规则引擎严格校验。
+                {commandDelay
+                  ? "正常情况下你不必碰这里：交接时提交的是各编队代理选定的方案。只有想逐舰指定时才在这里改 —— 一旦改动，交接就以你改的 JSON 为准。"
+                  : "表格修改会同步到完整 OrderBatch；提交时仍由规则引擎严格校验。"}
               </p>
-              {
+              {!commandDelay && (
                 <div
                   className={`guide-bar${mode === "tutorial" ? " tutorial-guide" : ""}`}
                 >
@@ -1287,21 +1325,44 @@ export default function App() {
                     （仅建议，可手改）
                   </span>
                 </div>
-              }
-              <PlanSheet
-                view={view}
-                side={side}
-                draft={draft}
-                setDraft={setDraft}
-                intent={planIntent}
-                setIntent={setPlanIntent}
-                actionHints={actionHints}
-                tutorial={mode === "tutorial"}
-                editingShipId={moveEditorShip}
-                onStartMoveEditor={setMoveEditorShip}
-                game={game}
-                onAssistPath={setTorpedoAssistOverlay}
-              />
+              )}
+              {commandDelay ? (
+                <details className="advanced-json">
+                  <summary>展开编辑完整 JSON（改过之后，交接就以它为准）</summary>
+                  <PlanSheet
+                    view={view}
+                    side={side}
+                    draft={draft}
+                    setDraft={(value) => {
+                      setCdDraftTouched(true);
+                      setDraft(value);
+                    }}
+                    intent={planIntent}
+                    setIntent={setPlanIntent}
+                    actionHints={actionHints}
+                    tutorial={false}
+                    editingShipId={moveEditorShip}
+                    onStartMoveEditor={setMoveEditorShip}
+                    game={game}
+                    onAssistPath={setTorpedoAssistOverlay}
+                  />
+                </details>
+              ) : (
+                <PlanSheet
+                  view={view}
+                  side={side}
+                  draft={draft}
+                  setDraft={setDraft}
+                  intent={planIntent}
+                  setIntent={setPlanIntent}
+                  actionHints={actionHints}
+                  tutorial={mode === "tutorial"}
+                  editingShipId={moveEditorShip}
+                  onStartMoveEditor={setMoveEditorShip}
+                  game={game}
+                  onAssistPath={setTorpedoAssistOverlay}
+                />
+              )}
             </section>
           )}
           <div className="event-log-heading">
@@ -1347,6 +1408,12 @@ export default function App() {
       )}{" "}
       {realisticRulesOpen && (
         <RealisticRulesModal onClose={() => setRealisticRulesOpen(false)} />
+      )}{" "}
+      {commandDelayRulesOpen && (
+        <RealisticRulesModal
+          source="command-delay"
+          onClose={() => setCommandDelayRulesOpen(false)}
+        />
       )}{" "}
       {replayOpen && (
         <ReplayModal game={game} side={side} onClose={() => setReplayOpen(false)} />

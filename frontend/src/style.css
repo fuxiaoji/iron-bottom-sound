@@ -525,6 +525,77 @@ button.editor-modal-close:hover{color:#ffe9b0}
 .cd-memory>b{color:#e0bc63;font-size:.76rem}
 .cd-memory ul{margin:6px 0 0;padding-left:16px;font-size:.7rem;line-height:1.6;color:#c8d2ce}
 
+/* 命令延迟 v2.4 交互层：角色说明、编队卡片、本回合步骤、投递预判、模型接入。
+   这一层的目标只有一个——让「我该做什么」在面板上直接可读，不必翻规则书。 */
+.cd-role{margin-bottom:10px;padding:10px;border:1px solid #6d5a2f;background:#1b2417}
+.cd-role b{color:#e0bc63}
+.cd-role span{display:block;margin-top:4px;color:#c8d2ce;font-size:.73rem;line-height:1.6}
+.cd-role span b{color:#e8d8ad}
+.cd-cards{display:grid;gap:8px}
+.cd-card{display:block;width:100%;text-align:left;padding:9px 10px;border:1px solid #3b5350;background:#101d1f;color:#c8d2ce;cursor:pointer;font:inherit}
+.cd-card:hover{border-color:#58706b;background:#14262a}
+.cd-card.active{border-color:#d4b061;background:#1d2a22;box-shadow:inset 3px 0 0 #d4b061}
+.cd-card.exact{border-color:#4d7a5a}
+.cd-card-top{display:flex;align-items:baseline;gap:8px}
+.cd-card-top b{color:#e8d8ad;font-size:.8rem}
+.cd-card-mid{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px;font-size:.7rem;color:#aeb9b5}
+.cd-card-bot{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px;font-size:.7rem}
+.cd-card-pick{color:#e0bc63}
+.cd-badge{padding:1px 6px;border:1px solid #40504e;font-size:.66rem;font-style:normal;color:#c8d2ce}
+.cd-badge.exact{border-color:#4d7a5a;color:#a8d6ae}
+.cd-badge.warn{border-color:#8a6a3a;color:#e8c58a}
+.cd-badge.ok{border-color:#4d7a5a;color:#a8d6ae}
+.cd-badge.order{border-color:#6d5a2f;color:#e0bc63}
+.cd-badge.age-0{border-color:#4d7a5a;color:#a8d6ae}
+.cd-badge.age-1{border-color:#5c6a3a;color:#d5d6a8}
+.cd-badge.age-2{border-color:#7a7040;color:#e0d29a}
+.cd-badge.age-3{border-color:#8a6a3a;color:#e8c58a}
+.cd-badge.age-4{border-color:#8a4a45;color:#e8a8a0}
+.cd-model{margin:10px 0;padding:9px 10px;border:1px solid #3b5350;background:#101d1f}
+.cd-model-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cd-model-head b{color:#c3b78f;font-size:.76rem}
+.cd-model-head button{margin-left:auto;padding:.35rem .6rem;font-size:.7rem}
+.cd-model-form{display:grid;gap:8px;margin-top:9px}
+.cd-model-form label{display:grid;gap:4px;color:#c8d2ce;font-size:.72rem}
+.cd-model-form input,.cd-model-form select{width:100%;box-sizing:border-box;padding:.45rem .5rem;border:1px solid #52615f;background:#0d181a;color:#e9e2d0;font:inherit;font-size:.74rem}
+.cd-model-form .cd-check{display:flex;flex-direction:row;align-items:center;gap:7px}
+.cd-model-form .cd-check input{width:auto}
+.cd-role+.cd-steps,.cd-steps{display:flex;gap:6px;flex-wrap:wrap;list-style:none;margin:0 0 10px;padding:0}
+.cd-steps li{display:flex;align-items:center;gap:6px;padding:5px 9px;border:1px solid #40504e;background:#101d1f;color:#9eaaa6;font-size:.7rem}
+.cd-steps li b{display:grid;place-items:center;width:16px;height:16px;border:1px solid #40504e;color:#c8d2ce;font-size:.62rem}
+.cd-steps li.now{border-color:#d4b061;background:#1d2a22;color:#f3e6c4}
+.cd-steps li.now b{border-color:#d4b061;background:#604a26;color:#f3e6c4}
+.cd-delivery{display:grid;gap:3px;padding:9px 10px;border:1px solid #52615f;background:#0d181a}
+.cd-delivery b{font-size:.78rem;color:#e8d8ad}
+.cd-delivery span{font-size:.71rem;line-height:1.55;color:#aeb9b5}
+.cd-delivery.instant{border-color:#4d7a5a;background:#12211a}
+.cd-delivery.instant b{color:#a8d6ae}
+.cd-delivery.fast{border-color:#4d7a5a}
+.cd-delivery.slow{border-color:#8a6a3a}
+.cd-delivery.slow b{color:#e8c58a}
+.cd-delivery.blocked{border-color:#8a4a45;background:#20100f}
+.cd-delivery.blocked b{color:#e8a8a0}
+.cd-warn{margin:8px 0 0;padding:7px 9px;border:1px solid #8a6a3a;background:#221a0f;color:#e8c58a;font-size:.72rem;line-height:1.55}
+.cd-counter{margin-top:-6px;text-align:right;color:#7f8c88;font-size:.66rem}
+.cd-templates{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.7rem}
+.cd-templates button{padding:.3rem .55rem;font-size:.7rem}
+.cd-compose{display:grid;gap:9px;padding:10px;border:1px dashed #52615f;background:#0e1a1c}
+.cd-compose label{display:grid;gap:5px;color:#c8d2ce;font-size:.72rem}
+.cd-compose select,.cd-compose input{width:100%;box-sizing:border-box;padding:.45rem .5rem;border:1px solid #52615f;background:#0d181a;color:#e9e2d0;font:inherit;font-size:.74rem}
+.cd-chips-pick{display:flex;flex-wrap:wrap;gap:5px}
+.cd-chips-pick .chip{padding:.28rem .55rem;border:1px solid #40504e;background:#101d1f;color:#c8d2ce;font-size:.68rem;cursor:pointer}
+.cd-chips-pick .chip.on{border-color:#d4b061;background:#4a3a1e;color:#f3e6c4}
+.cd-btn-note{flex:1 1 220px;font-size:.68rem;line-height:1.5}
+.cd-btn-note b{color:#e0bc63}
+.cd-orders-current,.cd-orders-plans,.cd-orders-advance{margin-top:12px;padding-top:10px;border-top:1px solid #263a38}
+.cd-orders h4{margin:0 0 6px;color:#c3b78f;font-size:.78rem}
+.cd-orders-current ul,.cd-orders-plans ul{list-style:none;margin:0;padding:0;font-size:.72rem;line-height:1.65;color:#c8d2ce}
+.cd-orders-plans li{padding:4px 0;border-bottom:1px solid #223230}
+.cd-knowledge li{font-size:.7rem!important}
+.cd-knowledge em{display:block;color:#8fa39e;font-style:normal;font-size:.66rem}
+.cd-reason{color:#9eaaa6;font-style:normal;font-size:.68rem}
+.cd-panel details>summary,.cd-orders details>summary{cursor:pointer;color:#c3b78f;font-size:.74rem;margin-bottom:6px}
+
 /* 编队机动方式控件（FormationPanels.tsx）。可用性原因由引擎下发，前端只展示。 */
 .cd-inline{display:flex!important;flex-direction:row!important;align-items:center;gap:8px;font-size:.74rem;color:#c8d2ce}
 .cd-inline input{width:auto}

@@ -95,6 +95,12 @@ def replay_sightings(battle_dir: Path) -> tuple[dict[int, dict[str, dict]], dict
     """
     battle = json.loads((battle_dir / "battle_data.json").read_text(encoding="utf-8"))
     orders = load_orders(battle_dir)
+    # Re-serve the models' own replies, exactly as replay_battle does: the message traffic
+    # they authored is part of the battle, and without it the sighting envelope is the
+    # envelope of a *different* battle.
+    from recorded_policies import provider_policies_from_record
+
+    provider_policies_from_record(battle, verbose=False)
     engine = IronBottomEngine()
     state = engine.reset(battle.get("scenario", "IBS-S-EM-01"), int(battle["seed"]), GameOptions(
         realistic_command=True, command_delay_mode=True,
@@ -118,7 +124,14 @@ def replay_sightings(battle_dir: Path) -> tuple[dict[int, dict[str, dict]], dict
                 batch = orders.get((state.turn, state.phase.value, side.value))
                 if batch is None:
                     raise SystemExit(f"missing recorded batch for {(state.turn, state.phase.value, side.value)}")
-                assert engine.submit_orders(state.game_id, batch).valid
+                result = engine.submit_orders(state.game_id, batch)
+                if not result.valid and state.phase is Phase.MOVEMENT_PLANNING:
+                    # the driver's substitution path: doctrine takes the side this turn
+                    from iron_bottom_sound.realistic_command import RealisticCommander
+
+                    _, fallback, _ = RealisticCommander().choose_plan(engine, state.game_id, side)
+                    result = engine.submit_orders(state.game_id, fallback)
+                assert result.valid, (state.turn, state.phase, side, result.errors[:2])
         engine.advance(state.game_id)
         snapshot = signatures_for(engine, state)
         for formation_id, payload in snapshot.items():

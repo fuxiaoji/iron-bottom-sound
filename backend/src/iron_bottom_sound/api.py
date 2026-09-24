@@ -842,6 +842,124 @@ def command_delay_order(
     }
 
 
+class CommandDelayPreviewRequest(BaseModel):
+    """预览用：正文可以为空（玩家还没写之前就要能看到链路与距离）。"""
+
+    formation_id: str
+    text: str = ""
+
+
+@app.post("/games/{game_id}/command-delay/order/preview")
+def command_delay_order_preview(
+    game_id: str, request: "CommandDelayPreviewRequest",
+    x_player_side: Annotated[str | None, Header()] = None,
+):
+    """这道命令现在发出去会怎样：走哪条链路、多久送到。只读，不发报。
+
+    玩家按下的按钮故意不是瞬时的，所以界面必须能事先说清后果；答案来自引擎自己的
+    路由与延迟计算，而不是前端猜的数。此调用不排入任何报文、不消耗序号、不改状态。
+    """
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.command_delay_mode:
+        raise HTTPException(409, "Order previews are available only in command delay mode")
+    from .command_delay import preview_order_delivery
+
+    try:
+        return preview_order_delivery(
+            engine, state, side=side, formation_id=request.formation_id, text=request.text,
+        )
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+
+
+class CommandDelayPolicyRequest(BaseModel):
+    """把某个模型接到本局的指挥代理上（也可以用来撤销：api_key 留空即回到教条）。"""
+
+    api_key: str | None = None
+    config: LLMConnectionConfig | None = None
+    thinking_enabled: bool = False
+    sides: list[str] = Field(default_factory=list, max_length=2)
+    fleet: bool = False
+
+
+def _command_delay_policy_view(state) -> dict:
+    """本局各侧代理当前由谁在指挥：模型标签或「教条」，以及舰队层是否有代理。"""
+    from .command_delay import fleet_policy, side_policy
+
+    formations: dict[str, str] = {}
+    fleets: dict[str, str] = {}
+    for side in Side:
+        _, formation_label = side_policy(side)
+        _, fleet_label = fleet_policy(side)
+        formations[side.value] = formation_label
+        fleets[side.value] = fleet_label
+    return {
+        "game_id": state.game_id,
+        "command_delay_mode": True,
+        "formation_labels": formations,
+        "fleet_labels": fleets,
+        "models_configured": any(
+            label.startswith("llm:") for label in formations.values()
+        ),
+        "keys_are_memory_only": True,
+    }
+
+
+@app.get("/games/{game_id}/command-delay/agent-policy")
+def command_delay_agent_policy(
+    game_id: str, x_player_side: Annotated[str | None, Header()] = None,
+):
+    """本局编队代理与舰队代理现在用的是模型还是教条。"""
+    state = get_game(game_id)
+    side_from_header(x_player_side)
+    if not state.options.command_delay_mode:
+        raise HTTPException(409, "Agent policies exist only in command delay mode")
+    return _command_delay_policy_view(state)
+
+
+@app.post("/games/{game_id}/command-delay/agent-policy")
+def command_delay_set_agent_policy(
+    game_id: str, request: CommandDelayPolicyRequest,
+    x_player_side: Annotated[str | None, Header()] = None,
+):
+    """给本局（已在进行的也可以）接上模型密钥，或撤销回教条。
+
+    密钥只用进程内存，不落盘、不进存档、不进战报；服务重启后需要重新接入，返回体
+    如实说明这一点。没有密钥时编队不会停止行动 —— 它们按确定性教条打，标签会写明。
+    """
+    state = get_game(game_id)
+    side_from_header(x_player_side)
+    if not state.options.command_delay_mode:
+        raise HTTPException(409, "Agent policies exist only in command delay mode")
+    from .command_delay import set_fleet_policy, set_side_policy
+    from .formation_llm import make_policy
+
+    sides = list(Side)
+    if request.sides:
+        try:
+            sides = [Side(value) for value in request.sides]
+        except ValueError as error:
+            raise HTTPException(422, f"unknown side: {error}") from error
+    config = request.config or LLMConnectionConfig()
+    policy, label = make_policy(
+        provider=config.provider, model=config.model, api_key=request.api_key,
+        thinking=request.thinking_enabled,
+    )
+    for target in sides:
+        set_side_policy(target, policy, label)
+        # The fleet commander is the one agent the mode never had in the web app: with a
+        # policy it can command a side nobody is writing orders for (the AI side), and
+        # without one the side simply keeps its old behaviour.
+        set_fleet_policy(target, policy, label)
+    view = _command_delay_policy_view(state)
+    view["registered"] = [target.value for target in sides]
+    view["fleet_registered"] = [target.value for target in sides] if request.fleet else []
+    view["configured"] = policy is not None
+    view["reason"] = label
+    return view
+
+
 @app.get("/games/{game_id}/command-delay/formation-orders")
 def command_delay_formation_orders(
     game_id: str, x_player_side: Annotated[str | None, Header()] = None,

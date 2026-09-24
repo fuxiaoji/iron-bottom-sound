@@ -1110,6 +1110,125 @@ def _normalised(text: str | None) -> str:
     return "".join(character for character in (text or "") if character not in drop)
 
 
+def preview_order_delivery(
+    engine: "IronBottomEngine", state: GameState, *, side: Side, formation_id: str,
+    text: str = "",
+) -> dict[str, Any]:
+    """What an order to this formation would cost *now*, without sending one.
+
+    The player is asked to press a button whose whole point is that it is not
+    instantaneous, so the interface must be able to say what pressing it will do.  The
+    answer is the engine's own routing and delay computation — never a number the front
+    end invents — and this call is **read-only**: no message is queued, no sequence
+    number is consumed, no order is created and no state is written.
+    """
+    from .communications.processing import (
+        TBS_DIRECT_RANGE_HEX,
+        breakdown_for,
+        range_units,
+        slot_cost,
+    )
+
+    # Read the mode state, never create it: ``state_for`` would write the empty shell
+    # into a game that has not built its command chain yet, and a preview that changes
+    # the thing it is previewing is not a preview.
+    mode = state.command_delay
+    authority = mode.authorities.get(side.value) if mode is not None else None
+    fleet_formation = (
+        state.formations.get(authority.fleet_formation_id) if authority else None
+    )
+    formation = state.formations.get(formation_id)
+    if formation is None or formation.side is not side:
+        raise ValueError(f"unknown formation {formation_id} for side {side.value}")
+    embarked = mode is not None and is_embarked(state, formation)
+    if mode is None:
+        decision = RouteDecision(
+            CommunicationMedium.BLACKOUT, 0, "指挥链尚未建立（仍在编成/部署阶段）",
+        )
+    elif embarked:
+        decision = RouteDecision(
+            CommunicationMedium.FACE_TO_FACE, 0,
+            "同编队当面下令：当面交办，不占用通信链路",
+        )
+    elif fleet_formation is not None:
+        decision = route(engine, state, fleet_formation, formation)
+    else:
+        decision = RouteDecision(
+            CommunicationMedium.BLACKOUT, 0, "本方已无编队可以下令",
+        )
+    cleaned = " ".join((text or "").split())
+    breakdown = breakdown_for(decision.medium, decision.relay_hops)
+    slots = slot_cost(MessageKind.MISSION_ORDER, len(cleaned))
+    origin = state.ships.get(fleet_formation.leader_id) if fleet_formation else None
+    destination = state.ships.get(formation.leader_id)
+    distance = None
+    if (
+        origin is not None and destination is not None
+        and origin.position is not None and destination.position is not None
+    ):
+        distance = origin.position.distance(destination.position)
+    entry = mode.formations.get(formation_id) if mode is not None else None
+    active = active_mission_order(state, formation_id) if mode is not None else None
+    if mode is None:
+        reason_code = "no_chain_yet"
+    elif embarked:
+        reason_code = "face_to_face"
+    elif fleet_formation is None:
+        reason_code = "no_fleet_formation"
+    elif destination is None or destination.position is None:
+        # The formation may simply not have arrived yet (a reinforcement) or its
+        # flagship may be gone; either way the interface says so plainly instead of
+        # printing the engine's English sentence.
+        reason_code = "recipient_not_on_board"
+    elif origin is None or origin.position is None:
+        reason_code = "fleet_flagship_not_on_board"
+    else:
+        reason_code = decision.medium.value
+    return {
+        "formation_id": formation_id,
+        "formation_name": formation.name,
+        "formation_arrived_hex": destination.position.label if (
+            destination is not None and destination.position is not None
+        ) else None,
+        "reason_code": reason_code,
+        "issued_by": (
+            authority.fleet_commander_ship_id if authority and authority.fleet_commander_ship_id
+            else (fleet_formation.flagship_id if fleet_formation else None)
+        ),
+        "delivered_in_person": embarked,
+        "medium": decision.medium.value,
+        "medium_reason": decision.reason,
+        "relay_hops": decision.relay_hops,
+        "relay_nodes": list(decision.route_nodes),
+        "direct_tbs_available": decision.direct_tbs_available,
+        "delay": breakdown.model_dump(mode="json"),
+        "total_delay": breakdown.total,
+        "slot_cost": slots,
+        "long_order": slots > 1,
+        "distance_hex": distance,
+        **range_units(distance),
+        "tbs_range_hex": TBS_DIRECT_RANGE_HEX,
+        "link_status": getattr(entry, "link_status", None),
+        "authority": getattr(entry, "authority", None),
+        "active_order": (
+            None if active is None else {
+                "order_id": active.order_id,
+                "mission": active.mission,
+                "revision": active.revision,
+                "confirmed_turn": active.confirmed_turn,
+                "deadline_turn": active.deadline_turn,
+            }
+        ),
+        # A restatement of the standing order is recorded as NO_NEW_ORDER rather than
+        # manufactured into a revision, so the interface can warn before the player
+        # spends a signal on words the formation already has.
+        "restates_active_order": bool(
+            active is not None and _normalised(active.mission) == _normalised(cleaned)
+            and cleaned
+        ),
+    }
+
+
 def formation_orders(state: GameState, side: Side) -> list[FormationMovementOrder]:
     """Movement orders for a side, produced by its formations' own agents.
 

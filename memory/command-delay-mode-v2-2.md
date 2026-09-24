@@ -61,3 +61,21 @@ metadata:
 7. **黄金基线只覆盖了模式关闭的行**：既有 7 行全是 `command_delay_mode:false`，所以 CD-13 的改动零漂移；新语义另开一行 `cd_s01` 冻结（含报文台账、上报作者、记忆条数、as-substitutions）。**判据的可失败性**又一次成为要点（见 CD12-F5/F6/F7）。
 
 **纪录片是"从记录生成"的**，不是剪出来的：`replay_battle.py` 先用 `orders.jsonl` 重演并核验（本局 90 个批次、24 舰、0 不一致），出三视角静帧；`build_timeline.py` 把解说词、屏显、节奏**全部由记录推导**（含每回合"看得见几艘 vs 海图上几艘"的信息差）；`tts_speak.py` 用固定音色的 ChatTTS 配音；Remotion 只负责包装层。**节奏按事件而非回合数**（安静回合合并成蒙太奇），否则同样一份记录会拍成 24 分钟。
+
+## CD v2.3 修复批次（2026-09-24，IR-0…IR-9）
+
+**两条必须记住的引擎事实**：
+1. **TBS 射程是可达性阈值，不是延迟**：`TBS_DIRECT_RANGE_HEX = 73`（≈25 法定英里 @600yd/格）。
+   v2.2 把**光学能见度**（13/15 hex）当射程用，于是 14–42 hex 的报文全被推上"转报再加密 +2"
+   （本局 55 封全是美方，理由声称"不同密码体系"——模式里根本没有密码域概念）。
+   **距离永远不换算成回合延迟**；延迟只来自 handling/encoding/relay/reencipher/queue/clarification。
+2. **"长命令 +1"已删除**：长度体现为**信道槽位**（≤240 字 1 槽、≤600 字 2 槽、更长 3 槽），
+   占不到槽位就在队列里等，延迟以 `queue` 分量出现。中继/再加密必须带 `route_nodes[]` 与理由。
+
+**三个新的模式机制**：`RadioPolicy`（NORMAL/CONTACT_ONLY/SCHEDULED_WINDOW/STRICT_SILENCE，起草前判定）；
+`KnowledgeItem` 知识账本（本地观测 / 投递报文，替代"编队可见兄弟报告位"的窗口）；
+`MissionOrder` 持久化 + 修订线（NEW/AMEND/CANCEL/ACTIVATE_PREBRIEFED_BRANCH/NO_NEW_ORDER，重述不产生修订）。
+
+**两个自己踩的坑**：① 当面交办路径**先折入投递、后盖送达回合** → `confirmed_turn` 恒为 None →
+命令永不"生效"、去重与修订线全失效（IR-9 战报的命令修订表暴露：全是 rev=1）；
+② 事件驱动上报必须先改**默认条令**（`mission_order_template` 里写着"每回合一份 sitrep"）。
