@@ -215,27 +215,65 @@ def assert_no_subordinate_gunnery(record: dict) -> list[str]:
 
 
 def assert_no_order_spam(record: dict) -> dict:
-    """No formation receives two orders in one turn, and no order restates the standing one."""
+    """No formation receives two orders in one turn, and no order restates the standing one.
+
+    The orders are read from the **message ledger**, which is where they live: the engine
+    writes each order as a message (that is the mode's input channel), and the message
+    payload carries the order event, revision and lineage.
+    """
     from iron_bottom_sound.command_delay import _normalised
 
+    orders = [message for message in record.get("messages", [])
+              if message.get("kind") == "mission_order"]
     by_turn: dict[tuple[int, str], list[dict]] = {}
-    for order in record.get("mission_orders", []):
-        by_turn.setdefault((int(order["issued_turn"]), order["formation_id"]), []).append(order)
-    duplicates = [key for key, rows in by_turn.items() if len(rows) > 1]
+    for message in orders:
+        by_turn.setdefault((int(message["issued_turn"]), message["destination"]), []).append(message)
+    duplicates = [f"T{turn} {destination}" for (turn, destination), rows in by_turn.items()
+                  if len(rows) > 1]
     lineages: dict[str, list[str]] = {}
-    for order in record.get("mission_orders", []):
-        lineages.setdefault(order["formation_id"], []).append(order["mission"])
+    for message in orders:
+        lineages.setdefault(message["destination"], []).append(
+            (message.get("payload") or {}).get("order_text") or ""
+        )
+    # The engine's rule is "an order identical to the one *in force* is not a new order", so
+    # that is what is checked: for each formation, an order may not repeat the text of the
+    # latest order that had been delivered to it by the time this one was issued.
+    # a withdrawn order is not "in force", so the engine would allow its text again
+    cancelled = {
+        (message.get("payload") or {}).get("amends_order_id")
+        for message in orders
+        if (message.get("payload") or {}).get("order_event") == "CANCEL_ORDER"
+    }
     restatements = 0
-    for texts in lineages.values():
-        for earlier, later in zip(texts, texts[1:]):
-            if _normalised(earlier) == _normalised(later):
+    for destination, rows in (
+        (destination, [message for message in orders if message["destination"] == destination])
+        for destination in lineages
+    ):
+        for message in rows:
+            issued = int(message["issued_turn"])
+            in_force = [
+                other for other in rows
+                if other is not message
+                and (other.get("payload") or {}).get("order_id") not in cancelled
+                and other.get("delivered_turn") is not None
+                and int(other["delivered_turn"]) <= issued
+                and int(other["issued_turn"]) < issued
+            ]
+            if not in_force:
+                continue
+            latest = max(in_force, key=lambda other: int(other["issued_turn"]))
+            if _normalised((latest.get("payload") or {}).get("order_text")) == _normalised(
+                (message.get("payload") or {}).get("order_text")
+            ):
                 restatements += 1
+    revisions = sorted({int((message.get("payload") or {}).get("revision") or 1)
+                        for message in orders})
     return {
-        "orders": len(record.get("mission_orders", [])),
+        "orders": len(orders),
+        "revisions_seen": revisions,
         "duplicate_orders_in_one_turn": duplicates[:5],
         "restated_orders": restatements,
-        "restatement_events": sum(1 for event in record.get("events", [])
-                                  if event.get("type") == "mission_order_restated"),
+        "per_formation": {destination: len(texts) for destination, texts in lineages.items()},
     }
 
 
@@ -280,7 +318,7 @@ def main() -> int:
     add(f"| 零下级提交炮击令 | {'PASS' if not gunnery else 'FAIL'} | {len(gunnery)} 处 |")
     add(f"| 无重复下达同一命令 | "
         f"{'PASS' if not spam['duplicate_orders_in_one_turn'] and not spam['restated_orders'] else 'FAIL'} "
-        f"| 命令 {spam['orders']} 条、重述事件 {spam['restatement_events']} 次 |")
+        f"| 命令 {spam['orders']} 条、修订 {spam['revisions_seen']}、重述 {spam['restated_orders']} |")
     add(f"| 重演一致 | {replay.get('verdict')} | "
         f"{replay.get('phases_compared', '—')} 阶段 / {replay.get('phase_mismatches', '—')} 不一致 |")
     add("")
@@ -324,10 +362,11 @@ def main() -> int:
     add("")
     add("| 命令 | 编队 | 事件 | 修订 | 修订自 | 签发回合 |")
     add("|---|---|---|---|---|---|")
-    for order in record.get("mission_orders", []):
-        add(f"| `{order.get('order_id')}` | {order.get('formation_id')} | {order.get('order_event')} "
-            f"| {order.get('revision')} | {order.get('amends_order_id') or '—'} "
-            f"| T{order.get('issued_turn')} |")
+    for message in [item for item in messages if item.get("kind") == "mission_order"]:
+        payload = message.get("payload") or {}
+        add(f"| `{payload.get('order_id')}` | {message.get('destination')} "
+            f"| {payload.get('order_event')} | {payload.get('revision')} "
+            f"| {payload.get('amends_order_id') or '—'} | T{message.get('issued_turn')} |")
     add("")
     out_path.write_text("\n".join(lines), encoding="utf-8")
     summary = {

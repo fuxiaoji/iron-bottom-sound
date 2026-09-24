@@ -173,6 +173,46 @@ def CommandMessage_stub(state, formation_id, older):
     )
 
 
+def test_a_face_to_face_order_is_confirmed_in_force_and_lineaged() -> None:
+    """An order handed over in person must be as binding as one sent by radio.
+
+    The regression this pins: the in-person path folded the delivery in *before* stamping
+    the delivery turn, so `confirmed_turn` stayed None.  The order was consequently never
+    "in force" - the revision lineage never advanced and an identical order could be issued
+    again, which the IR-9 battle report caught as "every order rev=1, one restatement
+    accepted".
+    """
+    engine, state, sessions = _game()
+    axis = state.command_delay.authorities["axis"]
+    own = axis.fleet_formation_id                      # the formation the admiral sails in
+
+    first = command_delay.draft_natural_order(
+        engine, state, side=Side.AXIS, formation_id=own, text="保持队形，向东南接敌。",
+    )
+    assert first is not None and first.medium.value == "face_to_face"
+    order = next(item for item in state.command_delay.mission_orders
+                 if item.order_id == first.payload["order_id"])
+    assert order.confirmed_turn is not None, "a hand-over in person is a delivery"
+    active = command_delay.active_mission_order(state, own)
+    assert active is not None and active.order_id == order.order_id, (
+        "the order the admiral handed over must be the one in force"
+    )
+
+    # the same words again are a restatement, not a new order
+    again = command_delay.draft_natural_order(
+        engine, state, side=Side.AXIS, formation_id=own, text="保持队形，向东南接敌。")
+    assert again is None
+    assert any(event.type == "mission_order_restated" for event in state.events)
+
+    # a changed order becomes revision 2 of that lineage
+    second = command_delay.draft_natural_order(
+        engine, state, side=Side.AXIS, formation_id=own, text="转向东北，脱离接触。")
+    assert second is not None
+    amended = next(item for item in state.command_delay.mission_orders
+                   if item.order_id == second.payload["order_id"])
+    assert amended.revision == 2 and amended.amends_order_id == order.order_id
+
+
 def test_cancel_order_removes_the_active_order() -> None:
     engine, state, sessions = _game()
     axis = state.command_delay.authorities["axis"]

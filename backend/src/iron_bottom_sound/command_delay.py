@@ -1061,11 +1061,17 @@ def draft_natural_order(
         },
     ))
     if embarked:
-        _apply_delivery(engine, state, message)
+        # Stamp the delivery *before* folding it in: ``_apply_delivery`` writes the order's
+        # confirmed_turn from the message's delivered_turn, so applying first left every
+        # face-to-face order unconfirmed - which meant the obligation was never "in force",
+        # the revision lineage never advanced, and an identical order could be issued again
+        # (found by the IR-9 report: every order to the fleet's own formation was rev=1 and
+        # two identical ones were accepted).
         message.status = MessageStatus.DELIVERED
         message.delivered_turn = state.turn
         message.delivered_phase = state.phase
         message.observed_turn = state.turn
+        _apply_delivery(engine, state, message)
         engine._event(
             state, "command_message_delivered",
             f"报文 {message.message_id}（mission_order）当面交办给 {formation_id}",

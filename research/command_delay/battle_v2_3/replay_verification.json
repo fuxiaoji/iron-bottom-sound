@@ -1,0 +1,20 @@
+{
+ "battle": "research/command_delay/battle_v2_3",
+ "model_traffic_replayed": true,
+ "recorded_policies_registered": {
+  "formation": 52,
+  "fleet": 22
+ },
+ "orders_used": 90,
+ "orders_recorded": 90,
+ "orders_missing_for_a_phase": [],
+ "final": {
+  "turn": 12,
+  "phase": "complete"
+ },
+ "phases_compared": 80,
+ "phase_mismatches": 0,
+ "mismatches": [],
+ "verdict": "PASS",
+ "frames_rendered": 0
+}

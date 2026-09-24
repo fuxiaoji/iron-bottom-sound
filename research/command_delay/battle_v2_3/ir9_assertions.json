@@ -1,0 +1,33 @@
+{
+ "report": "research/command_delay/battle_v2_3/REPORT_V2_3.md",
+ "assertions": {
+  "causal_information": "PASS",
+  "unit_violations": 5,
+  "unsupported_confirmed": 0,
+  "subordinate_gunnery": 0,
+  "order_spam": {
+   "orders": 32,
+   "revisions_seen": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "duplicate_orders_in_one_turn": [],
+   "restated_orders": 1,
+   "per_formation": {
+    "axis-cruiser-line": 1,
+    "axis-destroyer-line": 3,
+    "allies-cruiser-line": 8,
+    "allies-destroyer-line": 7,
+    "axis-battle-line": 7,
+    "allies-battle-line": 6
+   }
+  },
+  "replay": "PASS"
+ }
+}

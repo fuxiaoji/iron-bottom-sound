@@ -1,0 +1,9 @@
+{
+ "battle": "research/command_delay/battle_v2_3",
+ "calls_scanned": 76,
+ "calls_total": 76,
+ "report_bodies_seen": 4,
+ "criterion": "No side is ever told about an enemy ship that none of its own ships had sighted: every opposing-ship id or name in a prompt must fall inside the cumulative sightings of that side. Within-side ordering (a formation learning from a sibling's report before delivery) is not claimed - a formation's view legitimately carries the fleet's copies of sibling reports.",
+ "findings": [],
+ "verdict": "PASS"
+}

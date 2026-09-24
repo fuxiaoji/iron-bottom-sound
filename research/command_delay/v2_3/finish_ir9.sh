@@ -4,7 +4,8 @@
 # the driver writes "DONE turns=" as its last line, and everything after that is
 # deterministic post-processing.
 set -euo pipefail
-cd "$(dirname "${BASH_SOURCE[0]}")/../.."
+# three levels up: v2_3 -> command_delay -> research -> the repository root
+cd "$(dirname "${BASH_SOURCE[0]}")/../../.."
 LOG=research/command_delay/v2_3/logs/ir9_battle.log
 BATTLE=battle_v2_3
 
