@@ -190,10 +190,9 @@ def observation_tensors(
         LINK_RANK.get(observation.link_status.value, 0.0),
         AUTHORITY_RANK.get(observation.authority.value, 0.0),
         float(len(observation.received_messages)),
-        float(
-            max((report.age_turns or 0) for report in observation.stale_external_reports)
-            if observation.stale_external_reports else 0
-        ),
+        # How stale the oldest fact this formation holds is (v2.3: from its own knowledge
+        # ledger, not from its siblings' reports).
+        float(max((item.get("age_turns") or 0) for item in (observation.knowledge or [{}]))),
     ]
     objective_block = [
         1.0 if objective is not None and objective.waypoint is not None else 0.0,

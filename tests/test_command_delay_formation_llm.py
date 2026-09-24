@@ -70,7 +70,7 @@ def test_prompt_carries_exactly_the_local_input_list() -> None:
     prompt = formation_llm.build_prompt(observation, None)
     for key in ("formation_state", "local_map", "local_contacts",
                 "active_mission_order", "received_messages", "comm_state",
-                "stale_external_reports", "legal_formation_actions",
+                "knowledge", "legal_formation_actions",
                 "legal_target_priority_options", "report_actions"):
         assert key in prompt, key
     for forbidden in ("score", "sealed_orders", "submitted_orders", "wrecks",

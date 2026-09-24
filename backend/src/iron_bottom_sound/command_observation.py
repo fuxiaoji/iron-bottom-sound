@@ -126,7 +126,10 @@ class FormationObservation(BaseModel):
     active_mission_order: MissionOrder | None = None
     received_messages: list[CommandMessage] = Field(default_factory=list)
     comm_state: dict[str, Any] = Field(default_factory=dict)
-    stale_external_reports: list[FormationReport] = Field(default_factory=list)
+    # v2.3 replaced ``stale_external_reports`` (which handed a formation its siblings'
+    # positions straight from the fleet's copy) with this formation's own knowledge
+    # ledger: only what it observed or was actually sent.
+    knowledge: list[dict[str, Any]] = Field(default_factory=list)
     legal_formation_actions: list[dict[str, Any]] = Field(default_factory=list)
     legal_target_priority_options: list[dict[str, Any]] = Field(default_factory=list)
     report_actions: list[str] = Field(default_factory=lambda: list(REPORT_ACTIONS))
@@ -425,7 +428,7 @@ def formation_observation(
             "mediums_available": [medium.value for medium in
                                   _available_mediums(state)],
         },
-        stale_external_reports=_external_reports(state, side, formation_id),
+        knowledge=_knowledge_payload(state, formation_id),
         legal_formation_actions=legal_formation_actions(engine, state, formation),
         legal_target_priority_options=legal_target_priority_options(enemies, positions),
         report_actions=list(REPORT_ACTIONS),
@@ -459,40 +462,11 @@ def _active_order(state: GameState, formation_id: str) -> MissionOrder | None:
     return sorted(orders, key=lambda item: (item.issued_turn, item.order_id))[-1]
 
 
-def _external_reports(state: GameState, side: Side, formation_id: str) -> list[FormationReport]:
-    """Other formations' reports this formation has received — the only window out."""
-    mode = command_delay.state_for(state)
-    found = []
-    for other in command_delay.active_formations(state, side):
-        if other.id == formation_id:
-            continue
-        entry = mode.formations.get(other.id)
-        if entry is None or entry.reported_position is None:
-            continue
-        found.append(FormationReport(
-            formation_id=other.id,
-            name=other.name,
-            side=other.side,
-            reported_turn=entry.reported_turn,
-            age_turns=(
-                None if entry.reported_turn is None else max(0, state.turn - entry.reported_turn)
-            ),
-            link_status=entry.link_status,
-            authority=entry.authority,
-            commander_ship_id=entry.commander_ship_id,
-            guide_position=entry.reported_position,
-            guide_label=(
-                entry.reported_position.label if entry.reported_position else None
-            ),
-            guide_heading=entry.reported_heading,
-            guide_speed=entry.reported_speed,
-            ship_count=entry.reported_ship_count,
-            geometry_kind=(
-                entry.reported_geometry_kind.value if entry.reported_geometry_kind else None
-            ),
-            is_source_of_truth=False,
-        ))
-    return sorted(found, key=lambda item: item.formation_id)
+def _knowledge_payload(state: GameState, formation_id: str) -> list[dict[str, Any]]:
+    """This formation's own knowledge, with provenance (v2.3)."""
+    from .formation_knowledge import knowledge_payload
+
+    return knowledge_payload(state, formation_id)
 
 
 def legal_formation_actions(

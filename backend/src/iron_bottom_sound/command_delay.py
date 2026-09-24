@@ -670,6 +670,11 @@ def _apply_delivery(
         entry.reported_speed = snapshot.get("guide_speed")
         entry.reported_ship_count = snapshot.get("ship_count")
         entry.reported_geometry_kind = snapshot.get("geometry_kind")
+        # v2.3: the *addressee* learns the report's facts.  A formation that was not
+        # addressed learns nothing, which is the causal boundary the mode was missing.
+        from .formation_knowledge import record_delivered_report
+
+        record_delivered_report(state, message)
         text = str(message.payload.get("report_text") or "").strip()
         if text:
             # The formation's own words, kept as delivered.  This is what the fleet
@@ -1091,6 +1096,14 @@ def run_formation_agents(engine: "IronBottomEngine", state: GameState) -> list[d
         mode.policy_labels[side.value] = label
         for formation in active_formations(state, side):
             observation = formation_observation(engine, state, side, formation.id)
+            # v2.3: what this formation's own lookouts produced, recorded with provenance
+            # whether or not an agent commands it - the ledger is a state fact, not a
+            # by-product of having a model.
+            from .formation_knowledge import record_local_observation
+
+            record_local_observation(
+                state, formation.id, side, observation.local_contacts, state.turn,
+            )
             order = active_mission_order(state, formation.id)
             memory = memory_for(state, formation.id)
             order_text = memory.active_order_text

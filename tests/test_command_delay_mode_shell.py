@@ -276,15 +276,26 @@ def test_formation_view_reports_no_side_global_field() -> None:
         assert forbidden not in payload, f"{forbidden} must not reach a local agent"
 
 
-def test_formation_view_records_stale_external_reports_for_other_formations() -> None:
+def test_formation_view_does_not_expose_sibling_reports() -> None:
+    """IR-3: a formation's view carries its own knowledge, never its siblings' reports.
+
+    The v2.2 field this replaces (``stale_external_reports``) listed every other
+    formation's last reported position, read from the *fleet's* copy - so a formation saw
+    a sibling's sighting with no message delivered to it. The causal rule is now enforced
+    by what the view does not contain.
+    """
     engine, state = command_delay_game()
     formations = command_delay.active_formations(state, Side.AXIS)
     if len(formations) < 2:
         pytest.skip("scenario has a single axis formation")
     view = formation_observation(engine, state, Side.AXIS, formations[0].id)
-    ids = {report.formation_id for report in view.stale_external_reports}
-    assert formations[0].id not in ids
-    assert ids == {formation.id for formation in formations[1:]}
+    assert not hasattr(view, "stale_external_reports")
+    # and nothing in the knowledge ledger is about a *friendly* formation it was not sent:
+    # at this point no traffic has been delivered to it at all
+    assert view.knowledge == []
+    for item in view.knowledge:
+        assert item["source_kind"] in ("LOCAL_OBSERVATION", "DELIVERED_MESSAGE")
+        assert item["source_id"] != formations[1].id
 
 
 def test_formation_view_rejects_a_formation_of_the_other_side() -> None:

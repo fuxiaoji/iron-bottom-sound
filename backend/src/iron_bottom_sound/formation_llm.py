@@ -186,7 +186,9 @@ def build_prompt(
         "your_memory": memory_text or "",
         "received_messages": payload["received_messages"],
         "comm_state": payload["comm_state"],
-        "stale_external_reports": payload["stale_external_reports"],
+        # v2.3: this formation's own facts with provenance, replacing the v2.2 field that
+        # handed it its siblings' positions from the fleet's copy.
+        "knowledge": payload.get("knowledge", []),
         "legal_formation_actions": payload["legal_formation_actions"],
         "legal_target_priority_options": payload["legal_target_priority_options"],
         "report_actions": payload["report_actions"],

@@ -462,6 +462,10 @@ def audit_leakage() -> dict:
     sessions = {item: LLMPlayerSession(item, RealisticCommander()) for item in Side}
 
     findings: list[str] = []
+    # Knowledge is cumulative by nature: a formation that saw a ship at T2 still holds that
+    # fact at T4 even after the ship leaves its horizon, so the bound for a LOCAL_OBSERVATION
+    # item is everything the formation has ever seen, not what it can see right now.
+    ever_sighted: dict[str, set[str]] = {}
     fleet_rows: list[dict] = []
     formation_rows: list[dict] = []
     sampled_turns: set[int] = set()
@@ -622,7 +626,45 @@ def audit_leakage() -> dict:
                     # ``local_contacts`` and the priority options it may weight.  Any
                     # appearance elsewhere would be knowledge the formation never
                     # obtained.
-                    allowed_blocks = ("local_contacts", "legal_target_priority_options")
+                    # v2.3: ``knowledge`` holds this formation's own facts, each with the
+                    # source that produced it.  It may carry enemy ids - but only ones the
+                    # formation itself sighted, or that arrived in a message addressed to
+                    # it.  It is checked against that tighter bound here, not exempted.
+                    own_sighted = {
+                        contact.get("ship_id") for contact in view.get("local_contacts") or []
+                    }
+                    ever_sighted.setdefault(formation.id, set()).update(own_sighted)
+                    delivered_sources = {
+                        item.get("message_id") for item in view.get("knowledge") or []
+                        if item.get("source_kind") == "DELIVERED_MESSAGE"
+                    }
+                    delivered_enemy_ids: set[str] = set()
+                    for message in state.command_delay.messages:
+                        if message.message_id not in delivered_sources:
+                            continue
+                        snapshot = (message.payload or {}).get("report") or {}
+                        text = json.dumps(snapshot, ensure_ascii=False) + str(
+                            (message.payload or {}).get("report_text") or ""
+                        )
+                        delivered_enemy_ids |= {ship_id for ship_id in opponents if ship_id in text}
+                    for item in view.get("knowledge") or []:
+                        subject = item.get("subject_id")
+                        if subject not in opponents:
+                            continue
+                        if item.get("source_kind") == "LOCAL_OBSERVATION":
+                            if subject not in ever_sighted.get(formation.id, set()):
+                                findings.append(
+                                    f"t{state.turn} formation view {formation.id} claims a local "
+                                    f"sighting of {subject} it cannot see"
+                                )
+                        elif item.get("source_kind") == "DELIVERED_MESSAGE":
+                            if not item.get("message_id"):
+                                findings.append(
+                                    f"t{state.turn} formation view {formation.id} holds a learned "
+                                    f"fact about {subject} with no message id"
+                                )
+                    allowed_blocks = ("local_contacts", "legal_target_priority_options",
+                                      "knowledge")
                     outside_sightings = {
                         key: value for key, value in view.items()
                         if key not in allowed_blocks

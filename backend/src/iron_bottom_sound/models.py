@@ -767,6 +767,9 @@ class CommandDelayState(BaseModel):
     # CD-10: one memory per formation (never shared, never side-global), and the raw
     # agent transcript for the debug view and for replaying a game without the model.
     memories: dict[str, FormationMemory] = Field(default_factory=dict)
+    # Per-formation knowledge, with provenance (v2.3, IR-3).  Bounded like memory: a long
+    # scenario must not grow the state without limit.
+    knowledge: dict[str, list["KnowledgeItem"]] = Field(default_factory=dict)
     agent_log: list[dict[str, Any]] = Field(default_factory=list)
     # Which policy each side's formations run under, as a *label* only: the callable
     # itself is held in process memory and never persisted.
@@ -849,6 +852,35 @@ class DelayBreakdown(BaseModel):
             "reencipher": self.reencipher, "queue": self.queue,
             "clarification": self.clarification, "total": self.total,
         }
+
+
+class KnowledgeItem(BaseModel):
+    """One fact a formation is entitled to hold, with where it came from (v2.3).
+
+    The rule this exists to enforce: a formation may know an enemy fact only if **it**
+    observed it or **it** received a message carrying it, by the current turn.  Sibling
+    reports do not become visible to a formation just because the fleet holds them - that
+    was the v2.2 leak (``_external_reports`` read the fleet's copies and handed every
+    formation its siblings' positions).
+    """
+
+    subject_id: str                  # enemy ship id, or a formation id for own-side facts
+    field: str                       # POSITION | HEADING | SPEED | SHIP_TYPE | SHIP_COUNT
+    value: str | int | None = None
+    observed_turn: int = 0           # when the fact was true
+    received_turn: int | None = None # when this holder learned it
+    source_kind: str = "LOCAL_OBSERVATION"   # LOCAL_OBSERVATION | DELIVERED_MESSAGE
+    source_id: str = ""              # the observing formation, or the reporting one
+    message_id: str | None = None
+    # v2.3 keeps two levels here; the operational claim schema (CONFIRMED / REPORTED /
+    # INFERRED / SUSPECTED) is IR-6 and builds on this.
+    confidence: str = "OBSERVED"
+
+    @property
+    def age_turns(self) -> int | None:
+        if self.received_turn is None:
+            return None
+        return max(0, self.received_turn - self.observed_turn)
 
 
 class RouteProvenance(BaseModel):
