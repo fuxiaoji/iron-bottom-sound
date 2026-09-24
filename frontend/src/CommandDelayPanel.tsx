@@ -64,6 +64,9 @@ function ModelCard({game,side,onChanged}:{game:string;side:Side;onChanged:()=>vo
 
  const label=policy?.formation_labels?.[side];
  const isModel=Boolean(label&&label.startsWith("llm:"));
+ // 思考链状态直接读活策略对象（引擎下发），界面不自己记一份。
+ const thinkingOn=policy?.thinking_enabled?.[side]??null;
+ const budget=policy?.max_tokens?.[side]??null;
  const roleLine=(value:string|undefined)=>
   !value?"未知":value.startsWith("llm:")?`模型（${value.slice(4)}）`
    :value.includes("no API key")?"教条：服务端没有该模型的密钥"
@@ -93,6 +96,8 @@ function ModelCard({game,side,onChanged}:{game:string;side:Side;onChanged:()=>vo
   <div className="cd-model-head">
    <b>编队代理</b>
    <span className={isModel?"cd-badge ok":"cd-badge warn"}>{roleLine(label)}</span>
+   {isModel&&thinkingOn!==null&&<span className={thinkingOn?"cd-badge order":"cd-badge"}>{thinkingOn?"思考链：开":"思考链：关"}</span>}
+   {isModel&&budget?<span className="cd-badge">输出上限 {budget} tokens</span>:null}
    <button className="quiet" onClick={()=>setOpen(!open)}>{open?"收起":"接入模型…"}</button>
   </div>
   {!isModel&&!open&&<p className="cd-note">
@@ -117,7 +122,10 @@ function ModelCard({game,side,onChanged}:{game:string;side:Side;onChanged:()=>vo
    </div>
    <p className="cd-note">
     密钥用于双方的编队代理（可只给本侧）。留空密钥再点「接入」即撤销回教条。
-    接上舰队代理后，那一侧的舰队总指挥由模型担任：它会自己写命令，你就不必替它写。
+    接上舰队代理后，那一侧的舰队总指挥由模型担任：它会自己写命令，你就不必替它写。<br/>
+    <b>想看每个 agent 怎么想</b>：勾上「开启思维链」并用支持的模型（智谱 glm-4.5-flash 实测会返回推理），
+    然后打开顶栏的<b>调试</b>开关 —— 代理记录里每次往返都会分开显示「思考过程」与「原始回复」。
+    推理模型会先把预算花在思考上，所以输出上限给到 3000 左右；太小时它可能只思考不回答。
    </p>
    {result&&<p className="cd-dispatch">{result}</p>}
    {error&&<p className="cd-error">{error}</p>}

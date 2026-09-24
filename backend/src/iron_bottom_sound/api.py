@@ -879,6 +879,11 @@ class CommandDelayPolicyRequest(BaseModel):
     api_key: str | None = None
     config: LLMConnectionConfig | None = None
     thinking_enabled: bool = False
+    # A reasoning model spends part of the budget thinking *before* it writes the JSON;
+    # at 700-2000 tokens it is easy to get reasoning and no answer (the formation adapter
+    # then correctly refuses to parse and the doctrine takes the turn).  3000 leaves room
+    # for both, which is what the probe measured on glm-4.5-flash.
+    max_tokens: int = Field(default=3000, ge=256, le=16000)
     sides: list[str] = Field(default_factory=list, max_length=2)
     fleet: bool = False
 
@@ -889,16 +894,30 @@ def _command_delay_policy_view(state) -> dict:
 
     formations: dict[str, str] = {}
     fleets: dict[str, str] = {}
+    thinking: dict[str, bool | None] = {}
+    budgets: dict[str, int | None] = {}
     for side in Side:
-        _, formation_label = side_policy(side)
+        formation_policy, formation_label = side_policy(side)
         _, fleet_label = fleet_policy(side)
         formations[side.value] = formation_label
         fleets[side.value] = fleet_label
+        # Straight from the live policy object: the panel should be able to say whether
+        # the chain of thought is on without the front end keeping its own copy.
+        thinking[side.value] = (
+            getattr(formation_policy, "thinking_enabled", None)
+            if formation_policy is not None else None
+        )
+        budgets[side.value] = (
+            getattr(formation_policy, "max_tokens", None)
+            if formation_policy is not None else None
+        )
     return {
         "game_id": state.game_id,
         "command_delay_mode": True,
         "formation_labels": formations,
         "fleet_labels": fleets,
+        "thinking_enabled": thinking,
+        "max_tokens": budgets,
         "models_configured": any(
             label.startswith("llm:") for label in formations.values()
         ),
@@ -944,14 +963,23 @@ def command_delay_set_agent_policy(
     config = request.config or LLMConnectionConfig()
     policy, label = make_policy(
         provider=config.provider, model=config.model, api_key=request.api_key,
-        thinking=request.thinking_enabled,
+        thinking=request.thinking_enabled, max_tokens=request.max_tokens,
     )
-    for target in sides:
-        set_side_policy(target, policy, label)
-        # The fleet commander is the one agent the mode never had in the web app: with a
-        # policy it can command a side nobody is writing orders for (the AI side), and
-        # without one the side simply keeps its old behaviour.
-        set_fleet_policy(target, policy, label)
+    if policy is None:
+        # Revoking clears **both** layers for those sides: leaving a fleet policy behind
+        # would keep a model commanding a side the interface just labelled doctrine.
+        for target in sides:
+            set_side_policy(target, None, label)
+            set_fleet_policy(target, None, "no-fleet-agent")
+    else:
+        for target in sides:
+            set_side_policy(target, policy, label)
+            # The fleet commander is the one agent the mode never had in the web app: with
+            # a policy it can command a side nobody is writing orders for (the AI side).
+            # It is opt-in per request, because a player who writes their own orders must
+            # not have a model issuing orders on their side behind their back.
+            if request.fleet:
+                set_fleet_policy(target, policy, label)
     view = _command_delay_policy_view(state)
     view["registered"] = [target.value for target in sides]
     view["fleet_registered"] = [target.value for target in sides] if request.fleet else []

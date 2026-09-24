@@ -2,7 +2,7 @@
  "provider": "zhipu",
  "results": [
   {
-   "model": "glm-4-flash",
+   "model": "glm-4.5-flash",
    "max_tokens": 700,
    "thinking_field": true,
    "attempts": [
@@ -12,17 +12,20 @@
     }
    ],
    "http_status": 200,
-   "latency_s": 5.32,
+   "latency_s": 5.28,
    "finish_reason": "stop",
    "usage": {
-    "completion_tokens": 89,
-    "prompt_tokens": 406,
-    "total_tokens": 495
+    "completion_tokens": 81,
+    "prompt_tokens": 410,
+    "prompt_tokens_details": {
+     "cached_tokens": 5
+    },
+    "total_tokens": 491
    },
-   "request_id": "20260923234158048983dc6eb74a69",
-   "content_chars": 242,
+   "request_id": "202609241929575af293385d544de0",
+   "content_chars": 241,
    "reasoning_chars": 0,
-   "markdown_fenced": false,
+   "markdown_fenced": true,
    "strict_json": true,
    "parsed_keys": [
     "memory_note",
@@ -35,9 +38,79 @@
    "playable": true,
    "provider": "zhipu",
    "endpoint": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+   "model": "glm-4-flash",
+   "max_tokens": 700,
+   "thinking_field": true,
+   "attempts": [
+    {
+     "attempt": 1,
+     "http_status": 200
+    }
+   ],
+   "http_status": 200,
+   "latency_s": 7.9,
+   "finish_reason": "stop",
+   "usage": {
+    "completion_tokens": 105,
+    "prompt_tokens": 406,
+    "total_tokens": 511
+   },
+   "request_id": "20260924193002d011d503aadd4657",
+   "content_chars": 276,
+   "reasoning_chars": 0,
+   "markdown_fenced": true,
+   "strict_json": true,
+   "parsed_keys": [
+    "memory_note",
+    "rationale_summary",
+    "report_actions",
+    "selected_contingency_branch",
+    "selected_movement_action_id",
+    "target_priority_adjustments"
+   ],
+   "playable": true,
+   "provider": "zhipu",
+   "endpoint": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+   "model": "glm-5.2",
+   "max_tokens": 700,
+   "thinking_field": true,
+   "attempts": [
+    {
+     "attempt": 1,
+     "http_status": 429
+    }
+   ],
+   "http_status": 429,
+   "latency_s": 1.02,
+   "error_body": "{\"error\":{\"code\":\"1113\",\"message\":\"余额不足或无可用资源包,请充值。\"}}",
+   "playable": false,
+   "provider": "zhipu",
+   "endpoint": "https://open.bigmodel.cn/api/paas/v4"
+  },
+  {
+   "model": "glm-4.6",
+   "max_tokens": 700,
+   "thinking_field": true,
+   "attempts": [
+    {
+     "attempt": 1,
+     "http_status": 429
+    }
+   ],
+   "http_status": 429,
+   "latency_s": 0.28,
+   "error_body": "{\"error\":{\"code\":\"1113\",\"message\":\"余额不足或无可用资源包,请充值。\"}}",
+   "playable": false,
+   "provider": "zhipu",
+   "endpoint": "https://open.bigmodel.cn/api/paas/v4"
   }
  ],
  "playable": [
+  "glm-4.5-flash",
   "glm-4-flash"
  ]
 }

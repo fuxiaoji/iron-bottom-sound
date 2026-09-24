@@ -651,3 +651,13 @@ button.editor-modal-close:hover{color:#ffe9b0}
 .paper-formation-side li span{font-size:.66rem;color:#6d6350}
 .paper-footer{display:flex;justify-content:space-between;border-top:3px double #2c2416;margin-top:12px;padding-top:6px;font-size:.66rem;color:#6d6350}
 .paper-ai-stats{margin-top:8px}.paper-ai-stats h3{margin:10px 0 6px;font:1rem Georgia,serif;border-bottom:1px solid #b3a479;padding-bottom:3px}.paper-ai-stats p{font-size:.78rem;margin:.3rem 0}
+
+/* 思考链（调试）：模型自己的推理与它的正文回复分开呈现，避免把推理当成决策依据。 */
+.cd-thinking{margin:6px 0;padding:7px 9px;border-left:3px solid #6d5a2f;background:#1a1710}
+.cd-thinking>b{display:block;color:#e0bc63;font-size:.72rem;margin-bottom:2px}
+.cd-thinking>span{display:block;color:#9eaaa6;font-size:.66rem;line-height:1.5;margin-bottom:5px}
+.cd-thinking pre{margin:0;padding:7px;max-height:260px;overflow:auto;border:1px solid #3a3626;background:#0d0f0a;color:#d9cfae;font-size:.68rem;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.cd-response>b{display:block;color:#c3b78f;font-size:.7rem;margin:6px 0 2px}
+.cd-response pre{margin:0;padding:6px;max-height:200px;overflow:auto;border:1px solid #223230;background:#0a1113;color:#a8c0bb;font-size:.68rem;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.cd-no-thinking{margin:5px 0!important;font-size:.68rem!important}
+.cd-log-entry>.cd-badge{margin-left:6px}

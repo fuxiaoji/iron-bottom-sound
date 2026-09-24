@@ -957,9 +957,17 @@ export default function App() {
           }
         } else {
           if (result.both_submitted) {
-            const events = await advance(game, side);
-            if (view.phase === "gunnery")
-              setGunneryOutcome({ events, viewer: side, turn: view.turn });
+            // 命令延迟模式下这一次推进里，每个编队代理（以及舰队代理）都要向模型请求
+            // 一次决策：本地实测 6–7 次往返要几分钟。没有提示的话界面就是"点了没反应"。
+            const thinking = commandDelay;
+            if (thinking) setLlmBusy(true);
+            try {
+              const events = await advance(game, side);
+              if (view.phase === "gunnery")
+                setGunneryOutcome({ events, viewer: side, turn: view.turn });
+            } finally {
+              if (thinking) setLlmBusy(false);
+            }
           }
           await clearAndLock();
         }
@@ -1158,7 +1166,7 @@ export default function App() {
           <button disabled>对局已结束</button>
         ) : (
           <button onClick={act} disabled={llmBusy} title={advanceTitle}>
-            {advanceLabel}
+            {llmBusy && commandDelay ? "代理思考中…" : advanceLabel}
           </button>
         )}
       </header>
@@ -1436,10 +1444,15 @@ export default function App() {
       {llmBusy && (
         <div className="llm-mask">
           <b>
-            {llmProvider === "zhipu" ? "智谱 GLM" : "DeepSeek"}{" "}
-            正在编写本阶段计划…
+            {commandDelay
+              ? "各编队代理正在思考…"
+              : `${llmProvider === "zhipu" ? "智谱 GLM" : "DeepSeek"} 正在编写本阶段计划…`}
           </b>
-          <span>引擎仍会严格校验它的一切订单</span>
+          <span>
+            {commandDelay
+              ? "每个编队各向模型请求一次决策（开启思考链时每次往返可达一分钟），完成后引擎仍逐单校验"
+              : "引擎仍会严格校验它的一切订单"}
+          </span>
         </div>
       )}
     </main>

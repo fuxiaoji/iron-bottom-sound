@@ -279,6 +279,43 @@ def test_a_key_can_be_attached_to_a_running_game_and_is_never_persisted() -> Non
     assert api_engine.get(game_id).command_delay.policy_labels is not None
 
 
+def test_a_fleet_agent_is_opt_in_only() -> None:
+    """舰队层代理必须显式勾选：默认只接编队，否则模型会在玩家自己那一侧下单。"""
+    client = _client()
+    game_id = _command_delay_game(client)
+    plain = client.post(
+        f"/games/{game_id}/command-delay/agent-policy",
+        headers={"X-Player-Side": "axis"},
+        json={"api_key": "unit-test-key", "sides": ["axis"],
+              "config": {"provider": "deepseek", "model": "deepseek-chat",
+                         "vision_enabled": False}},
+    ).json()
+    assert plain["formation_labels"]["axis"].startswith("llm:")
+    assert plain["fleet_labels"]["axis"] == "no-fleet-agent", (
+        "没勾选舰队代理时，舰队层必须不动"
+    )
+    assert plain["fleet_registered"] == []
+
+    with_fleet = client.post(
+        f"/games/{game_id}/command-delay/agent-policy",
+        headers={"X-Player-Side": "axis"},
+        json={"api_key": "unit-test-key", "sides": ["allies"], "fleet": True},
+    ).json()
+    assert with_fleet["fleet_labels"]["allies"].startswith("llm:")
+    assert with_fleet["fleet_labels"]["axis"] == "no-fleet-agent", (
+        "只给另一侧勾选时，本侧舰队层不受影响"
+    )
+
+    revoked = client.post(
+        f"/games/{game_id}/command-delay/agent-policy",
+        headers={"X-Player-Side": "axis"},
+        json={"api_key": None, "sides": ["allies"]},
+    ).json()
+    assert revoked["fleet_labels"]["allies"] == "no-fleet-agent", (
+        "撤销必须把舰队层一起清掉，否则界面说教条而模型还在下令"
+    )
+
+
 def test_the_opponent_cannot_read_or_change_our_policy() -> None:
     """代理政策属于本方指挥链：换一侧 header 读不到刚才接入的标签。"""
     from iron_bottom_sound.api import engine as api_engine

@@ -308,18 +308,24 @@ export function CommandDelayOrders({game,side,turn,phase,debug,recipient,onRecip
   </div>
 
   <details className="cd-log">
-   <summary>编队代理记录{debug?"（调试）":""}{log?` · ${String(log.policy_labels[side]??"未知").startsWith("llm:")?"模型":"教条"} · ${(log.entries??[]).length} 条`:""}</summary>
+   <summary>编队代理记录{debug?"（调试 · 含思考链）":""}{log?` · ${String(log.policy_labels[side]??"未知").startsWith("llm:")?"模型":"教条"} · ${(log.entries??[]).length} 条`:""}</summary>
    {!log&&<p className="muted">暂无代理记录。</p>}
    {log&&String(log.policy_labels[side]??"").startsWith("deterministic")&&<p className="cd-policy">
     本侧编队代理策略：<b>确定性教条</b>（未接入模型密钥）。编队照常行动，但这些决策不是模型给出的 ——
     引擎记录里的标签如此，界面也不会把它说成模型判断。要接模型，见左侧「指挥链与通信 → 编队代理」。
    </p>}
-   {log&&decisions.slice(0,4).map((entry,index)=>{const payload=(entry.decision??{}) as Record<string,unknown>;
+   {log&&decisions.slice(0,6).map((entry,index)=>{const payload=(entry.decision??{}) as Record<string,unknown>;
+    const isFleet=entry.role==="fleet_agent";
     return <div className="cd-log-entry" key={`${entry.formation_id}-${entry.turn}-${index}`}>
-     <b>{entry.formation_name}</b>
+     <b>{isFleet?`舰队总指挥（${entry.formation_name}）`:entry.formation_name}</b>
+     {isFleet&&<em className="cd-badge order">舰队层代理</em>}
      <span className="muted">第 {entry.turn} 回合 · {entry.agent}</span>
      <p>收到的命令：{entry.order_text?`「${entry.order_text}」`:"（还没有命令）"}</p>
-     <p className="cd-decision">选择 {String(payload.selected_movement_plan??"保持")}
+     <p className="cd-decision">{isFleet?"本回合下令：":"选择 "}{isFleet
+       ?(Array.isArray(payload.orders)&&(payload.orders as unknown[]).length>0
+         ?(payload.orders as Array<Record<string,unknown>>).map(order=>`${String(order.formation_id??"")}：${String(order.order_event??"NEW_ORDER")} 「${String(order.text??"")}」`).join("；")
+         :"不下新命令（no_order）")
+       :String(payload.selected_movement_plan??"保持")}
       {payload.selected_contingency_branch?` · ${plainBranch(String(payload.selected_contingency_branch))}`:""}
       {payload.rationale_summary?` · 理由：${String(payload.rationale_summary)}`:""}</p>
      {Array.isArray(payload.target_priority_adjustments)&&(payload.target_priority_adjustments as Array<Record<string,unknown>>).length>0&&
@@ -327,9 +333,18 @@ export function CommandDelayOrders({game,side,turn,phase,debug,recipient,onRecip
        .map(adjustment=>`${String(adjustment.target_id)} ${Number(adjustment.weight)>0?"+":""}${String(adjustment.weight)}`).join("、")}</p>}
      {String(payload.memory_note??"")&&<p className="cd-note">写给自己的备忘：{String(payload.memory_note)}</p>}
      {debug&&entry.attempts.map(attempt=><div key={attempt.attempt} className={`cd-attempt ${attempt.accepted?"ok":attempt.fallback?"fallback":"bad"}`}>
-      <span>第 {attempt.attempt} 次{attempt.accepted?"已采纳":attempt.fallback?"回退教条":"被拒"}</span>
+      <span>第 {attempt.attempt} 次{attempt.accepted?"已采纳":attempt.fallback?"回退教条":"被拒"}
+       {attempt.finish_reason?` · finish=${attempt.finish_reason}`:""}
+       {attempt.usage?.completion_tokens?` · 输出 ${attempt.usage.completion_tokens} tokens`:""}</span>
       {attempt.errors.length>0&&<em>{attempt.errors.join("；")}</em>}
-      <pre>{attempt.raw_response.slice(0,600)}</pre>
+      {attempt.thinking
+       ? <div className="cd-thinking">
+         <b>思考过程</b>
+         <span className="muted">模型自己的推理，只用于解释它为什么这样决定，不参与任何裁决</span>
+         <pre>{attempt.thinking.slice(0,2000)}{attempt.thinking.length>2000?"…（已截断）":""}</pre>
+        </div>
+       : <p className="muted cd-no-thinking">这次往返没有思考内容：非推理模型，或该模型未开启思考链。</p>}
+      <div className="cd-response"><b>原始回复</b><pre>{attempt.raw_response.slice(0,900)}</pre></div>
      </div>)}
     </div>;})}
    {debug&&log&&Object.entries(log.memories).map(([fid,memory])=>{
