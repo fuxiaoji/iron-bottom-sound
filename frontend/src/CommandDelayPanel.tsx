@@ -69,8 +69,12 @@ function ModelCard({game,side,onChanged}:{game:string;side:Side;onChanged:()=>vo
  const budget=policy?.max_tokens?.[side]??null;
  const roleLine=(value:string|undefined)=>
   !value?"未知":value.startsWith("llm:")?`模型（${value.slice(4)}）`
+   :value==="no-fleet-agent"?"无舰队代理"
    :value.includes("no API key")?"教条：服务端没有该模型的密钥"
-   :value==="no-fleet-agent"?"无舰队代理":value;
+   // 引擎的默认标签（没有任何策略注册过时）；以及任何非模型标签都按教条说明，
+   // 界面不把引擎的标识符当成一句给人看的话。
+   :value==="deterministic-formation-v1"?"教条（引擎的确定性决策，未接模型）"
+   :`教条：${value}`;
 
  const submit=async()=>{
   setBusy(true);setError("");setResult("");
