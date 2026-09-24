@@ -18,7 +18,7 @@
  ],
  "directives_from_the_other_side": [],
  "directives_from_the_other_side_count": 0,
- "directives_that_reached_the_selector": 131,
+ "directives_that_reached_the_selector": 139,
  "forbidden_fields_on_decision": [],
  "illegal_examples": [],
  "invisible_target_fallback_legal": true,

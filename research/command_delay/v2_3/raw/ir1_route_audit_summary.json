@@ -1,5 +1,87 @@
 {
  "messages": 141,
+ "corrected_medium_v2_3": {
+  "tbs_short": 116,
+  "face_to_face": 21,
+  "undetermined_no_position": 4
+ },
+ "medium_changed_by_v2_3": 74,
+ "changed_examples": [
+  {
+   "message_id": "MSG-00005",
+   "kind": "mission_order",
+   "side": "axis",
+   "distance_hex": 0,
+   "old": "tbs_short",
+   "new": "face_to_face",
+   "old_delay": 0
+  },
+  {
+   "message_id": "MSG-00008",
+   "kind": "mission_order",
+   "side": "allies",
+   "distance_hex": 0,
+   "old": "tbs_short",
+   "new": "face_to_face",
+   "old_delay": 0
+  },
+  {
+   "message_id": "MSG-00018",
+   "kind": "mission_order",
+   "side": "axis",
+   "distance_hex": 0,
+   "old": "tbs_short",
+   "new": "face_to_face",
+   "old_delay": 0
+  },
+  {
+   "message_id": "MSG-00021",
+   "kind": "mission_order",
+   "side": "allies",
+   "distance_hex": 0,
+   "old": "tbs_short",
+   "new": "face_to_face",
+   "old_delay": 0
+  },
+  {
+   "message_id": "MSG-00032",
+   "kind": "mission_order",
+   "side": "axis",
+   "distance_hex": 0,
+   "old": "tbs_short",
+   "new": "face_to_face",
+   "old_delay": 0
+  },
+  {
+   "message_id": "MSG-00035",
+   "kind": "mission_order",
+   "side": "allies",
+   "distance_hex": 0,
+   "old": "tbs_short",
+   "new": "face_to_face",
+   "old_delay": 0
+  },
+  {
+   "message_id": "MSG-00036",
+   "kind": "mission_order",
+   "side": "allies",
+   "distance_hex": 14,
+   "old": "wt_reencipher_relay",
+   "new": "tbs_short",
+   "old_delay": 2
+  },
+  {
+   "message_id": "MSG-00037",
+   "kind": "mission_order",
+   "side": "allies",
+   "distance_hex": 18,
+   "old": "wt_reencipher_relay",
+   "new": "tbs_short",
+   "old_delay": 2
+  }
+ ],
+ "messages_paying_base_delay_before": 79,
+ "messages_paying_base_delay_after": 0,
  "reencipher_by_kind": {
   "mission_order": 18,
   "sitrep": 6,

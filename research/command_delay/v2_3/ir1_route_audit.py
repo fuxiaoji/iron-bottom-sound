@@ -31,7 +31,15 @@ from __future__ import annotations
 
 import csv
 import json
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "backend" / "src"))
+from iron_bottom_sound.communications.processing import (  # noqa: E402
+    TBS_DIRECT_RANGE_HEX, range_units,
+)
+from iron_bottom_sound.communications.routing import select_medium  # noqa: E402
+from iron_bottom_sound.models import CommunicationMedium  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[3]
 BATTLE = Path(__file__).resolve().parent / "raw" / "battle_em01"
@@ -177,6 +185,34 @@ def main() -> int:
                 "reporting_formation_id"),
             "flags": [],
         }
+        # what the v2.3 rule would have chosen for the same geometry.  Line of sight is
+        # inferred from the old route itself (only the visual branches required it), which
+        # is stated in the report rather than passed off as a measurement.
+        inferred_visual = medium in ("tbs_short", "blinker") and not in_person
+        if distance is None and not in_person:
+            # Reachability cannot be judged without positions.  Saying "coded" here would
+            # dress an unresolved record up as a routing result, so it is labelled as what
+            # it is: undetermined.
+            row["corrected_medium_v2_3"] = "undetermined_no_position"
+            row["corrected_base_delay_v2_3"] = None
+            row["medium_changed"] = None
+            row["range_nmi"] = None
+        else:
+            corrected = select_medium(
+                distance=distance,
+                tbs_range_hex=TBS_DIRECT_RANGE_HEX,
+                direct_visual=inferred_visual,
+                coded_available=True,
+                same_command_location=in_person,
+            )
+            row["corrected_medium_v2_3"] = corrected.medium.value
+            row["corrected_base_delay_v2_3"] = (
+                1 if corrected.medium in (CommunicationMedium.WT_CODED,
+                                          CommunicationMedium.WT_REENCIPHER_RELAY,
+                                          CommunicationMedium.MULTI_HOP) else 0
+            )
+            row["medium_changed"] = corrected.medium.value != medium
+            row["range_nmi"] = range_units(distance)["range_nmi"]
         # ---- flags
         if not reason:
             findings["MISSING_ROUTE_PROVENANCE"].append(message["message_id"])
@@ -234,8 +270,28 @@ def main() -> int:
                       if row["hex_distance"] is not None
                       and row["optical_range_hex_v2_2_rule"] is not None
                       and row["hex_distance"] > row["optical_range_hex_v2_2_rule"]]
+    changed = [row for row in rows if row["medium_changed"] is True]
+    corrected_mediums: dict[str, int] = {}
+    for row in rows:
+        corrected_mediums[row["corrected_medium_v2_3"]] = (
+            corrected_mediums.get(row["corrected_medium_v2_3"], 0) + 1
+        )
+    base_delay_before = sum(1 for row in rows if (row["handling_delay"] or 0) > 0)
+    base_delay_after = sum(1 for row in rows
+                           if isinstance(row["corrected_base_delay_v2_3"], int)
+                           and row["corrected_base_delay_v2_3"] > 0)
     summary = {
         "messages": len(rows),
+        "corrected_medium_v2_3": corrected_mediums,
+        "medium_changed_by_v2_3": len(changed),
+        "changed_examples": [
+            {"message_id": row["message_id"], "kind": row["kind"], "side": row["side"],
+             "distance_hex": row["hex_distance"], "old": row["selected_medium"],
+             "new": row["corrected_medium_v2_3"], "old_delay": row["handling_delay"]}
+            for row in changed[:8]
+        ],
+        "messages_paying_base_delay_before": base_delay_before,
+        "messages_paying_base_delay_after": base_delay_after,
         "reencipher_by_kind": reencipher_kinds,
         "messages_beyond_optical_range": len(beyond_optical),
         "optical_range_values": sorted({row["optical_range_hex_v2_2_rule"] for row in rows

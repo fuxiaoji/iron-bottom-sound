@@ -53,6 +53,7 @@ from .models import (
     AuthorityLevel,
     CommandAuthority,
     CommandDelayState,
+    DelayBreakdown,
     FormationCommandState,
     FormationGeometryKind,
     FormationMovementOrder,
@@ -64,9 +65,16 @@ from .models import (
     MessageStatus,
     MissionOrder,
     OrderBatch,
+    RouteProvenance,
     Phase,
     Side,
     TargetPriorityDirective,
+)
+from .communications.processing import (
+    TBS_DIRECT_RANGE_HEX as TBS_RANGE_HEX_CONFIG,
+    breakdown_for,
+    range_units,
+    slot_cost,
 )
 from .communications.queue import PHASE_RANK
 from .realistic_command import MAX_FORMATIONS_PER_SIDE, SUPPORTED_SCENARIOS
@@ -308,9 +316,17 @@ def refresh_link_status(state: GameState) -> None:
 
 # --------------------------------------------------------------------------- messages
 
-def _queues(state: GameState) -> dict[CommunicationMedium, ChannelQueue]:
-    """Fresh per-turn channel slots, one queue per medium."""
-    return {medium: schedule(medium) for medium in CommunicationMedium}
+def _queues(state: GameState) -> dict[Any, ChannelQueue]:
+    """Fresh per-phase channel slots: one queue per (side, medium).
+
+    Keyed by side because a tactical net is per side - sharing one slot pool between the
+    two fleets made one side's traffic delay the other's, which no doctrine does.
+    """
+    return {
+        (side.value, medium): schedule(medium)
+        for side in Side
+        for medium in CommunicationMedium
+    }
 
 
 def send(
@@ -326,6 +342,47 @@ def send(
     mode = state_for(state)
     message.message_id = message.message_id or f"MSG-{mode.next_sequence:05d}"
     mode.next_sequence += 1
+    # v2.3: the delay is decomposed at drafting time (the queue component is added when
+    # the message is actually delivered), and the route's provenance is recorded so an
+    # auditor can check reachability without trusting the medium's name.
+    if message.delay.total == 0 and message.delay.handling == 0 and message.delay.encoding == 0 \
+            and message.delay.relay == 0 and message.delay.reencipher == 0:
+        message.delay = breakdown_for(message.medium, message.relay_hops)
+    message.handling_delay = message.delay.total
+    route = RouteDecision(
+        medium=message.medium,
+        relay_hops=message.relay_hops,
+        reason=message.reason or "",
+        route_nodes=tuple((message.payload or {}).get("relay_nodes") or ()),
+        why_relay_required=(message.payload or {}).get("why_relay_required"),
+        why_reencipher_required=(message.payload or {}).get("why_reencipher_required"),
+    )
+    if message.route_provenance is None:
+        origin_ship = state.ships.get(
+            (state.formations.get(message.destination).leader_id
+             if state.formations.get(message.destination) else "")
+        )
+        sender_ship = state.ships.get(message.origin)
+        distance = None
+        if sender_ship is not None and origin_ship is not None and sender_ship.position \
+                and origin_ship.position:
+            distance = sender_ship.position.distance(origin_ship.position)
+        message.route_provenance = RouteProvenance(
+            sender_hex=sender_ship.position.label if sender_ship and sender_ship.position else None,
+            recipient_hex=origin_ship.position.label if origin_ship and origin_ship.position else None,
+            distance_hex=distance,
+            tbs_range_hex=TBS_RANGE_HEX_CONFIG,
+            direct_tbs_available=bool(distance is not None
+                                      and distance <= TBS_RANGE_HEX_CONFIG),
+            direct_visual_available=False,
+            same_command_location=message.medium == CommunicationMedium.FACE_TO_FACE,
+            radio_policy="NORMAL",
+            selected_medium=message.medium.value,
+            route_nodes=list(route.route_nodes),
+            why_relay_required=route.why_relay_required,
+            why_reencipher_required=route.why_reencipher_required,
+            blockers=list(route.blockers),
+        )
     mode.messages.append(message)
     engine._event(
         state, "command_message_queued",
@@ -342,6 +399,11 @@ def send(
             "relay_hops": message.relay_hops,
             "issued_turn": message.issued_turn,
             "issued_phase": message.issued_phase.value,
+            "delay_components": message.delay.as_dict(),
+            "route_reason": message.reason,
+            "distance_hex": message.route_provenance.distance_hex,
+            "tbs_range_hex": message.route_provenance.tbs_range_hex,
+            "direct_tbs_available": message.route_provenance.direct_tbs_available,
         },
         rule=engine._rule(RULE_COMMS, None, "命令延迟：通信处理链"),
     )
@@ -351,12 +413,23 @@ def send(
 def route(
     engine: "IronBottomEngine", state: GameState, origin: FormationState, destination: FormationState,
 ) -> RouteDecision:
-    """Select a medium between two formations from the scenario's own horizon.
+    """Select a medium between two formations (v2.3 rules).
 
-    The direct-signal horizon reuses the scenario's optical visibility rather
-    than inventing a second range constant: the scenario already declares how far
-    its lookouts see, and a direct tactical circuit is bounded by the same
-    horizon.  Line of sight between guides is the engine's own visibility rule.
+    Three separate questions, which v2.2 conflated:
+
+    * **reachability** - is the recipient inside the configured direct-TBS range
+      (``TBS_DIRECT_RANGE_HEX``, historically grounded at ~25 statute miles)?  This is
+      what decides between TBS and fallback routing, and it is *not* the optical horizon:
+      v2.2 passed the scenario's visibility here, which is why messages at 20 hex on a
+      73-hex board were treated as out of range and pushed onto relayed W/T.
+    * **direct visual** - the engine's own line-of-sight rule, for blinker.
+    * **same command location** - the sender and the recipient are the same formation,
+      so there is nothing to transmit at all: face to face.
+
+    Relay and re-encipherment are **never inferred here**.  They require an explicit relay
+    path with named nodes (and, for re-encipherment, an actual cryptographic-domain
+    transition) supplied by the scenario; the mode itself models no cipher domains, so
+    none of the current scenarios declares one and that branch is unreachable by default.
     """
     origin_guide = state.ships.get(origin.leader_id)
     destination_guide = state.ships.get(destination.leader_id)
@@ -367,13 +440,19 @@ def route(
         return RouteDecision(CommunicationMedium.BLACKOUT, 0, "a formation has no guide afloat")
     distance = origin_guide.position.distance(destination_guide.position)
     line_of_sight = engine._can_see(state, destination_guide, origin_guide)
-    same_command = origin.id == destination.id
+    entry = state_for(state).formations.get(destination.id)
+    blockers: tuple[str, ...] = ()
+    policy = getattr(entry, "radio_policy", "NORMAL") if entry else "NORMAL"
     return select_medium(
         distance=distance,
-        tactical_range=int(state.visibility[origin.side.value]),
-        line_of_sight=line_of_sight,
+        tbs_range_hex=TBS_RANGE_HEX_CONFIG,
+        direct_visual=line_of_sight,
         coded_available=True,
-        relay_available=not same_command,
+        same_command_location=origin.id == destination.id,
+        relay_path=None,
+        crypto_domain_transition=False,
+        tbs_blockers=blockers,
+        kind=MessageKind.SITREP,
     )
 
 
@@ -489,6 +568,16 @@ def deliver_due(engine: "IronBottomEngine", state: GameState) -> dict[str, list[
     applied = {"delivered": [], "waiting": [], "dropped": [], "superseded": []}
     for message in outcome.delivered:
         applied["delivered"].append(message.message_id)
+        # The queue component is the part of the elapsed time the channel explains: what
+        # is left after every other component.  Recording it here (rather than charging a
+        # constant for "complex orders") is what makes a spill visible and attributable.
+        if message.delivered_turn is not None:
+            elapsed = message.delivered_turn - message.issued_turn
+            accounted = (message.delay.handling + message.delay.encoding
+                         + message.delay.relay + message.delay.reencipher
+                         + message.delay.clarification)
+            message.delay.queue = max(0, elapsed - accounted)
+            message.handling_delay = message.delay.total
         _apply_delivery(engine, state, message)
         engine._event(
             state, "command_message_delivered",
@@ -500,13 +589,22 @@ def deliver_due(engine: "IronBottomEngine", state: GameState) -> dict[str, list[
                 "medium": message.medium.value,
                 "origin": message.origin,
                 "destination": message.destination,
+                "precedence": message.precedence.value,
                 "issued_turn": message.issued_turn,
                 "issued_phase": message.issued_phase.value,
+                "handling_delay": message.handling_delay,
+                "relay_hops": message.relay_hops,
                 "delivered_turn": message.delivered_turn,
                 "delivered_phase": (
                     message.delivered_phase.value if message.delivered_phase else None
                 ),
                 "observed_turn": message.observed_turn,
+                "delay_components": message.delay.as_dict(),
+                "route_reason": message.reason,
+                "distance_hex": (message.route_provenance.distance_hex
+                                 if message.route_provenance else None),
+                "direct_tbs_available": (message.route_provenance.direct_tbs_available
+                                         if message.route_provenance else None),
             },
             rule=engine._rule(RULE_COMMS, None, "命令延迟：通信处理链"),
         )
@@ -808,7 +906,7 @@ def draft_natural_order(
         destination=formation_id,
         kind=kind,
         precedence=MessagePrecedence.OPERATIONAL,
-        medium=CommunicationMedium.TBS_SHORT if embarked else decision.medium,
+        medium=CommunicationMedium.FACE_TO_FACE if embarked else decision.medium,
         issued_turn=state.turn,
         issued_phase=state.phase,
         handling_delay=0 if embarked else delay_for(
@@ -837,15 +935,20 @@ def draft_natural_order(
                 "secret_side": side.value,
                 "message_id": message.message_id,
                 "kind": kind.value,
-                "medium": CommunicationMedium.TBS_SHORT.value,
+                "medium": CommunicationMedium.FACE_TO_FACE.value,
                 "origin": order.issued_by,
                 "destination": formation_id,
+                "precedence": message.precedence.value,
                 "issued_turn": state.turn,
                 "issued_phase": state.phase.value,
+                "handling_delay": message.handling_delay,
+                "relay_hops": message.relay_hops,
                 "delivered_turn": state.turn,
                 "delivered_phase": state.phase.value,
                 "observed_turn": state.turn,
                 "in_person": True,
+                "delay_components": message.delay.as_dict(),
+                "route_reason": message.reason,
             },
             rule=engine._rule(RULE_COMMS, None, "命令延迟：通信处理链"),
         )

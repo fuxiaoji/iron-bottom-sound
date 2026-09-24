@@ -14,6 +14,7 @@
   "realistic_s03_seed9",
   "cd_s01"
  ],
+ "rebuilt_at_commit": "f41a252553b0afa38f9efe837c6fe4f67e5b4bab",
  "records": [
   {
    "digest_trees": "99144f7ccd802cc816bb9aa451d6ab4e7a0ebbe0959e9b503867b41350982cd7",
@@ -107,7 +108,7 @@
    "tag": "realistic_s03_seed9"
   },
   {
-   "digest_trees": "8445973cb14e64eb9a70f7ae8e2a379d033ca41d3e8d1096958a6082ba83dde5",
+   "digest_trees": "20d22d483e792d3f60b10ac2e37c85acbcbd8f7fe2b9ff77dcac875d7f329f26",
    "final_phase": "complete",
    "final_turn": 7,
    "n_events": 714,
@@ -118,6 +119,29 @@
    "scenario": "IBS-S-01",
    "seed": 20270830,
    "tag": "cd_s01"
+  }
+ ],
+ "refreeze": [
+  {
+   "authorized_by": "PI ruling \u2014 IBS Command Delay v2.3 Integrity, Historical Routing, and Regression Repair",
+   "date": "2026-09-24",
+   "note": "Only the Command Delay row may change under this batch: Classic and Realistic semantics stay frozen.  The digests above are the proof that they did.",
+   "previous_frozen_commit": "e3149c4f",
+   "reason": "v2.3 \u8def\u7531\u4fee\u590d\uff1a\u8ddd\u79bb\u53ea\u51b3\u5b9a\u53ef\u8fbe\u6027\u3001\u4e0d\u518d\u4ea7\u751f\u56de\u5408\u5ef6\u8fdf\uff1b\u8f6c\u62a5\u518d\u52a0\u5bc6\u5fc5\u987b\u643a\u5e26\u663e\u5f0f\u4e2d\u7ee7/\u5bc6\u7801\u57df\u51fa\u5904\uff1b'\u957f\u547d\u4ee4 +1' \u5220\u9664\uff0c\u6539\u4e3a\u6709\u9650\u4fe1\u9053\u5bb9\u91cf\u7684\u6392\u961f\u6ea2\u51fa",
+   "row": "cd_s01",
+   "trees_digest": {
+    "after": "20d22d483e792d3f60b10ac2e37c85acbcbd8f7fe2b9ff77dcac875d7f329f26",
+    "before": "8445973cb14e64eb"
+   },
+   "unchanged_non_cd_rows_sha256": {
+    "classic_em01": "3b7d4181b81a548b48cfeca2fe2d4ba3184831621a561e96264081ed7738990a",
+    "classic_s01": "2cca365b12fa6c29e73fe10ed185c2351925e4b7ed9c9211027c05dd6930904d",
+    "classic_s03": "ace5158a785a3ae0f8c2bb1ff54e3146f5ccf5cabb8dcb4394cddae26930ad88",
+    "realistic_em01": "cd343b3247035bd0a318c8c30592bb1b56fcf4209a4d073837657c9054e58cd6",
+    "realistic_s01": "95df6cdc7c382c962755999a2faac19c2807bb572a62c6b233fe09d0920ae320",
+    "realistic_s03": "eeda28483ee6c38f7d25815929c9cdcd6dd5c66a7888c9ba9d08a46e827e1047",
+    "realistic_s03_seed9": "e4dc623ce8152bd74a46bb391fc4673c4becd80c3a0e359fe56a03cdd88d1768"
+   }
   }
  ],
  "scalars": [

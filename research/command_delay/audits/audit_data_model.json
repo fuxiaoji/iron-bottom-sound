@@ -8,6 +8,7 @@
    "local_autonomy"
   ],
   "CommunicationMedium": [
+   "face_to_face",
    "tbs_short",
    "blinker",
    "wt_coded",

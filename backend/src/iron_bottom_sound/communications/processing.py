@@ -68,6 +68,14 @@ class MediumProfile:
 
 # The turn values are the plan's §6 abstraction table, transcribed as data.
 MEDIUM_PROFILES: dict[CommunicationMedium, MediumProfile] = {
+    CommunicationMedium.FACE_TO_FACE: MediumProfile(
+        medium=CommunicationMedium.FACE_TO_FACE,
+        base_delay_turns=0,
+        per_relay_stage_turns=0,
+        max_relay_hops=0,
+        requires_encipherment=False,
+        description="same command location: spoken, no radio event and no channel slot",
+    ),
     CommunicationMedium.TBS_SHORT: MediumProfile(
         medium=CommunicationMedium.TBS_SHORT,
         base_delay_turns=0,
@@ -118,13 +126,56 @@ MEDIUM_PROFILES: dict[CommunicationMedium, MediumProfile] = {
     ),
 }
 
-# A complex mission amendment on TBS may need an extra turn of formulation and
-# clarification, which is why it is not simply base 0.
-TBS_COMPLEX_KINDS = frozenset({
-    MessageKind.MISSION_ORDER,
-    MessageKind.AMENDMENT,
-    MessageKind.CLARIFICATION,
-})
+# v2.3 deleted the "a long order on TBS costs +1" rule.  Length is not a delay: a long
+# order costs more *channel slots*, and if the channel cannot take it this turn the
+# message waits - a queue delay, visible as ``queue_delay`` on the message rather than
+# hidden in a kind-based constant.  (Measured on the v2.2 battle: 63 mission orders paid
+# the deleted +1 while every one of them was inside direct TBS range.)
+# Direct TBS reachability, in hexes.  Historically grounded: U.S. Navy TBS was VHF
+# tactical voice, roughly line-of-sight, commonly described as ~25 statute miles; at
+# 600 yd/hex that is ~73 hex.  It is a *reachability* threshold - it never converts into
+# a delay.  Measured caveat (v2.3, recorded rather than assumed): the standard 46x39
+# board's maximum legal hex distance is 83 hex, so the pathological corner-to-corner case
+# is outside TBS range; every message in the CD-13 battle ran 0-42 hex.
+TBS_DIRECT_RANGE_HEX = 73
+HEX_YARDS = 600
+YARDS_PER_NMI = 2025.37
+
+
+def range_units(distance_hex: int | None) -> dict[str, float | int | None]:
+    """The same distance in hex, yards and nautical miles - computed here, never by a model.
+
+    The engine owns the unit conversion so an LLM never has to: the v2.2 battle produced a
+    report claiming "12-15 海里" for what was actually 12-15 *hex*, which this function
+    exists to make impossible (the prose is rendered from these numbers).
+    """
+    if distance_hex is None:
+        return {"range_hex": None, "range_yards": None, "range_nmi": None}
+    yards = distance_hex * HEX_YARDS
+    return {
+        "range_hex": distance_hex,
+        "range_yards": yards,
+        "range_nmi": round(yards / YARDS_PER_NMI, 2),
+    }
+
+
+SLOT_COST_LONG_CHARS = 240      # above this, an order is a multi-part signal
+SLOT_COST_VERY_LONG_CHARS = 600
+
+
+def slot_cost(kind: MessageKind, text_length: int = 0) -> int:
+    """How many channel slots this message occupies on its medium.
+
+    Only orders and amendments are priced by length: they are the messages that are
+    genuinely long.  Reports are short by construction and cost one slot.
+    """
+    if kind not in (MessageKind.MISSION_ORDER, MessageKind.AMENDMENT):
+        return 1
+    if text_length > SLOT_COST_VERY_LONG_CHARS:
+        return 3
+    if text_length > SLOT_COST_LONG_CHARS:
+        return 2
+    return 1
 
 
 def profile_for(medium: CommunicationMedium) -> MediumProfile:
@@ -134,14 +185,47 @@ def profile_for(medium: CommunicationMedium) -> MediumProfile:
 def delay_for(
     medium: CommunicationMedium, kind: MessageKind, relay_hops: int = 0,
 ) -> int:
-    """Abstracted delivery delay in turns for one message."""
+    """Abstracted delivery delay in turns for one message.
+
+    v2.3: this is exactly the medium profile's cost - no kind-based surcharge and no
+    distance term.  Delay beyond it can only come from the queue, which the caller
+    records as the ``queue`` component when the message is actually delivered.
+    """
+    del kind  # length/cost lives in ``slot_cost``, not in the delay
+    profile = profile_for(medium)
+    if medium in (CommunicationMedium.BLACKOUT, CommunicationMedium.FACE_TO_FACE):
+        return profile.base_delay_turns
+    return profile.delay_for(relay_hops)
+
+
+def breakdown_for(
+    medium: CommunicationMedium, relay_hops: int = 0, *,
+    reencipher_stages: int = 0,
+) -> "DelayBreakdown":
+    """The delay components a medium contributes before the queue is involved."""
+    from ..models import DelayBreakdown
+
     profile = profile_for(medium)
     if medium == CommunicationMedium.BLACKOUT:
-        return profile.base_delay_turns
-    delay = profile.delay_for(relay_hops)
-    if medium == CommunicationMedium.TBS_SHORT and kind in TBS_COMPLEX_KINDS:
-        delay += 1
-    return delay
+        return DelayBreakdown()
+    if medium == CommunicationMedium.FACE_TO_FACE:
+        return DelayBreakdown()
+    handling = 0
+    encoding = 0
+    relay = 0
+    reencipher = 0
+    if medium == CommunicationMedium.TBS_SHORT:
+        handling = profile.base_delay_turns
+    elif medium == CommunicationMedium.BLINKER:
+        handling = profile.base_delay_turns
+        relay = profile.per_relay_stage_turns * max(0, min(relay_hops, profile.max_relay_hops))
+    else:
+        # coded and relayed traffic pays encoding once, then one stage per hop.
+        encoding = profile.base_delay_turns
+        relay = profile.per_relay_stage_turns * max(0, min(relay_hops, profile.max_relay_hops))
+        reencipher = reencipher_stages
+    return DelayBreakdown(handling=handling, encoding=encoding, relay=relay,
+                          reencipher=reencipher)
 
 
 def abstraction_note() -> dict[str, str]:

@@ -179,9 +179,17 @@ def test_order_to_the_commander_own_formation_is_handed_over_in_person():
     )
 
     assert in_person.handling_delay == 0
+    assert in_person.medium.value == "face_to_face", "in person is its own medium, not cheap TBS"
     assert in_person.payload["delivered_in_person"] is True
     assert in_person.reason and "当面" in in_person.reason
-    assert by_signal.handling_delay >= 1, "a remote order must still cost signal time"
+    # v2.3: a remote order inside direct TBS range costs no signal time either.  What
+    # separates the two is that the radio order needs a channel slot and can therefore
+    # spill, while the face-to-face one uses no slot at all (measured on the CD-13 battle:
+    # distance alone used to add +1/+2 on a board whose TBS range covers it end to end).
+    assert by_signal.medium.value == "tbs_short"
+    assert by_signal.handling_delay == 0
+    assert by_signal.delay.as_dict()["total"] == 0
+    assert in_person.delay.as_dict()["total"] == 0
 
     # "in person" means: readable now, by the formation's own commander, in this phase
     assert in_person.delivered_turn == state.turn
@@ -238,9 +246,17 @@ def test_formation_reports_its_own_words_up_and_they_arrive_late():
                if item.kind.value == "clarification"]
     assert clarify, "CLARIFICATION_REQUEST did not become traffic"
 
-    # a report to a distant formation is traffic, and traffic is delayed
-    delayed = [item for item in reports + clarify if (item.handling_delay or 0) > 0]
-    assert delayed, "reports must travel on the chain's clock, not instantly"
+    # v2.3: a report inside direct TBS range is not delayed by distance.  What it does
+    # cost is a channel slot, and the delay it actually experiences is recorded as the
+    # queue component rather than hidden in the medium's name.
+    for item in reports + clarify:
+        assert item.delay is not None
+        assert item.delay.propagation == 0
+        assert item.delay.handling == 0, "no kind- or length-based surcharge"
+        assert item.route_provenance is not None
+        assert item.route_provenance.tbs_range_hex > 0
+    assert all(item.route_provenance.direct_tbs_available
+               for item in reports if item.medium.value == "tbs_short")
 
 
 def test_acknowledgement_now_reaches_the_ledger():

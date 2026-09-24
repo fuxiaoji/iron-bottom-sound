@@ -9,7 +9,7 @@
  "delay_samples": {
   "blinker_2hops": 2,
   "multi_hop_1hop": 2,
-  "tbs_short_amendment": 1,
+  "tbs_short_amendment": 0,
   "tbs_short_sitrep": 0,
   "wt_coded": 1,
   "wt_reencipher_relay_1hop": 2
@@ -21,33 +21,30 @@
   },
   "delivered_never_before_issued": true,
   "handling_delays": {
-   "0": 64,
-   "1": 2,
-   "2": 11
+   "0": 67,
+   "1": 10
   },
   "issued_delivered_observed_all_set": true,
   "link_statuses": {
    "blackout": 2,
-   "direct": 1,
-   "relayed": 1
+   "direct": 2
   },
   "mediums": {
    "blackout": 1,
-   "tbs_short": 65,
-   "wt_reencipher_relay": 11
+   "tbs_short": 76
   },
   "messages_total": 77,
   "mission_orders": 2,
   "report_ages": [
-   1,
+   0,
    2,
    6,
    6
   ],
   "scenario": "IBS-S-01",
   "statuses": {
-   "delivered": 65,
-   "queued": 12
+   "delivered": 75,
+   "queued": 2
   },
   "tick": 46,
   "turns": 7
@@ -70,6 +67,15 @@
    "label": "SIMULATION_ABSTRACTION",
    "max_relay_hops": 4,
    "per_relay_stage_turns": 1,
+   "propagation_turns": 0.0,
+   "requires_encipherment": false
+  },
+  "face_to_face": {
+   "base_delay_turns": 0,
+   "description": "same command location: spoken, no radio event and no channel slot",
+   "label": "SIMULATION_ABSTRACTION",
+   "max_relay_hops": 0,
+   "per_relay_stage_turns": 0,
    "propagation_turns": 0.0,
    "requires_encipherment": false
   },

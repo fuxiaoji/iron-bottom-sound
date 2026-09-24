@@ -5,7 +5,7 @@
   "realistic_has_command_delay_field": false
  },
  "command_events": {
-  "total": 175,
+  "total": 185,
   "types": [
    "command_delay_initialised",
    "command_delay_turn_state",

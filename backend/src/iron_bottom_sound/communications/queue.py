@@ -21,11 +21,15 @@ from ..models import (
     MessageStatus,
     Phase,
 )
+from .processing import slot_cost
 
 # Slots per turn, per channel.  A simulation abstraction: the game models a
 # single tactical circuit plus a message-centre channel, not a real radio room.
 DEFAULT_CHANNEL_CAPACITY = 4
 CHANNEL_CAPACITY: dict[CommunicationMedium, int] = {
+    # A hand-over in person uses no channel at all and is never queued; capacity 0 is how
+    # ``drain`` refuses to transmit it (``command_delay`` delivers it directly).
+    CommunicationMedium.FACE_TO_FACE: 0,
     CommunicationMedium.TBS_SHORT: 4,
     CommunicationMedium.BLINKER: 3,
     CommunicationMedium.WT_CODED: 2,
@@ -123,11 +127,21 @@ def drain(
         if not due(message, turn, phase):
             outcome.waiting.append(message)
             continue
-        queue = queues.get(message.medium)
-        if queue is None or queue.free <= 0:
+        # Each side has its own tactical net: one side's traffic must never consume the
+        # other's channel slots (the caller keys queues by (side, medium) for that reason;
+        # a flat mapping is still accepted, which the unit tests use).
+        queue = queues.get((message.side.value, message.medium)) or queues.get(message.medium)
+        cost = slot_cost(
+            message.kind, len(str((message.payload or {}).get("order_text")
+                                  or (message.payload or {}).get("report_text") or ""))
+        )
+        if queue is None or queue.free < cost:
+            # A long order costs more slots: if the channel is nearly full this turn it
+            # waits.  That is where "a complex order spills into the next turn" comes
+            # from in v2.3 - the queue, not a kind-based constant.
             outcome.waiting.append(message)
             continue
-        queue.slots_used += 1
+        queue.slots_used += cost
         message.status = MessageStatus.DELIVERED
         message.delivered_turn = turn
         message.delivered_phase = phase

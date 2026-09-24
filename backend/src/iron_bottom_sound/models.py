@@ -791,6 +791,10 @@ class CommunicationMedium(StrEnum):
     time scale.
     """
 
+    # Same-command hand-over: the fleet commander and the formation commander are in the
+    # same formation, so the order is spoken, not transmitted.  It is its own medium
+    # rather than a zero-cost TBS call, because nothing about it is a radio event.
+    FACE_TO_FACE = "face_to_face"
     TBS_SHORT = "tbs_short"
     BLINKER = "blinker"
     WT_CODED = "wt_coded"
@@ -816,6 +820,62 @@ class MessageStatus(StrEnum):
     SUPERSEDED = "superseded"
 
 
+class DelayBreakdown(BaseModel):
+    """Where a message's delay came from, component by component (v2.3).
+
+    The mode prices human and procedural work, never propagation: at a three-minute
+    turn, electromagnetic travel is zero at any map distance.  Distance decides *whether
+    a medium is reachable*, never how many turns a message takes - that rule is why this
+    breakdown exists as separate numbers instead of one opaque delay.
+    """
+
+    propagation: int = 0            # zero at game scale, stated rather than implied
+    handling: int = 0               # drafting / transcription / distribution
+    encoding: int = 0               # encipher, transmit, decipher
+    relay: int = 0                  # each actual relay stage
+    reencipher: int = 0             # each actual cryptographic-domain transition
+    queue: int = 0                  # channel capacity: waiting for a free slot
+    clarification: int = 0          # acknowledged clarification round trips
+
+    @property
+    def total(self) -> int:
+        return (self.propagation + self.handling + self.encoding + self.relay
+                + self.reencipher + self.queue + self.clarification)
+
+    def as_dict(self) -> dict[str, int]:
+        return {
+            "propagation": self.propagation, "handling": self.handling,
+            "encoding": self.encoding, "relay": self.relay,
+            "reencipher": self.reencipher, "queue": self.queue,
+            "clarification": self.clarification, "total": self.total,
+        }
+
+
+class RouteProvenance(BaseModel):
+    """Why this message took this route (v2.3).
+
+    A relay or re-enciphered route is only legal with an explicit node list and a reason;
+    without them the route is invalid and the audit flags it.  ``distance_hex`` and
+    ``tbs_range_hex`` are recorded so a reader can check reachability directly rather
+    than trusting the medium's name.
+    """
+
+    sender_hex: str | None = None
+    recipient_hex: str | None = None
+    distance_hex: int | None = None
+    tbs_range_hex: int = 0
+    direct_tbs_available: bool = False
+    direct_visual_available: bool = False
+    same_command_location: bool = False
+    radio_policy: str = "NORMAL"
+    channel_state: str | None = None
+    selected_medium: str = ""
+    route_nodes: list[str] = Field(default_factory=list)
+    why_relay_required: str | None = None
+    why_reencipher_required: str | None = None
+    blockers: list[str] = Field(default_factory=list)
+
+
 class CommandMessage(BaseModel):
     """One signal, with issued / delivered / observed turns kept separate."""
 
@@ -839,6 +899,11 @@ class CommandMessage(BaseModel):
     reason: str | None = None
     payload: dict[str, Any] = Field(default_factory=dict)
     superseded_by: str | None = None
+    # v2.3: where the delay came from, and why this route was chosen.  Both are filled
+    # when the message is drafted and completed when it is delivered (the queue
+    # component is only known then).
+    delay: DelayBreakdown = Field(default_factory=DelayBreakdown)
+    route_provenance: RouteProvenance | None = None
 
 
 class ContingencyBranch(StrEnum):

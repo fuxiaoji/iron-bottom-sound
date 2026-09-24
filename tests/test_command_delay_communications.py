@@ -115,9 +115,17 @@ def test_propagation_is_zero_and_every_value_is_labelled_an_abstraction() -> Non
 
 
 def test_medium_delay_table_matches_the_rule_table() -> None:
-    # TBS short: same turn if the channel is free; a complex amendment may need +1.
+    # TBS short: same turn if the channel is free - for every kind.  v2.3 deleted the
+    # "a complex order on TBS costs +1" rule: length is priced in channel slots, and the
+    # spill it may cause shows up as the queue component, not as a kind-based constant.
     assert delay_for(CommunicationMedium.TBS_SHORT, MessageKind.SITREP) == 0
-    assert delay_for(CommunicationMedium.TBS_SHORT, MessageKind.AMENDMENT) == 1
+    assert delay_for(CommunicationMedium.TBS_SHORT, MessageKind.AMENDMENT) == 0
+    assert delay_for(CommunicationMedium.TBS_SHORT, MessageKind.MISSION_ORDER) == 0
+    # ... and the length is still priced, as slots rather than turns.
+    from iron_bottom_sound.communications.processing import slot_cost
+    assert slot_cost(MessageKind.MISSION_ORDER, 120) == 1
+    assert slot_cost(MessageKind.MISSION_ORDER, 400) == 2
+    assert slot_cost(MessageKind.MISSION_ORDER, 900) == 3
     # Coded W/T: encode/transmit/decode/routing -> base +1.
     assert delay_for(CommunicationMedium.WT_CODED, MessageKind.SITREP) == 1
     # Relay / re-encipherment: the coded base plus one further turn.
@@ -134,22 +142,49 @@ def test_medium_delay_table_matches_the_rule_table() -> None:
 
 
 def test_distance_selects_the_medium_and_never_scales_the_delay() -> None:
-    near = select_medium(distance=3, tactical_range=12, line_of_sight=True,
-                         coded_available=True, relay_available=False)
-    far_same = select_medium(distance=9, tactical_range=12, line_of_sight=True,
-                             coded_available=True, relay_available=False)
-    assert near.medium == far_same.medium == CommunicationMedium.TBS_SHORT
-    far = select_medium(distance=30, tactical_range=12, line_of_sight=True,
-                        coded_available=True, relay_available=True)
-    assert far.medium == CommunicationMedium.BLINKER and far.relay_hops == 1
-    hidden = select_medium(distance=30, tactical_range=12, line_of_sight=False,
-                           coded_available=True, relay_available=False)
+    """v2.3: reachability picks the medium; a relay or re-encipher needs explicit provenance.
+
+    The v2.2 expectations this replaces encoded two defects found by auditing the CD-13
+    battle: the TBS range was the scenario's *optical* horizon, and any cross-formation
+    message without line of sight became a re-enciphered relay at +2.
+    """
+    # inside the configured TBS range: direct TBS, no delay, regardless of eyesight
+    within = select_medium(distance=20, tbs_range_hex=73, direct_visual=False,
+                           coded_available=True)
+    assert within.medium == CommunicationMedium.TBS_SHORT
+    assert delay_for(CommunicationMedium.TBS_SHORT, MessageKind.MISSION_ORDER) == 0
+    assert within.direct_tbs_available is True
+    # and distance inside the range changes nothing, at 3 hex or at 70
+    near = select_medium(distance=3, tbs_range_hex=73, direct_visual=True, coded_available=True)
+    far = select_medium(distance=70, tbs_range_hex=73, direct_visual=True, coded_available=True)
+    assert near.medium == far.medium == CommunicationMedium.TBS_SHORT
+    # beyond TBS range with eyesight: visual signal, not telegraphy
+    beyond = select_medium(distance=80, tbs_range_hex=73, direct_visual=True, coded_available=True)
+    assert beyond.medium == CommunicationMedium.BLINKER
+    # beyond TBS range without eyesight: coded W/T - and NOT a re-enciphered relay,
+    # because nothing in this call states a relay node or a cryptographic transition
+    hidden = select_medium(distance=80, tbs_range_hex=73, direct_visual=False, coded_available=True)
     assert hidden.medium == CommunicationMedium.WT_CODED
-    relayed = select_medium(distance=30, tactical_range=12, line_of_sight=False,
-                            coded_available=True, relay_available=True)
-    assert relayed.medium == CommunicationMedium.WT_REENCIPHER_RELAY
-    dark = select_medium(distance=30, tactical_range=12, line_of_sight=False,
-                         coded_available=False, relay_available=False)
+    assert hidden.route_is_valid
+    # a relay path only names itself when it names its nodes
+    relayed = select_medium(distance=80, tbs_range_hex=73, direct_visual=False,
+                            coded_available=True, relay_path=("node-A",))
+    assert relayed.medium == CommunicationMedium.MULTI_HOP
+    assert relayed.route_nodes == ("node-A",) and relayed.why_relay_required
+    assert relayed.route_is_valid
+    # re-encipherment additionally requires an actual cryptographic-domain transition
+    crypto = select_medium(distance=80, tbs_range_hex=73, direct_visual=False,
+                           coded_available=True, relay_path=("node-A",),
+                           crypto_domain_transition=True)
+    assert crypto.medium == CommunicationMedium.WT_REENCIPHER_RELAY
+    assert crypto.why_reencipher_required and crypto.route_is_valid
+    # a route that claims a relay without nodes is invalid provenance
+    bogus = select_medium(distance=80, tbs_range_hex=73, direct_visual=False,
+                          coded_available=True, relay_available=True)
+    assert bogus.medium == CommunicationMedium.WT_CODED and bogus.route_is_valid
+    # no coded set, no eyesight, out of range: no path at all
+    dark = select_medium(distance=80, tbs_range_hex=73, direct_visual=False,
+                         coded_available=False)
     assert dark.medium == CommunicationMedium.BLACKOUT and dark.is_blackout
 
 
