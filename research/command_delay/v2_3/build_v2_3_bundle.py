@@ -65,7 +65,11 @@ PATCH_PATHS = (
     "backend/src/iron_bottom_sound/engine.py",
     "backend/src/iron_bottom_sound/realistic_command.py",
     "tests/",
-    "research/command_delay/",
+    # research scripts only: the battle records, golden baselines and audit artefacts under
+    # research/command_delay/ are data, and sweeping them in produced a 59 MB patch
+    "research/command_delay/*.py",
+    "research/command_delay/v2_3/*.py",
+    "research/battle_video/*.py",
 )
 
 
