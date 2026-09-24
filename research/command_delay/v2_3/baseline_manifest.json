@@ -1,0 +1,88 @@
+{
+ "batch": "IBS Command Delay v2.3 — IR-0 baseline freeze",
+ "commit": "e3149c4f3c147c966efba49908fc960f3a439278",
+ "branch": "research/m2-2-compiler-fidelity",
+ "frozen_tag": "realistic-command-v1-frozen",
+ "battle_evidence": {
+  "REPORT.md": {
+   "sha256": "ab3f2892ca5025ad57e91495b42de368d6631c22784f41318c8af9a8c85133e1",
+   "bytes": 114152
+  },
+  "battle_data.json": {
+   "sha256": "1cc320ed3769c9f937dcaf0856ca852c99b73324f83eb035ed04107fb01d3022",
+   "bytes": 36748806
+  },
+  "calls.jsonl": {
+   "sha256": "551fbd77c396bb56967ec4c1218a60a835d832bd4739b54eb3fbe4de332b1662",
+   "bytes": 8135699
+  },
+  "leak_scan.json": {
+   "sha256": "c5d571c11cd82aebccd166eded3f143b7831ba442c18b8f21c20f0898dc5b663",
+   "bytes": 536
+  },
+  "leak_self_test.json": {
+   "sha256": "f18d83229296cde4ead7adf9703472e969955b735a7205487a60bdcc53e7e752",
+   "bytes": 199
+  },
+  "orders.jsonl": {
+   "sha256": "7b27e67e9e393dad8d8e8ab64f3545785d97920d3a1ebe841722b1b1f9467d06",
+   "bytes": 207910
+  },
+  "replay_verification.json": {
+   "sha256": "0f1750525ce9aac540cb4e0c9743d224b432a4f36de5b7331131669bc3962736",
+   "bytes": 398
+  },
+  "reports.jsonl": {
+   "sha256": "fc8cc04e5ee8b49e73458909f5c96553ed5b28c860a973e3a12f00777e903194",
+   "bytes": 19598
+  }
+ },
+ "source_surfaces_sha256": {
+  "backend/src/iron_bottom_sound/engine.py": "23e23b695862d4e572db10b06dab1773d1788e5672781b969e6315b4082ca277",
+  "backend/src/iron_bottom_sound/realistic_command.py": "4766d88db3219d384840aa29a9b765e4f5035349b160068e34dd39c3e4d161e2",
+  "backend/src/iron_bottom_sound/models.py": "36f75e852eb0b1fe45d781c5ea89aeadabae546a09fecfe35c2c9c04b399b8e3"
+ },
+ "golden_rows": {
+  "classic_s01": {
+   "digest_trees": "99144f7ccd802cc816bb9aa451d6ab4e7a0ebbe0959e9b503867b41350982cd7",
+   "final_turn": 7,
+   "passed": true
+  },
+  "classic_s03": {
+   "digest_trees": "e62cf8f68e0889dad8887e0885327c0e4f52313849983f1ad223f3b7327a0d29",
+   "final_turn": 4,
+   "passed": true
+  },
+  "classic_em01": {
+   "digest_trees": "fdad07cf14fc81eaddecadc0b79eb422280bbb60f70e1cb52048d92c23ab2514",
+   "final_turn": 12,
+   "passed": true
+  },
+  "realistic_s01": {
+   "digest_trees": "cd163a422e995436a3b1e8d0d678292303a48270f5fbe4d651972ee16760da99",
+   "final_turn": 7,
+   "passed": true
+  },
+  "realistic_s03": {
+   "digest_trees": "7bf2990ba5d0b5bad403d160710d24baaeb43031c0addab74947d859d30a3a35",
+   "final_turn": 4,
+   "passed": true
+  },
+  "realistic_em01": {
+   "digest_trees": "ec7b620379a119b2acd1ada1e3b6d8424f42186c5c85d0991bcc591b63850811",
+   "final_turn": 12,
+   "passed": true
+  },
+  "realistic_s03_seed9": {
+   "digest_trees": "c8ba60c03a2e80fbf119b6cc3e2456ca1188d46ed692d0f168671cf512a52480",
+   "final_turn": 4,
+   "passed": true
+  },
+  "cd_s01": {
+   "digest_trees": "8445973cb14e64eb9a70f7ae8e2a379d033ca41d3e8d1096958a6082ba83dde5",
+   "final_turn": 7,
+   "passed": true
+  }
+ },
+ "note": "Old battle evidence is archived here by copy; the originals under research/command_delay/battle_em01/ are neither moved nor overwritten. Replay verification was re-run at freeze time and is included above."
+}

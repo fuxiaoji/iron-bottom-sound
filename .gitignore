@@ -53,3 +53,7 @@ research/battle_video/remotion/out/
 research/battle_video/data/render_props_test.json
 research/command_delay/battle_em01_rehearsal/views/
 research/command_delay/battle_em01/views/
+# v2.3 repair batch: the archived copy of the battle evidence is bundle material
+# (the originals stay tracked under research/command_delay/battle_em01/)
+research/command_delay/v2_3/raw/battle_em01/
+research/command_delay/v2_3/logs/

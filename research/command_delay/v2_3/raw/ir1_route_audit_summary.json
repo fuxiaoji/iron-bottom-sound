@@ -1,0 +1,50 @@
+{
+ "messages": 141,
+ "reencipher_by_kind": {
+  "mission_order": 18,
+  "sitrep": 6,
+  "acknowledgement": 18,
+  "contact_report": 12,
+  "deviation_report": 1
+ },
+ "messages_beyond_optical_range": 49,
+ "optical_range_values": [
+  13,
+  15
+ ],
+ "by_medium": {
+  "tbs_short": 84,
+  "wt_reencipher_relay": 55,
+  "blackout": 2
+ },
+ "by_side_medium": {
+  "axis": {
+   "tbs_short": 61,
+   "blackout": 2
+  },
+  "allies": {
+   "tbs_short": 23,
+   "wt_reencipher_relay": 55
+  }
+ },
+ "distance_hex": {
+  "min": 0,
+  "max": 42,
+  "mean": 15.0,
+  "unresolved": 4
+ },
+ "tbs_range_hex": 73,
+ "within_tbs_range": 137,
+ "reencipher_reason_strings": [
+  "coded set but the ends are under different ciphers",
+  "偏离命令报告：coded set but the ends are under different ciphers"
+ ],
+ "findings": {
+  "UNJUSTIFIED_RELAY": 55,
+  "UNJUSTIFIED_REENCIPHER": 55,
+  "DIRECT_TBS_AVAILABLE_BUT_NOT_USED": 51,
+  "DISTANCE_DELAY_BUG": 49,
+  "MISSING_ROUTE_PROVENANCE": 0,
+  "MISSING_RELAY_OR_CRYPTO_PROVENANCE": 55
+ }
+}
