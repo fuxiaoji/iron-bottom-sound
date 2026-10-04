@@ -881,10 +881,14 @@ export default function App() {
     if (parsed && Array.isArray(parsed.formation_movement) && parsed.formation_movement.length > 0) {
       return { ...parsed, side, phase: view.phase };
     }
-    // 计划表还没跟上（例如刚切换阶段）：退回直接取代理方案，别让交接卡住。
-    const { orders } = await formationOrders(game, side);
-    if (orders.length === 0) throw new Error("本侧编队代理尚未给出机动方案");
-    return { side, phase: view.phase, formation_movement: orders };
+    // 只有机动阶段才要求"编队代理的方案"；其它阶段（编成/增援/鱼雷/炮击）提交的就是
+    // 计划表里那份草稿——之前在这里一刀切地去找机动方案，把非机动阶段的交接整个卡死。
+    if (view.phase === "movement_planning" && !cdDraftTouched) {
+      const { orders } = await formationOrders(game, side);
+      if (orders.length === 0) throw new Error("本侧编队代理尚未给出机动方案");
+      return { side, phase: view.phase, formation_movement: orders };
+    }
+    return parsed;
   };
   const changeGuide = async (profile: string) => {
     setGuideProfiles((prev) => ({ ...prev, [side]: profile }));

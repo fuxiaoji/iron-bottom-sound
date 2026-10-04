@@ -186,119 +186,129 @@ export function CommandDelayOrders({game,side,turn,phase,debug,recipient,onRecip
  const orderHistory=(fleet?.messages??[]).filter(m=>String(m.kind).includes("order"));
  const decisions=(log?.entries??[]).filter(entry=>entry.side===side);
 
+ // 一个「现在做什么」就够：把每阶段玩家真正要做的唯一动作放在最上面，
+ // 其余一切（写命令、方案、代理思考）全部收进折叠——信息多不等于可用。
+ const phaseTitle=phase==="movement_planning"?"移动计划":phase==="torpedo_planning"?"鱼雷计划"
+  :phase==="gunnery"?"炮击":phase==="reinforcement"?"增援":"裁决";
+ const now=phase==="movement_planning"
+  ? {title:"① 检阅方案（下面已展开）　② 可选：写一道命令　③ 交接",
+     hint:"方案由各编队 AI 选定；直接交接就按方案执行。想干预某个编队，展开「写命令」——命令会延迟送达，这是本模式的核心。"}
+  :phase==="torpedo_planning"
+  ? {title:"鱼雷计划：引擎已按各舰阵位自动填充",hint:"机动已封存并画在地图上。直接交接即可。"}
+  :phase==="gunnery"
+  ? {title:"炮击：目标分配由引擎按火力优先级完成",hint:"你不需要填任何表。直接交接即可。"}
+  :phase==="reinforcement"
+  ? {title:"增援阶段",hint:"确认后直接交接。"}
+  :{title:"引擎裁决",hint:"按交接推进。"};
+ const recipientName=(fleet?.reports??[]).find(report=>report.formation_id===target)?.name;
+
  return <section className="cd-orders">
-  <header><h2>下达命令</h2>
-   <span className="muted">你是舰队总指挥：写命令、收报告；各编队由自己的代理执行，你不需要逐舰点格子。</span></header>
+  <header><h2>命令延迟 <span className="cd-turn-chip">第 {turn} 回合 · {phaseTitle} · 你是{side==="axis"?"轴心":"同盟"}舰队总指挥</span></h2></header>
 
-  <ol className="cd-steps">
-   <li className={phase==="movement_planning"?"now":""}><b>1</b> 写命令</li>
-   <li className={phase==="movement_planning"?"now":""}><b>2</b> 发电报（可能延迟）</li>
-   <li className={["movement_planning","torpedo_planning","gunnery"].includes(phase)?"now":""}><b>3</b> 看代理方案</li>
-   <li className={["movement_planning","torpedo_planning","gunnery"].includes(phase)?"now":""}><b>4</b> 校验并交接</li>
-  </ol>
-
-  {phase!=="movement_planning"&&["torpedo_planning","gunnery"].includes(phase)&&<p className="cd-note">
-   当前是<b>{phase==="gunnery"?"炮击阶段":"鱼雷阶段"}</b>：机动已经封存，你能改的只有火力优先级（下面「火力优先级舰级」），
-   炮位与射界由引擎选择器决定。
-  </p>}
-
-  <div className="cd-order-form">
-   <label>收件编队（点指挥链里的卡片也可以改）
-    <select value={target} onChange={event=>onRecipient(event.target.value)}>
-     {!target&&<option value="">（选一个编队）</option>}
-     {(fleet?.reports??[]).map(report=><option key={report.formation_id} value={report.formation_id}>
-      {report.name}{report.is_source_of_truth
-       ? " · 当面受令（立即生效，无延迟）"
-       : ` · 链路${linkLabel[report.link_status]??report.link_status} · 报告${report.age_turns===null?"未知":`${report.age_turns} 回合前`}`}
-     </option>)}
-    </select></label>
-
-   <div className={`cd-delivery ${delivery.tone}`}>
-    <b>{delivery.headline}</b>
-    {delivery.detail&&<span>{delivery.detail}</span>}
-    {preview?.long_order&&<span className="cd-warn">正文偏长（超过 240 字）：占用 2 个时隙，可能顺延到下一回合。</span>}
-   </div>
-
-   <label>命令正文（自然语言，这是权威内容）
-    <textarea rows={4} value={text} maxLength={1000}
-     placeholder="例：敌轻巡已出现在西北（约 7 格），你部向东拉开距离保持接触，不要进入主力火线前方；优先打掉对方的驱逐舰。"
-     onChange={event=>setText(event.target.value)}/>
-   </label>
-   <div className="cd-counter">{text.length}/1000 字</div>
-
-   <div className="cd-templates">
-    <span className="muted">快速套用：</span>
-    {TEMPLATES.map(([label,body,mission])=><button type="button" key={label} className="quiet"
-      onClick={()=>setText(`${mission}：${body}`)}>{label}</button>)}
-   </div>
-
-   <button type="button" className="quiet" onClick={()=>setShowCompose(!showCompose)}>
-    {showCompose?"收起逐项辅助":"逐项辅助（约束 / 期限 / 火力优先级）"}
-   </button>
-
-   {showCompose&&<div className="cd-compose">
-    <label>约束（写进命令正文，编队代理会读到）
-     <span className="cd-chips-pick">{ROE_PRESETS.map(item=><button type="button" key={item}
-       className={roe.includes(item)?"chip on":"chip"}
-       onClick={()=>setRoe(roe.includes(item)?roe.filter(value=>value!==item):[...roe,item])}>{item}</button>)}</span>
-    </label>
-    <label>完成期限
-     <select value={deadline} onChange={event=>setDeadline(event.target.value)}>
-      <option value="">不设期限</option>
-      <option value={turn}>{turn} 回合（本回合）内</option>
-      <option value={turn+1}>{turn+1} 回合内</option>
-      <option value={turn+2}>{turn+2} 回合内</option>
-      <option value={turn+3}>{turn+3} 回合内</option>
-     </select></label>
-    <label>火力优先级舰级（只影响选靶顺序，不改射界与合法性）
-     {classes.length>0&&<span className="cd-chips-pick">{classes.map(value=><button type="button" key={value}
-       className={priorities.split(/[,，\s]+/).includes(value)?"chip on":"chip"}
-       onClick={()=>appendPriority(value)}>{value}</button>)}</span>}
-     <input value={priorities} onChange={event=>setPriorities(event.target.value)} placeholder="例如 DD,CL（可留空）"/>
-    </label>
-    <div className="cd-order-actions">
-     <button className="quiet" onClick={compose}>把这些字段补进正文</button>
-    </div>
-    <p className="cd-note">辅助字段拼出来的只是正文；编队代理读到的永远是正文本身。</p>
-   </div>}
-
-   {preview?.restates_active_order&&<p className="cd-warn">
-    与它现行命令的措辞基本一致：引擎会记为「重复命令（NO_NEW_ORDER）」，不会新建一版。要改变行动，请写出差别。
-   </p>}
-
-   <div className="cd-order-actions">
-    <button disabled={busy||!canSend} onClick={send}>发送电报</button>
-    <span className="muted cd-btn-note">命令是一项<b>信号</b>：按上面的链路投递，可能延迟；送达前编队仍按旧命令行动。</span>
-   </div>
+  <div className="cd-now">
+   <div className="cd-now-text"><b>{now.title}</b><span>{now.hint}</span></div>
+   <button className="cd-primary" disabled={busy} onClick={onAdvance}>{advanceLabel}</button>
   </div>
   {dispatch&&<p className="cd-dispatch">{dispatch}</p>}
+  {notice&&<p className="cd-dispatch">{notice}</p>}
   {error&&<p className="cd-error">{error}</p>}
 
-  <div className="cd-orders-current">
-   <h4>它现行的命令</h4>
-   {activeOrder?<div className="cd-order">
-     <b>{activeOrder.mission}</b>
-     <p className="muted">版本 {activeOrder.revision??1}
-      {activeOrder.confirmed_turn?` · T${activeOrder.confirmed_turn} 已确认`:" · 尚未确认"}
-      {activeOrder.deadline_turn?` · 期限 T${activeOrder.deadline_turn}`:""}</p>
-    </div>
-    :<p className="muted">这个编队还没有已确认的作战命令：它按预令与自己的判断行动。</p>}
-   {orderHistory.length>0&&<details><summary>命令投递台账（{orderHistory.length} 条）</summary>
-    <ul>{orderHistory.slice(-6).reverse().map((m,index)=><li key={String(m.message_id??index)}>
-     {statusLabel[String(m.status)]??String(m.status)} · {kindLabel[String(m.kind)]??String(m.kind)}
-     {" "}· 发 T{String(m.issued_turn)} → {m.delivered_turn?`到 T${String(m.delivered_turn)}`:"在途"}
-     {m.payload?<span className="cd-reason">「{String((m.payload as Record<string,unknown>).order_text??"")}」</span>:null}
-    </li>)}</ul></details>}
-  </div>
+  {phase==="movement_planning"&&<details className="cd-section">
+   <summary>✍ 给编队写命令（可选）{recipientName?` · 收件人：${recipientName}`:""}</summary>
+   <div className="cd-order-form">
+    <label>收件编队（点指挥链里的卡片也可以改）
+     <select value={target} onChange={event=>onRecipient(event.target.value)}>
+      {!target&&<option value="">（选一个编队）</option>}
+      {(fleet?.reports??[]).map(report=><option key={report.formation_id} value={report.formation_id}>
+       {report.name}{report.is_source_of_truth
+        ? " · 当面受令（立即生效，无延迟）"
+        : ` · 链路${linkLabel[report.link_status]??report.link_status} · 报告${report.age_turns===null?"未知":`${report.age_turns} 回合前`}`}
+      </option>)}
+     </select></label>
 
-  <div className="cd-orders-plans">
-   <h4>本阶段各编队的代理方案</h4>
+    <div className={`cd-delivery ${delivery.tone}`}>
+     <b>{delivery.headline}</b>
+     {delivery.detail&&<span>{delivery.detail}</span>}
+     {preview?.long_order&&<span className="cd-warn">正文偏长（超过 240 字）：占用 2 个时隙，可能顺延到下一回合。</span>}
+    </div>
+
+    <label>命令正文（自然语言，这是权威内容）
+     <textarea rows={3} value={text} maxLength={1000}
+      placeholder="例：敌轻巡已出现在西北（约 7 格），你部向东拉开距离保持接触；优先打掉对方的驱逐舰。"
+      onChange={event=>setText(event.target.value)}/>
+    </label>
+    <div className="cd-counter">{text.length}/1000 字</div>
+
+    <div className="cd-templates">
+     <span className="muted">快速套用：</span>
+     {TEMPLATES.map(([label,body,mission])=><button type="button" key={label} className="quiet"
+       onClick={()=>setText(`${mission}：${body}`)}>{label}</button>)}
+    </div>
+
+    {showCompose&&<div className="cd-compose">
+     <label>约束（写进命令正文，编队代理会读到）
+      <span className="cd-chips-pick">{ROE_PRESETS.map(item=><button type="button" key={item}
+        className={roe.includes(item)?"chip on":"chip"}
+        onClick={()=>setRoe(roe.includes(item)?roe.filter(value=>value!==item):[...roe,item])}>{item}</button>)}</span>
+     </label>
+     <label>完成期限
+      <select value={deadline} onChange={event=>setDeadline(event.target.value)}>
+       <option value="">不设期限</option>
+       <option value={turn}>{turn} 回合（本回合）内</option>
+       <option value={turn+1}>{turn+1} 回合内</option>
+       <option value={turn+2}>{turn+2} 回合内</option>
+      </select></label>
+     <label>火力优先级舰级（只影响选靶顺序，不改射界与合法性）
+      {classes.length>0&&<span className="cd-chips-pick">{classes.map(value=><button type="button" key={value}
+        className={priorities.split(/[,，\s]+/).includes(value)?"chip on":"chip"}
+        onClick={()=>appendPriority(value)}>{value}</button>)}</span>}
+      <input value={priorities} onChange={event=>setPriorities(event.target.value)} placeholder="例如 DD,CL（可留空）"/>
+     </label>
+     <div className="cd-order-actions">
+      <button className="quiet" onClick={compose}>把这些字段补进正文</button>
+     </div>
+     <p className="cd-note">辅助字段拼出来的只是正文；编队代理读到的永远是正文本身。</p>
+    </div>}
+    <div className="cd-order-actions">
+     <button type="button" className="quiet" onClick={()=>setShowCompose(!showCompose)}>
+      {showCompose?"收起逐项辅助":"约束 / 期限 / 火力优先级（逐项辅助）"}
+     </button>
+    </div>
+
+    {preview?.restates_active_order&&<p className="cd-warn">
+     与它现行命令的措辞基本一致：引擎会记为「重复命令（NO_NEW_ORDER）」，不会新建一版。要改变行动，请写出差别。
+    </p>}
+
+    <div className="cd-order-actions">
+     <button disabled={busy||!canSend} onClick={send}>发送电报</button>
+     <span className="muted cd-btn-note">命令是一项<b>信号</b>：按所示链路投递，可能延迟；送达前编队仍按旧命令行动。</span>
+    </div>
+   </div>
+   <div className="cd-orders-current">
+    {activeOrder?<div className="cd-order">
+      <b>它现行的命令：{activeOrder.mission}</b>
+      <p className="muted">版本 {activeOrder.revision??1}
+       {activeOrder.confirmed_turn?` · T${activeOrder.confirmed_turn} 已确认`:" · 尚未确认"}
+       {activeOrder.deadline_turn?` · 期限 T${activeOrder.deadline_turn}`:""}</p>
+     </div>
+     :<p className="muted">这个编队还没有已确认的作战命令：它按预令与自己的判断行动。</p>}
+    {orderHistory.length>0&&<details><summary>命令投递台账（{orderHistory.length} 条）</summary>
+     <ul>{orderHistory.slice(-6).reverse().map((m,index)=><li key={String(m.message_id??index)}>
+      {statusLabel[String(m.status)]??String(m.status)} · {kindLabel[String(m.kind)]??String(m.kind)}
+      {" "}· 发 T{String(m.issued_turn)} → {m.delivered_turn?`到 T${String(m.delivered_turn)}`:"在途"}
+      {m.payload?<span className="cd-reason">「{String((m.payload as Record<string,unknown>).order_text??"")}」</span>:null}
+     </li>)}</ul></details>}
+   </div>
+  </details>}
+
+  <details className="cd-section" open={phase==="movement_planning"}>
+   <summary>各编队本回合方案（{plans.length}）</summary>
    {plans.length===0
     ? <p className="muted">{phase==="gunnery"
-      ? "炮击阶段没有编队机动方案：炮位、射界与目标是引擎选择器按你下达的火力优先级生成的，你不需要提交炮击指令。"
+      ? "炮击阶段没有编队机动方案：炮位、射界与目标是引擎选择器按火力优先级生成的。"
       : phase==="torpedo_planning"
-        ? "鱼雷阶段没有编队机动方案：本阶段提交的是鱼雷攻击计划（由引擎与自动计划填充）。"
-        : "本阶段各编队没有机动方案（可能已过机动阶段，或本侧没有在编编队）。"}</p>
+        ? "鱼雷阶段没有编队机动方案：本阶段提交的是鱼雷攻击计划（引擎自动填充）。"
+        : "本阶段各编队没有机动方案。"}</p>
     : <ul>{plans.map(plan=><li key={plan.formation_id}>
       <b>{(fleet?.reports??[]).find(report=>report.formation_id===plan.formation_id)?.name??plan.formation_id}</b>
       {" "}机动 {plan.leader_plan}{(()=>{const decision=decisions.find(entry=>entry.formation_id===plan.formation_id);
@@ -316,28 +326,17 @@ export function CommandDelayOrders({game,side,turn,phase,debug,recipient,onRecip
        return readable?<em className="cd-reason">（{readable}）</em>
         :branch?<em className="cd-reason">（{plainBranch(branch)}执行）</em>:null;})()}
      </li>)}</ul>}
-   <div className="cd-order-actions">
-    <button className="quiet" disabled={busy||plans.length===0} onClick={submitPlans}>按编队代理方案提交订单</button>
-    <span className="muted cd-btn-note">把各编队代理自己选定的合法机动方案作为<b>本侧订单</b>提交（等价于替它们填表）；引擎仍会逐单校验。</span>
-   </div>
-   {notice&&<p className="cd-dispatch">{notice}</p>}
-  </div>
+   {plans.length>0&&<div className="cd-order-actions">
+    <button className="quiet" disabled={busy} onClick={submitPlans}>只提交方案，不推进</button>
+    <span className="muted cd-btn-note">交接（上面的主按钮）提交的就是这份方案。</span>
+   </div>}
+  </details>
 
-  <div className="cd-orders-advance">
-   <h4>交接</h4>
-   <div className="cd-order-actions">
-    <button disabled={busy} onClick={onAdvance}>{advanceLabel}</button>
-    <span className="muted cd-btn-note">提交本阶段计划并推进裁决；命令延迟模式下提交的就是<b>计划表里那份方案</b>（＝各编队代理的选择，引擎仅在两支编队航迹真冲突时调整一支的航速）。</span>
-   </div>
-  </div>
-
-  <details className="cd-log">
-   <summary>编队代理记录{debug?"（调试 · 含思考链）":""}{log?` · ${String(log.policy_labels[side]??"未知").startsWith("llm:")?"模型":"教条"} · ${(log.entries??[]).length} 条`:""}</summary>
+  <details className="cd-section">
+   <summary>编队代理的思考{debug?"（调试 · 含思考链）":""}{log?` · ${String(log.policy_labels[side]??"未知").startsWith("llm:")?"模型":"教条"} · ${(log.entries??[]).length} 条`:""}</summary>
    {!log&&<p className="muted">暂无代理记录。</p>}
    {log&&String(log.policy_labels[side]??"").startsWith("deterministic")&&<p className="cd-policy">
-    本侧编队代理策略：<b>确定性教条</b>（未接入模型密钥）。编队照常行动，但这些决策不是模型给出的 ——
-    引擎记录里的标签如此，界面也不会把它说成模型判断。要接模型，见左侧「指挥链与通信 → 编队代理」。
-   </p>}
+    本侧编队代理策略：<b>确定性教条</b>（未接入模型密钥）。编队照常行动，但这些决策不是模型给出的。</p>}
    {log&&decisions.slice(0,6).map((entry,index)=>{const payload=(entry.decision??{}) as Record<string,unknown>;
     const isFleet=entry.role==="fleet_agent";
     return <div className="cd-log-entry" key={`${entry.formation_id}-${entry.turn}-${index}`}>

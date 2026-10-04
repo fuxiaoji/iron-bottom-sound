@@ -46,7 +46,6 @@ const providerLabel:Record<string,string>={deepseek:"DeepSeek",zhipu:"智谱 GLM
 
 function ModelCard({game,side,onChanged}:{game:string;side:Side;onChanged:()=>void}){
  const [policy,setPolicy]=useState<CommandDelayAgentPolicy|null>(null);
- const [open,setOpen]=useState(false);
  const [key,setKey]=useState("");
  const [provider,setProvider]=useState("deepseek");
  const [model,setModel]=useState("");
@@ -96,45 +95,40 @@ function ModelCard({game,side,onChanged}:{game:string;side:Side;onChanged:()=>vo
   finally{setBusy(false)}
  };
 
- return <div className="cd-model">
-  <div className="cd-model-head">
-   <b>编队代理</b>
+ return <details className="cd-section cd-model">
+  <summary>
+   编队代理：
    <span className={isModel?"cd-badge ok":"cd-badge warn"}>{roleLine(label)}</span>
-   {isModel&&thinkingOn!==null&&<span className={thinkingOn?"cd-badge order":"cd-badge"}>{thinkingOn?"思考链：开":"思考链：关"}</span>}
-   {isModel&&budget?<span className="cd-badge">输出上限 {budget} tokens</span>:null}
-   <button className="quiet" onClick={()=>setOpen(!open)}>{open?"收起":"接入模型…"}</button>
-  </div>
-  {!isModel&&!open&&<p className="cd-note">
-   当前没有可用的模型密钥：各编队会**照常行动**，但按引擎的确定性教条执行，不调用模型
-   （标签由引擎写入，不会把教条输出冒充为模型决策）。想看到代理自己的判断，就在这里接入。
+   {isModel&&thinkingOn!==null&&<span className={thinkingOn?"cd-badge order":"cd-badge"}>{thinkingOn?"思考链开":"思考链关"}</span>}
+   {isModel&&budget?<span className="cd-badge">上限 {budget} tokens</span>:null}
+  </summary>
+  {!isModel&&<p className="cd-note">
+   当前是<b>教条</b>在指挥编队（引擎的确定性决策，不是模型）。想看每个 AI 的判断与思考，在这里接入模型。
   </p>}
-  {open&&<div className="cd-model-form">
+  <div className="cd-model-form">
    <label>模型提供方
     <select value={provider} onChange={event=>setProvider(event.target.value)}>
      {Object.entries(providerLabel).map(([value,text])=><option key={value} value={value}>{text}</option>)}
     </select></label>
    <label>模型名（留空用默认）
-    <input value={model} onChange={event=>setModel(event.target.value)} placeholder={provider==="zhipu"?"glm-4-flash":"deepseek-chat"}/></label>
+    <input value={model} onChange={event=>setModel(event.target.value)} placeholder={provider==="zhipu"?"glm-4.5-flash":"deepseek-chat"}/></label>
    <label>API 密钥
     <input type="password" value={key} onChange={event=>setKey(event.target.value)} placeholder="sk-…（只留在内存，不落盘）"/></label>
-   <label className="cd-check"><input type="checkbox" checked={thinking} onChange={event=>setThinking(event.target.checked)}/>开启思维链（推理型模型会先想再答，耗时更长）</label>
+   <label className="cd-check"><input type="checkbox" checked={thinking} onChange={event=>setThinking(event.target.checked)}/>开启思维链（推理型模型先想再答；想看思考就勾上）</label>
    <label className="cd-check"><input type="checkbox" checked={bothSides} onChange={event=>setBothSides(event.target.checked)}/>双方编队都用这个密钥</label>
-   <label className="cd-check"><input type="checkbox" checked={fleetAgent} onChange={event=>setFleetAgent(event.target.checked)}/>同时给该侧一个舰队代理（让模型替你指挥另一方）</label>
+   <label className="cd-check"><input type="checkbox" checked={fleetAgent} onChange={event=>setFleetAgent(event.target.checked)}/>给勾选的每侧各配一个舰队代理（模型替你写命令）</label>
    <div className="cd-order-actions">
     <button disabled={busy} onClick={submit}>接入</button>
-    <button className="quiet" disabled={busy} onClick={()=>{setKey("");setOpen(false)}}>取消</button>
+    <button className="quiet" disabled={busy} onClick={()=>{setKey("");}}>取消</button>
    </div>
    <p className="cd-note">
-    密钥用于双方的编队代理（可只给本侧）。留空密钥再点「接入」即撤销回教条。
-    接上舰队代理后，那一侧的舰队总指挥由模型担任：它会自己写命令，你就不必替它写。<br/>
-    <b>想看每个 agent 怎么想</b>：勾上「开启思维链」并用支持的模型（智谱 glm-4.5-flash 实测会返回推理），
-    然后打开顶栏的<b>调试</b>开关 —— 代理记录里每次往返都会分开显示「思考过程」与「原始回复」。
-    推理模型会先把预算花在思考上，所以输出上限给到 3000 左右；太小时它可能只思考不回答。
+    留空密钥点「接入」＝撤销回教条。密钥只在服务进程内存里，重启后需重接。
+    看思考：开思维链 + 顶栏「调试」→「编队代理的思考」。输出上限 3000 左右（推理模型先花预算思考）。
    </p>
    {result&&<p className="cd-dispatch">{result}</p>}
    {error&&<p className="cd-error">{error}</p>}
-  </div>}
- </div>;
+  </div>
+ </details>;
 }
 
 export function CommandDelayPanel({game,side,turn,phase,collapsed,onToggle,recipient,onRecipient,onOpenRules}:Props){
@@ -175,14 +169,12 @@ export function CommandDelayPanel({game,side,turn,phase,collapsed,onToggle,recip
   </header>
   {error&&<p className="cd-error">指挥链数据加载失败：{error}</p>}
 
-  <div className="cd-role">
-   <b>你是舰队总指挥</b>
+  <p className="cd-role-line">
    {fleet&&((fleet.embarked.ship_ids?.length??0)===0
-    ? <span>你的旗舰已不在水面：本侧只剩下过期报告，任何事情都得靠还在的编队自己判断。</span>
-    : <span>你的旗舰就在 <b>{fleet.embarked.name??fleet.embarked_formation_id??"—"}</b>：
-     对它下命令是<b>当面交办</b>（立即生效、不走链路）；对别的编队只能发电报，命令会<b>延迟送达</b>，
-     期间战场已经变了。你看不到远端编队的实时状态，只能看它们的报告——这就是这个模式要玩的东西。</span>)}
-  </div>
+    ? <>你的旗舰已不在水面：本侧只剩过期报告，一切靠还在的编队自己判断。</>
+    : <>你是舰队总指挥，旗舰在 <b>{fleet.embarked.name??fleet.embarked_formation_id??"—"}</b>：
+       对它当面受令；对别的编队要发电报，会延迟——你看到的是它们的报告，不是实时。</>)}
+  </p>
 
   {fleet&&<>
    <div className="cd-fleet">
@@ -229,7 +221,7 @@ export function CommandDelayPanel({game,side,turn,phase,collapsed,onToggle,recip
 
    <ModelCard game={game} side={side} onChanged={()=>setModelTick(value=>value+1)}/>
 
-   {local&&<details className="cd-local" open>
+   {local&&<details className="cd-local">
     <summary><b>{local.formation_name}</b> 的本地情报（它自己知道什么）
      <span className="muted"> · 链路 {linkLabel[local.link_status]??local.link_status} · 权限 {authorityLabel[local.authority]??local.authority}</span></summary>
     <div className="cd-grid">

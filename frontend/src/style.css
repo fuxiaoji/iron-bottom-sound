@@ -661,3 +661,19 @@ button.editor-modal-close:hover{color:#ffe9b0}
 .cd-response pre{margin:0;padding:6px;max-height:200px;overflow:auto;border:1px solid #223230;background:#0a1113;color:#a8c0bb;font-size:.68rem;line-height:1.5;white-space:pre-wrap;word-break:break-word}
 .cd-no-thinking{margin:5px 0!important;font-size:.68rem!important}
 .cd-log-entry>.cd-badge{margin-left:6px}
+
+/* v2.5 精简层：一个「现在做什么」主区 + 全部折叠的细节。 */
+.cd-turn-chip{display:inline-block;margin-left:8px;padding:2px 8px;border:1px solid #40504e;color:#9eaaa6;font-size:.7rem;font-weight:400;vertical-align:middle}
+.cd-now{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:11px 12px;border:1px solid #6d5a2f;background:#1d2417}
+.cd-now-text{display:grid;gap:3px;flex:1}
+.cd-now-text b{color:#e8d8ad;font-size:.82rem}
+.cd-now-text span{color:#9eaaa6;font-size:.7rem;line-height:1.55}
+.cd-primary{padding:.8rem 1.3rem;border-color:#d4b061;background:#4a3a1e;color:#f3e6c4;font-weight:700;font-size:.9rem;white-space:nowrap;cursor:pointer}
+.cd-primary:hover{background:#604a26}
+.cd-primary[disabled]{opacity:.5;cursor:not-allowed}
+.cd-section{margin:9px 0;padding:8px 10px;border:1px solid #3b5350;background:#101d1f}
+.cd-section>summary{cursor:pointer;color:#c3b78f;font-size:.78rem}
+.cd-section[open]>summary{margin-bottom:8px}
+.cd-role-line{margin:0 0 9px;color:#9eaaa6;font-size:.72rem;line-height:1.6}
+.cd-role-line b{color:#c8d2ce}
+.cd-model>summary{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
