@@ -17,6 +17,7 @@ import {
   submitOrders,
   suggestedOrders,
   tutorialOpponent,
+  formationOrders,
   viewGame,
 } from "./api";
 import type { LLMConnectionConfig, SavedGameSummary } from "./api";
@@ -28,10 +29,13 @@ import { HexMap } from "./HexMap";
 import { HexMoveEditor } from "./HexMoveEditor";
 import { PlanSheet } from "./PlanSheet";
 import { RealisticRulesModal } from "./RealisticRulesModal";
+import { CommandDelayPanel } from "./CommandDelayPanel";
+import { CommandDelayOrders } from "./CommandDelayOrders";
 import { ReplayModal } from "./ReplayModal";
 import { ShipStatusCard } from "./ShipStatusCard";
 import { TutorialPanel } from "./TutorialPanel";
 import { StartScreen } from "./StartScreen";
+import { REALISTIC_AI_PROFILES } from "./aiProfiles";
 import type {
   BattleReport,
   Event as GameEvent,
@@ -75,6 +79,7 @@ type AIPersona = {
 // 人机大战对手阵容：内置风格（tactical.PROFILES）+ 进化冠军（champions.CHAMPIONS）。
 // win = 双想定混战赛综合胜率差分（对内置对手池，0=五五开；rl/style-tourney-final 实测快照）。
 const AI_PROFILES: AIPersona[] = [
+  ...REALISTIC_AI_PROFILES,
   {
     id: "adaptive",
     label: "自适应鱼雷战术",
@@ -333,6 +338,10 @@ export default function App() {
   });
   const [realisticCommand, setRealisticCommand] = useState(false);
   const [realisticRulesOpen, setRealisticRulesOpen] = useState(false);
+  const [commandDelay, setCommandDelay] = useState(false);
+  const [commandDelayRulesOpen, setCommandDelayRulesOpen] = useState(false);
+  const [commandPanelCollapsed, setCommandPanelCollapsed] = useState(false);
+  const [acting, setActing] = useState(false);
   const [fleetPanelCollapsed, setFleetPanelCollapsed] = useState(false);
   const [ordersPanelCollapsed, setOrdersPanelCollapsed] = useState(false);
   const [replayOpen, setReplayOpen] = useState(false);
@@ -359,6 +368,7 @@ export default function App() {
     config?: LLMConnectionConfig | null,
     realisticOverride?: boolean,
     tutorialScript?: "classic_night" | "erma_grand_fleet",
+    commandDelayRequested = commandDelay,
   ) =>
     createGameApi(
       scenarioId,
@@ -371,7 +381,17 @@ export default function App() {
       config,
       realisticOverride ?? realisticCommand,
       tutorialScript,
+      commandDelayRequested,
     );
+  // 深链、旧存档和刷新均由对局观察中的权威模式标记恢复，不用错误状态猜模式。
+  useEffect(() => {
+    if (!game) {
+      setCommandDelay(false);
+      return;
+    }
+    if (view?.game_id === game) setCommandDelay(Boolean(view.command_delay_mode));
+  }, [game, view?.game_id, view?.command_delay_mode]);
+
   // URL 深链：?game=&side=&debug=&report=1 直接进入某局（报告视图供战报截图驱动）。
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -466,7 +486,7 @@ export default function App() {
         active = false;
       };
     }
-    if (view && game && orderPhases.has(view.phase)) {
+    if (view && game && orderPhases.has(view.phase) && !view.own_orders_submitted) {
       suggestedOrders(game, side, guideProfiles[side])
         .then((batch) => {
           if (active) setDraft(JSON.stringify(batch, null, 2));
@@ -684,10 +704,15 @@ export default function App() {
     profile = "balanced",
     realisticOverride?: boolean,
     tutorialScript?: "classic_night" | "erma_grand_fleet",
+    commandDelayRequested = false,
   ) => {
     try {
-      if (nextMode === "llm" && !llmModel.trim())
+      // 命令延迟模式下每个编队都由自己的 LLM 代理指挥，因此必须给出模型与密钥，
+      // 否则各编队会退回确定性教条（这本身是合法状态，但必须由此处明确告知）。
+      if ((nextMode === "llm" || commandDelayRequested) && !llmModel.trim())
         throw new Error("请先填写模型名称");
+      if (commandDelayRequested && !llmKey.trim())
+        throw new Error("命令延迟模式需要 LLM 密钥：每个编队都将由自己的 LLM 代理指挥");
       const g = await createGame(
         scenario_id,
         1,
@@ -696,9 +721,10 @@ export default function App() {
         recordReport,
         llmKey || null,
         { allow: researchAllow, handle: researchHandle || null },
-        nextMode === "llm" ? llmConfig : null,
+        nextMode === "llm" || commandDelayRequested ? llmConfig : null,
         realisticOverride,
         tutorialScript,
+        commandDelayRequested,
       );
       setGame(g.game_id);
       setMode(nextMode);
@@ -730,6 +756,7 @@ export default function App() {
       setAiProfile(item.ai_profile ?? "balanced");
       setSide(playerSide);
       setRealisticCommand(item.realistic_command);
+      setCommandDelay(Boolean(item.command_delay_mode)); // 随后由对局观察的权威标记覆盖
       setReportEnabled(item.battle_report);
       setLocked(false);
       setReplayOpen(false);
@@ -819,6 +846,18 @@ export default function App() {
     }
     setMoveEditorShip(null);
   };
+  const submitAgentOrders = async () => {
+    if (!game || !view) throw new Error("没有进行中的对局");
+    const { orders } = await formationOrders(game, side);
+    if (orders.length === 0) throw new Error("本侧编队代理尚未给出方案");
+    await submitOrders(game, side, {
+      side,
+      phase: view.phase,
+      formation_movement: orders,
+    });
+    await refresh(game, side);
+    return `已提交 ${orders.length} 个编队的代理方案（仍由引擎逐单校验）。`;
+  };
   const changeGuide = async (profile: string) => {
     setGuideProfiles((prev) => ({ ...prev, [side]: profile }));
     if (!game || !view) return;
@@ -840,11 +879,13 @@ export default function App() {
     }
   };
   const act = async () => {
-    if (!game || !view) return;
+    if (!game || !view || acting) return;
+    setActing(true);
     try {
       if (orderPhases.has(view.phase)) {
-        const batch = JSON.parse(draft);
-        const result = await submitOrders(game, side, batch);
+        const result = view.own_orders_submitted
+          ? { both_submitted: view.both_orders_submitted }
+          : await submitOrders(game, side, JSON.parse(draft));
         if (mode === "tutorial") {
           await tutorialOpponent(game, side);
           const events = await advance(game, side);
@@ -888,6 +929,9 @@ export default function App() {
       setError("");
     } catch (e) {
       setError(explainError(e));
+      await refresh(game, side).catch(() => {});
+    } finally {
+      setActing(false);
     }
   };
   const unlock = async () => {
@@ -922,10 +966,16 @@ export default function App() {
           onResume={resume}
           onImport={importSave}
           onPreviewRealisticRules={() => setRealisticRulesOpen(true)}
+          onPreviewCommandDelayRules={() => setCommandDelayRulesOpen(true)}
+          commandDelay={commandDelay}
+          setCommandDelay={setCommandDelay}
           error={error}
         />
         {realisticRulesOpen && (
           <RealisticRulesModal onClose={() => setRealisticRulesOpen(false)} />
+        )}
+        {commandDelayRulesOpen && (
+          <RealisticRulesModal source="command-delay" onClose={() => setCommandDelayRulesOpen(false)} />
         )}
       </>
     );
@@ -1029,12 +1079,13 @@ export default function App() {
               {AI_PROFILES.find((p) => p.id === aiProfile)?.label ?? aiProfile}
             </div>
           )}
-          {mode === "llm" && (
+          {mode === "llm" && !commandDelay && (
             <div className="opponent-badge">
               对手：{llmProvider === "zhipu" ? "智谱 GLM" : "DeepSeek"} ·{" "}
               {llmModel}
             </div>
           )}
+          {commandDelay && <div className="opponent-badge">命令延迟 · 编队本地代理（策略状态见代理记录）</div>}
         </div>
         <div className="turn">
           第 {view.turn}/{view.max_turns} 回合
@@ -1050,7 +1101,7 @@ export default function App() {
           className="rules-header-button"
           onClick={() => setRealisticRulesOpen(true)}
         >
-          真实模式规则
+          {commandDelay ? "命令延迟规则" : "真实模式规则"}
         </button>
         <label
           className={`debug-toggle${debug ? " on" : ""}`}
@@ -1067,14 +1118,14 @@ export default function App() {
         {view.phase === "complete" ? (
           <button disabled>对局已结束</button>
         ) : (
-          <button onClick={act} disabled={llmBusy}>
-            {orderPhases.has(view.phase)
+          <button onClick={act} disabled={acting || llmBusy || (orderPhases.has(view.phase) && !view.own_orders_submitted && !draft.trim())}>
+            {view.own_orders_submitted ? "本方已封存 · 重试对手并继续" : orderPhases.has(view.phase)
               ? mode === "tutorial"
                 ? "检查本课并继续"
                 : mode === "vs_ai"
                   ? "校验并继续"
                   : mode === "llm"
-                    ? "提交并让 DeepSeek 接招"
+                    ? commandDelay ? "提交并继续编队执行" : "提交并让 LLM 接招"
                     : "校验、封存并交接"
               : "执行引擎裁决"}
           </button>
@@ -1179,8 +1230,29 @@ export default function App() {
         </button>
         <aside>
           {mode === "tutorial" && <TutorialPanel view={view} />}
+          {commandDelay && (
+            <CommandDelayOrders
+              game={game}
+              side={side}
+              turn={view.turn}
+              phase={view.phase}
+              debug={debug}
+              submitted={view.own_orders_submitted}
+              onSubmitAgentOrders={submitAgentOrders}
+            />
+          )}
+          {commandDelay && (
+            <CommandDelayPanel
+              game={game}
+              side={side}
+              turn={view.turn}
+              phase={view.phase}
+              collapsed={commandPanelCollapsed}
+              onToggle={() => setCommandPanelCollapsed((value) => !value)}
+            />
+          )}
           <ShipStatusCard ship={selected} />
-          {orderPhases.has(view.phase) && (
+          {orderPhases.has(view.phase) && !view.own_orders_submitted && (
             <section className="order-editor">
               <h2>本阶段秘密计划表</h2>
               <p>
@@ -1216,6 +1288,7 @@ export default function App() {
                 </div>
               }
               <PlanSheet
+                commandDelay={commandDelay}
                 view={view}
                 side={side}
                 draft={draft}
@@ -1273,7 +1346,7 @@ export default function App() {
         />
       )}{" "}
       {realisticRulesOpen && (
-        <RealisticRulesModal onClose={() => setRealisticRulesOpen(false)} />
+        <RealisticRulesModal source={commandDelay ? "command-delay" : "realistic"} onClose={() => setRealisticRulesOpen(false)} />
       )}{" "}
       {replayOpen && (
         <ReplayModal game={game} side={side} onClose={() => setReplayOpen(false)} />
@@ -1296,7 +1369,7 @@ export default function App() {
       {llmBusy && (
         <div className="llm-mask">
           <b>
-            {llmProvider === "zhipu" ? "智谱 GLM" : "DeepSeek"}{" "}
+            {commandDelay ? "编队代理" : llmProvider === "zhipu" ? "智谱 GLM" : "DeepSeek"}{" "}
             正在编写本阶段计划…
           </b>
           <span>引擎仍会严格校验它的一切订单</span>

@@ -1,0 +1,40 @@
+schema_version: 1
+authority: project_extension
+namespace: IBS-R-CD
+notice: >-
+  命令延迟 v2.2 是独立项目扩展，不是原版规则或历史实测延迟。
+  默认关闭，仅在真实编队核心上启用；既有经典/真实模式不进入此状态机。
+provenance:
+  branch: command-delay-run
+  revision: 8f9598e
+  player_rules: docs/rules/command-delay.md
+supported_scenarios: [IBS-S-01, IBS-S-03, IBS-S-EM-01]
+simulation_parameters:
+  authority: SIMULATION_ABSTRACTION
+  channel_capacity: {tbs_short: 4, blinker: 3, wt_coded: 2, wt_reencipher_relay: 1, multi_hop: 1, blackout: 0}
+  queue_ttl_turns: 3
+  local_priority_weight_limit: 0.5
+  priority_lambda: 0.35
+  source_modules: [communications/processing.py, communications/queue.py, command_observation.py, target_priority.py]
+  random_drop_or_garble: disabled_without_sources
+rules:
+  - id: IBS-R-CD-02
+    title: 指挥权限与编队本地自主
+    executable_at: command_delay.on_phase_advanced
+    tests: [tests/test_command_delay_mode_shell.py, tests/test_command_delay_live_surface.py]
+  - id: IBS-R-CD-03
+    title: 确定性通信路由与处理链
+    executable_at: communications.processing.delay_for
+    tests: [tests/test_command_delay_communications.py]
+  - id: IBS-R-CD-04
+    title: 任务命令与三类备选方案
+    executable_at: delegation
+    tests: [tests/test_command_delay_formation_agent.py, tests/test_command_delay_agents_and_memory.py]
+  - id: IBS-R-CD-05
+    title: 信道容量、优先级与报文 TTL
+    executable_at: communications.queue.drain
+    tests: [tests/test_command_delay_communications.py]
+  - id: IBS-R-CD-06
+    title: 引擎炮击选择器与目标优先级授权边界
+    executable_at: target_priority.auto_gunnery
+    tests: [tests/test_command_delay_formation_agent.py, tests/test_command_delay_integration.py]

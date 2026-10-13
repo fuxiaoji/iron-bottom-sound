@@ -81,11 +81,12 @@ def _turn(heading: int, delta: int) -> int:
 
 
 def _safe_step(state, position: HexCoord, heading: int) -> HexCoord | None:
-    dq, dr = HexCoord.direction_delta(heading)
-    q, r = position.q + dq, position.r + dr
-    if not (0 <= q < 34 and 0 <= r < 27):
+    try:
+        nxt = position.neighbor(
+            heading, columns=state.map_columns, rows=state.map_rows,
+        )
+    except ValueError:
         return None
-    nxt = HexCoord(q=q, r=r)
     if nxt.label in state.land_hexes:
         return None
     return nxt
@@ -113,6 +114,8 @@ class AdaptiveTorpedoPlanner:
 
     def __init__(self, profile: Any) -> None:
         self.profile = profile
+        self._response_cache: dict[tuple, CounterfactualResponse] = {}
+        self._active_routes = None
 
     def enemy_routes(self, engine, state, side: Side) -> list[EnemyRouteHypothesis]:
         observation = engine.observe(state.game_id, side)
@@ -220,7 +223,21 @@ class AdaptiveTorpedoPlanner:
 
     def analyze(self, engine, state, side: Side) -> TorpedoDecisionAudit:
         routes = self.enemy_routes(engine, state, side)
-        raw = engine.torpedo_tactical_combos(state, side)
+        # AI policy: fire a selected launcher completely, or keep it in reserve.
+        # The engine still exposes partial salvos for human/LLM orders. Filter
+        # BEFORE scoring so audits and expected hits describe the full salvo;
+        # never inflate the count of a selected single-shot order afterwards.
+        # Read only our CURRENT loads, not nominal capacity or enemy stocks.
+        loaded = {
+            (ship.id, launcher.id): launcher.loaded
+            for ship in state.ships.values() if ship.side == side
+            for launcher in ship.torpedo_launchers
+            if launcher.loaded > 0 and not launcher.destroyed and not launcher.reload_turns_remaining
+        }
+        raw = [
+            row for row in engine.torpedo_tactical_combos(state, side)
+            if row["salvo_size"] == loaded.get((row["ship_id"], row["launcher_id"]))
+        ]
         doctrine = self._select_doctrine(engine, state, side, routes, raw)
         options = [self._score_option(row, doctrine, routes) for row in raw]
         options = [option for option in options if option is not None]
@@ -273,40 +290,26 @@ class AdaptiveTorpedoPlanner:
         return f"公开敌方航路假设 {len(routes)} 条；合法安全鱼雷候选 {len(raw)} 个。"
 
     def _score_option(self, row, doctrine, routes) -> TorpedoTacticalOption | None:
-        target_routes = [route for route in routes if route.ship_id == row["target_id"]]
+        # Counts/launchers sharing a lane have the same counterfactual response.
+        # Scope this cache to the exact route list (one decision), not game/turn.
+        # This is an identical calculation for legacy and new profiles, not a
+        # weaker or different opponent policy in the strength benchmark.
+        if self._active_routes is not routes:
+            self._response_cache.clear()
+            self._active_routes = routes
+            self._routes_by_target = defaultdict(list)
+            for route in routes:
+                self._routes_by_target[route.ship_id].append(route)
+        target_routes = self._routes_by_target.get(row["target_id"], [])
         if not target_routes:
             return None
         lane = set(row.get("predicted_path") or [])
-        baseline = max(target_routes, key=lambda route: (route.base_utility, _route_key(route)))
-
-        def threat(route: EnemyRouteHypothesis) -> float:
-            hits = len(lane.intersection(route.path))
-            near = 0
-            if not hits:
-                lane_hexes = [HexCoord.from_label(label) for label in lane]
-                near = sum(
-                    1 for label in route.path
-                    if lane_hexes and min(HexCoord.from_label(label).distance(cell) for cell in lane_hexes) <= 1
-                )
-            return hits * 4.0 + near * 0.75
-
-        threatened = max(
-            target_routes,
-            key=lambda route: (route.base_utility - threat(route), _route_key(route)),
-        )
-        base_end = HexCoord.from_label(baseline.final_hex)
-        threat_end = HexCoord.from_label(threatened.final_hex)
-        changed = _route_key(baseline) != _route_key(threatened)
-        response = CounterfactualResponse(
-            ship_id=row["target_id"], baseline_route=_route_key(baseline),
-            threatened_route=_route_key(threatened), forced_deviation=base_end.distance(threat_end),
-            speed_loss=max(0, baseline.speed - threatened.speed),
-            fire_position_loss=max(0.0, baseline.base_utility - threatened.base_utility),
-            crossing_t_loss=max(0.0, baseline.crossing_t_value - threatened.crossing_t_value),
-            formation_split=max(0.0, baseline.formation_cohesion - threatened.formation_cohesion),
-            local_force_ratio_gain=0.5 if changed and threat(baseline) > 0 else 0.0,
-            route_changed=changed,
-        )
+        response_key = (row["target_id"], tuple(sorted(lane)))
+        response = self._response_cache.get(response_key)
+        if response is None:
+            response = self._counterfactual(target_routes, lane)
+            self._response_cache[response_key] = response
+        changed = response.route_changed
         denial = (
             response.forced_deviation * 0.35 + response.speed_loss * 0.45
             + response.fire_position_loss * 0.6 + response.crossing_t_loss * 1.2
@@ -344,6 +347,46 @@ class AdaptiveTorpedoPlanner:
             option_id=option_id, doctrine=doctrine, order=order, target_id=row["target_id"],
             predicted_path=list(row.get("predicted_path") or []), expected_hits=direct,
             denial_score=denial, opportunity_cost=opportunity, score=score, response=response,
+        )
+
+    @staticmethod
+    def _counterfactual(target_routes, lane) -> CounterfactualResponse:
+        baseline = max(target_routes, key=lambda route: (route.base_utility, _route_key(route)))
+        # distance <= 1 is exactly membership of this axial neighbourhood.
+        # Parse each hex once, not once per route point per lane point per count.
+        near_lane = set()
+        for label in lane:
+            cell = HexCoord.from_label(label)
+            near_lane.add((cell.q, cell.r))
+            for heading in range(1, 7):
+                dq, dr = HexCoord.direction_delta(heading)
+                near_lane.add((cell.q + dq, cell.r + dr))
+
+        def threat(route: EnemyRouteHypothesis) -> float:
+            hits = len(lane.intersection(route.path))
+            near = 0
+            if not hits:
+                for label in route.path:
+                    cell = HexCoord.from_label(label)
+                    near += int((cell.q, cell.r) in near_lane)
+            return hits * 4.0 + near * 0.75
+
+        threatened = max(
+            target_routes,
+            key=lambda route: (route.base_utility - threat(route), _route_key(route)),
+        )
+        base_end = HexCoord.from_label(baseline.final_hex)
+        threat_end = HexCoord.from_label(threatened.final_hex)
+        changed = _route_key(baseline) != _route_key(threatened)
+        return CounterfactualResponse(
+            ship_id=baseline.ship_id, baseline_route=_route_key(baseline),
+            threatened_route=_route_key(threatened), forced_deviation=base_end.distance(threat_end),
+            speed_loss=max(0, baseline.speed - threatened.speed),
+            fire_position_loss=max(0.0, baseline.base_utility - threatened.base_utility),
+            crossing_t_loss=max(0.0, baseline.crossing_t_value - threatened.crossing_t_value),
+            formation_split=max(0.0, baseline.formation_cohesion - threatened.formation_cohesion),
+            local_force_ratio_gain=0.5 if changed and threat(baseline) > 0 else 0.0,
+            route_changed=changed,
         )
 
     def _beam_select(

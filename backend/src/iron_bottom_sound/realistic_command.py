@@ -12,12 +12,18 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 from .data import load_scenario
+from .formation_maneuver import (
+    commit_sealed_style_transitions,
+    expand_move_together,
+    follow_wake_allowed,
+)
 from .scenario_guidance import public_search_target
 from .models import (
     AIPlanSheet,
     CommandSuccession,
     ContactMovementOrder,
     FormationMovementOrder,
+    FormationMovementStyle,
     FormationSpeedDecision,
     FormationSetupOrder,
     FormationState,
@@ -153,6 +159,60 @@ def _layout_for_order(state: GameState, order: FormationSetupOrder) -> dict[str,
     return layout
 
 
+def legal_setup_orders(engine: "IronBottomEngine", state: GameState, side: Side) -> list[FormationSetupOrder]:
+    """Repair an overlapping historical proposal through editable setup orders.
+
+    Some newly entered scenarios have intersecting default column wakes. Keep
+    their memberships and flagships, but choose another own anchor/heading if
+    necessary. No source positions, hidden opponents or rule state are changed.
+    """
+    defaults = default_setup_orders(state, side)
+    batch = OrderBatch(side=side, phase=state.phase, formation_setup=defaults)
+    if engine.validate_orders(state.game_id, batch).valid:
+        return defaults
+    candidates = []
+    for original in defaults:
+        options = []
+        leaders = [item for item in original.ship_ids if _source_position(state, item)] or [original.leader_id]
+        original_heading = original.heading or state.ships[original.leader_id].heading
+        for leader_index, leader in enumerate(leaders):
+            for deviation in (0, 1, -1, 2, -2, 3):
+                for spacing in (original.spacing, 2, 3):
+                    order = original.model_copy(deep=True)
+                    order.leader_id = leader
+                    order.ship_ids = [leader] + [item for item in original.ship_ids if item != leader]
+                    order.heading = ((original_heading - 1 + deviation) % 6) + 1
+                    order.spacing = spacing
+                    try:
+                        layout = _layout_for_order(state, order)
+                    except ValueError:
+                        continue
+                    if any(engine._terrain_impassable(state, cell) for cell in layout.values()):
+                        continue
+                    preference = (abs(deviation), spacing != original.spacing, leader_index, spacing)
+                    options.append((preference, order, {cell.label for cell in layout.values()}))
+        candidates.append(sorted(options, key=lambda item: item[0]))
+    attempts = 0
+
+    def arrange(index, occupied, selected):
+        nonlocal attempts
+        if index == len(candidates):
+            proposal = OrderBatch(side=side, phase=state.phase, formation_setup=selected)
+            return selected if engine.validate_orders(state.game_id, proposal).valid else None
+        for _preference, order, labels in candidates[index]:
+            attempts += 1
+            if attempts > 10000:
+                return None
+            if labels & occupied:
+                continue
+            result = arrange(index + 1, occupied | labels, selected + [order])
+            if result is not None:
+                return result
+        return None
+
+    return arrange(0, set(), []) or defaults
+
+
 def validate_setup(engine: "IronBottomEngine", state: GameState, batch: OrderBatch) -> list[str]:
     errors: list[str] = []
     orders = batch.formation_setup
@@ -215,7 +275,7 @@ def _shortest_hex_path(
 
 
 def rebuild_guide_trail(state: GameState, formation: FormationState) -> list[HexCoord]:
-    active = [state.ships[ship_id] for ship_id in formation.ship_ids if state.ships[ship_id].position and state.ships[ship_id].command_status == "attached"]
+    active = [state.ships[ship_id] for ship_id in formation.ship_ids if state.ships[ship_id].position and not state.ships[ship_id].sunk and state.ships[ship_id].command_status == "attached"]
     if not active:
         return []
     trail: list[HexCoord] = []
@@ -288,9 +348,15 @@ def _edge_distance(
     }[edge]
 
 
-def choose_withdrawal_edge(state: GameState, ship_id: str) -> str:
+def _visible_enemies(engine: "IronBottomEngine", state: GameState, side: Side):
+    # Use observation mounts too: hidden damage must not alter withdrawal
+    # preferences through a secretly destroyed enemy gun.
+    return [ship for ship in engine.observe(state.game_id, side).ships
+            if ship.side != side and ship.position and not ship.sunk]
+
+
+def choose_withdrawal_edge(state: GameState, ship_id: str, *, enemies=()) -> str:
     ship = state.ships[ship_id]
-    enemies = [item for item in state.ships.values() if item.side != ship.side and item.position and not item.sunk]
     edges = ("north", "east", "south", "west")
     def score(edge: str) -> tuple[float, int, str]:
         # Prefer a short route whose boundary is on the side opposite the enemy mass.
@@ -322,6 +388,52 @@ def _at_edge(
 
 
 def _withdrawal_order(engine: "IronBottomEngine", state: GameState, ship) -> MovementOrder:
+    """Same retreat preference, but search routes only at the best candidate hex.
+
+    The former implementation ran a fresh path search for every final heading
+    at every reachable hex, although only the highest-scored valid hex is used.
+    Scores include the label, making distinct positions strictly ordered; the
+    first legal plan at the first legal position is exactly the previous result.
+    """
+    if not ship.position or not ship.withdrawal_edge or _at_edge(
+        ship.position, ship.withdrawal_edge, columns=state.map_columns, rows=state.map_rows,
+    ):
+        return _withdrawal_order_reference(engine, state, ship)
+    enemies = _visible_enemies(engine, state, ship.side)
+    candidates = engine.movement_candidates(state, ship, include_plans=False)["reachable"]
+    ranked = []
+    for entry in candidates:
+        position = HexCoord(q=entry["hex"]["q"], r=entry["hex"]["r"])
+        enemy_distance = min((position.distance(enemy.position) for enemy in enemies if enemy.position), default=20)
+        enemy_pressure = sum(engine.ship_gun_pressure(state, enemy, position=enemy.position, target_hexes=[position]) for enemy in enemies)
+        score = (float(enemy_distance), -enemy_pressure, -_edge_distance(
+            position, ship.withdrawal_edge, columns=state.map_columns, rows=state.map_rows,
+        ), position.label)
+        ranked.append((score, entry, position))
+    def commitable(plan):
+        commands = engine.movement_commands(MovementOrder(ship_id=ship.id, plan=plan))
+        if ship.turn_limit_degrees == 60 and any(command.endswith("120") for command in commands):
+            return False
+        if ship.forced_straight_turns and any(command != "advance" for command in commands):
+            return False
+        return engine.movement_preview(state, ship, plan=plan)["commitable"]
+    for _score, entry, position in sorted(ranked, key=lambda item: item[0], reverse=True):
+        seen = set()
+        if entry.get("plan") is not None:
+            seen.add(entry["plan"])
+            if commitable(entry["plan"]):
+                return MovementOrder(ship_id=ship.id, plan=entry["plan"])
+        for heading in entry["final_headings"]:
+            path = engine.movement_path(state, ship, position, heading=heading)
+            if path.get("valid") and path["plan"] not in seen:
+                seen.add(path["plan"])
+                if commitable(path["plan"]):
+                    return MovementOrder(ship_id=ship.id, plan=path["plan"])
+    # Preserve all the original forced-circle/edge/damage fallbacks verbatim.
+    return _withdrawal_order_reference(engine, state, ship)
+
+
+def _withdrawal_order_reference(engine: "IronBottomEngine", state: GameState, ship) -> MovementOrder:
     if not ship.position or not ship.withdrawal_edge:
         return MovementOrder(ship_id=ship.id, plan="0")
     if _at_edge(
@@ -332,7 +444,7 @@ def _withdrawal_order(engine: "IronBottomEngine", state: GameState, ship) -> Mov
         # boundary hold even when its damaged speed track normally requires
         # movement.
         return MovementOrder(ship_id=ship.id, plan="0", formation_emergency_stop=True)
-    enemies = [item for item in state.ships.values() if item.side != ship.side and item.position and not item.sunk]
+    enemies = _visible_enemies(engine, state, ship.side)
     candidates = engine.movement_candidates(state, ship, include_plans=True)["reachable"]
     scored: list[tuple[tuple[float, float, int, str], str]] = []
     for entry in candidates:
@@ -371,7 +483,7 @@ def _withdrawal_order(engine: "IronBottomEngine", state: GameState, ship) -> Mov
         # rudder command is appended.  Probe the two deterministic circling
         # programmes directly through the authoritative preview boundary.
         if ship.forced_circle_turns:
-            minimum, maximum = engine._legal_speed_range(ship, state.turn)
+            minimum, maximum = engine.movement_speed_range(state, ship)
             sides = [ship.forced_turn_side] if ship.forced_turn_side else ["port", "starboard"]
             token = {"port": "P", "starboard": "S"}
             for speed in range(maximum, minimum - 1, -1):
@@ -381,7 +493,7 @@ def _withdrawal_order(engine: "IronBottomEngine", state: GameState, ship) -> Mov
                         return MovementOrder(ship_id=ship.id, plan=plan)
         # Forced-straight damage can make every target-oriented path invalid
         # even though a plain legal straight programme exists.
-        minimum, maximum = engine._legal_speed_range(ship, state.turn)
+        minimum, maximum = engine.movement_speed_range(state, ship)
         for speed in range(maximum, minimum - 1, -1):
             plan = str(speed)
             if engine.movement_preview(state, ship, plan=plan)["commitable"]:
@@ -421,13 +533,13 @@ def _best_formation_cohort(
     available = [ship for ship in members if ship.id not in forced]
     if not available:
         return 0, sorted(forced)
-    maximum = max(engine._legal_speed_range(ship, state.turn)[1] for ship in available)
+    maximum = max(engine.movement_speed_range(state, ship)[1] for ship in available)
     choices: list[tuple[tuple[int, int, int, int], int, list[ShipState]]] = []
     for speed in range(maximum + 1):
         compatible = [
             ship for ship in available
-            if engine._legal_speed_range(ship, state.turn)[0]
-            <= speed <= engine._legal_speed_range(ship, state.turn)[1]
+            if engine.movement_speed_range(state, ship)[0]
+            <= speed <= engine.movement_speed_range(state, ship)[1]
         ]
         if not compatible:
             continue
@@ -448,6 +560,7 @@ def _best_formation_cohort(
 
 def expand_movement_orders(
     engine: "IronBottomEngine", state: GameState, batch: OrderBatch,
+    *, _withdrawal_orders: dict[str, MovementOrder] | None = None,
 ) -> tuple[OrderBatch, list[str], list[str]]:
     """Expand formation orders; return prepared batch, validation errors, detach ids."""
     prepared = batch.model_copy(deep=True)
@@ -495,14 +608,30 @@ def expand_movement_orders(
             # original-rule damage and collision limits have higher priority.
             # In that case the whole surviving column is truncated to the
             # highest speed every attached member can still make.
-            damage_floor = max(engine._legal_speed_range(ship, state.turn)[0] for ship in members)
-            damage_ceiling = min(engine._legal_speed_range(ship, state.turn)[1] for ship in members)
+            damage_floor = max(engine.movement_speed_range(state, ship)[0] for ship in members)
+            damage_ceiling = min(engine.movement_speed_range(state, ship)[1] for ship in members)
             plan = str(max(damage_floor, min(locked_speed, damage_ceiling)))
         if leader.forced_straight_turns:
             forced_speed = leader.forced_speed if leader.forced_speed is not None else engine.movement_cost(
                 plan, engine.movement_commands(MovementOrder(ship_id=leader.id, plan=plan))
             )
-            plan = str(min(forced_speed, engine._legal_speed_range(leader, state.turn)[1]))
+            plan = str(min(forced_speed, engine.movement_speed_range(state, leader)[1]))
+        # Command Delay CD-1: the one dispatch into the additive body-movement
+        # style.  Inert under the default FOLLOW_WAKE (and for any formation whose
+        # declared geometry is still a column), so the frozen path below is
+        # unchanged; the CD-0 golden replay is the proof.
+        style = order.movement_style or formation.movement_style
+        if style == FormationMovementStyle.MOVE_TOGETHER or order.reform_column:
+            body_orders, body_errors = expand_move_together(engine, state, formation, plan, members)
+            if body_errors:
+                errors.append(f"{formation.id}: " + "; ".join(body_errors))
+                continue
+            generated.extend(body_orders)
+            continue
+        allowed, refusal = follow_wake_allowed(formation)
+        if not allowed:
+            errors.append(f"{formation.id}: {refusal}")
+            continue
         leader_cost = engine.movement_cost(plan, engine.movement_commands(MovementOrder(ship_id=leader.id, plan=plan)))
         forced_incompatible = next(
             (ship for ship in members if ship.forced_circle_turns), None
@@ -512,7 +641,7 @@ def expand_movement_orders(
                 f"{formation.id}: {forced_incompatible.id} forced movement prevents formation following"
             )
             continue
-        incompatible = [ship for ship in members if not (engine._legal_speed_range(ship, state.turn)[0] <= leader_cost <= engine._legal_speed_range(ship, state.turn)[1])]
+        incompatible = [ship for ship in members if not (engine.movement_speed_range(state, ship)[0] <= leader_cost <= engine.movement_speed_range(state, ship)[1])]
         emergency_stop = bool(decision and decision.emergency_stop and leader_cost == 0)
         if incompatible and not emergency_stop:
             if decision is None:
@@ -524,7 +653,7 @@ def expand_movement_orders(
                     continue
                 plan = _truncate_plan(engine, leader.id, plan, decision.speed)
                 leader_cost = engine.movement_cost(plan, engine.movement_commands(MovementOrder(ship_id=leader.id, plan=plan)))
-                if not emergency_stop and any(not (engine._legal_speed_range(ship, state.turn)[0] <= leader_cost <= engine._legal_speed_range(ship, state.turn)[1]) for ship in members):
+                if not emergency_stop and any(not (engine.movement_speed_range(state, ship)[0] <= leader_cost <= engine.movement_speed_range(state, ship)[1]) for ship in members):
                     errors.append(f"{formation.id}: reduced speed is not legal for every member")
                     continue
             elif decision.action == "detach":
@@ -586,14 +715,15 @@ def expand_movement_orders(
             except ValueError as error:
                 errors.append(f"{formation.id}: {ship.id} ({ship.name}) cannot follow guide trail: {error}")
                 continue
-            minimum, maximum = engine._legal_speed_range(ship, state.turn)
+            minimum, maximum = engine.movement_speed_range(state, ship)
             if not minimum <= follower_cost <= maximum:
                 errors.append(f"{formation.id}: {ship.id} ({ship.name}) follower speed {follower_cost} outside {minimum}-{maximum}")
                 continue
             generated.append(MovementOrder(ship_id=ship.id, plan=follower_plan, speed=follower_cost, formation_emergency_stop=emergency_stop and follower_cost == 0))
     for ship in state.ships.values():
         if ship.side == batch.side and ship.position and not ship.sunk and ship.command_status == "retreating":
-            generated.append(_withdrawal_order(engine, state, ship))
+            cached = (_withdrawal_orders or {}).get(ship.id)
+            generated.append(cached if cached is not None else _withdrawal_order(engine, state, ship))
     # Newly detached ships are not mutated until the fully prepared batch has
     # passed classic validation.  Give them their first autonomous withdrawal
     # order now so movement coverage remains total and validation is atomic.
@@ -601,7 +731,13 @@ def expand_movement_orders(
     for ship_id in detach_ids:
         if ship_id not in generated_ids:
             ship = state.ships[ship_id]
-            edge = ship.withdrawal_edge or choose_withdrawal_edge(state, ship_id)
+            cached = (_withdrawal_orders or {}).get(ship_id)
+            if cached is not None:
+                generated.append(cached)
+                continue
+            edge = ship.withdrawal_edge or choose_withdrawal_edge(
+                state, ship_id, enemies=_visible_enemies(engine, state, ship.side),
+            )
             original_edge = ship.withdrawal_edge
             ship.withdrawal_edge = edge
             generated.append(_withdrawal_order(engine, state, ship))
@@ -643,7 +779,9 @@ def apply_detachments(engine: "IronBottomEngine", state: GameState, detach_ids: 
     for ship_id in detach_ids:
         ship = state.ships[ship_id]
         ship.command_status = "retreating"
-        ship.withdrawal_edge = choose_withdrawal_edge(state, ship_id)  # type: ignore[assignment]
+        ship.withdrawal_edge = choose_withdrawal_edge(
+            state, ship_id, enemies=_visible_enemies(engine, state, ship.side),
+        )  # type: ignore[assignment]
         state.withdrawals[ship_id] = WithdrawalState(ship_id=ship_id, edge=ship.withdrawal_edge)
         formation = state.formations.get(ship.formation_id or "")
         if formation and ship_id in formation.ship_ids:
@@ -733,6 +871,11 @@ def refresh_command_chain(engine: "IronBottomEngine", state: GameState) -> None:
 
 
 def after_movement(engine: "IronBottomEngine", state: GameState) -> None:
+    # Command Delay CD-1: commit the declared geometry of any formation that
+    # moved as a body this turn.  Returns without touching state when no sealed
+    # order asked for MOVE_TOGETHER / REFORM_COLUMN, so the frozen Realistic
+    # replay is unaffected.
+    commit_sealed_style_transitions(engine, state)
     for formation in state.formations.values():
         active = [state.ships[ship_id] for ship_id in formation.ship_ids if state.ships[ship_id].position and not state.ships[ship_id].sunk and state.ships[ship_id].command_status == "attached"]
         pending = [
@@ -791,7 +934,7 @@ class RealisticCommander:
         if state.phase == Phase.FORMATION_SETUP:
             batch = OrderBatch(
                 side=side, phase=state.phase,
-                formation_setup=default_setup_orders(state, side),
+                formation_setup=legal_setup_orders(engine, state, side),
             )
             intents = {order.formation_id: "建立纵队、指定旗舰与继承链" for order in batch.formation_setup}
             plan = AIPlanSheet(
@@ -810,9 +953,60 @@ class RealisticCommander:
             ]
             batch = OrderBatch(side=side, phase=state.phase, torpedoes=torpedoes)
             intents = {order.ship_id: "编队舰执行近距鱼雷齐射" for order in torpedoes}
-            return self.tactical._finalize(engine, state, side, batch, intents)
+            plan, batch, audits = self.tactical._finalize(engine, state, side, batch, intents)
+            if self.profile.formation_doctrine != "legacy":
+                plan.phase_goal = "沿己方已封存航路选择安全雷道，以雷击配合主力与侧翼编队。"
+                analysis = plan.tactical_analysis or {}
+                analysis["firing_formations"] = {
+                    formation.id: [order.ship_id for order in torpedoes if order.ship_id in formation.ship_ids]
+                    for formation in state.formations.values() if formation.side == side
+                }
+                plan.tactical_analysis = analysis
+                for order in torpedoes:
+                    formation_id = state.ships[order.ship_id].formation_id
+                    intents[order.ship_id] = f"{formation_id}：安全雷道齐射，配合炮战纵队"
+                plan.unit_intents = intents
+            return plan, batch, audits
+        if state.options.command_delay_mode and state.phase == Phase.GUNNERY:
+            # Command Delay CD-4: a commander on this mode does not submit gunnery
+            # orders at all.  It publishes target priorities and the engine's own
+            # selector generates every order, mount allocation and firing solution.
+            from .command_delay import gunnery_batch
+            batch = gunnery_batch(state, side)
+            plan = AIPlanSheet(
+                turn=state.turn, phase=state.phase,
+                situation_summary="按任务式命令公布目标优先级，炮位分配交由引擎选择器。",
+                phase_goal="在不越过授权边界的前提下影响火力分配。",
+                unit_intents={
+                    directive.target_id or directive.target_class or "priority": (
+                        f"{directive.source} 优先级 {directive.weight:+.2f}"
+                    )
+                    for directive in batch.target_priorities
+                },
+                orders=batch.model_dump(mode="json"),
+                contingency=["重点目标不可见/不可射时由选择器回退到其余合法目标"],
+            )
+            return plan, batch, []
         if state.phase != Phase.MOVEMENT_PLANNING:
             plan, batch, audits = self.tactical.choose_plan(engine, game_id, side)
+            return plan, batch, audits
+
+        if self.profile.formation_doctrine != "legacy" and not state.options.command_delay_mode:
+            from .formation_tactics import CooperativeFormationPlanner
+            # Reuse the command-chain controller for mandatory damage handling
+            # and detachment decisions before the joint fleet route search.
+            baseline_profile = self.profile.model_copy(update={"formation_doctrine": "legacy"})
+            baseline = RealisticCommander(profile=baseline_profile).choose_orders(engine, game_id, side)
+            batch, intents, analysis = CooperativeFormationPlanner(self.profile).optimize(
+                engine, state, side, baseline,
+            )
+            plan, batch, audits = self.tactical._finalize(engine, state, side, batch, intents)
+            plan.situation_summary = "真实编队协同：炮战纵队、雷击翼队和掩护支队共同规划逐脉冲航路。"
+            plan.phase_goal = "避让友军和可见鱼雷，抢占 T 头并保持侧翼雷击与掩护配合。"
+            plan.contingency = ["原版强制损伤与指挥中断优先", "无安全航路时报告剩余风险", "敌方航路仅依据当前可见信息预测"]
+            plan.tactical_analysis = analysis
+            for audit in audits:
+                audit.model = "realistic-cooperative-v2"
             return plan, batch, audits
 
         observation = engine.observe(game_id, side)
@@ -884,6 +1078,15 @@ class RealisticCommander:
             leader_plan = by_ship.get(leader.id, MovementOrder(ship_id=leader.id, plan="0")).plan
             if search_target is not None:
                 leader_plan = self._search_plan(engine, state, leader, search_target)
+            if state.options.command_delay_mode:
+                # Command Delay CD-4: the plan is whatever this formation's local
+                # agent selected from the engine's enumerated actions.  It is not
+                # re-derived here, and the engine still validates it below, so a
+                # bad agent choice fails loudly instead of being silently fixed.
+                from .command_delay import formation_plan
+                agent_plan = formation_plan(state, formation.id)
+                if agent_plan:
+                    leader_plan = agent_plan
             leader_commands = engine.movement_commands(MovementOrder(ship_id=leader.id, plan=leader_plan))
             if any(command.endswith("120") for command in leader_commands):
                 # A 120-degree in-place impulse cannot propagate down a spaced
@@ -891,8 +1094,8 @@ class RealisticCommander:
                 # equal-cost straight programme; human previews remain free to
                 # use 120-degree turns when every follower can reach the bend.
                 leader_plan = str(engine.movement_cost(leader_plan, leader_commands))
-            minimum = max(engine._legal_speed_range(ship, state.turn)[0] for ship in members)
-            maximum = min(engine._legal_speed_range(ship, state.turn)[1] for ship in members)
+            minimum = max(engine.movement_speed_range(state, ship)[0] for ship in members)
+            maximum = min(engine.movement_speed_range(state, ship)[1] for ship in members)
             if formation.disruption_turn == state.turn:
                 leader_plan = str(formation.locked_speed or 0)
                 intents[formation.id] = "指挥中断：按上轮航向和航速直航"
@@ -946,8 +1149,8 @@ class RealisticCommander:
                     if state.ships[ship_id].position and not state.ships[ship_id].sunk
                     and state.ships[ship_id].command_status == "attached"
                 ]
-                minimum = max((engine._legal_speed_range(ship, state.turn)[0] for ship in members), default=0)
-                maximum = min((engine._legal_speed_range(ship, state.turn)[1] for ship in members), default=0)
+                minimum = max((engine.movement_speed_range(state, ship)[0] for ship in members), default=0)
+                maximum = min((engine.movement_speed_range(state, ship)[1] for ship in members), default=0)
                 if minimum <= maximum:
                     speed = max(minimum, min(maximum, formation.speed))
                     safe_orders.append(FormationMovementOrder(
@@ -1015,7 +1218,7 @@ class RealisticCommander:
                                 if state.ships[ship_id].position and not state.ships[ship_id].sunk
                                 and state.ships[ship_id].command_status == "attached"
                             ]
-                            minimum = max((engine._legal_speed_range(ship, state.turn)[0] for ship in members), default=0)
+                            minimum = max((engine.movement_speed_range(state, ship)[0] for ship in members), default=0)
                             current = int(candidate.leader_plan) if candidate.leader_plan.isdigit() else formation.speed
                             if current > minimum:
                                 current -= 1
@@ -1058,7 +1261,7 @@ class RealisticCommander:
                         if state.ships[ship_id].position and not state.ships[ship_id].sunk
                         and state.ships[ship_id].command_status == "attached"
                     ]
-                    minimum = max((engine._legal_speed_range(ship, state.turn)[0] for ship in members), default=0)
+                    minimum = max((engine.movement_speed_range(state, ship)[0] for ship in members), default=0)
                     current = int(formation_order.leader_plan) if formation_order.leader_plan.isdigit() else formation.speed
                     forced_separation = (
                         " forced movement prevents formation following" in error
@@ -1101,11 +1304,11 @@ class RealisticCommander:
                             continue
                     if "reduced speed is not legal for every member" in error:
                         common_minimum = max(
-                            (engine._legal_speed_range(ship, state.turn)[0] for ship in members),
+                            (engine.movement_speed_range(state, ship)[0] for ship in members),
                             default=0,
                         )
                         common_maximum = min(
-                            (engine._legal_speed_range(ship, state.turn)[1] for ship in members),
+                            (engine.movement_speed_range(state, ship)[1] for ship in members),
                             default=0,
                         )
                         if common_minimum <= common_maximum:
@@ -1157,6 +1360,75 @@ class RealisticCommander:
                         continue
                 if not changed:
                     break
+        # Retry-loop errors can interact in large, damaged columns. A final
+        # monotone repair never reattaches a previously detached offender.
+        # It is shared by legacy and cooperative commanders, and is a no-op
+        # for every batch that already passes the authoritative validator.
+        for _repair in range(sum(len(item.ship_ids) for item in state.formations.values()) + 1):
+            prepared, errors, _ = expand_movement_orders(engine, state, batch)
+            if not errors:
+                errors = engine.validate_orders(state.game_id, prepared, _prepared=True).errors
+            if not errors:
+                break
+            changed = False
+            for formation_order in batch.formation_movement:
+                formation = state.formations[formation_order.formation_id]
+                members = [state.ships[sid] for sid in formation.ship_ids if (
+                    state.ships[sid].position and not state.ships[sid].sunk and state.ships[sid].command_status == "attached"
+                )]
+                relevant = [error for error in errors if error.startswith(f"{formation.id}:")]
+                relevant += [error for error in errors if any(
+                    error.startswith(f"{ship_id}:") for ship_id in formation.ship_ids
+                )]
+                if not relevant:
+                    continue
+                already = set(formation_order.speed_decision.detach_ship_ids) if formation_order.speed_decision and formation_order.speed_decision.action == "detach" else set()
+                # Scenario validation names ships, not formations. Try an
+                # engine-valid column route before resorting to detachment.
+                if members and any(error.startswith(tuple(f"{ship.id}:" for ship in members)) for error in relevant):
+                    leader = next((ship for ship in members if ship.id == formation.leader_id), members[0])
+                    proposals = engine.movement_candidates(state, leader, include_plans=True)["reachable"]
+                    repaired = False
+                    for entry in sorted(proposals, key=lambda entry: (
+                        abs(entry["cost"] - formation.speed), entry["label"],
+                    )):
+                        if entry.get("plan") is None:
+                            continue
+                        candidate = formation_order.model_copy(deep=True)
+                        candidate.leader_plan = entry["plan"]
+                        if candidate.speed_decision and candidate.speed_decision.action == "reduce":
+                            candidate.speed_decision = None
+                        trial = batch.model_copy(deep=True)
+                        trial.formation_movement = [candidate if item.formation_id == formation.id else item
+                                                    for item in trial.formation_movement]
+                        if engine.validate_orders(state.game_id, trial).valid:
+                            formation_order.leader_plan = candidate.leader_plan
+                            formation_order.speed_decision = candidate.speed_decision
+                            intents[formation.id] = "想定约束：改用引擎验证的纵队航迹"
+                            repaired = changed = True
+                            break
+                    if repaired:
+                        continue
+                offenders = {ship.id for ship in members if any(
+                    f"{ship.id} " in error or error.startswith(f"{ship.id}:") for error in relevant
+                )}
+                if not offenders - already:
+                    # A genuinely impossible wake may need to dissolve this
+                    # column. Each survivor still receives an engine-validated
+                    # autonomous retreat, not independently invented movement.
+                    offenders.update(ship.id for ship in members)
+                forced = already | offenders
+                if forced == already:
+                    continue
+                speed, detach = _best_formation_cohort(engine, state, formation, members, forced)
+                formation_order.leader_plan = str(speed)
+                formation_order.speed_decision = FormationSpeedDecision(
+                    formation_id=formation.id, action="detach", detach_ship_ids=detach,
+                )
+                intents[formation.id] = "受损航迹无法维持：永久脱队，执行原引擎自主撤退"
+                changed = True
+            if not changed:
+                break
         plan = AIPlanSheet(
             turn=state.turn, phase=state.phase,
             situation_summary="按编队指挥链评估共同航速与领舰航路。",

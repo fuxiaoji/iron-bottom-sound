@@ -22,12 +22,13 @@ rules:
     title: 领舰航路与逐脉冲尾随
     status: tested
     executable_at: realistic_command.expand_movement_orders
-    tests: [test_leader_order_expands_to_every_attached_member]
+    tests: [test_leader_order_expands_to_every_attached_member, test_rebuilt_wake_and_partial_planner_both_exclude_sunk_old_leader, test_partial_candidates_preserve_rebuilt_wake_when_a_member_detaches]
   - id: IBS-R-RC-03
     title: 编队碰撞预防与紧急停车
     status: tested
     executable_at: engine._resolve_movement
-    tests: [test_realistic_state_machine_completes_scenario_three_without_fallback]
+    tests: [test_realistic_state_machine_completes_scenario_three_without_fallback, test_overlapping_friendly_swap_and_same_hex_groups_stop_all_participants, test_overlapping_emergency_stop_trace_is_identical_across_python_hash_seeds]
+    implementation_note: 同时冲突组在紧急停车与原版碰撞检定两步均按既有舰 ID 顺序处理；一个冲突组已有成员被停车时，仍须停止该组其余成员，不能漏停共享碰撞组中的舰只。禁止 Python 集合遍历改变裁决。
   - id: IBS-R-RC-04
     title: 共同航速、永久脱队与自动撤退
     status: tested
@@ -48,3 +49,10 @@ rules:
     status: tested
     executable_at: realistic_command.RealisticCommander
     tests: [test_realistic_commander_emits_only_formation_movement_orders, test_realistic_state_machine_completes_scenario_three_without_fallback]
+  - id: IBS-R-RC-08
+    title: 整队同脉冲机动与显式重整纵队
+    authority: project_extension
+    source: docs/rules/command-delay.md
+    status: tested
+    executable_at: formation_maneuver.expand_move_together
+    tests: [tests/test_command_delay_movement_style.py]

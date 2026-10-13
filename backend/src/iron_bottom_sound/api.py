@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 from pathlib import Path
 from typing import Annotated, Literal
@@ -27,6 +28,9 @@ from .tactical import PROFILES, TacticalCommander
 from .torpedo_tactics import AdaptiveTorpedoPlanner
 from .models import FormationMovementOrder, FormationSetupOrder, GameOptions, GunneryAssistRequest, MovementPreviewRequest, MovementTrajectoriesRequest, OrderBatch, Phase, ResearchConsent, Side, TorpedoAssistRequest
 from .realistic_command import RealisticCommander, expand_movement_orders, validate_setup
+# Load cooperative planning together with the engine, never from a later version
+# of the files in a still-running, non-reloading server.
+from . import formation_tactics as _formation_tactics  # noqa: F401
 from .notify import notify_research_consent
 from .storage import GameRepository
 from .savegame import build_save_bundle, clone_imported_game, validate_save_bundle
@@ -88,6 +92,29 @@ _user_llm_keys: dict[str, str] = {}
 # reports remain provider-neutral and old saves continue to load unchanged.
 _user_llm_configs: dict[str, "LLMConnectionConfig"] = {}
 app = FastAPI(title="铁底湾的回响 IV", version="0.1.0")
+
+
+def source_revision() -> str:
+    digest = hashlib.sha256()
+    source = Path(__file__).resolve().parent
+    for path in sorted(source.rglob("*.py")):
+        digest.update(path.relative_to(source).as_posix().encode())
+        digest.update(path.read_bytes())
+    return digest.hexdigest()
+
+
+_loaded_revision = source_revision()
+
+
+@app.get("/health")
+def health():
+    current = source_revision()
+    payload = {"status": "ready" if current == _loaded_revision else "restart_required",
+               "pid": os.getpid(), "loaded_revision": _loaded_revision,
+               "source_revision": current}
+    return Response(json.dumps(payload), media_type="application/json",
+                    status_code=200 if current == _loaded_revision else 503)
+
 app.mount(
     "/assets/counters",
     StaticFiles(directory=ROOT / "resources" / "originals" / "assets" / "images"),
@@ -209,6 +236,30 @@ def realistic_command_rules() -> PlainTextResponse:
         _realistic_rules_path.read_text(encoding="utf-8"),
         media_type="text/markdown",
     )
+
+
+def _register_formation_policies(state, api_key: str | None, config: "LLMConnectionConfig | None") -> dict:
+    """Point the mode's formation agents at a model, or record why they are not.
+
+    The key is used from process memory only.  Registering it for both sides is
+    deliberate: in this mode *every* formation is commanded by an agent, and the
+    player commands fleets by writing orders, so both sides' formations run the same
+    kind of policy.  With no key the formations still fight, on doctrine, and the
+    label says so — no output is ever presented as a model's when it is not.
+    """
+    from .command_delay import set_side_policy
+    from .formation_llm import make_policy
+    from .models import Side
+
+    key = api_key
+    provider = "deepseek"
+    model = None
+    if config is not None:
+        provider, model = config.provider, config.model
+    policy, label = make_policy(provider=provider, model=model, api_key=key)
+    for side in Side:
+        set_side_policy(side, policy, label, game_id=state.game_id)
+    return {"policy": label, "sides": [side.value for side in Side]}
 
 
 def side_from_header(value: str | None) -> Side:
@@ -334,6 +385,8 @@ def create_game(request: CreateGame, background_tasks: BackgroundTasks):
         _user_llm_keys[state.game_id] = request.llm_api_key  # 仅内存，绝不落盘
     if request.llm_config:
         _user_llm_configs[state.game_id] = request.llm_config
+    if state.options.command_delay_mode:
+        _register_formation_policies(state, request.llm_api_key, request.llm_config)
     consent = request.research_consent
     if consent is not None:
         try:
@@ -399,6 +452,7 @@ def import_game(bundle: dict):
         "ai_profile": imported.options.ai_profile,
         "battle_report": imported.options.battle_report,
         "realistic_command": imported.options.realistic_command,
+        "command_delay_mode": imported.options.command_delay_mode,
     }
 
 
@@ -669,6 +723,25 @@ def llm_opponent(
     player_side = side_from_header(x_player_side)
     ai_side = player_side.opponent
     # 用户主动提供的配置/密钥（本次请求 > 开局时注入）> 服务器环境变量。
+    if state.options.command_delay_mode:
+        # Formation policies have already run on their local observations. Do
+        # not call the fleet-wide LLM commander, which would bypass that boundary
+        # and generate forbidden raw gunnery orders.
+        if player_side.value not in state.submitted_orders:
+            raise HTTPException(409, "Submit the player's orders first")
+        if ai_side.value in state.submitted_orders:
+            return {"valid": True, "ai_submitted": True, "audits": []}
+        if request is not None and request.api_key:
+            _user_llm_keys[game_id] = request.api_key
+            if request.config is not None:
+                _user_llm_configs[game_id] = request.config
+            _register_formation_policies(state, request.api_key, _user_llm_configs.get(game_id))
+        plan, batch, audits = RealisticCommander().choose_plan(engine, game_id, ai_side)
+        result = engine.submit_orders(game_id, batch)
+        if not result.valid:
+            raise HTTPException(409, result.errors)
+        repository.save(state)
+        return {"valid": True, "ai_submitted": True, "audits": []}
     config = (
         request.config if request is not None and request.config is not None
         else _user_llm_configs.get(game_id, LLMConnectionConfig())
@@ -732,6 +805,155 @@ def movement_preview(game_id: str, request: MovementPreviewRequest, x_player_sid
     )
 
 
+@app.get("/rules/command-delay", response_class=PlainTextResponse)
+def command_delay_rules() -> PlainTextResponse:
+    """Serve the Command Delay player rules from their single repository source."""
+    path = ROOT / "docs" / "rules" / "command-delay.md"
+    if not path.exists():
+        raise HTTPException(404, "Command Delay rules are not bundled")
+    return PlainTextResponse(path.read_text(encoding="utf-8"), media_type="text/markdown")
+
+
+@app.get("/games/{game_id}/command-delay/fleet-view")
+def command_delay_fleet_view(
+    game_id: str, x_player_side: Annotated[str | None, Header()] = None,
+):
+    """The fleet commander's plot: exact only for the formation it is embarked in.
+
+    Every other own-side formation is returned as a *report* with its age, and no
+    opposing formation appears at all.  Available only in Command Delay mode.
+    """
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.command_delay_mode:
+        raise HTTPException(409, "Fleet view is available only in command delay mode")
+    from .command_observation import fleet_observation
+    return fleet_observation(engine, state, side)
+
+
+@app.get("/games/{game_id}/command-delay/formation-view/{formation_id}")
+def command_delay_formation_view(
+    game_id: str, formation_id: str, x_player_side: Annotated[str | None, Header()] = None,
+):
+    """One formation's local view for its own agent: local contacts only."""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.command_delay_mode:
+        raise HTTPException(409, "Formation view is available only in command delay mode")
+    formation = state.formations.get(formation_id)
+    if formation is None or formation.side != side:
+        raise HTTPException(404, f"Unknown formation {formation_id}")
+    from .command_observation import formation_observation
+    return formation_observation(engine, state, side, formation_id)
+
+
+class CommandDelayOrderRequest(BaseModel):
+    """舰队总指挥用自然语言写的一道命令。"""
+    formation_id: str
+    text: str = Field(min_length=1, max_length=400)
+    priority_classes: list[str] = Field(default_factory=list, max_length=6)
+    roe: list[str] = Field(default_factory=list, max_length=6)
+    deadline_turn: int | None = Field(default=None, ge=1, le=200)
+
+
+@app.post("/games/{game_id}/command-delay/order")
+def command_delay_order(
+    game_id: str, request: CommandDelayOrderRequest,
+    x_player_side: Annotated[str | None, Header()] = None,
+):
+    """下达一道自然语言命令：它是一项信号，会按通信链路延迟或丢失。"""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.command_delay_mode:
+        raise HTTPException(409, "Orders by signal are available only in command delay mode")
+    from .command_delay import draft_natural_order
+
+    try:
+        message = draft_natural_order(
+            engine, state, side=side, formation_id=request.formation_id,
+            text=request.text, priority_classes=request.priority_classes,
+            roe=request.roe, deadline_turn=request.deadline_turn,
+        )
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    repository.save(state)
+    return {
+        "message_id": message.message_id,
+        "medium": message.medium.value,
+        "handling_delay": message.handling_delay,
+        "relay_hops": message.relay_hops,
+        "expected_delivery_turn": message.issued_turn + message.handling_delay,
+        "route_reason": message.reason,
+        "issued_turn": message.issued_turn,
+    }
+
+
+@app.get("/games/{game_id}/command-delay/formation-orders")
+def command_delay_formation_orders(
+    game_id: str, x_player_side: Annotated[str | None, Header()] = None,
+):
+    """本侧各编队代理本回合选定的机动方案（提交前给玩家过目）。"""
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.command_delay_mode:
+        raise HTTPException(409, "Formation orders are available only in command delay mode")
+    from .command_delay import formation_orders
+
+    orders = formation_orders(state, side)
+    return {
+        "phase": state.phase.value,
+        "turn": state.turn,
+        "orders": [order.model_dump(mode="json") for order in orders],
+    }
+
+
+@app.get("/games/{game_id}/command-delay/agent-log")
+def command_delay_agent_log(
+    game_id: str, formation_id: str | None = None, limit: int = 12,
+    x_player_side: Annotated[str | None, Header()] = None,
+):
+    """调试视图：本侧各编队代理的提示词、原始回复、解析结果与记忆。
+
+    只能读自己一侧；对方的提示词与记忆属于其指挥链。
+    """
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.command_delay_mode:
+        raise HTTPException(409, "The agent log is available only in command delay mode")
+    mode = state.command_delay
+    if mode is None:
+        raise HTTPException(409, "The agent log is available only in command delay mode")
+    known = {
+        formation.id for formation in state.formations.values() if formation.side == side
+    }
+    entries = [
+        record for record in mode.agent_log
+        if record.get("side") == side.value
+        and (formation_id is None or record.get("formation_id") == formation_id)
+    ]
+    payload = []
+    for record in entries[-max(1, min(limit, 48)):]:
+        formation = state.formations.get(record.get("formation_id") or "")
+        payload.append({
+            **record,
+            "own_formation": (record.get("formation_id") in known),
+            "formation_status": formation.status if formation else None,
+        })
+    memories = {}
+    for fid in sorted(known):
+        memory = mode.memories.get(fid)
+        if memory is not None:
+            from .formation_memory import memory_payload
+
+            memories[fid] = memory_payload(memory)
+    return {
+        "policy_labels": dict(mode.policy_labels),
+        "formations": sorted(known),
+        "memories": memories,
+        "entries": payload,
+    }
+
+
 @app.post("/games/{game_id}/formation-preview")
 def formation_preview(game_id: str, request: FormationPreviewRequest, x_player_side: Annotated[str | None, Header()] = None):
     """Validate an editable formation setup without mutating or exposing the opponent."""
@@ -742,6 +964,28 @@ def formation_preview(game_id: str, request: FormationPreviewRequest, x_player_s
     batch = OrderBatch(side=side, phase=state.phase, formation_setup=request.formations)
     errors = validate_setup(engine, state, batch)
     return {"valid": not errors, "errors": errors}
+
+
+@app.get("/games/{game_id}/movement-style-options")
+def movement_style_options(
+    game_id: str, x_player_side: Annotated[str | None, Header()] = None,
+):
+    """每种机动方式的当前可用性，附引擎给出的原因（真实模式与命令延迟模式通用）。
+
+    此处返回的原因与展开器稍后执行的是同一次判定，因此界面显示的就是将会被执行的。
+    """
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if not state.options.realistic_command:
+        raise HTTPException(409, "Movement styles are available only in realistic or command delay mode")
+    from .formation_maneuver import movement_style_options as options
+
+    return {
+        "phase": state.phase.value,
+        "turn": state.turn,
+        "styles": ["follow_wake", "move_together"],
+        "formations": options(engine, state, side),
+    }
 
 
 @app.post("/games/{game_id}/formation-movement-preview")

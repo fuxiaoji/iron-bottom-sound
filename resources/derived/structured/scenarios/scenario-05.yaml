@@ -1,4 +1,4 @@
-# 注：页面写明增援必达；引擎以 1d6∈[1..6] 表达确定性到达。
+# 注：原页规定第二回合必达，不掷骰；guaranteed_reinforcement 在计划入场前公开可用。
 id: IBS-S-05
 number: 5
 title: 圣乔治角海战
@@ -53,6 +53,11 @@ special_rule_kinds:
   - gunnery
   - torpedo
   reason: 想定特例：日军在第一回合无法炮击和发射鱼雷
+- id: IBS-S-05-R4
+  kind: guaranteed_reinforcement
+  turn: 2
+  sides: [axis]
+  source: {document: scenario-book-zh.pdf, pdf_page: 5, printed_page: 6, status: verified_source}
 
 ships:
   - {id: IBS-U-IJN-ONAMI, name: 大波, side: axis, template: dd-japanese-1942, position: X15, heading: 5, speed: 4, asset: 日本-DD-大波.png, flagship: true}

@@ -76,6 +76,12 @@ class TacticalProfile(BaseModel):
     torpedo_doctrine: str = "legacy"
     torpedo_min_tactical_score: float = 0.15
     w_torpedo_avoid: float = 2.5
+    # AI preferences for the formation planner, not adjudication constants.
+    formation_doctrine: str = "legacy"
+    w_cross_t: float = 2.0
+    w_coordination: float = 1.0
+    formation_standoff: int = 7
+    fleet_tactics_version: int = 4
 
 
 # —— 风格预设（用户要求的 6 种打法）——
@@ -109,6 +115,33 @@ PROFILES: dict[str, TacticalProfile] = {
     "formation_split": TacticalProfile(torpedo_doctrine="formation_split", torpedo_min_tactical_score=0.05),
     "crossfire": TacticalProfile(torpedo_doctrine="crossfire", torpedo_min_tactical_score=0.05),
     "cover_withdrawal": TacticalProfile(torpedo_doctrine="cover_withdrawal", torpedo_min_tactical_score=0.05),
+    "rc_coordinated": TacticalProfile(
+        formation_doctrine="coordinated", torpedo_doctrine="adaptive",
+        temperature=0, w_predict_opponent=0, w_cross_t=2.5,
+        torpedo_min_tactical_score=0.05, w_torpedo_avoid=5.0,
+    ),
+    "rc_t_hunter": TacticalProfile(
+        formation_doctrine="crossing_t", torpedo_doctrine="break_crossing_t",
+        temperature=0, w_predict_opponent=0, w_cross_t=4.0,
+        w_fire_pressure=1.5, formation_standoff=8, w_torpedo_avoid=5.0,
+    ),
+    "rc_torpedo_wings": TacticalProfile(
+        formation_doctrine="torpedo_wings", torpedo_doctrine="crossfire",
+        temperature=0, w_predict_opponent=0, w_cross_t=2.0,
+        formation_standoff=5, torpedo_min_tactical_score=0.03,
+        torpedo_min_expected=0.10, w_torpedo_avoid=5.0,
+    ),
+    "rc_screen": TacticalProfile(
+        formation_doctrine="screen", torpedo_doctrine="cover_withdrawal",
+        temperature=0, w_predict_opponent=0, w_enemy_heat=1.5,
+        w_coordination=2.0, formation_standoff=9, w_torpedo_avoid=6.0,
+    ),
+    "rc_pincer": TacticalProfile(
+        formation_doctrine="pincer", torpedo_doctrine="formation_split",
+        temperature=0, w_predict_opponent=0, w_cross_t=2.5,
+        w_coordination=2.0, formation_standoff=6, w_torpedo_avoid=5.0,
+        torpedo_min_tactical_score=0.05,
+    ),
 }
 
 # 旧模块级常量保留为 balanced 别名（兼容既有 import / 外部读参）；实现一律读 self.profile.*
@@ -367,8 +400,9 @@ class TacticalCommander(DeterministicCommander):
         pred_by_id: dict[str, tuple[HexCoord, int]] = {}
         pred_hexes: list[HexCoord] = []
         if self.profile.w_predict_opponent > 0 and enemies:
+            prediction_heat = {}
             for enemy in enemies:
-                hexc, heading = self._predict_enemy_move(engine, state, enemy, side)
+                hexc, heading = self._predict_enemy_move(engine, state, enemy, side, prediction_heat)
                 pred_by_id[enemy.id] = (hexc, heading)
                 pred_hexes.append(hexc)
         else:
@@ -427,6 +461,7 @@ class TacticalCommander(DeterministicCommander):
 
     def _predict_enemy_move(
         self, engine: IronBottomEngine, state, enemy: PublicShip, my_side: Side,
+        shared_heat: dict | None = None,
     ) -> tuple[HexCoord, int]:
         """预测敌舰下一回合最优落点（敌视角 1-ply）：敌规避"我方火力覆盖"、
         追求对我可见舰的火力压力、按自身风格接近与编队。只依赖敌当前可见信息，
@@ -451,14 +486,17 @@ class TacticalCommander(DeterministicCommander):
             if ship.side == es.side and ship.id != es.id and not ship.sunk and ship.position
             and engine._visible_to(state, ship, my_side, my_positions)
         ]
-        heat_cache: dict[str, float] = {}
+        # All hypotheses seeing the same ordered public fleet share the same
+        # heat at a hex. This changes neither the candidates nor their scores;
+        # it avoids re-evaluating that fleet for every nearby enemy follower.
+        heat_cache: dict[str, float] = {} if shared_heat is None else shared_heat.setdefault(tuple(ship.id for ship in seen), {})
+        public_seen = [self._public_copy(state, ship) for ship in seen]
 
         def my_heat(hexc: HexCoord) -> float:
             label = hexc.label
             if label not in heat_cache:
                 value = 0.0
-                for my_ship in seen:
-                    public = self._public_copy(state, my_ship)
+                for public in public_seen:
                     value += engine.ship_gun_pressure(state, public, target_hexes=[hexc])
                 heat_cache[label] = value
             return heat_cache[label]
@@ -1064,6 +1102,14 @@ class TacticalCommander(DeterministicCommander):
         来自引擎 `gunnery_target_options`，AI 不复制任何规则公式。blocked 舰（想定
         禁射/炮损/无射界）由引擎排除，未产出即不产订单（GUNNERY 无全舰覆盖校验）。
         敌情一律走 observe() 的 PublicShip（绝不读 `state.ships[敌].hull`）。"""
+        if self.profile.formation_doctrine != "legacy" and self.profile.fleet_tactics_version >= 3:
+            # The engine's existing fleet-wide assistant accounts for firing
+            # arcs and target modifiers and spreads otherwise equivalent salvos.
+            # Keep the legacy profile's independent selection unchanged.
+            return [GunneryOrder(
+                ship_id=row["ship_id"], primary_target=row["target_id"],
+                mounts=[GunMountOrder(mount_id=item, target_id=row["target_id"]) for item in row["mount_ids"]],
+            ) for row in engine.gunnery_assist(state, side)["recommendations"]]
         obs = engine.observe(state.game_id, side)
         enemies = [ship for ship in obs.ships if ship.side != side and not ship.sunk and ship.position]
         max_vp = max((ship.vp for ship in obs.ships), default=1)

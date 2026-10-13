@@ -245,6 +245,7 @@ class IronBottomEngine:
             rule=self._rule("IBS-R-05", 6, "5.0"),
         )
         record_tutorial_start(self, state)
+        self._prepare_guaranteed_reinforcements(state)
         self.games[identifier] = state
         self.initial_states[identifier] = state.model_copy(deep=True)
         return state
@@ -296,8 +297,8 @@ class IronBottomEngine:
                     max_speed=ship.max_speed_for_turn(state.turn) if reveal else None,
                     speed_damage_crossed=list(ship.speed_damage_crossed) if reveal else None,
                     speed_damage_track=[list(row) for row in ship.speed_damage_track] if reveal else None,
-                    min_legal_speed=self._legal_speed_range(ship, state.turn)[0] if reveal else None,
-                    max_legal_speed=self._legal_speed_range(ship, state.turn)[1] if reveal else None,
+                    min_legal_speed=self.movement_speed_range(state, ship)[0] if reveal else None,
+                    max_legal_speed=self.movement_speed_range(state, ship)[1] if reveal else None,
                     torpedo_type=ship.torpedo_type if reveal else None,
                     primary_armor=ship.primary_armor,
                     secondary_armor=ship.secondary_armor,
@@ -346,6 +347,10 @@ class IronBottomEngine:
                 markers.append(marker.model_copy(deep=True))
         return PlayerObservation(
             game_id=game_id,
+            realistic_command=state.options.realistic_command,
+            command_delay_mode=state.options.command_delay_mode,
+            own_orders_submitted=side.value in state.submitted_orders,
+            both_orders_submitted=len(state.submitted_orders) == 2,
             scenario_id=state.scenario_id,
             scenario_title=state.scenario_title,
             side=side,
@@ -609,7 +614,7 @@ class IronBottomEngine:
 
     def _formation_speed_range(self, state: GameState, formation) -> dict[str, int | None]:
         ranges = [
-            self._legal_speed_range(state.ships[ship_id], state.turn)
+            self.movement_speed_range(state, state.ships[ship_id])
             for ship_id in formation.ship_ids
             if state.ships[ship_id].position and not state.ships[ship_id].sunk
             and state.ships[ship_id].command_status == "attached"
@@ -775,6 +780,7 @@ class IronBottomEngine:
         self, state: GameState, ship: ShipState,
         position: HexCoord | None = None, heading: int | None = None,
         target_hexes: list[HexCoord] | None = None,
+        target_speed: int = 4,
     ) -> float:
         """舰在（可选假想）位/航向下对目标格的火力压力：Σ 可指向该格的未毁炮位
         `firepower × 期望命中`。
@@ -806,7 +812,7 @@ class IronBottomEngine:
                     continue
                 if self._relative_aspect(position, heading, target) not in mount.arcs:
                     continue
-                total += mount.firepower * self.expected_gunnery_hits(mount.firepower, position.distance(target))
+                total += mount.firepower * self.expected_gunnery_hits(mount.firepower, position.distance(target), target_speed)
         return total
 
     def field_of_fire_heatmap(self, state: GameState, viewer: Side, ship_id: str | None = None, target_speed: int = 4) -> dict[str, Any]:
@@ -1300,6 +1306,7 @@ class IronBottomEngine:
     def _assist_evaluate(
         self, state: GameState, target: ShipState, combo: dict[str, Any],
         friendly_routes: dict[str, set[str]] | None = None,
+        projection: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """对单个组合投影鱼雷航迹、推算与目标外推的交点、命中概率与期望命中。"""
         ship = state.ships[combo["ship_id"]]
@@ -1308,7 +1315,7 @@ class IronBottomEngine:
             int(combo["launch_heading"]), combo["launch_side"], combo["launch_angle"]
         )
         ship_heading = int(combo["launch_heading"])
-        projection = self._project_torpedo_path(
+        projection = projection if projection is not None else self._project_torpedo_path(
             state, torpedo_type, combo["launch_hex"], torpedo_heading,
             int(combo["setting_index"]), int(combo["launch_at_mf"]),
             combo["launch_angle"], ship_heading,
@@ -1428,10 +1435,31 @@ class IronBottomEngine:
 
         rows: list[dict[str, Any]] = []
         launch_combos = self._assist_launch_combos(state, side)
+        # Identical geometry is reused across targets and parallel launchers.
+        # Filtering known friendly-route intersections here is exactly the
+        # existing _assist_evaluate friendly_risk test, before expensive target
+        # interception. No changed launch, hit or movement adjudication.
+        projections = {}
+        safe_combos = []
+        for combo in launch_combos:
+            ship = state.ships[combo["ship_id"]]
+            torpedo_heading = self._torpedo_launch_heading(combo["launch_heading"], combo["launch_side"], combo["launch_angle"])
+            key = (ship.torpedo_type, combo["launch_hex"], torpedo_heading, combo["setting_index"],
+                   combo["launch_at_mf"], combo["launch_angle"], combo["launch_heading"])
+            if key not in projections:
+                projections[key] = self._project_torpedo_path(
+                    state, ship.torpedo_type or "", combo["launch_hex"], torpedo_heading,
+                    combo["setting_index"], combo["launch_at_mf"], combo["launch_angle"], combo["launch_heading"],
+                )
+            projection = projections[key]
+            route_hexes = set(projection["path"])
+            if any(ship_id != ship.id and route_hexes.intersection(labels) for ship_id, labels in friendly_routes.items()):
+                continue
+            safe_combos.append((combo, projection))
         for target_id in sorted(visible_enemy_ids):
             target = state.ships[target_id]
-            for launch_combo in launch_combos:
-                evaluated = self._assist_evaluate(state, target, launch_combo, friendly_routes)
+            for launch_combo, projection in safe_combos:
+                evaluated = self._assist_evaluate(state, target, launch_combo, friendly_routes, projection=projection)
                 if evaluated.get("blocked_reason") or evaluated.get("friendly_risk"):
                     continue
                 evaluated["target_id"] = target.id
@@ -1455,6 +1483,22 @@ class IronBottomEngine:
     def validate_orders(self, game_id: str, batch: OrderBatch, _prepared: bool = False) -> ValidationResult:
         state = self.get(game_id)
         errors: list[str] = []
+        if state.options.command_delay_mode and state.phase == Phase.GUNNERY and not _prepared:
+            # Command Delay: the fleet and its formation agents may only publish
+            # target priorities; the engine's own selector builds every gunnery
+            # order.  A raw gunnery order in this mode is refused rather than
+            # ignored, so a formation agent cannot smuggle one through.
+            from .target_priority import auto_gunnery
+            if batch.gunnery:
+                return ValidationResult(valid=False, errors=[
+                    "Command Delay generates gunnery through the engine selector; "
+                    "submit target priority directives instead of gunnery orders"
+                ])
+            return self.validate_orders(
+                game_id,
+                batch.model_copy(update={"gunnery": auto_gunnery(self, state, batch.side)}, deep=True),
+                _prepared=True,
+            )
         if state.options.realistic_command and not _prepared:
             from .realistic_command import expand_movement_orders, prepare_gunnery
             if state.phase == Phase.MOVEMENT_PLANNING:
@@ -1710,17 +1754,44 @@ class IronBottomEngine:
             minimum = 0
         return minimum, maximum
 
+    def movement_speed_range(self, state: GameState, ship: ShipState) -> tuple[int, int]:
+        """Planning bounds, including the same scenario limits used at submission.
+
+        An empty intersection stays empty: neither damage nor an emergency-stop
+        flag authorizes a planner to bypass a scenario-specific restriction.
+        """
+        minimum, maximum = self._legal_speed_range(ship, state.turn)
+        rule_set = scenario_rules(state.scenario_id)
+        alert_rule = rule_set.alert_rule()
+        if alert_rule and ship.side.value in alert_rule.get("sides", []):
+            if ship.id not in set(state.scenario_state.get("alerted", [])):
+                minimum = max(minimum, ship.current_speed)
+                maximum = min(maximum, ship.current_speed)
+            if ship.id in rule_set.speed_capped_ships(state.ships):
+                maximum = min(maximum, ship.current_speed + 1)
+        return minimum, maximum
+
     def submit_orders(self, game_id: str, batch: OrderBatch) -> ValidationResult:
         state = self.get(game_id)
         prepared = batch
         detach_ids: list[str] = []
+        if state.options.command_delay_mode and state.phase == Phase.GUNNERY:
+            from .target_priority import auto_gunnery
+            if batch.gunnery:
+                return ValidationResult(valid=False, errors=[
+                    "Command Delay generates gunnery through the engine selector; "
+                    "submit target priority directives instead of gunnery orders"
+                ])
+            prepared = batch.model_copy(
+                update={"gunnery": auto_gunnery(self, state, batch.side)}, deep=True,
+            )
         if state.options.realistic_command:
             from .realistic_command import expand_movement_orders, prepare_gunnery
             if state.phase == Phase.MOVEMENT_PLANNING:
                 prepared, errors, detach_ids = expand_movement_orders(self, state, batch)
                 if errors:
                     return ValidationResult(valid=False, errors=errors)
-            elif state.phase == Phase.GUNNERY:
+            elif state.phase == Phase.GUNNERY and not state.options.command_delay_mode:
                 prepared = prepare_gunnery(self, state, batch)
         validation = self.validate_orders(game_id, prepared, _prepared=True)
         if not validation.valid:
@@ -1844,6 +1915,10 @@ class IronBottomEngine:
                                     payload={"ship_id": ship.id, "launcher_id": launcher.id},
                                     rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
                                 )
+        self._prepare_guaranteed_reinforcements(state)
+        if state.options.command_delay_mode:
+            from .command_delay import on_phase_advanced
+            on_phase_advanced(self, state)
         self._event(state, "phase_changed", f"阶段：{state.phase.value}", rule=self._rule("IBS-R-05", 6, "5.0"))
         return state.events[before:]
 
@@ -2105,7 +2180,10 @@ class IronBottomEngine:
         advance、60° 免费、120° 计 1MF、forced/界/陆约束）。产出
         `(new_pos, new_head, new_cost, new_last, new_turned, action)`。
         """
-        turn_ok = not ship.forced_straight_turns
+        alert_rule = scenario_rules(state.scenario_id).alert_rule()
+        unalerted = bool(alert_rule and ship.side.value in alert_rule.get("sides", [])
+                         and ship.id not in state.scenario_state.get("alerted", []))
+        turn_ok = not ship.forced_straight_turns and not unalerted
         turn_120_ok = turn_ok and ship.turn_limit_degrees != 60 and not ship.forced_circle_turns
         circle_side = ship.forced_turn_side if ship.forced_circle_turns else None
         if cost < maximum:
@@ -2150,7 +2228,7 @@ class IronBottomEngine:
         """
         if not ship.position:
             return {"valid": False, "reason": "ship has no position"}
-        minimum, maximum = self._legal_speed_range(ship, state.turn)
+        minimum, maximum = self.movement_speed_range(state, ship)
         stay_only = self._advance_impossible(state, ship)
         start: tuple[Any, ...] = (ship.position, ship.heading, None, False)
         dist: dict[tuple[Any, ...], int] = {start: 0}
@@ -2174,6 +2252,8 @@ class IronBottomEngine:
                     commands.append(parent_actions[current])
                     current = parents[current]
                 commands.reverse()
+                if self._scenario_movement_violation(state, ship, commands, cost, pos):
+                    continue
                 return {
                     "valid": True,
                     "reason": None,
@@ -2211,7 +2291,7 @@ class IronBottomEngine:
         first command advance, turns only after advance, a free 60-degree turn
         allowed at the end, 120-degree turns cost 1 MF, cost must fall in the
         legal speed range, land and map-edge block advance. Pure read-only."""
-        minimum, maximum = self._legal_speed_range(ship, state.turn)
+        minimum, maximum = self.movement_speed_range(state, ship)
         stay_only = self._advance_impossible(state, ship)
         finals: dict[HexCoord, dict[int, set[int]]] = {}
         queue: deque[tuple[HexCoord, int, int, str | None, bool]] = deque(
@@ -2229,6 +2309,7 @@ class IronBottomEngine:
                 and cost <= maximum
                 and last in (None, "advance", "turn_port_60", "turn_starboard_60")
                 and (not ship.forced_circle_turns or turned_flag or stay_only or maximum == 0)
+                and not self._scenario_movement_violation(state, ship, [], cost, pos)
             ):
                 finals.setdefault(pos, {}).setdefault(cost, set()).add(head)
             for new_pos, new_head, new_cost, new_last, new_turned, _action in self._movement_expand(
@@ -2355,7 +2436,7 @@ class IronBottomEngine:
             columns=state.map_columns, rows=state.map_rows,
         )
         cost = self.movement_cost("", commands)
-        minimum, maximum = self._legal_speed_range(ship, state.turn)
+        minimum, maximum = self.movement_speed_range(state, ship)
         stay_only = self._advance_impossible(state, ship)
         trajectory = [
             {
@@ -2385,6 +2466,11 @@ class IronBottomEngine:
             sides = {"port" if "port" in command else "starboard" for command in sixty_turns}
             if len(sides) > 1 or (ship.forced_turn_side and sides and ship.forced_turn_side not in sides):
                 errors.append(f"circling direction must remain {ship.forced_turn_side or 'constant'}")
+        scenario_violation = self._scenario_movement_violation(
+            state, ship, commands, cost, current_pos,
+        )
+        if scenario_violation:
+            errors.append(scenario_violation)
         valid = not errors
         commitable = valid
         next_options: dict[str, Any] = {"advance": [], "turns": []}
@@ -2459,6 +2545,26 @@ class IronBottomEngine:
             "reachable": reachable,
             "forced": self._forced_constraints(ship),
         }
+
+    def _prepare_guaranteed_reinforcements(self, state: GameState) -> None:
+        """Source-backed automatic arrivals are known BEFORE entry orders.
+
+        Do not draw a synthetic die for a guaranteed arrival. Probabilistic
+        scenarios retain their existing timing and remain separately audited.
+        """
+        if state.phase != Phase.REINFORCEMENT or state.reinforcement_roll_done:
+            return
+        for entry in scenario_rules(state.scenario_id).kinds("guaranteed_reinforcement"):
+            if state.turn != int(entry["turn"]) or state.reinforcement_arrival_turn != state.turn:
+                continue
+            state.reinforcement_roll_done = True
+            state.reinforcement_available = True
+            source = entry["source"]
+            self._event(
+                state, "reinforcement_available", "想定增援按规定到达，可以计划入场（不掷骰）",
+                payload={"available": True, "arrival_turn": state.turn, "sides": entry["sides"], "automatic": True},
+                rule=self._scenario_rule(entry["id"], int(source["pdf_page"]), "想定规定增援到达"),
+            )
 
     def _resolve_reinforcements(self, state: GameState) -> None:
         if state.reinforcement_trigger_turn == state.turn and not state.reinforcement_roll_done:
@@ -3154,14 +3260,14 @@ class IronBottomEngine:
                 # is granted per side, not per whole hex group: when an enemy
                 # shares the contested hex, the friendly pair must still be
                 # stopped rather than rolling a die-rolled friendly ram.
-                for collision_set in collision_sets:
+                for collision_set in sorted(collision_sets, key=lambda group: sorted(group)):
                     ids = sorted(collision_set)
                     by_side: dict[Side, list[str]] = {}
                     for ship_id in ids:
                         by_side.setdefault(state.ships[ship_id].side, []).append(ship_id)
                     for side, members in by_side.items():
                         newly = [ship_id for ship_id in members if ship_id not in stopped]
-                        if len(newly) < 2:
+                        if len(members) < 2 or not newly:
                             continue
                         for ship_id in newly:
                             destinations[ship_id] = state.ships[ship_id].position  # type: ignore[assignment]

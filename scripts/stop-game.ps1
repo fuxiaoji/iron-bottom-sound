@@ -1,13 +1,10 @@
 ﻿$ProjectRoot = Split-Path -Parent $PSScriptRoot
-$PidFile = Join-Path $ProjectRoot "tmp\runtime\pids.txt"
-if (-not (Test-Path $PidFile)) {
-    Write-Host "没有找到正在运行的本项目服务。"
-    exit 0
-}
-
-Get-Content $PidFile | ForEach-Object {
-    $ProcessId = [int]$_
-    Stop-Process -Id $ProcessId -ErrorAction SilentlyContinue
-}
-Remove-Item -LiteralPath $PidFile -Force
-Write-Host "铁底湾服务已停止。"
+. (Join-Path $PSScriptRoot 'game-runtime.ps1')
+if (-not (Test-Path -LiteralPath $PidFile)) { Write-Host 'No recorded game processes.'; exit 0 }
+$Ids = @(Get-Content -LiteralPath $PidFile)
+$Backend = if ($Ids.Count -gt 0 -and [int]$Ids[0] -gt 0) { Get-GameProcess ([int]$Ids[0]) 'backend' }
+$Frontend = if ($Ids.Count -gt 1 -and [int]$Ids[1] -gt 0) { Get-GameProcess ([int]$Ids[1]) 'frontend' }
+Stop-GameProcess $Backend
+Stop-GameProcess $Frontend
+Save-GameProcesses $null $null
+Write-Host 'Game services stopped. Saved games and reports are unchanged.'

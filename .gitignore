@@ -33,3 +33,6 @@ resources/derived/rag/*.sqlite3-shm
 resources/derived/rag/*.sqlite3-wal
 .pt-run-*/
 .pt-run-*
+
+# Generated local launcher (rebuild from scripts/launcher/GameLauncher.cs).
+/一键启动游戏*.exe

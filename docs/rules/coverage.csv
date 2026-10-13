@@ -26,3 +26,12 @@ IBS-U-PLAYABLE,想定1/3逐舰记录,verified_source,structured,executable,teste
 IBS-M-OVERLAYS,X/Y/Z地形覆盖,verified_source,structured,pending,tested,structured
 IBS-S-01,埃斯佩兰斯角海战,verified_source,structured,partial,tested,structured
 IBS-S-03,通道行动,verified_source,structured,partial,tested,structured
+IBS-S-05-R4,圣乔治角确定性增援,verified_source,structured,executable,tested,tested
+IBS-S-10-R7-R8,萨沃岛未警戒直航和提速上限,verified_source,structured,executable,tested,tested
+IBS-S-02-R3,库拉湾连续邻接,verified_source,partial,partial,partial,blocked
+IBS-R-RC-08,整队机动与重整纵队,project_extension,structured,executable,tested,tested
+IBS-R-CD-02,指挥权限与本地自主,project_extension,structured,executable,tested,tested
+IBS-R-CD-03,通信路由与处理链,project_extension,structured,executable,tested,tested
+IBS-R-CD-04,任务命令与三类备选方案,project_extension,structured,executable,tested,tested
+IBS-R-CD-05,通信拥塞与报文TTL,project_extension,structured,executable,tested,tested
+IBS-R-CD-06,炮击优先级授权边界,project_extension,structured,executable,tested,tested

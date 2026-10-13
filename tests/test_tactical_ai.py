@@ -560,6 +560,19 @@ def test_predict_enemy_move_returns_valid_and_deterministic_candidate() -> None:
         assert (hexc, heading) == (hexc2, heading2)
 
 
+def test_shared_prediction_heat_preserves_all_legacy_predictions():
+    from iron_bottom_sound.tactical import PROFILES
+    engine, state = movement_planning_state(3)
+    enemies = [ship for ship in engine.observe(state.game_id, Side.AXIS).ships
+               if ship.side != Side.AXIS and not ship.sunk and ship.position]
+    commander = TacticalCommander(PROFILES["adaptive"])
+    before = state.model_dump(mode="json")
+    reference = {enemy.id: commander._predict_enemy_move(engine, state, enemy, Side.AXIS) for enemy in enemies}
+    optimized = commander._build_movement_context(engine, state, Side.AXIS, enemies)
+    assert optimized.pred_by_id == reference
+    assert state.model_dump(mode="json") == before
+
+
 def test_enemy_move_score_prefers_lower_my_heat() -> None:
     """敌视角打分镜像：敌规避"我方可视火力"（heat 项越小分越高）。"""
     engine, state = movement_planning_state(3)

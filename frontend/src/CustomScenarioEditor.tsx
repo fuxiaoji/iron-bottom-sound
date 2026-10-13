@@ -17,11 +17,11 @@ import {
 import {setActiveMapSize} from "./hexGeometry";
 import type {Axial} from "./hexGeometry";
 import type {EditorState,ScenarioMeta} from "./editor/scenario";
+import {AIProfilePicker,useAIProfile} from "./AIProfilePicker";
 
 type Mode="hotseat"|"vs_ai"|"llm";
 type Props={onClose:()=>void;onLaunch:(id:string,mode:Mode,side:Side,profile:string,realistic:boolean)=>void;error:string};
 const STEPS=["挑选舰船","编组分队","海图初设","其他设置","导出与开战"];
-const PROFILE_OPTIONS=[["adaptive","自适应鱼雷战术（推荐）"],["balanced","均衡"],["fleet","大舰队编队"],["line","长纵队"],["cautious","保守"]] as const;
 const BUILTIN_TEMPLATES=[["IBS-S-03","通道行动 · 驱逐舰夜战"],["IBS-S-01","埃斯佩兰斯角 · 巡洋舰与增援"],["IBS-S-EM-01","第二次马里亚纳海战 · 24 艘主力舰"]] as const;
 const headingOptions=[1,2,3,4,5,6];
 const SIDES:Side[]=["axis","allies"];
@@ -48,7 +48,6 @@ export function CustomScenarioEditor({onClose,onLaunch,error}:Props){
  // step4 开战设置
  const [mode,setMode]=useState<Mode>("hotseat");
  const [launchSide,setLaunchSide]=useState<Side>("axis");
- const [profile,setProfile]=useState("adaptive");
  const [launchRealistic,setLaunchRealistic]=useState(false);
  const [modeTouched,setModeTouched]=useState(false);
  const importRef=useRef<HTMLInputElement>(null);
@@ -73,6 +72,8 @@ export function CustomScenarioEditor({onClose,onLaunch,error}:Props){
  const mapSize=mapSizeOfMeta(meta);
  setActiveMapSize(mapSize);
  const capable=realisticCapable(editorState);
+ const effectiveLaunchRealistic=launchRealistic&&capable;
+ const [profile,setProfile]=useAIProfile(effectiveLaunchRealistic);
  const layoutErrors=useMemo(()=>computeLayout(editorState).errors,[editorState]);
  const bothSidesPresent=sideShips(editorState,"axis").length>0&&sideShips(editorState,"allies").length>0;
  const shipTotal=editorState.ships.length;
@@ -349,12 +350,12 @@ export function CustomScenarioEditor({onClose,onLaunch,error}:Props){
       <option value="hotseat">同机双人 PvP</option><option value="vs_ai">状态机 AI（PvE）</option><option value="llm">多模态 LLM（PvE）</option></select></label>
      <label>你的阵营<select value={launchSide} onChange={event=>setLaunchSide(event.target.value as Side)}>
       <option value="axis">轴心 / 日德方</option><option value="allies">同盟 / 美英方</option></select></label>
-     {mode==="vs_ai"&&<label>AI 风格<select value={profile} onChange={event=>setProfile(event.target.value)}>
-       {PROFILE_OPTIONS.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>}
-     <div className={`command-choice editor-mode ${launchRealistic?"on":""}`}>
+     {mode==="vs_ai"&&<AIProfilePicker profile={profile} onChange={setProfile} realistic={effectiveLaunchRealistic}
+      realisticLocked={!capable} onEnableRealistic={()=>setLaunchRealistic(true)}/>}
+     <div className={`command-choice editor-mode ${effectiveLaunchRealistic?"on":""}`}>
       <b>指挥模式</b>
-      <button onClick={()=>setLaunchRealistic(!launchRealistic)} disabled={!capable} className={launchRealistic?"active":""}>
-       {capable?(launchRealistic?"真实编队指挥（已选）":"真实编队指挥"):"真实模式需双方全部编队后才能选"}
+      <button onClick={()=>setLaunchRealistic(!effectiveLaunchRealistic)} disabled={!capable} className={effectiveLaunchRealistic?"active":""}>
+       {capable?(effectiveLaunchRealistic?"真实编队指挥（已选）":"真实编队指挥"):"真实模式需双方全部编队后才能选"}
       </button>
      </div>
      {!capable&&<p className="editor-inline-warning">本剧只能按经典逐舰模式开局（某方不足 2 艘或还有散舰）。</p>}

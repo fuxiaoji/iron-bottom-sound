@@ -6,8 +6,84 @@ from iron_bottom_sound.match import run_match
 from iron_bottom_sound.models import GameOptions, HexCoord, Phase, Side, TorpedoTrack
 from iron_bottom_sound.realistic_command import RealisticCommander
 from iron_bottom_sound.tactical import PROFILES, TacticalCommander
-from iron_bottom_sound.torpedo_tactics import AdaptiveTorpedoPlanner, TorpedoDoctrine
+from iron_bottom_sound.torpedo_tactics import AdaptiveTorpedoPlanner, TorpedoDoctrine, CounterfactualResponse, _route_key
 import pytest
+
+
+def _uncached_counterfactual(routes, lane):
+    """Pre-optimization algorithm, retained as an exact old-policy oracle."""
+    baseline = max(routes, key=lambda route: (route.base_utility, _route_key(route)))
+    def threat(route):
+        hits = len(lane.intersection(route.path))
+        near = 0
+        if not hits:
+            lane_hexes = [HexCoord.from_label(label) for label in lane]
+            near = sum(1 for label in route.path if lane_hexes and
+                       min(HexCoord.from_label(label).distance(cell) for cell in lane_hexes) <= 1)
+        return hits * 4.0 + near * .75
+    response = max(routes, key=lambda route: (route.base_utility - threat(route), _route_key(route)))
+    changed = _route_key(baseline) != _route_key(response)
+    return CounterfactualResponse(
+        ship_id=baseline.ship_id, baseline_route=_route_key(baseline), threatened_route=_route_key(response),
+        forced_deviation=HexCoord.from_label(baseline.final_hex).distance(HexCoord.from_label(response.final_hex)),
+        speed_loss=max(0, baseline.speed - response.speed),
+        fire_position_loss=max(0., baseline.base_utility - response.base_utility),
+        crossing_t_loss=max(0., baseline.crossing_t_value - response.crossing_t_value),
+        formation_split=max(0., baseline.formation_cohesion - response.formation_cohesion),
+        local_force_ratio_gain=.5 if changed and threat(baseline) > 0 else 0., route_changed=changed,
+    )
+
+
+def test_torpedo_performance_optimization_preserves_entire_legacy_decision(monkeypatch):
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=41)
+    _drive_to(engine, state.game_id, Phase.TORPEDO_PLANNING)
+    planner = AdaptiveTorpedoPlanner(PROFILES["adaptive"])
+    optimized = planner.analyze(engine, state, Side.AXIS)
+    monkeypatch.setattr(AdaptiveTorpedoPlanner, "_counterfactual", staticmethod(_uncached_counterfactual))
+    reference = AdaptiveTorpedoPlanner(PROFILES["adaptive"]).analyze(engine, state, Side.AXIS)
+    assert optimized == reference
+
+
+def test_lane_neighbourhood_is_exact_for_empty_hit_near_and_distant_lanes():
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=41)
+    planner = AdaptiveTorpedoPlanner(PROFILES["adaptive"])
+    routes = planner.enemy_routes(engine, state, Side.AXIS)
+    targets = sorted({route.ship_id for route in routes})
+    for target in targets:
+        choices = [route for route in routes if route.ship_id == target]
+        for lane in (set(), {choices[0].path[0]}, {"A1", "B1"}, set(choices[-1].path)):
+            assert planner._counterfactual(choices, lane) == _uncached_counterfactual(choices, lane)
+
+
+def test_torpedo_geometry_reuse_preserves_every_legacy_engine_candidate():
+    engine = IronBottomEngine()
+    state = engine.reset("IBS-S-03", seed=41)
+    _drive_to(engine, state.game_id, Phase.TORPEDO_PLANNING)
+    actual = engine.torpedo_tactical_combos(state, Side.AXIS)
+    visible = sorted(ship.id for ship in engine.observe(state.game_id, Side.AXIS).ships
+                     if ship.side != Side.AXIS and not ship.sunk and ship.position)
+    friendly = {ship.id: {ship.position.label} for ship in state.ships.values()
+                if ship.side == Side.AXIS and not ship.sunk and ship.position}
+    for trajectory in engine.sealed_movement_trajectories(state, Side.AXIS)["trajectories"]:
+        friendly.setdefault(trajectory["ship_id"], set()).update(item["label"] for item in trajectory["trajectory"])
+    reference = []
+    for target_id in visible:
+        for combo in engine._assist_launch_combos(state, Side.AXIS):
+            evaluated = engine._assist_evaluate(state, state.ships[target_id], combo, friendly)
+            if evaluated.get("blocked_reason") or evaluated.get("friendly_risk"):
+                continue
+            evaluated["target_id"] = target_id
+            evaluated["target_name"] = state.ships[target_id].name
+            for count in range(1, evaluated["salvo_size"] + 1):
+                row = dict(evaluated, salvo_size=count)
+                if row.get("aspect") and row.get("modifier") is not None:
+                    row["expected_hits"] = engine.expected_torpedo_hits(row["aspect"], row["modifier"], count)
+                reference.append(row)
+    reference.sort(key=lambda row: tuple(row[key] for key in (
+        "ship_id", "launcher_id", "launch_at_mf", "launch_side", "launch_angle", "setting_index", "target_id", "salvo_size")))
+    assert actual == reference
 
 
 def _drive_to(engine: IronBottomEngine, game_id: str, phase: Phase, realistic: bool = False):
@@ -30,7 +106,7 @@ def _drive_to(engine: IronBottomEngine, game_id: str, phase: Phase, realistic: b
     raise AssertionError(f"did not reach {phase}")
 
 
-def test_adaptive_orders_are_partial_salvo_capable_legal_and_deterministic() -> None:
+def test_engine_keeps_partial_salvos_but_adaptive_orders_are_full_legal_and_deterministic() -> None:
     engine = IronBottomEngine()
     state = engine.reset("IBS-S-03", seed=41, game_id="adaptive-partial")
     state = _drive_to(engine, state.game_id, Phase.TORPEDO_PLANNING)
@@ -48,6 +124,10 @@ def test_adaptive_orders_are_partial_salvo_capable_legal_and_deterministic() -> 
     assert first == second
     assert first_plan.tactical_analysis == second_plan.tactical_analysis
     assert engine.validate_orders(state.game_id, first).valid
+    assert first.torpedoes
+    for order in first.torpedoes:
+        launcher = next(item for item in state.ships[order.ship_id].torpedo_launchers if item.id == order.launcher_id)
+        assert order.count == launcher.loaded
     assert first_plan.tactical_analysis["doctrine"] in {item.value for item in TorpedoDoctrine}
     assert len(first_plan.tactical_analysis["top_candidates"]) <= 3
 

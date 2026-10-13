@@ -273,6 +273,13 @@ def render_map_image(state: GameState, engine: IronBottomEngine, side: Side) -> 
 # ---------------------------------------------------------------------------
 EXCLUDED_EVENT_TYPES = {"orders_submitted", "phase_changed", "game_created"}
 
+# Command Delay traffic is per-side private: a mission order, an agent decision
+# (with its activated contingency branch), a message, a link state.  The battle
+# report is a neutral document that either player may open, so these must not
+# enter it — the same reason orders_submitted is excluded above.  Matched by
+# prefix so a new event in the family cannot silently reintroduce the leak.
+PRIVATE_EVENT_PREFIXES = ("command_delay_", "command_message_", "formation_agent_", "mission_order")
+
 PHASE_ORDER = [
     "contact_setup", "reinforcement", "movement_planning", "torpedo_planning",
     "movement_resolution", "gunnery", "torpedo_effects", "fire_end",
@@ -333,6 +340,8 @@ def public_events_for_turn(
     result: list[GameEvent] = []
     for event in state.events:
         if event.turn != turn or event.type in EXCLUDED_EVENT_TYPES:
+            continue
+        if event.type.startswith(PRIVATE_EVENT_PREFIXES):
             continue
         if any(engine.event_visible_to(state, event, side) for side in Side):
             result.append(event)
