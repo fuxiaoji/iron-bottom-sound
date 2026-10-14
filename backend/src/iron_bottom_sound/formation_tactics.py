@@ -445,6 +445,9 @@ class CooperativeFormationPlanner:
                 # can expose every follower to very accurate enemy salvos.
                 score += .3 * min(cost, 4)
         score += 0.05 * (len(paths[leader.id]) - 1)
+        if state.options.ruleset_version == "night-v2":
+            # Weather is shared public environment; do not read any enemy plans.
+            score -= 4 * sum(engine._weather_blocked(state, path[-1]) for path in paths.values())
         return Route(order, paths, headings, next_paths, score)
 
     @staticmethod

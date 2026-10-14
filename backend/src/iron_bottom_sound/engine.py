@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import math
 import random
 import re
@@ -40,7 +41,9 @@ from .models import (
     ValidationResult,
     WreckState,
 )
-from .scenario_rules import scenario_rules
+from .scenario_rules import scenario_rules, state_scenario_rules
+from . import night, recognition
+from .rules_snapshot import active_state, bind_engine, pack, unpack
 
 
 RULES = ROOT / "resources" / "derived" / "structured" / "rules"
@@ -177,14 +180,16 @@ class RuleData:
     def penetration(self, nation: str, caliber: float, distance: int, period: str = "post_1942") -> float:
         # 同格（碰撞检定失败，distance=0）按最近档处理。
         distance = max(1, distance)
-        distance_column = next(
+        distance_column = next((
             label
             for label, lower, upper in (
                 ("1-2", 1, 2), ("3-5", 3, 5), ("6-7", 6, 7), ("8-10", 8, 10),
                 ("11-13", 11, 13), ("14-17", 14, 17), ("18-20", 18, 20), ("21-25", 21, 25),
             )
             if lower <= distance <= upper
-        )
+        ), None)
+        if distance_column is None:
+            raise ValueError("IBS-Q-021: 超出原穿甲表范围，阻断自动裁决")
         candidates = []
         for row in self.armour_penetration:
             calibers = [float(value) for value in row["caliber_in"].split("|")]
@@ -207,11 +212,13 @@ class RuleData:
         return 0 if value == "-" else float(value)
 
 
+@bind_engine
 class IronBottomEngine:
     def __init__(self) -> None:
         self.games: dict[str, GameState] = {}
         self.initial_states: dict[str, GameState] = {}
-        self.rules = RuleData()
+        self._base_rules = RuleData()
+        self._snapshot_tables: dict[str, RuleData] = {}
         # 命中期望值实例级缓存：对抗评分在单次移动决策里对同一 (firepower, distance,
         # target_speed) 求值约数万次，命中表/修正查表是该热点的唯一重复成本；
         # 键与规则常量无关、跨游戏复用，行为与不缓存完全等价。
@@ -219,6 +226,18 @@ class IronBottomEngine:
 
     def scenarios(self) -> list[dict[str, Any]]:
         return scenario_catalog()
+
+    @property
+    def rules(self) -> RuleData:
+        state = active_state.get()
+        if state is not None and state.rule_snapshot.get("adjudication"):
+            key = state.rule_snapshot["tables_hash"]
+            if key not in self._snapshot_tables:
+                rules = object.__new__(RuleData)
+                rules.__dict__.update(unpack(state.rule_snapshot["adjudication"]))
+                self._snapshot_tables[key] = rules
+            return self._snapshot_tables[key]
+        return self._base_rules
 
     def reset(
         self,
@@ -229,6 +248,10 @@ class IronBottomEngine:
     ) -> GameState:
         identifier = game_id or str(uuid.uuid4())
         state = build_initial_state(identifier, scenario_id, seed, options or GameOptions())
+        if night.enabled(state):
+            import hashlib, json
+            state.rule_snapshot["adjudication"] = pack(vars(self._base_rules))
+            state.rule_snapshot["tables_hash"] = hashlib.sha256(json.dumps(state.rule_snapshot["adjudication"], sort_keys=True).encode()).hexdigest()
         from .tutorials import prepare_tutorial_state, record_tutorial_start, validate_tutorial_options
         validate_tutorial_options(state)
         prepare_tutorial_state(state)
@@ -246,6 +269,8 @@ class IronBottomEngine:
         )
         record_tutorial_start(self, state)
         self._prepare_guaranteed_reinforcements(state)
+        if night.enabled(state):
+            state.events[0].payload["initial_state"] = state.model_dump(mode="json", exclude={"events"})
         self.games[identifier] = state
         self.initial_states[identifier] = state.model_copy(deep=True)
         return state
@@ -260,19 +285,17 @@ class IronBottomEngine:
         """调试模式（debug=True）解除战争迷雾：两阵营舰船/损伤/鱼雷/事件/比分全可见，
         仅用于本地调试，不参与任何裁决路径。"""
         state = self.get(game_id)
-        scenario_rules(state.scenario_id).refresh_score(state)
+        state_scenario_rules(state).refresh_score(state)
         ships: list[PublicShip] = []
-        all_safe_events = [
-            event
-            for event in state.events
-            if debug
-            or (
-                event.payload.get("secret_side") in (None, side.value)
-                and not self._hidden_damage_event(state, event, side)
-            )
-        ]
+        all_safe_events = self.public_events(state, side, state.events, debug=debug)
         own_positions = [ship.position for ship in state.ships.values() if ship.side == side and not ship.sunk and ship.position]
+        local_members = None
+        if recognition.enabled(state) and state.options.command_delay_mode and not debug:
+            local_members = {s.id for s in recognition.fleet_observers(state, side)}
+            own_positions = [state.ships[sid].position for sid in local_members]
         for ship in state.ships.values():
+            if local_members is not None and ship.side == side and ship.id not in local_members:
+                continue
             visible = debug or ship.side == side or bool(ship.position and self._visible_to(state, ship, side, own_positions))
             if not visible:
                 continue
@@ -316,7 +339,9 @@ class IronBottomEngine:
                     bridge_destroyed=ship.bridge_destroyed if reveal else False,
                     rudder_destroyed=ship.rudder_destroyed if reveal else False,
                     captain_status=ship.captain_status if reveal else None,
-                    combat_history=self._ship_combat_history(state, ship.id, all_safe_events),
+                    combat_history=self._ship_combat_history(state,
+                        recognition.contact_id(state, side, ship.id) if recognition.enabled(state) and not debug
+                        and ship.side != side and not recognition.private(side) else ship.id, all_safe_events),
                     formation_id=ship.formation_id if reveal else None,
                     command_status=ship.command_status if reveal else None,
                 )
@@ -327,6 +352,7 @@ class IronBottomEngine:
             for track in state.torpedo_tracks
             if debug
             or not state.options.optional_rules.blind_torpedoes
+            or not track.hidden
             or track.side == side
             or bool(track.contact_ship_ids)
         ]
@@ -334,7 +360,11 @@ class IronBottomEngine:
             self._normalize_torpedo_display_history(
                 track, columns=state.map_columns, rows=state.map_rows
             )
+            if night.enabled(state) and not debug and track.side != side and track.launcher_ship_id not in {s.id for s in ships}:
+                track.id = "public-torpedo-" + hashlib.sha256(track.id.encode()).hexdigest()[:12]
+                track.launcher_ship_id = "unidentified-ship"
         markers: list[MarkerState] = []
+        public_ids = {s.id for s in ships}
         for marker in state.markers:
             if marker.kind == "contact":
                 if marker.position is None and marker.secret_side != side and not debug:
@@ -344,8 +374,21 @@ class IronBottomEngine:
                     public_marker.contact_truth = None
                 markers.append(public_marker)
             elif marker.secret_side in (None, side) or debug:
-                markers.append(marker.model_copy(deep=True))
-        return PlayerObservation(
+                public_marker = marker.model_copy(deep=True)
+                if night.enabled(state) and not debug:
+                    public_marker.id = f"public-{marker.kind}-{len(markers)}"
+                    if marker.kind == "smoke" and marker.position:
+                        observers = [s for s in state.ships.values() if s.side == side and s.position and not s.sunk]
+                        if not any(night.optical(self, state, s.position, marker.position) and
+                                   s.position.distance(marker.position) <= state.visibility[side.value] for s in observers):
+                            continue
+                        public_marker.id = f"public-smoke-{len(markers)}"
+                    if marker.ship_id and marker.ship_id not in public_ids:
+                        continue
+                    if marker.target_ship_id and marker.target_ship_id not in public_ids:
+                        continue
+                markers.append(public_marker)
+        view = PlayerObservation(
             game_id=game_id,
             realistic_command=state.options.realistic_command,
             command_delay_mode=state.options.command_delay_mode,
@@ -365,7 +408,9 @@ class IronBottomEngine:
             ships=ships,
             torpedo_tracks=tracks,
             markers=markers,
-            wrecks=deepcopy(state.wrecks),
+            wrecks=[w.model_copy(deep=True) for w in state.wrecks if debug or not night.enabled(state)
+                    or state.ships[w.source_ship_id].side == side
+                    or w.source_ship_id in state.scenario_state.get("confirmed_losses", {}).get(side.value, [])],
             formations=[
                 formation.model_copy(deep=True)
                 for formation in state.formations.values()
@@ -379,7 +424,24 @@ class IronBottomEngine:
             recent_events=safe_events,
             winner=state.winner,
             victory_reason=state.victory_reason,
+            **night.observation(self, state, side, ships, all_safe_events, debug),
         )
+        return recognition.project_observation(self, state, view, debug)
+
+    def public_events(self, state: GameState, side: Side, events, debug=False):
+        result = []
+        for event in events:
+            if debug:
+                result.append(event.model_copy(deep=True))
+                continue
+            if (event.payload.get("secret_side") not in (None, side.value)
+                    or event.payload.get("debug_only")
+                    or self._hidden_damage_event(state, event, side)
+                    or side.value not in event.payload.get("observed_by", [side.value])):
+                continue
+            result.append(recognition.project_event(self, state, event, side) if recognition.enabled(state)
+                          else night.project_event(state, event, side) if night.enabled(state) else event)
+        return result
 
     @classmethod
     def _normalize_torpedo_display_history(
@@ -467,6 +529,10 @@ class IronBottomEngine:
         """
         if event.payload.get("secret_side") not in (None, side.value):
             return False
+        if night.enabled(state) and side.value not in event.payload.get("observed_by", [side.value]):
+            return False
+        if event.payload.get("debug_only"):
+            return False
         return not IronBottomEngine._hidden_damage_event(state, event, side)
 
     @staticmethod
@@ -535,6 +601,7 @@ class IronBottomEngine:
             ship.fire_source_attacker = attacker.id if attacker is not None else None
             ship.fire_source_turn = state.turn
 
+    @recognition.public_result
     def legal_actions(self, game_id: str, side: Side) -> list[LegalAction]:
         state = self.get(game_id)
         if state.phase == Phase.COMPLETE:
@@ -596,7 +663,13 @@ class IronBottomEngine:
                     "confirmation": {"ready": True},
                 },
             }
-            return [LegalAction(kind="submit_phase_orders", schema_hint=schemas[state.phase])]
+            hint = schemas[state.phase]
+            if night.enabled(state):
+                hint["night_candidates"] = night.candidates(self, state, side)
+                hint["rule_blockers"] = deepcopy(state.scenario_state.get("rule_blockers", []))
+                if state.phase == Phase.GUNNERY:
+                    hint["source_blocked_gunnery"] = night.blocked_gunnery(self, state, side)
+            return [LegalAction(kind="submit_phase_orders", schema_hint=hint)]
         return [LegalAction(kind="advance")] if state.phase not in ORDER_PHASES or len(state.submitted_orders) == 2 else []
 
     def _suggested_formation_movement(self, state: GameState, side: Side) -> list[dict[str, Any]]:
@@ -629,7 +702,7 @@ class IronBottomEngine:
             if ship.side != side or ship.sunk or not ship.position:
                 continue
             blocked_reason: str | None = None
-            scenario_block = scenario_rules(state.scenario_id).turn_restriction_reason(
+            scenario_block = state_scenario_rules(state).turn_restriction_reason(
                 side.value, state.turn, "gunnery"
             )
             if scenario_block:
@@ -657,6 +730,9 @@ class IronBottomEngine:
                         # 单人单目标固有修正（不含集火附加射手/多目标惩罚两项分配相关项）；
                         # 修正值由引擎计算下发，前端不复制规则常量。
                         modifier = self._gunnery_modifier(state, ship, target, distance, 1, caliber, 1)
+                        identified = recognition.identified(self, state, side, target)
+                        if not identified:
+                            modifier -= self._caliber_target_modifier(caliber, target.ship_type)
                         # 期望命中同样由引擎计算下发（规则公式唯一在引擎，AI 不复制）。
                         expected_hits = sum(
                             self.expected_gunnery_hits(mount.firepower, distance)
@@ -669,10 +745,12 @@ class IronBottomEngine:
                             "range": distance,
                             "modifier": modifier,
                             "expected_hits": expected_hits,
+                            "modifier_complete": identified,
                         })
             candidates.append({"ship_id": ship.id, "targets": targets, "blocked_reason": blocked_reason})
         return candidates
 
+    @recognition.public_result
     def gunnery_assist(
         self, state: GameState, side: Side, assigned: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
@@ -723,9 +801,11 @@ class IronBottomEngine:
                 "range": chosen["range"],
                 "modifier": chosen["modifier"],
                 "expected_hits": chosen["expected_hits"],
+                "modifier_complete": chosen["modifier_complete"],
             })
         return {"recommendations": recommendations, "excluded": excluded}
 
+    @recognition.public_result
     def gunnery_target_options(self, state: GameState, side: Side) -> list[dict[str, Any]]:
         """只读：每舰全部合法炮击目标选项（含 `expected_hits`），供 AI 概率抽样。
         与 `gunnery_assist` 的"每舰一条推荐"不同，这里返回每舰每个合法目标一条。"""
@@ -815,6 +895,7 @@ class IronBottomEngine:
                 total += mount.firepower * self.expected_gunnery_hits(mount.firepower, position.distance(target), target_speed)
         return total
 
+    @recognition.public_result
     def field_of_fire_heatmap(self, state: GameState, viewer: Side, ship_id: str | None = None, target_speed: int = 4) -> dict[str, Any]:
         """只读射界热力图：把双方各舰每门可射火炮的射界/射程覆盖叠加到地图每格。
 
@@ -855,6 +936,8 @@ class IronBottomEngine:
 
         if ship_id is not None:
             target = state.ships.get(ship_id)
+            if target and not recognition.identified(self, state, viewer, target):
+                return {"viewer": viewer.value, "sides": {s.value: empty_side() for s in Side}}
             if target is None or target.sunk or not target.position:
                 return {"viewer": viewer.value, "sides": {s.value: empty_side() for s in (Side.AXIS, Side.ALLIES)}}
             if target.side != viewer and not self._visible_to(state, target, viewer, own_positions):
@@ -882,6 +965,8 @@ class IronBottomEngine:
                     continue
                 if side != viewer and not self._visible_to(state, ship, viewer, own_positions):
                     continue
+                if not recognition.identified(self, state, viewer, ship):
+                    continue
                 if ship.gun_mounts:
                     ships_info.append({
                         "ship_id": ship.id,
@@ -905,6 +990,11 @@ class IronBottomEngine:
         `_reinforcement_entry_legal`（E17-U27 最短六角边走廊）枚举。检定结果取最后一条
         `reinforcement_roll` 事件。前端据此展示"检定失败/未到回合"或逐舰入场表。
         """
+        from . import savo
+        if savo.enabled(state):
+            rows = savo.candidates(self, state, side)
+            return {"group_available": bool(rows), "ships": rows, "entry_hexes": sorted({h for row in rows for h in row["entry_hexes"]}),
+                    "entry_range": None, "arrival_turn": state.turn, "trigger_turn": None, "succeeds_on": [], "roll_result": None}
         pending = [
             ship for ship in state.ships.values()
             if ship.side == side and ship.position is None and ship.reinforcement_turn == state.turn
@@ -1021,7 +1111,7 @@ class IronBottomEngine:
             if ship.side != side or ship.sunk or not ship.position or not ship.torpedo or ship.torpedo.destroyed:
                 continue
             blocked_reason: str | None = None
-            scenario_block = scenario_rules(state.scenario_id).turn_restriction_reason(
+            scenario_block = state_scenario_rules(state).turn_restriction_reason(
                 side.value, state.turn, "torpedo"
             )
             if scenario_block:
@@ -1358,6 +1448,7 @@ class IronBottomEngine:
             result["expected_hits"] = self.expected_torpedo_hits(aspect, modifier, int(combo["salvo_size"]))
         return result
 
+    @recognition.public_result
     def torpedo_assist(
         self, state: GameState, side: Side,
         target_id: str | None = None, launch: dict[str, Any] | None = None,
@@ -1371,7 +1462,8 @@ class IronBottomEngine:
                 target = chosen
         if target is None:
             own = [ship for ship in state.ships.values() if ship.side == side and ship.position and not ship.sunk]
-            enemies = [ship for ship in state.ships.values() if ship.side != side and ship.position and not ship.sunk]
+            enemies = [ship for ship in state.ships.values() if ship.side != side and ship.position and not ship.sunk
+                       and self._visible_to(state, ship, side, [s.position for s in own])]
             if own and enemies:
                 target = min(enemies, key=lambda enemy: min(enemy.position.distance(ship.position) for ship in own))
         if target is None:
@@ -1410,6 +1502,7 @@ class IronBottomEngine:
             "combos": top,
         }
 
+    @recognition.public_result
     def torpedo_tactical_combos(self, state: GameState, side: Side) -> list[dict[str, Any]]:
         """Return the full, count-expanded torpedo option set for tactical planning.
 
@@ -1421,7 +1514,7 @@ class IronBottomEngine:
         """
         observation = self.observe(state.game_id, side)
         visible_enemy_ids = {
-            ship.id for ship in observation.ships
+            recognition.decode_target(self, state, side, ship.id) for ship in observation.ships
             if ship.side != side and not ship.sunk and ship.position is not None
         }
         friendly_routes: dict[str, set[str]] = {}
@@ -1482,7 +1575,15 @@ class IronBottomEngine:
 
     def validate_orders(self, game_id: str, batch: OrderBatch, _prepared: bool = False) -> ValidationResult:
         state = self.get(game_id)
+        try:
+            batch = recognition.decode_orders(self, state, batch, allow_internal=_prepared)
+        except ValueError as exc:
+            return ValidationResult(valid=False, errors=[str(exc)])
         errors: list[str] = []
+        if night.enabled(state) and _prepared:
+            errors.extend(night.validate(self, state, batch))
+        elif night.enabled(state) and not state.options.realistic_command:
+            errors.extend(night.validate(self, state, batch))
         if state.options.command_delay_mode and state.phase == Phase.GUNNERY and not _prepared:
             # Command Delay: the fleet and its formation agents may only publish
             # target priorities; the engine's own selector builds every gunnery
@@ -1520,11 +1621,11 @@ class IronBottomEngine:
             Phase.CONTACT_SETUP: {"contacts"},
             Phase.REINFORCEMENT: {"reinforcements"},
             Phase.MOVEMENT_PLANNING: {"movement", "contact_movement", "formation_movement", "formation_speed_decisions"},
-            Phase.TORPEDO_PLANNING: {"torpedoes"},
-            Phase.GUNNERY: {"gunnery", "smoke", "smoke_ships", "illumination", "searchlights"},
+            Phase.TORPEDO_PLANNING: {"torpedoes", "blind_torpedo_reveals"},
+            Phase.GUNNERY: {"gunnery", "smoke", "smoke_ships", "illumination", "searchlights", "aircraft_illumination"},
         }.get(state.phase, set())
         populated = {
-            name for name in ("formation_setup", "formation_movement", "formation_speed_decisions", "contacts", "reinforcements", "movement", "contact_movement", "torpedoes", "gunnery", "smoke", "smoke_ships", "illumination", "searchlights")
+            name for name in ("formation_setup", "formation_movement", "formation_speed_decisions", "contacts", "reinforcements", "movement", "contact_movement", "torpedoes", "gunnery", "smoke", "smoke_ships", "illumination", "searchlights", "aircraft_illumination", "blind_torpedo_reveals")
             if getattr(batch, name)
         }
         for name in sorted(populated - allowed_fields):
@@ -1585,7 +1686,11 @@ class IronBottomEngine:
             if submitted != expected:
                 errors.append(f"Movement plans must cover every active ship; missing={sorted(expected-submitted)}, extra={sorted(submitted-expected)}")
             self._validate_contact_movement(state, batch, errors)
-        for order in batch.reinforcements if state.phase == Phase.REINFORCEMENT else []:
+        from . import savo
+        savo_reinforcement = savo.enabled(state) and state.phase == Phase.REINFORCEMENT
+        if savo_reinforcement:
+            errors.extend(savo.validate(self, state, batch))
+        for order in batch.reinforcements if state.phase == Phase.REINFORCEMENT and not savo_reinforcement else []:
             ship = owned.get(order.ship_id)
             if not ship or ship.position is not None or ship.reinforcement_turn != state.turn:
                 errors.append(f"Reinforcement references unavailable ship {order.ship_id}")
@@ -1610,7 +1715,7 @@ class IronBottomEngine:
                 if ship.position is None and ship.reinforcement_turn == state.turn and state.reinforcement_available
             }
             submitted_reinforcements = {order.ship_id for order in batch.reinforcements}
-            if submitted_reinforcements != expected_reinforcements:
+            if not savo_reinforcement and submitted_reinforcements != expected_reinforcements:
                 errors.append(
                     "Reinforcement orders must cover the available group; "
                     f"missing={sorted(expected_reinforcements-submitted_reinforcements)}, "
@@ -1621,7 +1726,7 @@ class IronBottomEngine:
             if not attacker:
                 errors.append(f"Gunnery references non-owned ship {order.ship_id}")
                 continue
-            scenario_block = scenario_rules(state.scenario_id).turn_restriction_reason(
+            scenario_block = state_scenario_rules(state).turn_restriction_reason(
                 batch.side.value, state.turn, "gunnery"
             )
             if scenario_block:
@@ -1668,7 +1773,7 @@ class IronBottomEngine:
                     errors.append(f"{order.ship_id}: cannot use searchlight")
                 elif order.active and (
                     not target or target.side == batch.side or not ship.position or not target.position
-                    or ship.position.distance(target.position) > (14 if ship.side == Side.AXIS else 12)
+                    or ship.position.distance(target.position) > (night.searchlight_range(state, ship) if night.enabled(state) else (14 if ship.side == Side.AXIS else 12))
                 ):
                     errors.append(f"{order.ship_id}: illegal searchlight target {order.target_id}")
             smoke_ids = batch.smoke_ships + [order.ship_id for order in batch.smoke if order.deploy]
@@ -1684,7 +1789,7 @@ class IronBottomEngine:
             if state.options.realistic_command and ship.command_status != "attached":
                 errors.append(f"{order.ship_id}: detached ships may not receive torpedo orders")
                 continue
-            scenario_block = scenario_rules(state.scenario_id).turn_restriction_reason(
+            scenario_block = state_scenario_rules(state).turn_restriction_reason(
                 batch.side.value, state.turn, "torpedo"
             )
             if scenario_block:
@@ -1761,7 +1866,7 @@ class IronBottomEngine:
         flag authorizes a planner to bypass a scenario-specific restriction.
         """
         minimum, maximum = self._legal_speed_range(ship, state.turn)
-        rule_set = scenario_rules(state.scenario_id)
+        rule_set = state_scenario_rules(state)
         alert_rule = rule_set.alert_rule()
         if alert_rule and ship.side.value in alert_rule.get("sides", []):
             if ship.id not in set(state.scenario_state.get("alerted", [])):
@@ -1773,6 +1878,10 @@ class IronBottomEngine:
 
     def submit_orders(self, game_id: str, batch: OrderBatch) -> ValidationResult:
         state = self.get(game_id)
+        try:
+            batch = recognition.decode_orders(self, state, batch)
+        except ValueError as exc:
+            return ValidationResult(valid=False, errors=[str(exc)])
         prepared = batch
         detach_ids: list[str] = []
         if state.options.command_delay_mode and state.phase == Phase.GUNNERY:
@@ -1793,6 +1902,7 @@ class IronBottomEngine:
                     return ValidationResult(valid=False, errors=errors)
             elif state.phase == Phase.GUNNERY and not state.options.command_delay_mode:
                 prepared = prepare_gunnery(self, state, batch)
+        prepared = recognition.decode_orders(self, state, prepared, allow_internal=True)
         validation = self.validate_orders(game_id, prepared, _prepared=True)
         if not validation.valid:
             return validation
@@ -1821,6 +1931,8 @@ class IronBottomEngine:
 
     def advance(self, game_id: str) -> list[GameEvent]:
         state = self.get(game_id)
+        if night.enabled(state) and state.scenario_state.get("rule_blockers"):
+            raise ValueError("；".join(f"{b['id']}: {b['text']}" for b in state.scenario_state["rule_blockers"]))
         before = len(state.events)
         if state.phase == Phase.COMPLETE:
             return []
@@ -1854,20 +1966,35 @@ class IronBottomEngine:
             if set(state.submitted_orders) != {Side.AXIS.value, Side.ALLIES.value}:
                 raise ValueError("Both sides must submit torpedo plans before advancing")
             self._seal_orders(state)
-            if state.options.optional_rules.squalls:
+            if night.enabled(state):
+                for batch in self._sealed_batches(state, Phase.TORPEDO_PLANNING):
+                    for tid in batch.blind_torpedo_reveals:
+                        track = next(t for t in state.torpedo_tracks if t.id == tid)
+                        track.hidden = False
+                        self._event(state, "blind_torpedo_revealed", "玩家揭示已接近目标的隐蔽鱼雷",
+                            payload={"track_id": tid, "position": track.position.label}, rule=self._rule("IBS-R-09.10", 14, "移动计划完成后揭示"))
+            if state.options.optional_rules.squalls and not night.enabled(state):
                 self._move_squalls(state)
             state.phase = Phase.MOVEMENT_RESOLUTION
         elif state.phase == Phase.MOVEMENT_RESOLUTION:
+            if night.enabled(state):
+                state.scenario_state["turn_paths"] = {s.id: [s.position.model_dump()] for s in state.ships.values() if s.position}
             self._resolve_movement(state)
             if state.options.realistic_command:
                 from .realistic_command import after_movement
                 after_movement(self, state)
+            if night.enabled(state):
+                if state.options.optional_rules.squalls:
+                    night.move_squalls(self, state)
+                night.after_movement(self, state)
             state.phase = Phase.GUNNERY
         elif state.phase == Phase.GUNNERY:
             if set(state.submitted_orders) != {Side.AXIS.value, Side.ALLIES.value}:
                 raise ValueError("Both sides must submit gunnery orders before advancing")
             self._seal_orders(state)
             self._resolve_gunnery(state)
+            if night.enabled(state):
+                state.markers = [m for m in state.markers if m.kind not in ("star_shell", "searchlight")]
             if state.options.realistic_command:
                 from .realistic_command import refresh_command_chain
                 refresh_command_chain(self, state)
@@ -1916,10 +2043,13 @@ class IronBottomEngine:
                                     rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
                                 )
         self._prepare_guaranteed_reinforcements(state)
+        recognition.refresh(self, state)
         if state.options.command_delay_mode:
             from .command_delay import on_phase_advanced
             on_phase_advanced(self, state)
         self._event(state, "phase_changed", f"阶段：{state.phase.value}", rule=self._rule("IBS-R-05", 6, "5.0"))
+        from .ai_memory import record_results
+        record_results(self, state)
         return state.events[before:]
 
     def step(self, game_id: str, joint_orders: dict[Side, OrderBatch]) -> tuple[dict[Side, PlayerObservation], list[GameEvent]]:
@@ -1945,6 +2075,8 @@ class IronBottomEngine:
                         smoke_ships=source.smoke_ships if state.phase == Phase.GUNNERY else [],
                         illumination=source.illumination if state.phase == Phase.GUNNERY else [],
                         searchlights=source.searchlights if state.phase == Phase.GUNNERY else [],
+                        aircraft_illumination=source.aircraft_illumination if state.phase == Phase.GUNNERY else [],
+                        blind_torpedo_reveals=source.blind_torpedo_reveals if state.phase == Phase.TORPEDO_PLANNING else [],
                     )
                     result = self.submit_orders(game_id, projected)
                     if not result.valid:
@@ -1954,20 +2086,30 @@ class IronBottomEngine:
                 break
         return {side: self.observe(game_id, side) for side in Side}, events
 
+    @recognition.replaying
     def replay(self, event_log: str | Iterable[GameEvent]) -> GameState:
         """Rebuild state only from the initial event and submitted command events."""
-        source_events = list(self.get(event_log).events) if isinstance(event_log, str) else list(event_log)
+        source_state = self.get(event_log) if isinstance(event_log, str) else None
+        source_events = list(source_state.events) if source_state else list(event_log)
         if not source_events or source_events[0].type != "game_created":
             raise ValueError("An event log must begin with game_created")
         created = source_events[0].payload
         replay_engine = IronBottomEngine()
-        state = replay_engine.reset(
-            str(created["scenario_id"]),
-            int(created["seed"]),
-            GameOptions.model_validate(created["options"]),
-            game_id=str(created["game_id"]),
-        )
-        for event in source_events[1:]:
+        if created.get("initial_state"):
+            state = GameState.model_validate(created["initial_state"])
+            replay_engine.games[state.game_id] = state
+            prefix = next((i for i,e in enumerate(source_events) if e.type in ("orders_submitted", "phase_changed")), len(source_events))
+            state.events = deepcopy(source_events[:prefix])
+            remaining = source_events[prefix:]
+        else:
+            state = replay_engine.reset(
+                str(created["scenario_id"]),
+                int(created["seed"]),
+                GameOptions.model_validate(created["options"]),
+                game_id=str(created["game_id"]),
+            )
+            remaining = source_events[1:]
+        for event in remaining:
             if event.type == "orders_submitted":
                 raw_batch = event.payload.get("order_batch")
                 if raw_batch is None:
@@ -1977,6 +2119,30 @@ class IronBottomEngine:
                     raise ValueError(f"Replay rejected event {event.sequence}: {result.errors}")
             elif event.type == "phase_changed":
                 replay_engine.advance(state.game_id)
+            elif event.type in {"ai_decision_accepted", "ai_decision_rejected"}:
+                if event.type == "ai_decision_accepted":
+                    state.ai_memory[event.payload["secret_side"]] = deepcopy(event.payload["memory"])
+                trace = deepcopy(event.payload["trace"])
+                state.ai_traces = (state.ai_traces + [trace])[-32:]
+                state.ai_trace_counter = trace["id"]
+                state.events.append(event.model_copy(deep=True))
+            elif event.type == "rules_upgraded_copy":
+                previous_events = state.events
+                state = GameState.model_validate(event.payload["upgrade_state"])
+                state.events = previous_events + [event.model_copy(deep=True)]
+                replay_engine.games[state.game_id] = state
+        # Early night-v2 saves recorded rejected calls only in their audit cache.
+        # Restore those non-gameplay receipts when replaying a saved game; an
+        # events-only replay cannot recover audit information absent from its log.
+        if source_state and source_state.options.ruleset_version == "night-v2":
+            from .ai_memory import sanitize
+            audited = {trace['id']: trace for trace in state.ai_traces}
+            for trace in source_state.ai_traces:
+                if trace.get('status') == 'rejected' and trace['id'] not in audited:
+                    audited[trace['id']] = sanitize(deepcopy(trace))
+            state.ai_traces = [audited[key] for key in sorted(audited)][-32:]
+            if audited:
+                state.ai_trace_counter = max(state.ai_trace_counter, max(audited))
         return state.model_copy(deep=True)
 
     @staticmethod
@@ -2180,7 +2346,7 @@ class IronBottomEngine:
         advance、60° 免费、120° 计 1MF、forced/界/陆约束）。产出
         `(new_pos, new_head, new_cost, new_last, new_turned, action)`。
         """
-        alert_rule = scenario_rules(state.scenario_id).alert_rule()
+        alert_rule = state_scenario_rules(state).alert_rule()
         unalerted = bool(alert_rule and ship.side.value in alert_rule.get("sides", [])
                          and ship.id not in state.scenario_state.get("alerted", []))
         turn_ok = not ship.forced_straight_turns and not unalerted
@@ -2438,6 +2604,8 @@ class IronBottomEngine:
         cost = self.movement_cost("", commands)
         minimum, maximum = self.movement_speed_range(state, ship)
         stay_only = self._advance_impossible(state, ship)
+        if any(self._terrain_impassable(state, pos) for pos, _head, _shift in program):
+            errors.append("movement plan enters land")
         trajectory = [
             {
                 "hex": {"q": pos.q, "r": pos.r},
@@ -2547,6 +2715,11 @@ class IronBottomEngine:
         }
 
     def _prepare_guaranteed_reinforcements(self, state: GameState) -> None:
+        from . import savo
+        if savo.enabled(state):
+            if not state.scenario_state.get("rule_blockers"):
+                savo.prepare(self, state)
+            return
         """Source-backed automatic arrivals are known BEFORE entry orders.
 
         Do not draw a synthetic die for a guaranteed arrival. Probabilistic
@@ -2554,7 +2727,7 @@ class IronBottomEngine:
         """
         if state.phase != Phase.REINFORCEMENT or state.reinforcement_roll_done:
             return
-        for entry in scenario_rules(state.scenario_id).kinds("guaranteed_reinforcement"):
+        for entry in state_scenario_rules(state).kinds("guaranteed_reinforcement"):
             if state.turn != int(entry["turn"]) or state.reinforcement_arrival_turn != state.turn:
                 continue
             state.reinforcement_roll_done = True
@@ -2567,6 +2740,10 @@ class IronBottomEngine:
             )
 
     def _resolve_reinforcements(self, state: GameState) -> None:
+        from . import savo
+        if savo.enabled(state):
+            savo.resolve(self, state)
+            return
         if state.reinforcement_trigger_turn == state.turn and not state.reinforcement_roll_done:
             roll, die = self._roll_d6(state)
             state.reinforcement_roll_done = True
@@ -2609,7 +2786,7 @@ class IronBottomEngine:
         if len(submitted_ids) != len(set(submitted_ids)):
             errors.append("Duplicate hidden contact setup order")
         if set(submitted_ids) != set(markers):
-            errors.append("Hidden contact setup must cover all four owned markers")
+            errors.append("Hidden contact setup must cover all owned markers")
         entry_labels = [order.entry_hex.label for order in batch.contacts]
         if len(entry_labels) != len(set(entry_labels)):
             errors.append("Hidden contacts must use distinct entry hexes")
@@ -2741,7 +2918,7 @@ class IronBottomEngine:
             return True
         return bool(
             radar and any(
-                HexCoord.from_label(label).distance(target) <= 4
+                HexCoord.from_label(label).distance(target) <= (night.config(state)["radar"]["shore_exclusion"] if night.enabled(state) else 4)
                 for label in blockers
             )
         )
@@ -3031,6 +3208,9 @@ class IronBottomEngine:
         launcher.loaded -= order.count
         expended = state.scenario_state.setdefault("torpedo_expended", {})
         expended[ship.side.value] = expended.get(ship.side.value, 0) + order.count
+        if night.enabled(state) and state.scenario_id == "IBS-S-10":
+            by_ship = state.scenario_state.setdefault("savo_torpedo_expended", {})
+            by_ship[ship.id] = by_ship.get(ship.id, 0) + order.count
         if launcher.loaded == 0 and launcher.reloads_remaining:
             reload_duration = 3 if ship.ship_type in {"DD", "APD"} else 2
             launcher.reload_turns_remaining = reload_duration + 1
@@ -3194,6 +3374,11 @@ class IronBottomEngine:
                 else:
                     destinations[ship_id] = path[impulse][0]
             for ship_id, destination in list(destinations.items()):
+                from .savo import crossing
+                if crossing(self, state, state.ships[ship_id], destination):
+                    stopped.add(ship_id)
+                    del destinations[ship_id]
+                    continue
                 if ship_id not in stopped and self._terrain_impassable(state, destination):
                     destinations[ship_id] = state.ships[ship_id].position  # type: ignore[assignment]
                     stopped.add(ship_id)
@@ -3322,6 +3507,8 @@ class IronBottomEngine:
             for ship_id, position in destinations.items():
                 if ship_id not in stopped:
                     state.ships[ship_id].position = position
+                    if night.enabled(state):
+                        state.scenario_state.setdefault("turn_paths", {}).setdefault(ship_id, []).append(position.model_dump())
                     if impulse < len(paths[ship_id]):
                         state.ships[ship_id].heading = paths[ship_id][impulse][1]
             for marker_id, path in contact_paths.items():
@@ -3553,7 +3740,7 @@ class IronBottomEngine:
                 len(targets_per_attacker[attacker.id]),
             )
             firepower = sum(mount.firepower for mount in mounts)
-            multiplier = scenario_rules(state.scenario_id).firepower_multiplier(
+            multiplier = state_scenario_rules(state).firepower_multiplier(
                 attacker.side.value,
                 attacker.ship_type,
                 caliber,
@@ -3568,8 +3755,10 @@ class IronBottomEngine:
             modifier = sum(modifiers.values())
             raw, dice = self._roll_d66(state)
             adjusted = d66_adjust(raw, modifier)
-            hits = scenario_rules(state.scenario_id).gunnery_hits(self.rules.hit_count, firepower, adjusted)
+            hits = state_scenario_rules(state).gunnery_hits(self.rules.hit_count, firepower, adjusted)
             attacker.fired = True
+            if night.enabled(state) and state.options.radar_1942_variant and not night.optical_ship(self, state, attacker, target):
+                state.scenario_state.setdefault("radar_first_fire", {}).setdefault(attacker.id, state.turn)
             mount_ids = [mount.id for mount in mounts]
             self._event(
                 state,
@@ -3590,7 +3779,7 @@ class IronBottomEngine:
                 dice=DiceRoll(dice=dice, notation="D66", raw=raw, adjusted=adjusted),
             )
             self._mark_alerted(state, target.id, "被炮击")
-            if hits and scenario_rules(state.scenario_id).penetration_blocked(
+            if hits and state_scenario_rules(state).penetration_blocked(
                 attacker.side.value, state.turn, attacker.ship_type
             ):
                 self._event(
@@ -3628,6 +3817,9 @@ class IronBottomEngine:
             state.ships[ship_id].guns_disabled_turns -= 1
 
     def _resolve_optional_gunnery(self, state: GameState, batches: list[OrderBatch]) -> None:
+        if night.enabled(state):
+            night.prepare_gunnery(self, state, batches)
+            return
         optional = state.options.optional_rules
         if optional.star_shells:
             for order in [item for batch in batches for item in batch.illumination]:
@@ -3834,9 +4026,13 @@ class IronBottomEngine:
                 )
 
     def _check_victory(self, state: GameState) -> None:
+        if night.enabled(state) and state.scenario_id == "IBS-S-10":
+            from .savo import finish
+            finish(self, state)
+            return
         if state.turn < state.max_turns:
             return
-        state.winner, state.victory_reason, source_page = scenario_rules(state.scenario_id).resolve_victory(state)
+        state.winner, state.victory_reason, source_page = state_scenario_rules(state).resolve_victory(state)
         state.phase = Phase.COMPLETE
         self._event(
             state,
@@ -3889,7 +4085,9 @@ class IronBottomEngine:
             int(self.rules.modifiers["optional"]["through_smoke"])
             if state.options.optional_rules.smoke and (target.smoke or attacker.smoke) else 0
         )
-        scenario_modifier = scenario_rules(state.scenario_id).gunnery_situation_modifier(
+        if night.enabled(state):
+            values["through_smoke"] = night.config(state)["smoke"]["modifier"] if night.smoke_crossed(self, state, attacker, target) else 0
+        scenario_modifier = state_scenario_rules(state).gunnery_situation_modifier(
             attacker.position, target.position
         )
         if scenario_modifier:
@@ -3918,7 +4116,7 @@ class IronBottomEngine:
     def _torpedo_modifier(self, state: GameState, attacker: ShipState, target: ShipState, distance: int) -> int:
         modifier = self.rules.range_modifier("torpedo", distance, japanese=attacker.id.startswith("IBS-U-IJN-"))
         modifier += self.rules.target_speed_modifier("torpedo", target.current_speed)
-        modifier += scenario_rules(state.scenario_id).torpedo_roll_bonus(attacker.side.value, state.turn)
+        modifier += state_scenario_rules(state).torpedo_roll_bonus(attacker.side.value, state.turn)
         return modifier
 
     @staticmethod
@@ -4180,7 +4378,7 @@ class IronBottomEngine:
                 "UK" if attacker.id.startswith("IBS-U-RN-") else "DE"
             )
         )
-        rules = scenario_rules(state.scenario_id)
+        rules = state_scenario_rules(state)
         effective_caliber = rules.penetration_caliber(attacker.id, caliber or attacker.primary.caliber)
         # 穿甲表注释：穿甲值必须大于装甲才算击穿（美 8" 炮 12 格无法穿透 9" 装甲，
         # 表中 11-13 档值恰为 9），平值不穿透。
@@ -4464,6 +4662,11 @@ class IronBottomEngine:
         return sum(crossed) - sum(before)
 
     def _visible_to(self, state: GameState, target: ShipState, side: Side, own_positions: Iterable[HexCoord | None]) -> bool:
+        if night.enabled(state):
+            if target.sunk:
+                return target.id in state.scenario_state.get("confirmed_losses", {}).get(side.value, [])
+            observers = [s for s in state.ships.values() if s.side == side and not s.sunk and s.position and s.position in own_positions]
+            return any(night.optical_ship(self, state, s, target) or night.radar_contact(self, state, s, target) for s in observers)
         if target.sunk or not target.position:
             return True
         if self._weather_blocked(state, target.position):
@@ -4497,6 +4700,8 @@ class IronBottomEngine:
         return state.options.optional_rules.silhouettes and self._silhouetted(state, target)
 
     def _can_see(self, state: GameState, attacker: ShipState, target: ShipState) -> bool:
+        if night.enabled(state):
+            return night.can_fire(self, state, attacker, target)
         if self._weather_blocked(state, attacker.position) or self._weather_blocked(state, target.position):
             return False
         if not attacker.position or not target.position:
@@ -4523,7 +4728,7 @@ class IronBottomEngine:
         if not candidate.position:
             return False
         firing_pairs: set[tuple[str, str]] = set()
-        for batch in self._sealed_batches(state, Phase.GUNNERY):
+        for batch in ([] if night.enabled(state) else self._sealed_batches(state, Phase.GUNNERY)):
             for order in batch.gunnery:
                 targets = {item.target_id for item in order.mounts}
                 targets.update(target for target in (order.primary_target, order.secondary_target) if target)
@@ -4620,7 +4825,7 @@ class IronBottomEngine:
         return False
 
     def _mark_alerted(self, state: GameState, ship_id: str, reason: str) -> None:
-        rule = scenario_rules(state.scenario_id).alert_rule()
+        rule = state_scenario_rules(state).alert_rule()
         if not rule or ship_id not in state.ships:
             return
         ship = state.ships[ship_id]
@@ -4641,7 +4846,7 @@ class IronBottomEngine:
 
     def _apply_turn_start_scenario_rules(self, state: GameState) -> None:
         """回合推进时的想定规则钩子：能见度日程、警戒自动升级与目视触发。"""
-        rule_set = scenario_rules(state.scenario_id)
+        rule_set = state_scenario_rules(state)
         for side in Side:
             value = rule_set.visibility_for_turn(side.value, state.turn)
             if value is not None:
@@ -4663,6 +4868,7 @@ class IronBottomEngine:
             enemy_visible = any(
                 enemy.position and not enemy.sunk and enemy.side != ship.side
                 and ship.position.distance(enemy.position) <= visibility
+                and (not night.enabled(state) or night.optical_ship(self, state, ship, enemy))
                 for enemy in state.ships.values()
             )
             if enemy_visible:
@@ -4671,7 +4877,7 @@ class IronBottomEngine:
     def _scenario_movement_violation(
         self, state: GameState, ship: ShipState, commands: list[str], cost: int, final_position: HexCoord | None
     ) -> str | None:
-        rule_set = scenario_rules(state.scenario_id)
+        rule_set = state_scenario_rules(state)
         for constraint in rule_set.movement_constraints():
             if constraint.get("constraint") != "stay_adjacent":
                 continue
@@ -4706,8 +4912,8 @@ class IronBottomEngine:
                 return f"想定特例：该舰每回合航速最多提升 1 MF（当前 {ship.current_speed}）"
         return None
 
-    @staticmethod
     def _event(
+        self,
         state: GameState,
         event_type: str,
         message: str,
@@ -4726,4 +4932,44 @@ class IronBottomEngine:
             dice=dice,
         )
         state.events.append(event)
+        if night.enabled(state):
+            track = next((t for t in state.torpedo_tracks if t.id == event.payload.get("track_id")), None)
+            if track and track.hidden and not track.contact_ship_ids:
+                event.payload["secret_side"] = track.side.value
+            fields = ("ship_id", "attacker", "target", "launcher_ship_id", "obstacle_id")
+            if recognition.enabled(state):
+                fields += ("target_id",)
+            related_ids = {event.payload.get(k) for k in fields if event.payload.get(k) in state.ships}
+            if track and track.launcher_ship_id in state.ships:
+                # A track id can embed its launcher even when an event only
+                # carries track_id (terrain impact or player reveal).
+                related_ids.add(track.launcher_ship_id)
+            for field in ("ships", "ship_ids", "candidate_targets"):
+                related_ids.update(sid for sid in event.payload.get(field, []) if sid in state.ships)
+            event.payload["known_ship_ids"] = {
+                which.value: sorted(sid for sid in related_ids if state.ships[sid].side == which or any(
+                    night.optical_ship(self, state, observer, state.ships[sid]) or night.radar_contact(self, state, observer, state.ships[sid])
+                    for observer in state.ships.values() if observer.side == which and observer.position and not observer.sunk))
+                for which in Side
+            }
+            if recognition.enabled(state):
+                event.payload["identified_ship_ids"] = {which.value: sorted(sid for sid in related_ids
+                    if recognition.identified(self, state, which, state.ships[sid])) for which in Side}
+        if night.enabled(state) and event_type != "ship_sunk" and not event.payload.get("secret_side"):
+            related = [state.ships[sid] for sid in (event.payload.get("ship_id"), event.payload.get("attacker"), event.payload.get("target")) if sid in state.ships]
+            if related:
+                event.payload["observed_by"] = [which.value for which in Side if any(
+                    ship.side == which or any(night.optical_ship(self, state, observer, ship) or night.radar_contact(self, state, observer, ship)
+                        for observer in state.ships.values() if observer.side == which and observer.position and not observer.sunk)
+                    for ship in related)]
+        if night.enabled(state) and event_type == "ship_sunk":
+            target = state.ships.get(event.payload.get("ship_id"))
+            if target:
+                known = [which.value for which in Side if which == target.side or any(
+                    night.optical_ship(self, state, observer, target) for observer in state.ships.values()
+                    if observer.side == which and observer.position and not observer.sunk)]
+                event.payload["observed_by"] = known
+                ledger = state.scenario_state.setdefault("confirmed_losses", {})
+                for which in known:
+                    ledger[which] = sorted(set(ledger.get(which, [])) | {target.id})
         return event

@@ -81,6 +81,8 @@ def export_frame(
         ships.append({
             "id": ship.id,
             "name": ship.name,
+            "identified": ship.identified,
+            "ship_type": ship.ship_type,
             "side": ship.side.value,
             "hex": ship.position.label if ship.position else None,
             "q": ship.position.q if ship.position else None,

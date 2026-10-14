@@ -12,7 +12,7 @@ from .storage import GameRepository
 
 
 FORMAT = "iron-bottom-sound-save"
-VERSION = 1
+VERSION = 2
 
 
 def _canonical(value: Any) -> bytes:
@@ -59,6 +59,7 @@ def build_save_bundle(
             for sequence, snapshot in snapshots
         ],
         "custom_scenario": custom_scenario,
+        "ai_debug": repository.ai_debug(state.game_id, limit=10000),
     }
     bundle["checksum"] = _checksum(bundle)
     return bundle
@@ -73,12 +74,26 @@ def _validate_sequences(events: list[GameEvent]) -> None:
 
 
 def validate_save_bundle(bundle: dict) -> tuple[GameState, list[tuple[int, GameState]]]:
-    if bundle.get("format") != FORMAT or bundle.get("version") != VERSION:
+    if bundle.get("format") != FORMAT or bundle.get("version") not in (1, VERSION):
         raise ValueError("不支持的存档格式或版本")
     checksum = bundle.get("checksum")
     if not isinstance(checksum, str) or checksum != _checksum(bundle):
         raise ValueError("存档校验和不匹配，文件可能已损坏或被修改")
     state = GameState.model_validate(bundle.get("state"))
+    from .recognition import validate_snapshot
+    validate_snapshot(state)
+    from .ai_memory import sanitize
+    journal = bundle.get("ai_debug", [])
+    if not isinstance(journal, list) or len(journal) > 10000:
+        raise ValueError("AI 调试记录格式／数量无效")
+    ids = set()
+    for entry in journal:
+        if not isinstance(entry, dict) or not isinstance(entry.get("id"), int) or entry["id"] < 1 or entry["id"] in ids:
+            raise ValueError("AI 调试记录编号无效")
+        if entry.get("side") not in ("axis", "allies") or entry["id"] > state.ai_trace_counter:
+            raise ValueError("AI 调试记录阵营／序号无效")
+        ids.add(entry["id"])
+    state.ai_traces = sorted(sanitize(journal or state.ai_traces), key=lambda e: e["id"])
     events = [GameEvent.model_validate(item) for item in bundle.get("events", [])]
     _validate_sequences(events)
     if state.events != events:
@@ -91,6 +106,7 @@ def validate_save_bundle(bundle: dict) -> tuple[GameState, list[tuple[int, GameS
     for item in bundle.get("snapshots", []):
         sequence = int(item["sequence"])
         snapshot = GameState.model_validate(item["state"])
+        validate_snapshot(snapshot)
         if sequence <= last_sequence or sequence > events[-1].sequence:
             raise ValueError("存档快照序列无效")
         if snapshot.game_id != state.game_id:
@@ -119,6 +135,11 @@ def clone_imported_game(
         if copied.events and copied.events[0].type == "game_created":
             copied.events[0].payload = deepcopy(copied.events[0].payload)
             copied.events[0].payload["game_id"] = new_id
+            if copied.events[0].payload.get("initial_state"):
+                copied.events[0].payload["initial_state"]["game_id"] = new_id
+        for event in copied.events:
+            if event.payload.get("upgrade_state"):
+                event.payload["upgrade_state"]["game_id"] = new_id
         return copied
 
     return clone(state), [(sequence, clone(snapshot)) for sequence, snapshot in snapshots]

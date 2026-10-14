@@ -18,6 +18,7 @@ from .formation_maneuver import (
     follow_wake_allowed,
 )
 from .scenario_guidance import public_search_target
+from .recognition import planner
 from .models import (
     AIPlanSheet,
     CommandSuccession,
@@ -927,6 +928,7 @@ class RealisticCommander:
         self.profile = profile or PROFILES["balanced"]
         self.tactical = TacticalCommander(profile=self.profile)
 
+    @planner
     def choose_plan(self, engine: "IronBottomEngine", game_id: str, side: Side):
         state = engine.get(game_id)
         if not state.options.realistic_command:
@@ -1003,7 +1005,7 @@ class RealisticCommander:
             plan, batch, audits = self.tactical._finalize(engine, state, side, batch, intents)
             plan.situation_summary = "真实编队协同：炮战纵队、雷击翼队和掩护支队共同规划逐脉冲航路。"
             plan.phase_goal = "避让友军和可见鱼雷，抢占 T 头并保持侧翼雷击与掩护配合。"
-            plan.contingency = ["原版强制损伤与指挥中断优先", "无安全航路时报告剩余风险", "敌方航路仅依据当前可见信息预测"]
+            plan.contingency = ["原版强制损伤与指挥中断优先；无安全航路时报告剩余风险", "敌方航路仅依据当前可见信息预测"]
             plan.tactical_analysis = analysis
             for audit in audits:
                 audit.model = "realistic-cooperative-v2"

@@ -26,6 +26,7 @@ from .models import (
     TorpedoOrder,
 )
 from .torpedo_tactics import AdaptiveTorpedoPlanner, TorpedoDecisionAudit
+from .recognition import planner
 
 
 class TacticalProfile(BaseModel):
@@ -200,6 +201,8 @@ class TacticalCommander(DeterministicCommander):
         self.profile = profile
         self._last_torpedo_audit: TorpedoDecisionAudit | None = None
         self._movement_candidate_cache: dict[str, list[MovementOrder]] = {}
+        self._movement_positions_cache: dict[tuple[str, str], list[HexCoord]] = {}
+        self._mandatory_hex_cache: dict[tuple[str, str], HexCoord | None] = {}
 
     # ------------------------------------------------------------------ AI 概率抽样基础设施
 
@@ -311,6 +314,7 @@ class TacticalCommander(DeterministicCommander):
 
     # ------------------------------------------------------------------ 总入口
 
+    @planner
     def choose_plan(
         self, engine: IronBottomEngine, game_id: str, side: Side,
     ) -> tuple[AIPlanSheet, OrderBatch, list[LLMCallAudit]]:
@@ -339,6 +343,9 @@ class TacticalCommander(DeterministicCommander):
     def _finalize(
         self, engine: IronBottomEngine, state, side: Side, batch: OrderBatch, intents: dict[str, str],
     ) -> tuple[AIPlanSheet, OrderBatch, list[LLMCallAudit]]:
+        if state.phase == Phase.GUNNERY and state.options.ruleset_version == "night-v2":
+            from .night import tactical_orders
+            tactical_orders(engine, state, side, batch, intents)
         plan = AIPlanSheet(
             turn=state.turn,
             phase=state.phase,
@@ -409,7 +416,7 @@ class TacticalCommander(DeterministicCommander):
             pred_by_id = {enemy.id: (enemy.position, enemy.heading) for enemy in enemies}
             pred_hexes = [enemy.position for enemy in enemies]
 
-        public_enemies = {enemy.id: self._public_copy(state, state.ships[enemy.id]) for enemy in enemies}
+        public_enemies = {enemy.id: self._public_copy(state, state.ships[enemy.id]) for enemy in enemies if enemy.identified}
         memo: dict[str, float] = {}
 
         def enemy_threat_of(hexc: HexCoord) -> float:
@@ -421,11 +428,11 @@ class TacticalCommander(DeterministicCommander):
                         position=pred_by_id[enemy.id][0], heading=pred_by_id[enemy.id][1],
                         target_hexes=[hexc],
                     )
-                    for enemy in enemies
+                    for enemy in enemies if enemy.id in public_enemies
                 )
             return memo[label]
 
-        max_vp = max((ship.vp for ship in state.ships.values()), default=1)
+        max_vp = max((ship.vp for ship in engine.observe(state.game_id, side).ships), default=1)
         enemy_value = {enemy.id: self._value_factor(enemy, max_vp) for enemy in enemies}
         torpedo_threat = self._visible_torpedo_threat(engine, state, side)
         return _MovementContext(
@@ -466,6 +473,8 @@ class TacticalCommander(DeterministicCommander):
         """预测敌舰下一回合最优落点（敌视角 1-ply）：敌规避"我方火力覆盖"、
         追求对我可见舰的火力压力、按自身风格接近与编队。只依赖敌当前可见信息，
         不递归预测我方反应。返回 (预测落点, 末航向)。"""
+        if not enemy.identified:
+            return enemy.position, enemy.heading
         es = self._public_copy(state, state.ships[enemy.id])
         candidates = engine.movement_candidates(state, es, include_plans=False)["reachable"]
         if not candidates:
@@ -551,6 +560,8 @@ class TacticalCommander(DeterministicCommander):
         # a local collision dead end.  Cache its legal plan set for this call;
         # movement state is immutable until the sealed batch is adjudicated.
         self._movement_candidate_cache.clear()
+        self._movement_positions_cache.clear()
+        self._mandatory_hex_cache.clear()
         obs = engine.observe(state.game_id, side)
         enemies = [ship for ship in obs.ships if ship.side != side and not ship.sunk and ship.position]
         ctx = self._build_movement_context(engine, state, side, enemies, rng)
@@ -599,6 +610,14 @@ class TacticalCommander(DeterministicCommander):
             for marker in obs.markers
             if marker.kind == "contact" and marker.secret_side == side and marker.position
         ]
+        if state.options.ruleset_version == "night-v2" and not state.options.realistic_command:
+            if any(self._movement_conflicts(engine, state, ship, order, reserved[:index])
+                   for index, (ship, order) in enumerate(reserved)) or not self._future_first_steps_clear(engine,state,reserved):
+                assignment = self._collision_free_prefix_assignment(
+                    engine, state, list(active.values()), {o.ship_id:o.plan for o in movement})
+                if assignment is None:
+                    raise ValueError("经典 AI 无法在本轮合法候选中解开友舰航路冲突；未封存危险订单")
+                movement = [assignment[o.ship_id] for o in movement]
         intents = {order.ship_id: "规避敌方火力并抢占射击阵位" for order in movement}
         intents.update({order.marker_id: "保持隐蔽编队推进" for order in contact_movement})
         return movement, contact_movement, intents
@@ -612,17 +631,20 @@ class TacticalCommander(DeterministicCommander):
         先尝试队首的战术最优计划；若队尾因地图边缘或损伤无法复制，则枚举队首
         其它合法命令串，避免把队首已经选定的危险机动强塞给全队。
         """
-        if len(ships) == 1:
+        if len(ships) == 1 and (state.options.ruleset_version!="night-v2" or self._next_bow_clear(engine,state,ships[0],preferred)):
             return [(ships[0], preferred)]
-        plans = [preferred.plan]
         leader = ships[0]
-        for entry in engine.movement_candidates(state, leader, include_plans=False)["reachable"]:
-            hexc = HexCoord(q=entry["hex"]["q"], r=entry["hex"]["r"])
-            for heading in entry["final_headings"]:
-                plan = self._path_to(engine, state, leader, hexc, heading)
-                if plan is not None and plan not in plans:
-                    plans.append(plan)
-        for plan in plans:
+        def plans():
+            seen = {preferred.plan}
+            yield preferred.plan
+            for entry in engine.movement_candidates(state, leader, include_plans=False)["reachable"]:
+                hexc = HexCoord(q=entry["hex"]["q"], r=entry["hex"]["r"])
+                for heading in entry["final_headings"]:
+                    plan = self._path_to(engine, state, leader, hexc, heading)
+                    if plan is not None and plan not in seen:
+                        seen.add(plan)
+                        yield plan
+        for plan in plans():
             local: list[tuple[ShipState, MovementOrder]] = []
             for ship in ships:
                 order = MovementOrder(ship_id=ship.id, plan=plan)
@@ -732,19 +754,89 @@ class TacticalCommander(DeterministicCommander):
             if plan is None:
                 continue
             order = MovementOrder(ship_id=ship.id, plan=plan)
+            if state.options.ruleset_version=="night-v2" and not self._next_bow_clear(engine,state,ship,order):
+                continue
             if not self._movement_conflicts(engine, state, ship, order, reserved):
                 return order
         return self._fallback_movement(engine, state, ship, reserved)
 
     @staticmethod
+    def _next_bow_clear(engine, state, ship, order):
+        positions, heading = engine.movement_trajectory(ship, order.plan, columns=state.map_columns, rows=state.map_rows)
+        end = positions[-1][0] if positions else ship.position
+        if end == ship.position and engine._advance_impossible(state, ship):
+            return True  # An existing blocked ship can only legally hold.
+        try:
+            ahead = end.neighbor(heading,columns=state.map_columns,rows=state.map_rows)
+        except ValueError:
+            return False
+        return not engine._terrain_impassable(state,ahead)
+
+    def _next_mandatory_hex(self,engine,state,ship,order):
+        if state.options.ruleset_version!="night-v2" or state.options.realistic_command:
+            return None
+        key = (ship.id, order.plan)
+        if key in self._mandatory_hex_cache:
+            return self._mandatory_hex_cache[key]
+        positions, heading=engine.movement_trajectory(ship,order.plan,columns=state.map_columns,rows=state.map_rows)
+        end=positions[-1][0] if positions else ship.position
+        cost=engine.movement_cost(order.plan,engine.movement_commands(order))
+        projected=ship.model_copy(update={"position":end,"heading":heading,"current_speed":cost,"previous_speed":cost})
+        future=state.model_copy(update={"turn":state.turn+1})
+        if engine.movement_speed_range(future,projected)[0]==0 or engine._advance_impossible(future,projected):
+            self._mandatory_hex_cache[key] = None
+            return None
+        result = end.neighbor(heading,columns=state.map_columns,rows=state.map_rows)
+        self._mandatory_hex_cache[key] = result
+        return result
+
+    @staticmethod
+    def _future_first_steps_clear(engine,state,orders):
+        """AI lookahead over own legal first steps, including forced hold chains."""
+        if state.options.ruleset_version!="night-v2" or state.options.realistic_command:
+            return True
+        domains={}; starts={}
+        future=state.model_copy(update={"turn":state.turn+1})
+        for ship,order in orders:
+            path,heading=engine.movement_trajectory(ship,order.plan,columns=state.map_columns,rows=state.map_rows)
+            end=path[-1][0] if path else ship.position
+            cost=engine.movement_cost(order.plan,engine.movement_commands(order))
+            projected=ship.model_copy(update={"position":end,"heading":heading,"current_speed":cost,"previous_speed":cost})
+            minimum,maximum=engine.movement_speed_range(future,projected)
+            cells=[]
+            if minimum==0 or engine._advance_impossible(future,projected):
+                cells.append(end)
+            if maximum>0 and not engine._advance_impossible(future,projected):
+                cells.append(end.neighbor(heading,columns=state.map_columns,rows=state.map_rows))
+            if not cells:
+                return False
+            domains[ship.id]=cells;starts[ship.id]=end
+        def search(remaining,chosen):
+            if not remaining:
+                return True
+            choices=[]
+            for sid in remaining:
+                legal=[p for p in domains[sid] if all(p!=other and not (p==starts[oid] and other==starts[sid]) for oid,other in chosen.items())]
+                if not legal:
+                    return False
+                choices.append((len(legal),sid,legal))
+            _,sid,legal=min(choices,key=lambda row:(row[0],row[1]))
+            return any(search([other for other in remaining if other!=sid],{**chosen,sid:p}) for p in legal)
+        return search(list(domains),{})
+
     def _movement_positions(
-        engine: IronBottomEngine, state, ship: ShipState, order: MovementOrder,
+        self, engine: IronBottomEngine, state, ship: ShipState, order: MovementOrder,
     ) -> list[HexCoord]:
+        key = (ship.id, order.plan)
+        if key in self._movement_positions_cache:
+            return self._movement_positions_cache[key]
         preview = engine.movement_preview(state, ship, plan=order.plan)
-        return [ship.position] + [
+        result = [ship.position] + [
             HexCoord(q=item["hex"]["q"], r=item["hex"]["r"])
             for item in preview["trajectory"]
         ]
+        self._movement_positions_cache[key] = result
+        return result
 
     def _movement_conflicts(
         self, engine: IronBottomEngine, state, ship: ShipState, order: MovementOrder,
@@ -764,6 +856,10 @@ class TacticalCommander(DeterministicCommander):
                     return True
                 if left_after == right_before and right_after == left_before:
                     return True
+            lf=self._next_mandatory_hex(engine,state,ship,order)
+            rf=self._next_mandatory_hex(engine,state,other,other_order)
+            if lf is not None and rf is not None and (lf==rf or (lf==right[-1] and rf==left[-1])):
+                return True
         return False
 
     def _score_hex(
@@ -944,6 +1040,7 @@ class TacticalCommander(DeterministicCommander):
         fixed = fixed or []
         options: dict[str, list[MovementOrder]] = {}
         trajectories: dict[tuple[str, int], tuple[HexCoord, ...]] = {}
+        next_hexes = {}
         conflicts: dict[tuple[tuple[str, int], tuple[str, int]], bool] = {}
         by_id = {ship.id: ship for ship in ships}
         for ship in ships:
@@ -965,6 +1062,7 @@ class TacticalCommander(DeterministicCommander):
                 trajectories[(ship.id, index)] = tuple(
                     self._movement_positions(engine, state, ship, order)
                 )
+                next_hexes[(ship.id,index)]=self._next_mandatory_hex(engine,state,ship,order)
         nodes = 0
 
         def pair_conflicts(left_key: tuple[str, int], right_key: tuple[str, int]) -> bool:
@@ -987,6 +1085,10 @@ class TacticalCommander(DeterministicCommander):
                     result = True
                     break
             conflicts[cache_key] = result
+            lf,rf=next_hexes[left_key],next_hexes[right_key]
+            if lf is not None and rf is not None and (lf==rf or (lf==right[-1] and rf==left[-1])):
+                result=True
+                conflicts[cache_key]=True
             return result
 
         def compatible(ship_id: str, chosen: dict[str, int]) -> list[int]:
@@ -1017,6 +1119,8 @@ class TacticalCommander(DeterministicCommander):
                 if nodes > 5_000:
                     return None
                 revised = {**chosen, ship_id: candidate_index}
+                if not self._future_first_steps_clear(engine,state,[(by_id[sid],options[sid][idx]) for sid,idx in revised.items()]+fixed):
+                    continue
                 if any(not compatible(other_id, revised) for other_id in tail):
                     continue
                 solved = search(tail, revised)
@@ -1036,6 +1140,30 @@ class TacticalCommander(DeterministicCommander):
         cached = self._movement_candidate_cache.get(ship.id)
         if cached is not None:
             return [order.model_copy() for order in cached]
+        if state.options.ruleset_version=="night-v2" and not state.options.realistic_command:
+            # Different routes to the same hex can differ in collision safety.
+            # Include alternate bends; every program is validated by the engine.
+            minimum, maximum = engine.movement_speed_range(state,ship)
+            programs={"0"}
+            for cost in range(1,maximum+1):
+                programs.add(str(cost))
+                for first in range(1,cost+1):
+                    for turn in ("P","S","PP","SS"):
+                        remainder=cost-first-(1 if len(turn)==2 else 0)
+                        if remainder<0:
+                            continue
+                        programs.add(f"{first}{turn}"+(str(remainder) if remainder else ""))
+                        for second in range(1,remainder+1):
+                            for other in ("P","S"):
+                                last=remainder-second
+                                programs.add(f"{first}{turn}{second}{other}"+(str(last) if last else ""))
+            result=[]
+            for program in sorted(programs):
+                order=MovementOrder(ship_id=ship.id,plan=program)
+                if engine.movement_preview(state,ship,plan=program)["commitable"] and self._next_bow_clear(engine,state,ship,order):
+                    result.append(order)
+            self._movement_candidate_cache[ship.id]=[o.model_copy() for o in result]
+            return result
         plans: list[str] = []
         if engine.movement_preview(state, ship, plan="0")["commitable"]:
             plans.append("0")
@@ -1047,6 +1175,8 @@ class TacticalCommander(DeterministicCommander):
                 if plan is not None and plan not in plans:
                     plans.append(plan)
         result = [MovementOrder(ship_id=ship.id, plan=plan) for plan in plans]
+        if state.options.ruleset_version=="night-v2":
+            result = [o for o in result if self._next_bow_clear(engine,state,ship,o)]
         self._movement_candidate_cache[ship.id] = [order.model_copy() for order in result]
         return result
 

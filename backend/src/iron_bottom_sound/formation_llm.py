@@ -459,12 +459,11 @@ class ProviderPolicy:
             body = response.json()
             choice = body["choices"][0]["message"]
             content = choice.get("content") or ""
-            reasoning = choice.get("reasoning_content") or ""
+            reasoning = bool(choice.get("reasoning_content"))
             self.last_meta = {
                 "model": self.model,
                 "request_id": body.get("id"),
                 "usage": body.get("usage") or {},
-                "reasoning_content": reasoning,
                 "finish_reason": body["choices"][0].get("finish_reason"),
             }
             if not content and reasoning:

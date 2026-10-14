@@ -2,6 +2,7 @@ import {useEffect} from "react";
 import type {Side} from "./types";
 import type {BriefingShip,ScenarioBriefing} from "./api";
 import {counterImage,counterFallbackImage} from "./assets";
+import {RULE_NAMES} from "./NightUI";
 
 type Props={briefing:ScenarioBriefing;onClose:()=>void;mySide?:Side};
 
@@ -43,7 +44,7 @@ function FleetBlock({title,ships,flagshipNote,reinforcements}:{title:string;ship
 
 function FormationList({briefing}:{briefing:ScenarioBriefing}){
  if(!briefing.formations)return null;
- const sideName:Record<Side,string>={axis:"轴心（日本）",allies:"同盟（美英）"};
+ const sideName:Record<Side,string>={axis:"轴心",allies:"同盟"};
  return <section className="paper-formations">
   <h3>真实模式 · 默认编队提案</h3>
   <p className="paper-fine">{briefing.setup_note??"编队仅为直接开局的默认提案；部署权威仍是想定初始位置与规则。"}</p>
@@ -69,10 +70,10 @@ export function ScenarioBriefingModal({briefing,onClose,mySide}:Props){
    <div className="paper-title-row">
     <span className="paper-badge"><small>Scenario</small><b>{numberText||briefing.id}</b></span>
     <div><h2>{briefing.title}</h2><p>{briefing.date??"日期未知"}</p></div>
-    {my&&<div className="paper-myside">你的席位提示：{my.side==="axis"?"轴心（日本）":"同盟（美英）"}{my.flagship?" · 旗舰 "+my.name:""}</div>}
+    {my&&<div className="paper-myside">你的席位提示：{my.side==="axis"?"轴心":"同盟"}{my.flagship?" · 旗舰 "+my.name:""}</div>}
    </div>
-   <FleetBlock title="日本舰队 配置" ships={briefing.ships.filter(s=>s.side==="axis")} flagshipNote="（旗舰加框标示）" reinforcements={briefing.reinforcements?.ships.filter(s=>s.side==="axis")}/>
-   <FleetBlock title="盟军舰队 配置" ships={briefing.ships.filter(s=>s.side==="allies")} flagshipNote="（旗舰加框标示）" reinforcements={briefing.reinforcements?.ships.filter(s=>s.side==="allies")}/>
+   <FleetBlock title="轴心舰队 配置" ships={briefing.ships.filter(s=>s.side==="axis")} flagshipNote="（旗舰加框标示）" reinforcements={briefing.reinforcements?.ships.filter(s=>s.side==="axis")}/>
+   <FleetBlock title="同盟舰队 配置" ships={briefing.ships.filter(s=>s.side==="allies")} flagshipNote="（旗舰加框标示）" reinforcements={briefing.reinforcements?.ships.filter(s=>s.side==="allies")}/>
    {briefing.reinforcements&&<p className="paper-reinforce-note">
     援军检定：第 {String((briefing.reinforcements.trigger as {turn?:number}).turn??"—")} 回合掷
     {" "+String((briefing.reinforcements.trigger as {roll?:string}).roll??"1d6")+" "}
@@ -80,9 +81,11 @@ export function ScenarioBriefingModal({briefing,onClose,mySide}:Props){
     从 {(briefing.reinforcements.arrival as {entry_hex_range?:string[]}).entry_hex_range?.join(" 至 ")??"—"} 间入场。
    </p>}
    <section className="paper-meta">
-    <p><b>游戏回合：</b>{briefing.turns} 个回合。<b>能见度：</b>日军 {briefing.visibility.axis} 格，盟军 {briefing.visibility.allies} 格。</p>
+    <p><b>游戏回合：</b>{briefing.runtime?.unlimited_turns?"无限":briefing.turns} 个回合。<b>能见度：</b>轴心 {briefing.runtime?.visibility.axis??briefing.visibility.axis} 格，同盟 {briefing.runtime?.visibility.allies??briefing.visibility.allies} 格。</p>
    </section>
+   {briefing.runtime&&<section className="paper-rules"><h3>本局实际规则与执行状态</h3><p>{briefing.runtime.ruleset_version} · T{briefing.runtime.turn} · {briefing.runtime.phase} · 已警戒 {briefing.runtime.alerted_count} 艘</p><p>已启用：{briefing.runtime.enabled_rules.map(k=>RULE_NAMES[k]??k).join("、")||"无可选规则"}</p><p>剧本强制：{briefing.runtime.forced_rules.map(k=>RULE_NAMES[k]??k).join("、")||"无"}</p>{briefing.runtime.blockers.map(b=><p className="source-blocker" key={b.id}>{b.id} · 来源阻断：{b.text}</p>)}</section>}
    {briefing.special_rules.length>0&&<section className="paper-rules">
+    {briefing.runtime&&<><p><b>裁决状态：</b>{briefing.runtime.special_status}</p><p><b>增援：</b>{briefing.runtime.reinforcement_status}</p><p><b>结束：</b>{briefing.runtime.ending_condition}</p></>}
     <h3>特殊规则</h3>
     <ol>{briefing.special_rules.map(r=><li key={r.id}>{r.text}</li>)}</ol>
    </section>}

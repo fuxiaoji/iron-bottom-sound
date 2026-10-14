@@ -111,6 +111,12 @@ def run_match(
                     result = engine.submit_orders(state.game_id, batch)
                     if not result.valid:
                         raise RuntimeError(f"Validated session batch was rejected: {result.errors}")
+                    session = sessions[side]
+                    if state.options.ruleset_version == "night-v2":
+                        from .ai_memory import accepted
+                        current_audits = [a for a in session.audits if a.turn==state.turn and a.phase==state.phase]
+                        accepted(engine, state, side, session.plan_sheets[-1], batch, current_audits,
+                                 getattr(session.commander, "last_trace", {}))
                     if battle_report and report_root is not None:
                         session = sessions[side]
                         reasoning = session.audits[-1].reasoning_content if session.audits else None

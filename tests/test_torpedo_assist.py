@@ -271,16 +271,18 @@ def test_torpedo_assist_api_shape_and_read_only() -> None:
     client = TestClient(app)
     game_id = game_in_torpedo_planning(client)
     state = api_engine.get(game_id)
-    enemy = next(ship for ship in state.ships.values() if ship.side == Side.ALLIES and ship.position)
+    from iron_bottom_sound.recognition import decode_target
+    contact = next(ship for ship in api_engine.observe(game_id,Side.AXIS).ships if ship.side == Side.ALLIES and ship.position)
+    enemy = state.ships[decode_target(api_engine,state,Side.AXIS,contact.id)]
     before = len(api_engine.get(game_id).events)
     response = client.post(
         f"/games/{game_id}/torpedo-assist",
         headers={"X-Player-Side": "axis"},
-        json={"target_id": enemy.id},
+        json={"target_id": contact.id},
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["target_id"] == enemy.id
+    assert body["target_id"] == contact.id
     assert body["projected_target"]["label"] == enemy.position.label
     assert body["combos"]
     for key in (

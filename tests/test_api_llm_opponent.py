@@ -110,7 +110,7 @@ def test_llm_opponent_submits_opponent_and_returns_public_audits(monkeypatch) ->
     assert response.status_code == 200
     body = response.json()
     assert body["valid"] is True and body["ai_submitted"] is True
-    assert body["audits"][0]["reasoning_preview"] == "选定南缘入口。"
+    assert body["audits"][0]["reasoning_preview"] is None  # Never expose private provider reasoning.
     assert "elapsed_ms" in body["audits"][0] and "validation_errors" in body["audits"][0]
     assert "orders" not in response.text and "plan" not in response.text  # 不泄漏私有订单
     state = api.engine.get(game_id)

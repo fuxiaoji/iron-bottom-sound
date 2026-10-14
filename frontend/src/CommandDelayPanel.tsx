@@ -93,7 +93,7 @@ export function CommandDelayPanel({game,side,turn,phase,collapsed,onToggle}:Prop
        <li>状态 {String(local.formation_state.status ?? "—")}</li></ul>
       <h4>本地接触（仅本编队自身舰只可见）</h4>
       {local.local_contacts.length===0?<p className="muted">暂无接触</p>:
-       <ul>{local.local_contacts.map(c=><li key={c.ship_id}>{c.name}（{c.ship_type}）· 距离 {c.range??"—"}</li>)}</ul>}</div>
+       <ul>{local.local_contacts.map(c=><li key={c.ship_id}>{c.name}（{c.ship_type==="UNKNOWN"?"未识别":c.ship_type}）· 距离 {c.range??"—"}</li>)}</ul>}</div>
      <div><h4>生效命令</h4>
       {local.active_mission_order?<div className="cd-order">
         <b>{local.active_mission_order.mission}</b>

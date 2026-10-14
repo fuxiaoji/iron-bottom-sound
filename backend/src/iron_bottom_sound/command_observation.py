@@ -27,6 +27,7 @@ from typing import TYPE_CHECKING, Any
 from pydantic import BaseModel, Field
 
 from . import command_delay
+from .recognition import local_projection
 from .models import (
     AuthorityLevel,
     CommandMessage,
@@ -235,6 +236,7 @@ def _optical_range(state: GameState, side: Side | None = None) -> int:
     return int(min(state.visibility.values()))
 
 
+@local_projection
 def fleet_observation(engine: "IronBottomEngine", state: GameState, side: Side) -> FleetObservation:
     """Build the fleet commander's plot.  Read-only."""
     mode = command_delay.state_for(state)
@@ -354,6 +356,7 @@ def _addressed_messages(
     return sorted(found, key=lambda item: (item.issued_turn, item.message_id))
 
 
+@local_projection
 def formation_observation(
     engine: "IronBottomEngine", state: GameState, side: Side, formation_id: str,
 ) -> FormationObservation:

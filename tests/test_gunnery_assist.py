@@ -197,10 +197,11 @@ def test_gunnery_assist_api_shape_read_only_and_wrong_phase() -> None:
     state = api_engine.get(game_id)
     state.phase = Phase.GUNNERY
     before = len(api_engine.get(game_id).events)
+    target = next(ship for ship in api_engine.observe(game_id,Side.AXIS).ships if ship.side == Side.ALLIES)
     response = client.post(
         f"/games/{game_id}/gunnery-assist",
         headers={"X-Player-Side": "axis"},
-        json={"assigned": [{"ship_id": "IBS-U-KM-KARL-GALSTER", "target_id": "IBS-U-RN-JAVELIN"}]},
+        json={"assigned": [{"ship_id": "IBS-U-KM-KARL-GALSTER", "target_id": target.id}]},
     )
     assert response.status_code == 200
     body = response.json()

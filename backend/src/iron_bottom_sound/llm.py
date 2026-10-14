@@ -80,12 +80,12 @@ class DeterministicCommander(LLMCommander):
             ship_id for ship_id in state.contact_reserve_positions
             if state.ships[ship_id].side == side
         ]
-        split = max(1, len(ship_ids) // 2)
-        groups = [ship_ids[:split], ship_ids[split:]]
         markers = sorted(
             (marker for marker in state.markers if marker.kind == "contact" and marker.secret_side == side),
             key=lambda marker: marker.id,
         )
+        real_count = sum(m.contact_truth == "real" for m in markers)
+        groups = [ship_ids[int(i*len(ship_ids)/real_count):int((i+1)*len(ship_ids)/real_count)] for i in range(real_count)]
         columns, rows = state.map_columns, state.map_rows
         candidates = self._edge_coords(columns=columns, rows=rows)
         if side == Side.ALLIES:
@@ -103,7 +103,7 @@ class DeterministicCommander(LLMCommander):
                 return False
             return True
 
-        for marker, group in zip(markers[:2], groups, strict=True):
+        for marker, group in zip(markers[:real_count], groups, strict=True):
             anchor = state.contact_reserve_positions[group[0]]
             entry = next(
                 candidate for candidate in candidates
@@ -126,7 +126,7 @@ class DeterministicCommander(LLMCommander):
                 speed=4,
                 ship_ids=group,
             ))
-        for marker in markers[2:]:
+        for marker in markers[real_count:]:
             entry = next(
                 candidate for candidate in candidates
                 if candidate.label not in used and has_inward_run(candidate, 5)
@@ -440,9 +440,9 @@ def _few_shot_for(state: GameState, side: Side) -> dict[str, Any]:
 class OpenAICompatibleCommander(LLMCommander):
     """OpenAI-compatible JSON adapter with optional side-filtered map vision.
 
-    提示词 = 棋盘 + 世界态帧 + 合法动作 + few-shot 示范 + 【思考纪律】。可选
-    `thinking_enabled`：开启时 DeepSeek 返回 reasoning_content，采集进
-    LLMCallAudit.reasoning_preview，供观察思考过程/找死循环点。"""
+    提示词 = 棋盘 + 世界态帧 + 合法动作 + few-shot 示范 + 输出纪律。
+    `thinking_enabled` 可启用提供商推理能力；私有 reasoning_content 不采集。
+    调试展示公开计划摘要、命令、校验、重试与记忆。"""
 
     def __init__(
         self,
@@ -529,6 +529,10 @@ class OpenAICompatibleCommander(LLMCommander):
             "plan_sheet_json_schema": AIPlanSheet.model_json_schema(),
             "few_shot_example_output": _few_shot_for(state, side),
         }
+        from .ai_memory import prompt_memory, memory, sanitize
+        prompt["same_game_memory"] = prompt_memory(state, side)
+        prompt["memory_instruction"] = "这是本局历史事实，seen_turn/age表示情报年龄；历史坐标不能当作实时目标，仅当前合法候选可下令。"
+        self.last_trace = {"prompt": sanitize(prompt), "memory_before": memory(state, side), "attempts": []}
         if state.options.realistic_command:
             target = public_search_target(state, side)
             prompt["realistic_command_guidance"] = {
@@ -571,6 +575,8 @@ class OpenAICompatibleCommander(LLMCommander):
             usage: dict[str, Any] = {}
             reasoning_content: str | None = None
             reasoning_preview: str | None = None
+            trace_attempt = {"attempt": attempt, "output": "", "parsed": None}
+            self.last_trace["attempts"].append(trace_attempt)
             try:
                 client = self.client or httpx.Client(timeout=self.timeout)
                 response = client.post(
@@ -583,11 +589,10 @@ class OpenAICompatibleCommander(LLMCommander):
                 request_id = body.get("id")
                 usage = body.get("usage") or {}
                 message = body["choices"][0]["message"]
-                reasoning = message.get("reasoning_content") or ""
-                if reasoning:
-                    reasoning_content = reasoning  # 全文：只进战报/本地存档
-                    reasoning_preview = reasoning[:500] + "…"
+                # Never collect provider private reasoning, even for debugging.
+                reasoning = bool(message.get("reasoning_content"))
                 content = message.get("content")
+                trace_attempt["output"] = sanitize(content or "", [api_key])
                 if not content:
                     finish = (body["choices"][0].get("finish_reason") or "unknown")
                     errors.append(
@@ -597,6 +602,7 @@ class OpenAICompatibleCommander(LLMCommander):
                 else:
                     plan = AIPlanSheet.model_validate_json(content)
                     batch = OrderBatch.model_validate(plan.orders)
+                    trace_attempt["parsed"] = sanitize(plan.model_dump(mode="json"), [api_key])
                     validation = engine.validate_orders(game_id, batch)
                     if plan.turn != state.turn or plan.phase != state.phase:
                         errors.append("Plan sheet turn or phase does not match current state")
@@ -608,6 +614,7 @@ class OpenAICompatibleCommander(LLMCommander):
                             state.turn, state.phase, side, attempt, started, request_id, usage,
                             True, [], reasoning_preview, reasoning_content,
                         ))
+                        trace_attempt.update(valid=True, errors=[], elapsed_ms=audits[-1].elapsed_ms)
                         return plan, batch, audits
             except httpx.HTTPStatusError as error:
                 # Keep the useful provider status/message, never headers or Authorization.
@@ -625,10 +632,12 @@ class OpenAICompatibleCommander(LLMCommander):
                 )
             except (httpx.HTTPError, KeyError, TypeError, ValueError) as error:
                 errors.append(type(error).__name__)
+            errors = sanitize(errors, [api_key])
             audits.append(self._audit(
                 state.turn, state.phase, side, attempt, started, request_id, usage,
                 False, errors, reasoning_preview, reasoning_content,
             ))
+            trace_attempt.update(valid=False, errors=errors, elapsed_ms=audits[-1].elapsed_ms)
             prompt["validation_errors"] = errors
         raise ValueError({"message": "LLM failed to self-correct within two retries", "audits": audits})
 

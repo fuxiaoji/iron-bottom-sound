@@ -1,0 +1,53 @@
+schema_version: 1
+source:
+  document: ship-record-manual-1.1-zh.pdf
+  sha256: eeff020db4a7f491def219335404996d4b204035923be2b5bd925f65dfdac210
+  pdf_pages: [17]
+  status: verified_source
+status: structured
+note: 想定10专用舰卡，回看原页及局部高分辨率图。圣胡安中央0炮力炮位不参加水面射击，矩形副炮按箭头逐座录入，不能直接套用通用亚特兰大级的主炮分类。霍巴特圆内双横线为2枚游戏鱼雷。两舰R格标示搜索雷达，飞机格按卡面保留。旧通用圣胡安编号及旧存档不改。
+families:
+  savo-san-juan-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows: [4, 3, 3]
+    speed_damage_track: [[6, 5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+    - {id: S1, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [bow, port]}
+    - {id: S2, kind: secondary, position: port, firepower: 3, caliber: 5, arcs: [port, stern]}
+    - {id: S3, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [bow, starboard]}
+    - {id: S4, kind: secondary, position: starboard, firepower: 2, caliber: 5, arcs: [starboard]}
+    - {id: S5, kind: secondary, position: starboard, firepower: 3, caliber: 5, arcs: [starboard, stern]}
+    torpedo_launchers:
+    - {id: TT1, position: bow, arcs: [port, starboard], torpedoes: 1, reloads: 0}
+    - {id: TT2, position: stern, arcs: [port, starboard], torpedoes: 1, reloads: 0}
+    torpedo_type: us-21-mk15-1942
+    armour: {primary: 1, secondary: 1, belt: 3, bridge: 2}
+    radar: true
+    aircraft: true
+    fire_control: true
+  savo-hobart-cl:
+    ship_type: CL
+    displacement_band: B
+    hull_rows: [4, 3, 3]
+    speed_damage_track: [[5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]]
+    guns:
+    - {id: P1, kind: primary, position: bow, firepower: 1, caliber: 6, arcs: [bow, port, starboard]}
+    - {id: P2, kind: primary, position: bow, firepower: 1, caliber: 6, arcs: [bow, port, starboard]}
+    - {id: P3, kind: primary, position: stern, firepower: 1, caliber: 6, arcs: [port, starboard, stern]}
+    - {id: P4, kind: primary, position: stern, firepower: 1, caliber: 6, arcs: [port, starboard, stern]}
+    - {id: S1, kind: secondary, position: port, firepower: 4, caliber: 4, arcs: [bow, port]}
+    - {id: S2, kind: secondary, position: port, firepower: 3, caliber: 4, arcs: [port, stern]}
+    - {id: S3, kind: secondary, position: starboard, firepower: 3, caliber: 4, arcs: [bow, starboard]}
+    - {id: S4, kind: secondary, position: starboard, firepower: 4, caliber: 4, arcs: [starboard, stern]}
+    torpedo_launchers:
+    - {id: TT1, position: bow, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    - {id: TT2, position: stern, arcs: [port, starboard], torpedoes: 2, reloads: 0}
+    torpedo_type: uk-21-mk7c
+    armour: {primary: 1, belt: 3}
+    radar: true
+    aircraft: true
+    fire_control: true
+records:
+  IBS-U-USN-SAN-JUAN: {family: savo-san-juan-cl, name: 圣胡安, vp: 8, source_page: 17}
+  IBS-U-RAN-HOBART: {family: savo-hobart-cl, name: 霍巴特, vp: 10, source_page: 17}

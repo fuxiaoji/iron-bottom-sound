@@ -335,6 +335,8 @@ class ScenarioRuleSet:
 
 @lru_cache(maxsize=32)
 def scenario_rules(scenario_id: str) -> ScenarioRuleSet:
+    # Engine calls are bound to a game-local ContextVar. Frozen definitions and
+    # extension rows must not change when the repository is updated later.
     definition = load_scenario(scenario_id)
     rows: tuple[dict[str, str], ...] = ()
     extension = next(
@@ -350,3 +352,10 @@ def scenario_rules(scenario_id: str) -> ScenarioRuleSet:
         with path.open("r", encoding="utf-8", newline="") as stream:
             rows = tuple(csv.DictReader(stream))
     return ScenarioRuleSet(scenario_id=scenario_id, definition=definition, gunnery_extension=rows)
+
+
+def state_scenario_rules(state: GameState) -> ScenarioRuleSet:
+    if state.options.ruleset_version == "night-v2" and state.rule_snapshot:
+        return ScenarioRuleSet(state.scenario_id, state.rule_snapshot["scenario"],
+                               tuple(state.rule_snapshot.get("gunnery_extension", [])))
+    return scenario_rules(state.scenario_id)

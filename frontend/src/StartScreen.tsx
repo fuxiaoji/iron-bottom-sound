@@ -1,6 +1,7 @@
 import {useEffect,useRef,useState} from "react";
 import type {Side} from "./types";
-import type {CustomScenarioDefinition,SavedGameSummary,ScenarioBriefing} from "./api";
+import type {CustomScenarioDefinition,SavedGameSummary,ScenarioBriefing,NightSetupOptions} from "./api";
+import {RuleSetup} from "./NightUI";
 import {customScenarios,savedGames,scenarioBriefing,scenarioList} from "./api";
 import {CustomScenarioEditor} from "./CustomScenarioEditor";
 import {ScenarioBriefingModal} from "./ScenarioBriefingModal";
@@ -17,7 +18,7 @@ type Props={
  researchAllow:boolean;setResearchAllow:(value:boolean)=>void;researchHandle:string;setResearchHandle:(value:string)=>void;
  llmProvider:"deepseek"|"zhipu";setLlmProvider:(value:"deepseek"|"zhipu")=>void;llmModel:string;setLlmModel:(value:string)=>void;
  llmKey:string;setLlmKey:(value:string)=>void;llmVision:boolean;setLlmVision:(value:boolean)=>void;
- onStart:(scenario:string,mode?:Mode,side?:Side,profile?:string,realisticOverride?:boolean,tutorialScript?:"classic_night"|"erma_grand_fleet",commandDelay?:boolean)=>void;
+ onStart:(scenario:string,mode?:Mode,side?:Side,profile?:string,realisticOverride?:boolean,tutorialScript?:"classic_night"|"erma_grand_fleet",commandDelay?:boolean,nightOptions?:NightSetupOptions)=>void;
  onResume:(game:SavedGameSummary,side:Side)=>void;onImport:(bundle:unknown,side:Side)=>Promise<void>;
  error:string;onPreviewRealisticRules:()=>void;onPreviewCommandDelayRules:()=>void;
  commandDelay:boolean;setCommandDelay:(value:boolean)=>void;
@@ -54,6 +55,7 @@ export function StartScreen(props:Props){
  const [builtinList,setBuiltinList]=useState<{id:string;title:string;turns:number;detail:string}[]>([]);
  const [briefing,setBriefing]=useState<ScenarioBriefing|null>(null);
  const [briefingError,setBriefingError]=useState("");
+ const [nightOptions,setNightOptions]=useState<NightSetupOptions>({optional_rules:{},squall_hexes:[]});
  const saveInput=useRef<HTMLInputElement>(null);
  const modeTouched=useRef(false);
  useEffect(()=>{customScenarios().then(list=>setCustoms(list)).catch(()=>setCustoms([]));savedGames().then(list=>setSaves(list)).catch(()=>setSaves([]));
@@ -114,7 +116,7 @@ export function StartScreen(props:Props){
    <button className="import-save" disabled={importBusy} onClick={()=>saveInput.current?.click()}>{importBusy?"正在校验…":"导入 .ibs-save.json"}</button>
    <input ref={saveInput} hidden type="file" accept=".json,.ibs-save.json,application/json" onChange={event=>void importSave(event.target.files?.[0])}/>
    {importError&&<p className="save-import-error">导入失败：{importError}</p>}
-   {saves.length>0&&<div className="saved-games">{saves.slice(0,6).map(item=><button key={item.game_id} onClick={()=>props.onResume(item,side)}><span><b>{item.scenario_title}</b><small>{item.updated_at.replace("T"," ").replace("Z","")} · {item.mode==="hotseat"?"同机双人":item.mode==="vs_ai"?"状态机 AI":item.mode==="llm"?"LLM 对战":"教学"}</small></span><strong>第 {item.turn}/{item.max_turns} 回合{item.winner?" · 已结束":""} →</strong></button>)}</div>}
+   {saves.length>0&&<div className="saved-games">{saves.slice(0,6).map(item=><button key={item.game_id} onClick={()=>props.onResume(item,side)}><span><b>{item.scenario_title}</b><small>{item.updated_at.replace("T"," ").replace("Z","")} · {item.mode==="hotseat"?"同机双人":item.mode==="vs_ai"?"状态机 AI":item.mode==="llm"?"LLM 对战":"教学"}</small></span><strong>第 {item.turn}/{item.unlimited_turns?"∞":item.max_turns} 回合{item.winner?" · 已结束":""} →</strong></button>)}</div>}
   </section>
 
   {journey==="learn"?<section className="academy-route">
@@ -171,6 +173,7 @@ export function StartScreen(props:Props){
     {!customLocked&&!commandDelayCapable&&<p className="scenario-lock-hint">命令延迟模式只在想定 1、想定 3 与第二次马里亚纳海战开放；本剧本将按真实（或经典）模式开局。</p>}
    {customLocked&&<p className="scenario-lock-hint">这个自定义剧本还达不到真实编队资格（某侧不足 2 艘或还有散舰），将按经典逐舰模式开局；可在「剧本工坊」里编好纵队后再次保存。</p>}
    </section>
+   <RuleSetup value={nightOptions} onChange={setNightOptions}/>
    <section className="setup-panel final"><h2>3. 确认你的席位</h2><div className="final-grid">
     <label>我方阵营<select value={side} onChange={event=>setSide(event.target.value as Side)}><option value="axis">轴心 / 日德方</option><option value="allies">同盟 / 美英方</option></select></label>
    </div>
@@ -178,7 +181,7 @@ export function StartScreen(props:Props){
     <label>接口供应商<select value={props.llmProvider} onChange={event=>{const provider=event.target.value as "deepseek"|"zhipu";props.setLlmProvider(provider);props.setLlmModel(provider==="zhipu"?"glm-5.2":"deepseek-v4-flash");props.setLlmVision(false)}}><option value="zhipu">智谱 BigModel</option><option value="deepseek">DeepSeek</option></select></label>
     <label>模型<input list="llm-models" value={props.llmModel} onChange={event=>{props.setLlmModel(event.target.value);props.setLlmVision(false)}}/><datalist id="llm-models">{props.llmProvider==="zhipu"?<><option value="glm-5.2"/><option value="glm-5.3-flash"/><option value="glm-5v-turbo"/></>:<option value="deepseek-v4-flash"/>}</datalist></label>
    </div><label className="llm-key">API 密钥（仅在本次会话内存中）<input type="password" value={props.llmKey} autoComplete="new-password" onChange={event=>props.setLlmKey(event.target.value)}/></label><label className="vision-toggle"><input type="checkbox" checked={props.llmVision} disabled={!props.llmModel.toLowerCase().startsWith("glm-5v")} onChange={event=>props.setLlmVision(event.target.checked)}/>每阶段发送本方可见地图</label></section>}
-   <div className="launch-summary"><div><b>{chosenTitle}</b><span>{commandMode==="command_delay"?"命令延迟（真实编队核心）":effectiveRealistic?"真实编队指挥":"经典逐舰指挥"} · {side==="axis"?"轴心席位":"同盟席位"}</span>{matchMode==="vs_ai"&&<span>对手：{aiProfileLabel(profile)}</span>}</div><div className="launch-actions"><button className="quiet briefing-btn" onClick={()=>openBriefing(scenario)}>📄 剧本简报</button><button className="launch" onClick={()=>props.onStart(scenario,matchMode,side,profile,effectiveRealistic,undefined,commandMode==="command_delay")}>{startLabel} →</button></div></div>
+   <div className="launch-summary"><div><b>{chosenTitle}</b><span>{commandMode==="command_delay"?"命令延迟（真实编队核心）":effectiveRealistic?"真实编队指挥":"经典逐舰指挥"} · {side==="axis"?"轴心席位":"同盟席位"}</span>{matchMode==="vs_ai"&&<span>对手：{aiProfileLabel(profile)}</span>}</div><div className="launch-actions"><button className="quiet briefing-btn" onClick={()=>openBriefing(scenario)}>📄 剧本简报</button><button className="launch" onClick={()=>props.onStart(scenario,matchMode,side,profile,effectiveRealistic,undefined,commandMode==="command_delay",nightOptions)}>{startLabel} →</button></div></div>
    </section>
    <details className="start-options"><summary>战报、科研授权与其他选项</summary><label><input type="checkbox" checked={props.recordReport} onChange={event=>props.setRecordReport(event.target.checked)}/>自动记录战报</label><label><input type="checkbox" checked={props.researchAllow} onChange={event=>props.setResearchAllow(event.target.checked)}/>允许匿名对战记录用于科研</label>{props.researchAllow&&<input value={props.researchHandle} maxLength={40} placeholder="称呼（可选）" onChange={event=>props.setResearchHandle(event.target.value)}/>}</details>
    <button className="text-action" onClick={()=>setJourney("learn")}>返回新手教学路线</button>

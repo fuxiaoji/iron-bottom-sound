@@ -98,7 +98,7 @@ def make_ship(
             "speed_track": record.maximum_speed_cycle,
             "speed_damage_track": record.speed_damage_track,
             "primary_gf": _broadside_firepower(record, "primary"),
-            "primary_caliber": primary_mounts[0].caliber,
+            "primary_caliber": primary_mounts[0].caliber if primary_mounts else 0,
             "secondary_gf": _broadside_firepower(record, "secondary") if secondary_mounts else 0,
             "secondary_caliber": secondary_mounts[0].caliber if secondary_mounts else 0,
             "torpedoes": sum(launcher.torpedoes for launcher in record.torpedo_launchers),
@@ -266,6 +266,8 @@ def build_initial_state(game_id: str, scenario_id: str, seed: int, options: Game
         state.reinforcement_entry_start = HexCoord.from_label(start)
         state.reinforcement_entry_end = HexCoord.from_label(end)
     _apply_scenario_setup_rules(state, scenario)
+    from .night import initialize
+    initialize(state)
     if options.optional_rules.hidden_contacts:
         state.resume_phase = state.phase
         state.phase = Phase.CONTACT_SETUP
@@ -276,13 +278,20 @@ def build_initial_state(game_id: str, scenario_id: str, seed: int, options: Game
             if ship.position:
                 ship.position = None
         for side in Side:
-            for index in range(1, 5):
+            real, decoy = 2, 2
+            if options.ruleset_version == "night-v2":
+                from .night import config, scenario_date
+                rules = config(state)["hidden_contacts"]
+                japanese = any(s.id.startswith("IBS-U-IJN-") and s.side == side for s in state.ships.values())
+                prefix = "japanese" if japanese and scenario_date(state).year >= rules["japanese_from_year"] else "default"
+                real, decoy = rules[prefix+"_real"], rules[prefix+"_decoy"]
+            for index in range(1, real+decoy+1):
                 state.markers.append(
                     MarkerState(
                         id=f"CONTACT-{side.value}-{index}",
                         kind="contact",
                         secret_side=side,
-                        contact_truth="real" if index <= 2 else "decoy",
+                        contact_truth="real" if index <= real else "decoy",
                     )
                 )
     if options.realistic_command:

@@ -548,7 +548,7 @@ def capture_ai_action(
     plan: Any, reasoning: str | None = None, audits: list[Any] | None = None,
     state: GameState | None = None,
 ) -> dict[str, Any] | None:
-    """AI 订单捕获：AIPlanSheet + LLM 思考全文 → kind='ai_action' 的 JSON 行。
+    """捕获公开 AIPlanSheet；兼容 reasoning 参数但丢弃私有推理。
 
     幂等（高位段稳定序号）；失败由调用方吞掉，绝不影响对局。返回条目字典或 None。
     """
@@ -566,7 +566,7 @@ def capture_ai_action(
         output_tokens = sum(int(audit.output_tokens) for audit in audits)
         content = json.dumps({
             "plan": plan_data,
-            "reasoning": reasoning,
+            "reasoning": None,
             "model": model,
             "elapsed_ms": elapsed_ms,
             "input_tokens": input_tokens,
@@ -623,6 +623,8 @@ def build_report_data(
                 payload = json.loads(entry["content"]) if entry.get("content") else {}
             except (ValueError, TypeError):
                 payload = {}
+            # Do not expose private reasoning persisted by older versions.
+            payload['reasoning'] = None
             # Counterfactual doctrine details remain side-private until the game ends.
             # Existing high-level plan capture behaviour is preserved for compatibility.
             if state.phase != Phase.COMPLETE:
@@ -729,23 +731,15 @@ def _plan_table(ai_action: dict[str, Any]) -> list[str]:
 
 
 def _ai_action_markdown(side_label: str, ai_action: dict[str, Any]) -> list[str]:
-    """一侧的 AI 行动小节：计划表 +（LLM 时）思考过程。"""
+    """一侧的公开 AI 计划表。"""
     lines = [f"**{side_label}计划表**（{ai_action.get('model', '—')}）", ""]
     lines.extend(_plan_table(ai_action))
-    reasoning = ai_action.get("reasoning")
-    if reasoning:
-        lines.extend([
-            "",
-            f"**{side_label}思考过程**（LLM）",
-            "",
-            "> " + reasoning.replace("\n", "\n> "),
-        ])
     return lines
 
 
 def build_report_markdown(root, data: dict[str, Any], game_id: str) -> str:
     """自包含 MD：截图以 data:image/png;base64 内嵌，可直接分享。每个阶段都有
-    文字叙述 + 双视角地图 + AI 计划表（含 LLM 思考过程）。"""
+    文字叙述 + 双视角地图 + 公开 AI 计划表。"""
     meta = data["meta"]
     score = meta["score"] or {}
     lines = ["# 铁底湾的回响 IV · 战报", ""]
@@ -959,11 +953,6 @@ def build_report_html(data: dict[str, Any], game_id: str) -> str:
                     o.append(f"<div class='plan'><strong>{side_label}计划表</strong>"
                              f"（{model}）</div>")
                     o.extend(_plan_table_html(action))
-                    reasoning = action.get("reasoning")
-                    if reasoning:
-                        o.append("<div class='reasoning'><strong>" + side_label
-                                 + "思考过程</strong>\n\n" + _html.escape(reasoning)
-                                 + "</div>")
         if turn_data.get("events"):
             o.append("<h4>公开事件</h4><ul class='events'>")
             for event in turn_data["events"]:

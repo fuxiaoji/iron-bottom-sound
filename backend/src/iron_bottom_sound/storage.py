@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from .models import BattleReportEntry, GameEvent, GameState
+from .night import unlimited_turns
 
 
 class GameRepository:
@@ -17,6 +18,15 @@ class GameRepository:
         self.connection.executescript(
             """
             PRAGMA journal_mode=WAL;
+            CREATE TABLE IF NOT EXISTS ai_debug (
+              game_id TEXT NOT NULL,
+              trace_id INTEGER NOT NULL,
+              side TEXT NOT NULL,
+              turn INTEGER NOT NULL,
+              phase TEXT NOT NULL,
+              payload TEXT NOT NULL,
+              PRIMARY KEY (game_id, trace_id)
+            );
             CREATE TABLE IF NOT EXISTS games (
               game_id TEXT PRIMARY KEY,
               state_json TEXT NOT NULL,
@@ -65,6 +75,12 @@ class GameRepository:
     def save(self, state: GameState) -> None:
         state_json = state.model_dump_json()
         with self.connection:
+            from .ai_memory import sanitize
+            self.connection.executemany(
+                "INSERT OR REPLACE INTO ai_debug VALUES (?, ?, ?, ?, ?, ?)",
+                [(state.game_id, t["id"], t["side"], t["turn"], t["phase"], json.dumps(sanitize(t), ensure_ascii=False))
+                 for t in state.ai_traces],
+            )
             self.connection.execute(
                 """INSERT INTO games(game_id, state_json) VALUES (?, ?)
                    ON CONFLICT(game_id) DO UPDATE SET
@@ -87,6 +103,29 @@ class GameRepository:
             raise KeyError(f"Unknown game {game_id}")
         return GameState.model_validate_json(row["state_json"])
 
+    def ai_debug(self, game_id: str, side: str | None = None, turn: int | None = None, phase: str | None = None, before: int | None = None, limit: int = 32, formation_id: str | None = None) -> list[dict]:
+        sql = "SELECT payload FROM ai_debug WHERE game_id=?"
+        args: list = [game_id]
+        for field, value, operator in (("side", side, "="), ("turn", turn, "="), ("phase", phase, "="), ("trace_id", before, "<")):
+            if value is not None:
+                sql += f" AND {field}{operator}?"
+                args.append(value)
+        sql += " ORDER BY trace_id DESC LIMIT ?"
+        count = max(1, min(limit, 10000))
+        if formation_id is None:
+            args.append(count)
+            return [json.loads(r[0]) for r in self.connection.execute(sql, args)]
+        # Filter before paging. Scanning the ordered cursor also works on SQLite
+        # builds without JSON functions and does not load the whole journal.
+        result = []
+        for row in self.connection.execute(sql.removesuffix(" LIMIT ?"), args):
+            entry = json.loads(row[0])
+            if formation_id in entry.get("plan", {}).get("unit_intents", {}):
+                result.append(entry)
+                if len(result) == count:
+                    break
+        return result
+
     def game_ids(self) -> list[str]:
         rows = self.connection.execute(
             "SELECT game_id FROM games ORDER BY updated_at DESC"
@@ -108,6 +147,7 @@ class GameRepository:
                     "scenario_title": state.scenario_title,
                     "turn": state.turn,
                     "max_turns": state.max_turns,
+                    "unlimited_turns": unlimited_turns(state),
                     "phase": state.phase.value,
                     "mode": state.options.mode,
                     "ai_profile": state.options.ai_profile,
@@ -160,6 +200,11 @@ class GameRepository:
         ).fetchone():
             raise ValueError(f"Game {state.game_id} already exists")
         with self.connection:
+            from .ai_memory import sanitize
+            self.connection.executemany(
+                "INSERT INTO ai_debug(game_id,trace_id,side,turn,phase,payload) VALUES (?,?,?,?,?,?)",
+                [(state.game_id, e["id"], e["side"], e["turn"], e["phase"], json.dumps(sanitize(e), ensure_ascii=False)) for e in state.ai_traces],
+            )
             self.connection.execute(
                 "INSERT INTO games(game_id, state_json) VALUES (?, ?)",
                 (state.game_id, state.model_dump_json()),
@@ -175,6 +220,7 @@ class GameRepository:
                     for sequence, snapshot in snapshots
                 ],
             )
+        state.ai_traces = state.ai_traces[-32:]
 
     def save_battle_entry(
         self,

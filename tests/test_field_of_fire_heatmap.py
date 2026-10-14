@@ -228,9 +228,14 @@ def test_per_ship_api_shape() -> None:
     assert body["sides"]["allies"]["hexes"] == {}
     assert body["sides"]["axis"]["hexes"]
     assert body["sides"]["axis"]["ships"][0]["ship_id"] == own.id
-    # 不带 ship_id 仍是双方全图
+    # 未识别舰没有已知武器射界；己方热力保持完整。
     full = client.post(f"/games/{game_id}/field-of-fire", headers={"X-Player-Side": "axis"}).json()
-    assert full["sides"]["allies"]["hexes"] and full["sides"]["axis"]["hexes"]
+    assert not full["sides"]["allies"]["hexes"] and full["sides"]["axis"]["hexes"]
+    enemy = next(ship for ship in api_engine.get(game_id).ships.values() if ship.side == Side.ALLIES)
+    enemy.position = HexCoord(q=own.position.q+2,r=own.position.r)
+    identified = client.post(f"/games/{game_id}/field-of-fire", headers={"X-Player-Side": "axis"}).json()
+    assert identified["sides"]["allies"]["hexes"]
+    assert identified["sides"]["allies"]["ships"][0]["ship_id"].startswith('contact-')
 
 
 def test_target_speed_4_uses_verified_zero_modifier_and_parameter_applies() -> None:

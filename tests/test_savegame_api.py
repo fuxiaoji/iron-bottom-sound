@@ -63,7 +63,10 @@ def test_save_download_import_clone_and_resume_listing(save_client) -> None:
     right = imported.model_dump(mode="json")
     left["game_id"] = right["game_id"]
     left["events"][0]["payload"]["game_id"] = right["game_id"]
+    if left["events"][0]["payload"].get("initial_state"):
+        left["events"][0]["payload"]["initial_state"]["game_id"] = right["game_id"]
     assert right == left
+    assert game_engine.replay(imported_id).model_dump(mode="json") == imported.model_dump(mode="json")
     assert game_engine.get(imported_id).game_id == imported_id
 
     cards = client.get("/games").json()

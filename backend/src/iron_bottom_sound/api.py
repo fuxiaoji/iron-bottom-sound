@@ -6,10 +6,10 @@ import os
 from pathlib import Path
 from typing import Annotated, Literal
 
-from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from .battle_report import (
     build_report_data,
@@ -55,12 +55,19 @@ class LLMConnectionConfig(BaseModel):
 class CreateGame(BaseModel):
     scenario_id: str = "IBS-S-03"
     seed: int = 1
-    options: GameOptions = Field(default_factory=GameOptions)
+    options: GameOptions = Field(default_factory=lambda: GameOptions(ruleset_version="night-v2", night_recognition=True))
     # 用户主动提供的 LLM 密钥：仅按局存进程内存（_user_llm_keys），绝不落库/落盘。
     llm_api_key: str | None = None
     llm_config: LLMConnectionConfig | None = None
     # 科研论文用途同意（可留称呼）：落库 research_consent 表 + 通知。
     research_consent: ResearchConsent | None = None
+
+    @field_validator("options", mode="before")
+    @classmethod
+    def new_game_version(cls, value):
+        if isinstance(value, dict):
+            return {"ruleset_version": "night-v2", "night_recognition": True, **value}
+        return value
 
 
 class FieldOfFireRequest(BaseModel):
@@ -313,6 +320,10 @@ def scenario_briefing(scenario_id: str):
         definition = load_scenario(scenario_id)
     except KeyError as error:
         raise HTTPException(404, str(error)) from error
+    return briefing_definition(scenario_id, definition)
+
+
+def briefing_definition(scenario_id: str, definition: dict):
     records = load_ship_records()
 
     def ship_row(entry: dict) -> dict:
@@ -355,6 +366,97 @@ def scenario_briefing(scenario_id: str):
         },
     }
     return payload
+
+
+@app.get("/games/{game_id}/briefing")
+def game_briefing(game_id: str):
+    from .night import unlimited_turns
+    state = get_game(game_id)
+    definition = state.rule_snapshot.get("scenario") or load_scenario(state.scenario_id)
+    payload = briefing_definition(state.scenario_id, definition)
+    if state.options.ruleset_version == "legacy-v1":
+        reinforcement_status = "沿用旧局增援流程"
+    elif state.scenario_id == "IBS-S-10":
+        reinforcement_status = "第2回合起逐回合2D6，图拉吉按离场条件触发"
+    elif state.reinforcement_arrival_turn:
+        reinforcement_status = f"入场回合 {state.reinforcement_arrival_turn}；{'检定已完成' if state.reinforcement_roll_done else '尚待检定'}"
+    else:
+        reinforcement_status = "无后续增援"
+    payload["runtime"] = {
+        "ruleset_version": state.options.ruleset_version, "turn": state.turn, "phase": state.phase.value,
+        "visibility": state.visibility, "enabled_rules": [k for k,v in state.options.optional_rules.model_dump().items() if v],
+        "forced_rules": definition.get("optional_rules", []), "alerted_count": len(state.scenario_state.get("alerted", [])),
+        "unlimited_turns": unlimited_turns(state),
+        "blockers": state.scenario_state.get("rule_blockers", []),
+        "special_status": "来源阻断，已知特例可单独验收" if state.scenario_state.get("rule_blockers") else
+                          ("新版特例裁决就绪" if state.options.ruleset_version=="night-v2" else "沿用旧局裁决"),
+        "reinforcement_status": reinforcement_status,
+        "ending_condition": (next((r["text"] for r in definition.get("special_rules",[]) if r["id"]=="IBS-S-10-R4"), "") if state.scenario_id=="IBS-S-10" and state.options.ruleset_version=="night-v2" else f"第{state.max_turns}回合结算想定胜利条件"),
+    }
+    return payload
+
+
+def local_debug(request: Request, explicit: bool):
+    if not explicit or not request.client or request.client.host not in ("127.0.0.1", "::1", "localhost", "testclient"):
+        raise HTTPException(403, "AI 详细记录仅允许显式本地调试读取")
+
+
+@app.get("/games/{game_id}/ai-debug")
+def ai_debug(game_id: str, request: Request, debug: bool = False, side: Side = Side.AXIS,
+             turn: int | None = None, phase: Phase | None = None, formation_id: str | None = None,
+             before: int | None = None, limit: int = Query(default=12, ge=1, le=48)):
+    local_debug(request, debug)
+    state = get_game(game_id)
+    from .ai_memory import debug_payload, sanitize
+    rows = repository.ai_debug(game_id, side.value, turn, phase.value if phase else None, before, limit, formation_id)
+    cd = []
+    if state.command_delay:
+        cd = [r for r in state.command_delay.agent_log if r.get("side") == side.value
+              and (turn is None or r.get("turn") == turn) and (phase is None or r.get("phase") == phase.value)
+              and (formation_id is None or r.get("formation_id") == formation_id)]
+    return sanitize({"entries": rows, "next_before": rows[-1]["id"] if len(rows) == limit else None,
+                     "memory": debug_payload(state, side), "command_delay": cd[-limit:]})
+
+
+@app.get("/games/{game_id}/ai-memory")
+def ai_memory_export(game_id: str, request: Request, debug: bool = False, side: Side = Side.AXIS):
+    local_debug(request, debug)
+    from .ai_memory import debug_payload
+    state = get_game(game_id)
+    payload = {"format": "ibs-ai-memory", "game_id": game_id, "side": side.value,
+               "turn": state.turn, "memory": debug_payload(state, side)}
+    return Response(json.dumps(payload, ensure_ascii=False), media_type="application/json",
+                    headers={"Content-Disposition": f'attachment; filename="ibs-memory-{side.value}.json"'})
+
+
+@app.post("/games/{game_id}/upgrade-copy", status_code=201)
+def upgrade_copy(game_id: str):
+    from . import night
+    from .rules_snapshot import pack
+    from uuid import uuid4
+    state = get_game(game_id)
+    if state.options.ruleset_version != "legacy-v1" or state.phase != Phase.REINFORCEMENT or state.submitted_orders or any(k.startswith(f"{state.turn}:") for k in state.sealed_orders):
+        raise HTTPException(409, "仅旧局无封存命令的回合起点可另存为新版；原局不会改变")
+    if state.markers or state.contact_formations or state.command_delay:
+        raise HTTPException(409, "当前隐蔽／环境／命令延迟状态无法安全转换，请新建新版对局")
+    copied = state.model_copy(deep=True)
+    copied.game_id = str(uuid4())
+    copied.options.ruleset_version = "night-v2"
+    copied.sealed_orders = {}  # Only historical batches: keep them in old archive, never execute them again.
+    try:
+        night.initialize(copied)
+    except ValueError as error:
+        raise HTTPException(409, str(error)) from error
+    if copied.scenario_state.get("rule_blockers"):
+        raise HTTPException(409, "；".join(b["text"] for b in copied.scenario_state["rule_blockers"]))
+    copied.rule_snapshot["adjudication"] = pack(vars(engine._base_rules))
+    copied.rule_snapshot["tables_hash"] = hashlib.sha256(json.dumps(copied.rule_snapshot["adjudication"], sort_keys=True).encode()).hexdigest()
+    copied.events[0].payload["game_id"] = copied.game_id
+    engine._event(copied, "rules_upgraded_copy", "旧局另存为新版，未重裁历史",
+                  payload={"source_game_id": state.game_id, "upgrade_state": copied.model_dump(mode="json", exclude={"events"})})
+    repository.import_game(copied, [(len(copied.events), copied)])
+    engine.games[copied.game_id] = copied
+    return {"game_id": copied.game_id}
 
 
 @app.get("/games")
@@ -459,10 +561,13 @@ def import_game(bundle: dict):
 @app.get("/games/{game_id}/view")
 def view_game(
     game_id: str,
+    request: Request,
     x_player_side: Annotated[str | None, Header()] = None,
     debug: bool = False,
 ):
     state = get_game(game_id)
+    if debug and state.options.ruleset_version=="night-v2":
+        local_debug(request, True)
     return engine.observe(game_id, side_from_header(x_player_side), debug=debug)
 
 
@@ -470,6 +575,27 @@ def view_game(
 def legal_actions(game_id: str, x_player_side: Annotated[str | None, Header()] = None):
     state = get_game(game_id)
     return engine.legal_actions(game_id, side_from_header(x_player_side))
+
+
+@app.post("/games/{game_id}/night-preview")
+def night_preview(game_id: str, batch: OrderBatch, x_player_side: Annotated[str | None, Header()] = None):
+    from . import night, recognition
+    state = get_game(game_id)
+    side = side_from_header(x_player_side)
+    if batch.side != side or state.phase != Phase.GUNNERY or not night.enabled(state):
+        raise HTTPException(409, "仅本方新版炮击阶段可预览夜战命令")
+    validation = engine.validate_orders(game_id, batch)
+    if not validation.valid:
+        raise HTTPException(422, validation.errors)
+    copied = state.model_copy(deep=True)
+    night.prepare_gunnery(engine, copied, [recognition.decode_orders(engine, state, batch)])
+    view = engine.observe(game_id, side)
+    for ship in view.ships:
+        ship.id = recognition.decode_target(engine, state, side, ship.id)
+    environment = {**view.environment, **night.observation(engine, copied, side, view.ships, view.recent_events, False)["environment"]}
+    environment["effect_notes"] = view.environment.get("effect_notes", {})
+    environment["preview"] = True
+    return recognition.project_value(engine, state, side, environment)
 
 
 @app.get("/games/{game_id}/export")
@@ -491,7 +617,10 @@ def download_save(game_id: str):
             custom_definition = repository.custom_scenario(state.scenario_id)
         except KeyError as error:
             raise HTTPException(409, "该对局的自定义想定定义已丢失，无法生成可移植存档") from error
-    bundle = build_save_bundle(repository, state, custom_definition)
+    try:
+        bundle = build_save_bundle(repository, state, custom_definition)
+    except (UnicodeError, ValueError) as error:
+        raise HTTPException(409, "该存档含旧版损坏快照，未修改原记录；请保留数据库备份后单独修复") from error
     filename = f"iron-bottom-sound-{game_id}.ibs-save.json"
     return Response(
         content=json.dumps(bundle, ensure_ascii=False, separators=(",", ":")),
@@ -505,7 +634,7 @@ def replay_checkpoints(game_id: str):
     get_game(game_id)
     try:
         snapshots = repository.snapshots(game_id)
-    except KeyError as error:
+    except (KeyError, UnicodeError, ValueError) as error:
         raise HTTPException(404, str(error)) from error
     return [
         {
@@ -668,7 +797,9 @@ def ai_opponent(game_id: str, request: AIOpponentRequest | None = None, x_player
             )
         except Exception:
             pass  # 战报失败绝不影响对局
-    repository.save(engine.get(game_id))
+    from .ai_memory import accepted
+    accepted(engine, state, ai_side, plan, batch, audits)
+    repository.save(state)
     return {"valid": True, "ai_submitted": True}
 
 
@@ -699,7 +830,7 @@ def _public_audit(audit) -> dict:
         "output_tokens": audit.output_tokens,
         "valid": audit.valid,
         "validation_errors": audit.validation_errors,
-        "reasoning_preview": audit.reasoning_preview,
+        "reasoning_preview": None,
     }
 
 
@@ -765,19 +896,25 @@ def llm_opponent(
     try:
         plan, batch, audits = commander.choose_plan(engine, game_id, ai_side)
     except ValueError as error:
+        from .ai_memory import rejected
+        rejected(engine, state, ai_side, {"details": getattr(commander, "last_trace", {}),
+                                         "error": str(error)[:500]})
+        repository.save(state)
         raise HTTPException(409, str(error)) from error
     result = engine.submit_orders(game_id, batch)
     if not result.valid:
         raise HTTPException(409, result.errors)
     if state.options.battle_report:
         try:
-            reasoning = audits[-1].reasoning_content if audits else None
+            reasoning = None
             capture_ai_action(
                 repository, game_id, state.turn, state.phase.value, ai_side.value,
                 plan, reasoning, audits, state,
             )
         except Exception:
             pass  # 战报失败绝不影响对局
+    from .ai_memory import accepted
+    accepted(engine, state, ai_side, plan, batch, audits, getattr(commander, "last_trace", {}))
     repository.save(engine.get(game_id))
     return {
         "valid": True,
@@ -1020,10 +1157,12 @@ def movement_trajectories(game_id: str, request: MovementTrajectoriesRequest, x_
 
 
 @app.get("/games/{game_id}/sealed-trajectories")
-def sealed_trajectories(game_id: str, x_player_side: Annotated[str | None, Header()] = None, debug: bool = False):
+def sealed_trajectories(game_id: str, request: Request, x_player_side: Annotated[str | None, Header()] = None, debug: bool = False):
     """Replay this turn's sealed movement plans as trajectories (kept visible during
     torpedo planning). Own side always; enemy plans only when debug=true."""
     state = get_game(game_id)
+    if debug and state.options.ruleset_version == "night-v2":
+        local_debug(request, True)
     side = side_from_header(x_player_side)
     if state.phase != Phase.TORPEDO_PLANNING:
         raise HTTPException(409, "Sealed trajectories are available only during torpedo planning")
@@ -1037,18 +1176,24 @@ def torpedo_assist(game_id: str, request: TorpedoAssistRequest, x_player_side: A
     side = side_from_header(x_player_side)
     if state.phase != Phase.TORPEDO_PLANNING:
         raise HTTPException(409, "Torpedo assist is available only during torpedo planning")
-    return engine.torpedo_assist(state, side, target_id=request.target_id, launch=request.launch)
+    try:
+        return engine.torpedo_assist(state, side, target_id=request.target_id, launch=request.launch)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
 
 
 @app.post("/games/{game_id}/field-of-fire")
 def field_of_fire(game_id: str, request: FieldOfFireRequest | None = None, x_player_side: Annotated[str | None, Header()] = None):
     """Pure read-only field-of-fire heatmap overlay (both sides, or one ship via body.ship_id); never saves."""
     state = get_game(game_id)
-    return engine.field_of_fire_heatmap(
-        state, side_from_header(x_player_side),
-        ship_id=request.ship_id if request else None,
-        target_speed=request.target_speed if request else 4,
-    )
+    try:
+        return engine.field_of_fire_heatmap(
+            state, side_from_header(x_player_side),
+            ship_id=request.ship_id if request else None,
+            target_speed=request.target_speed if request else 4,
+        )
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
 
 
 @app.post("/games/{game_id}/gunnery-assist")
@@ -1058,7 +1203,10 @@ def gunnery_assist(game_id: str, request: GunneryAssistRequest, x_player_side: A
     side = side_from_header(x_player_side)
     if state.phase != Phase.GUNNERY:
         raise HTTPException(409, "Gunnery assist is available only during gunnery")
-    return engine.gunnery_assist(state, side, assigned=request.assigned)
+    try:
+        return engine.gunnery_assist(state, side, assigned=request.assigned)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
 
 
 @app.post("/games/{game_id}/orders")
@@ -1115,23 +1263,14 @@ def advance(game_id: str, x_player_side: Annotated[str | None, Header()] = None)
         except Exception:
             pass  # 战报失败绝不影响对局
     repository.save(next_state)
-    return [
-        event for event in events
-        if event.payload.get("secret_side") in (None, side.value)
-        and not engine._hidden_damage_event(next_state, event, side)
-    ]
+    return engine.public_events(next_state, side, events)
 
 
 @app.get("/games/{game_id}/events")
 def events(game_id: str, after: int = Query(default=0, ge=0), x_player_side: Annotated[str | None, Header()] = None):
     state = get_game(game_id)
     side = side_from_header(x_player_side)
-    return [
-        event for event in state.events
-        if event.sequence > after
-        and event.payload.get("secret_side") in (None, side.value)
-        and not engine._hidden_damage_event(state, event, side)
-    ]
+    return engine.public_events(state, side, [e for e in state.events if e.sequence > after])
 
 
 def _report_entries(game_id: str) -> list[dict]:
@@ -1143,13 +1282,17 @@ def _report_entries(game_id: str) -> list[dict]:
 def battle_report(game_id: str):
     """战报 JSON（中立历史文档，无需 side 头）。纯只读，不参与裁决。"""
     state = get_game(game_id)
+    if state.options.ruleset_version == "night-v2" and state.phase != Phase.COMPLETE:
+        raise HTTPException(409, "完整双方战报在对局结束后开放；局内请使用事件、双方战损或显式本地 AI 调试")
     return build_report_data(state, engine, _report_entries(game_id))
 
 
 @app.get("/games/{game_id}/battle-report/image/{rel_path:path}")
 def battle_report_image(game_id: str, rel_path: str):
     """返回战报截图 PNG。路径穿越守卫：解析后必须落在该局的报告目录内。"""
-    get_game(game_id)
+    state = get_game(game_id)
+    if state.options.ruleset_version == "night-v2" and state.phase != Phase.COMPLETE:
+        raise HTTPException(409, "完整双方战报在对局结束后开放")
     base = (Path(reports_root) / game_id).resolve()
     target = (base / rel_path).resolve()
     if not target.is_relative_to(base) or not target.is_file():
@@ -1161,6 +1304,8 @@ def battle_report_image(game_id: str, rel_path: str):
 def battle_report_markdown(game_id: str):
     """自包含 MD 战报下载（截图以 base64 内嵌，可直接分享）。"""
     state = get_game(game_id)
+    if state.options.ruleset_version == "night-v2" and state.phase != Phase.COMPLETE:
+        raise HTTPException(409, "完整双方战报在对局结束后开放")
     data = build_report_data(state, engine, _report_entries(game_id))
     #  BOM 前缀：UTF-8 带 BOM，中文 Windows 编辑器才不会误判成 GBK 显示乱码。
     content = "﻿" + build_report_markdown(reports_root, data, game_id)

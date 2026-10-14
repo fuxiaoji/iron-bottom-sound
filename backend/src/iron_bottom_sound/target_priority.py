@@ -138,7 +138,14 @@ def selection_trace(
             continue
         for target in candidate["targets"]:
             target_ship = state.ships.get(target["target_id"])
-            target_class = target_ship.ship_type if target_ship else None
+            from .recognition import identified, contact_id, enabled
+            target_class = target_ship.ship_type if target_ship and identified(engine, state, side, target_ship) else None
+            # Local agents receive contact tokens; directives keep that public
+            # reference in their audit without requiring access to world ids.
+            matching = target["target_id"]
+            if enabled(state):
+                directives = [d.model_copy(update={"target_id": matching}) if d.target_id == contact_id(state, side, matching) else d for d in directives]
+                side_directives = [d.model_copy(update={"target_id": matching}) if d.target_id == contact_id(state, side, matching) else d for d in side_directives]
             bonus = priority_bonus(
                 target["target_id"], target_class, directives,
                 turn=state.turn, local_limit=local_limit,

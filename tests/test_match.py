@@ -100,7 +100,7 @@ def test_deepseek_adapter_retries_invalid_json_then_self_corrects(monkeypatch) -
     assert user_prompt["few_shot_example_output"]["phase"] == "reinforcement"
 
 
-def test_deepseek_adapter_captures_reasoning_content_when_thinking_enabled(monkeypatch) -> None:
+def test_deepseek_adapter_discards_private_reasoning_when_thinking_enabled(monkeypatch) -> None:
     monkeypatch.setenv("DEEPSEEK_API_KEY", "test-only-placeholder")
     requests: list[httpx.Request] = []
     valid_batch = OrderBatch(side=Side.AXIS, phase=Phase.REINFORCEMENT)
@@ -138,12 +138,9 @@ def test_deepseek_adapter_captures_reasoning_content_when_thinking_enabled(monke
     assert payload["thinking"] == {"type": "enabled"}
     assert payload["reasoning_effort"] == "low"
     assert payload["max_tokens"] == 6000
-    assert audits[-1].reasoning_preview is not None
-    assert audits[-1].reasoning_preview.startswith("方案A…方案B…")
-    # 截断上限 600 字符
-    assert len(audits[-1].reasoning_preview) <= 600
-    # 思考全文保留在审计（只进战报 DB / 本地存档，不进公共 API 响应）。
-    assert audits[-1].reasoning_content == "方案A…方案B…再检查一遍入口格。确定选第一个入口。"
+    assert audits[-1].reasoning_preview is None
+    assert audits[-1].reasoning_content is None
+    assert "方案A" not in json.dumps(commander.last_trace, ensure_ascii=False)
 
 
 def test_match_artifacts_include_frames_and_boards(tmp_path) -> None:

@@ -156,6 +156,12 @@ class GameOptions(BaseModel):
     # 人机大战时对手 AI 的风格 profile（tactical.PROFILES 或 champions.CHAMPIONS 键）；其余模式恒为 None。
     ai_profile: str | None = None
     optional_rules: OptionalRules = Field(default_factory=OptionalRules)
+    # Missing in existing archives means legacy, never silently upgrade an old game.
+    ruleset_version: Literal["legacy-v1", "night-v2"] = "legacy-v1"
+    squall_hexes: list[str] = Field(default_factory=list, max_length=32)
+    radar_1942_variant: bool = False
+    # New API games opt in; absent in an archive preserves its old knowledge rules.
+    night_recognition: bool = False
     # 战报系统开关（默认关：既有测试/无头调用保持 hermetic；前端起始勾选默认开→发 True）。
     battle_report: bool = False
     # 项目扩展：编队指挥链。默认关闭，保证旧存档和经典模式逐位兼容。
@@ -487,6 +493,7 @@ class IlluminationOrder(BaseModel):
     ship_id: str
     mount_id: str | None = None
     target_hex: HexCoord
+    broadside: Literal["port", "starboard"] | None = None
 
 
 class SearchlightOrder(BaseModel):
@@ -527,9 +534,11 @@ class OrderBatch(BaseModel):
     movement: list[MovementOrder] = Field(default_factory=list)
     gunnery: list[GunneryOrder] = Field(default_factory=list)
     torpedoes: list[TorpedoOrder] = Field(default_factory=list)
+    blind_torpedo_reveals: list[str] = Field(default_factory=list)
     smoke_ships: list[str] = Field(default_factory=list)
     smoke: list[SmokeOrder] = Field(default_factory=list)
     illumination: list[IlluminationOrder] = Field(default_factory=list)
+    aircraft_illumination: list[HexCoord] = Field(default_factory=list, max_length=1)
     searchlights: list[SearchlightOrder] = Field(default_factory=list)
     formation_setup: list[FormationSetupOrder] = Field(default_factory=list)
     formation_movement: list[FormationMovementOrder] = Field(default_factory=list)
@@ -948,6 +957,10 @@ class GameState(BaseModel):
     # 想定特例的运行期容器（警戒状态、鱼雷消耗计分等）；键结构由各想定的
     # special_rule_kinds 定义，引擎不在此处复制规则常量。
     scenario_state: dict[str, Any] = Field(default_factory=dict)
+    rule_snapshot: dict[str, Any] = Field(default_factory=dict)
+    ai_memory: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    ai_traces: list[dict[str, Any]] = Field(default_factory=list)
+    ai_trace_counter: int = 0
     winner: Side | None = None
     victory_reason: str | None = None
     # Command Delay mode state; ``None`` for Classic and Realistic, so those
@@ -956,6 +969,7 @@ class GameState(BaseModel):
 
 
 class PublicShip(BaseModel):
+    identified: bool = True
     id: str
     name: str
     side: Side
@@ -977,10 +991,10 @@ class PublicShip(BaseModel):
     max_legal_speed: int | None = None
     torpedo_type: str | None = None
     # 装甲（英寸，静态舰级数据，双方可见；穿透判定用）
-    primary_armor: float = 0
-    secondary_armor: float = 0
-    belt_armor: float = 0
-    bridge_armor: float = 0
+    primary_armor: float | None = 0
+    secondary_armor: float | None = 0
+    belt_armor: float | None = 0
+    bridge_armor: float | None = 0
     gun_mounts: list[GunMountState] = Field(default_factory=list)
     torpedo_launchers: list[TorpedoLauncherState] = Field(default_factory=list)
     turn_limit_degrees: int | None = None
@@ -1024,6 +1038,12 @@ class PlayerObservation(BaseModel):
     recent_events: list[GameEvent]
     winner: Side | None
     victory_reason: str | None
+    ruleset_version: str = "legacy-v1"
+    enabled_optional_rules: list[str] = Field(default_factory=list)
+    environment: dict[str, Any] = Field(default_factory=dict)
+    terrain: dict[str, Any] = Field(default_factory=dict)
+    battle_losses: dict[str, Any] = Field(default_factory=dict)
+    rule_blockers: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class LegalAction(BaseModel):

@@ -44,7 +44,7 @@ def _create_battle_report_game(client: TestClient, seed: int = 31) -> str:
         "/games",
         json={
             "scenario_id": "IBS-S-03", "seed": seed,
-            "options": {"mode": "hotseat", "battle_report": True},
+            "options": {"mode": "hotseat", "battle_report": True, "ruleset_version":"legacy-v1"},
         },
     )
     assert created.status_code == 201, created.text
@@ -195,7 +195,7 @@ def test_create_captures_initial_and_advance_persists() -> None:
 
 def test_battle_report_off_writes_nothing() -> None:
     client = TestClient(app)
-    created = client.post("/games", json={"scenario_id": "IBS-S-03", "seed": 41}).json()
+    created = client.post("/games", json={"scenario_id": "IBS-S-03", "seed": 41, "options":{"ruleset_version":"legacy-v1"}}).json()
     game_id = created["game_id"]
     assert api.repository.battle_entries(game_id) == []
     data = client.get(f"/games/{game_id}/battle-report").json()
@@ -391,7 +391,7 @@ def test_match_battle_report_artifacts_and_default_off(tmp_path) -> None:
 # ---------------------------------------------------------------------------
 # AI 计划表（capture_ai_action）+ 渲染器注入。
 # ---------------------------------------------------------------------------
-def test_capture_ai_action_persists_plan_and_reasoning(tmp_path) -> None:
+def test_capture_ai_action_persists_public_plan_and_discards_reasoning(tmp_path) -> None:
     repository = GameRepository(tmp_path / "r.sqlite3")
     engine, state = _engine_and_state()
     ship_id = next(iter(state.ships))
@@ -414,7 +414,8 @@ def test_capture_ai_action_persists_plan_and_reasoning(tmp_path) -> None:
     ai = phase["ai_actions"]["axis"]
     assert ai["plan"]["situation_summary"] == "确认无增援"
     assert ai["plan"]["unit_intents"]
-    assert ai["reasoning"] == "先评估入口格，本回合无增援。"
+    assert ai["reasoning"] is None
+    assert "先评估入口格" not in entry["content"]
     assert ai["model"] == "unknown"
 
 
@@ -432,6 +433,17 @@ def test_capture_ai_action_idempotent_replaces(tmp_path) -> None:
     data = br.build_report_data(state, engine, entries)
     phase = next(p for p in data["turns"][0]["phases"] if p["phase"] == "reinforcement")
     assert phase["ai_actions"]["axis"]["plan"]["situation_summary"] == "v2"
+
+
+def test_legacy_report_private_reasoning_is_filtered_without_rewriting_source(tmp_path) -> None:
+    engine, state = _engine_and_state()
+    entry = {'turn': 1, 'phase': 'reinforcement', 'kind': 'ai_action', 'side': 'axis',
+             'content': json.dumps({'model': 'old-model', 'plan': {}, 'reasoning': 'PRIVATE-LEGACY-REASONING'})}
+    original = entry['content']
+    data = br.build_report_data(state, engine, [entry])
+    assert 'PRIVATE-LEGACY-REASONING' not in json.dumps(data)
+    assert 'PRIVATE-LEGACY-REASONING' not in br.build_report_markdown(tmp_path, data, state.game_id)
+    assert entry['content'] == original
 
 
 def test_capture_phase_snapshot_uses_renderer_injection(tmp_path) -> None:
@@ -454,7 +466,7 @@ def test_capture_phase_snapshot_uses_renderer_injection(tmp_path) -> None:
         assert png.read_bytes() == b"UI-PNG"
 
 
-def test_markdown_contains_plan_table_and_reasoning(tmp_path) -> None:
+def test_markdown_contains_public_plan_and_discards_reasoning(tmp_path) -> None:
     repository = GameRepository(tmp_path / "r.sqlite3")
     engine, state = _engine_and_state()
     for side, model, reasoning in [
@@ -475,7 +487,7 @@ def test_markdown_contains_plan_table_and_reasoning(tmp_path) -> None:
     md = br.build_report_markdown(tmp_path / "reports", data, state.game_id)
     assert "**轴心计划表**" in md and "**同盟计划表**" in md
     assert "deepseek-v4-pro" in md
-    assert "**同盟思考过程**" in md and "先评估入口格" in md
+    assert "思考过程" not in md and "先评估入口格" not in md
     assert "| 态势判断 | 确认无增援 |" in md
     assert "第 1 回合" in md
 

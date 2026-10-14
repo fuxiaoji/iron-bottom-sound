@@ -19,8 +19,13 @@ import {
   tutorialOpponent,
   formationOrders,
   viewGame,
+  gameBriefing,
+  upgradeCopy,
+  nightPreview,
 } from "./api";
-import type { LLMConnectionConfig, SavedGameSummary } from "./api";
+import type { LLMConnectionConfig, SavedGameSummary, ScenarioBriefing, NightSetupOptions } from "./api";
+import {ScenarioBriefingModal} from "./ScenarioBriefingModal";
+import {DebugModal,LossModal,NightOrders,BlindReveal,NightSituation} from "./NightUI";
 import { BattleReportModal } from "./BattleReportModal";
 import { DamageChips } from "./damageSummary";
 import { FleetRoster } from "./FleetRoster";
@@ -331,6 +336,12 @@ export default function App() {
     null,
   );
   const [debug, setDebug] = useState(false);
+  const [briefing,setBriefing]=useState<ScenarioBriefing|null>(null);
+  const [lossesOpen,setLossesOpen]=useState(false);
+  const [aiDebugOpen,setAiDebugOpen]=useState(false);
+  const [nightHex,setNightHex]=useState<HexCoord|null>(null);
+  const [nightEnvironment,setNightEnvironment]=useState<Observation["environment"]>(undefined);
+  useEffect(()=>{let active=true;setNightEnvironment(undefined);if(!game||view?.phase!=="gunnery"||view.ruleset_version!=="night-v2"||view.own_orders_submitted)return;const timer=setTimeout(()=>{try{const batch=JSON.parse(draft);if(!["illumination","searchlights","aircraft_illumination","smoke_ships","smoke"].some(key=>Array.isArray(batch[key])&&batch[key].length))return;nightPreview(game,side,batch).then(env=>{if(active)setNightEnvironment(env)}).catch(()=>{if(active)setNightEnvironment(undefined)})}catch{/* invalid draft is handled by order validation */}},250);return()=>{active=false;clearTimeout(timer)}},[game,side,draft,view?.phase,view?.turn,view?.own_orders_submitted]);
   const [reportMode, setReportMode] = useState(false);
   const [guideProfiles, setGuideProfiles] = useState<Record<Side, string>>({
     axis: "balanced",
@@ -369,6 +380,7 @@ export default function App() {
     realisticOverride?: boolean,
     tutorialScript?: "classic_night" | "erma_grand_fleet",
     commandDelayRequested = commandDelay,
+    nightOptions?: NightSetupOptions,
   ) =>
     createGameApi(
       scenarioId,
@@ -382,6 +394,7 @@ export default function App() {
       realisticOverride ?? realisticCommand,
       tutorialScript,
       commandDelayRequested,
+      nightOptions,
     );
   // 深链、旧存档和刷新均由对局观察中的权威模式标记恢复，不用错误状态猜模式。
   useEffect(() => {
@@ -487,6 +500,7 @@ export default function App() {
       };
     }
     if (view && game && orderPhases.has(view.phase) && !view.own_orders_submitted) {
+        setDraft("");
       suggestedOrders(game, side, guideProfiles[side])
         .then((batch) => {
           if (active) setDraft(JSON.stringify(batch, null, 2));
@@ -506,7 +520,7 @@ export default function App() {
     return () => {
       active = false;
     };
-  }, [view, side, game, reportMode]);
+  }, [view?.phase, view?.turn, view?.own_orders_submitted, side, game, reportMode]);
   useEffect(() => {
     if (!game || !view || reportMode) {
       setFullEvents([]);
@@ -705,6 +719,7 @@ export default function App() {
     realisticOverride?: boolean,
     tutorialScript?: "classic_night" | "erma_grand_fleet",
     commandDelayRequested = false,
+    nightOptions?: NightSetupOptions,
   ) => {
     try {
       // 命令延迟模式下每个编队都由自己的 LLM 代理指挥，因此必须给出模型与密钥，
@@ -725,6 +740,7 @@ export default function App() {
         realisticOverride,
         tutorialScript,
         commandDelayRequested,
+        nightOptions,
       );
       setGame(g.game_id);
       setMode(nextMode);
@@ -808,6 +824,7 @@ export default function App() {
   const toggleDebug = async () => {
     const next = !debug;
     setDebug(next);
+    if(!next)setAiDebugOpen(false);
     if (game) setView(await viewGame(game, side, next));
   };
   const clearAndLock = async () => {
@@ -924,7 +941,7 @@ export default function App() {
         const makeReport = view.phase === "fire_end";
         await advance(game, side);
         const nextView = await refresh();
-        if (makeReport && nextView) await openServerReport();
+        if (makeReport && nextView && (nextView.ruleset_version!=="night-v2" || nextView.phase==="complete")) await openServerReport();
       }
       setError("");
     } catch (e) {
@@ -1032,8 +1049,11 @@ export default function App() {
         </header>
         <section className="workspace report-workspace">
           <div className="map-column">
+            <NightSituation view={view} events={visibleEventLog}/>
             <HexMap
               dims={view}
+              environment={nightEnvironment??view.environment}
+              terrain={view.terrain}
               ships={view.ships}
               torpedoTracks={view.torpedo_tracks}
               markers={view.markers}
@@ -1088,13 +1108,17 @@ export default function App() {
           {commandDelay && <div className="opponent-badge">命令延迟 · 编队本地代理（策略状态见代理记录）</div>}
         </div>
         <div className="turn">
-          第 {view.turn}/{view.max_turns} 回合
+          第 {view.turn}/{view.environment?.unlimited_turns?"∞":view.max_turns} 回合
           <br />
           <b>{phaseNames[view.phase]}</b>
         </div>
         <div className="save-actions">
+          <button onClick={()=>gameBriefing(game).then(setBriefing).catch(e=>setError(String(e)))}>剧本简报</button>
+          <button onClick={()=>setLossesOpen(true)}>双方战损</button>
           <button onClick={downloadSave}>存档</button>
           <button onClick={() => setReplayOpen(true)}>复盘</button>
+          {view.ruleset_version!=="night-v2"&&<button onClick={()=>upgradeCopy(game).then(async g=>{setGame(g.game_id);setView(await viewGame(g.game_id,side,false));setError("")}).catch(e=>setError(String(e)))}>另存为新版</button>}
+          {debug&&<button onClick={()=>setAiDebugOpen(true)}>AI 决策／记忆</button>}
           <button onClick={leaveGame}>首页</button>
         </div>
         <button
@@ -1111,8 +1135,8 @@ export default function App() {
           调试
         </label>
         {reportEnabled && (
-          <button className="report-button" onClick={openServerReport}>
-            战报
+          <button className="report-button" onClick={openServerReport} disabled={view.ruleset_version==="night-v2"&&view.phase!=="complete"} title="完整双方战报在结束后开放">
+            {view.ruleset_version==="night-v2"&&view.phase!=="complete"?"战报（结束后）":"战报"}
           </button>
         )}
         {view.phase === "complete" ? (
@@ -1166,6 +1190,7 @@ export default function App() {
           />
         ) : (
           <div className="map-column">
+            <NightSituation view={view} environment={nightEnvironment??view.environment} events={visibleEventLog}/>
             <div
               className="heatmap-toggle"
               role="group"
@@ -1193,6 +1218,9 @@ export default function App() {
             )}
             <HexMap
               dims={view}
+              environment={nightEnvironment??view.environment}
+              terrain={view.terrain}
+              onHexPick={view.phase==="gunnery"?setNightHex:undefined}
               ships={view.ships}
               torpedoTracks={view.torpedo_tracks}
               markers={view.markers}
@@ -1287,6 +1315,8 @@ export default function App() {
                   </span>
                 </div>
               }
+              <NightOrders view={view} draft={draft} setDraft={setDraft} hints={actionHints} pickedHex={nightHex}/>
+              <BlindReveal view={view} draft={draft} setDraft={setDraft} hints={actionHints}/>
               <PlanSheet
                 commandDelay={commandDelay}
                 view={view}
@@ -1351,6 +1381,10 @@ export default function App() {
       {replayOpen && (
         <ReplayModal game={game} side={side} onClose={() => setReplayOpen(false)} />
       )}
+      {briefing&&<ScenarioBriefingModal briefing={briefing} mySide={side} onClose={()=>setBriefing(null)}/>}
+      {lossesOpen&&<LossModal view={view} onClose={()=>setLossesOpen(false)}/>}
+      {debug&&aiDebugOpen&&<DebugModal game={game} view={view} onClose={()=>setAiDebugOpen(false)}/>}
+      {!!view.rule_blockers?.length&&<div className="rule-blocker" role="alert"><b>原典来源阻断 · 本局暂不能自动裁决</b>{view.rule_blockers.map(b=><p key={b.id}>{b.id}：{b.text}</p>)}</div>}
       {gunneryOutcome && (
         <GunneryOutcomeModal
           events={gunneryOutcome.events}
