@@ -1006,3 +1006,18 @@
 本批只恢复服务及记录审计，没有改引擎/规则/模型/阵容或旧赛果，沿用公共免费通道及Go零额度限制；未增加Go收费请求，未修改玩家数据库。相关检查采用冻结哈希、实际HTTP与决策推进/前缀保留校验，无源码变更故未重复运行全量测试。Codex打开直播请求返回queued，不声称已完成浏览器UI验收。
 
 证据：artifacts/worldcup-resume-20261014/{before.json,after.json,live-input.json}。直播：http://127.0.0.1:8765/ 。HEAD：4a7f5e24abfd269ee41e0c07f59fefb4843f79ce；本批未提交，其他聊天改动保留。赛事继续运行，未完成39场、未宣称冠军，未制作视频。
+
+## 2026-10-14 夜战更新提交GitHub、Git树维护与线上部署
+
+用户授权提交GitHub、维护Git树并更新服务器。功能提交 **2befb473346ab595ef78a7a5b9b80f4c8a786837**（60文件、4401新增/198删除）已推送 `origin/glm/rtt-port`；此前4a7f5e2检查点一并保留。射界图分支 `codex/phase1-engine` 的两项本地提交同步到远端e38557a77d775ec087a9b8889cd359b9ba1479a9，未重写历史或强推，main仍保留原状态。
+
+- 发布范围：夜战版本快照、发现/识别与敌舰/光源算子、直线探照灯、照明协同AI、同局阵营私有记忆及公开决策调试、萨沃舰卡与历史补充、旧存档兼容和射界图恢复。并行世界杯的9个实验文件未纳入发布；其运行冻结包不改。`tmp/command-delay` 工作树的6项未提交修改及本地分支保留（其远端后来有26个新提交），不在脏工作树中强行拉取或删除。fetch/prune及worktree prune完成，没有过期工作树引用；Git连通性检查通过，悬空恢复对象保留。
+- 验证：931个非世界杯节点；首批因会话中断停在576节点，记录574通过/2跳过；按同一集合续跑剩余355节点并交叉复跑1节点，356 passed / 437.56s，去重为 **929 passed / 2 skipped**，不是单次完整pytest进程的结果。来源、引擎、识别隐私、API、记忆、存档与确定性回放均在隔离库运行。TypeScript/Vite生产构建56模块通过，base=/tiedi/；最终差异与拟提交文本密钥扫描通过。沿用上一批实际桌面/手机夜战交互证据，本次未增加联网LLM调用。
+- 部署包由Git功能提交制作，449文件、92,759,528字节，SHA256 `da4185b2a0580ee81c99ccaab5d435aebbb6e77d1621523eab07d865d7e715d6`，不含数据库、战报、依赖目录、凭据或世界杯实验。现有素材在历史Git对象中为原始二进制，包内0个待还原LFS指针；本批未新增或改写二进制来源，未迁移历史过滤格式。上传后逐文件检查，隔离导入/夜战建局/6个既有存档格式预检通过；原服务器Python3.11.13依赖和环境文件保留。
+- 线上 `/opt/tiedi` 的 `tiedi.service` 已更新为该功能提交，PID3175596，状态active/ready。后端loaded/source及部署包摘要同为 `b8ee6a0bd93a2ed256849bfcf21361f08f8038e1beda15b59f120ab1b3f50f58`；部署后449个文件再次核验0差异。根目录保存release-manifest.json与deployment-result.json，仅含版本、文件摘要和行数摘要。
+- 数据保护：停服时253局、26,676事件、5,049快照、7,817战报、242科研同意、4自定义剧本；SQLite完整性ok。SQLite Backup API一致性备份及逐表原始字节摘要核验通过，备份位于 `/opt/tiedi/backups/pre-night-2befb473346a-20261014-111522/iron-bottom-sound.sqlite3`，旧运行目录存于同目录code/。重启后原六表行数及字节摘要完全一致，仅新增0行ai_debug表；没有以本机库覆盖线上库，不删除战报，不修改密钥文件。发布前的只读在线采样为248局，后续玩家活动增加到253局，所以保护结论以停服备份时的基线为准。
+- 公网验证：`https://fuwenji.asia/tiedi/`、新JS/CSS、20想定及全部10张用户算子均HTTP200；每张PNG与本地原件SHA256一致。最早与最近各2个旧局的双方视图8次GET全部200并保留legacy-v1；远程私有调试403，公共首页586字节SHA256保持 `d4dd28a2ca2e046108ee1fd53cd00a185fb6dccf982eb8bb20fd28a2fd5122e5`，没有修改nginx或首页作品集。未向线上创建测试局或提交测试订单。
+- 本地正式库仅作只读摘要采样；两次采样之间games数量4675不变、事件/战报等存在活动变化，未把这一段宣称为全库不变，也没有回写修复。测试显式指定独立IBS_DB_PATH/报告目录且每项API夹具隔离。线上与本地保护证据分开，不混用两台机器的行数。
+- 范围限度：新版新局生效，原局规则快照及识别开关保留。IBS-Q-024/025原典地形/部署仍开放，3格识别仍是用户授权的历史补充参数；以前Luna有限实测不等于整局或公共HTTP API模型验收。源码发布没有改变这些结论。
+
+证据：`artifacts/publish-20261013/{pytest-all.log,pytest-collection.log,pytest-resume.json,pytest-resume.log,release.json,remote-before.json,remote-deployment.json,remote-verification.json,public-before.json,public-after.json,db-before.json,db-after-tests.json}`；发布开始于10月13日、完成于10月14日，目录名保留原批次日期。部署说明已更新到deploy/README.md。

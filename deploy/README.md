@@ -20,7 +20,11 @@
 
 ## 1) 上传代码到 /opt/tiedi
 
-仓库无 git remote，需手动上传（在**本机**执行）：
+本地 Git 远端为 `https://github.com/fuxiaoji/iron-bottom-sound.git`。线上 `/opt/tiedi` 仍是无 Git 的运行目录，使用已提交版本的部署包更新（在**本机**准备）：
+
+发布前提交并推送所选分支，再从该提交归档后端、结构化数据、原始素材与前端。前端使用 `--base=/tiedi/` 构建；不要直接把仍在变化的实验工作区作为线上版本。归档中的 Git LFS 指针必须还原成对应原件，并按对象 SHA256 核对，不能把指针文本作为图片部署。
+
+下面是手动增量上传示例；数据库、战报、凭据和运行依赖不属于代码包：
 
 ```bash
 rsync -av --exclude .git --exclude tmp --exclude artifacts --exclude node_modules \
@@ -64,8 +68,6 @@ sudo sh -c 'echo "DEEPSEEK_API_KEY=<你的密钥>" >> /etc/tiedi.env'
 
 - **密钥纪律**：`DEEPSEEK_API_KEY` 只从环境变量读取、绝不写入仓库；服务器上持久化于
   root-only 的 `/etc/tiedi.env`。无密钥时战报叙事走确定性回退、LLM 对手不可用，对局照常。
-- **安全提示**：此前在对话中粘贴过一把 DeepSeek 密钥（`sk-8758...`）——请尽快到
-  DeepSeek 控制台**吊销并更换**；本部署只会用它注册到 `/etc/tiedi.env`，不落仓库。
 - `IBS_DB_PATH`/`IBS_REPORTS_DIR` 已在 systemd 单元内给出默认值，通常无需再设。
 
 ## 5) systemd 服务（服务器）
@@ -110,6 +112,9 @@ curl -sS -o /dev/null -w '%{http_code}\n' \
 
 ## 更新流程（后续发版）
 
-1. 重新上传代码（rsync，保留 DB/后端 reports）。
-2. `systemctl restart tiedi`；如需改前端：重跑 §3 构建。
-3. nginx 配置有改动才 `nginx -t && systemctl reload nginx`。
+1. 从明确的 Git 提交制作部署包，记录文件清单、包 SHA256 和提交号；上传到独立的 staging 目录并核对文件摘要。先用隔离数据库检查导入、新版建局和既有存档格式兼容性。
+2. 保留 `/etc/tiedi.env`、`.venv`、`backend/reports` 与线上数据库；停止 `tiedi` 后，用 SQLite Backup API 创建一致性备份并核对旧表行数和原始字节摘要，保存旧运行目录供回滚。不要用本机玩家库覆盖线上玩家库。
+3. 切换已核验的代码、数据和 `/tiedi/` 前端产物，启动 `tiedi`。`/tiedi/api/health` 的 `status=ready`、`loaded_revision=source_revision` 且与部署包后端摘要一致才表示加载了目标版本。如启动失败，恢复旧代码；玩家库保留，备份另存。
+4. 只读核验旧表摘要、既有存档、想定目录、JS/CSS及棋子图片；新增空的 `ai_debug` 表是新版结构迁移，不改变既有对局。核对公共首页摘要不变。nginx 配置有改动才 `nginx -t && systemctl reload nginx`。
+
+2026-10-14 夜战发布的详细提交、验证和备份位置见 `havedone.md`。服务器根目录的 `release-manifest.json` 记录实际运行提交及逐文件摘要，`deployment-result.json` 记录健康和数据保护结果；两者不含凭据或玩家行内容。
