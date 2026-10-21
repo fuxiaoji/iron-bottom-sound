@@ -4,13 +4,13 @@
 
 官方接入、精确指令、身份绑定及平台限制见 [QQ_OFFICIAL.md](QQ_OFFICIAL.md)，测试与失败收据见 [VALIDATION.md](VALIDATION.md)。NapCat 已停止、临时探针已还原；普通 QQ 账号的历史错误 168 不是当前官方路线的阻断。
 
-GitHub 可审查的安全证据入口为 [测试批次摘要](evidence/validation-summary.json)、[平台回调收据](evidence/official-callback.json) 与 [运行包来源清单](evidence/ibs-bot-runtime.tar.gz.json)。完整 raw XML、PNG、截图及运行包二进制留在本地 `artifacts/bot-20261022/`，不入 Git；下文这类本地产物链接需在本地工作区打开。
+GitHub 可审查的安全证据入口为 [测试批次摘要](evidence/validation-summary.json)、[实群验证](evidence/official-live.json)、[平台回调收据](evidence/official-callback.json) 与 [运行包来源清单](evidence/ibs-bot-runtime.tar.gz.json)。完整 raw XML、PNG、截图及运行包二进制留在本地 `artifacts/bot-20261022/`，不入 Git；下文这类本地产物链接需在本地工作区打开。
 
 ## 当前状态
 
 已创建官方应用，用户本人重置 AppSecret 后完成服务器私有配置，token 交换成功。HTTPS 回调 `https://fuwenji.asia/ibs-bot/qq-official/events` 已保存并经腾讯平台验证通过，真实平台挑战返回 200；伪造业务请求返回 401。
 
-`GROUP_AT_MESSAGE_CREATE` 和 `C2C_MESSAGE_CREATE` 两类消息订阅已保存。白名单为空时只做经过认证的群 OpenID 发现，不建局；合法发现自动持久化，管理员后台取值，无需用户转抄群号。当前真实群发现记录为零，机器人二维码已交给用户，等待添加新机器人并真实 @。取得真实 `group_openid` 并配置白名单后再联调；官方群创建、绑定、私聊操舰与回图尚未验收，真实 LLM agent QQ 对战也尚未完成。
+`GROUP_AT_MESSAGE_CREATE` 和 `C2C_MESSAGE_CREATE` 两类消息订阅已保存。用户已把机器人加入目标群，真实群事件验签及官方回复成功；从事件发现的唯一群已配置白名单。真实「创建 编队pve」已建立编队 PVE，私聊申请码与群内确认完成同席位绑定；首次私聊「自动 0」已推进到 revision 1 / 增援阶段，本方 PNG 与随后群「战况」公共 PNG 均有腾讯 API 发送确认，用户也确认两处都有图。这证明首阶段实群链路，完整真实 QQ 对局及自主 LLM agent 对战尚未完成。
 
 ## 安装与启动
 

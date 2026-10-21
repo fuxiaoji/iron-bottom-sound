@@ -136,6 +136,24 @@
       "errors": 0,
       "skipped": 0,
       "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/official-live-audit.xml",
+      "sha256": "1e8775889002ccb4073e57ffef701b0cec55dd26815886262c129d36b79cdb9e",
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/official-compact-command.xml",
+      "sha256": "99db7f7ad8fdd1f87c00c6bcdf89d74163583b34bd811d5789e2c3528414c261",
+      "tests": 42,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
     }
   ]
 }

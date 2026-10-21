@@ -2,21 +2,23 @@
 
 当前 QQ 路线为官方机器人「铁底湾指挥官」，AppID `1905878837`；NapCat 已停止，临时探针已还原。本记录区分官方协议/绑定验证、不同代码快照上的历史回归、服务器引擎烟测和真实 QQ 联调。各批次交叉覆盖，不把通过数相加；旧全批通过不代表所有后续改动已在同一最终快照全量通过。
 
-GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.json)，保留各批 raw XML 的 SHA256、计数与失败测试名，不发布原始错误正文或环境配置。安全部署副本包括 [鉴权](evidence/official-auth.json)、[回调](evidence/official-callback.json)、[PVE 烟测](evidence/server-smoke.json)、[SSH MCP 烟测](evidence/ssh-mcp-smoke.json)、[来源](evidence/runtime-sources.json)、[运行包清单](evidence/ibs-bot-runtime.tar.gz.json)、[缓存清理](evidence/cleanup.json) 和 [切换清理](evidence/official-switch-cleanup.json)。完整 raw XML、PNG、截图及运行包二进制留本地 `artifacts/bot-20261022/`，不入 Git；本文原始产物链接用于本地核验。
+GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.json)，保留各批 raw XML 的 SHA256、计数与失败测试名，不发布原始错误正文或环境配置。安全部署副本包括 [鉴权](evidence/official-auth.json)、[回调](evidence/official-callback.json)、[实群](evidence/official-live.json)、[PVE 烟测](evidence/server-smoke.json)、[SSH MCP 烟测](evidence/ssh-mcp-smoke.json)、[来源](evidence/runtime-sources.json)、[运行包清单](evidence/ibs-bot-runtime.tar.gz.json)、[缓存清理](evidence/cleanup.json) 和 [切换清理](evidence/official-switch-cleanup.json)。完整 raw XML、PNG、截图及运行包二进制留本地 `artifacts/bot-20261022/`，不入 Git；本文原始产物链接用于本地核验。
 
 ## 官方方案：已验证与仍待验收
 
-按用户指示创建应用，AppSecret 由用户本人重置后，服务器完成私有配置与官方 token 交换。平台已保存 Webhook 地址 `https://fuwenji.asia/ibs-bot/qq-official/events`；01:33:36 的真实平台 HTTP 挑战返回 200，服务记录 `challenge_signed`，腾讯平台验证回调并成功保存。验收依据为平台成功保存与服务端挑战记录，见 [official-callback.json](../../artifacts/bot-20261022/deploy/official-callback.json)。服务器伪造业务探针为 401，GET 为 405；旧游戏服务同时返回 200。官方网关/绑定功能提交为 `65eb4c8ba944ed1cc64c7eeb528ec2340165be48`，8 个已部署源码与该提交的摘要匹配。
+按用户指示创建应用，AppSecret 由用户本人重置后，服务器完成私有配置与官方 token 交换。平台已保存 Webhook 地址 `https://fuwenji.asia/ibs-bot/qq-official/events`；01:33:36 的真实平台 HTTP 挑战返回 200，服务记录 `challenge_signed`，腾讯平台验证回调并成功保存。验收依据为平台成功保存与服务端挑战记录，见 [official-callback.json](../../artifacts/bot-20261022/deploy/official-callback.json)。服务器伪造业务探针为 401，GET 为 405；旧游戏服务同时返回 200。官方网关/绑定功能提交为 `65eb4c8b`，后续连写解析与静态投递审计提交为 `160aa235a398263fa8a34478baeb251bec6773c3`；当前 8 个已部署源码与后者快照摘要匹配。
 
-上述结果证明应用鉴权及真实平台地址验证已经联通，不等于真实消息回调或群图回复通过。`GROUP_AT_MESSAGE_CREATE`、`C2C_MESSAGE_CREATE` 两项订阅已保存。白名单为空，仅从合法群事件发现真实 `group_openid`，私有表 `bot_official_groups` 只存应用、群 OpenID 和最后发现时间，不存正文、发送者或命令；管理员后台取值，无需用户转抄。当前该应用真实发现记录为零，没有把数字群号猜成 OpenID。
+`GROUP_AT_MESSAGE_CREATE`、`C2C_MESSAGE_CREATE` 两项订阅已保存。用户真实 @ 触发验签、回复成功，服务器从该事件发现唯一真实 `group_openid` 并配置白名单，没有把数字群号猜成 OpenID。私有表 `bot_official_groups` 只存应用、群 OpenID 和最后发现时间，不存正文、发送者或命令。安全实群收据仅发布群与对局摘要，不发布成员、私聊身份或验证码。
 
-官方机器人二维码已交给用户，等待用户添加新机器人并真实 @，再完成白名单、群创建/加入、C2C 绑定、私聊推进/PNG 和群公共战况查询。当前未认证应用的管理员/群主范围与后续个人认证说明见 [QQ_OFFICIAL.md](QQ_OFFICIAL.md)。普通 QQ 账号历史限制 168 不再作为这条路线的阻断。
+首次真实「创建 编队pve」因参数连写返回用法；修复后用户原命令重发，成功建立 formation/PVE、盟军席位的对局。C2C 申请码、正确群作者确认绑定均有真实回调与回复；数据库确认唯一别名与已消费挑战。首次真实私聊「自动 0」从编队部署推进到第 1 回合增援、revision 1，日志 `command_auto`、`image_delivered`、`delivered` 证明腾讯 API 确认本方 PNG 发送。随后真实群「战况」触发 `command_public_map`、`image_delivered`、`delivered`，用户确认「两处都有图」。API 回执和用户实际显示确认为两种独立证据；本轮不包含逐像素或全局终局验收。当前未认证应用的管理员/群主范围与后续个人认证说明见 [QQ_OFFICIAL.md](QQ_OFFICIAL.md)。普通 QQ 账号历史限制 168 不再作为这条路线的阻断。
 
 ### 官方协议与安全绑定收据
 
 - [identity-links.xml](../../artifacts/bot-20261022/identity-links.xml)：31 passed，29.504 秒，其中新绑定 18 项、既有服务 13 项。覆盖同 raw 值不同域、AppID/群隔离、错误作者不消费、过期、绑定冲突、8 个活码上限、稳定私聊收据、重启、双实例原子消费及真实别名席位/提交幂等。
 - [qq-official-protocol-pass.xml](../../artifacts/bot-20261022/qq-official-protocol-pass.xml)：35 passed，0.477 秒，其中网关 30 项、工厂/配置兼容 5 项。覆盖签名/时间窗、挑战限制、两类事件、群发现/白名单、消息幂等、回复次数与完整 JSON 超限拒发、私聊绑定及图片流程。
 - [official-discovery-final.xml](../../artifacts/bot-20261022/official-discovery-final.xml)：最终官方批次 36 passed，0.523 秒，其中网关 30 项、工厂/发现 6 项；新增持久化合法空白名单群发现，未验签事件不得写入记录。
+- [official-live-audit.xml](../../artifacts/bot-20261022/official-live-audit.xml)：36 passed，0.582 秒，核验静态命令结果与投递标签，不记录命令正文、用户身份、密钥或原始错误。
+- [official-compact-command.xml](../../artifacts/bot-20261022/official-compact-command.xml)：42 passed，0.715 秒，增加普通/编队与大小写 PVE/PVP 连写、原空格命令及错误参数覆盖。此为当前连写修复快照的定点验证，各批不相加。
 - [official-app-compat.xml](../../artifacts/bot-20261022/official-app-compat.xml)：兼容批次 70 passed，2.379 秒，分项为既有 HTTP/通知 9、当时官方工厂 5、OneBot 56；该批次早于新增第 6 项发现测试，不与最终 36 项相加。
 - [qq-official-core-integration.json](../../artifacts/bot-20261022/qq-official-core-integration.json)：真实 Python 引擎、群创建/加入、私聊申请码→群持有人确认、别名取得原席位、本方 PNG、自动命令及重复消息不再次推进、公共图均有本地联通证据；网络完全为 `httpx.MockTransport`，3 张图经模拟上传，未向真实平台广播。
 
@@ -24,7 +26,7 @@ GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.jso
 
 [qq-official-signature-evidence.json](../../artifacts/bot-20261022/qq-official-signature-evidence.json) 记录首轮协议运行 29 passed / 1 failed；首轮没有生成原始 JUnit，不把后续文件冒充首轮记录。失败原因是官方公开文档所印签名不能验证其所印 timestamp/body，异常为 `InvalidSignature`。
 
-[qq-official-documented-signature-failure.xml](../../artifacts/bot-20261022/qq-official-documented-signature-failure.xml) 是该示例的独立定点复现：0 passed / 1 failed，0.038 秒。官方公开的 32 字节公钥向量独立匹配，产品实现按官方 SDK 的种子派生及 timestamp+原始请求体校验；这项失败针对公开示例，不能称为产品真实回调失败，也不能被 35 项通过覆盖掉。本 App 后续真实平台挑战已通过；真实群业务验签仍需合法消息收据。示例来源：[官方 sign.md](https://github.com/tencent-connect/bot-docs/blob/main/docs/develop/api-v2/dev-prepare/interface-framework/sign.md)。
+[qq-official-documented-signature-failure.xml](../../artifacts/bot-20261022/qq-official-documented-signature-failure.xml) 是该示例的独立定点复现：0 passed / 1 failed，0.038 秒。官方公开的 32 字节公钥向量独立匹配，产品实现按官方 SDK 的种子派生及 timestamp+原始请求体校验；这项失败针对公开示例，不能称为产品真实回调失败，也不能被 35 项通过覆盖掉。本 App 后续真实平台挑战及群/C2C 业务验签已通过。示例来源：[官方 sign.md](https://github.com/tencent-connect/bot-docs/blob/main/docs/develop/api-v2/dev-prepare/interface-framework/sign.md)。
 
 ## 前一轮服务 / MCP / OneBot 测试与保留的失败
 
@@ -79,7 +81,7 @@ GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.jso
 
 后续运行包使用 [build_bot_release.py](../../scripts/build_bot_release.py)。它要求来源为完整文件，以当前仓库 `HEAD` 的 Git LFS OID 校验这 5 项，并输出来源与归档摘要。`--source-root` 可指定已有完整来源的另一仓库根目录；当前源码和结构化数据仍从当前仓库打包。命令见 [README.md](README.md#构建服务器运行包)。
 
-最终官方版 [ibs-bot-runtime.tar.gz](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz) 正向打包验证通过：68,202,363 字节、124 个成员，SHA256 `027a9e383b5f23cdd5b7f6d7c7aeb2d3a4eb7d75d83be1bff9043a8355ba2e8a`；包含本轮官方网关、绑定与远端启动器，5 个原始来源摘要均匹配，不含私有环境配置或 `.pyc`。逐来源字节数和摘要见 [最终打包收据](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz.json)。这是运行包验证，不合并计为完整 QQ 对局验收。
+当前官方版 [ibs-bot-runtime.tar.gz](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz) 正向打包验证通过：68,202,689 字节、124 个成员，SHA256 `459434914199d83830ba064daef4c9fb39fa63aa1a3eb6156769135d54b4874d`；包含本轮官方网关、连写修复、绑定与远端启动器，5 个原始来源摘要均匹配，不含私有环境配置或 `.pyc`。逐来源字节数和摘要见 [最终打包收据](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz.json)。这是运行包验证，不合并计为完整 QQ 对局验收。
 
 [cleanup.json](../../artifacts/bot-20261022/deploy/cleanup.json) 保留服务器空间处理收据：清理 4 份旧 VSCode Server 运行缓存与扩展下载缓存，释放 3,020,009,472 字节，清理后可用 3,689,418,752 字节。当前两份 VSCode Server、用户配置、已安装扩展及项目/对局均列为保留项；该容量是清理时快照，不代表安装镜像后的当前剩余空间。
 
@@ -93,6 +95,6 @@ GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.jso
 
 ## 官方实群与真实 LLM agent 对战未完成项
 
-真实平台地址握手与两类消息订阅保存已完成；仍需合法群/C2C 回调、真实群 OpenID、白名单、群建局、群持有人确认私聊绑定、本方图与公共战况的官方 API 成功回执，以及重启后续局验证。官方主动推送已停止，验收应按用户主动查询战况设计，而非承诺双方完成就异步广播。
+真实平台握手、群/C2C 回调、群发现/白名单、编队 PVE 建局、群持有人确认私聊绑定、首阶段推进、本方与群公共 PNG 的官方 API 回执及用户显示确认已完成。仍需其他模式的真实群对局、第二名真实群友加入 PVP、重启后真实续局及完整终局验证。官方主动推送已停止，验收按用户主动查询战况设计，不承诺双方完成就异步广播。
 
 `bot_mcp_duel.py`、本地和远端双会话证据均为确定性状态机建议。尚无两个 LLM 自主制定战术、经 MCP 参与同一官方 QQ 对局并完整终局的证据。管理员配置 agent 房间或已绑定人类身份后，仍须实际验证对应席位权限及公开/私有图边界。
