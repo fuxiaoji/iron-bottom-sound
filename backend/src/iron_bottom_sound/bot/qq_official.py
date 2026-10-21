@@ -40,6 +40,14 @@ HELP = """铁底湾：帮助 / 列表 / 创建 普通|编队 pve|pvp [想定ID] 
 私聊读取席位前必须完成可信身份绑定，不根据原始openid相同自动关联。"""
 GROUP_COMMANDS = {"帮助", "列表", "创建", "加入", "状态", "战况", "绑定"}
 TACTICAL = {"态势", "行动", "建议", "提交", "自动", "确认", "截图"}
+COMMAND_LABELS = {"帮助": "help", "列表": "list", "创建": "create", "加入": "join",
+                  "状态": "status", "战况": "public_map", "绑定": "bind", "态势": "situation",
+                  "行动": "legal", "建议": "suggest", "提交": "submit", "自动": "auto",
+                  "确认": "confirm", "截图": "screenshot"}
+ERROR_LABELS = {name: "rejected_" + name for name in (
+    "forbidden", "not_found", "identity", "identity_link", "identity_link_conflict",
+    "identity_link_expired", "identity_link_limit", "room", "room_limit", "scenario",
+    "stale_revision", "already_ready", "invalid_orders", "orders", "full", "waiting")}
 
 
 def _openid(value: Any) -> str:
@@ -159,6 +167,7 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
         if scope == "group":
             parts = text.split()
             command, args = parts[0], parts[1:]
+            _log(scope, "command_" + COMMAND_LABELS.get(command, "unknown"))
             if command in TACTICAL:
                 return [("text", "本方态势和战术命令请私聊：铁底湾 群openid 对局ID 态势。")]
             if command not in GROUP_COMMANDS:
@@ -170,8 +179,13 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
                 value = service.claim_identity_link(args[0], actor_id=actor, room_id=room)
                 return [("text", "席位私聊身份已绑定。" if value.get("linked") is True else "绑定未完成。")]
             if command == "创建":
+                # QQ users commonly type the mode and opponent together. Split
+                # only this exact command token; never rewrite order JSON.
+                compact = re.fullmatch(r"(普通|编队)(pve|pvp)", args[0], re.IGNORECASE) if args else None
+                if compact:
+                    args = [compact[1], compact[2], *args[1:]]
                 if not 2 <= len(args) <= 4 or args[0] not in {"普通", "编队"} or args[1].lower() not in {"pve", "pvp"}:
-                    raise ValueError("用法：创建 普通|编队 pve|pvp [想定ID] [盟军|日军]")
+                    raise ValueError("用法：创建 普通|编队 pve|pvp [想定ID] [盟军|日军]\n例如：创建 编队 pve（也支持 创建 编队pve）")
                 extra, side = args[2:], "allies"
                 if extra and extra[-1] in {"盟军", "日军"}:
                     side = {"盟军": "allies", "日军": "axis"}[extra.pop()]
@@ -180,6 +194,7 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
                 value = service.create(actor_id=actor, room_id=room,
                     mode={"普通": "classic", "编队": "formation"}[args[0]], opponent=args[1].lower(),
                     scenario_id=extra[0] if extra else "IBS-S-03", side=side, seed=1, request_id=rid)
+                _log(scope, "create_accepted")
                 return [("text", _public(value) + f"\n私聊：铁底湾 {data['group_openid']} {value['match_id']} 态势")]
             if command == "加入" and len(args) == 1:
                 return [("text", _public(service.join(args[0], actor_id=actor, room_id=room, request_id=rid)))]
@@ -195,6 +210,7 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
         if len(parts) < 3:
             raise ValueError("用法：铁底湾 群openid 对局ID 态势|行动|建议|提交 版本 JSON")
         group, match, command = _openid(parts[0]), parts[1], parts[2]
+        _log(scope, "command_" + COMMAND_LABELS.get(command, "unknown"))
         if group not in settings.allowed_groups:
             raise ValueError("该群未获授权。")
         context = {"actor_id": actor, "room_id": "qqbot:" + settings.app_id + ":" + group}
@@ -255,10 +271,12 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
                         parts = await run_in_threadpool(commands, scope, data, entry["actor"], entry["room"], entry["rid"])
                 except Exception as exc:
                     if hasattr(exc, "code") and hasattr(exc, "message"):
+                        _log(scope, ERROR_LABELS.get(exc.code, "request_rejected"))
                         detail = str(exc.message) if scope == "c2c" else "请求未接受，请核对席位、对局和阶段。"
                         if scope == "c2c" and exc.code == "forbidden":
                             detail += "\n请先私聊：铁底湾 群openid 对局ID 绑定 盟军|日军，再由该席位本人在对应群确认。"
                     elif isinstance(exc, ValueError):
+                        _log(scope, "command_parameters_rejected")
                         detail = str(exc)
                     else:
                         _log(scope, "business_failed")
@@ -295,6 +313,8 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
                     if not isinstance(result.get("id"), str) or not result["id"]:
                         raise OfficialAPIError("reply_unacknowledged")
                     entry["sent"] += 1
+                    if kind == "image":
+                        _log(scope, "image_delivered")
                 entry["complete"] = True
                 _log(scope, "delivered")
 

@@ -216,6 +216,35 @@ def test_unlisted_group_is_ignored(bot):
     assert service.calls == seen == []
 
 
+@pytest.mark.parametrize(('word', 'mode', 'opponent'), [
+    ('编队pve', 'formation', 'pve'), ('编队PVP', 'formation', 'pvp'),
+    ('普通PvE', 'classic', 'pve'), ('普通pvp', 'classic', 'pvp'),
+])
+def test_group_create_accepts_compact_mode_opponent(bot, word, mode, opponent):
+    client, service, seen, _ = bot
+    assert post(client, event('创建 ' + word + ' IBS-S-03 日军')).json() == ACK
+    calls = [args for name, args in service.calls if name == 'create']
+    assert len(calls) == 1
+    assert (calls[0]['mode'], calls[0]['opponent'], calls[0]['side']) == (mode, opponent, 'axis')
+    assert 'match_id' in messages(seen)[0]['content']
+
+
+def test_compact_create_still_requires_signed_authorized_group(bot):
+    client, service, seen, _ = bot
+    assert post(client, event('创建 编队pve'), signed=False).status_code == 401
+    assert post(client, event('创建 编队pve', group='OTHER')).json() == ACK
+    assert service.calls == seen == []
+
+
+def test_rejected_create_logs_safe_category_without_acceptance(bot, caplog):
+    client, service, seen, _ = bot
+    with caplog.at_level(logging.INFO, logger='uvicorn.error'):
+        assert post(client, event('创建 编队not-valid')).json() == ACK
+    assert service.calls == []
+    assert 'command_parameters_rejected' in caplog.text and 'create_accepted' not in caplog.text
+    assert '编队not-valid' not in caplog.text and 'MEMBER' not in caplog.text
+
+
 def test_empty_whitelist_only_discovers_signed_group_openid():
     service, seen = FakeService(), []
 
