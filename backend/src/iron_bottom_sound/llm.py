@@ -265,6 +265,9 @@ _DISCIPLINE_SYSTEM_PROMPT = (
     "不要数棋盘格子（ASCII 棋盘排版对六角格只是近似）。例：O14(q14,r6) → P15(q15,r7) "
     "距离 = (1+1+2)/2 = 2。\n"
     "领域指导（不要自行推导规则）：\n"
+    "- 先阅读【合法动作】schema_hint里的movement_timing_guidance：它给出本局时钟版本、"
+    "舰船与鱼雷共用的完整脉冲表及途中发射例子。区分计划总MF、发射MF和实际区间，"
+    "新局采用脉冲表时按同一区间比较舰船与雷的位置，不能把每艘船的第i个MF当成同一时刻。\n"
     "- 【合法动作】里的 movement_candidates / torpedo_candidates / gunnery_candidates 是引擎算好的"
     "合法值（可达格、speed 范围、launcher/sides/angles/settings/launch_positions、mount_ids）。直接采用"
     "候选组合，不要自己重算方位、射程、速度或齐射修正。\n"
@@ -369,7 +372,7 @@ _FEW_SHOT_BY_PHASE: dict[str, dict[str, Any]] = {
     },
     "movement_planning": {
         "turn": 2, "phase": "movement_planning",
-        "situation_summary": "轴心舰队以4节纵队南下，各舰保持间距并远离鱼雷轨道。",
+        "situation_summary": "轴心舰队采用4MF纵队南下，各舰保持间距并远离鱼雷轨道。",
         "phase_goal": "全舰队合法移动并保持队形。",
         "unit_intents": {"SAMPLE-U-KM-0001": "直行4节", "SAMPLE-U-KM-0002": "右转1格保持间距"},
         "orders": {

@@ -671,6 +671,7 @@ class IronBottomEngine:
                 },
             }
             hint = schemas[state.phase]
+            hint["movement_timing_guidance"] = self.movement_timing_guidance(state)
             if night.enabled(state):
                 hint["night_candidates"] = night.candidates(self, state, side)
                 hint["rule_blockers"] = deepcopy(state.scenario_state.get("rule_blockers", []))
@@ -3330,6 +3331,59 @@ class IronBottomEngine:
         if speed not in rows:
             raise ValueError(f'Movement speed outside Greg Courter table: {speed}')
         return tuple(index + 1 for index, cell in enumerate(rows[speed]) if cell == 'M')
+
+    def movement_timing_guidance(self, state: GameState) -> dict[str, Any]:
+        """Public rule lesson, generated from this game's authoritative clock.
+
+        No ship, track, order or hidden position is read. LLM transports and local
+        observations share this output rather than maintaining their own table.
+        """
+        if state.movement_timing == 'legacy-mf-v1':
+            return {
+                'version': state.movement_timing,
+                'instruction': '本局是旧存档，使用顺序MF时钟，不套用Greg Courter八区间表。'
+                               '途中发射首回合可走格数为max(0,鱼雷速度减发射舰已用MF)。'
+                               '保持本局合法候选与旧时钟，不把新局规则用于旧局。',
+            }
+        chart = self.rules.movement_impulses
+        example_speed, launch_mf, torpedo_speed = 4, 2, 8
+        launch_interval = self.movement_intervals(example_speed)[launch_mf - 1]
+        remaining = [i for i in self.movement_intervals(torpedo_speed) if i > launch_interval]
+        return {
+            'version': state.movement_timing,
+            'rule_id': chart['id'],
+            'source_pdf_page': chart['source']['pdf_page'],
+            'interval_count': chart['intervals'],
+            'applies_to': ['ships', 'torpedoes', 'contact_markers'],
+            'rows': [{'speed_or_total_mf': speed, 'spend_one_mf_at': list(self.movement_intervals(speed))}
+                     for speed in sorted(chart['rows'])],
+            'reading': '舰船和鱼雷共用本表；每回合从第1区间依序结算到最后区间。'
+                       '表中未列出的区间留在当前格。舰船用所选计划的总MF查行，'
+                       '鱼雷用当前回合速度周期对应的雷速查行；MF不是节，也不是区间编号。'
+                       '每次表列行动消耗1MF；付费转向也消耗MF，但可以原地转向而不走格。',
+            'launch': 'launch_at_mf填写发射舰已消耗的MF序号，不要改填区间编号。'
+                      'launch_positions每项的mf、hex、heading、movement_interval是一组对应值；'
+                      '选用同一项，bearing取该项heading。MF0在移动前发射。'
+                      '途中发射发生在舰船完成该区间动作之后；新雷在发射区间不前进，'
+                      '仅在雷速行严格晚于发射区间的M区间走格，不补走已过去的M。'
+                      '当回合剩余移动次数不是“雷速减已用MF”。后续回合按相应完整雷速行。',
+            'worked_example': {
+                'launcher_total_mf': example_speed, 'launcher_intervals': list(self.movement_intervals(example_speed)),
+                'launch_at_mf': launch_mf, 'launch_interval': launch_interval,
+                'torpedo_speed': torpedo_speed, 'first_turn_move_intervals': remaining,
+                'first_turn_hexes': len(remaining),
+                'explanation': f'{example_speed}MF舰消耗第{launch_mf}个MF时是第{launch_interval}区间；'
+                               f'此时发射{torpedo_speed}速雷，本回合仅在{remaining}前进，共{len(remaining)}格。',
+            },
+            'contact': '按同一区间的位置检查接触：同格或双方对向交换相邻格构成接触；'
+                       '同向尾随进入对方刚离开的格不构成接触。仍有射程但本回合走完的雷停在原格，'
+                       '舰船随后驶入仍会接触；最后一格先检查接触，再移除耗尽且未接触的雷。'
+                       '友舰也可能中雷；发射舰自身和发射时与其共格目标除外。'
+                       '接触时冻结目标航向和速度，炮击阶段之后再结算鱼雷效果。',
+            'planning': '把本方各舰航路与可见雷轨按区间对齐，检查中途同格/对穿，不能只比终点。'
+                        '对未知敌方航路只作公开信息预测，不能当成已知订单。'
+                        '本表用于理解时间；仍须从当前合法候选选择命令，不能自行填补或修改候选。',
+        }
 
     def _interval_program(self, program: list, position: HexCoord, heading: int) -> list:
         intervals = iter(self.movement_intervals(len(program)))

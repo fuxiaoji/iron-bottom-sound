@@ -73,6 +73,8 @@ RESPONSE_SCHEMA: dict[str, Any] = {
 INSTRUCTION = (
     "你是编队指挥官。只依据给出的本地情报与你的记忆决策。"
     "机动只能从 legal_formation_actions 里选一个 action_id，不得自创航路。"
+    "先阅读 movement_timing_guidance 给出的本局脉冲表与途中发射示例：舰船和鱼雷共用时钟，"
+    "按实际区间比较航路与可见雷轨，不能把MF序号当作区间编号；旧局遵守其旧时钟。"
     "火力只能通过 target_priority_adjustments 给可见目标附加 -0.5..0.5 的优先级权重；"
     "炮位分配、射界、修正与命中由引擎选择器完成，你不得输出任何炮击命令、炮位、射击解或命中计算。"
     "你可以在 memory_note 里写一句给下一回合自己的备忘（会原样保留并再次给你看）。"
@@ -148,6 +150,7 @@ def build_prompt(
         "instruction": INSTRUCTION,
         "response_schema": RESPONSE_SCHEMA,
         "formation_state": payload["formation_state"],
+        "movement_timing_guidance": payload["movement_timing_guidance"],
         "local_map": payload["local_map"],
         "local_contacts": payload["local_contacts"],
         "active_mission_order": (
@@ -420,6 +423,7 @@ class ProviderPolicy:
                 "order_text": order,
                 "your_memory": memory,
                 "formation_state": prompt.get("formation_state"),
+                "movement_timing_guidance": prompt.get("movement_timing_guidance"),
                 "local_contacts": prompt.get("local_contacts"),
                 "legal_formation_actions": prompt.get("legal_formation_actions"),
                 "legal_target_priority_options": prompt.get("legal_target_priority_options"),

@@ -39,3 +39,10 @@
 新建局及首条game_created标记版本；旧存档/事件缺版本字段时仍按`legacy-mf-v1`执行，旧事件不追加新字段。历史世界杯、正常赛果、旧封存订单和原来源文件不迁移。新旧时钟分别有确定性回放测试，避免更新后重算历史成绩。
 
 边界测试：`tests/test_movement_impulses.py`；既有引擎、鱼雷辅助、战术与真实编队、API存档、整局与回放回归继续适用。
+
+
+## LLM实际输入
+
+引擎`movement_timing_guidance(state)`按当前局规则数据生成完整表和教学说明，在每个订单阶段的`legal_actions[].schema_hint.movement_timing_guidance`提供给舰队LLM。说明区分总MF/发射MF/实际区间，并包含4MF舰第2MF对应第4区间、8速雷只走第5–8段的计算实例、付费转向、接触/对穿/尾随和炮击后结算。表格没有复制到LLM模块。
+
+指挥延迟模式的`FormationObservation`携带相同公开规则，`build_prompt`、地图精简、纠错重试和`ProviderPolicy`实际HTTP字段白名单都保留它。该字段不包含任何舰船、雷轨、对手订单或隐藏坐标；未知敌方航路仍只是公开信息预测。旧时钟返回明确旧规则说明，不发送新表。`tests/test_llm_movement_timing.py`捕获舰队与本地编队真实序列化请求，核对9行、示例、重试/精简、版本和隐私，不调用外部模型。

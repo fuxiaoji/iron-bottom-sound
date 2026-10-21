@@ -129,6 +129,7 @@ class FormationObservation(BaseModel):
     legal_target_priority_options: list[dict[str, Any]] = Field(default_factory=list)
     report_actions: list[str] = Field(default_factory=lambda: list(REPORT_ACTIONS))
     local_priority_weight_limit: float = LOCAL_PRIORITY_WEIGHT_LIMIT
+    movement_timing_guidance: dict[str, Any] = Field(default_factory=dict)
 
 
 def formation_members(state: GameState, formation: FormationState) -> list[str]:
@@ -387,6 +388,7 @@ def formation_observation(
         map_columns=state.map_columns,
         map_rows=state.map_rows,
         authority=entry.authority if entry else AuthorityLevel.DELEGATED,
+        movement_timing_guidance=engine.movement_timing_guidance(state),
         link_status=entry.link_status if entry else LinkStatus.DIRECT,
         formation_state={
             "leader_id": formation.leader_id,
