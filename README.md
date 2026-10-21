@@ -192,6 +192,8 @@ pnpm run build
 
 ## QQ 机器人与 MCP
 
+当前接入方案为 QQ 开放平台官方机器人，使用 AppID / AppSecret，无需普通 QQ 账号在线。配置与群/私聊席位绑定见 [官方接入指南](docs/bot/QQ_OFFICIAL.md)。
+
 普通/编队模式、PVE/PVP、群 @ 创建与加入、私聊阶段命令、群公共图/双方受限视角图，以及两个 MCP agent 共用对局的配置见 [QQ / MCP 文档](docs/bot/README.md)。启动共享服务：
 
 ```sh

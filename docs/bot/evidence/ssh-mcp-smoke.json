@@ -1,0 +1,22 @@
+{
+  "transport": "MCP stdio over SSH; shared remote HTTP",
+  "decisions": "deterministic suggestions, no LLM",
+  "modes": [
+    {
+      "mode": "classic",
+      "match_id": "e73a7d54b6b4",
+      "revision": 1,
+      "phase": "movement_planning",
+      "png_bytes": 122803,
+      "png_sha256": "e51d6ffbb0620a6720cd8004847b63cc00e076e112ebc9643a66f60c3614ca6f"
+    },
+    {
+      "mode": "formation",
+      "match_id": "d7a957644e29",
+      "revision": 1,
+      "phase": "reinforcement",
+      "png_bytes": 109584,
+      "png_sha256": "f12558e406f65d296d2fe6dc270b46772a9ac4d5da542515d509fa5260a49faa"
+    }
+  ]
+}

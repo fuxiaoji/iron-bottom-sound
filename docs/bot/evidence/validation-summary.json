@@ -1,0 +1,141 @@
+{
+  "note": "Receipts cover different snapshots and overlap; counts must not be added. Raw failure bodies and secrets are not published.",
+  "runs": [
+    {
+      "receipt": "artifacts/bot-20261022/pytest.xml",
+      "sha256": "c8e0e3d991b1121ecc9868a10def9c66893132311d492c3a97de549717e2b616",
+      "tests": 145,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/bot-release.xml",
+      "sha256": "cdbd96b478fb2e9153fe992d3b9eb678fe9ca33a38f8435fa3c2220f5acf2c0c",
+      "tests": 115,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/publish.xml",
+      "sha256": "a1206badb5d159a4252bc6c695ad7706ba775bb4b5136cb6fc3ecc041c0a9ae9",
+      "tests": 124,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": [
+        "test_mcp_duel_script_runs_two_sessions_through_real_engine[formation-5]"
+      ]
+    },
+    {
+      "receipt": "artifacts/bot-20261022/formation-recheck.xml",
+      "sha256": "8728bb2fe578734cccb74ba774d6c904c3c4206674b1ed93bb5a7eedb2e7a138",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/shipnames-final.xml",
+      "sha256": "071c6041c998b881aecff51a9b59cdc69108ebeabf50fffce1d5a2816e7b35ce",
+      "tests": 125,
+      "failures": 3,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": [
+        "test_two_real_mcp_stdio_processes_share_http_service_and_fixed_identity",
+        "test_mcp_duel_script_runs_two_sessions_through_real_engine[classic-4]",
+        "test_mcp_duel_script_runs_two_sessions_through_real_engine[formation-5]"
+      ]
+    },
+    {
+      "receipt": "artifacts/bot-20261022/last-delta.xml",
+      "sha256": "9814fb1143eb9d6b12ea6cbb3d4a2fdf6ec0fdc5bcd6ff591b0fe6c996c8e57b",
+      "tests": 2,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": [
+        "test_real_qq_group_create_dm_submit_and_durable_delivery"
+      ]
+    },
+    {
+      "receipt": "artifacts/bot-20261022/final-fixes.xml",
+      "sha256": "4ed177a9c61bb5531953f994c35c1ef4ebccf1dd11bc4518ec5a6064c26c97f4",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/mcp-release-recheck.xml",
+      "sha256": "4355066dc0699e9aa849c45adbe22b6bc4fe06eccdaba650eab0f8c8b880a11d",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/onebot-ingress-recheck.xml",
+      "sha256": "4d6e43645dc117a85e2df2bd4747dd7596c641be4a519efad91b869d10df6ccc",
+      "tests": 56,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/identity-links.xml",
+      "sha256": "b4662bbc68340b206b2f9dc474efd551b08e4131aad628872ed06a3ac366b794",
+      "tests": 31,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/qq-official-protocol-pass.xml",
+      "sha256": "d4612b28e379f9a21c678f404a0eca01e96b39976769b2c5f286dac09df847f4",
+      "tests": 35,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/qq-official-documented-signature-failure.xml",
+      "sha256": "97e27636ee3d8125301feafbd577a58a5ea419b61795bd35a7b30a8f5d78a4c9",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": [
+        "test_published_signature_example_reproduces_mismatch"
+      ]
+    },
+    {
+      "receipt": "artifacts/bot-20261022/official-app-compat.xml",
+      "sha256": "ddb41634be44e61066a6e4aa866e9332ed7196e3488e2e60ad2eb8b21196b213",
+      "tests": 70,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/official-discovery-final.xml",
+      "sha256": "27fbd24b86ccbace0a1497dae2457e542fb87e636f1652521969a6d236d34d85",
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    }
+  ]
+}

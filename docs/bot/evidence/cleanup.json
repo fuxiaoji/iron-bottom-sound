@@ -1,0 +1,34 @@
+{
+  "before_available_bytes": 669409280,
+  "removed": [
+    {
+      "path": "/root/.vscode-server/cli/servers/Stable-16507d91be0dc1ce4f94c04d4d0430210b8685d9",
+      "logical_bytes": 690534598
+    },
+    {
+      "path": "/root/.vscode-server/cli/servers/Stable-2a59476c9bfcb90b3ddc372c36762471b7dfad1c",
+      "logical_bytes": 690465007
+    },
+    {
+      "path": "/root/.vscode-server/cli/servers/Stable-6d62b1d5dace93a33b3a6d3eca1317bd5e15bcb1",
+      "logical_bytes": 645777105
+    },
+    {
+      "path": "/root/.vscode-server/cli/servers/Stable-7baac39ec3ca969dab74ac12c097f6a486e46593",
+      "logical_bytes": 690498274
+    },
+    {
+      "path": "/root/.vscode-server/data/CachedExtensionVSIXs",
+      "logical_bytes": 252581711
+    }
+  ],
+  "kept": [
+    "Stable-3c631b164c239e7aeaaae7c626b46c527b361af2",
+    "Stable-2d0b7506a36c1d6db9a466440131a8e01eab2289",
+    "extensions",
+    "data/User",
+    "all projects and games"
+  ],
+  "after_available_bytes": 3689418752,
+  "released_bytes": 3020009472
+}
