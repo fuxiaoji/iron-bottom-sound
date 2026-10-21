@@ -4,7 +4,9 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+import secrets
 import sqlite3
+import time
 import uuid
 from contextlib import contextmanager
 from io import BytesIO
@@ -57,6 +59,18 @@ class BattleService:
             CREATE TABLE IF NOT EXISTS bot_outbox(
               id INTEGER PRIMARY KEY AUTOINCREMENT, payload TEXT NOT NULL,
               delivered INTEGER NOT NULL DEFAULT 0);
+            CREATE TABLE IF NOT EXISTS bot_identity_challenges(
+              codehash TEXT PRIMARY KEY, c2c_actor TEXT NOT NULL, room TEXT NOT NULL,
+              match TEXT NOT NULL, side TEXT NOT NULL, expected_member_actor TEXT NOT NULL,
+              expires REAL NOT NULL, consumed INTEGER NOT NULL DEFAULT 0);
+            CREATE INDEX IF NOT EXISTS bot_identity_challenges_actor
+              ON bot_identity_challenges(c2c_actor, consumed, expires);
+            CREATE TABLE IF NOT EXISTS bot_identity_aliases(
+              c2c_actor TEXT NOT NULL, room TEXT NOT NULL, memberactor TEXT NOT NULL,
+              PRIMARY KEY(c2c_actor, room));
+            CREATE TABLE IF NOT EXISTS bot_official_groups(
+              app_id TEXT NOT NULL, group_openid TEXT NOT NULL, last_seen REAL NOT NULL,
+              PRIMARY KEY(app_id, group_openid));
         ''')
         # DB includes secret orders and QQ seat identities: never serve it as an asset.
         if str(path) != ':memory:':
@@ -65,6 +79,19 @@ class BattleService:
     def close(self):
         with self.lock:
             self.db.close()
+
+    def record_official_group(self, app_id, group_openid):
+        """Private administrator discovery, called only after webhook validation.
+
+        Store no message text, sender identity or orders. Opaque platform group
+        IDs cannot be derived from a numeric QQ group number.
+        """
+        room = 'qqbot:' + app_id + ':' + group_openid
+        self._qqbot_context('qqbot:' + app_id + ':member:' + group_openid + ':discovery', room)
+        with self._transaction():
+            self.db.execute('INSERT INTO bot_official_groups VALUES(?,?,?) '
+                            'ON CONFLICT(app_id,group_openid) DO UPDATE SET last_seen=excluded.last_seen',
+                            (app_id, group_openid, time.time()))
 
     @contextmanager
     def _transaction(self):
@@ -89,6 +116,120 @@ class BattleService:
             raise ServiceError('identity', 'QQ玩家编号必须为规范正整数')
         if not isinstance(room_id, str) or not room_id or len(room_id) > 160:
             raise ServiceError('room', '缺少有效群/房间编号')
+        if actor_id.startswith('qqbot:'):
+            BattleService._qqbot_context(actor_id, room_id)
+
+    @staticmethod
+    def _qqbot_context(actor_id, room_id):
+        """Keep app, C2C and group-member identity domains explicitly separate."""
+        if not isinstance(actor_id, str) or not isinstance(room_id, str):
+            raise ServiceError('identity_link', '官方机器人身份或房间格式错误')
+        actor, room = actor_id.split(':'), room_id.split(':')
+        if (len(room) != 3 or room[0] != 'qqbot' or
+                len(actor) not in {4, 5} or actor[0] != 'qqbot' or
+                any(not p or not p.isascii() or any(ord(c) < 33 or ord(c) > 126 for c in p)
+                    for p in actor + room)):
+            raise ServiceError('identity_link', '官方机器人身份或房间格式错误')
+        kind = actor[2]
+        if ((kind == 'c2c' and len(actor) != 4) or
+                (kind == 'member' and len(actor) != 5) or kind not in {'c2c', 'member'}):
+            raise ServiceError('identity_link', '官方机器人身份域错误')
+        if actor[1] != room[1] or (kind == 'member' and actor[3] != room[2]):
+            raise ServiceError('identity_link', '官方机器人身份不属于此应用或群')
+        return kind, actor[1], room[2]
+
+    def resolve_actor(self, actor_id, room_id):
+        """Resolve only an explicitly authorized C2C alias in this exact room.
+
+        Callers already inside a match transaction retain the SQLite write lock
+        through resolution and the subsequent operation, including across processes.
+        """
+        self._identity(actor_id, room_id)
+        if not actor_id.startswith('qqbot:') or self._qqbot_context(actor_id, room_id)[0] != 'c2c':
+            return actor_id
+        with self.lock:
+            row = self.db.execute('SELECT memberactor FROM bot_identity_aliases WHERE c2c_actor=? AND room=?',
+                                  (actor_id, room_id)).fetchone()
+            if row is None:
+                return actor_id
+            member = row['memberactor']
+            self._identity(member, room_id)
+            if self._qqbot_context(member, room_id)[0] != 'member':
+                raise ServiceError('identity_link', '已保存的官方身份绑定无效')
+            return member
+
+    def issue_identity_link(self, actor_id, room_id, match_id, side='allies', request_id=None):
+        """Privately issue a challenge for an existing, fixed group seat owner.
+
+        The receipt is keyed by the original C2C identity, never its canonical
+        member alias. The code must only be returned over that C2C conversation.
+        """
+        self._identity(actor_id, room_id)
+        if not actor_id.startswith('qqbot:') or self._qqbot_context(actor_id, room_id)[0] != 'c2c':
+            raise ServiceError('identity_link', '绑定码只能由官方机器人私聊身份申请')
+        try:
+            side = Side(side).value
+        except (ValueError, TypeError):
+            raise ServiceError('side', '阵营需为allies或axis') from None
+        request_id = request_id if request_id is not None else 'identity-link:' + uuid.uuid4().hex
+        with self._transaction():
+            fp, cached = self._cached(actor_id, request_id,
+                dict(op='issue_identity_link', room=room_id, match=match_id, side=side))
+            if cached is not None:
+                return cached
+            row = self.db.execute('SELECT seats FROM bot_matches WHERE id=? AND room=?',
+                                  (match_id, room_id)).fetchone()
+            if row is None:
+                raise ServiceError('not_found', '此群没有该对局')
+            member = json.loads(row['seats']).get(side)
+            if not isinstance(member, str) or not member.startswith('qqbot:'):
+                raise ServiceError('identity_link', '该席位没有可绑定的官方群成员')
+            if self._qqbot_context(member, room_id)[0] != 'member':
+                raise ServiceError('identity_link', '该席位没有可绑定的官方群成员')
+            alias = self.db.execute('SELECT memberactor FROM bot_identity_aliases WHERE c2c_actor=? AND room=?',
+                                    (actor_id, room_id)).fetchone()
+            if alias is not None and alias['memberactor'] != member:
+                raise ServiceError('identity_link_conflict', '此私聊身份已绑定本群另一位成员，不能覆盖')
+            now = time.time()
+            active = self.db.execute('SELECT count(*) FROM bot_identity_challenges '
+                                    'WHERE c2c_actor=? AND consumed=0 AND expires>?', (actor_id, now)).fetchone()[0]
+            if active >= 8:
+                raise ServiceError('identity_link_limit', '未过期绑定码已达上限，请稍后重试')
+            code = secrets.token_urlsafe(24)
+            self.db.execute('INSERT INTO bot_identity_challenges VALUES(?,?,?,?,?,?,?,0)',
+                (hashlib.sha256(code.encode()).hexdigest(), actor_id, room_id, match_id, side, member, now + 300))
+            return self._receipt(actor_id, request_id, fp, dict(code=code, expires_in=300))
+
+    def claim_identity_link(self, code, actor_id, room_id):
+        """Only the authenticated, predetermined group author may consume a code."""
+        self._identity(actor_id, room_id)
+        if not actor_id.startswith('qqbot:') or self._qqbot_context(actor_id, room_id)[0] != 'member':
+            raise ServiceError('identity_link', '绑定确认必须来自官方群成员事件')
+        if not isinstance(code, str) or not 1 <= len(code) <= 128:
+            raise ServiceError('identity_link', '绑定码无效')
+        digest = hashlib.sha256(code.encode()).hexdigest()
+        with self._transaction():
+            row = self.db.execute('SELECT * FROM bot_identity_challenges WHERE codehash=?', (digest,)).fetchone()
+            if row is None or row['room'] != room_id or row['expected_member_actor'] != actor_id:
+                raise ServiceError('identity_link', '绑定码或群席位身份不匹配')
+            alias = self.db.execute('SELECT memberactor FROM bot_identity_aliases WHERE c2c_actor=? AND room=?',
+                                    (row['c2c_actor'], room_id)).fetchone()
+            if alias is not None and alias['memberactor'] != actor_id:
+                raise ServiceError('identity_link_conflict', '此私聊身份已绑定本群另一位成员，不能覆盖')
+            if row['consumed']:
+                if alias is not None:
+                    return dict(linked=True)
+                raise ServiceError('identity_link', '绑定码已使用，绑定记录不可用')
+            if row['expires'] <= time.time():
+                raise ServiceError('identity_link_expired', '绑定码已过期，请在私聊重新申请')
+            match = self.db.execute('SELECT seats FROM bot_matches WHERE id=? AND room=?',
+                                    (row['match'], room_id)).fetchone()
+            if match is None or json.loads(match['seats']).get(row['side']) != actor_id:
+                raise ServiceError('identity_link', '原群席位已变化，请重新申请绑定')
+            self.db.execute('INSERT INTO bot_identity_aliases VALUES(?,?,?) ON CONFLICT(c2c_actor,room) DO NOTHING',
+                            (row['c2c_actor'], room_id, actor_id))
+            self.db.execute('UPDATE bot_identity_challenges SET consumed=1 WHERE codehash=?', (digest,))
+            return dict(linked=True)
 
     @staticmethod
     def _fingerprint(data):
@@ -161,6 +302,7 @@ class BattleService:
         data = dict(op='create', room=room_id, mode=mode, opponent=opponent,
                     scenario=scenario_id, side=side.value, seed=seed)
         with self._transaction():
+            actor_id = self.resolve_actor(actor_id, room_id)
             fp, cached = self._cached(actor_id, request_id, data)
             if cached is not None:
                 return cached
@@ -187,6 +329,7 @@ class BattleService:
     def join(self, match_id, actor_id, room_id, request_id=None):
         self._identity(actor_id, room_id)
         with self._transaction():
+            actor_id = self.resolve_actor(actor_id, room_id)
             fp, cached = self._cached(actor_id, request_id, dict(op='join', match=match_id, room=room_id))
             if cached is not None:
                 return cached
@@ -205,6 +348,7 @@ class BattleService:
     def matches(self, actor_id, room_id):
         self._identity(actor_id, room_id)
         with self._transaction():
+            actor_id = self.resolve_actor(actor_id, room_id)
             result = []
             for item in self.db.execute('SELECT id FROM bot_matches WHERE room=?', (room_id,)).fetchall():
                 row, state = self._load(item['id'], room_id)
@@ -216,6 +360,7 @@ class BattleService:
     def status(self, match_id, actor_id, room_id):
         self._identity(actor_id, room_id)
         with self._transaction():
+            actor_id = self.resolve_actor(actor_id, room_id)
             row, state = self._load(match_id, room_id, actor_id)
             return self._status(row, state, actor_id)
 
@@ -236,6 +381,7 @@ class BattleService:
     def legal(self, match_id, actor_id, room_id):
         self._identity(actor_id, room_id)
         with self._transaction():
+            actor_id = self.resolve_actor(actor_id, room_id)
             row, state = self._load(match_id, room_id, actor_id)
             side = self._side(row, actor_id)
             return dict(match_id=match_id, revision=row['revision'], phase=state.phase.value,
@@ -258,6 +404,7 @@ class BattleService:
     def suggest(self, match_id, actor_id, room_id):
         self._identity(actor_id, room_id)
         with self._transaction():
+            actor_id = self.resolve_actor(actor_id, room_id)
             row, state = self._load(match_id, room_id, actor_id)
             if state.phase == Phase.COMPLETE:
                 raise ServiceError('complete', '对局已结束')
@@ -274,6 +421,7 @@ class BattleService:
     def submit(self, match_id, actor_id, room_id, orders, expected_revision, request_id):
         self._identity(actor_id, room_id)
         with self._transaction():
+            actor_id = self.resolve_actor(actor_id, room_id)
             fp, cached = self._cached(actor_id, request_id,
                 dict(op='submit', match=match_id, room=room_id, orders=orders, revision=expected_revision))
             if cached is not None:
@@ -340,6 +488,7 @@ class BattleService:
     def screenshot(self, match_id, actor_id, room_id):
         self._identity(actor_id, room_id)
         with self._transaction():
+            actor_id = self.resolve_actor(actor_id, room_id)
             row, state = self._load(match_id, room_id, actor_id)
             return self._png(state, self._side(row, actor_id))
 

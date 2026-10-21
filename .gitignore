@@ -39,3 +39,4 @@ resources/derived/rag/*.sqlite3-wal
 
 # Isolated bot integration test databases and render samples.
 .pytest-bot*/
+.pytest-tmp-*/

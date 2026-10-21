@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 import hmac
 import json
 import os
+import re
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
@@ -94,14 +95,16 @@ class NotificationDelivery:
 
 
 def create_app(service: BattleService | None = None, *, identities: dict[str, str] | None = None,
-               onebot_settings=None, onebot_client=None, notification_interval: float | None = 5) -> FastAPI:
+               onebot_settings=None, onebot_client=None, notification_interval: float | None = 5,
+               official_settings=None, official_client=None, official_transport=None) -> FastAPI:
     owned = service is None
     service = service or BattleService(Path(os.environ.get('IBS_BOT_DATABASE', 'backend/bot.sqlite3')))
     identities = identities if identities is not None else json.loads(os.environ.get('IBS_AGENT_IDENTITIES', '{}'))
     if not isinstance(identities, dict) or any(not isinstance(k, str) or not k or not k.isascii() or any(c.isspace() for c in k) or
-            not isinstance(v, str) or not v.startswith(('qq:', 'agent:')) or not v.split(':', 1)[1] or
+            not isinstance(v, str) or not v.startswith(('qq:', 'agent:', 'qqbot:')) or not v.split(':', 1)[1] or
+            (v.startswith('qqbot:') and not re.fullmatch(r'qqbot:[0-9]+:(?:c2c:[A-Za-z0-9_-]+|member:[A-Za-z0-9_-]+:[A-Za-z0-9_-]+)', v)) or
             (v.startswith('qq:') and (not v[3:].isascii() or not v[3:].isdigit() or v[3:].startswith('0'))) for k, v in identities.items()):
-        raise ValueError('IBS_AGENT_IDENTITIES must map nonempty bearer tokens to qq:/agent: identities')
+        raise ValueError('IBS_AGENT_IDENTITIES must map nonempty bearer tokens to valid qq:/agent:/qqbot: identities')
     if onebot_settings is None and os.environ.get('IBS_ONEBOT_SELF_ID'):
         from .onebot import BotSettings
         onebot_settings = BotSettings.from_env()
@@ -194,4 +197,11 @@ def create_app(service: BattleService | None = None, *, identities: dict[str, st
     if onebot_settings:
         from .onebot import create_onebot_router
         app.include_router(create_onebot_router(service, onebot_settings, client=onebot_client))
+    if official_settings is None and os.environ.get('IBS_QQ_APP_ID'):
+        from .qq_official import QQOfficialSettings
+        official_settings = QQOfficialSettings.from_env()
+    if official_settings:
+        from .qq_official import create_qq_official_router
+        app.include_router(create_qq_official_router(
+            service, official_settings, client=official_client, transport=official_transport))
     return app
