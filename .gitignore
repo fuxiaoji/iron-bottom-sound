@@ -36,3 +36,6 @@ resources/derived/rag/*.sqlite3-wal
 
 # Generated local launcher (rebuild from scripts/launcher/GameLauncher.cs).
 /一键启动游戏*.exe
+
+# Isolated bot integration test databases and render samples.
+.pytest-bot*/
