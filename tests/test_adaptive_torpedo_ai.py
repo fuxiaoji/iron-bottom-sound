@@ -36,7 +36,7 @@ def _uncached_counterfactual(routes, lane):
 
 def test_torpedo_performance_optimization_preserves_entire_legacy_decision(monkeypatch):
     engine = IronBottomEngine()
-    state = engine.reset("IBS-S-03", seed=41)
+    state = engine.reset("IBS-S-03", seed=41, movement_timing="legacy-mf-v1")
     _drive_to(engine, state.game_id, Phase.TORPEDO_PLANNING)
     planner = AdaptiveTorpedoPlanner(PROFILES["adaptive"])
     optimized = planner.analyze(engine, state, Side.AXIS)

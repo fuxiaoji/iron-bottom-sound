@@ -38,6 +38,7 @@ from .models import (
     ShipState,
     Side,
     TorpedoTrack,
+    TorpedoContactSnapshot,
     ValidationResult,
     WreckState,
 )
@@ -96,6 +97,7 @@ class RuleData:
         self.torpedo_collision = self._yaml("torpedo-collision-table.yaml")
         self.torpedoes = self._yaml("torpedoes.yaml")["types"]
         self.torpedo_launch_directions = self._yaml("torpedo-launch-directions.yaml")
+        self.movement_impulses = self._yaml("movement-impulses.yaml")
         self.modifiers = self._yaml("modifiers.yaml")
         self.fire_table = self._yaml("fire-table.yaml")
         self.fire_results = self.fire_table["results"]
@@ -245,9 +247,13 @@ class IronBottomEngine:
         seed: int = 1,
         options: GameOptions | None = None,
         game_id: str | None = None,
+        movement_timing: str = 'greg-courter-8-v1',
     ) -> GameState:
         identifier = game_id or str(uuid.uuid4())
         state = build_initial_state(identifier, scenario_id, seed, options or GameOptions())
+        if movement_timing not in {'legacy-mf-v1', 'greg-courter-8-v1'}:
+            raise ValueError(f'Unknown movement timing {movement_timing}')
+        state.movement_timing = movement_timing
         if night.enabled(state):
             import hashlib, json
             state.rule_snapshot["adjudication"] = pack(vars(self._base_rules))
@@ -264,6 +270,7 @@ class IronBottomEngine:
                 "scenario_id": scenario_id,
                 "seed": seed,
                 "options": state.options.model_dump(mode="json"),
+                **({'movement_timing': movement_timing} if movement_timing != 'legacy-mf-v1' else {}),
             },
             rule=self._rule("IBS-R-05", 6, "5.0"),
         )
@@ -1141,6 +1148,9 @@ class IronBottomEngine:
                     {"mf": index, "hex": position.model_dump(mode="json"), "heading": heading}
                     for index, (position, heading) in enumerate(trajectory, start=1)
                 ]
+            if state.movement_timing == 'greg-courter-8-v1':
+                for position in launch_positions:
+                    position['movement_interval'] = self._launch_interval(state, ship.id, position['mf'])
             launchers = [] if blocked_reason else [
                 {
                     "launcher_id": launcher.id,
@@ -1197,10 +1207,10 @@ class IronBottomEngine:
         heading: int, setting_index: int, launch_at_mf: int,
         launch_angle: str = "A", ship_heading: int | None = None,
     ) -> dict[str, Any]:
-        """纯几何直线投影，与 _resolve_movement 鱼雷循环一致：逐格直行、
-        range_remaining 递减、触陆/越界截停；跨回合按 speed_cycle[(回合-发射)%3]
-        推进（发射回合首段扣已耗 MF）。起点按锚点偏移（B 船尾外 1 格、X 船头外
-        1 格）落格。"""
+        """完整剩余射程的几何直线，不表示当回合能走到的终点。
+        逐格扣射程、触陆/越界截停；新时钟的区间位置由
+        torpedo_clock_positions 计算，接触由 _assist_intercept 推算。
+        起点按B船尾外1格、X船头外1格锚点偏移。"""
         definition = self.rules.torpedoes[torpedo_type]
         setting = definition["settings"][setting_index]
         cycle = setting["speed"]
@@ -1262,10 +1272,20 @@ class IronBottomEngine:
         self, state: GameState, torpedo_type: str, launch_hex: HexCoord, heading: int,
         setting_index: int, launch_at_mf: int, target: ShipState,
         launch_angle: str = "A", ship_heading: int | None = None,
+        launch_interval: int | None = None,
     ) -> tuple[HexCoord | None, int, str | None, int]:
         """逐 impulse 同时推进鱼雷与目标，返回 (交点, 鱼雷到交点距离, 截停原因, 第几回合)。
         与 _resolve_movement 同步移动语义一致：同格即接触，船撞静止雷也算；
         发射回合目标在发射前领先 launch_at_mf 步。起点按锚点偏移落格。"""
+        if state.movement_timing == 'greg-courter-8-v1':
+            if launch_interval is None:
+                if launch_at_mf != 0:
+                    raise ValueError('Mid-turn intercept requires the launcher movement interval')
+                launch_interval = 0
+            return self._assist_intercept_intervals(
+                state, torpedo_type, launch_hex, heading, setting_index, target,
+                launch_angle, ship_heading or heading, launch_interval,
+            )
         definition = self.rules.torpedoes[torpedo_type]
         setting = definition["settings"][setting_index]
         cycle = setting["speed"]
@@ -1324,6 +1344,55 @@ class IronBottomEngine:
             if range_remaining <= 0:
                 break
         return None, max(1, distance), None, rel_turn
+
+    def _assist_intercept_intervals(
+        self, state: GameState, torpedo_type: str, launch_hex: HexCoord, heading: int,
+        setting_index: int, target: ShipState, launch_angle: str, ship_heading: int,
+        launch_interval: int,
+    ) -> tuple[HexCoord | None, int, str | None, int]:
+        setting = self.rules.torpedoes[torpedo_type]['settings'][setting_index]
+        cycle = setting['speed']
+        position = self._torpedo_anchor_hex(launch_hex, ship_heading, launch_angle,
+                                           columns=state.map_columns, rows=state.map_rows)
+        target_position = target.position
+        if target_position is None:
+            return None, 1, None, 0
+        remaining, distance = int(setting['range']), 0
+        target_intervals = self.movement_intervals(max(0, target.current_speed))
+        if launch_interval == 0 and position == target_position and position != launch_hex:
+            return position, 1, None, 0
+        # Every non-empty speed cycle spends at least one MF per complete cycle.
+        if not any(cycle):
+            return None, 1, 'immobile', 0
+        for relative_turn in range(remaining * len(cycle) + 1):
+            torpedo_intervals = self.movement_intervals(int(cycle[relative_turn % len(cycle)]))
+            for interval in range(1, int(self.rules.movement_impulses['intervals']) + 1):
+                previous_target, previous_track = target_position, position
+                if interval in target_intervals:
+                    try:
+                        proposed = target_position.neighbor(target.heading, columns=state.map_columns, rows=state.map_rows)
+                        if not self._terrain_impassable(state, proposed):
+                            target_position = proposed
+                    except ValueError:
+                        pass
+                if relative_turn == 0 and interval < launch_interval:
+                    continue
+                if interval in torpedo_intervals and (relative_turn > 0 or interval > launch_interval):
+                    try:
+                        proposed = position.neighbor(heading, columns=state.map_columns, rows=state.map_rows)
+                    except ValueError:
+                        return None, max(1, distance), 'edge', relative_turn
+                    if self._terrain_impassable(state, proposed):
+                        return None, max(1, distance), 'land', relative_turn
+                    position = proposed
+                    remaining -= 1
+                    distance += 1
+                contact = self._torpedo_segment_contact(previous_target, target_position, previous_track, position)
+                if contact and not (distance == 0 and target_position == launch_hex):
+                    return position, max(1, distance), None, relative_turn
+                if remaining <= 0:
+                    return None, max(1, distance), None, relative_turn
+        return None, max(1, distance), None, relative_turn
 
     def _assist_launch_combos(self, state: GameState, side: Side) -> list[dict[str, Any]]:
         """枚举某阵营当前可发射的全部合法组合（复用 _torpedo_candidates 为唯一事实来源）。"""
@@ -1414,6 +1483,8 @@ class IronBottomEngine:
             state, torpedo_type, combo["launch_hex"], torpedo_heading,
             int(combo["setting_index"]), int(combo["launch_at_mf"]), target,
             combo["launch_angle"], ship_heading,
+            launch_interval=self._launch_interval(state, ship.id, int(combo['launch_at_mf']))
+            if state.movement_timing == 'greg-courter-8-v1' else None,
         )
         result: dict[str, Any] = {
             **combo,
@@ -1429,6 +1500,8 @@ class IronBottomEngine:
             "predicted_path": projection["path"],
             "predicted_end": projection["end_hex"],
             "blocked_reason": obstacle,
+            **({'launch_interval': self._launch_interval(state, ship.id, int(combo['launch_at_mf']))}
+               if state.movement_timing == 'greg-courter-8-v1' else {}),
         }
         route_hexes = set(projection["path"])
         friendly_ship_ids = sorted(
@@ -1437,6 +1510,16 @@ class IronBottomEngine:
         )
         result["friendly_ship_ids"] = friendly_ship_ids
         result["friendly_risk"] = bool(friendly_ship_ids)
+        if state.movement_timing == 'greg-courter-8-v1':
+            setting = self.rules.torpedoes[torpedo_type]['settings'][int(combo['setting_index'])]
+            anchor = self._torpedo_anchor_hex(combo['launch_hex'], ship_heading, combo['launch_angle'],
+                                               columns=state.map_columns, rows=state.map_rows)
+            result['first_turn_positions'] = [
+                position.label if position else None for position in self.torpedo_clock_positions(
+                    state, anchor, torpedo_heading, int(setting['speed'][0]), int(setting['range']),
+                    launch_interval=result['launch_interval'],
+                )
+            ]
         if intercept_hex:
             source_bearing = ((torpedo_heading + 2) % 6) + 1
             relative = (source_bearing - target.heading) % 6
@@ -2107,6 +2190,7 @@ class IronBottomEngine:
                 int(created["seed"]),
                 GameOptions.model_validate(created["options"]),
                 game_id=str(created["game_id"]),
+                movement_timing=str(created.get("movement_timing", "legacy-mf-v1")),
             )
             remaining = source_events[1:]
         for event in remaining:
@@ -3231,12 +3315,93 @@ class IronBottomEngine:
                 "heading": heading,
                 "setting": order.setting_index,
                 "salvo_size": order.count,
+                **({'movement_interval': self._launch_interval(state, ship.id, order.launch_at_mf),
+                    'first_turn_move_intervals': [interval for interval in self.movement_intervals(int(setting['speed'][0]))
+                                                  if interval > self._launch_interval(state, ship.id, order.launch_at_mf)]}
+                   if state.movement_timing == 'greg-courter-8-v1' else {}),
             },
             rule=self._rule("IBS-R-08.2.2", 11, "8.2 发射鱼雷"),
         )
         return track
 
+    def movement_intervals(self, speed: int) -> tuple[int, ...]:
+        """IBS-R-06-GC8: source table is the only movement clock definition."""
+        rows = self.rules.movement_impulses['rows']
+        if speed not in rows:
+            raise ValueError(f'Movement speed outside Greg Courter table: {speed}')
+        return tuple(index + 1 for index, cell in enumerate(rows[speed]) if cell == 'M')
+
+    def _interval_program(self, program: list, position: HexCoord, heading: int) -> list:
+        intervals = iter(self.movement_intervals(len(program)))
+        due = next(intervals, None)
+        result = []
+        index = 0
+        for interval in range(1, int(self.rules.movement_impulses['intervals']) + 1):
+            edge = None
+            if interval == due:
+                step = program[index]
+                position, heading = step[:2]
+                edge = step[2] if len(step) == 3 else None
+                index += 1
+                due = next(intervals, None)
+            result.append((position, heading, edge) if program and len(program[0]) == 3 else (position, heading))
+        return result
+
+    def _launch_interval(self, state: GameState, ship_id: str, launch_at_mf: int) -> int:
+        if launch_at_mf == 0:
+            return 0
+        order = next((order for batch in self._sealed_batches(state, Phase.MOVEMENT_PLANNING)
+                      for order in batch.movement if order.ship_id == ship_id), None)
+        if order is None:
+            raise ValueError('Launch timing requires the sealed friendly movement plan')
+        speed = self.movement_cost(order.plan, self.movement_commands(order))
+        intervals = self.movement_intervals(speed)
+        if launch_at_mf > len(intervals):
+            raise ValueError('Launch MF exceeds the sealed movement plan')
+        return intervals[launch_at_mf - 1]
+
+    def movement_clock_positions(self, state: GameState, start: HexCoord, mf_positions: list[HexCoord]) -> list[HexCoord]:
+        """Read-only path including time zero; shared by all command planners."""
+        if state.movement_timing == 'legacy-mf-v1':
+            return [start, *mf_positions]
+        program = [(position, 1) for position in mf_positions]
+        return [start, *(step[0] for step in self._interval_program(program, start, 1))]
+
+    def torpedo_clock_positions(
+        self, state: GameState, start: HexCoord, heading: int, speed: int,
+        range_remaining: int, *, launch_interval: int = 0,
+    ) -> list[HexCoord | None]:
+        """One turn of a known track, including its last range hex at contact time.
+
+        None denotes a track not yet launched, grounded, off map or expired.
+        Inputs are supplied by the caller's observation; no secret orders are read.
+        """
+        result = [start if launch_interval == 0 else None]
+        position = start
+        intervals = self.movement_intervals(speed)
+        remaining = range_remaining
+        for interval in range(1, int(self.rules.movement_impulses['intervals']) + 1):
+            if interval < launch_interval or remaining <= 0:
+                result.append(None)
+                continue
+            if interval > launch_interval and interval in intervals:
+                try:
+                    proposed = position.neighbor(heading, columns=state.map_columns, rows=state.map_rows)
+                except ValueError:
+                    remaining = 0
+                    result.append(None)
+                    continue
+                if self._terrain_impassable(state, proposed):
+                    remaining = 0
+                    result.append(None)
+                    continue
+                position = proposed
+                remaining -= 1
+            result.append(position)
+        return result
+
     def _resolve_movement(self, state: GameState) -> None:
+        greg_clock = state.movement_timing == 'greg-courter-8-v1'
         self._resolve_sinking_drift(state)
         movement_orders = {
             order.ship_id: order
@@ -3302,6 +3467,23 @@ class IronBottomEngine:
                 trajectory[-1][0].label if trajectory else ship.position.label
             )
             ship.current_speed = self.movement_cost(order.plan, commands)
+        launch_intervals = {
+            id(order): self._launch_interval(state, order.ship_id, order.launch_at_mf)
+            for order in torpedo_orders
+        } if greg_clock else {}
+        if greg_clock:
+            for ship_id, path in paths.items():
+                ship = state.ships[ship_id]
+                paths[ship_id] = self._interval_program(path, ship.position, ship.heading) if path else [
+                    (ship.position, ship.heading, None)
+                    for _ in range(int(self.rules.movement_impulses['intervals']))
+                ]
+            for marker_id, path in contact_paths.items():
+                marker = contact_markers[marker_id]
+                contact_paths[marker_id] = self._interval_program(path, marker.position, marker.heading) if path else [
+                    (marker.position, marker.heading)
+                    for _ in range(int(self.rules.movement_impulses['intervals']))
+                ]
         track_allowance = {
             track.id: track.speed_cycle[(state.turn - track.launched_turn) % 3]
             for track in state.torpedo_tracks
@@ -3318,6 +3500,8 @@ class IronBottomEngine:
             + planned_torpedo_allowance
             + [0]
         )
+        if greg_clock:
+            maximum_impulses = int(self.rules.movement_impulses['intervals'])
         stopped: set[str] = set()
         moved_tracks: dict[str, int] = {track.id: 0 for track in state.torpedo_tracks}
         movement_trace_start: dict[str, str] = {}
@@ -3327,12 +3511,13 @@ class IronBottomEngine:
                 continue
             track = self._launch_torpedo_order(state, order, state.ships[order.ship_id].heading)
             if track:
-                # IBS-R-08.2.x: a torpedo's first-turn speed is reduced by the
-                # MF the launcher already consumed before firing.  At MF 0 this
-                # is simply the full first-cycle speed.
-                track_allowance[track.id] = max(0, track.speed_cycle[0] - order.launch_at_mf)
+                # MF 0 is the start of the shared clock; the full speed row applies.
+                track_allowance[track.id] = track.speed_cycle[0] if greg_clock else max(0, track.speed_cycle[0] - order.launch_at_mf)
                 moved_tracks[track.id] = 0
+        if greg_clock:
+            self._check_torpedo_contacts(state, movement_interval=0)
         for impulse in range(maximum_impulses):
+            previous_ship_positions = {ship.id: ship.position for ship in state.ships.values() if ship.position}
             # IBS-R-MAP-01: the play area has a fixed sea buffer outside the
             # printed 34×27 map.  At the final buffer edge the exiting ship
             # stops; no ship, torpedo, wreck, marker or sealed route is ever
@@ -3519,17 +3704,19 @@ class IronBottomEngine:
             self._reveal_detected_contacts(state)
             launched_this_impulse: set[str] = set()
             for order in torpedo_orders:
-                if order.launch_at_mf != impulse + 1 or not order.launch_hex or not order.launcher_id:
+                due_interval = launch_intervals.get(id(order), order.launch_at_mf)
+                if due_interval != impulse + 1 or not order.launch_hex or not order.launcher_id:
                     continue
                 ship = state.ships[order.ship_id]
                 launch_heading = paths[ship.id][impulse][1]
                 track = self._launch_torpedo_order(state, order, launch_heading)
                 if not track:
                     continue
-                # First-turn speed is reduced by the launcher's already-spent MF.
-                track_allowance[track.id] = max(0, track.speed_cycle[0] - order.launch_at_mf)
+                # New clock skips past intervals; legacy archives subtract spent MF.
+                track_allowance[track.id] = track.speed_cycle[0] if greg_clock else max(0, track.speed_cycle[0] - order.launch_at_mf)
                 moved_tracks[track.id] = 0
                 launched_this_impulse.add(track.id)
+            previous_track_positions = {track.id: track.position for track in state.torpedo_tracks}
             for track in list(state.torpedo_tracks):
                 if (
                     track.id in launched_this_impulse
@@ -3538,12 +3725,16 @@ class IronBottomEngine:
                     or moved_tracks.get(track.id, 0) >= track_allowance.get(track.id, 0)
                 ):
                     continue
+                if greg_clock and impulse + 1 not in self.movement_intervals(track_allowance.get(track.id, 0)):
+                    continue
                 try:
                     next_position = track.position.neighbor(
                         track.heading, columns=state.map_columns, rows=state.map_rows
                     )
                 except ValueError:
                     track.range_remaining = 0
+                    if greg_clock:
+                        state.torpedo_tracks.remove(track)
                     continue
                 if self._terrain_impassable(state, next_position):
                     track.range_remaining = 0
@@ -3554,6 +3745,8 @@ class IronBottomEngine:
                         payload={"track_id": track.id, "land_hex": next_position.label},
                         rule=self._rule("IBS-R-08.2.3", 11, "8.2 鱼雷移动"),
                     )
+                    if greg_clock:
+                        state.torpedo_tracks.remove(track)
                     continue
                 movement_trace_start.setdefault(track.id, track.position.label)
                 movement_trace_tracks[track.id] = track
@@ -3567,7 +3760,18 @@ class IronBottomEngine:
             # IBS-R-08.2.3: any torpedo and ship sharing a hex is a contact,
             # whether the torpedo moved this impulse or a ship drove into its
             # stationary hex.
-            self._check_torpedo_contacts(state)
+            self._check_torpedo_contacts(
+                state,
+                previous_ship_positions=previous_ship_positions if greg_clock else None,
+                previous_track_positions=previous_track_positions if greg_clock else None,
+                movement_interval=impulse + 1,
+            )
+            if greg_clock:
+                self._event(
+                    state, 'movement_interval_resolved', f'移动区间 {impulse + 1}/8 结算完成',
+                    payload={'movement_interval': impulse + 1, 'movement_timing': state.movement_timing},
+                    rule=self._rule('IBS-R-06-GC8', 14, 'Greg Courter移动分段表'),
+                )
             state.torpedo_tracks = [
                 track for track in state.torpedo_tracks if track.range_remaining > 0 or track.contact_ship_ids
             ]
@@ -3662,7 +3866,25 @@ class IronBottomEngine:
                 rule=self._rule("IBS-R-09.1", 13, "9.1 隐蔽标记算子"),
             )
 
-    def _check_torpedo_contacts(self, state: GameState) -> None:
+    @staticmethod
+    def _torpedo_segment_contact(
+        previous_ship: HexCoord | None, ship: HexCoord,
+        previous_track: HexCoord | None, track: HexCoord,
+    ) -> str | None:
+        if ship == track:
+            return 'same_hex'
+        if (previous_ship is not None and previous_track is not None
+                and previous_ship != ship and previous_track != track
+                and previous_ship == track and previous_track == ship):
+            return 'edge_crossing'
+        return None
+
+    def _check_torpedo_contacts(
+        self, state: GameState, *,
+        previous_ship_positions: dict[str, HexCoord] | None = None,
+        previous_track_positions: dict[str, HexCoord] | None = None,
+        movement_interval: int = 0,
+    ) -> None:
         """IBS-R-08.2.3: mark any torpedo sharing a hex with an opposing,
         unsunk ship as in contact.  Runs every impulse so a ship that drives
         into a stationary torpedo's hex is detected even when the torpedo does
@@ -3670,18 +3892,43 @@ class IronBottomEngine:
         for track in state.torpedo_tracks:
             if track.contact_ship_ids:
                 continue
-            contacts = [
-                ship.id
-                for ship in state.ships.values()
-                if ship.side != track.side and not ship.sunk and ship.position == track.position
-            ]
+            greg_clock = state.movement_timing == 'greg-courter-8-v1'
+            contacts = []
+            snapshots = {}
+            for ship in state.ships.values():
+                if ship.sunk or not ship.position:
+                    continue
+                if (not greg_clock and ship.side == track.side) or (greg_clock and ship.id == track.launcher_ship_id):
+                    continue
+                previous_ship = (previous_ship_positions or {}).get(ship.id)
+                previous_track = (previous_track_positions or {}).get(track.id)
+                kind = self._torpedo_segment_contact(previous_ship, ship.position, previous_track, track.position) if greg_clock else (
+                    'same_hex' if ship.position == track.position else None)
+                # A newly launched torpedo cannot attack a target sharing its launcher's hex.
+                launcher = state.ships[track.launcher_ship_id]
+                if greg_clock and track.distance_travelled == 0 and ship.position == launcher.position:
+                    continue
+                if kind is None:
+                    continue
+                contacts.append(ship.id)
+                if greg_clock:
+                    snapshots[ship.id] = TorpedoContactSnapshot(
+                        position=ship.position, heading=ship.heading, speed=ship.current_speed,
+                        movement_interval=movement_interval,
+                        kind=kind,
+                    )
             if contacts:
                 track.contact_ship_ids = contacts
+                if greg_clock:
+                    state.torpedo_contact_snapshots[track.id] = snapshots
                 self._event(
                     state,
                     "torpedo_contact",
                     f"鱼雷 {track.id} 进入目标格 {track.position.label}",
-                    payload={"track_id": track.id, "candidate_targets": contacts},
+                    payload={"track_id": track.id, "candidate_targets": contacts,
+                             **({'movement_interval': movement_interval,
+                                 'contact_kinds': {key: value.kind for key, value in snapshots.items()}}
+                                if greg_clock else {})},
                     rule=self._rule("IBS-R-08.2.3", 12, "8.2 鱼雷攻击过程"),
                 )
 
@@ -3899,9 +4146,11 @@ class IronBottomEngine:
             candidates: list[tuple[int, ShipState, int, list[int], str]] = []
             for target_id in track.contact_ship_ids:
                 target = state.ships[target_id]
+                snapshot = state.torpedo_contact_snapshots.get(track.id, {}).get(target_id)
+                contact_target = target.model_copy(update={'heading': snapshot.heading, 'current_speed': snapshot.speed}) if snapshot else target
                 roll, dice = self._roll_2d6(state)
-                adjusted = roll + self._torpedo_modifier(state, attacker, target, distance)
-                aspect = self._torpedo_track_aspect(track, target)
+                adjusted = roll + self._torpedo_modifier(state, attacker, contact_target, distance)
+                aspect = self._torpedo_track_aspect(track, contact_target)
                 candidates.append((adjusted, target, roll, dice, aspect))
             adjusted, target, roll, dice, aspect = max(candidates, key=lambda item: item[0])
             hits = min(self.torpedo_hit_count(aspect, adjusted), track.salvo_size)
@@ -3955,6 +4204,8 @@ class IronBottomEngine:
                 )
             resolved_track_ids.add(track.id)
         state.torpedo_tracks = [track for track in state.torpedo_tracks if track.id not in resolved_track_ids]
+        for track_id in resolved_track_ids:
+            state.torpedo_contact_snapshots.pop(track_id, None)
 
     def _torpedo_launch_heading(self, ship_heading: int, side: str, angle: str) -> int:
         relative = int(self.rules.torpedo_launch_directions["relative_heading"][side][angle])

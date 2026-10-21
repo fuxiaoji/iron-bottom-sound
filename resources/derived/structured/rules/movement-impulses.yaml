@@ -1,0 +1,29 @@
+schema_version: 1
+id: IBS-R-06-GC8
+version: greg-courter-8-v1
+source:
+  document: iron-bottom-sound-iv-rules-zh.pdf
+  pdf_page: 14
+  printed_section: Greg Courter movement chart
+  status: verified_source_with_user_clarification
+intervals: 8
+legend: {S: starting_hex, M: spend_one_mf, '-': remain_in_current_hex}
+rows:
+  0: [S, S, S, S, S, S, S, S]
+  1: [S, S, S, M, '-', '-', '-', '-']
+  2: [S, S, M, '-', '-', M, '-', '-']
+  3: [S, M, '-', '-', M, '-', '-', M]
+  4: [S, M, '-', M, '-', M, '-', M]
+  5: [M, M, '-', M, '-', M, '-', M]
+  6: [M, M, '-', M, '-', M, M, M]
+  7: [M, M, M, M, '-', M, M, M]
+  8: [M, M, M, M, M, M, M, M]
+clarifications:
+  - id: IBS-Q-008
+    date: '2026-10-21'
+    authority: direct_user_instruction
+    decision: Speed 3 moves at intervals 2, 5 and 8; the printed final S is a typo.
+  - id: IBS-Q-009
+    date: '2026-10-21'
+    authority: direct_user_instruction
+    decision: A mid-turn launch uses only the torpedo speed row's remaining intervals after its launch interval; no catch-up or extra substeps.

@@ -758,7 +758,7 @@ def expand_movement_orders(
             )
         except ValueError:
             continue
-        paths[ship.id] = [ship.position] + [position for position, _ in trajectory]
+        paths[ship.id] = engine.movement_clock_positions(state, ship.position, [position for position, _ in trajectory])
     ids = sorted(paths)
     for left_index, left_id in enumerate(ids):
         for right_id in ids[left_index + 1:]:

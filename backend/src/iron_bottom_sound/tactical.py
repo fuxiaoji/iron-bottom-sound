@@ -180,6 +180,7 @@ class _MovementContext:
     max_vp: float = 1.0
     rng: random.Random | None = None  # None → 退化为 argmax（单测/兼容路径）
     visible_torpedo_threat: dict[str, float] = field(default_factory=dict)
+    visible_torpedo_paths: list[list[HexCoord | None]] = field(default_factory=list)
 
 
 class TacticalCommander(DeterministicCommander):
@@ -435,10 +436,19 @@ class TacticalCommander(DeterministicCommander):
         max_vp = max((ship.vp for ship in engine.observe(state.game_id, side).ships), default=1)
         enemy_value = {enemy.id: self._value_factor(enemy, max_vp) for enemy in enemies}
         torpedo_threat = self._visible_torpedo_threat(engine, state, side)
+        timed_tracks = []
+        if state.movement_timing == 'greg-courter-8-v1':
+            for track in engine.observe(state.game_id, side).torpedo_tracks:
+                age = max(0, state.turn - track.launched_turn)
+                timed_tracks.append(engine.torpedo_clock_positions(
+                    state, track.position, track.heading, track.speed_cycle[age % len(track.speed_cycle)],
+                    track.range_remaining,
+                ))
         return _MovementContext(
             enemies, pred_by_id, pred_hexes, enemy_threat_of, my_positions,
             enemy_value=enemy_value, max_vp=max_vp, rng=rng,
             visible_torpedo_threat=torpedo_threat,
+            visible_torpedo_paths=timed_tracks,
         )
 
     @staticmethod
@@ -749,7 +759,10 @@ class TacticalCommander(DeterministicCommander):
         reserved = reserved or []
         preferred = ordered[:self.profile.top_k_candidates]
         remaining = ordered[self.profile.top_k_candidates:]
+        best_order, best_score = None, float('-inf')
         for _score, _cost, hexc, heading in preferred + remaining:
+            if best_order is not None and _score <= best_score:
+                break
             plan = self._path_to(engine, state, ship, hexc, heading)
             if plan is None:
                 continue
@@ -757,8 +770,11 @@ class TacticalCommander(DeterministicCommander):
             if state.options.ruleset_version=="night-v2" and not self._next_bow_clear(engine,state,ship,order):
                 continue
             if not self._movement_conflicts(engine, state, ship, order, reserved):
-                return order
-        return self._fallback_movement(engine, state, ship, reserved)
+                risk = self._timed_torpedo_risk(engine, state, ship, order, ctx.visible_torpedo_paths)
+                score = _score - self.profile.w_torpedo_avoid * risk
+                if score > best_score:
+                    best_order, best_score = order, score
+        return best_order or self._fallback_movement(engine, state, ship, reserved)
 
     @staticmethod
     def _next_bow_clear(engine, state, ship, order):
@@ -831,12 +847,27 @@ class TacticalCommander(DeterministicCommander):
         if key in self._movement_positions_cache:
             return self._movement_positions_cache[key]
         preview = engine.movement_preview(state, ship, plan=order.plan)
-        result = [ship.position] + [
+        result = engine.movement_clock_positions(state, ship.position, [
             HexCoord(q=item["hex"]["q"], r=item["hex"]["r"])
             for item in preview["trajectory"]
-        ]
+        ])
         self._movement_positions_cache[key] = result
         return result
+
+    def _timed_torpedo_risk(self, engine, state, ship, order, tracks) -> float:
+        if not tracks:
+            return 0.0
+        path = self._movement_positions(engine, state, ship, order)
+        risk = 0.0
+        for track in tracks:
+            for interval in range(1, min(len(path), len(track))):
+                if track[interval] is None:
+                    continue
+                before = track[interval - 1] or track[interval]
+                if engine._torpedo_segment_contact(path[interval - 1], path[interval], before, track[interval]):
+                    risk += 1.0
+                    break
+        return risk
 
     def _movement_conflicts(
         self, engine: IronBottomEngine, state, ship: ShipState, order: MovementOrder,
@@ -891,7 +922,7 @@ class TacticalCommander(DeterministicCommander):
             cand_dist = min(hexc.distance(position) for position in ctx.pred_hexes)
             score += own_value * self.profile.w_retreat * (cand_dist - start_dist) / self.profile.approach_range
         score += self._formation_factor(ship.position, hexc, heading, ctx.my_positions)
-        if ctx.visible_torpedo_threat:
+        if ctx.visible_torpedo_threat and state.movement_timing == 'legacy-mf-v1':
             exact = ctx.visible_torpedo_threat.get(hexc.label, 0.0)
             nearby = max(
                 (value * 0.35 for label, value in ctx.visible_torpedo_threat.items()

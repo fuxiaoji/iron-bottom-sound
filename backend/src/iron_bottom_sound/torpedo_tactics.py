@@ -239,7 +239,7 @@ class AdaptiveTorpedoPlanner:
             if row["salvo_size"] == loaded.get((row["ship_id"], row["launcher_id"]))
         ]
         doctrine = self._select_doctrine(engine, state, side, routes, raw)
-        options = [self._score_option(row, doctrine, routes) for row in raw]
+        options = [self._score_option(row, doctrine, routes, engine=engine, state=state) for row in raw]
         options = [option for option in options if option is not None]
         by_launcher: dict[tuple[str, str], list[TorpedoTacticalOption]] = defaultdict(list)
         for option in options:
@@ -289,7 +289,7 @@ class AdaptiveTorpedoPlanner:
     def _situation(routes, raw) -> str:
         return f"公开敌方航路假设 {len(routes)} 条；合法安全鱼雷候选 {len(raw)} 个。"
 
-    def _score_option(self, row, doctrine, routes) -> TorpedoTacticalOption | None:
+    def _score_option(self, row, doctrine, routes, *, engine=None, state=None) -> TorpedoTacticalOption | None:
         # Counts/launchers sharing a lane have the same counterfactual response.
         # Scope this cache to the exact route list (one decision), not game/turn.
         # This is an identical calculation for legacy and new profiles, not a
@@ -304,10 +304,13 @@ class AdaptiveTorpedoPlanner:
         if not target_routes:
             return None
         lane = set(row.get("predicted_path") or [])
-        response_key = (row["target_id"], tuple(sorted(lane)))
+        response_key = (row["target_id"], tuple(sorted(lane)), tuple(row.get("first_turn_positions", [])))
         response = self._response_cache.get(response_key)
         if response is None:
-            response = self._counterfactual(target_routes, lane)
+            if engine is not None and state.movement_timing == "greg-courter-8-v1":
+                response = self._counterfactual(target_routes, lane, engine=engine, state=state, timed_track=row["first_turn_positions"])
+            else:
+                response = self._counterfactual(target_routes, lane)
             self._response_cache[response_key] = response
         changed = response.route_changed
         denial = (
@@ -350,7 +353,7 @@ class AdaptiveTorpedoPlanner:
         )
 
     @staticmethod
-    def _counterfactual(target_routes, lane) -> CounterfactualResponse:
+    def _counterfactual(target_routes, lane, *, engine=None, state=None, timed_track=None) -> CounterfactualResponse:
         baseline = max(target_routes, key=lambda route: (route.base_utility, _route_key(route)))
         # distance <= 1 is exactly membership of this axial neighbourhood.
         # Parse each hex once, not once per route point per lane point per count.
@@ -365,6 +368,23 @@ class AdaptiveTorpedoPlanner:
         def threat(route: EnemyRouteHypothesis) -> float:
             hits = len(lane.intersection(route.path))
             near = 0
+            if engine is not None and state.movement_timing == 'greg-courter-8-v1':
+                # Hypotheses contain public positions per MF, not secret plans.
+                # A geometric crossing only threatens this turn at matching times.
+                positions = [HexCoord.from_label(label) for label in route.path]
+                path = engine.movement_clock_positions(state, positions[0], positions[1:])
+                track = [HexCoord.from_label(label) if label else None
+                         for label in timed_track]
+                hits = near = 0
+                for interval in range(1, min(len(path), len(track))):
+                    if track[interval] is None:
+                        continue
+                    before = track[interval - 1] or track[interval]
+                    if engine._torpedo_segment_contact(path[interval - 1], path[interval], before, track[interval]):
+                        hits = 1
+                        break
+                    near += path[interval].distance(track[interval]) <= 1
+                return hits * 4.0 + (near * 0.75 if not hits else 0.0)
             if not hits:
                 for label in route.path:
                     cell = HexCoord.from_label(label)

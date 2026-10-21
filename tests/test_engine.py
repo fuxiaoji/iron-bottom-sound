@@ -402,7 +402,7 @@ def test_leaving_fixed_expanded_map_stops_without_translating_any_counter() -> N
     event = next(event for event in state.events if event.type == "movement_blocked_by_edge")
     assert event.rule and event.rule.rule_id == "IBS-R-MAP-01"
     assert event.payload["coordinate_frame_changed"] is False
-    assert event.payload["movement_impulse"] == 1
+    assert event.payload["movement_impulse"] == 4  # speed 1 spends its MF in interval 4
     other_resolution = next(
         event for event in state.events
         if event.type == "movement_plan_resolved" and event.payload.get("ship_id") == other.id
@@ -952,12 +952,12 @@ def test_ship_driving_into_stopped_torpedo_hex_detects_contact() -> None:
 
 
 def test_late_torpedo_launch_has_reduced_first_turn_speed() -> None:
-    """IBS-R-08.2.x: a torpedo launched at MF k travels (speed - k) hexes on the
+    """Legacy replay: a torpedo launched at MF k travels (speed - k) hexes on the
     launch turn, not its full first-cycle speed — even when another torpedo
     launched at MF 0 extends the resolution phase to k+8 impulses. Regression:
     the full-speed allowance used to let a late-launched slow torpedo over-travel."""
     engine = IronBottomEngine()
-    state = engine.reset("IBS-S-03", seed=9)
+    state = engine.reset("IBS-S-03", seed=9, movement_timing="legacy-mf-v1")
     karl = state.ships["IBS-U-KM-KARL-GALSTER"]
     beitzen = state.ships["IBS-U-KM-RICHARD-BEITZEN"]
     for side in Side:

@@ -1,6 +1,7 @@
 rule_id,title,source_status,data_status,execution_status,test_status,overall_status
 IBS-R-05,七阶段回合,verified_source,structured,executable,tested,tested
 IBS-R-06,移动与速度,verified_source,structured,executable,tested,tested
+IBS-R-06-GC8,八区间共同移动时钟,verified_source_with_user_clarification,structured,executable,tested,tested
 IBS-R-06.4,碰撞与船骸,verified_source,structured,executable,tested,tested
 IBS-R-08.1,炮击,verified_source,structured,executable,tested,tested
 IBS-R-08.2,鱼雷,verified_source,structured,executable,tested,tested

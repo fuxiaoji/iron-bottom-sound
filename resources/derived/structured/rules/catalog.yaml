@@ -26,6 +26,12 @@ rules:
       free_turn_degrees: 60
       paid_turn_degrees: 120
       paid_turn_cost: 1
+  - id: IBS-R-06-GC8
+    title: Greg Courter八区间共同移动时钟
+    status: tested
+    source: {document: iron-bottom-sound-iv-rules-zh.pdf, pdf_page: 14, printed_section: "Greg Courter movement chart"}
+    data_file: movement-impulses.yaml
+    clarifications: [IBS-Q-008, IBS-Q-009]
   - id: IBS-R-06.4
     title: 碰撞与船骸
     status: tested

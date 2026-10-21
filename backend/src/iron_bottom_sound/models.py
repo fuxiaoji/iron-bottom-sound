@@ -905,6 +905,14 @@ class MissionOrder(BaseModel):
     confirmed_turn: int | None = None
 
 
+class TorpedoContactSnapshot(BaseModel):
+    position: HexCoord
+    heading: int = Field(ge=1, le=6)
+    speed: int = Field(ge=0, le=8)
+    movement_interval: int = Field(ge=0, le=8)
+    kind: Literal['same_hex', 'edge_crossing']
+
+
 class GameState(BaseModel):
     game_id: str
     scenario_id: str
@@ -913,6 +921,8 @@ class GameState(BaseModel):
     max_turns: int
     phase: Phase = Phase.REINFORCEMENT
     seed: int
+    # Missing in historical saves: preserve the clock used by their event log.
+    movement_timing: Literal['legacy-mf-v1', 'greg-courter-8-v1'] = 'legacy-mf-v1'
     # Active map size for this game (defaults to the fixed IBS-R-MAP-01 board).
     # printed_* may be smaller than map_* (a "printed" inner region the rest of
     # the board is sea buffer around); None means the whole map is the printed
@@ -929,6 +939,8 @@ class GameState(BaseModel):
     submitted_orders: dict[str, OrderBatch] = Field(default_factory=dict)
     sealed_orders: dict[str, dict[str, OrderBatch]] = Field(default_factory=dict)
     torpedo_tracks: list[TorpedoTrack] = Field(default_factory=list)
+    # Internal adjudication data; deliberately absent from PlayerObservation tracks.
+    torpedo_contact_snapshots: dict[str, dict[str, TorpedoContactSnapshot]] = Field(default_factory=dict)
     wrecks: list[WreckState] = Field(default_factory=list)
     markers: list[MarkerState] = Field(default_factory=list)
     land_hexes: set[str] = Field(default_factory=set)

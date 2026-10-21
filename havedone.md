@@ -1021,3 +1021,7 @@
 - 范围限度：新版新局生效，原局规则快照及识别开关保留。IBS-Q-024/025原典地形/部署仍开放，3格识别仍是用户授权的历史补充参数；以前Luna有限实测不等于整局或公共HTTP API模型验收。源码发布没有改变这些结论。
 
 证据：`artifacts/publish-20261013/{pytest-all.log,pytest-collection.log,pytest-resume.json,pytest-resume.log,release.json,remote-before.json,remote-deployment.json,remote-verification.json,public-before.json,public-after.json,db-before.json,db-after-tests.json}`；发布开始于10月13日、完成于10月14日，目录名保留原批次日期。部署说明已更新到deploy/README.md。
+
+
+## 2026-10-21 Greg Courter共同8段时钟及状态机集成
+原规则PDF14页已目视核验，用户裁定3速2/5/8段、途中发射按发射区间后的剩余时间。结构化movement-impulses.yaml/IBS-R-06-GC8成为共同时间表；舰船/隐蔽标记/鱼雷同步、同格与对穿接触、最后射程及接触航向/速度快照、炮击后鱼雷损伤和旧日志双版本回放已接入。战术AI/真实编队解冲突、可见雷同段避让、自适应压制与拦截共用时间表，不读敌方封存计划。以服务器逐文件匹配的1c02581为集成基线，保留night-v2快照/识别/编队与性能缓存，不覆盖为旧main。当前集成核心268项通过（E:/AI舰队世界杯/gc8-live-core.xml），包含原规则、边界、旧日志、夜战/识别/存档和真实模式整局回放；全状态机/API补充回归及线上部署继续，不将本条冒称已部署。主工作区原131项核心与28项新增边界通过。基线HEAD 1c02581126633cec971bcdf47e6d6576e3bba7a5。
