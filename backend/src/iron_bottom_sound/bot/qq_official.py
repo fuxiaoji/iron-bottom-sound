@@ -43,7 +43,8 @@ COMMAND_LABELS = {"帮助": "help", "列表": "list", "创建": "create", "加�
                   "状态": "status", "战况": "public_map", "绑定": "bind", "态势": "situation",
                   "行动": "legal", "建议": "suggest", "提交": "submit", "自动": "auto",
                   "确认": "confirm", "截图": "screenshot", "下一步": "next_steps",
-                  "选择": "manual_choose", "草稿": "manual_draft", "清空": "manual_clear"}
+                  "选择": "manual_choose", "草稿": "manual_draft", "清空": "manual_clear",
+                  "参谋": "llm_report", "下令": "llm_orders"}
 ERROR_LABELS = {name: "rejected_" + name for name in (
     "forbidden", "not_found", "identity", "identity_link", "identity_link_conflict",
     "identity_link_expired", "identity_link_limit", "room", "room_limit", "scenario",
@@ -141,11 +142,14 @@ class _QQAPI:
 
 
 def create_qq_official_router(service, settings: QQOfficialSettings, *, client: httpx.AsyncClient | None = None,
-                              transport: httpx.AsyncBaseTransport | None = None) -> APIRouter:
+                              transport: httpx.AsyncBaseTransport | None = None, llm_client=None) -> APIRouter:
     """Mount POST /qq-official/events; supplied clients must disable environment proxies."""
     if client is not None and client.trust_env:
         raise ValueError("QQ官方HTTP客户端须trust_env=False")
     router, api = APIRouter(), _QQAPI(settings)
+    if llm_client is None:
+        from .llm_client import BotLLMClient, BotLLMSettings
+        llm_client = BotLLMClient(BotLLMSettings.from_env())
     seed = settings.app_secret.encode()
     while len(seed) < 32:
         seed += seed
@@ -193,6 +197,27 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
         head = text.split(maxsplit=1)
         if not head or head[0] == "帮助":
             return [("text", help_text(scope, head[1] if len(head) > 1 else ""))]
+        if head[0] in {"参谋", "下令"}:
+            command, tail = head[0], head[1] if len(head) > 1 else ""
+            _log(scope, "command_" + COMMAND_LABELS[command])
+            task = "report" if command == "参谋" else "orders"
+            if command == "下令" and not tail:
+                return [("text", "用法：/下令 [对局ID] 本阶段的自然语言命令。\n例如：/下令 所有可开火炮位集中射击最近的已发现敌舰。\n这会经引擎校验后提交一个阶段；只想听建议请用 /参谋。")]
+            values = (service.llm_matches(actor_id=actor, room_id=room, public=task == "report")
+                      if scope == "group" else private_matches(actor))
+            args = tail.split(maxsplit=1)
+            hint = ""
+            if args and (any(v["match_id"] == args[0] for v in values) or re.fullmatch(r"[0-9a-fA-F]{12}", args[0])):
+                hint, tail = args[0], args[1] if len(args) > 1 else ""
+            selected = choose_match(values, hint)
+            target_room = room if scope == "group" else "qqbot:" + settings.app_id + ":" + selected["group_openid"]
+            value = service.llm_run(selected["match_id"], actor_id=actor, room_id=target_room,
+                task=task, instruction=tail, scope=scope, request_id=rid, llm=llm_client)
+            result = [("text", value["text"])]
+            if value.get("submitted"):
+                result.append(("image", service.public_screenshot(selected["match_id"], room_id=target_room)
+                    if scope == "group" else service.screenshot(selected["match_id"], actor_id=actor, room_id=target_room)))
+            return result
         if scope == "group":
             parts = text.split()
             command, args = parts[0], parts[1:]
@@ -397,7 +422,7 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
                 except Exception as exc:
                     if hasattr(exc, "code") and hasattr(exc, "message"):
                         _log(scope, ERROR_LABELS.get(exc.code, "request_rejected"))
-                        detail = str(exc.message) if scope == "c2c" else "请求未接受，请核对席位、对局和阶段。"
+                        detail = str(exc.message) if scope == "c2c" or exc.code in {"llm_pending", "llm_rate", "llm_parameters"} else "请求未接受，请核对席位、对局和阶段。"
                         if scope == "c2c" and exc.code == "forbidden":
                             detail += "\n请先私聊：铁底湾 群openid 对局ID 绑定 盟军|日军，再由该席位本人在对应群确认。"
                     elif isinstance(exc, ValueError):

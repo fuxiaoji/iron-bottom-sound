@@ -22,6 +22,7 @@ from ..tactical import TacticalCommander
 from ..models import GameOptions, GameState, OptionalRules, OrderBatch, Phase, Side
 from ..realistic_command import RealisticCommander
 from .manual_commands import ManualOrdersMixin
+from .llm_commands import LLMCommandsMixin
 
 
 class ServiceError(ValueError):
@@ -30,7 +31,7 @@ class ServiceError(ValueError):
         self.code, self.message = code, message
 
 
-class BattleService(ManualOrdersMixin):
+class BattleService(ManualOrdersMixin, LLMCommandsMixin):
     """SQLite is the single writer boundary, including across service instances.
 
     Every operation reloads its state inside a transaction. A failed engine call
@@ -74,6 +75,7 @@ class BattleService(ManualOrdersMixin):
               PRIMARY KEY(app_id, group_openid));
         ''')
         self._init_manual()
+        self._init_llm()
         # DB includes secret orders and QQ seat identities: never serve it as an asset.
         if str(path) != ':memory:':
             path.chmod(0o600)
