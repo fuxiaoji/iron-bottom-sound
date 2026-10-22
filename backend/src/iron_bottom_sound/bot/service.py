@@ -23,6 +23,7 @@ from ..models import GameOptions, GameState, OptionalRules, OrderBatch, Phase, S
 from ..realistic_command import RealisticCommander
 from .manual_commands import ManualOrdersMixin
 from .llm_commands import LLMCommandsMixin
+from .referee import RefereeMixin
 
 
 class ServiceError(ValueError):
@@ -31,7 +32,7 @@ class ServiceError(ValueError):
         self.code, self.message = code, message
 
 
-class BattleService(ManualOrdersMixin, LLMCommandsMixin):
+class BattleService(ManualOrdersMixin, LLMCommandsMixin, RefereeMixin):
     """SQLite is the single writer boundary, including across service instances.
 
     Every operation reloads its state inside a transaction. A failed engine call
@@ -76,6 +77,7 @@ class BattleService(ManualOrdersMixin, LLMCommandsMixin):
         ''')
         self._init_manual()
         self._init_llm()
+        self._init_referee()
         # DB includes secret orders and QQ seat identities: never serve it as an asset.
         if str(path) != ':memory:':
             path.chmod(0o600)
@@ -267,9 +269,12 @@ class BattleService(ManualOrdersMixin, LLMCommandsMixin):
         self.engine.games[state.game_id] = state
         return row, state
 
-    def _save(self, row, state):
+    def _save(self, row, state, *, actor=None, operation='state_update', history=True):
+        state_json = state.model_dump_json()
+        if history:
+            self._referee_save_history(row, state_json, actor, operation)
         self.db.execute('UPDATE bot_matches SET seats=?, revision=?, state=? WHERE id=?',
-                        (json.dumps(row['seats']), row['revision'], state.model_dump_json(), row['id']))
+                        (json.dumps(row['seats']), row['revision'], state_json, row['id']))
 
     @staticmethod
     def _side(row, actor_id):
@@ -437,6 +442,14 @@ class BattleService(ManualOrdersMixin, LLMCommandsMixin):
     def auto(self, match_id, actor_id, room_id, expected_revision, request_id):
         return self.submit(match_id, actor_id, room_id, {'_auto': True}, expected_revision, request_id)
 
+    def _advance_decision(self, state):
+        self.engine.advance(state.game_id)
+        for _ in range(len(Phase)):
+            if state.phase in ORDER_PHASES or state.phase == Phase.COMPLETE:
+                return
+            self.engine.advance(state.game_id)
+        raise ServiceError('phase_loop', '引擎未停在下个决策阶段')
+
     def submit(self, match_id, actor_id, room_id, orders, expected_revision, request_id, *, manual_guard=None):
         self._identity(actor_id, room_id)
         with self._transaction():
@@ -486,16 +499,9 @@ class BattleService(ManualOrdersMixin, LLMCommandsMixin):
                     raise ServiceError('invalid_orders', '; '.join(valid.errors))
                 advanced = set(state.submitted_orders) == {s.value for s in Side}
                 if advanced:
-                    self.engine.advance(state.game_id)
-                    # Resolve automatic phases; stop at the next player decision.
-                    for _ in range(len(Phase)):
-                        if state.phase in ORDER_PHASES or state.phase == Phase.COMPLETE:
-                            break
-                        self.engine.advance(state.game_id)
-                    else:
-                        raise ServiceError('phase_loop', '引擎未停在下个决策阶段')
+                    self._advance_decision(state)
                     row['revision'] += 1
-                self._save(row, state)
+                self._save(row, state, actor=actor_id, operation='submit')
                 if advanced:
                     self._enqueue(row, state)
                 result = self._status(row, state, actor_id)

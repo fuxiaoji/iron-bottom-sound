@@ -311,3 +311,112 @@ def test_usage_only_accepts_nonnegative_plain_integers():
 def test_exception_message_cannot_echo_external_text():
     error = BotLLMError("provider", "SECRET-key " + KEY)
     assert "SECRET" not in str(error) and KEY not in repr(error)
+
+
+def referee_result(action="clarify", **changes):
+    data = dict(action=action, match_id=None, create=None, changes=None, steps=1,
+                message="请说明操作")
+    if action == "create":
+        data["create"] = dict(mode="formation", opponent="pve", scenario_id="IBS-S-03",
+                              side="allies", seed=1)
+        data["message"] = "拟创建默认编队PVE对局"
+    elif action == "patch":
+        data["changes"] = {"ships": [{"ship_id": "标枪", "fields": {
+            "position": {"q": 15, "r": 7}, "hull": 4,
+        }}], "game": {"visibility": {"allies": 8}}}
+        data["message"] = "拟调整标枪的位置与损伤"
+    elif action == "advance":
+        data["message"] = "拟推进1个阶段"
+    elif action == "undo":
+        data["message"] = "拟撤销上次裁判修改"
+    elif action == "report":
+        data["message"] = "当前处于机动规划阶段"
+    data.update(changes)
+    return data
+
+
+@pytest.mark.parametrize("action", ["create", "advance", "patch", "undo", "report", "clarify"])
+def test_referee_actions_are_structured_only_single_call_and_keep_original_protocol(action):
+    expected = referee_result(action)
+    client, calls = client_for(httpx.Response(200, json=envelope(expected)))
+    result = client.generate(task="referee", context={"matches": [], "current": CONTEXT},
+                             instruction="推进阶段" if action == "advance" else "明确管理员操作")
+    assert len(calls) == 1
+    assert {key: result[key] for key in expected} == expected
+    assert set(result) == set(expected) | {"model", "usage"}
+    request = json.loads(calls[0].content)
+    assert request["thinking"] == {"type": "disabled"} and request["model"] == "deepseek-flash"
+    assert request["stream"] is False and request["response_format"] == {"type": "json_object"}
+    assert json.loads(request["messages"][1]["content"])["task"] == "referee"
+    system = request["messages"][0]["content"]
+    for part in ["只识别用户操作", "六个字段必须齐全", "formation/pve/IBS-S-03/allies/1",
+                 "steps=1", "状态纠错", "不能声称", "800字", "action=clarify", "完整舰名"]:
+        assert part in system
+    assert "SECRET" not in json.dumps(result)
+
+
+@pytest.mark.parametrize("missing", ["action", "match_id", "create", "changes", "steps", "message"])
+def test_referee_requires_every_fixed_field(missing):
+    expected = referee_result()
+    del expected[missing]
+    client, calls = client_for(httpx.Response(200, json=envelope(expected)))
+    with pytest.raises(BotLLMError) as caught:
+        client.generate(task="referee", context={})
+    assert caught.value.code == "schema" and len(calls) == 1
+
+
+@pytest.mark.parametrize("change", [
+    {"extra": True}, {"action": "shell"}, {"steps": 0}, {"steps": 7}, {"steps": True},
+    {"steps": "1"}, {"message": "x" * 801}, {"message": None}, {"match_id": 12},
+    {"create": {}}, {"changes": {}},
+])
+def test_referee_rejects_extra_fields_wrong_types_and_bounds(change):
+    client, _ = client_for(httpx.Response(200, json=envelope(referee_result(**change))))
+    with pytest.raises(BotLLMError) as caught:
+        client.generate(task="referee", context={})
+    assert caught.value.code == "schema"
+
+
+@pytest.mark.parametrize("create", [
+    None, {}, {"mode": "formation", "opponent": "pve", "scenario_id": "IBS-S-03", "side": "allies"},
+    {"mode": "formation", "opponent": "pve", "scenario_id": "IBS-S-03", "side": "allies", "seed": True},
+    {"mode": "formation", "opponent": "pve", "scenario_id": "IBS-S-03", "side": "allies", "seed": 1, "secret": True},
+    {"mode": "bad", "opponent": "pve", "scenario_id": "IBS-S-03", "side": "allies", "seed": 1},
+])
+def test_referee_create_schema_does_not_guess_missing_model_fields(create):
+    client, _ = client_for(httpx.Response(200, json=envelope(referee_result("create", create=create))))
+    with pytest.raises(BotLLMError) as caught:
+        client.generate(task="referee", context={}, instruction="建局")
+    assert caught.value.code == "schema"
+
+
+@pytest.mark.parametrize("changes", [
+    None, {}, {"ships": []}, {"game": {}}, {"ships": [], "game": {}, "extra": True},
+    {"ships": [{"ship_id": "标枪", "fields": {}, "extra": True}], "game": {}},
+    {"ships": [{"ship_id": "标枪"}], "game": {}},
+    {"ships": [{"ship_id": "标枪", "fields": []}], "game": {}},
+    {"ships": [{"ship_id": 1, "fields": {}}], "game": {}},
+])
+def test_referee_patch_nested_schema_is_strict_but_leaves_editable_fields_to_service(changes):
+    client, _ = client_for(httpx.Response(200, json=envelope(referee_result("patch", changes=changes))))
+    with pytest.raises(BotLLMError) as caught:
+        client.generate(task="referee", context={}, instruction="修正标枪")
+    assert caught.value.code == "schema"
+
+
+def test_referee_patch_preserves_json_fields_and_empty_collections_without_execution():
+    changes = {"ships": [], "game": {}}
+    client, calls = client_for(httpx.Response(200, json=envelope(referee_result("patch", changes=changes))))
+    result = client.generate(task="referee", context={}, instruction="明确修正值")
+    assert result["changes"] == changes and len(calls) == 1
+    assert result["steps"] == 1 and result["action"] == "patch"
+
+
+def test_referee_incomplete_response_never_retries_and_safe_errors_hide_payload():
+    data = envelope(referee_result("advance", message="SECRET-user-instruction"))
+    data["choices"][0]["finish_reason"] = "length"
+    client, calls = client_for(httpx.Response(200, json=data))
+    with pytest.raises(BotLLMError) as caught:
+        client.generate(task="referee", context={}, instruction="SECRET-user-instruction")
+    assert caught.value.code == "truncated" and len(calls) == 1
+    assert "SECRET" not in str(caught.value)

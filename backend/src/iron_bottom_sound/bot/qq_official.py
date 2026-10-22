@@ -44,7 +44,7 @@ COMMAND_LABELS = {"帮助": "help", "列表": "list", "创建": "create", "加�
                   "行动": "legal", "建议": "suggest", "提交": "submit", "自动": "auto",
                   "确认": "confirm", "截图": "screenshot", "下一步": "next_steps",
                   "选择": "manual_choose", "草稿": "manual_draft", "清空": "manual_clear",
-                  "参谋": "llm_report", "下令": "llm_orders"}
+                  "参谋": "llm_report", "下令": "llm_orders", "裁判": "llm_referee"}
 ERROR_LABELS = {name: "rejected_" + name for name in (
     "forbidden", "not_found", "identity", "identity_link", "identity_link_conflict",
     "identity_link_expired", "identity_link_limit", "room", "room_limit", "scenario",
@@ -142,7 +142,8 @@ class _QQAPI:
 
 
 def create_qq_official_router(service, settings: QQOfficialSettings, *, client: httpx.AsyncClient | None = None,
-                              transport: httpx.AsyncBaseTransport | None = None, llm_client=None) -> APIRouter:
+                              transport: httpx.AsyncBaseTransport | None = None, llm_client=None,
+                              referee_admins: frozenset[str] | None = None) -> APIRouter:
     """Mount POST /qq-official/events; supplied clients must disable environment proxies."""
     if client is not None and client.trust_env:
         raise ValueError("QQ官方HTTP客户端须trust_env=False")
@@ -150,6 +151,16 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
     if llm_client is None:
         from .llm_client import BotLLMClient, BotLLMSettings
         llm_client = BotLLMClient(BotLLMSettings.from_env())
+    if referee_admins is None:
+        try:
+            configured = json.loads(os.environ.get("IBS_BOT_REFEREE_ADMINS", "[]"))
+        except (ValueError, RecursionError):
+            raise ValueError("裁判管理员配置无效") from None
+        if not isinstance(configured, list) or any(not isinstance(v, str) or
+                not re.fullmatch(r"qqbot:" + re.escape(settings.app_id) + r":member:[A-Za-z0-9_-]+:[A-Za-z0-9_-]+", v)
+                for v in configured):
+            raise ValueError("裁判管理员配置无效")
+        referee_admins = frozenset(configured)
     seed = settings.app_secret.encode()
     while len(seed) < 32:
         seed += seed
@@ -197,6 +208,39 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
         head = text.split(maxsplit=1)
         if not head or head[0] == "帮助":
             return [("text", help_text(scope, head[1] if len(head) > 1 else ""))]
+        if head[0] == "裁判":
+            _log(scope, "command_llm_referee")
+            tail = head[1] if len(head) > 1 else ""
+            if not tail:
+                return [("text", help_text(scope, "裁判"))]
+            args = tail.split(maxsplit=1)
+            hint = args[0] if re.fullmatch(r"[0-9a-fA-F]{12}", args[0]) else None
+            if hint:
+                tail = args[1] if len(args) > 1 else ""
+            target_room = room
+            if scope == "c2c":
+                values = private_matches(actor)
+                if hint:
+                    values = [v for v in values if v["match_id"] == hint]
+                groups = {v["group_openid"] for v in values}
+                if len(groups) != 1:
+                    raise ValueError("请在目标群 @机器人使用 /裁判，或先绑定该群席位并明确对局ID。")
+                target_room = "qqbot:" + settings.app_id + ":" + next(iter(groups))
+            referee_args = dict(actor_id=actor, room_id=target_room, instruction=tail,
+                scope=scope, request_id=rid, llm=llm_client, admins=referee_admins)
+            try:
+                value = service.referee_run(hint, **referee_args)
+            except Exception as exc:
+                if getattr(exc, "code", None) != "referee_recovery":
+                    raise
+                # Recover the already committed create receipt once, without a
+                # new model request or a second game. Persistent errors remain
+                # retryable when the platform redelivers this exact event.
+                value = service.referee_run(hint, **referee_args)
+            result = [("text", value["text"])]
+            if value.get("mutated") and value.get("match_id"):
+                result.append(("image", service.public_screenshot(value["match_id"], room_id=target_room)))
+            return result
         if head[0] in {"参谋", "下令"}:
             command, tail = head[0], head[1] if len(head) > 1 else ""
             _log(scope, "command_" + COMMAND_LABELS[command])
@@ -414,6 +458,7 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
                 _log(scope, "reply_expired")
                 return
             if entry["parts"] is None:
+                recoverable = False
                 try:
                     if scope == "group" and not settings.allowed_groups:
                         parts = [("text", "此群尚未授权。管理员配置群openid：" + data["group_openid"])]
@@ -421,8 +466,9 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
                         parts = await run_in_threadpool(commands, scope, data, entry["actor"], entry["room"], entry["rid"])
                 except Exception as exc:
                     if hasattr(exc, "code") and hasattr(exc, "message"):
+                        recoverable = exc.code == "referee_recovery"
                         _log(scope, ERROR_LABELS.get(exc.code, "request_rejected"))
-                        detail = str(exc.message) if scope == "c2c" or exc.code in {"llm_pending", "llm_rate", "llm_parameters"} else "请求未接受，请核对席位、对局和阶段。"
+                        detail = str(exc.message) if scope == "c2c" or exc.code in {"llm_pending", "llm_rate", "llm_parameters"} or exc.code.startswith("referee_") else "请求未接受，请核对席位、对局和阶段。"
                         if scope == "c2c" and exc.code == "forbidden":
                             detail += "\n请先私聊：铁底湾 群openid 对局ID 绑定 盟军|日军，再由该席位本人在对应群确认。"
                     elif isinstance(exc, ValueError):
@@ -443,6 +489,7 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
                 if len(compiled) > 5:
                     compiled = [("text", "输出超过单次5条被动回复限额，完整JSON未发送。建议可改用 自动 版本号；或用MCP获取完整JSON、行动 舰ID 缩小查询。已执行的操作可重新查询状态。")]
                 entry["parts"] = compiled
+                entry["recoverable"] = recoverable
 
             async def deliver(http):
                 path = "/v2/" + ("groups/" if scope == "group" else "users/") + entry["target"]
@@ -450,7 +497,10 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
                     if time.time() >= entry["deadline"]:
                         raise OfficialAPIError("reply_expired")
                     kind, value = entry["parts"][entry["sent"]]
-                    payload = {"msg_id": data["id"], "msg_seq": entry["sent"] + 1}
+                    sequence = entry.get("seq_offset", 0) + entry["sent"] + 1
+                    if sequence > 5:
+                        raise OfficialAPIError("reply_limit")
+                    payload = {"msg_id": data["id"], "msg_seq": sequence}
                     if kind == "image":
                         media = await api.post(http, path + "/files", {"file_type": 1,
                             "file_data": base64.b64encode(value).decode(), "srv_send_msg": False})
@@ -478,6 +528,9 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
         except Exception:
             _log(scope, "internal_failed")
         finally:
+            if entry.get("recoverable") and entry.get("complete"):
+                entry["seq_offset"] = entry.get("seq_offset", 0) + entry["sent"]
+                entry.update(parts=None, sent=0, complete=False, recoverable=False)
             entry["busy"] = False
 
     @router.post("/qq-official/events")

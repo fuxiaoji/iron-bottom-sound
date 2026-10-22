@@ -96,7 +96,8 @@ class NotificationDelivery:
 
 def create_app(service: BattleService | None = None, *, identities: dict[str, str] | None = None,
                onebot_settings=None, onebot_client=None, notification_interval: float | None = 5,
-               official_settings=None, official_client=None, official_transport=None, official_llm_client=None) -> FastAPI:
+               official_settings=None, official_client=None, official_transport=None, official_llm_client=None,
+               official_referee_admins=None) -> FastAPI:
     owned = service is None
     service = service or BattleService(Path(os.environ.get('IBS_BOT_DATABASE', 'backend/bot.sqlite3')))
     identities = identities if identities is not None else json.loads(os.environ.get('IBS_AGENT_IDENTITIES', '{}'))
@@ -204,5 +205,5 @@ def create_app(service: BattleService | None = None, *, identities: dict[str, st
         from .qq_official import create_qq_official_router
         app.include_router(create_qq_official_router(
             service, official_settings, client=official_client, transport=official_transport,
-            llm_client=official_llm_client))
+            llm_client=official_llm_client, referee_admins=official_referee_admins))
     return app
