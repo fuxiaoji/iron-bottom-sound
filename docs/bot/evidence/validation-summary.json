@@ -297,6 +297,87 @@
       "errors": 0,
       "skipped": 0,
       "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/llm-client.xml",
+      "sha256": "dbe2c4de6ab0b9b59cef77ad5d6c7e7a76b5bbab2ef700d95cd8f000cd2dfef5",
+      "tests": 81,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/llm-client-final.xml",
+      "sha256": "09e6a18f98481dff572a717a8e32226adc73a6033171670046c66995bc7d68fb",
+      "tests": 84,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/llm-client-current-model.xml",
+      "sha256": "7f706ad94449baba69eaa608c45dd1f48f36ed793343c0aa8cda2d4879ad7b71",
+      "tests": 84,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/llm-commands-root-first.xml",
+      "sha256": "132db08e25d08d5848d82e678d153c16fccfdf5811908603c9cffb0ae5b77ef4",
+      "tests": 27,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/llm-commands.xml",
+      "sha256": "ef1b4fb76a107d690e505f9b96c53cfdf612af35c78bbebf0d4c36c3e0f0d38c",
+      "tests": 27,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/llm-commands-final.xml",
+      "sha256": "277b5a271ffaefd2f0bf0db609656b8baadbb61c7bdb06259997724c250bb538",
+      "tests": 38,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/qq-llm-first.xml",
+      "sha256": "8341c14ee7ff43a25078fae2622de222e1398c5c6ec882bb072eeae1471a5b41",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/llm-ingress-first.xml",
+      "sha256": "2ade16c12333d59f0d7c8b01df6f5125a095f8ad95530685ccb2dee1c6e8a1dc",
+      "tests": 205,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/llm-release.xml",
+      "sha256": "b747322827581474e3ca7b6482daf0c4efd652a3514b5d78b34302e25b4f9c59",
+      "tests": 423,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
     }
   ]
 }

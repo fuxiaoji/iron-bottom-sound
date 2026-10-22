@@ -1,0 +1,46 @@
+{
+  "feature_commit": "a43f6fab18c8cc675ba667bedc5aaf0f2887dc82",
+  "app_id": "1905878837",
+  "saved_and_reloaded": true,
+  "group_commands": [
+    "帮助",
+    "编队人机",
+    "普通人机",
+    "参谋",
+    "下令",
+    "我的对局",
+    "战况",
+    "下一步",
+    "加入",
+    "绑定"
+  ],
+  "friend_commands": [
+    "帮助",
+    "参谋",
+    "态势",
+    "下一步",
+    "行动",
+    "提交",
+    "自动",
+    "下令",
+    "选择",
+    "草稿"
+  ],
+  "friend_menu": [
+    "帮助",
+    "态势",
+    "下一步"
+  ],
+  "previous_panel_receipt": "qq-manual-panel.json",
+  "direct_commands_preserved": [
+    "编队对战",
+    "普通对战",
+    "我的对局",
+    "清空",
+    "建议",
+    "确认"
+  ],
+  "screenshot_local": "artifacts/bot-20261022/deploy/qq-llm-panel.png",
+  "screenshot_sha256": "61a5fcd1e50cda03a13f6249f42cc5db3b3c326e11388596e0adfb24a505eab0",
+  "client_verification": "user_confirmed_both_commands_and_image"
+}

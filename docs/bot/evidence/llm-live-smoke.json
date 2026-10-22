@@ -1,0 +1,90 @@
+{
+  "feature_commit": "a43f6fab18c8cc675ba667bedc5aaf0f2887dc82",
+  "verified_source_files": 12,
+  "checked_at_utc": "2026-10-22T02:43:34.689865+00:00",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "production_database_connection": "read_only",
+  "production_match_rows_unchanged": true,
+  "phase_before": "gunnery",
+  "snapshot_revision_before": 4,
+  "snapshot_revision_after": 5,
+  "match_sha256": "92898c92d9c6cfbe9600d78d0204fdb982d902f844d1ef63206644ac30bd8cc9",
+  "report_valid": true,
+  "natural_order_submitted": true,
+  "real_model_attempts": 2,
+  "attempts": [
+    {
+      "task": "report",
+      "result": "accepted",
+      "elapsed_seconds": 2.067
+    },
+    {
+      "task": "orders",
+      "result": "accepted",
+      "elapsed_seconds": 0.729
+    }
+  ],
+  "real_model_successful_calls": 2,
+  "calls": [
+    {
+      "task": "report",
+      "model": "deepseek-flash",
+      "elapsed_seconds": 2.067,
+      "usage": {
+        "prompt_tokens": 3574,
+        "completion_tokens": 215,
+        "total_tokens": 3789,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 3574
+      }
+    },
+    {
+      "task": "orders",
+      "model": "deepseek-flash",
+      "elapsed_seconds": 0.729,
+      "usage": {
+        "prompt_tokens": 8337,
+        "completion_tokens": 72,
+        "total_tokens": 8409,
+        "prompt_cache_hit_tokens": 128,
+        "prompt_cache_miss_tokens": 8209
+      }
+    }
+  ],
+  "checks": [
+    {
+      "command": "group_report",
+      "text_reply_count": 1,
+      "max_text_chars": 325,
+      "png_count": 0,
+      "qq_delivery": "mock_only"
+    },
+    {
+      "command": "group_natural_orders",
+      "text_reply_count": 2,
+      "max_text_chars": 321,
+      "png_count": 1,
+      "qq_delivery": "mock_only"
+    },
+    {
+      "command": "same_event_duplicate",
+      "text_reply_count": 0,
+      "max_text_chars": 0,
+      "png_count": 0,
+      "qq_delivery": "mock_only"
+    }
+  ],
+  "call_results": [
+    {
+      "task": "report",
+      "submitted": false,
+      "text_sha256": "f683c37cedd49e9e3730af553f00f8743c93375823c3f56b3ea24146729c6383"
+    },
+    {
+      "task": "orders",
+      "submitted": true,
+      "text_sha256": "9c7714765e3db88e892baccce6d24c95fcb4bc87bd9f86413c3ba372e895f07c"
+    }
+  ]
+}

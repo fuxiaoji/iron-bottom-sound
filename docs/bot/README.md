@@ -2,6 +2,8 @@
 
 当前 QQ 入口为开放平台官方机器人 **铁底湾指挥官**，AppID `1905878837`。普通逐舰（`classic`）/编队（`formation`）、PVE/PVP 共用现有 Python 引擎和独立 SQLite 服务。PVE 使用 `TacticalCommander` / `RealisticCommander` 离线状态机，不消耗模型 API。
 
+群聊和私聊另提供 DeepSeek `/参谋` 与 `/下令`：前者汇报已知战况并建议，不提交；后者把本人的自然语言转成当前阶段订单，经原引擎校验后执行并返回战况/截图。它们使用独立 API 配置，区别于离线 PVE 对手和 `/自动`。实际模型与副本验证收据见 [llm-live-smoke.json](evidence/llm-live-smoke.json)。
+
 官方接入、精确指令、身份绑定及平台限制见 [QQ_OFFICIAL.md](QQ_OFFICIAL.md)，测试与失败收据见 [VALIDATION.md](VALIDATION.md)。NapCat 已停止、临时探针已还原；普通 QQ 账号的历史错误 168 不是当前官方路线的阻断。
 
 GitHub 可审查的安全证据入口为 [测试批次摘要](evidence/validation-summary.json)、[实群验证](evidence/official-live.json)、[平台回调收据](evidence/official-callback.json) 与 [运行包来源清单](evidence/ibs-bot-runtime.tar.gz.json)。完整 raw XML、PNG、截图及运行包二进制留在本地 `artifacts/bot-20261022/`，不入 Git；下文这类本地产物链接需在本地工作区打开。
@@ -16,7 +18,9 @@ GitHub 可审查的安全证据入口为 [测试批次摘要](evidence/validatio
 
 ### 直接在 QQ 操作
 
-群聊与私聊的原生 `/` 指令面板已在控制台保存并重载核验。群聊有帮助、四种开局、我的对局、战况、下一步、加入、绑定共 10 项；私聊有帮助、我的对局、态势、下一步、行动、提交、自动、清空、选择、草稿共 10 项，底部菜单另有「帮助／态势／下一步」。用户已确认上一版列表和推进提示可见；本版新手动指令的真实 QQ 显示另行验收。
+群聊与私聊的原生 `/` 指令面板已在控制台保存并重载核验。群聊有帮助、编队人机、普通人机、参谋、下令、我的对局、战况、下一步、加入、绑定共 10 项；私聊有帮助、参谋、态势、下一步、行动、提交、自动、下令、选择、草稿共 10 项，底部菜单另有「帮助／态势／下一步」。`/编队对战`、`/普通对战`、`/我的对局`、`/清空` 等仍可在适用场景手动输入。当前配置见 [LLM面板](evidence/qq-llm-panel.json)，此前版本的客户端确认不代替新功能实测。
+
+群内真正 @机器人后可发送 `/参谋`，也可加问题，例如 `/参谋 现在优先处理什么？`。下令示例（仅适用炮战阶段）：`/下令 所有可开火炮位各自射击射界内最近的已发现敌舰，同距按候选顺序选择，不使用鱼雷、烟幕或照明`。有多个对局时紧跟指令加对局 ID。模型不清楚意图时要求澄清，不执行；每次只提交一个阶段。PVE 群参谋使用玩家受限视角，PVP 群参谋只看双方公共交集；群下令仅操作发言者自己的席位，PVP 群回执不展开私有战术。
 
 完成一次私聊绑定后，直接发 `/下一步` 获取中文阶段、版本和可复制命令；`/态势` 返回本方图。若只有一个未结束对局，不再要求长串群 OpenID；有多个时须明确对局 ID，系统不猜默认。比如 `/自动 1 对局ID` 用状态机代填并提交一个决策阶段，成功后按新回复的版本继续。只发 `/自动` 或 `/确认` 是只读引导，不推进。
 
@@ -105,7 +109,7 @@ scp scripts/bot_mcp_remote.py MyAliyunServer:/opt/ibs-bot/mcp-session.py
 
 `--source-root` 指完整来源所在的仓库根目录，默认当前仓库。脚本以当前 `HEAD` 的 Git LFS OID 核验 5 项 SHA256，遇到指针或摘要不符即失败；源码和结构化数据仍从当前仓库打包，包含远程 MCP 启动器。旁边的 `.tar.gz.json` 记录来源与包摘要。私有配置、令牌、数据库和字体另行部署。
 
-当前官方版 [本地运行包](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz) 为 68,218,771 字节，SHA256 `6053b6023f53103b1026d8d8e023008ef0beeec8376e6fa5cc95cabb03b3a5d2`；5 个原始来源摘要核验通过，包含手动草稿模块，不含私有环境配置或 `.pyc`。来源/归档收据见 [ibs-bot-runtime.tar.gz.json](evidence/ibs-bot-runtime.tar.gz.json)。
+当前官方版 [本地运行包](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz) 为 68,229,020 字节、128 个成员，SHA256 `758f342812a9ac1bf9857f71f0f8147b0d9d143fe4f19524e455345cb7917831`；5 个原始来源摘要核验通过，包含 LLM 与手动草稿模块，不含私有环境配置或 `.pyc`。来源/归档收据见 [ibs-bot-runtime.tar.gz.json](evidence/ibs-bot-runtime.tar.gz.json)。
 
 ## OneBot 历史兼容
 

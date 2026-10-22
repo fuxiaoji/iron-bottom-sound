@@ -1,0 +1,24 @@
+{
+  "feature_commit": "a43f6fab18c8cc675ba667bedc5aaf0f2887dc82",
+  "checked_date": "2026-10-22",
+  "scope": "official_qq_group",
+  "user_confirmation": "user_reports_both_commands_normal",
+  "verified": [
+    "group_llm_report_and_advice",
+    "group_natural_language_clarification",
+    "signed_group_reply_delivery"
+  ],
+  "limits": [
+    "not_a_full_game",
+    "not_all_modes_or_natural_language_forms",
+    "no_second_human_pvp_or_two_autonomous_llm_duel",
+    "Real user orders requested clarification; execution/PNG was verified on a read-only production snapshot with mocked QQ delivery."
+  ],
+  "privacy": "No raw group/member/C2C identities, chat, orders, or credentials included.",
+  "server_receipts": {
+    "report_done": 1,
+    "orders_clarified_not_submitted": 2,
+    "submitted": 0,
+    "image_delivery_observed": false
+  }
+}

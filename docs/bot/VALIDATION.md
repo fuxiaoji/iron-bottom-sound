@@ -6,11 +6,23 @@ GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.jso
 
 ## 官方方案：已验证与仍待验收
 
-按用户指示创建应用，AppSecret 由用户本人重置后，服务器完成私有配置与官方 token 交换。平台已保存 Webhook 地址 `https://fuwenji.asia/ibs-bot/qq-official/events`；01:33:36 的真实平台 HTTP 挑战返回 200，服务记录 `challenge_signed`，腾讯平台验证回调并成功保存。验收依据为平台成功保存与服务端挑战记录，见 [official-callback.json](../../artifacts/bot-20261022/deploy/official-callback.json)。服务器伪造业务探针为 401，GET 为 405；旧游戏服务同时返回 200。官方网关/绑定提交为 `65eb4c8b`，连写解析为 `160aa235`，斜杠/引导为 `110c4a43`；当前群图/手动草稿修复为 `5bc33acc88de7f04560e06eeb8aebb33241d01c9`，服务器 10 个源码摘要匹配。
+按用户指示创建应用，AppSecret 由用户本人重置后，服务器完成私有配置与官方 token 交换。平台已保存 Webhook 地址 `https://fuwenji.asia/ibs-bot/qq-official/events`；01:33:36 的真实平台 HTTP 挑战返回 200，服务记录 `challenge_signed`，腾讯平台验证回调并成功保存。验收依据为平台成功保存与服务端挑战记录，见 [official-callback.json](../../artifacts/bot-20261022/deploy/official-callback.json)。服务器伪造业务探针为 401，GET 为 405；旧游戏服务同时返回 200。官方网关/绑定提交为 `65eb4c8b`，连写解析为 `160aa235`，斜杠/引导为 `110c4a43`；群图/手动草稿修复为 `5bc33acc88de7f04560e06eeb8aebb33241d01c9`，服务器 10 个源码摘要匹配。
 
 `GROUP_AT_MESSAGE_CREATE`、`C2C_MESSAGE_CREATE` 两项订阅已保存。用户真实 @ 触发验签、回复成功，服务器从该事件发现唯一真实 `group_openid` 并配置白名单，没有把数字群号猜成 OpenID。私有表 `bot_official_groups` 只存应用、群 OpenID 和最后发现时间，不存正文、发送者或命令。安全实群收据仅发布群与对局摘要，不发布成员、私聊身份或验证码。
 
 首次真实「创建 编队pve」因参数连写返回用法；修复后用户原命令重发，成功建立 formation/PVE、盟军席位的对局。C2C 申请码、正确群作者确认绑定均有真实回调与回复；数据库确认唯一别名与已消费挑战。首次真实私聊「自动 0」从编队部署推进到第 1 回合增援、revision 1，日志 `command_auto`、`image_delivered`、`delivered` 证明腾讯 API 确认本方 PNG 发送。随后真实群「战况」触发 `command_public_map`、`image_delivered`、`delivered`，用户确认「两处都有图」。API 回执和用户实际显示确认为两种独立证据；本轮不包含逐像素或全局终局验收。当前未认证应用的管理员/群主范围与后续个人认证说明见 [QQ_OFFICIAL.md](QQ_OFFICIAL.md)。普通 QQ 账号历史限制 168 不再作为这条路线的阻断。
+
+### DeepSeek群参谋与自然语言下令（a43f6fab）
+
+功能a43f6fab18c8cc675ba667bedc5aaf0f2887dc82已部署，12源码摘要匹配。/参谋只读战报/建议，/下令仅当前发令者自有席位；原引擎最终验证。PVE群看玩家受限观察，PVP报告只看交集且下令/澄清群回执不展开私有战术。SQLite pending/prepared/done持久防重，模型IO不持锁，失败无状态机回退。完整说明与API字段来源见[QQ_OFFICIAL.md](QQ_OFFICIAL.md#llm-参谋与自然语言下令)。
+
+主合并回归llm-release.xml为423通过/0失败/0跳过，108.283秒。随后仅Bot默认模型由旧全局别名改为账户当前可用deepseek-flash，llm-client-current-model.xml单文件84通过；全局模型配置未改。各批不累加，安全摘要见[validation-summary.json](evidence/validation-summary.json)。客户端初版1个负例误将任意str航程当结构错误，修正为缺必填ship_id，语义仍留原引擎裁决；该初失败无XML，不伪造收据。
+
+[真实模型副本验证](evidence/llm-live-smoke.json)调用DeepSeek普通API共2次，战报2.067秒/3789tokens，订单0.729秒/8409tokens；不读取或存储私有推理。正式库只读复制至内存，实际炮战版本4经明确自然语言单炮位命令在副本推进到5，重复事件不再调用模型或推进，正式行摘要不变。QQ平台发送全部MockTransport，含回图，不能称实群执行。
+
+用户反馈“两条都正常”；实际官方群日志有参谋与两次下令回复成功。正式LLM收据为战报1次、下令澄清2次，均未提交，没有新PNG投递标签。第一次混合炮击/移动/雷击阶段要求，第二次仅说推进阶段；应记录为战报及澄清成功，不假称实群已推进。[实群收据](evidence/qq-llm-live.json)。当前好友/群各10条预设保存重载核验，见[面板](evidence/qq-llm-panel.json)。后续用户要求管理员裁判完整对局权限，另批开发，不把该需求当旧下令已支持。
+
+当前包68229020字节/128成员，SHA256 758f342812a9ac1bf9857f71f0f8147b0d9d143fe4f19524e455345cb7917831，5来源OID核验。Bot/Nginx/旧游戏/大厅active，bot健康200；凭据仅服务器私有env，公开证据无原始身份或聊天。
 
 ### PVE 群图与可操作的手动草稿（5bc33acc）
 
@@ -105,7 +117,7 @@ GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.jso
 
 后续运行包使用 [build_bot_release.py](../../scripts/build_bot_release.py)。它要求来源为完整文件，以当前仓库 `HEAD` 的 Git LFS OID 校验这 5 项，并输出来源与归档摘要。`--source-root` 可指定已有完整来源的另一仓库根目录；当前源码和结构化数据仍从当前仓库打包。命令见 [README.md](README.md#构建服务器运行包)。
 
-当前官方版 [ibs-bot-runtime.tar.gz](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz) 正向打包验证通过：68,218,771 字节、126 个成员，SHA256 `6053b6023f53103b1026d8d8e023008ef0beeec8376e6fa5cc95cabb03b3a5d2`；包含官方网关、手动草稿、斜杠/阶段引导、绑定与远端启动器，5 个原始来源摘要均匹配，不含私有环境配置或 `.pyc`。逐来源字节数和摘要见 [最终打包收据](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz.json)。这是运行包验证，不合并计为完整 QQ 对局验收。
+手动版当时的 [ibs-bot-runtime.tar.gz](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz) 正向打包验证通过：68,218,771 字节、126 个成员，SHA256 `6053b6023f53103b1026d8d8e023008ef0beeec8376e6fa5cc95cabb03b3a5d2`；包含官方网关、手动草稿、斜杠/阶段引导、绑定与远端启动器，5 个原始来源摘要均匹配，不含私有环境配置或 `.pyc`。逐来源字节数和摘要见 [最终打包收据](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz.json)。这是运行包验证，不合并计为完整 QQ 对局验收。
 
 [cleanup.json](../../artifacts/bot-20261022/deploy/cleanup.json) 保留服务器空间处理收据：清理 4 份旧 VSCode Server 运行缓存与扩展下载缓存，释放 3,020,009,472 字节，清理后可用 3,689,418,752 字节。当前两份 VSCode Server、用户配置、已安装扩展及项目/对局均列为保留项；该容量是清理时快照，不代表安装镜像后的当前剩余空间。
 

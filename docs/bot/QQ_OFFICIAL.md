@@ -26,9 +26,39 @@ https://fuwenji.asia/ibs-bot/qq-official/events
 
 ### 斜杠预设与分步帮助
 
-控制台「高级设置 → 菜单与指令」现已保存好友 10 条、群聊 10 条原生指令，好友底部还配置「帮助／态势／下一步」3 个只读菜单；页面重载后均保留，当前界面每场景最多 10 条。原生面板在 QQ 输入 `/` 唤起，见 [官方指令面板说明](https://github.com/tencent-connect/bot-docs/blob/main/docs/README.md#912-指令配置)。当前配置见 [qq-manual-panel.json](evidence/qq-manual-panel.json)。此前好友 8 条的原始配置与用户可见性确认保留在 [qq-command-panel.json](evidence/qq-command-panel.json)、[实测收据](evidence/qq-shortcuts-live.json)，不把旧确认当本版手动流程验收。
+控制台「高级设置 → 菜单与指令」现已保存好友 10 条、群聊 10 条原生指令，好友底部还配置「帮助／态势／下一步」3 个只读菜单；页面重载后均保留，当前界面每场景最多 10 条。原生面板在 QQ 输入 `/` 唤起，见 [官方指令面板说明](https://github.com/tencent-connect/bot-docs/blob/main/docs/README.md#912-指令配置)。当前配置见 [qq-llm-panel.json](evidence/qq-llm-panel.json)。此前配置与用户可见性确认保留在 [qq-manual-panel.json](evidence/qq-manual-panel.json)、[qq-command-panel.json](evidence/qq-command-panel.json)、[实测收据](evidence/qq-shortcuts-live.json)，不把旧确认当本版 LLM 流程验收。
 
-群预设 `/编队人机`、`/普通人机`、`/编队对战`、`/普通对战` 分别创建对应 PVE/PVP；群里仍需真正 @机器人。`/我的对局` 查询本人参加的对局，`/战况` 在本人唯一未结束对局时可省 ID；旁观者或多个对局请用 `/战况 对局ID`。
+群预设 `/编队人机`、`/普通人机` 创建 PVE；`/编队对战`、`/普通对战` 仍可手动输入创建 PVP，其原生面板名额改为 `/参谋`、`/下令`。群里仍需真正 @机器人。`/我的对局` 查询本人参加的对局，`/战况` 在本人唯一未结束对局时可省 ID；旁观者或多个对局请用 `/战况 对局ID`。
+
+### LLM 参谋与自然语言下令
+
+群内真正 @机器人，或在已绑定的私聊中发送：
+
+```text
+/参谋 [对局ID] [问题]
+/下令 [对局ID] 本阶段的自然语言命令
+/帮助 LLM
+```
+
+`/参谋` 调用 DeepSeek 汇报已知战况和最多三条建议，不修改对局。群内 PVE 使用唯一玩家的受限观察，PVP 只使用双方公共交集；私聊可分析本人的完整受限观察。群旁观者可查看群公开战报，有多局时须明确 ID。
+
+`/下令` 仅控制发消息者已拥有的席位，群内直接使用已验签 member 身份，不要求额外私聊绑定。模型将明确的舰船、动作和目标转成 OrderBatch，原引擎再校验当前版本并提交；思考期间版本改变、越权、未知字段、非法命令或模糊意图均不推进。每条只提交一个阶段，不启动连续自主对战。炮战示例：`/下令 所有可开火炮位各自射击射界内最近的已发现敌舰，同距按候选顺序选择，不使用鱼雷、烟幕或照明`。需要时改用具体舰名、炮位和已发现目标，以减少歧义。
+
+群内 PVP 回执只显示封存/阶段进度与公共图，不转发看过本方信息的模型文本；澄清也不回显私有单位或计划。PVE 与私聊回执显示动作种类/数量、原引擎战况与图。建议只是模型判断，实际合法性与战果以引擎为准；只请求建议不会偷偷变成自动下令。
+
+模型只接收显式白名单观察、合法行动与 OrderBatch schema，不接收群/成员/私聊身份、原始世界状态、PRNG、对手秘密订单或凭据。网络调用在 SQLite/引擎锁外；保存 pending/prepared/done 以避免同事件重复计费和推进。已完成回执和 prepared 订单可重启恢复；中断的 pending 不自动重发，需查询后发新指令。最多同群 2 个处理中请求、单人同群每分钟 6 条；每次一个 HTTP 请求、不自动重试，默认 45 秒超时，拒绝截断/过大/非法结构。
+
+服务器专属配置示例（密钥只放服务器私有环境文件，不入聊天或 Git）：
+
+```dotenv
+IBS_BOT_LLM_PROVIDER=deepseek
+IBS_BOT_LLM_MODEL=deepseek-flash
+IBS_BOT_LLM_API_KEY=replace-with-private-api-key
+IBS_BOT_LLM_TIMEOUT=45
+IBS_BOT_LLM_MAX_TOKENS=2400
+```
+
+省略模型时 Bot 默认 `deepseek-flash`，普通 API endpoint 为 `https://api.deepseek.com`，DeepSeek 请求显式关闭 thinking。空密钥会禁用 LLM 命令，其他功能继续可用；不借用视频、Coding Plan 或其他项目凭据。使用单次 `chat/completions` 与 JSON 模式，字段依据 [DeepSeek官方API](https://api-docs.deepseek.com/api/create-chat-completion/)、[JSON模式](https://api-docs.deepseek.com/guides/json_mode/)；账户模型枚举已实际验证。另支持专属 `zhipu`/`compatible` 配置，未经本次真实调用验收。
 
 绑定后可直接私聊：
 
@@ -61,7 +91,7 @@ https://fuwenji.asia/ibs-bot/qq-official/events
 
 草稿按用户席位、群、对局、版本与阶段隔离，持久保存在服务器私有数据库。候选来自本方受限观察与引擎 `legal_actions` 提示，代表菜单不穷举合法行动空间：编队部署目前提供默认部署，编队移动提供可达领舰路径；自定义重组、夜间照明/烟幕、接触部署，以及更细的增援航向/速度仍须高级 JSON 或 MCP。动作选择不等于完整组合已合法，最终由原引擎裁决。版本过期时重新查询；重复事件和重复提交不会再次推进。
 
-控制台私聊预设为 10 项：帮助、我的对局、态势、下一步、行动、提交、自动、清空、选择、草稿；底部菜单保留帮助、态势、下一步。`/建议` 与 `/确认` 仍可直接输入，未占原生面板名额。当前配置收据见 [qq-manual-panel.json](evidence/qq-manual-panel.json)。
+控制台私聊预设为 10 项：帮助、参谋、态势、下一步、行动、提交、自动、下令、选择、草稿；底部菜单保留帮助、态势、下一步。`/我的对局`、`/清空`、`/建议` 与 `/确认` 仍可直接输入，未占原生面板名额。当前配置收据见 [qq-llm-panel.json](evidence/qq-llm-panel.json)。
 
 ### 完整格式与首次绑定
 

@@ -1096,3 +1096,13 @@
 - 已备份旧源码并部署，10源码摘要匹配；QQ控制台好友10/群10预设保存重载核验，底部3菜单保留。服务器正式库只读备份内存，实际局版本4/炮战、群图8船已视觉核验；模拟平台全链路行动/选择/草稿/提交及重复事件通过，副本4→5、正式行摘要不变。首个烟测脚本同消息ID的时间戳改变被拒，按原事件精确重放后通过。新真实客户端群图与草稿复测已请求，未冒用旧确认。
 - 运行包68218771字节/126成员，SHA256 6053b6023f53103b1026d8d8e023008ef0beeec8376e6fa5cc95cabb03b3a5d2；5原始LFS来源OID匹配。ibs-bot/nginx/tiedi/hall active，三内部探针200；未重启旧玩家服务。安全证据docs/bot/evidence/manual-group-server-smoke.json、qq-manual-panel.json，真实图/截图/身份仅忽略目录。旧OneBot异步投递仍历史交集策略，当前官方不走此队列。
 - Draft PR #1继续；其他实群模式、完整真人PVP/终局与自主LLM对战保持待验。原研究、脏工作树与FM02暂停点保持，无论文阶段推进或付费对战模型请求。
+
+
+## 2026-10-22：DeepSeek群参谋与自然语言下令（a43f6fab）
+
+- 新增/参谋只读战报建议、/下令自然语言转原引擎订单，群与私聊可用。本人席位、PVE受限观察/PVP交集及私有回执隔离，SQLite pending/prepared/done防重、无锁模型IO、过期/非法/澄清不执行；不静默用状态机代替LLM。好友/群各10预设与3好友菜单保存重载核验。
+- 功能a43f6fab18c8cc675ba667bedc5aaf0f2887dc82；423主合并回归通过/0失败/0跳过，108.283s，原命令与XML在artifacts/bot-20261022/llm-release.xml；随后只修Bot默认模型为账户/官网当前deepseek-flash，84客户端配置delta通过（llm-client-current-model.xml）。不将不同快照批次相加；首客户端航程负例夹具错误保留说明。
+- 代理group_map独占llm_client+84测试（gpt-6.1-sol/high），qq_guidance独占38服务测试（继承线程，无独立用量），Root整合/路由/部署+12真实路由测试。代码与JUnit SHA见安全validation-summary，未伪报模型独立审核。
+- 12源码部署匹配；私有DeepSeek鉴权/模型枚举200，专属env0600，不借视频/Coding Plan预算。真实API副本烟测2次：战报2.067s/3789tokens，订单0.729s/8409tokens，副本4→5，正式库只读且行摘要不变，QQ为Mock含图；重复不计费或推进。安全收据docs/bot/evidence/llm-live-smoke.json。
+- 用户反馈两条正常；正式群战报1与下令澄清2均回复成功、未提交/无新PNG标签，不能把用户确认解释成已实际推进。实群收据qq-llm-live.json如实区分；用户随后要更高权限/裁判，另批继续。
+- 运行包68229020字节/128成员，SHA256 758f342812a9ac1bf9857f71f0f8147b0d9d143fe4f19524e455345cb7917831，5来源OID一致。Bot/nginx/tiedi/hall active，bot健康200；源码/凭据/规则与研究来源边界保持。Draft PR #1继续，旧研究/FM02不推进。
