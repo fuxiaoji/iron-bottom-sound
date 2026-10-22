@@ -1073,3 +1073,15 @@
 - 定点收据 `artifacts/bot-20261022/official-live-audit.xml` 36通过/0失败（0.582s）；连写修复快照 `official-compact-command.xml` 42通过/0失败（0.715s），批次交叉不相加。安全实群摘要 `docs/bot/evidence/official-live.json` 只包含摘要/计数/阶段与API及用户确认，不含成员、私聊身份、验证码、正文或密钥。原失败记录继续保留。
 - 当前运行包68202689字节、124成员，SHA256 `459434914199d83830ba064daef4c9fb39fa63aa1a3eb6156769135d54b4874d`，五原始LFS来源匹配；服务器部署收据确认8源码匹配160aa235。ibs-bot/nginx/tiedi/hall均active，三个内部健康入口200；用户对局保留在revision1，不代替用户继续提交。
 - GitHub入口保持Draft PR #1： https://github.com/fuxiaoji/iron-bottom-sound/pull/1 。剩余：其他模式实群、第二名真人PVP、重启后的真实续局、完整终局与两个自主LLM通过MCP对战。公开群友使用仍需用户完成平台认证；官方按被动命令查询，不承诺异步广播。原研究、原工作树未提交改动与FM02暂停点不动，无付费模型请求或论文阶段推进。
+
+
+## 2026-10-22：QQ原生预设、短命令与详细阶段引导（110c4a43）
+
+- 按用户要求在官方控制台“高级设置→菜单与指令”保存群聊10条、好友8条斜杠预设及好友3项只读菜单；页面重载后配置保留且无未保存改动。当前界面每场景最多10条，未借配置扩大账号/群访问范围，未改认证或密钥。客户端列表是否可见仍待用户实测。
+- 功能提交 **110c4a435914783d9b81e72e3bb371cc9c06c25c**：绑定后可发/态势、/下一步等短命令；只从本App允许群中按原身份/席位检查枚举，多局不猜默认。自动/确认须显式版本，无版本只读显示当前步骤；原完整格式兼容，JSON不改写。中文阶段、当前版本与可复制下一步进入态势/提交回复，PVP封存、等待和终局不误导重复提交；帮助分快速开始/推进/手动/PVP/绑定。
+- Root整合与独立代理qq_guidance并行（模块/测试独占，第二轮只读审核）；代理模型继承线程、独立用量未取得，不冒称外部模型评审。采纳“多局手动指令也带当前ID”建议。模块输出SHA256 `48db77390a645157a64df6b950d41ee701deb5c8883198b8973a80b35ef279b0`。
+- 最终相关 **144 passed / 0 failed / 0 skipped，8.536秒**，命令：`.venv/bin/python -m pytest tests/test_bot_qq_official.py tests/test_bot_official_app.py tests/test_bot_qq_guidance.py tests/test_bot_qq_shortcuts.py tests/test_bot_qq_shortcuts_integration.py tests/test_bot_identity_links.py --junitxml=artifacts/bot-20261022/qq-shortcuts-release.xml -q`。覆盖36网关/6工厂/36引导/46短路由/2真实引擎重启/18身份绑定，实际命令与XML交叉核对；没有累计旧批次。中途72项中4个显示契约断言失败、2个验证码编码夹具失败单独保留，修正后汇总通过；入口文件名误输导致pytest未收集的一次命令也不计为测试通过。
+- 已部署并重启，9源码摘要匹配110c4a43；ibs-bot/nginx/tiedi/hall active，三个健康入口200。服务器正式库只读备份到内存，用真实已有绑定验证4项短命令与本方PNG，网络完全Mock，正式对局行摘要未变，用户局仍增援/revision1。没有替用户下令或额外发真实QQ消息。安全收据docs/bot/evidence/qq-command-panel.json、qq-shortcuts-server-smoke.json；截图只留忽略目录。
+- 当前运行包68208712字节/125成员、SHA256 `41bc84f3a592d5d24841abcd6852a05736e3bd9c36cbe7201d6d9590bd8125f9`，五原始来源OID匹配。原实群双图通过记录保留；新客户端预设显示等待反馈，其他真人PVP/完整终局/自主LLM对战仍未验，研究及FM02暂停点不动。
+
+- 后续实测确认：用户反馈“列表和推进提示都有”；真实C2C /下一步回复成功，另有自动提交与图片成功标签，正式同局已自然推进到revision2/机动规划。该推进发生在用户实测阶段，不是Root的只读内存烟测。安全后续收据docs/bot/evidence/qq-shortcuts-live.json，日志计数指标签出现次数，不当作不同命令数。原生客户端列表与新帮助不再是待验项。

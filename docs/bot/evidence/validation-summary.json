@@ -154,6 +154,86 @@
       "errors": 0,
       "skipped": 0,
       "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/qq-guidance.xml",
+      "sha256": "2a6d31809349b73fe74f886348748f00f334dd794ebfde1bbead75ad0871fddf",
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/qq-shortcuts.xml",
+      "sha256": "3d8c1be3d18540d037702ae2d076be0a0ae2f63589b6e9687da7cba57941a4d9",
+      "tests": 46,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/qq-shortcuts-initial.xml",
+      "sha256": "cbcada9bec2dab6e7a609fb92ad72d5ef5d2b0aafd764c7b21e8829366bf857d",
+      "tests": 72,
+      "failures": 4,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": [
+        "test_group_create_accepts_compact_mode_opponent[\\u7f16\\u961fpve-formation-pve]",
+        "test_group_create_accepts_compact_mode_opponent[\\u7f16\\u961fPVP-formation-pvp]",
+        "test_group_create_accepts_compact_mode_opponent[\\u666e\\u901aPvE-classic-pve]",
+        "test_group_create_accepts_compact_mode_opponent[\\u666e\\u901apvp-classic-pvp]"
+      ]
+    },
+    {
+      "receipt": "artifacts/bot-20261022/qq-shortcuts-core.xml",
+      "sha256": "f26dd024afaf6e4215f0e39f5aeb0ae17381a608cf422fb54ee9b53bf2902195",
+      "tests": 78,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/qq-shortcuts-real-core.xml",
+      "sha256": "9ab9c6875dc7214323a3df066b7dad43eb3d043cd29f0357e561e2819f5ce821",
+      "tests": 2,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": [
+        "test_real_bound_short_commands_survive_restart_and_do_not_replay_phase[\\u666e\\u901a\\u4eba\\u673a-classic]",
+        "test_real_bound_short_commands_survive_restart_and_do_not_replay_phase[\\u7f16\\u961f\\u4eba\\u673a-formation]"
+      ]
+    },
+    {
+      "receipt": "artifacts/bot-20261022/qq-shortcuts-real-recheck.xml",
+      "sha256": "10b12de19d6df58cec8d56f069d556998c45bd2fe8c3fc9bf02482630af96c06",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/qq-shortcuts-final.xml",
+      "sha256": "77a9084508ce3a7c8a3093072da74dc5b32011ef47c092c6639f4b213cce9805",
+      "tests": 144,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/qq-shortcuts-release.xml",
+      "sha256": "76b0107dc7e395c033d2294c78af07dc38b671d6c811553cf98556bc95eae447",
+      "tests": 144,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
     }
   ]
 }

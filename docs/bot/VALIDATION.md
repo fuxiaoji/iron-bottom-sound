@@ -6,13 +6,23 @@ GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.jso
 
 ## 官方方案：已验证与仍待验收
 
-按用户指示创建应用，AppSecret 由用户本人重置后，服务器完成私有配置与官方 token 交换。平台已保存 Webhook 地址 `https://fuwenji.asia/ibs-bot/qq-official/events`；01:33:36 的真实平台 HTTP 挑战返回 200，服务记录 `challenge_signed`，腾讯平台验证回调并成功保存。验收依据为平台成功保存与服务端挑战记录，见 [official-callback.json](../../artifacts/bot-20261022/deploy/official-callback.json)。服务器伪造业务探针为 401，GET 为 405；旧游戏服务同时返回 200。官方网关/绑定功能提交为 `65eb4c8b`，后续连写解析与静态投递审计提交为 `160aa235a398263fa8a34478baeb251bec6773c3`；当前 8 个已部署源码与后者快照摘要匹配。
+按用户指示创建应用，AppSecret 由用户本人重置后，服务器完成私有配置与官方 token 交换。平台已保存 Webhook 地址 `https://fuwenji.asia/ibs-bot/qq-official/events`；01:33:36 的真实平台 HTTP 挑战返回 200，服务记录 `challenge_signed`，腾讯平台验证回调并成功保存。验收依据为平台成功保存与服务端挑战记录，见 [official-callback.json](../../artifacts/bot-20261022/deploy/official-callback.json)。服务器伪造业务探针为 401，GET 为 405；旧游戏服务同时返回 200。官方网关/绑定提交为 `65eb4c8b`，连写解析与静态投递审计为 `160aa235`，当前斜杠短命令/新手引导为 `110c4a435914783d9b81e72e3bb371cc9c06c25c`；服务器 9 个源码摘要与后者匹配。
 
 `GROUP_AT_MESSAGE_CREATE`、`C2C_MESSAGE_CREATE` 两项订阅已保存。用户真实 @ 触发验签、回复成功，服务器从该事件发现唯一真实 `group_openid` 并配置白名单，没有把数字群号猜成 OpenID。私有表 `bot_official_groups` 只存应用、群 OpenID 和最后发现时间，不存正文、发送者或命令。安全实群收据仅发布群与对局摘要，不发布成员、私聊身份或验证码。
 
 首次真实「创建 编队pve」因参数连写返回用法；修复后用户原命令重发，成功建立 formation/PVE、盟军席位的对局。C2C 申请码、正确群作者确认绑定均有真实回调与回复；数据库确认唯一别名与已消费挑战。首次真实私聊「自动 0」从编队部署推进到第 1 回合增援、revision 1，日志 `command_auto`、`image_delivered`、`delivered` 证明腾讯 API 确认本方 PNG 发送。随后真实群「战况」触发 `command_public_map`、`image_delivered`、`delivered`，用户确认「两处都有图」。API 回执和用户实际显示确认为两种独立证据；本轮不包含逐像素或全局终局验收。当前未认证应用的管理员/群主范围与后续个人认证说明见 [QQ_OFFICIAL.md](QQ_OFFICIAL.md)。普通 QQ 账号历史限制 168 不再作为这条路线的阻断。
 
-### 官方协议与安全绑定收据
+### 斜杠预设与详细推进引导（110c4a43）
+
+控制台已保存群聊 10 条、好友 8 条斜杠预设，好友底部另有 3 个只读菜单；重载后存在且无未保存改动，见 [qq-command-panel.json](evidence/qq-command-panel.json)。当前控制台显示每场景上限 10 条，不能把历史文档的上限直接当本应用实际能力。用户随后在真实 QQ 私聊中确认「列表和推进提示都有」，实际 `/下一步` 回调与回复计数见 [qq-shortcuts-live.json](evidence/qq-shortcuts-live.json)。此确认不外推为全部预设的全模式终局测试。
+
+最终相关快照 [qq-shortcuts-release.xml](../../artifacts/bot-20261022/qq-shortcuts-release.xml) 为 **144 passed / 0 failed / 0 skipped**：网关 36、工厂 6、引导 36、短路由 46、真实绑定/引擎/重启 2、既有身份绑定 18。涵盖允许群与 App/席位隔离、多局不猜默认、明确版本门槛、无版本自动/确认只读、提交 JSON 保真、公开元数据白名单、PVP 等待与终局不误导提交。真实引擎两模式在隔离 SQLite 中通过绑定、首阶段提交、路由重建/数据库重开、旧事件重发不重复推进和真实 PNG；平台网络为 MockTransport，未向 QQ 用户发送测试消息。
+
+服务器部署后，[qq-shortcuts-server-smoke.json](evidence/qq-shortcuts-server-smoke.json) 从正式库只读备份到内存，使用实际已绑定席位验证短 `/下一步`、`/态势`、无版本 `/自动` 与 `/帮助 推进`；回复走模拟平台，未向真实用户额外发消息。正式对局行摘要和内存版本均未改变，用户局仍 revision 1 / 增援。此证据证明已部署代码可解析现有绑定；后续用户的真实客户端确认另列，不与模拟平台烟测混淆。
+
+中途失败保留：[qq-shortcuts-initial.xml](../../artifacts/bot-20261022/qq-shortcuts-initial.xml) 为 68 passed / 4 failed，旧断言要求英文 JSON 键 `match_id`，与本轮改为中文状态说明的显示契约冲突；后续断言改为实际对局编号仍可见，解析与席位断言保留。[qq-shortcuts-real-core.xml](../../artifacts/bot-20261022/qq-shortcuts-real-core.xml) 为 0 passed / 2 failed，测试夹具误把既有 URL-safe 验证码当十六进制；修正夹具后 [qq-shortcuts-real-recheck.xml](../../artifacts/bot-20261022/qq-shortcuts-real-recheck.xml) 2 passed。最终 144 项在上述修正与多局手动提示明确化后运行，旧失败不改写。
+
+### 此前官方协议与安全绑定收据
 
 - [identity-links.xml](../../artifacts/bot-20261022/identity-links.xml)：31 passed，29.504 秒，其中新绑定 18 项、既有服务 13 项。覆盖同 raw 值不同域、AppID/群隔离、错误作者不消费、过期、绑定冲突、8 个活码上限、稳定私聊收据、重启、双实例原子消费及真实别名席位/提交幂等。
 - [qq-official-protocol-pass.xml](../../artifacts/bot-20261022/qq-official-protocol-pass.xml)：35 passed，0.477 秒，其中网关 30 项、工厂/配置兼容 5 项。覆盖签名/时间窗、挑战限制、两类事件、群发现/白名单、消息幂等、回复次数与完整 JSON 超限拒发、私聊绑定及图片流程。
@@ -81,7 +91,7 @@ GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.jso
 
 后续运行包使用 [build_bot_release.py](../../scripts/build_bot_release.py)。它要求来源为完整文件，以当前仓库 `HEAD` 的 Git LFS OID 校验这 5 项，并输出来源与归档摘要。`--source-root` 可指定已有完整来源的另一仓库根目录；当前源码和结构化数据仍从当前仓库打包。命令见 [README.md](README.md#构建服务器运行包)。
 
-当前官方版 [ibs-bot-runtime.tar.gz](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz) 正向打包验证通过：68,202,689 字节、124 个成员，SHA256 `459434914199d83830ba064daef4c9fb39fa63aa1a3eb6156769135d54b4874d`；包含本轮官方网关、连写修复、绑定与远端启动器，5 个原始来源摘要均匹配，不含私有环境配置或 `.pyc`。逐来源字节数和摘要见 [最终打包收据](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz.json)。这是运行包验证，不合并计为完整 QQ 对局验收。
+当前官方版 [ibs-bot-runtime.tar.gz](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz) 正向打包验证通过：68,208,712 字节、125 个成员，SHA256 `41bc84f3a592d5d24841abcd6852a05736e3bd9c36cbe7201d6d9590bd8125f9`；包含本轮官方网关、斜杠/阶段引导、绑定与远端启动器，5 个原始来源摘要均匹配，不含私有环境配置或 `.pyc`。逐来源字节数和摘要见 [最终打包收据](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz.json)。这是运行包验证，不合并计为完整 QQ 对局验收。
 
 [cleanup.json](../../artifacts/bot-20261022/deploy/cleanup.json) 保留服务器空间处理收据：清理 4 份旧 VSCode Server 运行缓存与扩展下载缓存，释放 3,020,009,472 字节，清理后可用 3,689,418,752 字节。当前两份 VSCode Server、用户配置、已安装扩展及项目/对局均列为保留项；该容量是清理时快照，不代表安装镜像后的当前剩余空间。
 

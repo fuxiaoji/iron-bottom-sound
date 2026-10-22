@@ -1,0 +1,22 @@
+{
+  "checked_at_utc": "2026-10-22T01:44:36.785492+00:00",
+  "feature_commit": "110c4a435914783d9b81e72e3bb371cc9c06c25c",
+  "user_confirmed_slash_list_visible": true,
+  "user_confirmed_detailed_next_step_received": true,
+  "revision": 2,
+  "phase": "movement_planning",
+  "match_sha256": "92898c92d9c6cfbe9600d78d0204fdb982d902f844d1ef63206644ac30bd8cc9",
+  "audit_labels": {
+    "group result=accepted": 2,
+    "group result=command_next_steps": 1,
+    "group result=delivered": 2,
+    "c2c result=accepted": 5,
+    "c2c result=command_next_steps": 2,
+    "c2c result=delivered": 5,
+    "c2c result=command_auto": 2,
+    "c2c result=image_delivered": 1,
+    "c2c result=command_legal": 4,
+    "c2c result=command_suggest": 2
+  },
+  "audit_note": "Static log occurrences, not distinct command counts."
+}
