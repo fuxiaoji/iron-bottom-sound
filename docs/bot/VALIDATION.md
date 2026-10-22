@@ -24,7 +24,7 @@ GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.jso
 
 另有[初次真实调用夹具失败](evidence/referee-live-smoke-initial.json)：模型create合法返回，记录进度时跨线程查询主线程创建的只读SQLite触发异常，隔离局未创建；该次1请求0.834秒/7216tokens如实保留。修正烟测只读连接的线程设置后，上述4请求全部通过；本批共5次真实API调用，不隐去失败成本。未因该夹具修改产品代码。首次部署检查误将健康字段当ok布尔值、随后用系统Python3.6执行仅支持新版本的text参数，均是验证助手错误；改用健康status字段与已有Python3.11后完成，服务保持active，没有重复重启。
 
-[部署收据](evidence/referee-deployment.json)确认Bot/Nginx/旧游戏/大厅active，13192健康、旧游戏API、4180 HTTP探针均200（4180只为HTTP探针，不冒称引擎JSON健康）。[预设](evidence/qq-referee-panel.json)的好友/群各10条已保存重载；群“我的对局”、私聊“自动”的面板位置换为“裁判”，旧文本指令仍有效。当前运行包68,238,745字节/129成员，SHA256 `941445ce0227697ed8b90e5daeef8f8ba7444b1e78e2dfd8ea11451c39752153`，5份LFS原始来源核验通过。真实QQ管理员只读裁判回复/客户端预设显示已请求用户验证，尚未以旧版参谋确认代替；正式局未由验证脚本推进。
+[部署收据](evidence/referee-deployment.json)确认Bot/Nginx/旧游戏/大厅active，13192健康、旧游戏API、4180 HTTP探针均200（4180只为HTTP探针，不冒称引擎JSON健康）。[预设](evidence/qq-referee-panel.json)的好友/群各10条已保存重载；群“我的对局”、私聊“自动”的面板位置换为“裁判”，旧文本指令仍有效。当前运行包68,238,745字节/129成员，SHA256 `941445ce0227697ed8b90e5daeef8f8ba7444b1e78e2dfd8ea11451c39752153`，5份LFS原始来源核验通过。用户随后确认实群裁判回复“正常”。截至北京时间11:46:55，[真实群裁判收据](evidence/qq-referee-live.json)为4条done：只读report1、实际advance2、clarify1；两次推进的版本4→5→6，历史表各有before快照，当前机动规划。报告和澄清均未修改；真实群日志有2次image_delivered、0次delivery_failed，客户端图片实际显示及预设可见性未单独确认。真实QQ创建/patch/undo仍不由副本验证替代。检查器只读，不替用户推进。
 
 ### DeepSeek群参谋与自然语言下令（a43f6fab）
 

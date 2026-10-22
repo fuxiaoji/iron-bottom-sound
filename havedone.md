@@ -1116,3 +1116,8 @@
 - 真实DeepSeek副本4请求create/advance/patch/undo通过：1.014/0.729/1.373/1.225s，7217/6863/7003/6994tokens；副本0→1→2→3，undo完整JSON/RNG恢复，重复/非管理员0新增API。首轮烟测进度器跨线程SQLite夹具错误的1请求0.834s/7216tokens也保留（模型create合法但未应用），本批5真实请求。正式库只读，行摘要不变；QQ发送全部Mock含PNG，不能称实群修改。
 - 13源码部署匹配，运行进程管理员1名，env0600；Bot/nginx/tiedi/hall active、健康/HTTP探针200。一次误读健康字段及一次系统Python3.6验证助手错误保留说明，纠正验证后通过，无重复重启。当前包68238745字节/129成员，SHA256 941445ce0227697ed8b90e5daeef8f8ba7444b1e78e2dfd8ea11451c39752153，5来源OID匹配。
 - 好友/群各10预设保存重载，加入裁判，旧自动/我的对局仍可输入；截图本地artifacts/bot-20261022/deploy/qq-referee-panel.png。安全公开收据docs/bot/evidence/referee-{audit,live-smoke,deployment}.json及qq-referee-panel.json。真实QQ群管理员只读裁判/预设显示反馈待验，不沿用旧参谋确认；其他模式真人PVP/完整LLM终局继续待验。Draft PR #1保留，研究/FM02暂停点不动。
+
+
+## 2026-10-22：裁判实群反馈验收（基于dd36c9d6）
+
+用户回复“正常”。北京时间11:46:55只读查正式SQLite和精确群日志标签，4条done=advance2/report1/clarify1；两次真实推进4→5→6，before快照各保存，现机动规划。报告与澄清未修改，群image_delivered2、delivery_failed0。安全证据docs/bot/evidence/qq-referee-live.json，不含原始身份或聊天。未单独确认新预设显示、客户端PNG实际显示或实群create/patch/undo；不把副本验证扩展为实群全部操作。本批只更新文档与证据，源码仍dd36c9d6，无新测试/模型请求/QQ发送/部署或代玩家推进。新文档提交哈希由本条所在Git提交自证，之前c524ec30证据保留。
