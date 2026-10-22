@@ -30,7 +30,8 @@ def test_focused_help_is_available_without_long_reply(topic):
 def test_manual_help_distinguishes_empty_confirmation_from_automatic_orders():
     text = help_text("c2c", "手动")
     assert "/确认 版本号" in text and "空命令" in text and "引擎认可" in text
-    assert "只查看" in text and "不会自动提交" in text
+    assert "这一步不结算" in text and "/草稿" in text
+    assert "无需JSON" in text and "不会用AI补齐" in text
 
 
 def test_progression_help_explains_multiple_phases_and_version_refresh():
@@ -45,7 +46,7 @@ def test_private_phase_hint_gives_exact_current_revision_without_advancing_it():
     text = next_steps(value, private=True)
     assert "增援阶段" in text and "/自动 1 match-123" in text
     assert "/自动 2" not in text and value["revision"] == 1
-    assert "/提交 1 match-123 JSON对象" in text
+    assert "/提交 1 match-123" in text and "无需JSON" in text
 
 
 def test_pvp_sealed_seat_only_waits_and_refreshes():

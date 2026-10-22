@@ -188,6 +188,7 @@ def test_selected_match_ship_filter_does_not_parse_ship_as_another_match(bot):
     client, service, seen, _ = bot
     owned_matches(service, ["match1", "match2"])
     post(client, event("/行动 match2 ship1", private=True))
-    args = next(args for name, args in service.calls if name == "legal")
+    args = next(args for name, args in service.calls if name == "manual_actions")
     assert args["match_id"] == "match2" and "ship1" in texts(seen)
+    assert args["unit"] == "ship1" and args["page"] == 1
     assert service.mutations == 0 and not uploads(seen)

@@ -89,6 +89,27 @@ class FakeService:
         self.calls.append(("legal", {"match_id": match_id, **kwargs}))
         return {"match_id": match_id, "revision": 2, "actions": [{"ship_id": "ship1", "kind": "move"}]}
 
+    def manual_actions(self, match_id, **kwargs):
+        self.calls.append(("manual_actions", {"match_id": match_id, **kwargs}))
+        if self.denied:
+            raise DomainError()
+        return {"text": "行动第1页 · ship1\n编号 move1：前进\n/选择 2 move1 " + match_id}
+
+    def manual_draft(self, match_id, **kwargs):
+        self.calls.append(("manual_draft", {"match_id": match_id, **kwargs}))
+        return {"text": "草稿：尚未选择行动"}
+
+    def manual_choose(self, match_id, **kwargs):
+        self.calls.append(("manual_choose", {"match_id": match_id, **kwargs}))
+        return {"text": "已加入草稿，尚未提交"}
+
+    def manual_clear(self, match_id, **kwargs):
+        self.calls.append(("manual_clear", {"match_id": match_id, **kwargs}))
+        return {"text": "草稿已清空，未推进"}
+
+    def manual_submit(self, match_id, **kwargs):
+        return self.mutate("manual_submit", match_id=match_id, **kwargs)
+
     def suggest(self, match_id, **kwargs):
         self.calls.append(("suggest", {"match_id": match_id, **kwargs}))
         return {"revision": 2, "orders": {"movement": []}}

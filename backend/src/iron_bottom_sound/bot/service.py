@@ -21,6 +21,7 @@ from ..engine import IronBottomEngine, ORDER_PHASES
 from ..tactical import TacticalCommander
 from ..models import GameOptions, GameState, OptionalRules, OrderBatch, Phase, Side
 from ..realistic_command import RealisticCommander
+from .manual_commands import ManualOrdersMixin
 
 
 class ServiceError(ValueError):
@@ -29,7 +30,7 @@ class ServiceError(ValueError):
         self.code, self.message = code, message
 
 
-class BattleService:
+class BattleService(ManualOrdersMixin):
     """SQLite is the single writer boundary, including across service instances.
 
     Every operation reloads its state inside a transaction. A failed engine call
@@ -72,6 +73,7 @@ class BattleService:
               app_id TEXT NOT NULL, group_openid TEXT NOT NULL, last_seen REAL NOT NULL,
               PRIMARY KEY(app_id, group_openid));
         ''')
+        self._init_manual()
         # DB includes secret orders and QQ seat identities: never serve it as an asset.
         if str(path) != ':memory:':
             path.chmod(0o600)
@@ -367,15 +369,30 @@ class BattleService:
     def public_status(self, match_id, room_id):
         with self._transaction():
             row, state = self._load(match_id, room_id)
+            player = self._pve_player_side(row)
             return dict(match_id=match_id, revision=row['revision'], turn=state.turn,
                         phase=state.phase.value, mode=row['mode'], opponent=row['opponent'],
                         ready=sorted(state.submitted_orders), started=len(row['seats']) == 2,
-                        complete=state.phase == Phase.COMPLETE)
+                        complete=state.phase == Phase.COMPLETE,
+                        map_view='pve_player' if player is not None else 'shared',
+                        view_side=player.value if player is not None else None)
+
+    @staticmethod
+    def _pve_player_side(row):
+        if row['opponent'] != 'pve':
+            return None
+        players = [Side(side) for side, actor in row['seats'].items() if not actor.startswith('bot:')]
+        if len(players) != 1:
+            raise ServiceError('seats', '人机对局的玩家视角无法确定')
+        return players[0]
 
     def public_screenshot(self, match_id, room_id):
-        from .public_view import public_png
+        from .public_view import public_png, pve_public_png
         with self._transaction():
             row, state = self._load(match_id, room_id)
+            player = self._pve_player_side(row)
+            if player is not None:
+                return pve_public_png(self.engine, state, player)
             return public_png(self.engine, state)
 
     def legal(self, match_id, actor_id, room_id):
@@ -418,7 +435,7 @@ class BattleService:
     def auto(self, match_id, actor_id, room_id, expected_revision, request_id):
         return self.submit(match_id, actor_id, room_id, {'_auto': True}, expected_revision, request_id)
 
-    def submit(self, match_id, actor_id, room_id, orders, expected_revision, request_id):
+    def submit(self, match_id, actor_id, room_id, orders, expected_revision, request_id, *, manual_guard=None):
         self._identity(actor_id, room_id)
         with self._transaction():
             actor_id = self.resolve_actor(actor_id, room_id)
@@ -438,6 +455,13 @@ class BattleService:
             side = self._side(row, actor_id)
             if side.value in state.submitted_orders:
                 raise ServiceError('already_ready', '本阶段已封存命令，等待对手')
+            if manual_guard is not None:
+                saved = self.db.execute('SELECT selections FROM bot_manual_drafts WHERE actor=? AND room=? '
+                    'AND match=? AND revision=? AND phase=?',
+                    (actor_id, room_id, match_id, expected_revision, str(state.phase))).fetchone()
+                if (manual_guard[0] != str(state.phase) or saved is None
+                        or hashlib.sha256(saved['selections'].encode()).hexdigest() != manual_guard[1]):
+                    raise ServiceError('manual_stale', '草稿刚刚被修改，请重新查看 /草稿 后再提交；本次未推进。')
             if not isinstance(orders, dict):
                 raise ServiceError('orders', '命令必须是OrderBatch JSON对象')
             if orders.get('side', side.value) != side.value or orders.get('phase', state.phase.value) != state.phase.value:

@@ -34,7 +34,7 @@ API = "https://api.sgroup.qq.com"
 TOKEN_URL = "https://bots.qq.com/app/getAppAccessToken"
 HELP = help_text("group")
 GROUP_COMMANDS = {"帮助", "列表", "创建", "加入", "状态", "战况", "绑定", "下一步"}
-TACTICAL = {"态势", "行动", "建议", "提交", "自动", "确认", "截图"}
+TACTICAL = {"态势", "行动", "建议", "提交", "自动", "确认", "截图", "选择", "草稿", "清空"}
 ALIASES = {"help": "帮助", "菜单": "帮助", "新手": "帮助 快速开始", "教程": "帮助 快速开始",
            "推进帮助": "帮助 推进", "绑定帮助": "帮助 绑定", "手动帮助": "帮助 手动",
            "我的对局": "状态", "推进": "自动", "编队人机": "创建 编队pve",
@@ -42,7 +42,8 @@ ALIASES = {"help": "帮助", "菜单": "帮助", "新手": "帮助 快速开始"
 COMMAND_LABELS = {"帮助": "help", "列表": "list", "创建": "create", "加入": "join",
                   "状态": "status", "战况": "public_map", "绑定": "bind", "态势": "situation",
                   "行动": "legal", "建议": "suggest", "提交": "submit", "自动": "auto",
-                  "确认": "confirm", "截图": "screenshot", "下一步": "next_steps"}
+                  "确认": "confirm", "截图": "screenshot", "下一步": "next_steps",
+                  "选择": "manual_choose", "草稿": "manual_draft", "清空": "manual_clear"}
 ERROR_LABELS = {name: "rejected_" + name for name in (
     "forbidden", "not_found", "identity", "identity_link", "identity_link_conflict",
     "identity_link_expired", "identity_link_limit", "room", "room_limit", "scenario",
@@ -263,7 +264,15 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
                 return [("text", "\n\n".join(status_text(v, private=True) + "\n/态势 " + v["match_id"] for v in values[:10])
                          or "尚未绑定对局。请先群内创建/加入，然后按 /帮助 绑定 操作。")]
             hint, rest = "", ""
-            if command in {"自动", "确认"}:
+            if command == "选择":
+                args = tail.split()
+                if not args:
+                    return [("text", help_text(scope, "手动"))]
+                if (len(args) not in {2, 3} or not re.fullmatch(r"[0-9]{1,10}", args[0])
+                        or not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", args[1])):
+                    raise ValueError("用法：/选择 版本号 行动编号 [对局ID]；先发 /行动 查看分页候选。")
+                hint, rest = (args[2] if len(args) == 3 else ""), args[0] + " " + args[1]
+            elif command in {"自动", "确认", "清空"}:
                 args = tail.split()
                 if args and (not re.fullmatch(r"[0-9]{1,10}", args[0]) or len(args) > 2):
                     raise ValueError("用法：/" + command + " 版本号 [对局ID]。先发 /下一步 查看当前版本；未执行操作。")
@@ -274,14 +283,25 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
                 args = tail.split(maxsplit=2)
                 if len(args) == 3 and not args[1].startswith("{") and args[2].lstrip().startswith("{"):
                     hint, rest = args[1], args[0] + " " + args[2]
+                elif len(args) == 2 and not args[1].startswith("{"):
+                    hint, rest = args[1], args[0]
+                elif not args:
+                    return [("text", help_text(scope, "手动"))]
+            elif command in {"行动", "草稿"}:
+                args = tail.split(maxsplit=1)
+                if args and any(v["match_id"] == args[0] for v in values):
+                    hint = args[0]
+                    rest = args[1] if len(args) > 1 else ""
+                else:
+                    rest = tail
             else:
                 args = tail.split(maxsplit=1)
-                if len(args) > 1 and command != "行动":
+                if len(args) > 1:
                     raise ValueError("用法：/" + command + " [对局ID]")
                 hint = args[0] if args else ""
                 rest = args[1] if len(args) > 1 else ""
             selected = choose_match(values, hint)
-            if command in {"自动", "确认"} and not rest:
+            if command in {"自动", "确认", "清空"} and not rest:
                 value = service.status(selected["match_id"], actor_id=actor,
                     room_id="qqbot:" + settings.app_id + ":" + selected["group_openid"])
                 return [("text", "尚未提交任何命令。\n" + status_text(value, private=True) + "\n" + next_steps(value, private=True))]
@@ -314,11 +334,26 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
             value = service.status(match, **context)
             return [("text", status_text(value, private=True) + "\n" + next_steps(value, private=True))]
         if command == "行动":
-            value = service.legal(match, **context)
-            if rest:
-                value = {k: value[k] for k in ("match_id", "revision", "phase") if k in value} | {
-                    "selected_ship": rest, "actions": [a for a in value.get("actions", []) if a.get("ship_id") == rest]}
-            return [("text", _json(value))]
+            args, page = rest.split(), 1
+            if args and re.fullmatch(r"(?:页|第)([0-9]{1,6})页?", args[-1]):
+                page = int(re.fullmatch(r"(?:页|第)([0-9]{1,6})页?", args.pop())[1])
+            value = service.manual_actions(match, **context, page=page, unit=" ".join(args) or None)
+            return [("text", value["text"])]
+        if command == "草稿":
+            if rest and not re.fullmatch(r"(?:页|第)([0-9]{1,6})页?", rest):
+                raise ValueError("用法：/草稿 [对局ID] [页N]")
+            page = int(re.fullmatch(r"(?:页|第)([0-9]{1,6})页?", rest)[1]) if rest else 1
+            return [("text", service.manual_draft(match, **context, page=page)["text"])]
+        if command == "选择":
+            args = rest.split()
+            if len(args) != 2 or not re.fullmatch(r"[0-9]{1,10}", args[0]):
+                raise ValueError("用法：选择 版本号 行动编号；先发 /行动 查看候选。")
+            return [("text", service.manual_choose(match, **context, expected_revision=int(args[0]),
+                choice_id=args[1], request_id=rid)["text"])]
+        if command == "清空":
+            if not re.fullmatch(r"[0-9]{1,10}", rest):
+                raise ValueError("用法：/清空 版本号 [对局ID]；先用 /草稿 检查待提交内容。")
+            return [("text", service.manual_clear(match, **context, expected_revision=int(rest), request_id=rid)["text"])]
         if command == "状态" and not rest:
             value = service.status(match, **context)
             return [("text", status_text(value, private=True) + "\n" + next_steps(value, private=True))]
@@ -336,6 +371,8 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
             value = service.auto(match, **context, expected_revision=revision, request_id=rid) if command == "自动" else service.submit(
                 match, **context, orders={}, expected_revision=revision, request_id=rid)
         else:
+            if len(args) == 1:
+                return situation(service.manual_submit(match, **context, expected_revision=revision, request_id=rid))
             try:
                 orders = json.loads(args[1]) if len(args) == 2 else None
             except (ValueError, RecursionError):
