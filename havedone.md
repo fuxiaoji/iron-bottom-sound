@@ -1040,3 +1040,84 @@
 ## 2026-10-21 LLM完整脉冲表教学接入
 用户要求提示词教会LLM。引擎单一movement-impulses表动态生成movement_timing_guidance，包含全部9档、舰/雷/接触标记共同时钟、MF不是节或区间、付费转向、发射MF→区间映射和4MF舰MF2/段4发射8速雷仅走5–8段实例，以及同格/对穿/尾随/最后射程/炮击后效果说明。每个订单阶段的legal_actions携带该公开教学输入，舰队system提示显式要求阅读；编队局部观察/build_prompt/精简/重试/ProviderPolicy的真实HTTP白名单亦完整保留。旧局返回旧时钟说明，不套新表；示范“4节”纠正为4MF。
 新增8项专门测试捕获真正序列化的舰队/编队HTTP载荷，核对源表动态性、版本、示例、重试/精简和隐私，0外部模型调用。提示/多模态/夜战记忆/编队LLM共42项通过；脉冲/指挥延迟/API/存档70项通过、1项因原fixture仅一个轴心编队而跳过；合计112通过/1跳过/0失败，XML位于artifacts/gc8-llm-20261021。规则执行、预算、旧历史/胜负均不变。基线HEAD267ab2ad6801bcc40e291fe6569a001027a1c7a5；下一步将本批提交同步GitHub及线上并核验实际请求。
+
+
+## 2026-10-22：QQ / MCP 工程首版与独立服务器部署（实群联调待账号恢复）
+
+- 从 GitHub `origin/main` **6eddc9613b5ae27e321cc5a20623f08a0a87f548** 建立隔离工作树 `../iron-bottom-sound-qq-mcp`、分支 `codex/qq-mcp`。功能提交 **a02f108e85cfb8158b067d448e1c48d178662c1e**；原研究分支、未提交改动、已暂存环境清理及 FM02 暂停对局均保留。
+- 统一 SQLite 服务包装既有 Python 引擎，支持普通/编队、PVE/PVP、席位权限、同阶段双方密封、版本与幂等收据、事务恢复和持久通知；OneBot HMAC 群 @ / 私聊及官方 MCP SDK 共用服务。本方截图直接显示舰名，未识别舰仍为“敌舰”；群图仅双方观察交集。没有改规则或请求付费模型。
+- 已在 `fuwenji.asia` 独立部署 `ibs-bot.service`（回环 13192）与 NapCat 4.18.41，使用独立库/目录；原 tiedi/hall/nginx 健康保持。服务器两模式各五阶段 PVE HTTP 烟测成功；两个真实 MCP stdio 会话经 SSH 连服务器，PVP 两模式各共同推进一阶段并收到 PNG。此为状态机建议与协议验证，**不是两个 LLM 自主对战或实群端到端成功**。
+- 验证保留旧145通过及中途超时/队列竞争失败；相关修复后定点13通过（app9/counter3/formation MCP1）、最终3个MCP进程用例通过、最新OneBot56通过。未声称最终快照一次全量全绿。详细命令、原失败与复验收据见隔离树 `docs/bot/VALIDATION.md`、`artifacts/bot-20261022/`。
+- 运行包强制校验五个原始 LFS OID；服务器现有来源与 Git 指针哈希相符。构建包 `ibs-bot-runtime.tar.gz` 68195224 字节、SHA256 `604ab0804de0583de4ce26f43007562f34e6f95a34e6f1d0bc539d3ef98a0358`，不含环境秘密。
+- 用户授权检查服务器空间后，仅清理4份无进程引用的旧 VSCode Server缓存及扩展下载缓存，释放 **3020009472字节（2.81GiB）**；保留当前运行/最新版本、用户配置、项目/数据库。安装 NapCat 后根分区约1.49GiB可用；容量收据见 `artifacts/bot-20261022/deploy/cleanup.json`。
+- **未完成及明确阻断**：用户两次已真实发送 @ 帮助，但未取得真实事件回调。探针重启后扫码确认，QQ 返回 **serverErrorCode 168**：“账号近期存在安全风险，部分功能使用受限，请登录最新手机QQ并根据提示恢复账号使用”。已请用户在手机恢复；当前不能称账号在线。临时 NapCat 探针只记计数/时间/字段存在性，无正文或身份；恢复实群链路后须还原官方 bundle。
+- 下一步：手机账号恢复 → 恢复登录 → 核验真实 @、群创建、私聊提交/截图、阶段公共图和继续旧局；再做两个自主 agent 的真实 QQ 对局。凭据只在服务器私有环境中，不入库/日志；原研究进度不推进。
+
+
+## 2026-10-22：改接QQ开放平台官方机器人（65eb4c8b）
+
+- 用户明确改为官方机器人，停止普通QQ账号方案。通过用户现有开放平台主体创建 **铁底湾指挥官**（AppID `1905878837`）；AppSecret重置由用户本人完成，密钥仅写服务器私有配置，本地临时凭据文件已移除。服务器换取官方token成功，未记录token。
+- 实现官方Ed25519 Webhook验签/URL挑战、群AT/C2C被动回复、官方PNG上传、固定openid身份域与持久安全跨群/私聊席位绑定；普通/编队、PVE/PVP和MCP仍共用既有Python裁决与SQLite。代码提交 **65eb4c8ba944ed1cc64c7eeb528ec2340165be48**。
+- 腾讯平台实际校验并保存 `https://fuwenji.asia/ibs-bot/qq-official/events`，仅选择群AT与C2C两种事件；伪造业务请求401、GET405，旧玩家API仍200。当前官方群白名单为空，仅签名群事件可发现真实group_openid，不能由数字群号猜映射；发现记录只保存AppID、group_openid与时间，不记正文/成员/订单。
+- 验证：持久绑定18+旧service13共31通过；网关/工厂35通过，新增签名发现后36通过；app+旧工厂+OneBot兼容70通过（批次重叠不可相加）。真实引擎MockTransport整链创建/加入/绑定/自动提交/受限PNG/公共PNG通过。官方文档示例签名与其印刷正文不一致的1项失败复现仍单独保留；本App实际腾讯平台挑战已通过，未冒称直接运行官方SDK验签。
+- 双MCP经真实SSH重新连接服务器，两模式PVP各推进一阶段并收到PNG；仍是确定性建议，不是自主LLM实战。启动器支持私有配置固定 `IBS_MCP_BLUE_IDENTITY`/`RED_IDENTITY`；MCP不自动冒领人类席位。
+- 运行包最终68202363字节、124成员、SHA256 `027a9e383b5f23cdd5b7f6d7c7aeb2d3a4eb7d75d83be1bff9043a8355ba2e8a`，五原始LFS来源SHA校验通过；官方8个部署源码文件与提交哈希一致。安全汇总在 `docs/bot/evidence/`，完整XML/截图/运行包在忽略目录 `artifacts/bot-20261022/`，不上传凭据/原始消息。
+- NapCat临时元数据探针已还原官方bundle，普通QQ入口关闭。仅移除本批已停NapCat容器与可重建固定镜像（host账号/配置目录保留，恢复tar在本地），额外释放1707474944字节；根盘当前3303755776字节约3.08GiB可用。此前旧VSCode缓存释放2.81GiB的原收据保留，不把两次清理混为一次。
+- **待完成**：用户把新官方机器人加入目标群并真实@（已提供官方添加二维码），随后配置真实群openid并验收群建局、私聊绑定/阶段命令/本方图与群公共图。官方停止主动推送，群5分钟/最多5条、C2C60分钟/最多5条；玩家需按指令查询更新。未认证主体仅管理员使用/可加其群主的群，其他群友公开使用需用户完成平台认证。完整真实QQ对局与两个自主LLM终局仍未验收。
+
+
+## 2026-10-22：官方QQ实群首阶段与双通道图片验证（160aa235）
+
+- 用户真实群 @ 已验签并取得官方回复；仅授权该次事件发现的唯一目标群，不公开原始 OpenID。首次「创建 编队pve」返回用法的问题已定位为参数连写，提交 **160aa235a398263fa8a34478baeb251bec6773c3** 兼容普通/编队与 PVE/PVP 连写并加入静态结果审计，未改裁决规则。
+- 用户重发原命令后真实建立编队 PVE/盟军席位；C2C申请验证码与本人群内确认均完成，数据库有1个别名及1个已消费挑战。真实私聊「自动 0」已从编队部署推进到第1回合增援、revision1；本方PNG与随后群「战况」公共PNG均有官方API发送确认，用户明确反馈「两处都有图」。这证明首阶段实群链路，不等同所有模式或完整终局验收。
+- 定点收据 `artifacts/bot-20261022/official-live-audit.xml` 36通过/0失败（0.582s）；连写修复快照 `official-compact-command.xml` 42通过/0失败（0.715s），批次交叉不相加。安全实群摘要 `docs/bot/evidence/official-live.json` 只包含摘要/计数/阶段与API及用户确认，不含成员、私聊身份、验证码、正文或密钥。原失败记录继续保留。
+- 当前运行包68202689字节、124成员，SHA256 `459434914199d83830ba064daef4c9fb39fa63aa1a3eb6156769135d54b4874d`，五原始LFS来源匹配；服务器部署收据确认8源码匹配160aa235。ibs-bot/nginx/tiedi/hall均active，三个内部健康入口200；用户对局保留在revision1，不代替用户继续提交。
+- GitHub入口保持Draft PR #1： https://github.com/fuxiaoji/iron-bottom-sound/pull/1 。剩余：其他模式实群、第二名真人PVP、重启后的真实续局、完整终局与两个自主LLM通过MCP对战。公开群友使用仍需用户完成平台认证；官方按被动命令查询，不承诺异步广播。原研究、原工作树未提交改动与FM02暂停点不动，无付费模型请求或论文阶段推进。
+
+
+## 2026-10-22：QQ原生预设、短命令与详细阶段引导（110c4a43）
+
+- 按用户要求在官方控制台“高级设置→菜单与指令”保存群聊10条、好友8条斜杠预设及好友3项只读菜单；页面重载后配置保留且无未保存改动。当前界面每场景最多10条，未借配置扩大账号/群访问范围，未改认证或密钥。客户端列表是否可见仍待用户实测。
+- 功能提交 **110c4a435914783d9b81e72e3bb371cc9c06c25c**：绑定后可发/态势、/下一步等短命令；只从本App允许群中按原身份/席位检查枚举，多局不猜默认。自动/确认须显式版本，无版本只读显示当前步骤；原完整格式兼容，JSON不改写。中文阶段、当前版本与可复制下一步进入态势/提交回复，PVP封存、等待和终局不误导重复提交；帮助分快速开始/推进/手动/PVP/绑定。
+- Root整合与独立代理qq_guidance并行（模块/测试独占，第二轮只读审核）；代理模型继承线程、独立用量未取得，不冒称外部模型评审。采纳“多局手动指令也带当前ID”建议。模块输出SHA256 `48db77390a645157a64df6b950d41ee701deb5c8883198b8973a80b35ef279b0`。
+- 最终相关 **144 passed / 0 failed / 0 skipped，8.536秒**，命令：`.venv/bin/python -m pytest tests/test_bot_qq_official.py tests/test_bot_official_app.py tests/test_bot_qq_guidance.py tests/test_bot_qq_shortcuts.py tests/test_bot_qq_shortcuts_integration.py tests/test_bot_identity_links.py --junitxml=artifacts/bot-20261022/qq-shortcuts-release.xml -q`。覆盖36网关/6工厂/36引导/46短路由/2真实引擎重启/18身份绑定，实际命令与XML交叉核对；没有累计旧批次。中途72项中4个显示契约断言失败、2个验证码编码夹具失败单独保留，修正后汇总通过；入口文件名误输导致pytest未收集的一次命令也不计为测试通过。
+- 已部署并重启，9源码摘要匹配110c4a43；ibs-bot/nginx/tiedi/hall active，三个健康入口200。服务器正式库只读备份到内存，用真实已有绑定验证4项短命令与本方PNG，网络完全Mock，正式对局行摘要未变，用户局仍增援/revision1。没有替用户下令或额外发真实QQ消息。安全收据docs/bot/evidence/qq-command-panel.json、qq-shortcuts-server-smoke.json；截图只留忽略目录。
+- 当前运行包68208712字节/125成员、SHA256 `41bc84f3a592d5d24841abcd6852a05736e3bd9c36cbe7201d6d9590bd8125f9`，五原始来源OID匹配。原实群双图通过记录保留；新客户端预设显示等待反馈，其他真人PVP/完整终局/自主LLM对战仍未验，研究及FM02暂停点不动。
+
+- 后续实测确认：用户反馈“列表和推进提示都有”；真实C2C /下一步回复成功，另有自动提交与图片成功标签，正式同局已自然推进到revision2/机动规划。该推进发生在用户实测阶段，不是Root的只读内存烟测。安全后续收据docs/bot/evidence/qq-shortcuts-live.json，日志计数指标签出现次数，不当作不同命令数。原生客户端列表与新帮助不再是待验项。
+
+
+## 2026-10-22：修复PVE群空图与QQ手动草稿（5bc33acc）
+
+- 用户截图证明旧/行动整份嵌套schema超过回复上限，旧舰ID筛选匹配顶层也失效；此前收到PNG/提示不代表能手动操作。PVE群图原取交集导致实际局0船；本批改为唯一人类席位受限观察，标题标明PVE玩家/阵营；PVP仍交集并解释空图。隐藏敌情、未识别姓名、命令与编队计划不由世界真值补入。
+- 功能提交5bc33acc88de7f04560e06eeb8aebb33241d01c9；/行动中文每页6项，可筛舰/编队、翻页；/选择 版本 编号存私有草稿，/草稿分页检查，/清空只清草稿，/提交 版本经原引擎校验。未选动作不代填，同槽替换、重启恢复、版本与跨实例草稿变更保护、重复提交幂等均保留。菜单是代表选项，自定义编队重组/照明/烟幕等仍需JSON或MCP，不声称穷举合法空间。
+- 分工：Root负责service/QQ路由/帮助/部署，qq_guidance代理独占manual_commands与27项相关测试（模型继承，无独立用量）；group_map代理gpt-6.1-sol/high独占public_view与11项新投影测试，并渲染4张PVE/2张PVP重置图。代理不发布、不访问正式凭据、不改规则。原图测试夹具4项失败经frozen HexCoord/换行姓名/重复side修正，无原始XML；不伪造失败收据。
+- 最终同快照289 passed/0 failed/0 skipped，73.462s；实际命令为 .venv/bin/python -m pytest tests/test_bot_manual_commands.py tests/test_bot_manual_qq.py tests/test_bot_group_map_mode.py tests/test_bot_pve_group_view.py tests/test_bot_public_view.py tests/test_bot_qq_guidance.py tests/test_bot_qq_official.py tests/test_bot_qq_shortcuts.py tests/test_bot_official_app.py tests/test_bot_identity_links.py tests/test_bot_service.py tests/test_bot_app.py tests/test_bot_qq_shortcuts_integration.py tests/test_bot_onebot.py --junitxml=artifacts/bot-20261022/manual-group-release.xml -q 。保留旧批次与本轮各定点收据，不相加。
+- 已备份旧源码并部署，10源码摘要匹配；QQ控制台好友10/群10预设保存重载核验，底部3菜单保留。服务器正式库只读备份内存，实际局版本4/炮战、群图8船已视觉核验；模拟平台全链路行动/选择/草稿/提交及重复事件通过，副本4→5、正式行摘要不变。首个烟测脚本同消息ID的时间戳改变被拒，按原事件精确重放后通过。新真实客户端群图与草稿复测已请求，未冒用旧确认。
+- 运行包68218771字节/126成员，SHA256 6053b6023f53103b1026d8d8e023008ef0beeec8376e6fa5cc95cabb03b3a5d2；5原始LFS来源OID匹配。ibs-bot/nginx/tiedi/hall active，三内部探针200；未重启旧玩家服务。安全证据docs/bot/evidence/manual-group-server-smoke.json、qq-manual-panel.json，真实图/截图/身份仅忽略目录。旧OneBot异步投递仍历史交集策略，当前官方不走此队列。
+- Draft PR #1继续；其他实群模式、完整真人PVP/终局与自主LLM对战保持待验。原研究、脏工作树与FM02暂停点保持，无论文阶段推进或付费对战模型请求。
+
+
+## 2026-10-22：DeepSeek群参谋与自然语言下令（a43f6fab）
+
+- 新增/参谋只读战报建议、/下令自然语言转原引擎订单，群与私聊可用。本人席位、PVE受限观察/PVP交集及私有回执隔离，SQLite pending/prepared/done防重、无锁模型IO、过期/非法/澄清不执行；不静默用状态机代替LLM。好友/群各10预设与3好友菜单保存重载核验。
+- 功能a43f6fab18c8cc675ba667bedc5aaf0f2887dc82；423主合并回归通过/0失败/0跳过，108.283s，原命令与XML在artifacts/bot-20261022/llm-release.xml；随后只修Bot默认模型为账户/官网当前deepseek-flash，84客户端配置delta通过（llm-client-current-model.xml）。不将不同快照批次相加；首客户端航程负例夹具错误保留说明。
+- 代理group_map独占llm_client+84测试（gpt-6.1-sol/high），qq_guidance独占38服务测试（继承线程，无独立用量），Root整合/路由/部署+12真实路由测试。代码与JUnit SHA见安全validation-summary，未伪报模型独立审核。
+- 12源码部署匹配；私有DeepSeek鉴权/模型枚举200，专属env0600，不借视频/Coding Plan预算。真实API副本烟测2次：战报2.067s/3789tokens，订单0.729s/8409tokens，副本4→5，正式库只读且行摘要不变，QQ为Mock含图；重复不计费或推进。安全收据docs/bot/evidence/llm-live-smoke.json。
+- 用户反馈两条正常；正式群战报1与下令澄清2均回复成功、未提交/无新PNG标签，不能把用户确认解释成已实际推进。实群收据qq-llm-live.json如实区分；用户随后要更高权限/裁判，另批继续。
+- 运行包68229020字节/128成员，SHA256 758f342812a9ac1bf9857f71f0f8147b0d9d143fe4f19524e455345cb7917831，5来源OID一致。Bot/nginx/tiedi/hall active，bot健康200；源码/凭据/规则与研究来源边界保持。Draft PR #1继续，旧研究/FM02不推进。
+
+
+## 2026-10-22：管理员DeepSeek裁判（dd36c9d6）
+
+- 用户明确授权LLM完整游戏管理权限。新增群/私聊 `/裁判`：创建、双方阶段推进、坐标/正舰体/已有武器运行状态/进度修正、撤销；服务端固定管理员身份与冻结版本，完整私有before快照含RNG，递增revision，pending/prepared/done防重。跨容器生命周期字段明确拒绝，原始来源/规则/账号/文件权限不在接口内。推进使用既有状态机补双方缺令，再经原引擎，不宣称LLM逐舰制定战术。
+- 功能提交dd36c9d6d40109250caf891813add374e6d4784d；最终同一源码 `.venv/bin/python -m pytest`（此前llm-release.xml列出的17文件及test_bot_referee.py/test_bot_qq_referee.py）542通过/0失败/0跳过，129.265s；raw artifacts/bot-20261022/referee-release.xml SHA256 c3df5814ab54a18856b46a7faaf41c83a58a258d9951ae8d29b4a3f510b78fb0。64服务/124客户端/15恢复路由定点不累加；初服务fixture漏role的1失败/46通过XML保留。
+- group_map（gpt-6.1-sol/high）独占客户端并独立有限审计，qq_guidance（继承root，精确运行ID/独立用量不可取）独占referee.py/service.py/服务测试，Root集成路由/帮助/恢复修正/部署。最终审计找到的元数据、坐标、猜隐藏舰、create finalize、QQ缓存五路径全在冻结SHA复验通过，安全audit SHA 475fcf241316acd4f97386e4c6500654147f90bc60b75387b5d24388ca3fe4d6；不声称研究独立模型结论。
+- 真实DeepSeek副本4请求create/advance/patch/undo通过：1.014/0.729/1.373/1.225s，7217/6863/7003/6994tokens；副本0→1→2→3，undo完整JSON/RNG恢复，重复/非管理员0新增API。首轮烟测进度器跨线程SQLite夹具错误的1请求0.834s/7216tokens也保留（模型create合法但未应用），本批5真实请求。正式库只读，行摘要不变；QQ发送全部Mock含PNG，不能称实群修改。
+- 13源码部署匹配，运行进程管理员1名，env0600；Bot/nginx/tiedi/hall active、健康/HTTP探针200。一次误读健康字段及一次系统Python3.6验证助手错误保留说明，纠正验证后通过，无重复重启。当前包68238745字节/129成员，SHA256 941445ce0227697ed8b90e5daeef8f8ba7444b1e78e2dfd8ea11451c39752153，5来源OID匹配。
+- 好友/群各10预设保存重载，加入裁判，旧自动/我的对局仍可输入；截图本地artifacts/bot-20261022/deploy/qq-referee-panel.png。安全公开收据docs/bot/evidence/referee-{audit,live-smoke,deployment}.json及qq-referee-panel.json。真实QQ群管理员只读裁判/预设显示反馈待验，不沿用旧参谋确认；其他模式真人PVP/完整LLM终局继续待验。Draft PR #1保留，研究/FM02暂停点不动。
+
+
+## 2026-10-22：裁判实群反馈验收（基于dd36c9d6）
+
+用户回复“正常”。北京时间11:46:55只读查正式SQLite和精确群日志标签，4条done=advance2/report1/clarify1；两次真实推进4→5→6，before快照各保存，现机动规划。报告与澄清未修改，群image_delivered2、delivery_failed0。安全证据docs/bot/evidence/qq-referee-live.json，不含原始身份或聊天。未单独确认新预设显示、客户端PNG实际显示或实群create/patch/undo；不把副本验证扩展为实群全部操作。本批只更新文档与证据，源码仍dd36c9d6，无新测试/模型请求/QQ发送/部署或代玩家推进。新文档提交哈希由本条所在Git提交自证，之前c524ec30证据保留。

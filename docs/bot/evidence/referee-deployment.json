@@ -1,0 +1,27 @@
+{
+  "feature_commit": "dd36c9d6d40109250caf891813add374e6d4784d",
+  "verified_source_files": 13,
+  "checked_at_utc": "2026-10-22T03:37:23.544682+00:00",
+  "referee_admin_count_from_running_process": 1,
+  "private_env_mode": "0o600",
+  "production_match_rows_unchanged_during_validation": true,
+  "services": {
+    "ibs-bot": "active",
+    "nginx": "active",
+    "tiedi": "active",
+    "hall": "active"
+  },
+  "http_probes": {
+    "bot": 200,
+    "previous_game": 200,
+    "hall_http": 200
+  },
+  "bot_health": {
+    "status": "ok",
+    "engine": "python",
+    "modes": [
+      "classic",
+      "formation"
+    ]
+  }
+}

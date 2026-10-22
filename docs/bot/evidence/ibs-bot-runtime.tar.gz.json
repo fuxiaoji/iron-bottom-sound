@@ -1,0 +1,29 @@
+{
+  "archive": "ibs-bot-runtime.tar.gz",
+  "sha256": "941445ce0227697ed8b90e5daeef8f8ba7444b1e78e2dfd8ea11451c39752153",
+  "sources": {
+    "resources/originals/rules/iron-bottom-sound-iv-rules-zh.pdf": {
+      "sha256": "0f14cbf1dee747d14e1fb52db77a4fff440076b2a96826f4299faa60b45c573e",
+      "bytes": 4463021
+    },
+    "resources/originals/rules/player-aid-tables-zh.pdf": {
+      "sha256": "0aae79ccc1ec699834e259d8818dbf48f66cbd077b19c34ed9570c6aff9b76bc",
+      "bytes": 2460843
+    },
+    "resources/originals/scenarios/scenario-book-zh.pdf": {
+      "sha256": "c11394a7dda262dcafd17a647d3699426ba54c9e55f2a142704f094c31c1c813",
+      "bytes": 7907157
+    },
+    "resources/originals/records/ship-record-manual-1.1-zh.pdf": {
+      "sha256": "eeff020db4a7f491def219335404996d4b204035923be2b5bd925f65dfdac210",
+      "bytes": 53104132
+    },
+    "resources/originals/assets/images/岛屿.jpg": {
+      "sha256": "5b9cd594846235d829228a202a8a8bb320baf5b0b7ee84753725fb1986fc79fd",
+      "bytes": 2821411
+    }
+  },
+  "feature_commit": "dd36c9d6d40109250caf891813add374e6d4784d",
+  "bytes": 68238745,
+  "members": 129
+}

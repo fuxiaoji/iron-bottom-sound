@@ -1,0 +1,38 @@
+{
+  "feature_commit": "5bc33acc88de7f04560e06eeb8aebb33241d01c9",
+  "app_id": "1905878837",
+  "saved_and_reloaded": true,
+  "group_commands": [
+    "帮助",
+    "编队人机",
+    "普通人机",
+    "编队对战",
+    "普通对战",
+    "我的对局",
+    "战况",
+    "下一步",
+    "加入",
+    "绑定"
+  ],
+  "friend_commands": [
+    "帮助",
+    "我的对局",
+    "态势",
+    "下一步",
+    "行动",
+    "提交",
+    "自动",
+    "清空",
+    "选择",
+    "草稿"
+  ],
+  "friend_menu": [
+    "帮助",
+    "态势",
+    "下一步"
+  ],
+  "previous_panel_receipt": "qq-command-panel.json",
+  "screenshot_local": "artifacts/bot-20261022/deploy/qq-manual-panel.png",
+  "screenshot_sha256": "68e149dc594613cca7cbf1b70b085f1be04fa9737dff902e45495d881022b08c",
+  "client_verification": "pending_user_reply"
+}

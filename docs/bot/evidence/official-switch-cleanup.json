@@ -1,0 +1,9 @@
+{
+  "reason": "Switched to official QQ Bot; removed only task-created stopped NapCat container and reproducible image",
+  "image_id": "sha256:045cb917c7d6f0147447eb272902a153f51e8cbdb1dc0e6df270ebd4253b4337",
+  "preserved": "Host account/config bind mounts and all other containers/services",
+  "before_available_bytes": 1596280832,
+  "after_available_bytes": 3303755776,
+  "released_bytes": 1707474944,
+  "restore_archive_sha256": "1d63a5c42a8fceaa4e55c9ab078741f82d915e35f555c034d04e38ec90f181fb"
+}

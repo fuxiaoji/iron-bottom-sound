@@ -1,0 +1,34 @@
+[
+  {
+    "mode": "classic",
+    "phases": [
+      "reinforcement",
+      "movement_planning",
+      "torpedo_planning",
+      "gunnery",
+      "reinforcement"
+    ],
+    "final_phase": "movement_planning",
+    "turn": 2,
+    "revision": 5,
+    "png_sha256": "6b4f334090248a9037e349459b857123d1a0eac9f6611a03cac375d9c6d6063b",
+    "png_bytes": 118821,
+    "elapsed_seconds": 2.62
+  },
+  {
+    "mode": "formation",
+    "phases": [
+      "formation_setup",
+      "reinforcement",
+      "movement_planning",
+      "torpedo_planning",
+      "gunnery"
+    ],
+    "final_phase": "reinforcement",
+    "turn": 2,
+    "revision": 5,
+    "png_sha256": "13a7add64127b6a11087a289f197976c9902915a385045f6e9c200f0ee5bad2d",
+    "png_bytes": 119162,
+    "elapsed_seconds": 2.24
+  }
+]

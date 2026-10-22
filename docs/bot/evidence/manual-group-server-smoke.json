@@ -1,0 +1,66 @@
+{
+  "feature_commit": "5bc33acc88de7f04560e06eeb8aebb33241d01c9",
+  "verified_source_files": 10,
+  "mismatches": [],
+  "checked_at_utc": "2026-10-22T02:13:38.468186+00:00",
+  "production_match_rows_unchanged": true,
+  "snapshot_revision_before": 4,
+  "snapshot_revision_after": 5,
+  "phase_before": "gunnery",
+  "match_sha256": "92898c92d9c6cfbe9600d78d0204fdb982d902f844d1ef63206644ac30bd8cc9",
+  "map_view": "pve_player",
+  "player_observed_ships_before": 8,
+  "group_png_sha256": "76b998c40edb95b875d84423c8c373ab92f8f4ede448b2ed7a18ef6a0da0c4b5",
+  "group_png_bytes": 120542,
+  "checks": [
+    {
+      "command": "group_public_map",
+      "reply_count": 2,
+      "max_text_chars": 155,
+      "png_count": 1,
+      "outbound_platform": "mock_only"
+    },
+    {
+      "command": "manual_actions",
+      "reply_count": 1,
+      "max_text_chars": 434,
+      "png_count": 0,
+      "outbound_platform": "mock_only"
+    },
+    {
+      "command": "manual_choose",
+      "reply_count": 1,
+      "max_text_chars": 120,
+      "png_count": 0,
+      "outbound_platform": "mock_only"
+    },
+    {
+      "command": "manual_choose_duplicate",
+      "reply_count": 0,
+      "max_text_chars": 0,
+      "png_count": 0,
+      "outbound_platform": "mock_only"
+    },
+    {
+      "command": "manual_draft",
+      "reply_count": 1,
+      "max_text_chars": 128,
+      "png_count": 0,
+      "outbound_platform": "mock_only"
+    },
+    {
+      "command": "manual_submit",
+      "reply_count": 2,
+      "max_text_chars": 454,
+      "png_count": 1,
+      "outbound_platform": "mock_only"
+    },
+    {
+      "command": "manual_submit_duplicate",
+      "reply_count": 0,
+      "max_text_chars": 0,
+      "png_count": 0,
+      "outbound_platform": "mock_only"
+    }
+  ]
+}

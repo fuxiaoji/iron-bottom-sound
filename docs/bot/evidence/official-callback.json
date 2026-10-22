@@ -1,0 +1,14 @@
+{
+  "app_id": "1905878837",
+  "bot_name": "铁底湾指挥官",
+  "callback": "https://fuwenji.asia/ibs-bot/qq-official/events",
+  "vendor_platform_validation": "passed",
+  "expected_events": [
+    "GROUP_AT_MESSAGE_CREATE",
+    "C2C_MESSAGE_CREATE"
+  ],
+  "control_panel_selected_events": 2,
+  "unsigned_dispatch_http": 401,
+  "get_http": 405,
+  "group_dispatch": "not yet observed"
+}

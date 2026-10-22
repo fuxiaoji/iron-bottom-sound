@@ -1,0 +1,115 @@
+{
+  "all_four_previous_paths_passed": true,
+  "router_recovery_single_and_double_failure_passed": true,
+  "checks": {
+    "real_client_metadata": {
+      "passed": true,
+      "http_calls": 1,
+      "metadata_model": "deepseek-flash",
+      "usage": {
+        "completion_tokens": 12,
+        "prompt_tokens": 11,
+        "total_tokens": 23
+      },
+      "prepared_plan_exact_keys": [
+        "action",
+        "changes",
+        "create",
+        "match_id",
+        "message",
+        "steps"
+      ],
+      "private_reasoning_absent": true
+    },
+    "coordinates": {
+      "passed": true,
+      "position": "P15",
+      "hull": 4,
+      "revision": 1
+    },
+    "unseen_selector": {
+      "passed": true,
+      "mutation_rejected": true,
+      "state_and_revision_unchanged": true
+    },
+    "create_finalize_restart": {
+      "passed": true,
+      "prepared_after_failure": true,
+      "same_receipt_after_duplicate": true,
+      "total_new_matches": 1,
+      "total_model_calls": 1
+    }
+  },
+  "source_sha256": {
+    "backend/src/iron_bottom_sound/bot/referee.py": "1364db23c08290d78cd91ce54b9a57b98529e6ad9d21f4453d5ac3dc88b60603",
+    "backend/src/iron_bottom_sound/bot/service.py": "0f8d47cd09ea2a43f82bbd21cebbfaea3b5ecd192c6dc38c947acfab9ba82d79",
+    "backend/src/iron_bottom_sound/bot/qq_official.py": "d2f1c5007074fc29fae1891e7ffd6ffd42d37439f3fc8ccbd3708876c8a01fa8",
+    "backend/src/iron_bottom_sound/bot/llm_client.py": "2969baa4629729dfc137cfc080f7909703d5c2ea2933e6cbd228f3b5f0698156"
+  },
+  "source_unchanged_during_check": true,
+  "router_evidence_sha256": "efdd449f8bc225738abe3a237ef6a6ab26180e28bcd6a5fcaf7f645e1470e0ae",
+  "real_api_calls": 0,
+  "feature_commit": "dd36c9d6d40109250caf891813add374e6d4784d",
+  "router_checks": [
+    {
+      "injected_finalization_failures": 1,
+      "first_http": 200,
+      "second_http": 200,
+      "third_http": 200,
+      "status_after_first": "done",
+      "status_after_same_event_retry": "done",
+      "finalize_attempts": 2,
+      "model_calls": 1,
+      "matches_after_first": 1,
+      "final_matches": 1,
+      "message_sequences": [
+        1,
+        2
+      ],
+      "unique_sequences": true,
+      "post_done_duplicate_added_no_reply": true
+    },
+    {
+      "injected_finalization_failures": 2,
+      "first_http": 200,
+      "second_http": 200,
+      "third_http": 200,
+      "status_after_first": "prepared",
+      "status_after_same_event_retry": "done",
+      "finalize_attempts": 3,
+      "model_calls": 1,
+      "matches_after_first": 1,
+      "final_matches": 1,
+      "message_sequences": [
+        1,
+        2,
+        3
+      ],
+      "unique_sequences": true,
+      "post_done_duplicate_added_no_reply": true
+    }
+  ],
+  "audit_receipt_sha256": "475fcf241316acd4f97386e4c6500654147f90bc60b75387b5d24388ca3fe4d6",
+  "previous_defects": [
+    "client metadata rejected by service six-field boundary",
+    "incorrect engine coordinate helper arguments",
+    "unseen target guessed by model",
+    "create committed before final receipt failure incorrectly cached as not modified",
+    "QQ receipt parts blocked recovery redelivery"
+  ],
+  "delegation": [
+    {
+      "agent": "group_map",
+      "model": "gpt-6.1-sol",
+      "reasoning_effort": "high",
+      "scope": "client protocol and independent focused audit",
+      "usage": null
+    },
+    {
+      "agent": "qq_guidance",
+      "model": "inherited root thread; exact runtime ID unavailable",
+      "scope": "referee service and isolated service tests",
+      "usage": null
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "discovery": {
+    "app_id": "1905878837",
+    "event_type": "GROUP_AT_MESSAGE_CREATE",
+    "signature_verified": true,
+    "api_reply_confirmed": true,
+    "authorized_group_count": 1,
+    "group_sha256": "95286628fe634fd251630ac9dce31a1da7a534b6bdb5605b0547e246e164ce18",
+    "group_match_to_user_target": "User confirmed invitation and @ in requested group"
+  },
+  "creation": {
+    "app_id": "1905878837",
+    "mode": "formation",
+    "opponent": "pve",
+    "revision": 0,
+    "group_creation_verified": true,
+    "match_sha256": "92898c92d9c6cfbe9600d78d0204fdb982d902f844d1ef63206644ac30bd8cc9"
+  },
+  "private_binding": {
+    "group_confirmation_delivered": true,
+    "alias_count": 1,
+    "consumed_challenge_count": 1
+  },
+  "image_delivery": {
+    "private_png_api_confirmed": true,
+    "public_png_api_confirmed": true,
+    "user_confirmed_both_visible": true
+  },
+  "checked_at_utc": "2026-10-21T18:08:30.893580+00:00",
+  "deployed_feature_commit": "160aa235a398263fa8a34478baeb251bec6773c3",
+  "phase_progression": {
+    "match_sha256": "92898c92d9c6cfbe9600d78d0204fdb982d902f844d1ef63206644ac30bd8cc9",
+    "mode": "formation",
+    "opponent": "pve",
+    "revision": 1,
+    "turn": 1,
+    "phase": "reinforcement",
+    "alias_count": 1,
+    "consumed_challenge_count": 1
+  },
+  "audit_labels": {
+    "group result=accepted": 4,
+    "group result=command_create": 1,
+    "group result=create_accepted": 1,
+    "group result=delivered": 4,
+    "c2c result=accepted": 3,
+    "c2c result=command_bind": 1,
+    "c2c result=delivered": 3,
+    "group result=command_bind": 1,
+    "c2c result=command_auto": 1,
+    "c2c result=image_delivered": 1,
+    "group result=command_public_map": 1,
+    "group result=image_delivered": 1
+  },
+  "scope": "One real formation PVE first phase, private binding and both image channels; not a full game or autonomous LLM duel."
+}

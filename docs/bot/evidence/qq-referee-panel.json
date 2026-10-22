@@ -1,0 +1,37 @@
+{
+  "feature_commit": "dd36c9d6d40109250caf891813add374e6d4784d",
+  "app_id": "1905878837",
+  "group_commands": [
+    "帮助",
+    "编队人机",
+    "普通人机",
+    "参谋",
+    "下令",
+    "裁判",
+    "战况",
+    "下一步",
+    "加入",
+    "绑定"
+  ],
+  "private_commands": [
+    "帮助",
+    "参谋",
+    "态势",
+    "下一步",
+    "行动",
+    "提交",
+    "裁判",
+    "下令",
+    "选择",
+    "草稿"
+  ],
+  "private_bottom_menu": [
+    "帮助",
+    "态势",
+    "下一步"
+  ],
+  "saved_and_reloaded": true,
+  "client_visibility_confirmation": false,
+  "proof_screenshot": "artifacts/bot-20261022/deploy/qq-referee-panel.png",
+  "screenshot_sha256": "566fe3cd774b9df985fc1486c197c97fdd2da6eb858f579e8e16036b432c57a4"
+}

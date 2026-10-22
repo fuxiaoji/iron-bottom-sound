@@ -102,9 +102,11 @@ def _cjk_font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
     override = os.environ.get("IBS_REPORT_FONT")
     names = [override] if override else []
     names += ["msyh.ttc", "simhei.ttf", "simsun.ttc", "Deng.ttf", "PingFang.ttc",
+              "Hiragino Sans GB.ttc", "STHeiti Medium.ttc",
               "NotoSansCJK-Regular.ttc", "wqy-microhei.ttc"]
     directories = ["C:/Windows/Fonts", "/System/Library/Fonts",
-                   "/usr/share/fonts", "/usr/local/share/fonts"]
+                   "/usr/share/fonts", "/usr/share/fonts/opentype/noto",
+                   "/usr/share/fonts/truetype/wqy", "/usr/local/share/fonts"]
     for name in names:
         if not name:
             continue
@@ -179,7 +181,8 @@ def _draw_wrecks(draw: ImageDraw.ImageDraw, observation: Any) -> None:
 
 
 def _draw_ships(
-    draw: ImageDraw.ImageDraw, observation: Any, ship_index: dict[str, str]
+    draw: ImageDraw.ImageDraw, observation: Any, ship_index: dict[str, str],
+    *, ship_names: bool = False,
 ) -> None:
     for ship in observation.ships:
         if ship.position is None:
@@ -194,9 +197,31 @@ def _draw_ships(
             [bow, (stern[0] + px * 7, stern[1] + py * 7), (stern[0] - px * 7, stern[1] - py * 7)],
             fill=color, outline=(255, 255, 255),
         )
-        token = ship_index.get(ship.id, "")
-        draw.text((cx - dx * 2, cy - dy * 2), token, fill="white",
-                  font=_cjk_font(12), anchor="mm")
+        if ship_names:
+            # QQ/MCP counters carry readable names at their observed hex. Unknown
+            # contacts stay anonymous; never recover their true names from state.
+            name = ship.name if ship.identified else "敌舰"
+            split = (len(name) + 1) // 2
+            lines = [name] if len(name) <= 2 else [name[:split], name[split:]]
+            font_size = 11
+            font = _cjk_font(font_size)
+            while font_size > 5 and max(draw.textlength(line, font=font) for line in lines) > 31:
+                font_size -= 1
+                font = _cjk_font(font_size)
+            draw.rounded_rectangle((cx - 17, cy - 14, cx + 17, cy + 14),
+                                   radius=3, fill=color, outline="white")
+            # Small compass pointer outside the name panel preserves the heading.
+            tip = (cx + dx * 23, cy + dy * 23)
+            base = (cx + dx * 16, cy + dy * 16)
+            draw.polygon([tip, (base[0] + px * 4, base[1] + py * 4),
+                          (base[0] - px * 4, base[1] - py * 4)], fill="white")
+            for i, line in enumerate(lines):
+                y = cy + (i - (len(lines) - 1) / 2) * (font_size + 1)
+                draw.text((cx, y), line, fill="white", font=font, anchor="mm")
+        else:
+            token = ship_index.get(ship.id, "")
+            draw.text((cx - dx * 2, cy - dy * 2), token, fill="white",
+                      font=_cjk_font(12), anchor="mm")
         if ship.fire_markers > 0:
             for i in range(min(ship.fire_markers, 3)):
                 fx, fy = cx + dx * (14 - i * 5), cy + dy * (14 - i * 5)
@@ -239,20 +264,24 @@ def _draw_annotations(
 
 
 def _wrap_text(draw: ImageDraw.ImageDraw, text: str, font, max_width: int) -> list[str]:
+    # Measure whole shaped substrings, but avoid re-shaping every growing prefix
+    # of a long CJK legend. Binary search preserves the exact pixel width bound.
     lines: list[str] = []
-    current = ""
-    for char in text:
-        if draw.textlength(current + char, font=font) > max_width and current:
-            lines.append(current)
-            current = char
-        else:
-            current += char
-    if current:
-        lines.append(current)
+    start = 0
+    while start < len(text):
+        low, high = start + 1, len(text)
+        while low < high:
+            middle = (low + high + 1) // 2
+            if draw.textlength(text[start:middle], font=font) <= max_width:
+                low = middle
+            else:
+                high = middle - 1
+        lines.append(text[start:low])
+        start = low
     return lines
 
 
-def render_map_image(state: GameState, engine: IronBottomEngine, side: Side) -> Image.Image:
+def render_map_image(state: GameState, engine: IronBottomEngine, side: Side, *, ship_names: bool = False) -> Image.Image:
     """单侧扩展海图截图。只画该侧观察可见集 + 公开地形。尺寸随局声明（默认 46×39 与既有一致）。"""
     observation = engine.observe(state.game_id, side)
     width, _legend_top, height = _map_geometry(state.map_columns, state.map_rows)
@@ -263,7 +292,7 @@ def render_map_image(state: GameState, engine: IronBottomEngine, side: Side) -> 
     _draw_torpedoes(draw, observation)
     _draw_wrecks(draw, observation)
     _, legend_parts, ship_index = _board_cells(state, engine, side)
-    _draw_ships(draw, observation, ship_index)
+    _draw_ships(draw, observation, ship_index, ship_names=ship_names)
     _draw_annotations(draw, state, observation, legend_parts)
     return image
 

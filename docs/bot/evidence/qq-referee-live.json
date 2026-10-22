@@ -1,0 +1,93 @@
+{
+  "feature_commit": "dd36c9d6d40109250caf891813add374e6d4784d",
+  "checked_at_utc": "2026-10-22T03:46:55.295861+00:00",
+  "user_confirmed_group_referee_reply_normal": true,
+  "client_slash_list_visibility_not_separately_confirmed": true,
+  "verified_admin_calls": 4,
+  "same_match": true,
+  "calls": [
+    {
+      "status": "done",
+      "action": "advance",
+      "steps": 1,
+      "mutated": true,
+      "result_revision": 5,
+      "frozen_revision": 4,
+      "usage": {
+        "completion_tokens": 44,
+        "prompt_cache_hit_tokens": 6912,
+        "prompt_cache_miss_tokens": 210,
+        "prompt_tokens": 7122,
+        "total_tokens": 7166
+      }
+    },
+    {
+      "status": "done",
+      "action": "report",
+      "steps": 1,
+      "mutated": false,
+      "result_revision": null,
+      "frozen_revision": 5,
+      "usage": {
+        "completion_tokens": 52,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 7062,
+        "prompt_tokens": 7446,
+        "total_tokens": 7498
+      }
+    },
+    {
+      "status": "done",
+      "action": "advance",
+      "steps": 1,
+      "mutated": true,
+      "result_revision": 6,
+      "frozen_revision": 5,
+      "usage": {
+        "completion_tokens": 44,
+        "prompt_cache_hit_tokens": 3968,
+        "prompt_cache_miss_tokens": 3499,
+        "prompt_tokens": 7467,
+        "total_tokens": 7511
+      }
+    },
+    {
+      "status": "done",
+      "action": "clarify",
+      "steps": 1,
+      "mutated": false,
+      "result_revision": null,
+      "frozen_revision": 6,
+      "usage": {
+        "completion_tokens": 122,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 7094,
+        "prompt_tokens": 7478,
+        "total_tokens": 7600
+      }
+    }
+  ],
+  "current_revision": 6,
+  "current_phase": "movement_planning",
+  "history": [
+    {
+      "before_revision": 4,
+      "operation": "referee_advance"
+    },
+    {
+      "before_revision": 5,
+      "operation": "referee_advance"
+    }
+  ],
+  "journal_exact_group_tag_counts": {
+    "command_llm_referee": 4,
+    "delivered": 5,
+    "image_delivered": 2,
+    "delivery_failed": 0
+  },
+  "inspector_connection": "read_only",
+  "actual_referee_advances_verified": 2,
+  "report_did_not_mutate": true,
+  "actual_patch_and_undo_not_tested_in_qq": true,
+  "client_image_display_not_separately_confirmed": true
+}

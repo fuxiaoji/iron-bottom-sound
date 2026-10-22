@@ -1,0 +1,58 @@
+[
+  {
+    "path": "artifacts/bot-20261022/pve-map-classic-axis.png",
+    "size": [
+      1786,
+      1936
+    ],
+    "sha256": "6be2beca55d42cc8a4e95e1e15eec2ca3b06b057e9c678033705d52d657c047a",
+    "visible_ships": 8,
+    "own_ships": 3,
+    "mode": "classic",
+    "side": "axis"
+  },
+  {
+    "path": "artifacts/bot-20261022/pve-map-classic-allies.png",
+    "size": [
+      1786,
+      1936
+    ],
+    "sha256": "e1cc637b923e80b37ffad4aa9fb799eed42d2ccaf50073f17d98e7fa6a6e038c",
+    "visible_ships": 8,
+    "own_ships": 5,
+    "mode": "classic",
+    "side": "allies"
+  },
+  {
+    "path": "artifacts/bot-20261022/pvp-map-classic-intersection.png",
+    "sha256": "5a93f18539d635620a967fc80dcd5342a6c3780af4632ff3d3944be87ac4d7b6"
+  },
+  {
+    "path": "artifacts/bot-20261022/pve-map-formation-axis.png",
+    "size": [
+      1786,
+      1936
+    ],
+    "sha256": "e4675fcf1c9e5d249492d4caa415d40bce5320ccf975bd6376fe7ab77c8b2eb2",
+    "visible_ships": 8,
+    "own_ships": 3,
+    "mode": "formation",
+    "side": "axis"
+  },
+  {
+    "path": "artifacts/bot-20261022/pve-map-formation-allies.png",
+    "size": [
+      1786,
+      1936
+    ],
+    "sha256": "21724ec6d6299ac58fe6f0b7ee9d1503a8caac3bb274c8178d89a76af58a9619",
+    "visible_ships": 8,
+    "own_ships": 5,
+    "mode": "formation",
+    "side": "allies"
+  },
+  {
+    "path": "artifacts/bot-20261022/pvp-map-formation-intersection.png",
+    "sha256": "676ee89ffbc807fa29d94e47e1a88811b8c34a79c3410847a4e871cbb71d790c"
+  }
+]

@@ -1,0 +1,40 @@
+{
+  "app_id": "1905878837",
+  "feature_commit": "110c4a435914783d9b81e72e3bb371cc9c06c25c",
+  "control_panel_url": "https://q.qq.com/qqbot/dashboard/manage/1905878837?sec=advanced&sub=menu-command",
+  "saved_and_reloaded": true,
+  "group_commands": [
+    "帮助",
+    "编队人机",
+    "普通人机",
+    "编队对战",
+    "普通对战",
+    "我的对局",
+    "战况",
+    "下一步",
+    "加入",
+    "绑定"
+  ],
+  "private_commands": [
+    "帮助",
+    "我的对局",
+    "态势",
+    "下一步",
+    "行动",
+    "建议",
+    "自动",
+    "确认"
+  ],
+  "private_menu": [
+    "帮助",
+    "态势",
+    "下一步"
+  ],
+  "observed_command_limit_per_scene": 10,
+  "qq_client_list_visibility": "user_confirmed_visible",
+  "screenshots": {
+    "qq-group-command-panel.png": "c065379deab5549a7c3ff3ef746d40a6fc0da33ee9be409d3304b221091dce8a",
+    "qq-private-menu.png": "d1b5fd8948eb430daa962e157d4dac506fc92bd682f0481178dbdcc221805318"
+  },
+  "detailed_next_step": "user_confirmed_received"
+}

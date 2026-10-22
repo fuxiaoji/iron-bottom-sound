@@ -189,3 +189,14 @@ pnpm run build
 - OCR 和全文检索只用于定位；表格与关键图必须回看原始页逐格核验。
 - 未核实规则不得进入裁决核心，统一登记到 `docs/rules/open_questions.md`。
 - 原始资料可能受版权保护；仓库应保持私有。
+
+## QQ 机器人与 MCP
+
+当前接入方案为 QQ 开放平台官方机器人，使用 AppID / AppSecret，无需普通 QQ 账号在线。配置与群/私聊席位绑定见 [官方接入指南](docs/bot/QQ_OFFICIAL.md)。
+
+普通/编队模式、PVE/PVP、群 @ 创建与加入、私聊阶段命令、群公共图/双方受限视角图，以及两个 MCP agent 共用对局的配置见 [QQ / MCP 文档](docs/bot/README.md)。启动共享服务：
+
+```sh
+python -m pip install -e '.[bot]'
+python -m uvicorn iron_bottom_sound.bot.app:create_app --factory --host 127.0.0.1 --port 3192 --env-file .env --workers 1
+```

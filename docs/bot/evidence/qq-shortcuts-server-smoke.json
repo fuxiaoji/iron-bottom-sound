@@ -1,0 +1,37 @@
+{
+  "feature_commit": "110c4a435914783d9b81e72e3bb371cc9c06c25c",
+  "verified_source_files": 9,
+  "mismatches": [],
+  "checked_at_utc": "2026-10-22T01:39:19.822044+00:00",
+  "production_match_rows_unchanged": true,
+  "snapshot_revision_unchanged": true,
+  "revision": 1,
+  "phase": "reinforcement",
+  "match_sha256": "92898c92d9c6cfbe9600d78d0204fdb982d902f844d1ef63206644ac30bd8cc9",
+  "checks": [
+    {
+      "command": "/下一步",
+      "reply_count": 1,
+      "png_count": 0,
+      "outbound_platform": "mock_only"
+    },
+    {
+      "command": "/态势",
+      "reply_count": 2,
+      "png_count": 1,
+      "outbound_platform": "mock_only"
+    },
+    {
+      "command": "/自动",
+      "reply_count": 1,
+      "png_count": 0,
+      "outbound_platform": "mock_only"
+    },
+    {
+      "command": "/帮助 推进",
+      "reply_count": 1,
+      "png_count": 0,
+      "outbound_platform": "mock_only"
+    }
+  ]
+}
