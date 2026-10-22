@@ -1,6 +1,6 @@
 {
   "archive": "ibs-bot-runtime.tar.gz",
-  "sha256": "758f342812a9ac1bf9857f71f0f8147b0d9d143fe4f19524e455345cb7917831",
+  "sha256": "941445ce0227697ed8b90e5daeef8f8ba7444b1e78e2dfd8ea11451c39752153",
   "sources": {
     "resources/originals/rules/iron-bottom-sound-iv-rules-zh.pdf": {
       "sha256": "0f14cbf1dee747d14e1fb52db77a4fff440076b2a96826f4299faa60b45c573e",
@@ -22,5 +22,8 @@
       "sha256": "5b9cd594846235d829228a202a8a8bb320baf5b0b7ee84753725fb1986fc79fd",
       "bytes": 2821411
     }
-  }
+  },
+  "feature_commit": "dd36c9d6d40109250caf891813add374e6d4784d",
+  "bytes": 68238745,
+  "members": 129
 }

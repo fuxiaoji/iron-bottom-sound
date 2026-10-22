@@ -1106,3 +1106,13 @@
 - 12源码部署匹配；私有DeepSeek鉴权/模型枚举200，专属env0600，不借视频/Coding Plan预算。真实API副本烟测2次：战报2.067s/3789tokens，订单0.729s/8409tokens，副本4→5，正式库只读且行摘要不变，QQ为Mock含图；重复不计费或推进。安全收据docs/bot/evidence/llm-live-smoke.json。
 - 用户反馈两条正常；正式群战报1与下令澄清2均回复成功、未提交/无新PNG标签，不能把用户确认解释成已实际推进。实群收据qq-llm-live.json如实区分；用户随后要更高权限/裁判，另批继续。
 - 运行包68229020字节/128成员，SHA256 758f342812a9ac1bf9857f71f0f8147b0d9d143fe4f19524e455345cb7917831，5来源OID一致。Bot/nginx/tiedi/hall active，bot健康200；源码/凭据/规则与研究来源边界保持。Draft PR #1继续，旧研究/FM02不推进。
+
+
+## 2026-10-22：管理员DeepSeek裁判（dd36c9d6）
+
+- 用户明确授权LLM完整游戏管理权限。新增群/私聊 `/裁判`：创建、双方阶段推进、坐标/正舰体/已有武器运行状态/进度修正、撤销；服务端固定管理员身份与冻结版本，完整私有before快照含RNG，递增revision，pending/prepared/done防重。跨容器生命周期字段明确拒绝，原始来源/规则/账号/文件权限不在接口内。推进使用既有状态机补双方缺令，再经原引擎，不宣称LLM逐舰制定战术。
+- 功能提交dd36c9d6d40109250caf891813add374e6d4784d；最终同一源码 `.venv/bin/python -m pytest`（此前llm-release.xml列出的17文件及test_bot_referee.py/test_bot_qq_referee.py）542通过/0失败/0跳过，129.265s；raw artifacts/bot-20261022/referee-release.xml SHA256 c3df5814ab54a18856b46a7faaf41c83a58a258d9951ae8d29b4a3f510b78fb0。64服务/124客户端/15恢复路由定点不累加；初服务fixture漏role的1失败/46通过XML保留。
+- group_map（gpt-6.1-sol/high）独占客户端并独立有限审计，qq_guidance（继承root，精确运行ID/独立用量不可取）独占referee.py/service.py/服务测试，Root集成路由/帮助/恢复修正/部署。最终审计找到的元数据、坐标、猜隐藏舰、create finalize、QQ缓存五路径全在冻结SHA复验通过，安全audit SHA 475fcf241316acd4f97386e4c6500654147f90bc60b75387b5d24388ca3fe4d6；不声称研究独立模型结论。
+- 真实DeepSeek副本4请求create/advance/patch/undo通过：1.014/0.729/1.373/1.225s，7217/6863/7003/6994tokens；副本0→1→2→3，undo完整JSON/RNG恢复，重复/非管理员0新增API。首轮烟测进度器跨线程SQLite夹具错误的1请求0.834s/7216tokens也保留（模型create合法但未应用），本批5真实请求。正式库只读，行摘要不变；QQ发送全部Mock含PNG，不能称实群修改。
+- 13源码部署匹配，运行进程管理员1名，env0600；Bot/nginx/tiedi/hall active、健康/HTTP探针200。一次误读健康字段及一次系统Python3.6验证助手错误保留说明，纠正验证后通过，无重复重启。当前包68238745字节/129成员，SHA256 941445ce0227697ed8b90e5daeef8f8ba7444b1e78e2dfd8ea11451c39752153，5来源OID匹配。
+- 好友/群各10预设保存重载，加入裁判，旧自动/我的对局仍可输入；截图本地artifacts/bot-20261022/deploy/qq-referee-panel.png。安全公开收据docs/bot/evidence/referee-{audit,live-smoke,deployment}.json及qq-referee-panel.json。真实QQ群管理员只读裁判/预设显示反馈待验，不沿用旧参谋确认；其他模式真人PVP/完整LLM终局继续待验。Draft PR #1保留，研究/FM02暂停点不动。

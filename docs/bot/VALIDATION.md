@@ -12,6 +12,20 @@ GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.jso
 
 首次真实「创建 编队pve」因参数连写返回用法；修复后用户原命令重发，成功建立 formation/PVE、盟军席位的对局。C2C 申请码、正确群作者确认绑定均有真实回调与回复；数据库确认唯一别名与已消费挑战。首次真实私聊「自动 0」从编队部署推进到第 1 回合增援、revision 1，日志 `command_auto`、`image_delivered`、`delivered` 证明腾讯 API 确认本方 PNG 发送。随后真实群「战况」触发 `command_public_map`、`image_delivered`、`delivered`，用户确认「两处都有图」。API 回执和用户实际显示确认为两种独立证据；本轮不包含逐像素或全局终局验收。当前未认证应用的管理员/群主范围与后续个人认证说明见 [QQ_OFFICIAL.md](QQ_OFFICIAL.md)。普通 QQ 账号历史限制 168 不再作为这条路线的阻断。
 
+### 管理员 DeepSeek 裁判（dd36c9d6）
+
+功能提交 `dd36c9d6d40109250caf891813add374e6d4784d` 已部署，13个源码摘要匹配。新增 `/裁判` 自然语言创建、双方阶段推进、状态修正、最近快照撤销及只读解释。生产运行进程只配置1名已验证管理员，私有env为0600；普通成员或自称管理员的提示不能提权。修改边界与生命周期限制见[管理员裁判](QQ_OFFICIAL.md#管理员-llm-裁判)。
+
+最终同一源码主整合回归 `referee-release.xml` 为 **542通过 / 0失败 / 0跳过，129.265秒**。原423项范围加裁判服务、客户端和QQ路由，不把重叠单批相加。服务定点64项、客户端124项、恢复路由15项均有独立原始XML摘要。初次服务夹具漏 `role=assistant` 的1失败/46通过保留，修正夹具后重验；不得把初失败改为通过。
+
+独立[有限审计](evidence/referee-audit.json)找到并验证修复：客户端metadata与六字段协议边界、地图坐标调用、模型猜隐藏舰、创建已提交但最终收据失败、QQ缓存挡住恢复。最终在冻结SHA下复验；一次或连续两次故障后均仅1次模型、1局，对同一事件恢复为done且回复msg_seq不重复。审计用真实客户端+MockTransport和隔离引擎，真实API调用0，不冒称独立模型提供研究结论。
+
+[真实DeepSeek副本验证](evidence/referee-live-smoke.json)顺序调用4次：创建1.014秒/7217tokens，推进0.729秒/6863tokens，位置+正舰体修正1.373秒/7003tokens，撤销1.225秒/6994tokens。副本版本0→1→2→3，撤销后完整状态JSON与修正前相等（包括RNG）；重复撤销及非管理员均无新增模型请求或推进。正式SQLite只读连接复制，正式行摘要不变；QQ发送为Mock且每次成功操作返回1张PNG，不能称实际群修改验收。
+
+另有[初次真实调用夹具失败](evidence/referee-live-smoke-initial.json)：模型create合法返回，记录进度时跨线程查询主线程创建的只读SQLite触发异常，隔离局未创建；该次1请求0.834秒/7216tokens如实保留。修正烟测只读连接的线程设置后，上述4请求全部通过；本批共5次真实API调用，不隐去失败成本。未因该夹具修改产品代码。首次部署检查误将健康字段当ok布尔值、随后用系统Python3.6执行仅支持新版本的text参数，均是验证助手错误；改用健康status字段与已有Python3.11后完成，服务保持active，没有重复重启。
+
+[部署收据](evidence/referee-deployment.json)确认Bot/Nginx/旧游戏/大厅active，13192健康、旧游戏API、4180 HTTP探针均200（4180只为HTTP探针，不冒称引擎JSON健康）。[预设](evidence/qq-referee-panel.json)的好友/群各10条已保存重载；群“我的对局”、私聊“自动”的面板位置换为“裁判”，旧文本指令仍有效。当前运行包68,238,745字节/129成员，SHA256 `941445ce0227697ed8b90e5daeef8f8ba7444b1e78e2dfd8ea11451c39752153`，5份LFS原始来源核验通过。真实QQ管理员只读裁判回复/客户端预设显示已请求用户验证，尚未以旧版参谋确认代替；正式局未由验证脚本推进。
+
 ### DeepSeek群参谋与自然语言下令（a43f6fab）
 
 功能a43f6fab18c8cc675ba667bedc5aaf0f2887dc82已部署，12源码摘要匹配。/参谋只读战报/建议，/下令仅当前发令者自有席位；原引擎最终验证。PVE群看玩家受限观察，PVP报告只看交集且下令/澄清群回执不展开私有战术。SQLite pending/prepared/done持久防重，模型IO不持锁，失败无状态机回退。完整说明与API字段来源见[QQ_OFFICIAL.md](QQ_OFFICIAL.md#llm-参谋与自然语言下令)。
@@ -22,7 +36,7 @@ GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.jso
 
 用户反馈“两条都正常”；实际官方群日志有参谋与两次下令回复成功。正式LLM收据为战报1次、下令澄清2次，均未提交，没有新PNG投递标签。第一次混合炮击/移动/雷击阶段要求，第二次仅说推进阶段；应记录为战报及澄清成功，不假称实群已推进。[实群收据](evidence/qq-llm-live.json)。当前好友/群各10条预设保存重载核验，见[面板](evidence/qq-llm-panel.json)。后续用户要求管理员裁判完整对局权限，另批开发，不把该需求当旧下令已支持。
 
-当前包68229020字节/128成员，SHA256 758f342812a9ac1bf9857f71f0f8147b0d9d143fe4f19524e455345cb7917831，5来源OID核验。Bot/Nginx/旧游戏/大厅active，bot健康200；凭据仅服务器私有env，公开证据无原始身份或聊天。
+该批当时的包68229020字节/128成员，SHA256 758f342812a9ac1bf9857f71f0f8147b0d9d143fe4f19524e455345cb7917831，5来源OID核验。Bot/Nginx/旧游戏/大厅active，bot健康200；凭据仅服务器私有env，公开证据无原始身份或聊天。
 
 ### PVE 群图与可操作的手动草稿（5bc33acc）
 

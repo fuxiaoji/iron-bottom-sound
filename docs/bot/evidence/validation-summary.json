@@ -378,6 +378,78 @@
       "errors": 0,
       "skipped": 0,
       "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/referee-client.xml",
+      "sha256": "2c706aadc7904c60e4234c9563768f5330e96661f181918e0ad2a658c4310e57",
+      "tests": 124,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.445,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/referee-routing-first.xml",
+      "sha256": "1c09bd8d1aebf066f5e61b13b3f671367059f4efda062415e1a795fc66e27ac5",
+      "tests": 67,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 6.809,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/referee-service-initial.xml",
+      "sha256": "040a17f77dc37f0adea99d478e169256945146b2c744e2d2de197314b5f0ad29",
+      "tests": 47,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 16.029,
+      "failed_test_names": [
+        "test_real_client_mock_transport_metadata_connects_and_never_echoes_provider_internals"
+      ]
+    },
+    {
+      "receipt": "artifacts/bot-20261022/referee-service-client.xml",
+      "sha256": "8509e64f44426696b5ac516b8ff29513a3fc561a32e79b631a54f139683fba2f",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.405,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/referee-service.xml",
+      "sha256": "5cce20fd0d917c86d17c72228b840ff9b1a3ada71cbec03b1779ee19023f1264",
+      "tests": 64,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 22.344,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/referee-recovery-routing.xml",
+      "sha256": "14d66ba82662475e79f218fceb330ebbb769de5e1c8f8b9cd5e4b61d14728da1",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.235,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/referee-release.xml",
+      "sha256": "c3df5814ab54a18856b46a7faaf41c83a58a258d9951ae8d29b4a3f510b78fb0",
+      "tests": 542,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 129.265,
+      "failed_test_names": []
     }
   ]
 }

@@ -1,0 +1,34 @@
+{
+  "feature_commit": "dd36c9d6d40109250caf891813add374e6d4784d",
+  "status": "failed_validation_fixture",
+  "model": "deepseek-flash",
+  "attempts": [
+    {
+      "task": "referee",
+      "result": "accepted",
+      "action": "create",
+      "elapsed_seconds": 0.834,
+      "usage": {
+        "prompt_tokens": 7137,
+        "completion_tokens": 79,
+        "total_tokens": 7216,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 7137
+      }
+    }
+  ],
+  "checks": [
+    {
+      "command": "create",
+      "reply_count": 1,
+      "max_text_chars": 31,
+      "png_count": 0,
+      "qq_delivery": "mock_only"
+    }
+  ],
+  "production_match_rows_unchanged": true,
+  "cause": "SQLite read-only source connection was created on main thread but queried in callback worker while writing progress receipt",
+  "fix": "Allow the read-only source connection on the worker; product source unchanged",
+  "isolated_game_created": false,
+  "raw_receipt_sha256": "d870e32557a002bf97ae6da56807fb782fb9cdcce37f6b3f1c0114f8b041a786"
+}

@@ -1,0 +1,120 @@
+{
+  "feature_commit": "dd36c9d6d40109250caf891813add374e6d4784d",
+  "verified_source_files": 13,
+  "checked_at_utc": "2026-10-22T03:35:25.388945+00:00",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "production_database_connection": "read_only",
+  "production_match_rows_unchanged": true,
+  "isolated_new_match_created": true,
+  "mode": "classic",
+  "snapshot_revisions": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "patch_position_and_hull_verified": true,
+  "undo_restored_full_state_and_rng": true,
+  "duplicate_did_not_call_model_or_mutate": true,
+  "unauthorized_did_not_call_model_or_mutate": true,
+  "real_model_attempts": 4,
+  "attempts": [
+    {
+      "task": "referee",
+      "result": "accepted",
+      "action": "create",
+      "elapsed_seconds": 1.014,
+      "usage": {
+        "prompt_tokens": 7137,
+        "completion_tokens": 80,
+        "total_tokens": 7217,
+        "prompt_cache_hit_tokens": 6912,
+        "prompt_cache_miss_tokens": 225
+      }
+    },
+    {
+      "task": "referee",
+      "result": "accepted",
+      "action": "advance",
+      "elapsed_seconds": 0.729,
+      "usage": {
+        "prompt_tokens": 6822,
+        "completion_tokens": 41,
+        "total_tokens": 6863,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 6438
+      }
+    },
+    {
+      "task": "referee",
+      "result": "accepted",
+      "action": "patch",
+      "elapsed_seconds": 1.373,
+      "usage": {
+        "prompt_tokens": 6903,
+        "completion_tokens": 100,
+        "total_tokens": 7003,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 6519
+      }
+    },
+    {
+      "task": "referee",
+      "result": "accepted",
+      "action": "undo",
+      "elapsed_seconds": 1.225,
+      "usage": {
+        "prompt_tokens": 6942,
+        "completion_tokens": 52,
+        "total_tokens": 6994,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 6558
+      }
+    }
+  ],
+  "checks": [
+    {
+      "command": "create",
+      "reply_count": 2,
+      "max_text_chars": 70,
+      "png_count": 1,
+      "qq_delivery": "mock_only"
+    },
+    {
+      "command": "advance",
+      "reply_count": 2,
+      "max_text_chars": 80,
+      "png_count": 1,
+      "qq_delivery": "mock_only"
+    },
+    {
+      "command": "patch",
+      "reply_count": 2,
+      "max_text_chars": 76,
+      "png_count": 1,
+      "qq_delivery": "mock_only"
+    },
+    {
+      "command": "undo",
+      "reply_count": 2,
+      "max_text_chars": 83,
+      "png_count": 1,
+      "qq_delivery": "mock_only"
+    },
+    {
+      "command": "duplicate_undo",
+      "reply_count": 0,
+      "max_text_chars": 0,
+      "png_count": 0,
+      "qq_delivery": "mock_only"
+    },
+    {
+      "command": "unauthorized",
+      "reply_count": 1,
+      "max_text_chars": 18,
+      "png_count": 0,
+      "qq_delivery": "mock_only"
+    }
+  ]
+}
