@@ -226,7 +226,7 @@ def test_group_create_accepts_compact_mode_opponent(bot, word, mode, opponent):
     calls = [args for name, args in service.calls if name == 'create']
     assert len(calls) == 1
     assert (calls[0]['mode'], calls[0]['opponent'], calls[0]['side']) == (mode, opponent, 'axis')
-    assert 'match_id' in messages(seen)[0]['content']
+    assert '对局 match1' in messages(seen)[0]['content']
 
 
 def test_compact_create_still_requires_signed_authorized_group(bot):

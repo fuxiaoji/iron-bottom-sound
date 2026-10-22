@@ -26,24 +26,23 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from starlette.concurrency import run_in_threadpool
 import httpx
 
+from .qq_guidance import help_text, next_steps, status_text
+
 logger = logging.getLogger("uvicorn.error")
 ACK = {"op": 12, "d": 0}
 API = "https://api.sgroup.qq.com"
 TOKEN_URL = "https://bots.qq.com/app/getAppAccessToken"
-HELP = """铁底湾：帮助 / 列表 / 创建 普通|编队 pve|pvp [想定ID] [盟军|日军]
-加入 对局ID / 状态 [对局ID] / 战况 对局ID（公共地图）
-私聊：铁底湾 群openid 对局ID 态势|行动 [舰ID]|建议
-私聊：铁底湾 群openid 对局ID 提交 版本 JSON对象 / 自动 版本 / 确认 版本
-私聊绑定席位：铁底湾 群openid 对局ID 绑定 盟军|日军
-随后本人在对应群@机器人：绑定 私聊获得的验证码
-版本号来自态势。PVP另一席请主动查询更新；平台主动推送已停止。
-私聊读取席位前必须完成可信身份绑定，不根据原始openid相同自动关联。"""
-GROUP_COMMANDS = {"帮助", "列表", "创建", "加入", "状态", "战况", "绑定"}
+HELP = help_text("group")
+GROUP_COMMANDS = {"帮助", "列表", "创建", "加入", "状态", "战况", "绑定", "下一步"}
 TACTICAL = {"态势", "行动", "建议", "提交", "自动", "确认", "截图"}
+ALIASES = {"help": "帮助", "菜单": "帮助", "新手": "帮助 快速开始", "教程": "帮助 快速开始",
+           "推进帮助": "帮助 推进", "绑定帮助": "帮助 绑定", "手动帮助": "帮助 手动",
+           "我的对局": "状态", "推进": "自动", "编队人机": "创建 编队pve",
+           "普通人机": "创建 普通pve", "编队对战": "创建 编队pvp", "普通对战": "创建 普通pvp"}
 COMMAND_LABELS = {"帮助": "help", "列表": "list", "创建": "create", "加入": "join",
                   "状态": "status", "战况": "public_map", "绑定": "bind", "态势": "situation",
                   "行动": "legal", "建议": "suggest", "提交": "submit", "自动": "auto",
-                  "确认": "confirm", "截图": "screenshot"}
+                  "确认": "confirm", "截图": "screenshot", "下一步": "next_steps"}
 ERROR_LABELS = {name: "rejected_" + name for name in (
     "forbidden", "not_found", "identity", "identity_link", "identity_link_conflict",
     "identity_link_expired", "identity_link_limit", "room", "room_limit", "scenario",
@@ -153,31 +152,60 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
     receipts: OrderedDict[str, dict] = OrderedDict()
     receipt_lock = asyncio.Lock()
 
+    def private_matches(actor):
+        # Enumeration uses the same authenticated seat/alias checks as status.
+        # Never infer a C2C identity from a group member OpenID.
+        result = []
+        for group in sorted(settings.allowed_groups):
+            room = "qqbot:" + settings.app_id + ":" + group
+            for value in service.matches(actor_id=actor, room_id=room):
+                result.append({k: value[k] for k in (
+                    "match_id", "revision", "turn", "phase", "side", "mode", "opponent",
+                    "ready", "started", "complete") if k in value} | {"group_openid": group})
+        return result
+
+    def choose_match(values, hint=""):
+        candidates = [v for v in values if v["match_id"] == hint] if hint else [
+            v for v in values if not v.get("complete")]
+        if not candidates and not hint:
+            candidates = values
+        if len(candidates) == 1:
+            return candidates[0]
+        if not values:
+            raise ValueError("还没有可用的已绑定对局。先在群中创建/加入，再完成私聊绑定。\n发送 /帮助 绑定 查看步骤。")
+        choices = "\n".join("/态势 " + v["match_id"] for v in values[:10])
+        raise ValueError(("没有找到你已加入的该对局。" if hint else "你有多个对局，请指定对局ID，不会自动替你选择。")
+                         + "\n" + choices)
+
     def commands(scope, data, actor, room, rid):
         text = data["content"].strip()
         # GROUP_AT_MESSAGE_CREATE itself is the signed mention gate.
         if scope == "group":
             text = re.sub(r"^(?:<@!?[^>\s]{1,128}>\s*)+", "", text)
+        text = text.removeprefix("/").removeprefix("／").lstrip()
         if text.startswith("铁底湾"):
             text = text[len("铁底湾"):].lstrip()
-        elif scope == "c2c":
-            return [("text", "私聊指令请以 铁底湾 开头。\n" + HELP)]
-        if text in {"", "帮助"}:
-            return [("text", HELP)]
+        text = text.removeprefix("/").removeprefix("／").lstrip()
+        head = text.split(maxsplit=1)
+        if head and head[0] in ALIASES:
+            text = ALIASES[head[0]] + (" " + head[1] if len(head) > 1 else "")
+        head = text.split(maxsplit=1)
+        if not head or head[0] == "帮助":
+            return [("text", help_text(scope, head[1] if len(head) > 1 else ""))]
         if scope == "group":
             parts = text.split()
             command, args = parts[0], parts[1:]
             _log(scope, "command_" + COMMAND_LABELS.get(command, "unknown"))
             if command in TACTICAL:
-                return [("text", "本方态势和战术命令请私聊：铁底湾 群openid 对局ID 态势。")]
+                return [("text", "本方态势和战术命令请私聊。绑定后直接发送 /态势 或 /下一步；首次绑定请看 /帮助 绑定。")]
             if command not in GROUP_COMMANDS:
-                return [("text", HELP)]
+                return [("text", help_text(scope))]
             if command == "列表":
                 return [("text", _json([{k: v[k] for k in ("id", "scenario_id", "title", "name") if k in v}
                                          for v in service.catalog()]))]
             if command == "绑定" and len(args) == 1:
                 value = service.claim_identity_link(args[0], actor_id=actor, room_id=room)
-                return [("text", "席位私聊身份已绑定。" if value.get("linked") is True else "绑定未完成。")]
+                return [("text", "席位私聊身份已绑定。\n现在私聊发送 /态势 看本方地图，或 /下一步 看该怎样推进。" if value.get("linked") is True else "绑定未完成。")]
             if command == "创建":
                 # QQ users commonly type the mode and opponent together. Split
                 # only this exact command token; never rewrite order JSON.
@@ -195,20 +223,72 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
                     mode={"普通": "classic", "编队": "formation"}[args[0]], opponent=args[1].lower(),
                     scenario_id=extra[0] if extra else "IBS-S-03", side=side, seed=1, request_id=rid)
                 _log(scope, "create_accepted")
-                return [("text", _public(value) + f"\n私聊：铁底湾 {data['group_openid']} {value['match_id']} 态势")]
-            if command == "加入" and len(args) == 1:
-                return [("text", _public(service.join(args[0], actor_id=actor, room_id=room, request_id=rid)))]
+                return [("text", status_text(value) + "\n先把下面整行发给机器人私聊，取得验证码后回本群由本人@确认：\n"
+                    + f"铁底湾 {data['group_openid']} {value['match_id']} 绑定 " + {"allies": "盟军", "axis": "日军"}[side]
+                    + "\n绑定后私聊 /下一步；群内 /战况 查询双方共同可见地图。")]
+            if command == "加入":
+                if len(args) != 1:
+                    return [("text", "请在群中@机器人发送 /加入 对局ID。对局ID在创建者的回复中；PVP另一席加入后双方分别绑定私聊。")]
+                value = service.join(args[0], actor_id=actor, room_id=room, request_id=rid)
+                return [("text", status_text(value) + "\n请先私聊绑定自己席位，再用 /下一步 查看当前阶段：\n"
+                    + f"铁底湾 {data['group_openid']} {value['match_id']} 绑定 " + {"allies": "盟军", "axis": "日军"}.get(value.get("side"), "盟军|日军"))]
+            if command == "绑定" and not args:
+                return [("text", help_text(scope, "绑定"))]
             if command == "状态" and not args:
-                return [("text", "\n".join(_public(v) for v in service.matches(actor_id=actor, room_id=room)) or "你尚未加入对局。")]
-            if command in {"状态", "战况"} and len(args) == 1:
-                result = [("text", _public(service.public_status(args[0], room_id=room)))]
+                return [("text", "\n\n".join(status_text(v) for v in service.matches(actor_id=actor, room_id=room)) or "你尚未加入对局。可发送 /编队人机 开始，或 /加入 对局ID。")]
+            if command in {"战况", "下一步"} and not args:
+                values = service.matches(actor_id=actor, room_id=room)
+                try:
+                    args = [choose_match(values)["match_id"]]
+                except ValueError:
+                    return [("text", "请发送 /" + command + " 对局ID；先用 /我的对局 查看自己的对局编号。")]
+            if command in {"状态", "战况", "下一步"} and len(args) == 1:
+                value = service.public_status(args[0], room_id=room)
+                result = [("text", status_text(value) + "\n" + next_steps(value))]
                 if command == "战况":
                     result.append(("image", service.public_screenshot(args[0], room_id=room)))
                 return result
             raise ValueError("指令参数错误，请发送 帮助。")
+
+        # Short private commands resolve only an authenticated, already-owned
+        # seat in allowlisted rooms. Explicit legacy group/match syntax remains.
+        short = text.split(maxsplit=1)
+        if short and short[0] in TACTICAL | {"状态", "下一步", "绑定"}:
+            command, tail = short[0], short[1] if len(short) > 1 else ""
+            _log(scope, "command_" + COMMAND_LABELS.get(command, "unknown"))
+            if command == "绑定":
+                return [("text", help_text(scope, "绑定"))]
+            values = private_matches(actor)
+            if command == "状态" and not tail:
+                return [("text", "\n\n".join(status_text(v, private=True) + "\n/态势 " + v["match_id"] for v in values[:10])
+                         or "尚未绑定对局。请先群内创建/加入，然后按 /帮助 绑定 操作。")]
+            hint, rest = "", ""
+            if command in {"自动", "确认"}:
+                args = tail.split()
+                if args and (not re.fullmatch(r"[0-9]{1,10}", args[0]) or len(args) > 2):
+                    raise ValueError("用法：/" + command + " 版本号 [对局ID]。先发 /下一步 查看当前版本；未执行操作。")
+                hint = args[1] if len(args) == 2 else ""
+                rest = args[0] if args else ""
+            elif command == "提交":
+                rest = tail
+                args = tail.split(maxsplit=2)
+                if len(args) == 3 and not args[1].startswith("{") and args[2].lstrip().startswith("{"):
+                    hint, rest = args[1], args[0] + " " + args[2]
+            else:
+                args = tail.split(maxsplit=1)
+                if len(args) > 1 and command != "行动":
+                    raise ValueError("用法：/" + command + " [对局ID]")
+                hint = args[0] if args else ""
+                rest = args[1] if len(args) > 1 else ""
+            selected = choose_match(values, hint)
+            if command in {"自动", "确认"} and not rest:
+                value = service.status(selected["match_id"], actor_id=actor,
+                    room_id="qqbot:" + settings.app_id + ":" + selected["group_openid"])
+                return [("text", "尚未提交任何命令。\n" + status_text(value, private=True) + "\n" + next_steps(value, private=True))]
+            text = selected["group_openid"] + " " + selected["match_id"] + " " + command + (" " + rest if rest else "")
         parts = text.split(maxsplit=3)
         if len(parts) < 3:
-            raise ValueError("用法：铁底湾 群openid 对局ID 态势|行动|建议|提交 版本 JSON")
+            return [("text", "未识别这条指令。绑定后可直接发送 /态势 或 /下一步。\n" + help_text(scope))]
         group, match, command = _openid(parts[0]), parts[1], parts[2]
         _log(scope, "command_" + COMMAND_LABELS.get(command, "unknown"))
         if group not in settings.allowed_groups:
@@ -223,19 +303,27 @@ def create_qq_official_router(service, settings: QQOfficialSettings, *, client: 
             return [("text", f"请在目标群由该席位本人@机器人发送：绑定 {value['code']}\n有效期{value['expires_in']}秒；绑定前不能读取该席位态势。")]
 
         def situation(value):
-            return [("text", _public(value) + "\n" + str(value.get("summary", ""))),
+            events = str(value.get("summary", "")).splitlines()[1:]
+            return [("text", status_text(value, private=True) + "\n" + next_steps(value, private=True)
+                     + ("\n最近战况：\n" + "\n".join(events) if events else "")),
                     ("image", service.screenshot(match, **context))]
 
         if command in {"态势", "截图"} and not rest:
             return situation(service.status(match, **context))
+        if command == "下一步" and not rest:
+            value = service.status(match, **context)
+            return [("text", status_text(value, private=True) + "\n" + next_steps(value, private=True))]
         if command == "行动":
             value = service.legal(match, **context)
             if rest:
                 value = {k: value[k] for k in ("match_id", "revision", "phase") if k in value} | {
                     "selected_ship": rest, "actions": [a for a in value.get("actions", []) if a.get("ship_id") == rest]}
             return [("text", _json(value))]
-        if command in {"建议", "状态"} and not rest:
-            return [("text", _json((service.suggest if command == "建议" else service.status)(match, **context)))]
+        if command == "状态" and not rest:
+            value = service.status(match, **context)
+            return [("text", status_text(value, private=True) + "\n" + next_steps(value, private=True))]
+        if command == "建议" and not rest:
+            return [("text", _json(service.suggest(match, **context)))]
         if command not in {"提交", "自动", "确认"}:
             raise ValueError("未识别私聊指令。")
         args = rest.split(maxsplit=1)
