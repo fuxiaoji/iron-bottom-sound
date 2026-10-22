@@ -234,6 +234,69 @@
       "errors": 0,
       "skipped": 0,
       "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/manual-ui-and-map.xml",
+      "sha256": "abb9c1077533f8b94ac0d8d5cbb8a591616b80321b50909c3db9460e4a2036a7",
+      "tests": 158,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/manual-commands.xml",
+      "sha256": "acef10da7d50994a5d2aae2a1c94cc42ccb0ed8a418179e507965dd31160c62f",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/manual-commands-final.xml",
+      "sha256": "f1c273578777ece8d55258bf4c0c2a0716a12b340a344596220c05cc5eb4ff5c",
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/manual-draft-guard.xml",
+      "sha256": "70c9d07ca6ffb8382ef88a313f62c461d640d97ecf885e02ce77f20e12a21047",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/manual-qq-protocol.xml",
+      "sha256": "aebc6ce95ae18f7db43ff53b71af686d2794fdb9aa6fa7170dc50f57c89edd13",
+      "tests": 133,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/group-map-final.xml",
+      "sha256": "3a94877eb3643fbd9d56c24e3eabdca0022c19dbb57f56f5cfa00a4da7fe07cf",
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
+    },
+    {
+      "receipt": "artifacts/bot-20261022/manual-group-release.xml",
+      "sha256": "1b65df6396e14752271fb51489d618ef078339b026f2845e8e669b57b9082993",
+      "tests": 289,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test_names": []
     }
   ]
 }

@@ -6,13 +6,27 @@ GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.jso
 
 ## 官方方案：已验证与仍待验收
 
-按用户指示创建应用，AppSecret 由用户本人重置后，服务器完成私有配置与官方 token 交换。平台已保存 Webhook 地址 `https://fuwenji.asia/ibs-bot/qq-official/events`；01:33:36 的真实平台 HTTP 挑战返回 200，服务记录 `challenge_signed`，腾讯平台验证回调并成功保存。验收依据为平台成功保存与服务端挑战记录，见 [official-callback.json](../../artifacts/bot-20261022/deploy/official-callback.json)。服务器伪造业务探针为 401，GET 为 405；旧游戏服务同时返回 200。官方网关/绑定提交为 `65eb4c8b`，连写解析与静态投递审计为 `160aa235`，当前斜杠短命令/新手引导为 `110c4a435914783d9b81e72e3bb371cc9c06c25c`；服务器 9 个源码摘要与后者匹配。
+按用户指示创建应用，AppSecret 由用户本人重置后，服务器完成私有配置与官方 token 交换。平台已保存 Webhook 地址 `https://fuwenji.asia/ibs-bot/qq-official/events`；01:33:36 的真实平台 HTTP 挑战返回 200，服务记录 `challenge_signed`，腾讯平台验证回调并成功保存。验收依据为平台成功保存与服务端挑战记录，见 [official-callback.json](../../artifacts/bot-20261022/deploy/official-callback.json)。服务器伪造业务探针为 401，GET 为 405；旧游戏服务同时返回 200。官方网关/绑定提交为 `65eb4c8b`，连写解析为 `160aa235`，斜杠/引导为 `110c4a43`；当前群图/手动草稿修复为 `5bc33acc88de7f04560e06eeb8aebb33241d01c9`，服务器 10 个源码摘要匹配。
 
 `GROUP_AT_MESSAGE_CREATE`、`C2C_MESSAGE_CREATE` 两项订阅已保存。用户真实 @ 触发验签、回复成功，服务器从该事件发现唯一真实 `group_openid` 并配置白名单，没有把数字群号猜成 OpenID。私有表 `bot_official_groups` 只存应用、群 OpenID 和最后发现时间，不存正文、发送者或命令。安全实群收据仅发布群与对局摘要，不发布成员、私聊身份或验证码。
 
 首次真实「创建 编队pve」因参数连写返回用法；修复后用户原命令重发，成功建立 formation/PVE、盟军席位的对局。C2C 申请码、正确群作者确认绑定均有真实回调与回复；数据库确认唯一别名与已消费挑战。首次真实私聊「自动 0」从编队部署推进到第 1 回合增援、revision 1，日志 `command_auto`、`image_delivered`、`delivered` 证明腾讯 API 确认本方 PNG 发送。随后真实群「战况」触发 `command_public_map`、`image_delivered`、`delivered`，用户确认「两处都有图」。API 回执和用户实际显示确认为两种独立证据；本轮不包含逐像素或全局终局验收。当前未认证应用的管理员/群主范围与后续个人认证说明见 [QQ_OFFICIAL.md](QQ_OFFICIAL.md)。普通 QQ 账号历史限制 168 不再作为这条路线的阻断。
 
-### 斜杠预设与详细推进引导（110c4a43）
+### PVE 群图与可操作的手动草稿（5bc33acc）
+
+用户实际反馈推翻了“收到 PNG 与提示即可操作”的假设：PVE 仍取双方观察交集，因本方真实 ID 与敌方观察别名不同，实局交集为 0 艘；`/行动` 发送整个嵌套 schema 超过被动回复上限，旧舰 ID 筛选还错误匹配顶层动作。没有据此改引擎识别规则。PVE 群图改用唯一人类席位的受限观察，PVP 保持交集并增加空图提示；菜单从本方提示构造代表选项，选择进入持久私有草稿，原引擎负责最终提交校验。未选动作不代填。
+
+最终同一源码快照 [manual-group-release.xml](../../artifacts/bot-20261022/manual-group-release.xml) 为 **289 passed / 0 failed / 0 skipped**。覆盖两模式/两阵营 PVE 投影和隐藏负例、PVP 交集、席位与群隔离、分页/筛选、选择/替换/清空不推进、草稿重启恢复、多实例修改草稿后拒绝旧提交、当前版本校验与幂等、旧 JSON 与 OneBot 兼容。详细计数与原始收据摘要见 [validation-summary.json](evidence/validation-summary.json)，各批不累加。
+
+部署后 [manual-group-server-smoke.json](evidence/manual-group-server-smoke.json) 验证 10 个源码摘要。正式数据库以只读连接备份至内存，使用现有绑定的实际版本 4 / 炮战阶段，群图渲染 8 艘玩家可见船，经过原 QQ 路由模拟群战况、私聊行动、选择、草稿、提交及重复消息；副本从版本 4 推进到 5，正式对局行摘要前后相同。行动回复为 434 字符/1 条，选择 120 字符，草稿 128 字符，提交 2 条含本方 PNG。所有平台发送为 MockTransport，不是实群确认。初次烟测脚本为同一消息 ID 生成了不同时间戳，被防重放检查拒绝；修正为重放完全相同事件后通过，此次夹具失败不计为产品推进失败。
+
+实际版本 4 群图保存在本地 [manual-group-live-before.png](../../artifacts/bot-20261022/deploy/manual-group-live-before.png)，已视觉核验有带名称舰船；不上传用户对局图或原始身份。另有两模式/两阵营重置测试图及 PVP 空交集图，摘要见 [pve-group-map-render-evidence.json](evidence/pve-group-map-render-evidence.json)，它们不是实际玩家局。当前官方路径已切换；停用的旧 OneBot 异步队列仍保留历史公共交集策略。
+
+控制台好友与群聊各 10 个预设保存、重载核验；好友新增选择/草稿/提交/清空入口，原建议/确认仍可直接输入。证据见 [qq-manual-panel.json](evidence/qq-manual-panel.json)。本版真实客户端群图、选择与草稿已请求用户复测，尚未用旧版确认代替。菜单并未穷举自定义重组、照明/烟幕等全部动作，详见 [手动流程与边界](QQ_OFFICIAL.md#手动选择检查与提交)。
+
+运行包 68,218,771 字节，SHA256 `6053b6023f53103b1026d8d8e023008ef0beeec8376e6fa5cc95cabb03b3a5d2`，5 个原始来源均与 HEAD LFS OID 一致。独立 bot、Nginx、旧游戏与大厅服务均 active，13192/8001/4180 对应探针返回 200；未重启旧玩家服务。
+
+### 斜杠预设与详细推进引导（110c4a43，历史快照）
 
 控制台已保存群聊 10 条、好友 8 条斜杠预设，好友底部另有 3 个只读菜单；重载后存在且无未保存改动，见 [qq-command-panel.json](evidence/qq-command-panel.json)。当前控制台显示每场景上限 10 条，不能把历史文档的上限直接当本应用实际能力。用户随后在真实 QQ 私聊中确认「列表和推进提示都有」，实际 `/下一步` 回调与回复计数见 [qq-shortcuts-live.json](evidence/qq-shortcuts-live.json)。此确认不外推为全部预设的全模式终局测试。
 
@@ -91,7 +105,7 @@ GitHub 审查入口为 [validation-summary.json](evidence/validation-summary.jso
 
 后续运行包使用 [build_bot_release.py](../../scripts/build_bot_release.py)。它要求来源为完整文件，以当前仓库 `HEAD` 的 Git LFS OID 校验这 5 项，并输出来源与归档摘要。`--source-root` 可指定已有完整来源的另一仓库根目录；当前源码和结构化数据仍从当前仓库打包。命令见 [README.md](README.md#构建服务器运行包)。
 
-当前官方版 [ibs-bot-runtime.tar.gz](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz) 正向打包验证通过：68,208,712 字节、125 个成员，SHA256 `41bc84f3a592d5d24841abcd6852a05736e3bd9c36cbe7201d6d9590bd8125f9`；包含本轮官方网关、斜杠/阶段引导、绑定与远端启动器，5 个原始来源摘要均匹配，不含私有环境配置或 `.pyc`。逐来源字节数和摘要见 [最终打包收据](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz.json)。这是运行包验证，不合并计为完整 QQ 对局验收。
+当前官方版 [ibs-bot-runtime.tar.gz](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz) 正向打包验证通过：68,218,771 字节、126 个成员，SHA256 `6053b6023f53103b1026d8d8e023008ef0beeec8376e6fa5cc95cabb03b3a5d2`；包含官方网关、手动草稿、斜杠/阶段引导、绑定与远端启动器，5 个原始来源摘要均匹配，不含私有环境配置或 `.pyc`。逐来源字节数和摘要见 [最终打包收据](../../artifacts/bot-20261022/deploy/ibs-bot-runtime.tar.gz.json)。这是运行包验证，不合并计为完整 QQ 对局验收。
 
 [cleanup.json](../../artifacts/bot-20261022/deploy/cleanup.json) 保留服务器空间处理收据：清理 4 份旧 VSCode Server 运行缓存与扩展下载缓存，释放 3,020,009,472 字节，清理后可用 3,689,418,752 字节。当前两份 VSCode Server、用户配置、已安装扩展及项目/对局均列为保留项；该容量是清理时快照，不代表安装镜像后的当前剩余空间。
 

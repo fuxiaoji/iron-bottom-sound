@@ -1085,3 +1085,14 @@
 - 当前运行包68208712字节/125成员、SHA256 `41bc84f3a592d5d24841abcd6852a05736e3bd9c36cbe7201d6d9590bd8125f9`，五原始来源OID匹配。原实群双图通过记录保留；新客户端预设显示等待反馈，其他真人PVP/完整终局/自主LLM对战仍未验，研究及FM02暂停点不动。
 
 - 后续实测确认：用户反馈“列表和推进提示都有”；真实C2C /下一步回复成功，另有自动提交与图片成功标签，正式同局已自然推进到revision2/机动规划。该推进发生在用户实测阶段，不是Root的只读内存烟测。安全后续收据docs/bot/evidence/qq-shortcuts-live.json，日志计数指标签出现次数，不当作不同命令数。原生客户端列表与新帮助不再是待验项。
+
+
+## 2026-10-22：修复PVE群空图与QQ手动草稿（5bc33acc）
+
+- 用户截图证明旧/行动整份嵌套schema超过回复上限，旧舰ID筛选匹配顶层也失效；此前收到PNG/提示不代表能手动操作。PVE群图原取交集导致实际局0船；本批改为唯一人类席位受限观察，标题标明PVE玩家/阵营；PVP仍交集并解释空图。隐藏敌情、未识别姓名、命令与编队计划不由世界真值补入。
+- 功能提交5bc33acc88de7f04560e06eeb8aebb33241d01c9；/行动中文每页6项，可筛舰/编队、翻页；/选择 版本 编号存私有草稿，/草稿分页检查，/清空只清草稿，/提交 版本经原引擎校验。未选动作不代填，同槽替换、重启恢复、版本与跨实例草稿变更保护、重复提交幂等均保留。菜单是代表选项，自定义编队重组/照明/烟幕等仍需JSON或MCP，不声称穷举合法空间。
+- 分工：Root负责service/QQ路由/帮助/部署，qq_guidance代理独占manual_commands与27项相关测试（模型继承，无独立用量）；group_map代理gpt-6.1-sol/high独占public_view与11项新投影测试，并渲染4张PVE/2张PVP重置图。代理不发布、不访问正式凭据、不改规则。原图测试夹具4项失败经frozen HexCoord/换行姓名/重复side修正，无原始XML；不伪造失败收据。
+- 最终同快照289 passed/0 failed/0 skipped，73.462s；实际命令为 .venv/bin/python -m pytest tests/test_bot_manual_commands.py tests/test_bot_manual_qq.py tests/test_bot_group_map_mode.py tests/test_bot_pve_group_view.py tests/test_bot_public_view.py tests/test_bot_qq_guidance.py tests/test_bot_qq_official.py tests/test_bot_qq_shortcuts.py tests/test_bot_official_app.py tests/test_bot_identity_links.py tests/test_bot_service.py tests/test_bot_app.py tests/test_bot_qq_shortcuts_integration.py tests/test_bot_onebot.py --junitxml=artifacts/bot-20261022/manual-group-release.xml -q 。保留旧批次与本轮各定点收据，不相加。
+- 已备份旧源码并部署，10源码摘要匹配；QQ控制台好友10/群10预设保存重载核验，底部3菜单保留。服务器正式库只读备份内存，实际局版本4/炮战、群图8船已视觉核验；模拟平台全链路行动/选择/草稿/提交及重复事件通过，副本4→5、正式行摘要不变。首个烟测脚本同消息ID的时间戳改变被拒，按原事件精确重放后通过。新真实客户端群图与草稿复测已请求，未冒用旧确认。
+- 运行包68218771字节/126成员，SHA256 6053b6023f53103b1026d8d8e023008ef0beeec8376e6fa5cc95cabb03b3a5d2；5原始LFS来源OID匹配。ibs-bot/nginx/tiedi/hall active，三内部探针200；未重启旧玩家服务。安全证据docs/bot/evidence/manual-group-server-smoke.json、qq-manual-panel.json，真实图/截图/身份仅忽略目录。旧OneBot异步投递仍历史交集策略，当前官方不走此队列。
+- Draft PR #1继续；其他实群模式、完整真人PVP/终局与自主LLM对战保持待验。原研究、脏工作树与FM02暂停点保持，无论文阶段推进或付费对战模型请求。
